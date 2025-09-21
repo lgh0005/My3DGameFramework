@@ -20,7 +20,6 @@
 #include <fstream>
 #include <sstream>
 #include <format>
-#include <thread>
 using namespace std;
 
 // SDL
@@ -55,3 +54,18 @@ using namespace FMOD;
 #include <glm/gtc/type_ptr.hpp>
 #pragma comment(lib, "glew/glew32.lib")
 #pragma comment(lib, "opengl32.lib")
+
+// Misc
+#include "Types.h"
+#include "Defines.h"
+#include "Values.h"
+#include "Enums.h"
+
+// Managers
+#include "TimeManager.h"
+#include "InputManager.h"
+#include "RenderManager.h"
+
+#define TIME TimeManager::GetInstance()
+#define INPUT InputManager::GetInstance()
+#define RENDER RenderManager::GetInstance()

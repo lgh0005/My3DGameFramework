@@ -12,6 +12,39 @@
     <Filter Include="소스 파일\99. Headers">
       <UniqueIdentifier>{c7d8f531-7659-4d4a-a731-fdf5717d6be2}</UniqueIdentifier>
     </Filter>
+    <Filter Include="소스 파일\00. Game">
+      <UniqueIdentifier>{08558e24-4c62-4d2b-80ee-4da889dea510}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스 파일\Executable">
+      <UniqueIdentifier>{c70fd9f4-f30e-4ad9-9933-1a6f78bfd643}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스 파일\98. Shaders">
+      <UniqueIdentifier>{b3fdc83b-54cf-4f27-8bd5-c317b53ce137}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스 파일\04. Managers">
+      <UniqueIdentifier>{f7e4ab3e-ade2-4123-913d-7575ac899fdb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스 파일\01. Scene">
+      <UniqueIdentifier>{c0f93d90-5764-4e86-a93d-e7e0f8775483}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스 파일\02. GameObject">
+      <UniqueIdentifier>{e1d428d0-eb45-459d-a67c-2280ca540830}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스 파일\03. Components">
+      <UniqueIdentifier>{a8f53a1b-618f-488e-b2b5-3b9905626cb5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스 파일\05. Resources">
+      <UniqueIdentifier>{d5e6322a-7221-48bd-b896-4aaafd409f88}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스 파일\06. Interfaces">
+      <UniqueIdentifier>{d9b413ed-dce9-46ab-92f9-cb5df5b1b2e2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스 파일\97. Debug">
+      <UniqueIdentifier>{b37db700-0894-40e6-b9b8-576f3c17e289}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스 파일\98. Utils">
+      <UniqueIdentifier>{15c13cf4-7aa8-4efa-b350-159596cfba12}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="pch.cpp">
@@ -20,12 +53,54 @@
     <ClCompile Include="EnginePch.cpp">
       <Filter>소스 파일\99. Headers</Filter>
     </ClCompile>
+    <ClCompile Include="Game.cpp">
+      <Filter>소스 파일\00. Game</Filter>
+    </ClCompile>
+    <ClCompile Include="TimeManager.cpp">
+      <Filter>소스 파일\04. Managers</Filter>
+    </ClCompile>
+    <ClCompile Include="InputManager.cpp">
+      <Filter>소스 파일\04. Managers</Filter>
+    </ClCompile>
+    <ClCompile Include="RenderManager.cpp">
+      <Filter>소스 파일\04. Managers</Filter>
+    </ClCompile>
+    <ClCompile Include="ISingleton.cpp">
+      <Filter>소스 파일\06. Interfaces</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h">
       <Filter>소스 파일\99. Headers</Filter>
     </ClInclude>
     <ClInclude Include="EnginePch.h">
+      <Filter>소스 파일\99. Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="Game.h">
+      <Filter>소스 파일\00. Game</Filter>
+    </ClInclude>
+    <ClInclude Include="InputManager.h">
+      <Filter>소스 파일\04. Managers</Filter>
+    </ClInclude>
+    <ClInclude Include="TimeManager.h">
+      <Filter>소스 파일\04. Managers</Filter>
+    </ClInclude>
+    <ClInclude Include="Types.h">
+      <Filter>소스 파일\99. Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="RenderManager.h">
+      <Filter>소스 파일\04. Managers</Filter>
+    </ClInclude>
+    <ClInclude Include="Defines.h">
+      <Filter>소스 파일\99. Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="ISingleton.h">
+      <Filter>소스 파일\06. Interfaces</Filter>
+    </ClInclude>
+    <ClInclude Include="Values.h">
+      <Filter>소스 파일\99. Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="Enums.h">
       <Filter>소스 파일\99. Headers</Filter>
     </ClInclude>
   </ItemGroup>
