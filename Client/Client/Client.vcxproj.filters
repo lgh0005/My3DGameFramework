@@ -62,6 +62,9 @@
     <ClCompile Include="Rectangle.cpp">
       <Filter>소스 파일\01. Scenes\02. Rectangle</Filter>
     </ClCompile>
+    <ClCompile Include="Pyramid.cpp">
+      <Filter>소스 파일\01. Scenes\03. Pyramid</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h">
@@ -82,12 +85,21 @@
     <ClInclude Include="Rectangle.h">
       <Filter>소스 파일\01. Scenes\02. Rectangle</Filter>
     </ClInclude>
+    <ClInclude Include="Pyramid.h">
+      <Filter>소스 파일\01. Scenes\03. Pyramid</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="shader.frag">
       <Filter>소스 파일\98. Shaders</Filter>
     </None>
     <None Include="shader.vert">
+      <Filter>소스 파일\98. Shaders</Filter>
+    </None>
+    <None Include="shader2.vert">
+      <Filter>소스 파일\98. Shaders</Filter>
+    </None>
+    <None Include="shader2.frag">
       <Filter>소스 파일\98. Shaders</Filter>
     </None>
   </ItemGroup>
