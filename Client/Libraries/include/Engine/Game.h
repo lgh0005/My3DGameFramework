@@ -1,5 +1,7 @@
 #pragma once
 
+class Scene;
+
 class Game
 {
 public:
@@ -8,7 +10,7 @@ public:
 
 public:
 	void Init();
-	void Launch();
+	void Launch(const string& sceneName);
 	void Update();
 
 private:

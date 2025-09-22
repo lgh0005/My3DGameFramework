@@ -14,9 +14,9 @@ public:
 public:
 	virtual void Init() override;
 	virtual void Update() override;
-	void Render();
-	
+
 public:
+	SDL_Window* GetWindow() { return _window; }
 	void SetClearColor(const array<GLclampf, 4>& clearColor);
 
 private:

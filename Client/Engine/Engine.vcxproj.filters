@@ -5,18 +5,11 @@
       <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
       <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
     </Filter>
-    <Filter Include="리소스 파일">
-      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
-      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
-    </Filter>
     <Filter Include="소스 파일\99. Headers">
       <UniqueIdentifier>{c7d8f531-7659-4d4a-a731-fdf5717d6be2}</UniqueIdentifier>
     </Filter>
     <Filter Include="소스 파일\00. Game">
       <UniqueIdentifier>{08558e24-4c62-4d2b-80ee-4da889dea510}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="소스 파일\Executable">
-      <UniqueIdentifier>{c70fd9f4-f30e-4ad9-9933-1a6f78bfd643}</UniqueIdentifier>
     </Filter>
     <Filter Include="소스 파일\98. Shaders">
       <UniqueIdentifier>{b3fdc83b-54cf-4f27-8bd5-c317b53ce137}</UniqueIdentifier>
@@ -68,6 +61,12 @@
     <ClCompile Include="ISingleton.cpp">
       <Filter>소스 파일\06. Interfaces</Filter>
     </ClCompile>
+    <ClCompile Include="Scene.cpp">
+      <Filter>소스 파일\01. Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="SceneManager.cpp">
+      <Filter>소스 파일\04. Managers</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h">
@@ -102,6 +101,12 @@
     </ClInclude>
     <ClInclude Include="Enums.h">
       <Filter>소스 파일\99. Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="Scene.h">
+      <Filter>소스 파일\01. Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="SceneManager.h">
+      <Filter>소스 파일\04. Managers</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

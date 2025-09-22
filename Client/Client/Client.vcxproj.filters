@@ -15,6 +15,27 @@
     <Filter Include="소스 파일\99. Headers">
       <UniqueIdentifier>{5d41b827-5d4e-4d38-baa2-10a58b5caa44}</UniqueIdentifier>
     </Filter>
+    <Filter Include="소스 파일\01. Scenes">
+      <UniqueIdentifier>{18fb3227-1043-4012-8d96-8762b9e4e728}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스 파일\01. Scenes\01. Triangle">
+      <UniqueIdentifier>{1ba843ee-5a92-4d7f-a0e7-e6b9a82ea612}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스 파일\01. Scenes\02. Rectangle">
+      <UniqueIdentifier>{d5e82611-bf4c-427e-ac77-dc45e7753490}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스 파일\01. Scenes\03. Pyramid">
+      <UniqueIdentifier>{f241c455-4d51-4bfa-85de-0348c4b4be7c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스 파일\01. Scenes\04. Camera">
+      <UniqueIdentifier>{59b089f5-b87e-43eb-a44c-7b69e3f1179f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스 파일\01. Scenes\05. Texture">
+      <UniqueIdentifier>{4f194a72-5f88-4391-b387-5e3a457cccae}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스 파일\01. Scenes\00. DeviceInit">
+      <UniqueIdentifier>{5a30b627-5571-4971-8afd-6300964cc72c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="pch.cpp">
@@ -23,6 +44,12 @@
     <ClCompile Include="Game.cpp">
       <Filter>소스 파일\00. Game</Filter>
     </ClCompile>
+    <ClCompile Include="Launcher.cpp">
+      <Filter>소스 파일\00. Game</Filter>
+    </ClCompile>
+    <ClCompile Include="DeviceInit.cpp">
+      <Filter>소스 파일\01. Scenes\00. DeviceInit</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h">
@@ -30,6 +57,12 @@
     </ClInclude>
     <ClInclude Include="Game.h">
       <Filter>소스 파일\00. Game</Filter>
+    </ClInclude>
+    <ClInclude Include="Launcher.h">
+      <Filter>소스 파일\00. Game</Filter>
+    </ClInclude>
+    <ClInclude Include="DeviceInit.h">
+      <Filter>소스 파일\01. Scenes\00. DeviceInit</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

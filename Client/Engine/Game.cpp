@@ -13,11 +13,14 @@ void Game::Init()
 
 	// Init Managers
 	RENDER.Init();
-    RENDER.SetClearColor({ 0.2f, 0.0f, 0.0f, 1.0f });
+    RENDER.SetClearColor({ 0.0f, 0.0f, 0.0f, 0.0f });
 }
 
-void Game::Launch()
+void Game::Launch(const string& sceneName)
 {
+    // Load first scene
+    SCENE.LoadScene(sceneName);
+
     // Event Looping
     while (_running)
     {
@@ -37,13 +40,14 @@ void Game::Launch()
         // Update Logic
         Update();
 
-        // Render game
-        RENDER.Render();
+        //// Render game
+        //RENDER.Render();
     }
 }
 
 void Game::Update()
 {
     // Update Managers
+    SCENE.Update();
     INPUT.Update();
 }

@@ -47,17 +47,6 @@ void RenderManager::Update()
 
 }
 
-void RenderManager::Render()
-{
-    // Clear screen
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-    // --- 앞으로 여기서 그리기 코드 들어갈 예정 ---
-
-    // Swap buffers
-    SDL_GL_SwapWindow(_window);
-}
-
 void RenderManager::SetClearColor(const array<GLclampf, 4>& clearColor)
 {
     _clearColor = clearColor;
