@@ -67,6 +67,9 @@
     <ClCompile Include="SceneManager.cpp">
       <Filter>소스 파일\04. Managers</Filter>
     </ClCompile>
+    <ClCompile Include="TempCamera.cpp">
+      <Filter>소스 파일\03. Components</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h">
@@ -107,6 +110,9 @@
     </ClInclude>
     <ClInclude Include="SceneManager.h">
       <Filter>소스 파일\04. Managers</Filter>
+    </ClInclude>
+    <ClInclude Include="TempCamera.h">
+      <Filter>소스 파일\03. Components</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

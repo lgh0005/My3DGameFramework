@@ -68,6 +68,9 @@
     <ClCompile Include="Texture.cpp">
       <Filter>소스 파일\01. Scenes\04. Texture</Filter>
     </ClCompile>
+    <ClCompile Include="CameraTest.cpp">
+      <Filter>소스 파일\01. Scenes\05. Camera</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h">
@@ -93,6 +96,9 @@
     </ClInclude>
     <ClInclude Include="Texture.h">
       <Filter>소스 파일\01. Scenes\04. Texture</Filter>
+    </ClInclude>
+    <ClInclude Include="CameraTest.h">
+      <Filter>소스 파일\01. Scenes\05. Camera</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

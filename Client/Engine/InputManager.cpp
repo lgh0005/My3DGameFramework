@@ -23,6 +23,7 @@ void InputManager::Update()
 		else if (state == InputState::Up) state = InputState::None;
 	}
 
+	_mouseDelta = glm::vec2(0.f, 0.f);
 	_mouseWheel = 0;
 }
 
@@ -80,6 +81,7 @@ void InputManager::GetEvent(const SDL_Event& e)
 		}
 		case SDL_MOUSEMOTION:
 		{
+			_mouseDelta += glm::vec2(e.motion.xrel, e.motion.yrel);
 			_mousePosition = glm::vec2(e.motion.x, e.motion.y);
 			break;
 		}

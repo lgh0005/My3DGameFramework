@@ -132,6 +132,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="CameraTest.h" />
     <ClInclude Include="DeviceInit.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="Launcher.h" />
@@ -142,6 +143,7 @@
     <ClInclude Include="Triangle.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="CameraTest.cpp" />
     <ClCompile Include="DeviceInit.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="Launcher.cpp" />

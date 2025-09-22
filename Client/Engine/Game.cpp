@@ -33,6 +33,13 @@ void Game::Launch(const string& sceneName)
             if (_event.type == SDL_QUIT)
                 _running = false;
 
+            // ESC 키로 종료
+            if (_event.type == SDL_KEYDOWN)
+            {
+                if (_event.key.keysym.sym == SDLK_ESCAPE)
+                    _running = false;
+            }
+
             // Input event polling
             INPUT.GetEvent(_event);
         }

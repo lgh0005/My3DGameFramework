@@ -35,6 +35,7 @@ public:
 	bool MouseClick(Inputs::Mouse button) { return InputState::Down == GetMouseState(button); }
 	bool MouseUp(Inputs::Mouse button) { return InputState::Up == GetMouseState(button); }
 	int8 GetMouseWheel() const { return _mouseWheel; }
+	glm::vec2 GetMouseDelta() const { return _mouseDelta; }
 
 private:
 	InputState GetKeyState(Inputs::Key key) { return _keyboardState[static_cast<uint16>(key)]; }
@@ -48,6 +49,7 @@ private:
 	array<InputState, Inputs::MOUSE_COUNT> _mouseState{};
 
 	glm::vec2 _mousePosition;
+	glm::vec2 _mouseDelta;
 	int8 _mouseWheel = 0;
 };
 

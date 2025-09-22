@@ -26,6 +26,10 @@ void RenderManager::Init()
     // Get window buffer information
     SDL_GL_GetDrawableSize(_window, &_bufferWidth, &_bufferHeight);
 
+    // Fix mouse cursor to window
+    SDL_ShowCursor(SDL_DISABLE); 
+    SDL_SetRelativeMouseMode(SDL_TRUE);
+
     // Create OpenGL context
     _glContext = SDL_GL_CreateContext(_window);
     SDL_GL_MakeCurrent(_window, _glContext);
