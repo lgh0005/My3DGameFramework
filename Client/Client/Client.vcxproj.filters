@@ -27,12 +27,6 @@
     <Filter Include="소스 파일\01. Scenes\03. Pyramid">
       <UniqueIdentifier>{f241c455-4d51-4bfa-85de-0348c4b4be7c}</UniqueIdentifier>
     </Filter>
-    <Filter Include="소스 파일\01. Scenes\04. Camera">
-      <UniqueIdentifier>{59b089f5-b87e-43eb-a44c-7b69e3f1179f}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="소스 파일\01. Scenes\05. Texture">
-      <UniqueIdentifier>{4f194a72-5f88-4391-b387-5e3a457cccae}</UniqueIdentifier>
-    </Filter>
     <Filter Include="소스 파일\01. Scenes\00. DeviceInit">
       <UniqueIdentifier>{5a30b627-5571-4971-8afd-6300964cc72c}</UniqueIdentifier>
     </Filter>
@@ -41,6 +35,12 @@
     </Filter>
     <Filter Include="소스 파일\98. Shaders">
       <UniqueIdentifier>{96222445-0bd9-4068-8d09-0e699df541a9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스 파일\01. Scenes\04. Texture">
+      <UniqueIdentifier>{4f194a72-5f88-4391-b387-5e3a457cccae}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스 파일\01. Scenes\05. Camera">
+      <UniqueIdentifier>{76ebdfa3-72d3-4e5f-90f8-d324890068fe}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -65,6 +65,9 @@
     <ClCompile Include="Pyramid.cpp">
       <Filter>소스 파일\01. Scenes\03. Pyramid</Filter>
     </ClCompile>
+    <ClCompile Include="Texture.cpp">
+      <Filter>소스 파일\01. Scenes\04. Texture</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h">
@@ -88,6 +91,9 @@
     <ClInclude Include="Pyramid.h">
       <Filter>소스 파일\01. Scenes\03. Pyramid</Filter>
     </ClInclude>
+    <ClInclude Include="Texture.h">
+      <Filter>소스 파일\01. Scenes\04. Texture</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="shader.frag">
@@ -100,6 +106,12 @@
       <Filter>소스 파일\98. Shaders</Filter>
     </None>
     <None Include="shader2.frag">
+      <Filter>소스 파일\98. Shaders</Filter>
+    </None>
+    <None Include="shader3.vert">
+      <Filter>소스 파일\98. Shaders</Filter>
+    </None>
+    <None Include="shader3.frag">
       <Filter>소스 파일\98. Shaders</Filter>
     </None>
   </ItemGroup>

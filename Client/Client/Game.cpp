@@ -9,12 +9,13 @@ int SDL_main(int, char**)
 		make_shared<DeviceInit>("DeviceInit"),
 		make_shared<Triangle>("Triangle"),
 		make_shared<Rectangle>("Rectangle"),
-		make_shared<Pyramid>("Pyramid")
+		make_shared<Pyramid>("Pyramid"),
+		make_shared<Texture>("Texture")
 	};
 
 	// Run game application
 	LAUNCH->AddScenes(SCENES);
-	LAUNCH->Run("Pyramid");
+	LAUNCH->Run("Texture");
 
 	return 0;
 }

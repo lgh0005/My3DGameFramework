@@ -41,6 +41,9 @@ void RenderManager::Init()
     // Enable alpha blending for font/text rendering
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+    // Enable Depth
+    glEnable(GL_DEPTH_TEST);
 }
 
 void RenderManager::Update()

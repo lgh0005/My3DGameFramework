@@ -138,6 +138,7 @@
     <ClInclude Include="pch.h" />
     <ClInclude Include="Pyramid.h" />
     <ClInclude Include="Rectangle.h" />
+    <ClInclude Include="Texture.h" />
     <ClInclude Include="Triangle.h" />
   </ItemGroup>
   <ItemGroup>
@@ -149,6 +150,7 @@
     </ClCompile>
     <ClCompile Include="Pyramid.cpp" />
     <ClCompile Include="Rectangle.cpp" />
+    <ClCompile Include="Texture.cpp" />
     <ClCompile Include="Triangle.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -156,6 +158,8 @@
     <None Include="shader.vert" />
     <None Include="shader2.frag" />
     <None Include="shader2.vert" />
+    <None Include="shader3.frag" />
+    <None Include="shader3.vert" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
