@@ -32,6 +32,7 @@ void RenderManager::Init()
 
     // Enable modern OpenGL extensions and initialize GLEW
     glewExperimental = GL_TRUE;
+    glewInit();
 
     // Create Viewport
     glViewport(0, 0, _bufferWidth, _bufferHeight);
