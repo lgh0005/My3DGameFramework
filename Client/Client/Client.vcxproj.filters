@@ -36,8 +36,11 @@
     <Filter Include="소스 파일\01. Scenes\00. DeviceInit">
       <UniqueIdentifier>{5a30b627-5571-4971-8afd-6300964cc72c}</UniqueIdentifier>
     </Filter>
-    <Filter Include="소스 파일\01. Scenes\01. Triangle\shader">
-      <UniqueIdentifier>{391bff96-7cd2-4876-a113-4444361b9562}</UniqueIdentifier>
+    <Filter Include="소스 파일\01. Scenes\02. Rectangle\shader">
+      <UniqueIdentifier>{a1d4af00-5e63-42df-a73d-79b2e2322954}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스 파일\98. Shaders">
+      <UniqueIdentifier>{96222445-0bd9-4068-8d09-0e699df541a9}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -56,6 +59,9 @@
     <ClCompile Include="Triangle.cpp">
       <Filter>소스 파일\01. Scenes\01. Triangle</Filter>
     </ClCompile>
+    <ClCompile Include="Rectangle.cpp">
+      <Filter>소스 파일\01. Scenes\02. Rectangle</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h">
@@ -73,13 +79,16 @@
     <ClInclude Include="Triangle.h">
       <Filter>소스 파일\01. Scenes\01. Triangle</Filter>
     </ClInclude>
+    <ClInclude Include="Rectangle.h">
+      <Filter>소스 파일\01. Scenes\02. Rectangle</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="shader.vert">
-      <Filter>소스 파일\01. Scenes\01. Triangle\shader</Filter>
-    </None>
     <None Include="shader.frag">
-      <Filter>소스 파일\01. Scenes\01. Triangle\shader</Filter>
+      <Filter>소스 파일\98. Shaders</Filter>
+    </None>
+    <None Include="shader.vert">
+      <Filter>소스 파일\98. Shaders</Filter>
     </None>
   </ItemGroup>
 </Project>

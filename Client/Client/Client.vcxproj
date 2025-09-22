@@ -136,6 +136,7 @@
     <ClInclude Include="Game.h" />
     <ClInclude Include="Launcher.h" />
     <ClInclude Include="pch.h" />
+    <ClInclude Include="Rectangle.h" />
     <ClInclude Include="Triangle.h" />
   </ItemGroup>
   <ItemGroup>
@@ -145,6 +146,7 @@
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="Rectangle.cpp" />
     <ClCompile Include="Triangle.cpp" />
   </ItemGroup>
   <ItemGroup>

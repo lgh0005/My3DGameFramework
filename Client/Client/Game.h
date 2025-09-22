@@ -5,3 +5,4 @@
 =====================*/
 #include "DeviceInit.h"
 #include "Triangle.h"
+#include "Rectangle.h"

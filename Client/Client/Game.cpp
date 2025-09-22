@@ -8,11 +8,12 @@ int SDL_main(int, char**)
 	{
 		make_shared<DeviceInit>("DeviceInit"),
 		make_shared<Triangle>("Triangle"),
+		make_shared<Rectangle>("Rectangle")
 	};
 
 	// Run game application
 	LAUNCH->AddScenes(SCENES);
-	LAUNCH->Run("Triangle");
+	LAUNCH->Run("Rectangle");
 
 	return 0;
 }
