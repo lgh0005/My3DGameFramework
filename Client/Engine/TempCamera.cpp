@@ -33,10 +33,14 @@ void TempCamera::Update()
 void TempCamera::KeyControl()
 {
     float moveSpeed = _speed * TIME.deltaTime;
-    if (INPUT.GetKey(Inputs::Key::W)) _position += _front * moveSpeed;
-    if (INPUT.GetKey(Inputs::Key::S)) _position -= _front * moveSpeed;
-    if (INPUT.GetKey(Inputs::Key::A)) _position -= _right * moveSpeed;
-    if (INPUT.GetKey(Inputs::Key::D)) _position += _right * moveSpeed;
+
+    glm::vec3 forward = glm::normalize(glm::vec3(_front.x, 0.0f, _front.z));
+    glm::vec3 right = glm::normalize(glm::cross(forward, _worldUp));
+
+    if (INPUT.GetKey(Inputs::Key::W)) _position += forward * moveSpeed;
+    if (INPUT.GetKey(Inputs::Key::S)) _position -= forward * moveSpeed;
+    if (INPUT.GetKey(Inputs::Key::A)) _position -= right * moveSpeed;
+    if (INPUT.GetKey(Inputs::Key::D)) _position += right * moveSpeed;
 }
 
 void TempCamera::MouseControl()
