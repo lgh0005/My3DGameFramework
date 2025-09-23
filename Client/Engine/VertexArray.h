@@ -14,6 +14,7 @@ public:
 	void SetIndexBuffer(const shared_ptr<IndexBuffer>& ibo);
 	void Bind() const { glBindVertexArray(_vao); }
 	void Unbind() const { glBindVertexArray(0); }
+	GLuint GetVAO() { return _vao; }
 
 private:
 	GLuint _vao;
