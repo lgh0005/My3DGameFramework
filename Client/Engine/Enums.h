@@ -52,3 +52,15 @@ namespace Inputs
     // constants
     constexpr int32 MOUSE_COUNT = static_cast<int32>(Mouse::END);
 }
+
+namespace Resources
+{
+    enum class ResourceType : int8
+    {
+        Unknown = -1,
+        Mesh,
+        END
+    };
+
+    constexpr int8 RESOURCE_TYPE_COUNT = static_cast<int8>(ResourceType::END);
+}

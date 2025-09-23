@@ -1,6 +1,12 @@
 #pragma once
 #include "Engine\Scene.h"
 
+class VertexArray;
+class VertexBuffer;
+class IndexBuffer;
+class Shader;
+struct Pass;
+
 class Rectangle : public Scene
 {
 	using Super = Scene;
@@ -17,18 +23,10 @@ private:
 	void CreateRectangle();
 
 private:
-	string ReadFile(const string& filePath);
-	void AddShader(const string& shaderCode, GLenum shaderType);
-	void CompileShader();
-
-private:
-	GLuint _vao;
-	GLuint _ibo;
-	GLuint _vbo;
-	GLuint _shader;
-
-private:
-	string VertexShaderFilePath = "shader.vert";
-	string FragmentShaderFilePath = "shader.frag";
+	shared_ptr<VertexArray> _vao;
+	shared_ptr<VertexBuffer> _vbo;
+	shared_ptr<IndexBuffer> _ibo;
+	shared_ptr<Shader> _shader;
+	shared_ptr<Pass> _pass;
 };
 

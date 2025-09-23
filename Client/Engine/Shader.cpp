@@ -7,9 +7,10 @@ Shader::Shader(const string& vertPath, const string& fragPath)
 	CompileShader();
 }
 
-void Shader::AddUniform(const string& uniformName)
+void Shader::AddUniform(const string& uniformName, const UniformValue& value)
 {
 	_uniformLocation[uniformName] = glGetUniformLocation(_shader, uniformName.c_str());
+	_uniformMap[uniformName] = value;
 }
 
 GLuint Shader::GetUniformLocation(const string& uniformName)
@@ -17,6 +18,14 @@ GLuint Shader::GetUniformLocation(const string& uniformName)
 	auto it = _uniformLocation.find(uniformName);
 	if (it != _uniformLocation.end()) return it->second;
 	return -1;
+}
+
+void Shader::ApplyUniforms()
+{
+	for (auto& [name, value] : _uniformMap)
+	{
+		visit([&](auto&& v) { SetUniform(name, v); }, value);
+	}
 }
 
 string Shader::ReadFile(const string& filePath)

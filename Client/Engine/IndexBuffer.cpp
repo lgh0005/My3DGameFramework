@@ -11,7 +11,7 @@ IndexBuffer::~IndexBuffer()
 	glDeleteBuffers(1, &_ibo);
 }
 
-void IndexBuffer::Create(vector<uint32>& indices)
+void IndexBuffer::Create(const vector<uint32>& indices)
 {
 	_count = static_cast<GLuint>(indices.size());
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _ibo);

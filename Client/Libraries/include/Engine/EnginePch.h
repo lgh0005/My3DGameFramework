@@ -17,6 +17,7 @@
 #include <functional>
 #include <concepts>
 #include <type_traits>
+#include <variant>
 #include <fstream>
 #include <sstream>
 #include <format>
@@ -37,7 +38,6 @@ using namespace std;
 #include <Fmod/fmod_common.h>
 #include <Fmod/fmod_codec.h>
 #include <Fmod/fmod_errors.h>
-using namespace FMOD;
 
 #ifdef _DEBUG
 #pragma comment(lib, "Fmod/Debug/fmodL_vc.lib")

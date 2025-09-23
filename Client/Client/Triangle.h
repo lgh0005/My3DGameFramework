@@ -3,6 +3,7 @@
 
 class VertexArray;
 class VertexBuffer;
+class IndexBuffer;
 class Shader;
 struct Pass;
 
@@ -24,6 +25,7 @@ private:
 private:
 	shared_ptr<VertexArray> _vao;
 	shared_ptr<VertexBuffer> _vbo;
+	shared_ptr<IndexBuffer> _ibo;
 	shared_ptr<Shader> _shader;
 	shared_ptr<Pass> _pass;
 };

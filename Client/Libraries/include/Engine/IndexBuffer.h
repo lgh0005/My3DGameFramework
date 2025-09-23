@@ -7,7 +7,7 @@ public:
 	~IndexBuffer();
 
 public:
-	void Create(vector<uint32>& indices);
+	void Create(const vector<uint32>& indices);
 	void Bind() const { glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _ibo); }
 	void Unbind() const { glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0); }
 	GLuint GetCount() const { return _count; }
