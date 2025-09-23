@@ -33,14 +33,14 @@
     <Filter Include="소스 파일\01. Scenes\02. Rectangle\shader">
       <UniqueIdentifier>{a1d4af00-5e63-42df-a73d-79b2e2322954}</UniqueIdentifier>
     </Filter>
-    <Filter Include="소스 파일\98. Shaders">
-      <UniqueIdentifier>{96222445-0bd9-4068-8d09-0e699df541a9}</UniqueIdentifier>
-    </Filter>
     <Filter Include="소스 파일\01. Scenes\04. Texture">
       <UniqueIdentifier>{4f194a72-5f88-4391-b387-5e3a457cccae}</UniqueIdentifier>
     </Filter>
     <Filter Include="소스 파일\01. Scenes\05. Camera">
       <UniqueIdentifier>{76ebdfa3-72d3-4e5f-90f8-d324890068fe}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스 파일\98. glsl">
+      <UniqueIdentifier>{96222445-0bd9-4068-8d09-0e699df541a9}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -103,22 +103,22 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="shader.frag">
-      <Filter>소스 파일\98. Shaders</Filter>
+      <Filter>소스 파일\98. glsl</Filter>
     </None>
     <None Include="shader.vert">
-      <Filter>소스 파일\98. Shaders</Filter>
+      <Filter>소스 파일\98. glsl</Filter>
     </None>
     <None Include="shader2.vert">
-      <Filter>소스 파일\98. Shaders</Filter>
+      <Filter>소스 파일\98. glsl</Filter>
     </None>
     <None Include="shader2.frag">
-      <Filter>소스 파일\98. Shaders</Filter>
+      <Filter>소스 파일\98. glsl</Filter>
     </None>
     <None Include="shader3.vert">
-      <Filter>소스 파일\98. Shaders</Filter>
+      <Filter>소스 파일\98. glsl</Filter>
     </None>
     <None Include="shader3.frag">
-      <Filter>소스 파일\98. Shaders</Filter>
+      <Filter>소스 파일\98. glsl</Filter>
     </None>
   </ItemGroup>
 </Project>

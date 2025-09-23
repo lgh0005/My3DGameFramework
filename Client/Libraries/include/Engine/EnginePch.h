@@ -55,6 +55,15 @@ using namespace FMOD;
 #pragma comment(lib, "glew/glew32.lib")
 #pragma comment(lib, "opengl32.lib")
 
+// Assimp
+#include <assimp/Importer.hpp>
+#include <assimp/scene.h>
+#include <assimp/postprocess.h>
+#pragma comment(lib, "assimp/assimp-vc143-mt.lib")
+
+// tinyxml2
+#include "tinyxml2/tinyxml2.h"
+
 // Misc
 #include "Types.h"
 #include "Defines.h"
@@ -62,11 +71,13 @@ using namespace FMOD;
 #include "Enums.h"
 
 // Managers
+#include "Graphics.h"
 #include "TimeManager.h"
 #include "InputManager.h"
 #include "RenderManager.h"
 #include "SceneManager.h"
 
+#define GRAPHICS Graphics::GetInstance()
 #define TIME TimeManager::GetInstance()
 #define INPUT InputManager::GetInstance()
 #define RENDER RenderManager::GetInstance()

@@ -8,7 +8,7 @@ Scene::Scene(const string& name) : _name(name)
 
 void Scene::Init()
 {
-	_window = RENDER.GetWindow();
+	_window = GRAPHICS.GetWindow();
 }
 
 void Scene::Update()

@@ -126,6 +126,7 @@
       <Command>xcopy /Y "$(SolutionDir)Libraries\lib\Fmod\Debug\*.dll" "$(SolutionDir)Binaries\"
 xcopy /Y "$(SolutionDir)Libraries\lib\SDL\*.dll" "$(SolutionDir)Binaries\"
 xcopy /Y "$(SolutionDir)Libraries\lib\glew\*.dll" "$(SolutionDir)Binaries\"
+xcopy /Y "$(SolutionDir)Libraries\lib\assimp\*.dll" "$(SolutionDir)Binaries\"
 
 xcopy /Y "$(SolutionDir)Engine\*.h" "$(SolutionDir)Libraries\include\Engine"</Command>
     </PreBuildEvent>
@@ -152,22 +153,33 @@ xcopy /Y "$(SolutionDir)Engine\*.h" "$(SolutionDir)Libraries\include\Engine"</Co
     <ClInclude Include="EnginePch.h" />
     <ClInclude Include="Enums.h" />
     <ClInclude Include="Game.h" />
+    <ClInclude Include="Graphics.h" />
+    <ClInclude Include="IndexBuffer.h" />
     <ClInclude Include="InputManager.h" />
     <ClInclude Include="ISingleton.h" />
+    <ClInclude Include="Pass.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="RenderManager.h" />
     <ClInclude Include="Scene.h" />
     <ClInclude Include="SceneManager.h" />
+    <ClInclude Include="Shader.h" />
     <ClInclude Include="TempCamera.h" />
     <ClInclude Include="TimeManager.h" />
     <ClInclude Include="Types.h" />
+    <ClInclude Include="UniformBuffer.h" />
     <ClInclude Include="Values.h" />
+    <ClInclude Include="VertexArray.h" />
+    <ClInclude Include="VertexBuffer.h" />
+    <ClInclude Include="VertexData.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="EnginePch.cpp" />
     <ClCompile Include="Game.cpp" />
+    <ClCompile Include="Graphics.cpp" />
+    <ClCompile Include="IndexBuffer.cpp" />
     <ClCompile Include="InputManager.cpp" />
     <ClCompile Include="ISingleton.cpp" />
+    <ClCompile Include="Pass.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
@@ -177,8 +189,13 @@ xcopy /Y "$(SolutionDir)Engine\*.h" "$(SolutionDir)Libraries\include\Engine"</Co
     <ClCompile Include="RenderManager.cpp" />
     <ClCompile Include="Scene.cpp" />
     <ClCompile Include="SceneManager.cpp" />
+    <ClCompile Include="Shader.cpp" />
     <ClCompile Include="TempCamera.cpp" />
     <ClCompile Include="TimeManager.cpp" />
+    <ClCompile Include="UniformBuffer.cpp" />
+    <ClCompile Include="VertexArray.cpp" />
+    <ClCompile Include="VertexBuffer.cpp" />
+    <ClCompile Include="VertexData.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

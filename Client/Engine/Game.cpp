@@ -12,8 +12,8 @@ void Game::Init()
 	TTF_Init();
 
 	// Init Managers
-	RENDER.Init();
-    RENDER.SetClearColor({ 0.0f, 0.0f, 0.0f, 0.0f });
+	GRAPHICS.Init();
+    GRAPHICS.SetClearColor({ 0.0f, 0.0f, 0.0f, 0.0f });
 }
 
 void Game::Launch(const string& sceneName)
@@ -47,8 +47,7 @@ void Game::Launch(const string& sceneName)
         // Update Logic
         Update();
 
-        //// Render game
-        //RENDER.Render();
+        // TODO : Render Logics
     }
 }
 
