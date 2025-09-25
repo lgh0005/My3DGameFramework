@@ -130,7 +130,13 @@ void Mesh::CreateSphere()
             v.position.x = radius * sinf(phi) * cosf(theta);
             v.position.y = radius * cosf(phi);
             v.position.z = radius * sinf(phi) * sinf(theta);
-            v.color = { 1,1,1,1 }; // 단순 흰색
+            
+            // Y값을 0~1로 정규화
+            float t = (v.position.y / radius + 1.0f) * 0.5f;
+
+            // 위는 빨강(1,0,0), 아래는 파랑(0,0,1)
+            v.color = { 1.0f * t, 0.0f, 1.0f - t, 1.0f };
+
             vertices.push_back(v);
         }
     }

@@ -24,9 +24,10 @@ private:
 	glm::mat4 _projection;
 
 private:
-	glm::vec3 _position;   // 카메라의 World 좌표상의 위치
-	glm::vec3 _front;      // 카메라 좌표계 상의 _front 벡터
+	glm::vec3 _position;    // 카메라의 World 좌표상의 위치
+	glm::quat _orientation; // 쿼터니언 회전 저장
 
+	glm::vec3 _front;      // 카메라 좌표계 상의 _front 벡터
 	glm::vec3 _up;         // 카메라 좌표계 상의 _up 벡터
 	glm::vec3 _right;      // 카메라 좌표계 상의 _right 벡터
 	glm::vec3 _worldUp;    // 카메라가 있는 World 좌표상의 Up 벡터.

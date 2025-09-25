@@ -16,7 +16,7 @@ int SDL_main(int, char**)
 
 	// Run game application
 	LAUNCH->AddScenes(SCENES);
-	LAUNCH->Run("Pyramid");
+	LAUNCH->Run("CameraTest");
 
 	return 0;
 }

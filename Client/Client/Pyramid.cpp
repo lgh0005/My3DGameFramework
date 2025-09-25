@@ -19,7 +19,7 @@ void Pyramid::Init()
 	
 	// Create Pyramid Model
 	_pyramid = make_shared<Mesh>("Pyramid");
-	_pyramid->CreatePyramid();
+	_pyramid->CreateSphere();
 
 	// Shader
 	_shader = std::make_shared<Shader>("shader2.vert", "shader2.frag");
