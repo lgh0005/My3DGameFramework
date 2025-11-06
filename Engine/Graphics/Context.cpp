@@ -43,8 +43,12 @@ bool Context::Init()
     if (!image)  return false;
     SPDLOG_INFO("image: {}x{}, {} channels", image->GetWidth(), image->GetHeight(), image->GetChannelCount());
 
-    // 이미지로부터 텍스쳐를 생성
+    // 이미지로부터 텍스쳐를 생성 및 바인딩
     m_texture = Texture::CreateFromImage(image.get());
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, m_texture->Get());
+    auto texLoc = glGetUniformLocation(m_program->Get(), "tex");
+    glUniform1i(texLoc, 0);
 
     // 사각형 그리기
     {
@@ -68,8 +72,26 @@ bool Context::Init()
         m_vertexLayout->SetAttrib(2, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 8, 6 * sizeof(float));
         m_indexBuffer = Buffer::CreateWithData(GL_ELEMENT_ARRAY_BUFFER, GL_STATIC_DRAW, indices, sizeof(uint32) * 6);
 
-        auto texLoc = glGetUniformLocation(m_program->Get(), "tex");
-        glUniform1i(texLoc, 0);
+        // TEMP : Transform
+        m_program->Use();
+        auto transform = glm::mat4(1.0f);
+        auto transformloc = glGetUniformLocation(m_program->Get(), "transform");
+
+        glm::vec3 scale(1.0f, 1.0f, 1.0f);
+        auto S = glm::scale(glm::mat4(1.0f), scale);
+
+        // Rotation (예: Z축 기준 45도 회전)
+        float angle = glm::radians(45.0f);
+        auto R = glm::rotate(glm::mat4(1.0f), angle, glm::vec3(0.0f, 0.0f, 1.0f));
+
+        // Translation
+        glm::vec3 pos(0.5f, 0.5f, 0.0f);
+        auto T = glm::translate(glm::mat4(1.0f), pos);
+
+        // SRT 결합 (T * R * S 순서 중요)
+        transform = T * R * S;
+
+        glUniformMatrix4fv(transformloc, 1, GL_FALSE, glm::value_ptr(transform));
     }
 
     return true;

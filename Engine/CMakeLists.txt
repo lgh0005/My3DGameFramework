@@ -42,5 +42,5 @@ target_link_libraries(Engine PUBLIC
 target_compile_definitions(Engine PUBLIC
     WINDOW_WIDTH=1200
     WINDOW_HEIGHT=800
-    WINDOW_NAME="My2DGameFramework"
+    WINDOW_NAME="My3DGameFramework"
 )
