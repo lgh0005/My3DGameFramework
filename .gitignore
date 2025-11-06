@@ -1,0 +1,33 @@
+##################################################
+# Visual Studio & C++
+##################################################
+
+# Visual Studio 2022 workspace settings
+/.vs/
+
+# Build output directory
+/out/
+
+# General build outputs
+*.exe
+*.dll
+*.lib
+*.pdb
+*.obj
+*.obj*
+*.ilk
+*.pch
+*.suo
+*.user
+*.log
+
+# CMake cache and internal files
+CMakeCache.txt
+CMakeFiles/
+CMakeUserPresets.json
+
+##################################################
+# OS Generated files
+##################################################
+.DS_Store
+Thumbs.db

@@ -1,0 +1,17 @@
+{
+    "$schema": "https://raw.githubusercontent.com/microsoft/vcpkg/master/scripts/vcpkg.schema.json",
+    "name": "my-3d-game-framework",
+    "version": "0.1.0",
+    "dependencies": [
+      "fmt",
+      "glad",
+      "glfw3",
+      "glm",
+      "spdlog",
+      "stb",
+      {
+        "name": "imgui",
+        "features": [ "glfw-binding", "opengl3-binding" ]
+      }
+    ]
+}
