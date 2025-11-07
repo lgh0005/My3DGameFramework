@@ -39,6 +39,9 @@ bool Program::Link(const std::vector<ShaderPtr>& shaders)
     return true;
 }
 
+/*=============================//
+//   uniform variable setters  //
+//=============================*/
 void Program::SetUniform(const std::string& name, int value) const 
 {
     auto loc = glGetUniformLocation(m_program, name.c_str());
