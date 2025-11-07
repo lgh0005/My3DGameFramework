@@ -5,6 +5,8 @@ CLASS_PTR(Program)
 CLASS_PTR(Buffer)
 CLASS_PTR(VertexLayout)
 CLASS_PTR(Texture)
+CLASS_PTR(Transform)
+CLASS_PTR(Camera)
 #pragma endregion
 
 CLASS_PTR(Context)
@@ -27,4 +29,8 @@ private:
     VertexLayoutUPtr m_vertexLayout;
     BufferUPtr m_vertexBuffer;
     BufferUPtr m_indexBuffer;
+    TransformUPtr m_cubeTransform;
+
+    CameraUPtr m_camera;
+
 };

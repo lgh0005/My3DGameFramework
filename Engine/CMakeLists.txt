@@ -20,6 +20,8 @@ add_library(Engine STATIC
    "Graphics/Image.h"        "Graphics/Image.cpp"
    "Graphics/Texture.h"      "Graphics/Texture.cpp" 
 
+   "Components/Camera.h"     "Components/Camera.cpp"
+   "Components/Transform.h"  "Components/Transform.cpp"
 )
 
 # 2. [PCH 설정] EnginePCH.h를 PCH로 사용합니다.
