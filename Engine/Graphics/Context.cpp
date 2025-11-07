@@ -23,15 +23,25 @@ void Context::Render()
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glEnable(GL_DEPTH_TEST);
 
-    m_cubeTransform->SetRotation(glm::vec3(1.0f, 0.5f, 0.0f),
+    m_cubeTransform1->SetRotation(glm::vec3(1.0f, 2.0f, 0.0f),
+        glm::radians((float)glfwGetTime() * 120.0f));
+
+    m_cubeTransform2->SetRotation(glm::vec3(2.0f, 4.0f, 0.0f),
         glm::radians((float)glfwGetTime() * 120.0f));
 
     auto projection = m_camera->GetProjectionMatrix();
     auto view = m_camera->GetViewMatrix();
-    auto model = m_cubeTransform->GetModelMatrix();
-    auto transform = projection * view * model;
-    m_program->SetUniform("transform", transform);
 
+    // 큐브 #1
+    auto cubeModel1 = m_cubeTransform1->GetModelMatrix();
+    auto transform1 = projection * view * cubeModel1;
+    m_program->SetUniform("transform", transform1);
+    glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
+
+    // 큐브 #2
+    auto cubeModel2 = m_cubeTransform2->GetModelMatrix();
+    auto transform2 = projection * view * cubeModel2;
+    m_program->SetUniform("transform", transform2);
     glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
 }
 
@@ -120,19 +130,88 @@ bool Context::Init()
     m_program->SetUniform("tex", 0);
     m_program->SetUniform("tex2", 1);
 
-    // Transform 행렬
-    //// 일반적인 변환 : 0.5배 축소후 z축으로 90도 회전하는 행렬
-    //auto transform = glm::rotate(
-    //    glm::scale(glm::mat4(1.0f), glm::vec3(0.5f)),
-    //    glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f)
-    //);
+    m_cubeTransform1 = Transform::Create();
 
-    m_cubeTransform = Transform::Create();
+    m_cubeTransform2 = Transform::Create();
+    m_cubeTransform2->SetPosition(glm::vec3(2.0f, 2.0f, 0.0f));
 
     m_camera = Camera::Create();
-    m_camera->GetTransform().SetPosition(glm::vec3(0.0f, 0.0f, 3.0f));
+    m_camera->GetTransform().SetPosition(glm::vec3(0.0f, 0.0f, 5.0f));
     m_camera->SetProjection(45.0f, (float)WINDOW_WIDTH / (float)WINDOW_HEIGHT,
-        0.01f, 10.0f);
+        0.01f, 100.0f);
 
     return true;
+}
+
+// TEMP : 이후에는 스크립트로 이를 조정해야 한다.
+/*=====================//
+//  camera controller  //
+//=====================*/
+void Context::ProcessInput(GLFWwindow* window)
+{
+    if (!m_cameraControl) return;
+
+    // 1. m_camera에서 Transform 참조를 가져옵니다.
+    auto& camTransform = m_camera->GetTransform();
+
+    // 2. Transform에서 직접 방향 벡터를 가져옵니다.
+    glm::vec3 forward = camTransform.GetForwardVector();
+    glm::vec3 right = camTransform.GetRightVector();
+    glm::vec3 up = camTransform.GetUpVector();
+
+    const float cameraSpeed = 0.0005f;
+    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+        camTransform.Translate(cameraSpeed * forward);
+    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+        camTransform.Translate(-cameraSpeed * forward);
+
+    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+        camTransform.Translate(cameraSpeed * right);
+    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+        camTransform.Translate(-cameraSpeed * right);
+
+    if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS)
+        camTransform.Translate(cameraSpeed * up);
+    if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS)
+        camTransform.Translate(-cameraSpeed * up);
+}
+
+void Context::MouseMove(double x, double y)
+{
+    if (!m_cameraControl) return;
+
+    auto pos = glm::vec2((float)x, (float)y);
+    auto deltaPos = pos - m_prevMousePos;
+
+    const float cameraRotSpeed = 0.1f;
+    m_cameraYaw -= deltaPos.x * cameraRotSpeed;
+    m_cameraPitch -= deltaPos.y * cameraRotSpeed;
+
+    if (m_cameraYaw < 0.0f)   m_cameraYaw += 360.0f;
+    if (m_cameraYaw > 360.0f) m_cameraYaw -= 360.0f;
+
+    if (m_cameraPitch > 89.0f)  m_cameraPitch = 89.0f;
+    if (m_cameraPitch < -89.0f) m_cameraPitch = -89.0f;
+
+    m_camera->GetTransform().SetRotation(glm::vec3(m_cameraPitch, m_cameraYaw, 0.0f));
+
+    m_prevMousePos = pos;
+}
+
+void Context::MouseButton(int button, int action, double x, double y)
+{
+    if (button == GLFW_MOUSE_BUTTON_RIGHT) 
+    {
+        SPDLOG_INFO("Pressed Right mouse button.");
+        if (action == GLFW_PRESS) 
+        {
+            // 마우스 조작 시작 시점에 현재 마우스 커서 위치 저장
+            m_prevMousePos = glm::vec2((float)x, (float)y);
+            m_cameraControl = true;
+        }
+        else if (action == GLFW_RELEASE) 
+        {
+            m_cameraControl = false;
+        }
+    }
 }

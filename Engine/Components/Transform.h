@@ -17,6 +17,7 @@ public:
 
 	// È¸Àü
 	void SetRotation(const glm::vec3& eulerAnglesDegrees);
+	void SetRotation(const glm::quat& rotation) { m_rotation = rotation; }
 	void Rotate(const glm::vec3& eulerAnglesDegrees);
 	glm::vec3 GetRotationEuler() const;
 	void SetRotation(const glm::vec3& axis, float angleRadians);

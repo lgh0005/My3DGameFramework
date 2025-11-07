@@ -39,3 +39,11 @@ glm::mat4 Camera::GetViewMatrix() const
     glm::vec3 up = m_transform->GetUpVector();
     return glm::lookAt(position, position + forward, up);
 }
+
+void Camera::LookAt(const glm::vec3& target, const glm::vec3& up)
+{
+    glm::vec3 position = m_transform->GetPosition();
+    glm::vec3 direction = glm::normalize(target - position);
+    glm::quat rotation = glm::quatLookAt(direction, up);
+    m_transform->SetRotation(rotation);
+}

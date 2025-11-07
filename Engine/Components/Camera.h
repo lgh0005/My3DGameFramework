@@ -14,6 +14,8 @@ public:
 
 	glm::mat4 GetViewMatrix() const;
 	glm::mat4 GetProjectionMatrix() const { return m_projectionMatrix; }
+	void LookAt(const glm::vec3& target, 
+				const glm::vec3& up = glm::vec3(0.0f, 1.0f, 0.0f));
 
 	// TODO : 이후에는 GameObject가 들고 있는 Transform을 통해서
 	// 접근하여 가져와야 함. 현재는 카메라의 위치/방향을 조작할 때 사용.

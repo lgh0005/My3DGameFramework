@@ -9,42 +9,34 @@ class Game
 {
 public:
 	static GameUPtr Create();
+
 	bool Init();
 	void Update();
 	void Shutdown();
     ~Game();
 
+    Context& GetContext();
+
 private:
 	Game() = default;
-	GLFWwindow* m_window   = nullptr;
+    GLFWwindow* m_window   = nullptr;
     ContextUPtr m_context  = nullptr;
-};
 
 /*======================//
 //   default callbacks  //
 //======================*/
-#pragma region DEFAULT_CALLBACKS
+// TODO : 이후에 Window 매니저 클래스가 수행하도록 수정해야 한다.
+private:
+    int32 m_width   { WINDOW_WIDTH };
+    int32 m_height  { WINDOW_HEIGHT };
 
-// 윈도우 크기 변경 콜백
-inline void OnFramebufferSizeChange(GLFWwindow* window, int width, int height)
-{
-	SPDLOG_INFO("framebuffer size changed: ({} x {})", width, height);
-	glViewport(0, 0, width, height);
-}
+    void HandleFramebufferSizeChange(int32 width, int32 height);
+    void HandleKeyEvent(int32 key, int32 scancode, int32 action, int32 mods);
+    void HandleCursorMove(double x, double y);
+    void HandleMouseButton(GLFWwindow* window, int32 button, int32 action, int32 mod);
 
-inline void OnKeyEvent(GLFWwindow* window, int key, int scancode, int action, int mods)
-{
-    SPDLOG_INFO("key: {}, scancode: {}, action: {}, mods: {}{}{}",
-        key, scancode,
-        action == GLFW_PRESS ? "Pressed" :
-        action == GLFW_RELEASE ? "Released" :
-        action == GLFW_REPEAT ? "Repeat" : "Unknown",
-        mods & GLFW_MOD_CONTROL ? "C" : "-",
-        mods & GLFW_MOD_SHIFT ? "S" : "-",
-        mods & GLFW_MOD_ALT ? "A" : "-");
-    if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
-        glfwSetWindowShouldClose(window, true);
-    }
-}
-
-#pragma endregion
+    static void OnFramebufferSizeChange(GLFWwindow* window, int32 width, int32 height);
+    static void OnKeyEvent(GLFWwindow* window, int32 key, int32 scancode, int32 action, int32 mods);
+    static void OnCursorPos(GLFWwindow* window, double x, double y);
+    static void OnMouseButton(GLFWwindow* window, int32 button, int32 action, int32 mod);
+};
