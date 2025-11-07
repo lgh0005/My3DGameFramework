@@ -21,13 +21,13 @@ void Texture::Bind() const
     glBindTexture(GL_TEXTURE_2D, m_texture);
 }
 
-void Texture::SetFilter(uint32_t minFilter, uint32_t magFilter) const
+void Texture::SetFilter(uint32 minFilter, uint32 magFilter) const
 {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, minFilter);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, magFilter);
 }
 
-void Texture::SetWrap(uint32_t sWrap, uint32_t tWrap) const
+void Texture::SetWrap(uint32 sWrap, uint32 tWrap) const
 {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, sWrap);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, tWrap);
@@ -54,4 +54,6 @@ void Texture::SetTextureFromImage(const Image* image)
 
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, image->GetWidth(), image->GetHeight(), 0,
         format, GL_UNSIGNED_BYTE, image->GetData());
+
+    glGenerateMipmap(GL_TEXTURE_2D);
 }

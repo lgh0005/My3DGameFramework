@@ -21,5 +21,5 @@ private:
 	void CreateTexture();
 	void SetTextureFromImage(const Image* image);
 
-	uint32 m_texture	{ 0 };
+	uint32 m_texture { 0 };
 };

@@ -11,6 +11,17 @@ target_precompile_headers(Game PRIVATE pch.h)
 # 3. [링크 설정] Game 타겟은 Engine 라이브러리가 필요합니다.
 target_link_libraries(Game PRIVATE Engine)
 
-# 4. Shaders 폴더를 빌드 폴더로 복사 (이미 복사된 Shaders 폴더를 지우고 다시 복사)
-file(REMOVE_RECURSE ${CMAKE_CURRENT_BINARY_DIR}/Resources)
-file(COPY ${CMAKE_SOURCE_DIR}/Resources DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+# 4. Resource 폴더를 빌드 폴더에 덮어쓰기
+set(RESOURCE_SRC_DIR "${CMAKE_SOURCE_DIR}/Resources")
+set(RESOURCE_DEST_DIR "${CMAKE_CURRENT_BINARY_DIR}/Resources")
+
+file(GLOB_RECURSE RESOURCE_FILES "${RESOURCE_SRC_DIR}/*")
+
+add_custom_target(
+    CopyResources ALL
+    COMMAND ${CMAKE_COMMAND} -E copy_directory "${RESOURCE_SRC_DIR}" "${RESOURCE_DEST_DIR}"
+    DEPENDS ${RESOURCE_FILES}
+    COMMENT "Copying resources..."
+)
+
+add_dependencies(Game CopyResources)

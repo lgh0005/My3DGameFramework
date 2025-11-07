@@ -13,7 +13,7 @@ ContextUPtr Context::Create()
 {
     auto context = ContextUPtr(new Context());
     if (!context->Init()) return nullptr;
-    return move(context);
+    return std::move(context);
 }
 
 void Context::Render()
@@ -21,46 +21,24 @@ void Context::Render()
     glClear(GL_COLOR_BUFFER_BIT);
 
     m_program->Use();
+    glUniform1i(glGetUniformLocation(m_program->Get(), "tex"), 0);
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 }
 
 bool Context::Init()
 {
-    ShaderPtr vertShader = Shader::CreateFromFile("./Resources/Shaders/texture.vert", GL_VERTEX_SHADER);
-    ShaderPtr fragShader = Shader::CreateFromFile("./Resources/Shaders/texture.frag", GL_FRAGMENT_SHADER);
-    if (!vertShader || !fragShader) return false;
-    SPDLOG_INFO("vertex shader id: {}", vertShader->Get());
-    SPDLOG_INFO("fragment shader id: {}", fragShader->Get());
-
-    m_program = Program::Create({ fragShader, vertShader });
-    if (!m_program) return false;
-    SPDLOG_INFO("program id: {}", m_program->Get());
-
-    glClearColor(0.1f, 0.2f, 0.3f, 0.0f);
-
-    // 이미지 로드
-    auto image = Image::Load("./Resources/Images/container.jpg");
-    if (!image)  return false;
-    SPDLOG_INFO("image: {}x{}, {} channels", image->GetWidth(), image->GetHeight(), image->GetChannelCount());
-
-    // 이미지로부터 텍스쳐를 생성 및 바인딩
-    m_texture = Texture::CreateFromImage(image.get());
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, m_texture->Get());
-    auto texLoc = glGetUniformLocation(m_program->Get(), "tex");
-    glUniform1i(texLoc, 0);
-
-    // 사각형 그리기
+    // 1. 사각형 생성
     {
-        float vertices[] = 
+        float vertices[] =
         {
             0.5f, 0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f,
             0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f,
             -0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f,
             -0.5f, 0.5f, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f,
         };
-        uint32_t indices[] = 
-        { 
+
+        uint32 indices[] =
+        {
             0, 1, 3, // first triangle
             1, 2, 3, // second triangle
         };
@@ -71,28 +49,49 @@ bool Context::Init()
         m_vertexLayout->SetAttrib(1, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 8, 3 * sizeof(float));
         m_vertexLayout->SetAttrib(2, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 8, 6 * sizeof(float));
         m_indexBuffer = Buffer::CreateWithData(GL_ELEMENT_ARRAY_BUFFER, GL_STATIC_DRAW, indices, sizeof(uint32) * 6);
-
-        // TEMP : Transform
-        m_program->Use();
-        auto transform = glm::mat4(1.0f);
-        auto transformloc = glGetUniformLocation(m_program->Get(), "transform");
-
-        glm::vec3 scale(1.0f, 1.0f, 1.0f);
-        auto S = glm::scale(glm::mat4(1.0f), scale);
-
-        // Rotation (예: Z축 기준 45도 회전)
-        float angle = glm::radians(45.0f);
-        auto R = glm::rotate(glm::mat4(1.0f), angle, glm::vec3(0.0f, 0.0f, 1.0f));
-
-        // Translation
-        glm::vec3 pos(0.5f, 0.5f, 0.0f);
-        auto T = glm::translate(glm::mat4(1.0f), pos);
-
-        // SRT 결합 (T * R * S 순서 중요)
-        transform = T * R * S;
-
-        glUniformMatrix4fv(transformloc, 1, GL_FALSE, glm::value_ptr(transform));
     }
+
+    // 2. 렌더링 파이프라인 생성
+    {
+        ShaderPtr vertShader = Shader::CreateFromFile("./Resources/Shaders/texture.vert", GL_VERTEX_SHADER);
+        ShaderPtr fragShader = Shader::CreateFromFile("./Resources/Shaders/texture.frag", GL_FRAGMENT_SHADER);
+        if (!vertShader || !fragShader) return false;
+        SPDLOG_INFO("vertex shader id: {}", vertShader->Get());
+        SPDLOG_INFO("fragment shader id: {}", fragShader->Get());
+
+        m_program = Program::Create({ fragShader, vertShader });
+        if (!m_program) return false;
+        SPDLOG_INFO("program id: {}", m_program->Get());
+
+        glClearColor(0.1f, 0.2f, 0.3f, 0.0f);
+    }
+
+    // 이미지 로드
+    auto image1 = Image::Load("./Resources/Images/container.jpg");
+    if (!image1)  return false;
+    m_texture1 = Texture::CreateFromImage(image1.get());
+
+    auto image2 = Image::Load("./Resources/Images/awesomeface.png");
+    if (!image2)  return false;
+    m_texture2 = Texture::CreateFromImage(image2.get());
+
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, m_texture1->Get());
+    glActiveTexture(GL_TEXTURE1);
+    glBindTexture(GL_TEXTURE_2D, m_texture2->Get());
+
+    m_program->Use();
+    glUniform1i(glGetUniformLocation(m_program->Get(), "tex1"), 0);
+    glUniform1i(glGetUniformLocation(m_program->Get(), "tex2"), 1);
+
+    // Transform 행렬
+    // 0.5배 축소후 z축으로 90도 회전하는 행렬
+    auto transform = glm::rotate(
+        glm::scale(glm::mat4(1.0f), glm::vec3(0.5f)),
+        glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f)
+    );
+    auto transformLoc = glGetUniformLocation(m_program->Get(), "transform");
+    glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(transform));
 
     return true;
 }

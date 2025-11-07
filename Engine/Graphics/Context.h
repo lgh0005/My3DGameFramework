@@ -22,7 +22,8 @@ private:
 
 // TEMP : 잠시 테스트
 private:
-    TextureUPtr m_texture;
+    TextureUPtr m_texture1;
+    TextureUPtr m_texture2;
     VertexLayoutUPtr m_vertexLayout;
     BufferUPtr m_vertexBuffer;
     BufferUPtr m_indexBuffer;
