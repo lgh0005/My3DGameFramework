@@ -79,6 +79,11 @@ bool Game::Init()
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
+    // 매니저들 초기화
+    WINDOW.Init(m_window);
+    TIME.Init();
+    IMGUI.Init(m_window, true);
+
     return true;
 }
 
@@ -88,6 +93,10 @@ void Game::Update()
     {
         glfwPollEvents();
 
+        // 메니저 업데이트
+        TIME.Update();
+
+        // 컨텍스트 업데이트
         m_context->ProcessInput(m_window);
         m_context->Render();
 
@@ -104,6 +113,9 @@ void Game::Shutdown()
     SPDLOG_INFO("Program terminated successfully.");
     spdlog::shutdown();
 
+    // 매니저 정리
+    IMGUI.ShutDown();
+
     // glfw 정리
     glfwTerminate();
     if (m_window)
@@ -117,7 +129,7 @@ void Game::Shutdown()
 /*======================//
 //   default callbacks  //
 //======================*/
-// static 호출을 위한 래핑을 해두었음.
+#pragma region DEFAULT_CALLBACKS
 void Game::HandleFramebufferSizeChange(int32 width, int32 height)
 {
     SPDLOG_INFO("framebuffer size changed: ({} x {})", width, height);
@@ -133,32 +145,25 @@ void Game::HandleFramebufferSizeChange(int32 width, int32 height)
 
 void Game::HandleKeyEvent(int32 key, int32 scancode, int32 action, int32 mods)
 {
-    SPDLOG_INFO("key: {}, scancode: {}, action: {}, mods: {}{}{}",
-        key, scancode,
-        action == GLFW_PRESS ? "Pressed" :
-        action == GLFW_RELEASE ? "Released" :
-        action == GLFW_REPEAT ? "Repeat" : "Unknown",
-        mods & GLFW_MOD_CONTROL ? "C" : "-",
-        mods & GLFW_MOD_SHIFT ? "S" : "-",
-        mods & GLFW_MOD_ALT ? "A" : "-");
-    if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
-    {
-        glfwSetWindowShouldClose(m_window, true);
-    }
+    INPUT.HandleKeyEvent(key, scancode, action, mods);
 }
 
 void Game::HandleCursorMove(double x, double y)
 {
-    m_context->MouseMove(x, y);
+    INPUT.HandleCursorMove(*m_context, x, y);
 }
 
 void Game::HandleMouseButton(GLFWwindow* window, int32 button, int32 action, int32 mod)
 {
-    double x, y;
-    glfwGetCursorPos(window, &x, &y);
-    m_context->MouseButton(button, action, x, y);
+    INPUT.HandleMouseButton(*m_context, button, action, mod);
 }
+#pragma endregion
 
+// TEMP : 이후에 콜백을 넘기는 방식을 좀 더 고려 필요
+/*====================//
+//   static wrappers  //
+//====================*/
+#pragma region STATIC_WRAPPERS
 void Game::OnFramebufferSizeChange(GLFWwindow* window, int32 width, int32 height)
 {
     Game* game = static_cast<Game*>(glfwGetWindowUserPointer(window));
@@ -182,3 +187,4 @@ void Game::OnMouseButton(GLFWwindow* window, int32 button, int32 action, int32 m
     Game* game = static_cast<Game*>(glfwGetWindowUserPointer(window));
     if (game) game->HandleMouseButton(window, button, action, mod);
 }
+#pragma endregion

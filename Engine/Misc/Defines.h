@@ -4,31 +4,20 @@
 //   declare singleton  //
 //======================*/
 #define DECLARE_SINGLE(classType)                                               \
-    friend class std::unique_ptr<classType>;                                    \
-    friend struct std::default_delete<classType>;                               \
-                                                                                \
 private:                                                                        \
-    classType();                                                                \
-    ~classType();                                                               \
+    classType() = default;                                                      \
+    ~classType() = default;                                                     \
+                                                                                \
     classType(const classType&) = delete;                                       \
     classType& operator=(const classType&) = delete;                            \
-    static std::unique_ptr<classType> s_instance;                               \
+    classType(classType&&) = delete;                                            \
+    classType& operator=(classType&&) = delete;                                 \
                                                                                 \
 public:                                                                         \
-    static classType* Instance()                                                \
+    static classType& Instance()                                                \
     {                                                                           \
-        return s_instance.get();                                                \
-    }                                                                           \
-                                                                                \
-    static void Create()                                                        \
-    {                                                                           \
-        if (!s_instance)                                                        \
-        s_instance.reset(new classType());                                      \
-    }                                                                           \
-                                                                                \
-    static void Destroy()                                                       \
-    {                                                                           \
-        s_instance.reset();                                                     \
+        static classType s_instance;                                            \
+        return s_instance;                                                      \
     }
 
 /*======================//
@@ -36,12 +25,6 @@ public:                                                                         
 //======================*/
 #define DEFINE_SINGLE(classType)                                                \
     std::unique_ptr<classType> classType::s_instance = nullptr;
-
-/*=========================//
-//   forward declaration   //
-//=========================*/
-#define FORWARD_DECLARE(className)                                               \
-class className;
 
 /*===========================//
 //   declare smart pointers  //

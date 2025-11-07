@@ -20,6 +20,15 @@ ContextUPtr Context::Create()
 
 void Context::Render()
 {
+    IMGUI.BeginFrame();
+
+    // imgui context
+    if (ImGui::Begin("My First ImGUI Window"))
+    {
+        ImGui::Text("Hello, ImGui!");
+    }ImGui::End();
+
+    // render context
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glEnable(GL_DEPTH_TEST);
 
@@ -43,6 +52,8 @@ void Context::Render()
     auto transform2 = projection * view * cubeModel2;
     m_program->SetUniform("transform", transform2);
     glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
+   
+    IMGUI.EndFrame();
 }
 
 bool Context::Init()
@@ -159,7 +170,7 @@ void Context::ProcessInput(GLFWwindow* window)
     glm::vec3 right = camTransform.GetRightVector();
     glm::vec3 up = camTransform.GetUpVector();
 
-    const float cameraSpeed = 0.0005f;
+    const float cameraSpeed = 5.0f * TIME.GetDeltaTime();
     if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
         camTransform.Translate(cameraSpeed * forward);
     if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)

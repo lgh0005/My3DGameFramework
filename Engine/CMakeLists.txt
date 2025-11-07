@@ -11,6 +11,7 @@ add_library(Engine STATIC
        
    "Misc/Defines.h"
    "Misc/Types.h"
+   "Misc/ImguiManager.h"     "Misc/ImguiManager.cpp"
 
    "Graphics/Shader.h"       "Graphics/Shader.cpp"
    "Graphics/Program.h"      "Graphics/Program.cpp"
@@ -22,6 +23,13 @@ add_library(Engine STATIC
 
    "Components/Camera.h"     "Components/Camera.cpp"
    "Components/Transform.h"  "Components/Transform.cpp"
+
+   "Managers/TimeManager.h"  "Managers/TimeManager.cpp"
+
+   "Managers/WindowManager.h" "Managers/WindowManager.cpp"
+   "Managers/InputManager.h" "Managers/InputManager.cpp"
+ "Misc/ImguiManager.cpp"
+
 )
 
 # 2. [PCH 설정] EnginePCH.h를 PCH로 사용합니다.

@@ -18,11 +18,17 @@
 #include <glm/gtx/quaternion.hpp>
 #include <glm/gtx/euler_angles.hpp>
 
-// ImGUI
-#include "imgui.h"
-#include "imgui_impl_glfw.h"
-#include "imgui_impl_opengl3.h"
-
 // Misc
 #include "Misc/Defines.h"
 #include "Misc/Types.h"
+#include "Misc/ImguiManager.h"
+#define IMGUI ImGuiManager::Instance()
+
+// Managers
+#include "Managers/TimeManager.h"
+#include "Managers/WindowManager.h"
+#include "Managers/InputManager.h"
+
+#define TIME TimeManager::Instance()
+#define WINDOW WindowManager::Instance()
+#define INPUT InputManager::Instance()
