@@ -7,6 +7,10 @@ CLASS_PTR(VertexLayout)
 CLASS_PTR(Texture)
 CLASS_PTR(Transform)
 CLASS_PTR(Camera)
+
+CLASS_PTR(PointLight)
+CLASS_PTR(DirectionalLight)
+CLASS_PTR(SpotLight)
 #pragma endregion
 
 CLASS_PTR(Context)
@@ -41,7 +45,6 @@ private:
     ProgramUPtr m_lighting;      // 단색에 조명 효과
     ProgramUPtr m_lighting2;     // 텍스쳐에 조명 효과
 
-
 // TEMP : 잠시 테스트
 private:
     // TODO : 이후 Mesh와 Material로 통합
@@ -54,8 +57,6 @@ private:
 
     TransformUPtr m_cubeTransform1;
     TransformUPtr m_cubeTransform2;
-
-    TransformUPtr m_lightCubeTransform1;
      
     // TODO : 이후에 camera controller와 같은 곳에서 처리해야 할 내용
     CameraUPtr m_camera;
@@ -67,35 +68,19 @@ private:
     bool  m_cameraControl       { false };
     glm::vec2 m_prevMousePos    { glm::vec2(0.0f) };
 
-    // TODO : 이후에 Light 컴포넌트로 따로 뺄 내용
-    // light parameters
-    struct Light 
-    {
-        glm::vec3 position{ glm::vec3(3.0f, 3.0f, 3.0f) };
-        glm::vec3 ambient{ glm::vec3(0.1f, 0.1f, 0.1f) };
-        glm::vec3 diffuse{ glm::vec3(0.5f, 0.5f, 0.5f) };
-        glm::vec3 specular{ glm::vec3(1.0f, 1.0f, 1.0f) };
-    };
-    Light m_light;
+    // 임시 PointLight 컴포넌트
+    PointLightUPtr       m_pointLight;
+    DirectionalLightUPtr m_directionalLight;
+    SpotLightPtr         m_spotLight;
 
     // TODO : 나중에 텍스쳐가 따로 지정된게 없다면
     // 기본 색상/값으로 들어가도록 처리해야 할 필요가 있을 것 같다.
-    // Material #1 : 기본 단색 머티리얼
-    struct Material_param
-    {
-        glm::vec3 ambient{ glm::vec3(1.0f, 0.5f, 0.3f) };
-        glm::vec3 diffuse{ glm::vec3(1.0f, 0.5f, 0.3f) };
-        glm::vec3 specular{ glm::vec3(0.5f, 0.5f, 0.5f) };
-        float shininess{ 32.0f };
-    };
-    Material_param m_material1;
-
-    // Material #2 : 텍스쳐를 입힌 머티리얼
-    struct Material_tex
+    // Material : 텍스쳐를 입힌 머티리얼
+    struct Material
     {
         TextureUPtr diffuse;
         TextureUPtr specular;
         float shininess{ 32.0f };
     };
-    Material_tex m_material2;
+    Material m_material;
 };

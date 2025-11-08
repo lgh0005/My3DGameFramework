@@ -6,8 +6,11 @@
 #include "Graphics/VertexLayout.h"
 #include "Graphics/Image.h"
 #include "Graphics/Texture.h"
-#include "Components//Transform.h"
+#include "Components/Transform.h"
 #include "Components/Camera.h"
+#include "Components/PointLight.h"
+#include "Components/DirectionalLight.h"
+#include "Components/SpotLight.h"
 
 Context::~Context() = default;
 
@@ -53,25 +56,40 @@ void Context::Render()
             // imgui context #2 : 광원에 대한 imgui 창.
             if (IMGUI.Begin("Light Parameters"))
             {
-                ImGui::DragFloat3("Position", glm::value_ptr(m_light.position), 0.01f);
-                ImGui::ColorEdit3("Ambient", glm::value_ptr(m_light.ambient));
-                ImGui::ColorEdit3("Diffuse", glm::value_ptr(m_light.diffuse));
-                ImGui::ColorEdit3("Specular", glm::value_ptr(m_light.specular));
+                glm::vec3 lightPos = m_spotLight->GetTransform().GetPosition();
+                if (ImGui::DragFloat3("position", glm::value_ptr(lightPos), 0.01f))
+                    m_spotLight->GetTransform().SetPosition(lightPos);
+
+                glm::vec3 lightDir = m_spotLight->GetDirection();
+                if (ImGui::DragFloat3("direction", glm::value_ptr(lightDir), 0.01))
+                    m_spotLight->SetDirection(lightDir);
+
+                glm::vec2 lightCutoff = m_spotLight->GetCutoff();
+                if (ImGui::DragFloat("cutoff", glm::value_ptr(lightCutoff), 0.01))
+                    m_spotLight->SetCutoff(lightCutoff);
+
+                float lightDist = m_spotLight->GetDistance();
+                if (ImGui::DragFloat("distance", &lightDist, 0.01))
+                    m_spotLight->SetDistance(lightDist);
+
+                glm::vec3 ambient = m_spotLight->GetAmbient();
+                if (ImGui::ColorEdit3("Ambient", glm::value_ptr(ambient)))
+                    m_spotLight->SetAmbient(ambient);
+
+                glm::vec3 diffuse = m_spotLight->GetDiffuse();
+                if (ImGui::ColorEdit3("Diffuse", glm::value_ptr(diffuse)))
+                    m_spotLight->SetDiffuse(diffuse);
+
+                glm::vec3 specular = m_spotLight->GetSpecular();
+                if (ImGui::ColorEdit3("Specular", glm::value_ptr(specular)))
+                    m_spotLight->SetSpecular(specular);
+
             } IMGUI.End();
 
-            // imgui context #3 : 머티리얼에 대한 imgui 창 #1.
-            if (IMGUI.Begin("Material Parameters (Parameters)"))
-            {
-                ImGui::ColorEdit3("Ambient", glm::value_ptr(m_material1.ambient));
-                ImGui::ColorEdit3("Diffuse", glm::value_ptr(m_material1.diffuse));
-                ImGui::ColorEdit3("Specular", glm::value_ptr(m_material1.specular));
-                ImGui::DragFloat("Shininess", &m_material1.shininess, 1.0f, 1.0f, 256.0f);
-            } IMGUI.End();
-
-            // imgui context #4 : 머티리얼에 대한 imgui 창 #2.
+            // imgui context #3 : 머티리얼에 대한 imgui 창 #2.
             if (IMGUI.Begin("Material Parameters (Textures)"))
             {
-                ImGui::DragFloat("Shininess", &m_material2.shininess, 1.0f, 1.0f, 256.0f);
+                ImGui::DragFloat("Shininess", &m_material.shininess, 1.0f, 1.0f, 256.0f);
             } IMGUI.End();
         }
 
@@ -89,10 +107,18 @@ void Context::Render()
             m_lighting2->Use();
             m_lighting2->SetUniform("viewPos", cameraPos);
 
-            m_lighting2->SetUniform("light.position", m_light.position);
-            m_lighting2->SetUniform("light.ambient", m_light.ambient);
-            m_lighting2->SetUniform("light.diffuse", m_light.diffuse);
-            m_lighting2->SetUniform("light.specular", m_light.specular);
+            m_lighting2->SetUniform("light.position", m_spotLight->GetTransform().GetPosition());
+            m_lighting2->SetUniform("light.direction", m_spotLight->GetDirection());
+            auto cutoff = m_spotLight->GetCutoff();
+            m_lighting2->SetUniform("light.cutoff", glm::vec2
+            (
+                cosf(glm::radians(cutoff[0])),
+                cosf(glm::radians(cutoff[0] + cutoff[1]))));
+
+            m_lighting2->SetUniform("light.attenuation", Utils::GetAttenuationCoeff(m_spotLight->GetDistance()));
+            m_lighting2->SetUniform("light.ambient", m_spotLight->GetAmbient());
+            m_lighting2->SetUniform("light.diffuse", m_spotLight->GetDiffuse());
+            m_lighting2->SetUniform("light.specular", m_spotLight->GetSpecular());
 
             /*m_lighting2->SetUniform("material.ambient", m_material1.ambient);
             m_lighting2->SetUniform("material.diffuse", m_material1.diffuse);*/
@@ -100,10 +126,10 @@ void Context::Render()
             m_lighting2->SetUniform("material.diffuse", 0);
             m_lighting2->SetUniform("material.specular", 1);
             glActiveTexture(GL_TEXTURE0);
-            m_material2.diffuse->Bind();
+            m_material.diffuse->Bind();
             glActiveTexture(GL_TEXTURE1);
-            m_material2.specular->Bind();
-            m_lighting2->SetUniform("material.shininess", m_material2.shininess);
+            m_material.specular->Bind();
+            m_lighting2->SetUniform("material.shininess", m_material.shininess);
         }
 
         // 큐브 물체
@@ -128,17 +154,16 @@ void Context::Render()
 
             // 조명 위치를 표시하는 큐브 #1
             {
-                m_lightCubeTransform1->SetPosition(m_light.position);
-                m_lightCubeTransform1->SetScale(glm::vec3(0.2f));
-                auto lightModel1 = m_lightCubeTransform1->GetModelMatrix();
+                m_spotLight->GetTransform().SetScale(glm::vec3(0.2f));
+                auto lightModel1 = m_spotLight->GetTransform().GetModelMatrix();
                 auto lightTransform1 = projection * view * lightModel1;
 
                 m_simpleProgram->SetUniform("transform", lightTransform1);
 
                 // 반사, 확산 모두 끄기
                 m_simpleProgram->Use();
-                m_simpleProgram->SetUniform("color", glm::vec4(m_light.ambient + m_light.diffuse, 1.0f));
-                m_simpleProgram->SetUniform("transform", projection * view * lightModel1);
+                m_simpleProgram->SetUniform("color", glm::vec4(m_spotLight->GetAmbient() + m_spotLight->GetDiffuse(), 1.0f));
+                m_simpleProgram->SetUniform("transform", lightTransform1);
 
                 glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
             }
@@ -260,11 +285,11 @@ bool Context::Init()
         // Material #2를 위한 머티리얼 맵들을 생성
         auto image3 = Image::Load("./Resources/Images/container2.png");
         if (!image3)  return false;
-        m_material2.diffuse = Texture::CreateFromImage(image3.get());
+        m_material.diffuse = Texture::CreateFromImage(image3.get());
 
         auto image4 = Image::Load("./Resources/Images/container2_specular.png");
         if (!image4)  return false;
-        m_material2.specular = Texture::CreateFromImage(image4.get());
+        m_material.specular = Texture::CreateFromImage(image4.get());
             
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, m_texture1->Get());
@@ -274,8 +299,6 @@ bool Context::Init()
         m_program->Use();
         m_program->SetUniform("tex", 0);
         m_program->SetUniform("tex2", 1);
-
-        
     }
 
     // 큐브의 Transform과 카메라 생성
@@ -287,8 +310,14 @@ bool Context::Init()
         m_cubeTransform2 = Transform::Create();
         m_cubeTransform2->SetPosition(glm::vec3(2.0f, 2.0f, 0.0f));
 
-        // 조명 큐브 Transform
-        m_lightCubeTransform1 = Transform::Create();
+        // 조명
+        m_pointLight = PointLight::Create();
+        m_pointLight->GetTransform().SetPosition(glm::vec3(3.0f, 3.0f, 3.0f));
+
+        m_directionalLight = DirectionalLight::Create();
+
+        m_spotLight = SpotLight::Create();
+        m_spotLight->GetTransform().SetPosition(glm::vec3(3.0f, 3.0f, 3.0f));
 
         // 카메라
         m_camera = Camera::Create();

@@ -8,29 +8,38 @@ find_package(assimp CONFIG REQUIRED)
 
 add_library(Engine STATIC
 
-   "EnginePch.h" "EnginePch.cpp"
-   "Game.h"      "Game.cpp"
+    # PCH
+   "EnginePch.h"                    "EnginePch.cpp"
+
+   # Core
+   "Game.h"                         "Game.cpp"
        
+   # Misc
    "Misc/Defines.h"
    "Misc/Types.h"
-   "Misc/ImguiManager.h"     "Misc/ImguiManager.cpp"
+   "Misc/ImguiManager.h"            "Misc/ImguiManager.cpp"
+   "Misc/Utils.h"                   "Misc/Utils.cpp"
 
-   "Graphics/Shader.h"       "Graphics/Shader.cpp"
-   "Graphics/Program.h"      "Graphics/Program.cpp"
-   "Graphics/Context.h"      "Graphics/Context.cpp"
-   "Graphics/Buffer.h"       "Graphics/Buffer.cpp" 
-   "Graphics/VertexLayout.h" "Graphics/VertexLayout.cpp"
-   "Graphics/Image.h"        "Graphics/Image.cpp"
-   "Graphics/Texture.h"      "Graphics/Texture.cpp" 
+   # Graphics
+   "Graphics/Shader.h"              "Graphics/Shader.cpp"
+   "Graphics/Program.h"             "Graphics/Program.cpp"
+   "Graphics/Context.h"             "Graphics/Context.cpp"
+   "Graphics/Buffer.h"              "Graphics/Buffer.cpp" 
+   "Graphics/VertexLayout.h"        "Graphics/VertexLayout.cpp"
+   "Graphics/Image.h"               "Graphics/Image.cpp"
+   "Graphics/Texture.h"             "Graphics/Texture.cpp" 
 
-   "Components/Camera.h"     "Components/Camera.cpp"
-   "Components/Transform.h"  "Components/Transform.cpp"
+   # Components
+   "Components/Camera.h"            "Components/Camera.cpp"
+   "Components/Transform.h"         "Components/Transform.cpp"
+   "Components/DirectionalLight.h"  "Components/DirectionalLight.cpp"
+   "Components/PointLight.h"        "Components/PointLight.cpp"
+   "Components/SpotLight.h"         "Components/SpotLight.cpp"
 
-   "Managers/TimeManager.h"  "Managers/TimeManager.cpp"
-
-   "Managers/WindowManager.h" "Managers/WindowManager.cpp"
-   "Managers/InputManager.h" "Managers/InputManager.cpp"
- "Misc/ImguiManager.cpp"
+   # Managers
+   "Managers/TimeManager.h"         "Managers/TimeManager.cpp"
+   "Managers/WindowManager.h"       "Managers/WindowManager.cpp"
+   "Managers/InputManager.h"        "Managers/InputManager.cpp"
 
 )
 

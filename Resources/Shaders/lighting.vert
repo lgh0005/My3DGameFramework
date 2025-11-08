@@ -1,5 +1,9 @@
 #version 460 core
 
+////////////////////////////////////////////////
+// 조명 컴포넌트의 동작을 확인할 임시 셰이더 코드 //
+////////////////////////////////////////////////
+
 layout (location = 0) in vec3 aPos;
 layout (location = 1) in vec3 aNormal;
 layout (location = 2) in vec2 aTexCoord;
