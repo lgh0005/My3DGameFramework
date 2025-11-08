@@ -21,37 +21,129 @@ ContextUPtr Context::Create()
 void Context::Render()
 {
     IMGUI.BeginFrame();
-
-    // imgui context
-    if (ImGui::Begin("My First ImGUI Window"))
+    
     {
-        ImGui::Text("Hello, ImGui!");
-    }ImGui::End();
+        // imgui 컨텍스트들
+        {
+            // imgui context #1 : 카메라에 대한 imgui 창.
+            if (IMGUI.Begin("Camera Parameters")) {
+                if (ImGui::ColorEdit4("clear color", glm::value_ptr(m_clearColor)))
+                    glClearColor(m_clearColor.r, m_clearColor.g, m_clearColor.b, m_clearColor.a);
 
-    // render context
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    glEnable(GL_DEPTH_TEST);
+                ImGui::Separator();
 
-    m_cubeTransform1->SetRotation(glm::vec3(1.0f, 2.0f, 0.0f),
-        glm::radians((float)glfwGetTime() * 120.0f));
+                glm::vec3 cameraPos = m_camera->GetTransform().GetPosition();
+                bool posChanged = ImGui::DragFloat3("camera pos", glm::value_ptr(cameraPos), 0.01f);
+                bool rotChanged = ImGui::DragFloat("camera yaw", &m_cameraYaw, 0.5f);
+                rotChanged |= ImGui::DragFloat("camera pitch", &m_cameraPitch, 0.5f, -89.0f, 89.0f);
 
-    m_cubeTransform2->SetRotation(glm::vec3(2.0f, 4.0f, 0.0f),
-        glm::radians((float)glfwGetTime() * 120.0f));
+                if (posChanged) m_camera->GetTransform().SetPosition(cameraPos);
+                if (rotChanged) m_camera->GetTransform().SetRotation(glm::vec3(m_cameraPitch, m_cameraYaw, 0.0f));
 
-    auto projection = m_camera->GetProjectionMatrix();
-    auto view = m_camera->GetViewMatrix();
+                ImGui::Separator();
+                if (ImGui::Button("reset camera"))
+                {
+                    m_cameraYaw = 0.0f;
+                    m_cameraPitch = 0.0f;
+                    m_camera->GetTransform().SetPosition(glm::vec3(0.0f, 0.0f, 3.0f));
+                    m_camera->GetTransform().SetRotation(glm::vec3(m_cameraPitch, m_cameraYaw, 0.0f));
+                }
+            } IMGUI.End();
 
-    // 큐브 #1
-    auto cubeModel1 = m_cubeTransform1->GetModelMatrix();
-    auto transform1 = projection * view * cubeModel1;
-    m_program->SetUniform("transform", transform1);
-    glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
+            // imgui context #2 : 광원에 대한 imgui 창.
+            if (IMGUI.Begin("Light Parameters"))
+            {
+                ImGui::DragFloat3("Position", glm::value_ptr(m_light.position), 0.01f);
+                ImGui::ColorEdit3("Ambient", glm::value_ptr(m_light.ambient));
+                ImGui::ColorEdit3("Diffuse", glm::value_ptr(m_light.diffuse));
+                ImGui::ColorEdit3("Specular", glm::value_ptr(m_light.specular));
+            } IMGUI.End();
 
-    // 큐브 #2
-    auto cubeModel2 = m_cubeTransform2->GetModelMatrix();
-    auto transform2 = projection * view * cubeModel2;
-    m_program->SetUniform("transform", transform2);
-    glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
+            // imgui context #3 : 머티리얼에 대한 imgui 창 #1.
+            if (IMGUI.Begin("Material Parameters (Parameters)"))
+            {
+                ImGui::ColorEdit3("Ambient", glm::value_ptr(m_material1.ambient));
+                ImGui::ColorEdit3("Diffuse", glm::value_ptr(m_material1.diffuse));
+                ImGui::ColorEdit3("Specular", glm::value_ptr(m_material1.specular));
+                ImGui::DragFloat("Shininess", &m_material1.shininess, 1.0f, 1.0f, 256.0f);
+            } IMGUI.End();
+
+            // imgui context #4 : 머티리얼에 대한 imgui 창 #2.
+            if (IMGUI.Begin("Material Parameters (Textures)"))
+            {
+                ImGui::DragFloat("Shininess", &m_material2.shininess, 1.0f, 1.0f, 256.0f);
+            } IMGUI.End();
+        }
+
+        // render context
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        glEnable(GL_DEPTH_TEST);
+
+        // 카메라 시점 행렬
+        auto cameraPos = m_camera->GetTransform().GetPosition();
+        auto projection = m_camera->GetProjectionMatrix();
+        auto view = m_camera->GetViewMatrix();
+
+        // 조명 큐브와 조명 유니폼 변수를 설정
+        {
+            m_lighting2->Use();
+            m_lighting2->SetUniform("viewPos", cameraPos);
+
+            m_lighting2->SetUniform("light.position", m_light.position);
+            m_lighting2->SetUniform("light.ambient", m_light.ambient);
+            m_lighting2->SetUniform("light.diffuse", m_light.diffuse);
+            m_lighting2->SetUniform("light.specular", m_light.specular);
+
+            /*m_lighting2->SetUniform("material.ambient", m_material1.ambient);
+            m_lighting2->SetUniform("material.diffuse", m_material1.diffuse);*/
+
+            m_lighting2->SetUniform("material.diffuse", 0);
+            m_lighting2->SetUniform("material.specular", 1);
+            glActiveTexture(GL_TEXTURE0);
+            m_material2.diffuse->Bind();
+            glActiveTexture(GL_TEXTURE1);
+            m_material2.specular->Bind();
+            m_lighting2->SetUniform("material.shininess", m_material2.shininess);
+        }
+
+        // 큐브 물체
+        {
+            // 큐브 #1
+            m_cubeTransform1->SetRotation(glm::vec3(1.0f, 2.0f, 0.0f),
+                glm::radians((float)glfwGetTime() * 30.0f));
+            auto cubeModel1 = m_cubeTransform1->GetModelMatrix();
+            auto transform1 = projection * view * cubeModel1;
+            m_lighting2->SetUniform("transform", transform1);
+            m_lighting2->SetUniform("modelTransform", cubeModel1);
+            glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
+
+            // 큐브 #2
+            m_cubeTransform2->SetRotation(glm::vec3(2.0f, 4.0f, 0.0f),
+                glm::radians((float)glfwGetTime() * 30.0f));
+            auto cubeModel2 = m_cubeTransform2->GetModelMatrix();
+            auto transform2 = projection * view * cubeModel2;
+            m_lighting2->SetUniform("transform", transform2);
+            m_lighting2->SetUniform("modelTransform", cubeModel2);
+            glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
+
+            // 조명 위치를 표시하는 큐브 #1
+            {
+                m_lightCubeTransform1->SetPosition(m_light.position);
+                m_lightCubeTransform1->SetScale(glm::vec3(0.2f));
+                auto lightModel1 = m_lightCubeTransform1->GetModelMatrix();
+                auto lightTransform1 = projection * view * lightModel1;
+
+                m_simpleProgram->SetUniform("transform", lightTransform1);
+
+                // 반사, 확산 모두 끄기
+                m_simpleProgram->Use();
+                m_simpleProgram->SetUniform("color", glm::vec4(m_light.ambient + m_light.diffuse, 1.0f));
+                m_simpleProgram->SetUniform("transform", projection * view * lightModel1);
+
+                glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
+            }
+        }
+    }
    
     IMGUI.EndFrame();
 }
@@ -60,36 +152,36 @@ bool Context::Init()
 {
     // 1. 큐브 생성
     {
-        float vertices[] = {
-          -0.5f, -0.5f, -0.5f, 0.0f, 0.0f,
-           0.5f, -0.5f, -0.5f, 1.0f, 0.0f,
-           0.5f,  0.5f, -0.5f, 1.0f, 1.0f,
-          -0.5f,  0.5f, -0.5f, 0.0f, 1.0f,
+        float vertices[] = { // pos.xyz, normal.xyz, texcoord.uv
+              -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f, 0.0f, 0.0f,
+               0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f, 1.0f, 0.0f,
+               0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f, 1.0f, 1.0f,
+              -0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f, 0.0f, 1.0f,
 
-          -0.5f, -0.5f,  0.5f, 0.0f, 0.0f,
-           0.5f, -0.5f,  0.5f, 1.0f, 0.0f,
-           0.5f,  0.5f,  0.5f, 1.0f, 1.0f,
-          -0.5f,  0.5f,  0.5f, 0.0f, 1.0f,
+              -0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f, 0.0f, 0.0f,
+               0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f, 1.0f, 0.0f,
+               0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f, 1.0f, 1.0f,
+              -0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f, 0.0f, 1.0f,
 
-          -0.5f,  0.5f,  0.5f, 1.0f, 0.0f,
-          -0.5f,  0.5f, -0.5f, 1.0f, 1.0f,
-          -0.5f, -0.5f, -0.5f, 0.0f, 1.0f,
-          -0.5f, -0.5f,  0.5f, 0.0f, 0.0f,
+              -0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f, 1.0f, 0.0f,
+              -0.5f,  0.5f, -0.5f, -1.0f,  0.0f,  0.0f, 1.0f, 1.0f,
+              -0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f, 0.0f, 1.0f,
+              -0.5f, -0.5f,  0.5f, -1.0f,  0.0f,  0.0f, 0.0f, 0.0f,
 
-           0.5f,  0.5f,  0.5f, 1.0f, 0.0f,
-           0.5f,  0.5f, -0.5f, 1.0f, 1.0f,
-           0.5f, -0.5f, -0.5f, 0.0f, 1.0f,
-           0.5f, -0.5f,  0.5f, 0.0f, 0.0f,
+               0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f, 1.0f, 0.0f,
+               0.5f,  0.5f, -0.5f,  1.0f,  0.0f,  0.0f, 1.0f, 1.0f,
+               0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f, 0.0f, 1.0f,
+               0.5f, -0.5f,  0.5f,  1.0f,  0.0f,  0.0f, 0.0f, 0.0f,
 
-          -0.5f, -0.5f, -0.5f, 0.0f, 1.0f,
-           0.5f, -0.5f, -0.5f, 1.0f, 1.0f,
-           0.5f, -0.5f,  0.5f, 1.0f, 0.0f,
-          -0.5f, -0.5f,  0.5f, 0.0f, 0.0f,
+              -0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f, 0.0f, 1.0f,
+               0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f, 1.0f, 1.0f,
+               0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f, 1.0f, 0.0f,
+              -0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f, 0.0f, 0.0f,
 
-          -0.5f,  0.5f, -0.5f, 0.0f, 1.0f,
-           0.5f,  0.5f, -0.5f, 1.0f, 1.0f,
-           0.5f,  0.5f,  0.5f, 1.0f, 0.0f,
-          -0.5f,  0.5f,  0.5f, 0.0f, 0.0f,
+              -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f, 0.0f, 1.0f,
+               0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f, 1.0f, 1.0f,
+               0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f, 1.0f, 0.0f,
+              -0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f, 0.0f, 0.0f,
         };
 
         uint32 indices[] = {
@@ -102,54 +194,108 @@ bool Context::Init()
         };
 
         m_vertexLayout = VertexLayout::Create();
-        m_vertexBuffer = Buffer::CreateWithData(GL_ARRAY_BUFFER, GL_STATIC_DRAW, vertices, sizeof(float) * 120);
-        m_vertexLayout->SetAttrib(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 5, 0);
-        m_vertexLayout->SetAttrib(2, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 5, 3 * sizeof(float));
+        m_vertexBuffer = Buffer::CreateWithData(GL_ARRAY_BUFFER, GL_STATIC_DRAW, vertices, sizeof(float) * 8 * 6 * 4);
+        m_vertexLayout->SetAttrib(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 8, 0);
+        m_vertexLayout->SetAttrib(1, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 8, sizeof(float) * 3);
+        m_vertexLayout->SetAttrib(2, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 8, sizeof(float) * 6);
         m_indexBuffer = Buffer::CreateWithData(GL_ELEMENT_ARRAY_BUFFER, GL_STATIC_DRAW, indices, sizeof(uint32) * 36);
     }
 
     // 2. 렌더링 파이프라인 생성
     {
-        ShaderPtr vertShader = Shader::CreateFromFile("./Resources/Shaders/texture.vert", GL_VERTEX_SHADER);
-        ShaderPtr fragShader = Shader::CreateFromFile("./Resources/Shaders/texture.frag", GL_FRAGMENT_SHADER);
-        if (!vertShader || !fragShader) return false;
-        SPDLOG_INFO("vertex shader id: {}", vertShader->Get());
-        SPDLOG_INFO("fragment shader id: {}", fragShader->Get());
+        // 1. 기본 텍스쳐 프로그램 생성
+        {
+            m_program = Program::Create
+            (
+                "./Resources/Shaders/texture.vert", 
+                "./Resources/Shaders/texture.frag"
+            );
+            if (!m_program) return false;
+            SPDLOG_INFO("program id: {}", m_program->Get());
+        }
 
-        m_program = Program::Create({ fragShader, vertShader });
-        if (!m_program) return false;
-        SPDLOG_INFO("program id: {}", m_program->Get());
+        // 2. 조명의 영향을 받는 단색 텍스쳐 프로그램 생성
+        {
+            m_simpleProgram = Program::Create
+            (
+                "./Resources/Shaders/simple.vert",
+                "./Resources/Shaders/simple.frag"
+            );
+        }
 
-        glClearColor(0.1f, 0.2f, 0.3f, 0.0f);
-    }
+        // 3. 조명 프로그램 생성
+        {
+            m_lighting = Program::Create
+            (
+                "./Resources/Shaders/lighting.vert", 
+                "./Resources/Shaders/lighting.frag"
+            );
+            if (!m_lighting) return false;
+            SPDLOG_INFO("program id: {}", m_lighting->Get());
+        }
+
+        // 4. 텍스쳐에 조명 효과
+        {
+            m_lighting2 = Program::Create
+            (
+                "./Resources/Shaders/lighting2.vert",
+                "./Resources/Shaders/lighting2.frag"
+            );
+        }
+
+    } glClearColor(0.1f, 0.2f, 0.3f, 0.0f);
 
     // 이미지 로드
-    auto image1 = Image::Load("./Resources/Images/container.jpg");
-    if (!image1)  return false;
-    m_texture1 = Texture::CreateFromImage(image1.get());
+    {
+        // 블록 나무 이미지 로드 후 텍스쳐 생성
+        auto image1 = Image::Load("./Resources/Images/container.jpg");
+        if (!image1)  return false;
+        m_texture1 = Texture::CreateFromImage(image1.get());
 
-    auto image2 = Image::Load("./Resources/Images/awesomeface.png");
-    if (!image2)  return false;
-    m_texture2 = Texture::CreateFromImage(image2.get());
+        // awesomeface 이미지 로드 후 텍스쳐 생성 (복수 이미지 로드)
+        auto image2 = Image::Load("./Resources/Images/awesomeface.png");
+        if (!image2)  return false;
+        m_texture2 = Texture::CreateFromImage(image2.get());
 
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, m_texture1->Get());
-    glActiveTexture(GL_TEXTURE1);
-    glBindTexture(GL_TEXTURE_2D, m_texture2->Get());
+        // Material #2를 위한 머티리얼 맵들을 생성
+        auto image3 = Image::Load("./Resources/Images/container2.png");
+        if (!image3)  return false;
+        m_material2.diffuse = Texture::CreateFromImage(image3.get());
 
-    m_program->Use();
-    m_program->SetUniform("tex", 0);
-    m_program->SetUniform("tex2", 1);
+        auto image4 = Image::Load("./Resources/Images/container2_specular.png");
+        if (!image4)  return false;
+        m_material2.specular = Texture::CreateFromImage(image4.get());
+            
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, m_texture1->Get());
+        glActiveTexture(GL_TEXTURE1);
+        glBindTexture(GL_TEXTURE_2D, m_texture2->Get());
 
-    m_cubeTransform1 = Transform::Create();
+        m_program->Use();
+        m_program->SetUniform("tex", 0);
+        m_program->SetUniform("tex2", 1);
 
-    m_cubeTransform2 = Transform::Create();
-    m_cubeTransform2->SetPosition(glm::vec3(2.0f, 2.0f, 0.0f));
+        
+    }
 
-    m_camera = Camera::Create();
-    m_camera->GetTransform().SetPosition(glm::vec3(0.0f, 0.0f, 5.0f));
-    m_camera->SetProjection(45.0f, (float)WINDOW_WIDTH / (float)WINDOW_HEIGHT,
-        0.01f, 100.0f);
+    // 큐브의 Transform과 카메라 생성
+    {
+        // 첫 번째 큐브 Transform
+        m_cubeTransform1 = Transform::Create();
+
+        // 두 번째 큐브 Transform
+        m_cubeTransform2 = Transform::Create();
+        m_cubeTransform2->SetPosition(glm::vec3(2.0f, 2.0f, 0.0f));
+
+        // 조명 큐브 Transform
+        m_lightCubeTransform1 = Transform::Create();
+
+        // 카메라
+        m_camera = Camera::Create();
+        m_camera->GetTransform().SetPosition(glm::vec3(0.0f, 0.0f, 5.0f));
+        m_camera->SetProjection(45.0f, (float)WINDOW_WIDTH / (float)WINDOW_HEIGHT,
+            0.01f, 100.0f);
+    }
 
     return true;
 }

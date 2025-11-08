@@ -12,6 +12,8 @@ class InputManager
 
 public:
 	void HandleKeyEvent(int32 key, int32 scancode, int32 action, int32 mods);
+	void HandleCharEvent(uint32 ch);
+	void HandleScroll(double xOffset, double yOffset);
 	void HandleCursorMove(Context& context, double x, double y);
 	void HandleMouseButton(Context& context, int32 button, int32 action, int32 mod);
 };

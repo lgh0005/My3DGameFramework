@@ -13,10 +13,13 @@ class WindowManager
 public:
 	void Init(GLFWwindow* handle);
 	GLFWwindow* GetHandle() { return m_handle; }
+	bool IsInconified() { return m_isIconified; }
 
 	// TEMP : 코드를 옮겨둠.
 	void HandleFramebufferSizeChange(Context& context, int32 width, int32 height);
+	void HandleWindowIconified(int32 iconified);
 
 private:
 	GLFWwindow* m_handle;
+	bool m_isIconified	{ false };
 };

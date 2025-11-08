@@ -67,6 +67,7 @@ bool Game::Init()
     // glfw 콜백 함수 등록
     OnFramebufferSizeChange(m_window, WINDOW_WIDTH, WINDOW_HEIGHT);
     glfwSetFramebufferSizeCallback(m_window, OnFramebufferSizeChange);
+    glfwSetWindowIconifyCallback(m_window, OnWindowIconified);
     glfwSetKeyCallback(m_window, OnKeyEvent);
     glfwSetCursorPosCallback(m_window, OnCursorPos);
     glfwSetMouseButtonCallback(m_window, OnMouseButton);
@@ -92,6 +93,9 @@ void Game::Update()
     while (!glfwWindowShouldClose(m_window))
     {
         glfwPollEvents();
+
+        // 윈도우가 최소화된 상태라면 건너뛰기
+        if (WINDOW.IsInconified()) continue;
 
         // 메니저 업데이트
         TIME.Update();
@@ -132,15 +136,12 @@ void Game::Shutdown()
 #pragma region DEFAULT_CALLBACKS
 void Game::HandleFramebufferSizeChange(int32 width, int32 height)
 {
-    SPDLOG_INFO("framebuffer size changed: ({} x {})", width, height);
-    Camera& camera = m_context->GetCamera();
-    camera.SetProjection
-    (
-        45.0f,
-        (float)width / (float)height,
-        0.01f, 100.0f
-    );
-    glViewport(0, 0, width, height);
+    WINDOW.HandleFramebufferSizeChange(*m_context, width, height);
+}
+
+void Game::HandleWindowIconified(int32 iconified)
+{
+    WINDOW.HandleWindowIconified(iconified);
 }
 
 void Game::HandleKeyEvent(int32 key, int32 scancode, int32 action, int32 mods)
@@ -153,10 +154,11 @@ void Game::HandleCursorMove(double x, double y)
     INPUT.HandleCursorMove(*m_context, x, y);
 }
 
-void Game::HandleMouseButton(GLFWwindow* window, int32 button, int32 action, int32 mod)
+void Game::HandleMouseButton(int32 button, int32 action, int32 mod)
 {
     INPUT.HandleMouseButton(*m_context, button, action, mod);
 }
+
 #pragma endregion
 
 // TEMP : 이후에 콜백을 넘기는 방식을 좀 더 고려 필요
@@ -168,6 +170,12 @@ void Game::OnFramebufferSizeChange(GLFWwindow* window, int32 width, int32 height
 {
     Game* game = static_cast<Game*>(glfwGetWindowUserPointer(window));
     if (game) game->HandleFramebufferSizeChange(width, height);
+}
+
+void Game::OnWindowIconified(GLFWwindow* window, int32 iconified)
+{
+    Game* game = static_cast<Game*>(glfwGetWindowUserPointer(window));
+    if (game) game->HandleWindowIconified(iconified);
 }
 
 void Game::OnKeyEvent(GLFWwindow* window, int32 key, int32 scancode, int32 action, int32 mods)
@@ -185,6 +193,7 @@ void Game::OnCursorPos(GLFWwindow* window, double x, double y)
 void Game::OnMouseButton(GLFWwindow* window, int32 button, int32 action, int32 mod)
 {
     Game* game = static_cast<Game*>(glfwGetWindowUserPointer(window));
-    if (game) game->HandleMouseButton(window, button, action, mod);
+    if (game) game->HandleMouseButton(button, action, mod);
 }
+
 #pragma endregion

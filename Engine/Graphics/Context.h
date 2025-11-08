@@ -32,10 +32,20 @@ public:
 private:
     Context() = default;
     bool Init();
-    ProgramUPtr m_program;
+
+    // 1. 기본 텍스쳐 프로그램
+    ProgramUPtr m_program;       // 이미지를 텍스쳐로 출력
+    ProgramUPtr m_simpleProgram; // 그냥 하나의 단색만 출력
+
+    // 2. 조명 프로그램
+    ProgramUPtr m_lighting;      // 단색에 조명 효과
+    ProgramUPtr m_lighting2;     // 텍스쳐에 조명 효과
+
 
 // TEMP : 잠시 테스트
 private:
+    // TODO : 이후 Mesh와 Material로 통합
+    // cube properties
     TextureUPtr m_texture1;
     TextureUPtr m_texture2;
     VertexLayoutUPtr m_vertexLayout;
@@ -45,11 +55,47 @@ private:
     TransformUPtr m_cubeTransform1;
     TransformUPtr m_cubeTransform2;
 
+    TransformUPtr m_lightCubeTransform1;
+     
+    // TODO : 이후에 camera controller와 같은 곳에서 처리해야 할 내용
     CameraUPtr m_camera;
-    // TODO : 이후에 camera controller와 같은 곳에서
-    // 처리해야 할 내용
+
+    // camera parameters
+    glm::vec4 m_clearColor      { glm::vec4(0.1f, 0.2f, 0.3f, 0.0f) };
     float m_cameraPitch         { 0.0f };
     float m_cameraYaw           { 0.0f };
     bool  m_cameraControl       { false };
     glm::vec2 m_prevMousePos    { glm::vec2(0.0f) };
+
+    // TODO : 이후에 Light 컴포넌트로 따로 뺄 내용
+    // light parameters
+    struct Light 
+    {
+        glm::vec3 position{ glm::vec3(3.0f, 3.0f, 3.0f) };
+        glm::vec3 ambient{ glm::vec3(0.1f, 0.1f, 0.1f) };
+        glm::vec3 diffuse{ glm::vec3(0.5f, 0.5f, 0.5f) };
+        glm::vec3 specular{ glm::vec3(1.0f, 1.0f, 1.0f) };
+    };
+    Light m_light;
+
+    // TODO : 나중에 텍스쳐가 따로 지정된게 없다면
+    // 기본 색상/값으로 들어가도록 처리해야 할 필요가 있을 것 같다.
+    // Material #1 : 기본 단색 머티리얼
+    struct Material_param
+    {
+        glm::vec3 ambient{ glm::vec3(1.0f, 0.5f, 0.3f) };
+        glm::vec3 diffuse{ glm::vec3(1.0f, 0.5f, 0.3f) };
+        glm::vec3 specular{ glm::vec3(0.5f, 0.5f, 0.5f) };
+        float shininess{ 32.0f };
+    };
+    Material_param m_material1;
+
+    // Material #2 : 텍스쳐를 입힌 머티리얼
+    struct Material_tex
+    {
+        TextureUPtr diffuse;
+        TextureUPtr specular;
+        float shininess{ 32.0f };
+    };
+    Material_tex m_material2;
 };

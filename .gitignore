@@ -26,6 +26,9 @@ CMakeCache.txt
 CMakeFiles/
 CMakeUserPresets.json
 
+# vcpkg (Manifest Mode)
+vcpkg_installed/
+
 ##################################################
 # OS Generated files
 ##################################################
