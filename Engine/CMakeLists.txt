@@ -32,6 +32,8 @@ add_library(Engine STATIC
    "Graphics/Vertex.h"              "Graphics/Vertex.cpp"
    "Graphics/Model.h"               "Graphics/Model.cpp"
    "Graphics/Material.h"            "Graphics/Material.cpp"
+   "Graphics/Bone.h"                "Graphics/Bone.cpp"
+   "Graphics/Animation.h"           "Graphics/Animation.cpp"
 
    # Components
    "Components/Camera.h"            "Components/Camera.cpp"
@@ -39,6 +41,7 @@ add_library(Engine STATIC
    "Components/DirectionalLight.h"  "Components/DirectionalLight.cpp"
    "Components/PointLight.h"        "Components/PointLight.cpp"
    "Components/SpotLight.h"         "Components/SpotLight.cpp"
+    "Components/Animator.h"         "Components/Animator.cpp"
 
    # Managers
    "Managers/TimeManager.h"         "Managers/TimeManager.cpp"

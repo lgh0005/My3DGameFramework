@@ -32,6 +32,8 @@ void Mesh::Init(const std::vector<Vertex>& vertices,
     m_vertexLayout->SetAttrib(0, 3, GL_FLOAT, false, sizeof(Vertex), 0);
     m_vertexLayout->SetAttrib(1, 3, GL_FLOAT, false, sizeof(Vertex), offsetof(Vertex, normal));
     m_vertexLayout->SetAttrib(2, 2, GL_FLOAT, false, sizeof(Vertex), offsetof(Vertex, texCoord));
+    m_vertexLayout->SetAttribI(3, 4, GL_INT, sizeof(Vertex), offsetof(Vertex, boneIDs));
+    m_vertexLayout->SetAttrib(4, 4, GL_FLOAT, false, sizeof(Vertex), offsetof(Vertex, weights));
 }
 
 void Mesh::Draw(const Program* program) const

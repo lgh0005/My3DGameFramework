@@ -1,8 +1,10 @@
 #pragma once
+#include <filesystem>
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
-#include <filesystem>
+#include "Graphics/Vertex.h"
+#include "Graphics/Bone.h"
 
 #pragma region FORWARD_DECLARATION
 CLASS_PTR(Mesh)
@@ -18,6 +20,23 @@ public:
 	uint32 GetMeshCount() const { return (uint32)m_meshes.size(); }
 	MeshPtr GetMesh(int index) const { return m_meshes[index]; }
 	void Draw(const Program* program) const;
+
+/*===================//
+//  Bone properties  //
+//===================*/
+public: // TODO : public으로 열어둬야 하는거 
+	auto& GetBoneInfoMap() { return m_boneInfoMap; }
+	int32& GetBoneCount() { return m_BoneCounter; }
+
+private:
+	void SetVertexBoneDataToDefault(Vertex& vertex);
+	void SetVertexBoneData(Vertex& vertex, int boneID, float weight);
+	void ExtractBoneWeightForVertices(std::vector<Vertex>& vertices,
+								 aiMesh* mesh, const aiScene* scene);
+
+private:
+	std::unordered_map<std::string, BoneInfo> m_boneInfoMap;
+	int32 m_BoneCounter = 0;
 
 private:
 	Model() = default;

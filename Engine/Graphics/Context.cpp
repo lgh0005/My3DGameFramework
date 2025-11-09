@@ -8,12 +8,14 @@
 #include "Graphics/Image.h"
 #include "Graphics/Texture.h"
 #include "Graphics/Model.h"
+#include "Graphics/Animation.h"
 
 #include "Components/Transform.h"
 #include "Components/Camera.h"
 #include "Components/PointLight.h"
 #include "Components/DirectionalLight.h"
 #include "Components/SpotLight.h"
+#include "Components/Animator.h"
 
 Context::~Context() = default;
 
@@ -165,37 +167,29 @@ void Context::Render()
                 m_simpleProgram->SetUniform("color", glm::vec4(m_spotLight->GetAmbient() + m_spotLight->GetDiffuse(), 1.0f));
                 m_simpleProgram->SetUniform("transform", lightTransform1);
 
-                m_box->Draw(m_lighting2.get());
+                m_box->Draw(m_simpleProgram.get());
             }
 
             // 모델 #1
             {
-                m_lighting2->Use();
-                m_lighting2->SetUniform("viewPos", cameraPos);
-                m_lighting2->SetUniform("light.position", m_spotLight->GetTransform().GetPosition());
-                m_lighting2->SetUniform("light.direction", m_spotLight->GetDirection());
-                auto cutoff = m_spotLight->GetCutoff();
-                m_lighting2->SetUniform("light.cutoff", glm::vec2(
-                    cosf(glm::radians(cutoff[0])),
-                    cosf(glm::radians(cutoff[0] + cutoff[1]))));
-                m_lighting2->SetUniform("light.attenuation", Utils::GetAttenuationCoeff(m_spotLight->GetDistance()));
-                m_lighting2->SetUniform("light.ambient", m_spotLight->GetAmbient());
-                m_lighting2->SetUniform("light.diffuse", m_spotLight->GetDiffuse());
-                m_lighting2->SetUniform("light.specular", m_spotLight->GetSpecular());
+                m_skinningProgram->Use();
 
-                /*m_lighting2->SetUniform("material.diffuse", 0);
-                m_lighting2->SetUniform("material.specular", 1);*/
-                m_lighting2->SetUniform("material.shininess", m_material.shininess);
-                /*glActiveTexture(GL_TEXTURE0);
-                m_material.diffuse->Bind();
-                glActiveTexture(GL_TEXTURE1);
-                m_material.specular->Bind();*/
+                // 1. 셰이더에 MVP 행렬 설정
+                auto modelTransform = m_modelTransform->GetModelMatrix();
+                m_skinningProgram->SetUniform("projection", projection);
+                m_skinningProgram->SetUniform("view", view);
+                m_skinningProgram->SetUniform("model", modelTransform);
 
-                auto modelTransform = glm::scale(glm::mat4(1.0f), glm::vec3(0.01f));
-                auto transform = projection * view * modelTransform;
-                m_lighting2->SetUniform("transform", transform);
-                m_lighting2->SetUniform("modelTransform", modelTransform);
-                m_model->Draw(m_lighting2.get());
+                // 2. 셰이더에 뼈(Bone) 행렬 배열 설정
+                auto finalMatrices = m_animator->GetFinalBoneMatrices();
+                for (int i = 0; i < finalMatrices.size(); ++i)
+                {
+                    // "finalBoneMatrices[0]", "finalBoneMatrices[1]" ...
+                    std::string uniformName = "finalBoneMatrices[" + std::to_string(i) + "]";
+                    m_skinningProgram->SetUniform(uniformName, finalMatrices[i]);
+                }
+
+                m_model->Draw(m_skinningProgram.get());
             }
         }
     }
@@ -250,6 +244,15 @@ bool Context::Init()
                 "./Resources/Shaders/lighting2.vert",
                 "./Resources/Shaders/lighting2.frag"
             );
+        }
+
+        // 5. 모델 셰이더
+        {
+            m_skinningProgram = Program::Create(
+                "./Resources/Shaders/skinning.vert",
+                "./Resources/Shaders/skinning.frag"
+            );
+            if (!m_skinningProgram) return false;
         }
 
     } glClearColor(0.1f, 0.2f, 0.3f, 0.0f);
@@ -320,6 +323,22 @@ bool Context::Init()
         // 모델
         m_model = Model::Load("./Resources/Models/spacesoldier/aliensoldier.fbx");
         if (!m_model) return false;
+        m_modelTransform = Transform::Create();
+        m_modelTransform->SetScale(glm::vec3(0.01f));
+        {
+            auto animation = Animation::Create(
+                "./Resources/Models/spacesoldier/Idle.fbx", m_model.get());
+            if (!animation)
+            {
+                SPDLOG_ERROR("Failed to load animation");
+                return false;
+            }
+
+            // 애니메이터 생성
+            m_animator = Animator::Create(std::move(animation));
+            if (!m_animator) return false;
+        }
+
     }
 
     return true;

@@ -21,11 +21,25 @@ void VertexLayout::Bind() const
     glBindVertexArray(m_vertexArrayObject);
 }
 
-void VertexLayout::SetAttrib(uint32_t attribIndex, int count, uint32_t type, bool normalized, size_t stride, uint64_t offset) const
+void VertexLayout::SetAttrib(uint32 attribIndex, int count, uint32 type,
+            bool normalized, usize stride, uint64 offset) const
 {
     glEnableVertexAttribArray(attribIndex);
     glVertexAttribPointer(attribIndex, count,
         type, normalized, stride, (const void*)offset);
+}
+
+void VertexLayout::SetAttribI(uint32 attribIndex, int count, uint32 type,
+           usize stride, uint64 offset) const
+{
+    glEnableVertexAttribArray(attribIndex);
+    glVertexAttribIPointer(attribIndex, count,
+        type, stride, (const void*)offset);
+}
+
+void VertexLayout::DisableAttrib(int attribIndex) const
+{
+    // TODO : 관련 함수 작성 필요
 }
 
 void VertexLayout::Init()

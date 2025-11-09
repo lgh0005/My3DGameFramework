@@ -13,6 +13,7 @@ CLASS_PTR(Model)
 CLASS_PTR(PointLight)
 CLASS_PTR(DirectionalLight)
 CLASS_PTR(SpotLight)
+CLASS_PTR(Animator)
 #pragma endregion
 
 CLASS_PTR(Context)
@@ -47,6 +48,9 @@ private:
     ProgramUPtr m_lighting;      // 단색에 조명 효과
     ProgramUPtr m_lighting2;     // 텍스쳐에 조명 효과
 
+    // 3. 애니메이션 프로그램
+    ProgramUPtr m_skinningProgram; // 스키닝 전용 셰이더
+
 // TEMP : 잠시 테스트
 private:
     // TODO : 이후 Mesh와 Material로 통합
@@ -59,6 +63,8 @@ private:
 
     // model properties
     ModelUPtr m_model;
+    TransformUPtr m_modelTransform;
+    AnimatorUPtr m_animator;
      
     // TODO : 이후에 camera controller와 같은 곳에서 처리해야 할 내용
     CameraUPtr m_camera;
