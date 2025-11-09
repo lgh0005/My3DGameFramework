@@ -2,11 +2,13 @@
 
 #pragma region FORWARD_DECLARATION
 CLASS_PTR(Program)
-CLASS_PTR(Buffer)
+
+CLASS_PTR(Mesh)
 CLASS_PTR(VertexLayout)
 CLASS_PTR(Texture)
 CLASS_PTR(Transform)
 CLASS_PTR(Camera)
+CLASS_PTR(Model)
 
 CLASS_PTR(PointLight)
 CLASS_PTR(DirectionalLight)
@@ -51,12 +53,12 @@ private:
     // cube properties
     TextureUPtr m_texture1;
     TextureUPtr m_texture2;
-    VertexLayoutUPtr m_vertexLayout;
-    BufferUPtr m_vertexBuffer;
-    BufferUPtr m_indexBuffer;
-
+    MeshUPtr m_box;
     TransformUPtr m_cubeTransform1;
     TransformUPtr m_cubeTransform2;
+
+    // model properties
+    ModelUPtr m_model;
      
     // TODO : 이후에 camera controller와 같은 곳에서 처리해야 할 내용
     CameraUPtr m_camera;

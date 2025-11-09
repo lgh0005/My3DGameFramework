@@ -25,6 +25,8 @@
 #include "Misc/ImguiManager.h"
 #define IMGUI ImGuiManager::Instance()
 
+#include "Graphics/VertexLayout.h" // TEMP : 어디에서 이걸 포함하지 않은 건지 추적 필요
+
 // Managers
 #include "Managers/TimeManager.h"
 #include "Managers/WindowManager.h"

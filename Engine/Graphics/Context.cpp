@@ -2,10 +2,13 @@
 #include "Context.h"
 #include "Graphics/Shader.h"
 #include "Graphics/Program.h"
-#include "Graphics/Buffer.h"
+
 #include "Graphics/VertexLayout.h"
+#include "Graphics/Mesh.h"
 #include "Graphics/Image.h"
 #include "Graphics/Texture.h"
+#include "Graphics/Model.h"
+
 #include "Components/Transform.h"
 #include "Components/Camera.h"
 #include "Components/PointLight.h"
@@ -65,7 +68,7 @@ void Context::Render()
                     m_spotLight->SetDirection(lightDir);
 
                 glm::vec2 lightCutoff = m_spotLight->GetCutoff();
-                if (ImGui::DragFloat("cutoff", glm::value_ptr(lightCutoff), 0.01))
+                if (ImGui::DragFloat("cutoff", glm::value_ptr(lightCutoff), 0.1))
                     m_spotLight->SetCutoff(lightCutoff);
 
                 float lightDist = m_spotLight->GetDistance();
@@ -120,9 +123,6 @@ void Context::Render()
             m_lighting2->SetUniform("light.diffuse", m_spotLight->GetDiffuse());
             m_lighting2->SetUniform("light.specular", m_spotLight->GetSpecular());
 
-            /*m_lighting2->SetUniform("material.ambient", m_material1.ambient);
-            m_lighting2->SetUniform("material.diffuse", m_material1.diffuse);*/
-
             m_lighting2->SetUniform("material.diffuse", 0);
             m_lighting2->SetUniform("material.specular", 1);
             glActiveTexture(GL_TEXTURE0);
@@ -141,7 +141,7 @@ void Context::Render()
             auto transform1 = projection * view * cubeModel1;
             m_lighting2->SetUniform("transform", transform1);
             m_lighting2->SetUniform("modelTransform", cubeModel1);
-            glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
+            m_box->Draw(m_lighting2.get());
 
             // 큐브 #2
             m_cubeTransform2->SetRotation(glm::vec3(2.0f, 4.0f, 0.0f),
@@ -150,7 +150,7 @@ void Context::Render()
             auto transform2 = projection * view * cubeModel2;
             m_lighting2->SetUniform("transform", transform2);
             m_lighting2->SetUniform("modelTransform", cubeModel2);
-            glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
+            m_box->Draw(m_lighting2.get());
 
             // 조명 위치를 표시하는 큐브 #1
             {
@@ -165,7 +165,37 @@ void Context::Render()
                 m_simpleProgram->SetUniform("color", glm::vec4(m_spotLight->GetAmbient() + m_spotLight->GetDiffuse(), 1.0f));
                 m_simpleProgram->SetUniform("transform", lightTransform1);
 
-                glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
+                m_box->Draw(m_lighting2.get());
+            }
+
+            // 모델 #1
+            {
+                m_lighting2->Use();
+                m_lighting2->SetUniform("viewPos", cameraPos);
+                m_lighting2->SetUniform("light.position", m_spotLight->GetTransform().GetPosition());
+                m_lighting2->SetUniform("light.direction", m_spotLight->GetDirection());
+                auto cutoff = m_spotLight->GetCutoff();
+                m_lighting2->SetUniform("light.cutoff", glm::vec2(
+                    cosf(glm::radians(cutoff[0])),
+                    cosf(glm::radians(cutoff[0] + cutoff[1]))));
+                m_lighting2->SetUniform("light.attenuation", Utils::GetAttenuationCoeff(m_spotLight->GetDistance()));
+                m_lighting2->SetUniform("light.ambient", m_spotLight->GetAmbient());
+                m_lighting2->SetUniform("light.diffuse", m_spotLight->GetDiffuse());
+                m_lighting2->SetUniform("light.specular", m_spotLight->GetSpecular());
+
+                m_lighting2->SetUniform("material.diffuse", 0);
+                m_lighting2->SetUniform("material.specular", 1);
+                m_lighting2->SetUniform("material.shininess", m_material.shininess);
+                glActiveTexture(GL_TEXTURE0);
+                m_material.diffuse->Bind();
+                glActiveTexture(GL_TEXTURE1);
+                m_material.specular->Bind();
+
+                auto modelTransform = glm::mat4(1.0f);
+                auto transform = projection * view * modelTransform;
+                m_lighting2->SetUniform("transform", transform);
+                m_lighting2->SetUniform("modelTransform", modelTransform);
+                m_model->Draw(m_lighting2.get());
             }
         }
     }
@@ -177,53 +207,7 @@ bool Context::Init()
 {
     // 1. 큐브 생성
     {
-        float vertices[] = { // pos.xyz, normal.xyz, texcoord.uv
-              -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f, 0.0f, 0.0f,
-               0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f, 1.0f, 0.0f,
-               0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f, 1.0f, 1.0f,
-              -0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f, 0.0f, 1.0f,
-
-              -0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f, 0.0f, 0.0f,
-               0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f, 1.0f, 0.0f,
-               0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f, 1.0f, 1.0f,
-              -0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f, 0.0f, 1.0f,
-
-              -0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f, 1.0f, 0.0f,
-              -0.5f,  0.5f, -0.5f, -1.0f,  0.0f,  0.0f, 1.0f, 1.0f,
-              -0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f, 0.0f, 1.0f,
-              -0.5f, -0.5f,  0.5f, -1.0f,  0.0f,  0.0f, 0.0f, 0.0f,
-
-               0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f, 1.0f, 0.0f,
-               0.5f,  0.5f, -0.5f,  1.0f,  0.0f,  0.0f, 1.0f, 1.0f,
-               0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f, 0.0f, 1.0f,
-               0.5f, -0.5f,  0.5f,  1.0f,  0.0f,  0.0f, 0.0f, 0.0f,
-
-              -0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f, 0.0f, 1.0f,
-               0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f, 1.0f, 1.0f,
-               0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f, 1.0f, 0.0f,
-              -0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f, 0.0f, 0.0f,
-
-              -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f, 0.0f, 1.0f,
-               0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f, 1.0f, 1.0f,
-               0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f, 1.0f, 0.0f,
-              -0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f, 0.0f, 0.0f,
-        };
-
-        uint32 indices[] = {
-           0,  2,  1,  2,  0,  3,
-           4,  5,  6,  6,  7,  4,
-           8,  9, 10, 10, 11,  8,
-          12, 14, 13, 14, 12, 15,
-          16, 17, 18, 18, 19, 16,
-          20, 22, 21, 22, 20, 23,
-        };
-
-        m_vertexLayout = VertexLayout::Create();
-        m_vertexBuffer = Buffer::CreateWithData(GL_ARRAY_BUFFER, GL_STATIC_DRAW, vertices, sizeof(float) * 8 * 6 * 4);
-        m_vertexLayout->SetAttrib(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 8, 0);
-        m_vertexLayout->SetAttrib(1, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 8, sizeof(float) * 3);
-        m_vertexLayout->SetAttrib(2, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 8, sizeof(float) * 6);
-        m_indexBuffer = Buffer::CreateWithData(GL_ELEMENT_ARRAY_BUFFER, GL_STATIC_DRAW, indices, sizeof(uint32) * 36);
+        m_box = Mesh::CreateBox();
     }
 
     // 2. 렌더링 파이프라인 생성
@@ -283,13 +267,20 @@ bool Context::Init()
         m_texture2 = Texture::CreateFromImage(image2.get());
 
         // Material #2를 위한 머티리얼 맵들을 생성
-        auto image3 = Image::Load("./Resources/Images/container2.png");
+        /*auto image3 = Image::Load("./Resources/Images/container2.png");
         if (!image3)  return false;
         m_material.diffuse = Texture::CreateFromImage(image3.get());
 
+
         auto image4 = Image::Load("./Resources/Images/container2_specular.png");
         if (!image4)  return false;
-        m_material.specular = Texture::CreateFromImage(image4.get());
+        m_material.specular = Texture::CreateFromImage(image4.get());*/
+
+        m_material.diffuse = Texture::CreateFromImage(
+            Image::CreateSingleColorImage(4, 4, glm::vec4(1.0f, 1.0f, 1.0f, 1.0f)).get());
+
+        m_material.specular = Texture::CreateFromImage(
+            Image::CreateSingleColorImage(4, 4, glm::vec4(0.5f, 0.5f, 0.5f, 1.0f)).get());
             
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, m_texture1->Get());
@@ -305,6 +296,7 @@ bool Context::Init()
     {
         // 첫 번째 큐브 Transform
         m_cubeTransform1 = Transform::Create();
+        m_cubeTransform1->SetPosition(glm::vec3(5.0f, 10.0f, 0.0f));
 
         // 두 번째 큐브 Transform
         m_cubeTransform2 = Transform::Create();
@@ -324,6 +316,10 @@ bool Context::Init()
         m_camera->GetTransform().SetPosition(glm::vec3(0.0f, 0.0f, 5.0f));
         m_camera->SetProjection(45.0f, (float)WINDOW_WIDTH / (float)WINDOW_HEIGHT,
             0.01f, 100.0f);
+
+        // 모델
+        m_model = Model::Load("./Resources/Models/backpack/backpack.obj");
+        if (!m_model) return false;
     }
 
     return true;

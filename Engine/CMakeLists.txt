@@ -28,6 +28,10 @@ add_library(Engine STATIC
    "Graphics/VertexLayout.h"        "Graphics/VertexLayout.cpp"
    "Graphics/Image.h"               "Graphics/Image.cpp"
    "Graphics/Texture.h"             "Graphics/Texture.cpp" 
+   "Graphics/Mesh.h"                "Graphics/Mesh.cpp"
+   "Graphics/Vertex.h"              "Graphics/Vertex.cpp"
+   "Graphics/Model.h"               "Graphics/Model.cpp"
+   "Graphics/Material.h"            "Graphics/Material.cpp"
 
    # Components
    "Components/Camera.h"            "Components/Camera.cpp"
@@ -40,7 +44,6 @@ add_library(Engine STATIC
    "Managers/TimeManager.h"         "Managers/TimeManager.cpp"
    "Managers/WindowManager.h"       "Managers/WindowManager.cpp"
    "Managers/InputManager.h"        "Managers/InputManager.cpp"
-
 )
 
 # 2. [PCH 설정] EnginePCH.h를 PCH로 사용합니다.
