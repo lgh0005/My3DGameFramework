@@ -191,6 +191,7 @@ void Context::Render()
 
                 m_model->Draw(m_skinningProgram.get());
             }
+            m_animator->UpdateAnimation();
         }
     }
    
@@ -327,7 +328,7 @@ bool Context::Init()
         m_modelTransform->SetScale(glm::vec3(0.01f));
         {
             auto animation = Animation::Create(
-                "./Resources/Models/spacesoldier/Idle.fbx", m_model.get());
+                "./Resources/Models/spacesoldier/Hip Hop Dancing.fbx", m_model.get());
             if (!animation)
             {
                 SPDLOG_ERROR("Failed to load animation");

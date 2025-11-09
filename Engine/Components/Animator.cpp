@@ -12,13 +12,19 @@ AnimatorUPtr Animator::Create(AnimationUPtr animation)
 
 bool Animator::Init(AnimationUPtr animation)
 {
+	if (!animation)
+	{
+		SPDLOG_ERROR("Animator::Init failed: animation is nullptr");
+		return false;
+	}
+
 	m_currentTime = 0.0;
 	m_currentAnimation = std::move(animation);
 
-	usize boneMatSize = 100; // 크기 하드코딩
-	m_finalBoneMatrices.reserve(boneMatSize);
-	for (int i = 0; i < boneMatSize; i++)
-		m_finalBoneMatrices.push_back(glm::mat4(1.0f));
+	usize boneMatSize = m_currentAnimation->GetBoneIDMap().size();
+	m_finalBoneMatrices.resize(boneMatSize, glm::mat4(1.0f));
+
+	return true;
 }
 
 void Animator::UpdateAnimation()
@@ -50,11 +56,20 @@ void Animator::CalculateBoneTransform(const AssimpNodeData* node, glm::mat4 pare
 	}
 
 	glm::mat4 globalTransformation = parentTransform * nodeTransform;
-	auto boneInfoMap = m_currentAnimation->GetBoneIDMap();
-	if (boneInfoMap.find(nodeName) != boneInfoMap.end())
+	auto& boneInfoMap = m_currentAnimation->GetBoneIDMap();
+
+	/*if (boneInfoMap.find(nodeName) != boneInfoMap.end())
 	{
 		int index = boneInfoMap[nodeName].id;
 		glm::mat4 offset = boneInfoMap[nodeName].offset;
+		m_finalBoneMatrices[index] = globalTransformation * offset;
+	}*/
+
+	auto it = boneInfoMap.find(nodeName);
+	if (it != boneInfoMap.end())
+	{
+		int index = it->second.id;
+		glm::mat4 offset = it->second.offset;
 		m_finalBoneMatrices[index] = globalTransformation * offset;
 	}
 

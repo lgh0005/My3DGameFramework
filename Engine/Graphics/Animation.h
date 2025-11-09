@@ -1,5 +1,16 @@
 #pragma once
 
+// TODO : include 문제 해결 필요
+
+// [추가] 이 헤더가 스스로 완전해지도록 모든 의존성을 포함합니다.
+#include <string>
+#include <vector>
+#include <unordered_map>
+#include <glm/glm.hpp>
+
+// [수정] BoneInfo의 *정의*가 필요하므로 Bone.h를 include합니다.
+#include "Graphics/Bone.h"
+
 #pragma region FORWARD_DECLARATION
 CLASS_PTR(Model)
 CLASS_PTR(Bone)

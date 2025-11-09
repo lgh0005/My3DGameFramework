@@ -16,7 +16,9 @@ ModelUPtr Model::Load(const std::string& filename)
 bool Model::LoadByAssimp(const std::string& filename)
 {
     Assimp::Importer importer;
-    auto scene = importer.ReadFile(filename, aiProcess_Triangulate | aiProcess_FlipUVs);
+    // TODO : 어떤 모델은 UV 좌표가 올바르고 어떤 모델은 뒤집히는 것이 있는 모양이다.
+    // auto scene = importer.ReadFile(filename, aiProcess_Triangulate | aiProcess_FlipUVs);
+    auto scene = importer.ReadFile(filename, aiProcess_Triangulate);
     if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode) 
     {
         SPDLOG_ERROR("failed to load model: {}", filename);
