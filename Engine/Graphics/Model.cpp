@@ -23,21 +23,41 @@ bool Model::LoadByAssimp(const std::string& filename)
         return false;
     }
 
+    // TODO : 이후에 한 번 3D 모델 파일들을 작업용 포멧을 한 번 파싱한 다음
+    // 그것을 로드하도록 만들어야 한다.
     auto dirname = filename.substr(0, filename.find_last_of("/"));
     auto LoadTexture = [&](aiMaterial* material, aiTextureType type) -> TexturePtr 
     {
         if (material->GetTextureCount(type) <= 0) return nullptr;
 
         aiString filepath;
-        material->GetTexture(aiTextureType_DIFFUSE, 0, &filepath);
+        if (material->GetTexture(type, 0, &filepath) != AI_SUCCESS) 
+            return nullptr;
 
-        auto image = Image::Load(fmt::format("{}/{}", dirname, filepath.C_Str()));
-        if (!image) return nullptr;
+        std::filesystem::path texturePath(filepath.C_Str());
+        std::string filenameOnly = texturePath.filename().string();
+
+        if (filenameOnly.empty())
+        {
+            SPDLOG_WARN("Texture path was empty: {}", filepath.C_Str());
+            return nullptr;
+        }
+
+        auto fullPath = (std::filesystem::path(dirname) / filenameOnly).string();
+        SPDLOG_INFO("Loading texture [filesystem]: {}", fullPath);
+
+        auto image = Image::Load(fullPath);
+        if (!image)
+        {
+            SPDLOG_WARN("Failed to load image: {}", fullPath);
+            return nullptr;
+        }
 
         return Texture::CreateFromImage(image.get());
     };
 
-    for (uint32_t i = 0; i < scene->mNumMaterials; i++) {
+    for (uint32 i = 0; i < scene->mNumMaterials; i++) 
+    {
         auto material = scene->mMaterials[i];
         auto glMaterial = Material::Create();
         glMaterial->diffuse = LoadTexture(material, aiTextureType_DIFFUSE);

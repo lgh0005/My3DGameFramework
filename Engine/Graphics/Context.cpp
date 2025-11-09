@@ -183,15 +183,15 @@ void Context::Render()
                 m_lighting2->SetUniform("light.diffuse", m_spotLight->GetDiffuse());
                 m_lighting2->SetUniform("light.specular", m_spotLight->GetSpecular());
 
-                m_lighting2->SetUniform("material.diffuse", 0);
-                m_lighting2->SetUniform("material.specular", 1);
+                /*m_lighting2->SetUniform("material.diffuse", 0);
+                m_lighting2->SetUniform("material.specular", 1);*/
                 m_lighting2->SetUniform("material.shininess", m_material.shininess);
-                glActiveTexture(GL_TEXTURE0);
+                /*glActiveTexture(GL_TEXTURE0);
                 m_material.diffuse->Bind();
                 glActiveTexture(GL_TEXTURE1);
-                m_material.specular->Bind();
+                m_material.specular->Bind();*/
 
-                auto modelTransform = glm::mat4(1.0f);
+                auto modelTransform = glm::scale(glm::mat4(1.0f), glm::vec3(0.01f));
                 auto transform = projection * view * modelTransform;
                 m_lighting2->SetUniform("transform", transform);
                 m_lighting2->SetUniform("modelTransform", modelTransform);
@@ -318,7 +318,7 @@ bool Context::Init()
             0.01f, 100.0f);
 
         // 모델
-        m_model = Model::Load("./Resources/Models/backpack/backpack.obj");
+        m_model = Model::Load("./Resources/Models/spacesoldier/aliensoldier.fbx");
         if (!m_model) return false;
     }
 
