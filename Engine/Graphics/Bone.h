@@ -31,6 +31,9 @@ class Bone
 {
 public:
 	static BoneUPtr Create(const std::string& name, int id, const aiNodeAnim* channel);
+    static BoneUPtr Create(uint32 id, std::vector<KeyPosition>&& positions,
+                                      std::vector<KeyRotation>&& rotations,
+                                      std::vector<KeyScale>&& scales);
 
 public:
     void Update(float animationTime);
@@ -51,6 +54,9 @@ private:
 private:
 	Bone() = default;
     bool Init(const std::string& name, int id, const aiNodeAnim* channel);
+    void Init(uint32 id, std::vector<KeyPosition>&& positions,
+                         std::vector<KeyRotation>&& rotations,
+                         std::vector<KeyScale>&& scales);
 
     std::vector<KeyPosition> m_positions;
     std::vector<KeyRotation> m_rotations;

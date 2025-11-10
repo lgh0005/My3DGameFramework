@@ -8,6 +8,13 @@ BoneUPtr Bone::Create(const std::string& name, int id, const aiNodeAnim* channel
     return std::move(bone);
 }
 
+BoneUPtr Bone::Create(uint32 id, std::vector<KeyPosition>&& positions, std::vector<KeyRotation>&& rotations, std::vector<KeyScale>&& scales)
+{
+    auto bone = BoneUPtr(new Bone());
+    bone->Init(id, std::move(positions), std::move(rotations), std::move(scales));
+    return std::move(bone);
+}
+
 bool Bone::Init(const std::string& name, int id, const aiNodeAnim* channel)
 {
     if (!channel) return false;
@@ -49,6 +56,21 @@ bool Bone::Init(const std::string& name, int id, const aiNodeAnim* channel)
     }
 
 	return true;
+}
+
+void Bone::Init(uint32 id, std::vector<KeyPosition>&& positions,
+                           std::vector<KeyRotation>&& rotations,
+                           std::vector<KeyScale>&& scales)
+{
+    m_id = id;
+
+    m_positions = std::move(positions);
+    m_rotations = std::move(rotations);
+    m_scales = std::move(scales);
+
+    m_numPositions = (uint32)m_positions.size();
+    m_numRotations = (uint32)m_rotations.size();
+    m_numScalings = (uint32)m_scales.size();
 }
 
 void Bone::Update(float animationTime)

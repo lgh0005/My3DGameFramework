@@ -331,12 +331,12 @@ bool Context::Init()
             0.01f, 100.0f);
 
         // 모델 #1 
-        m_model = Model::Load("./Resources/Models/spacesoldier/aliensoldier.fbx");
+        m_model = Model::Load("./Resources/Models/spacesoldier/aliensoldier.mymodel");
         if (!m_model) return false;
         m_modelTransform = Transform::Create();
         m_modelTransform->SetScale(glm::vec3(0.01f));
         {
-            auto animation = Animation::Create(
+            auto animation = Animation::Load(
                 "./Resources/Models/spacesoldier/Hip Hop Dancing.fbx", m_model.get());
             if (!animation)
             {
@@ -350,7 +350,7 @@ bool Context::Init()
         }
 
         // 모델 #2
-        m_backpack = Model::Load("./Resources/Models/backpack/backpack.obj");
+        m_backpack = Model::Load("./Resources/Models/backpack/backpack.mymodel");
         if (!m_backpack) return false;
         m_backpackTransform = Transform::Create();
         m_backpackTransform->SetPosition(glm::vec3(2.0f, 0.0f, 0.0f));

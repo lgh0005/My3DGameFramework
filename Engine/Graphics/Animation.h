@@ -1,14 +1,4 @@
 #pragma once
-
-// TODO : include 문제 해결 필요
-
-//// [추가] 이 헤더가 스스로 완전해지도록 모든 의존성을 포함합니다.
-//#include <string>
-//#include <vector>
-//#include <unordered_map>
-//#include <glm/glm.hpp>
-//
-//// [수정] BoneInfo의 *정의*가 필요하므로 Bone.h를 include합니다.
 #include "Graphics/Bone.h"
 
 #pragma region FORWARD_DECLARATION
@@ -28,7 +18,7 @@ CLASS_PTR(Animation)
 class Animation
 {
 public:
-	static AnimationUPtr Create(const std::string& animationPath, Model* model);
+	static AnimationUPtr Load(const std::string& filePath, Model* model);
 
     Bone* FindBone(const std::string& name);
     float GetTicksPerSecond() { return m_ticksPerSecond; }
@@ -37,12 +27,14 @@ public:
     const std::unordered_map<std::string, BoneInfo>& GetBoneIDMap() { return m_boneInfoMap; }
 
 private:
+	Animation() = default;
+
+    // 로딩 함수 분리
+    bool LoadByAssimp(const std::string& filePath, Model* model);
+    bool LoadByBinary(const std::string& filePath);
+
     void ReadMissingBones(const aiAnimation* animation, Model& model);
     void ReadHeirarchyData(AssimpNodeData& dest, const aiNode* src);
-
-private:
-	Animation() = default;
-    bool Init(const std::string& animationPath, Model* model);
 
     float m_duration;
     int32 m_ticksPerSecond;

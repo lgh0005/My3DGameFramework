@@ -1,4 +1,4 @@
-#include "../pch.h"
+ï»¿#include "../pch.h"
 #include "AnimConverter.h"
 
 /*=========================//
@@ -20,7 +20,7 @@ bool AnimConverter::RunConversion(const std::string& animPath,
                                   const std::string& modelPath,
                                   const std::string& outputPath)
 {
-    // 1. ±âÁØ ½ºÄÌ·¹Åæ ·Îµå (.mymodel ÆÄÀÏ¿¡¼­)
+    // 1. ê¸°ì¤€ ìŠ¤ì¼ˆë ˆí†¤ ë¡œë“œ (.mymodel íŒŒì¼ì—ì„œ)
     SPDLOG_INFO("Loading skeleton from model file: {}", modelPath);
     if (!LoadSkeletonFromMyModel(modelPath))
     {
@@ -29,7 +29,7 @@ bool AnimConverter::RunConversion(const std::string& animPath,
     }
     SPDLOG_INFO("Skeleton loaded. Total {} bones.", m_boneNameToIdMap.size());
 
-    // 2. Assimp·Î ¾Ö´Ï¸ŞÀÌ¼Ç ÆÄÀÏ ·Îµå
+    // 2. Assimpë¡œ ì• ë‹ˆë©”ì´ì…˜ íŒŒì¼ ë¡œë“œ
     Assimp::Importer importer;
     const aiScene* scene = importer.ReadFile(animPath, aiProcess_Triangulate);
     if (!scene || !scene->mRootNode)
@@ -44,12 +44,12 @@ bool AnimConverter::RunConversion(const std::string& animPath,
         return false;
     }
 
-    // 3. Ã¹ ¹øÂ° ¾Ö´Ï¸ŞÀÌ¼Ç¸¸ Ã³¸® (¿©·¯ °³¶ó¸é ·çÇÁ ÇÊ¿ä)
+    // 3. ì²« ë²ˆì§¸ ì• ë‹ˆë©”ì´ì…˜ë§Œ ì²˜ë¦¬ (ì—¬ëŸ¬ ê°œë¼ë©´ ë£¨í”„ í•„ìš”)
     SPDLOG_INFO("Processing animation '0' from file...");
     ProcessAnimation(scene->mAnimations[0]);
     SPDLOG_INFO("Processed {} bone channels.", m_boneChannels.size());
 
-    // 4. Ä¿½ºÅÒ ¾Ö´Ï¸ŞÀÌ¼Ç ÆÄÀÏ ¾²±â
+    // 4. ì»¤ìŠ¤í…€ ì• ë‹ˆë©”ì´ì…˜ íŒŒì¼ ì“°ê¸°
     SPDLOG_INFO("Writing custom animation file: {}", outputPath);
     if (!WriteCustomAnimFile(outputPath))
     {
@@ -69,7 +69,7 @@ bool AnimConverter::LoadSkeletonFromMyModel(const std::string& modelPath)
     std::ifstream inFile(modelPath, std::ios::binary);
     if (!inFile) return false;
 
-    // 1. Çì´õ ÀĞ±â (ModelConverter°¡ ¾´ ¼ø¼­´ë·Î!)
+    // 1. í—¤ë” ì½ê¸° (ModelConverterê°€ ì“´ ìˆœì„œëŒ€ë¡œ!)
     uint32 magic, version, materialCount, meshCount;
     bool hasSkeleton;
     inFile.read(reinterpret_cast<char*>(&magic), sizeof(magic));
@@ -84,23 +84,23 @@ bool AnimConverter::LoadSkeletonFromMyModel(const std::string& modelPath)
         return false;
     }
 
-    // 2. ½ºÄÌ·¹Åæ ºí·Ï ÀĞ±â
+    // 2. ìŠ¤ì¼ˆë ˆí†¤ ë¸”ë¡ ì½ê¸°
     uint32 boneCount;
     inFile.read(reinterpret_cast<char*>(&boneCount), sizeof(boneCount));
 
     for (uint32 i = 0; i < boneCount; ++i)
     {
-        // »À ÀÌ¸§ ÀĞ±â
+        // ë¼ˆ ì´ë¦„ ì½ê¸°
         uint32 nameLen;
         inFile.read(reinterpret_cast<char*>(&nameLen), sizeof(nameLen));
         std::string boneName(nameLen, '\0');
         inFile.read(&boneName[0], nameLen);
 
-        // BoneInfo ÀĞ±â (ID¿Í OffsetÀÌ µé¾îÀÖÀ½)
+        // BoneInfo ì½ê¸° (IDì™€ Offsetì´ ë“¤ì–´ìˆìŒ)
         BoneInfo boneInfo;
         inFile.read(reinterpret_cast<char*>(&boneInfo), sizeof(BoneInfo));
 
-        // [ÇÙ½É] ÀÌ¸§ <-> ID ¸ÊÇÎ ÀúÀå
+        // [í•µì‹¬] ì´ë¦„ <-> ID ë§µí•‘ ì €ì¥
         m_boneNameToIdMap[boneName] = boneInfo.id;
     }
 
@@ -116,24 +116,24 @@ void AnimConverter::ProcessAnimation(const aiAnimation* anim)
     m_animName = anim->mName.C_Str();
     m_duration = (float)anim->mDuration;
     m_ticksPerSecond = (float)anim->mTicksPerSecond;
-    if (m_ticksPerSecond == 0.0f) m_ticksPerSecond = 25.0f; // ±âº»°ª
+    if (m_ticksPerSecond == 0.0f) m_ticksPerSecond = 25.0f; // ê¸°ë³¸ê°’
 
     for (uint32 i = 0; i < anim->mNumChannels; ++i)
     {
         aiNodeAnim* channel = anim->mChannels[i];
         std::string boneName = channel->mNodeName.C_Str();
 
-        // [ÇÙ½É] ÀÌ Ã¤³ÎÀÌ ¿ì¸® ½ºÄÌ·¹Åæ¿¡ ÀÖ´Â »ÀÀÎÁö È®ÀÎ!
+        // [í•µì‹¬] ì´ ì±„ë„ì´ ìš°ë¦¬ ìŠ¤ì¼ˆë ˆí†¤ì— ìˆëŠ” ë¼ˆì¸ì§€ í™•ì¸!
         if (m_boneNameToIdMap.find(boneName) == m_boneNameToIdMap.end())
         {
-            // ½ºÄÌ·¹Åæ¿¡ ¾ø´Â »ÀÀÇ ¾Ö´Ï¸ŞÀÌ¼ÇÀº ¹«½ÃÇÕ´Ï´Ù. (¶Ç´Â °æ°í ·Î±×)
-            // SPDLOG_WARN("Animation channel for unknown bone: {}", boneName);
+            // ìŠ¤ì¼ˆë ˆí†¤ì— ì—†ëŠ” ë¼ˆì˜ ì• ë‹ˆë©”ì´ì…˜ì€ ë¬´ì‹œí•©ë‹ˆë‹¤. (ë˜ëŠ” ê²½ê³  ë¡œê·¸)
+            SPDLOG_WARN("Animation channel for unknown bone: {}", boneName);
             continue;
         }
 
-        // À¯È¿ÇÑ »À¶ó¸é Ã³¸®
+        // ìœ íš¨í•œ ë¼ˆë¼ë©´ ì²˜ë¦¬
         TempBoneChannel tempChannel = ProcessBoneChannel(channel);
-        tempChannel.boneID = m_boneNameToIdMap[boneName]; // ID ÇÒ´ç
+        tempChannel.boneID = m_boneNameToIdMap[boneName]; // ID í• ë‹¹
         m_boneChannels.push_back(std::move(tempChannel));
     }
 }
@@ -143,7 +143,7 @@ TempBoneChannel AnimConverter::ProcessBoneChannel(const aiNodeAnim* channel)
     TempBoneChannel tempChannel;
     tempChannel.boneName = channel->mNodeName.C_Str();
 
-    // 1. Æ÷Áö¼Ç Å° º¹»ç
+    // 1. í¬ì§€ì…˜ í‚¤ ë³µì‚¬
     for (uint32 i = 0; i < channel->mNumPositionKeys; ++i)
     {
         aiVector3D pos = channel->mPositionKeys[i].mValue;
@@ -151,7 +151,7 @@ TempBoneChannel AnimConverter::ProcessBoneChannel(const aiNodeAnim* channel)
         tempChannel.positions.push_back({ glm::vec3(pos.x, pos.y, pos.z), time });
     }
 
-    // 2. ·ÎÅ×ÀÌ¼Ç Å° º¹»ç
+    // 2. ë¡œí…Œì´ì…˜ í‚¤ ë³µì‚¬
     for (uint32 i = 0; i < channel->mNumRotationKeys; ++i)
     {
         aiQuaternion rot = channel->mRotationKeys[i].mValue;
@@ -159,7 +159,7 @@ TempBoneChannel AnimConverter::ProcessBoneChannel(const aiNodeAnim* channel)
         tempChannel.rotations.push_back({ glm::quat(rot.w, rot.x, rot.y, rot.z), time });
     }
 
-    // 3. ½ºÄÉÀÏ Å° º¹»ç
+    // 3. ìŠ¤ì¼€ì¼ í‚¤ ë³µì‚¬
     for (uint32 i = 0; i < channel->mNumScalingKeys; ++i)
     {
         aiVector3D scale = channel->mScalingKeys[i].mValue;
@@ -178,28 +178,28 @@ bool AnimConverter::WriteCustomAnimFile(const std::string& outputPath)
     std::ofstream outFile(outputPath, std::ios::binary);
     if (!outFile) return false;
 
-    // 1. Çì´õ
+    // 1. í—¤ë”
     uint32 magic = 0x414E494D; // 'ANIM'
     uint32 version = 1;
     ConverterUtils::WriteData(outFile, magic);
     ConverterUtils::WriteData(outFile, version);
 
-    // 2. ¾Ö´Ï¸ŞÀÌ¼Ç ±âº» Á¤º¸
+    // 2. ì• ë‹ˆë©”ì´ì…˜ ê¸°ë³¸ ì •ë³´
     ConverterUtils::WriteString(outFile, m_animName);
     ConverterUtils::WriteData(outFile, m_duration);
     ConverterUtils::WriteData(outFile, m_ticksPerSecond);
 
-    // 3. Ã¤³Î µ¥ÀÌÅÍ
+    // 3. ì±„ë„ ë°ì´í„°
     uint32 channelCount = (uint32)m_boneChannels.size();
     ConverterUtils::WriteData(outFile, channelCount);
 
     for (const auto& channel : m_boneChannels)
     {
-        // Ã¤³Î Çì´õ (¾î¶² »ÀÀÎÁö)
+        // ì±„ë„ í—¤ë” (ì–´ë–¤ ë¼ˆì¸ì§€)
         ConverterUtils::WriteData(outFile, channel.boneID);
-        // WriteString(outFile, channel.boneName); // µğ¹ö±ë¿ëÀ¸·Î ÀÌ¸§µµ ÀúÀå °¡´É
+        // WriteString(outFile, channel.boneName); // ë””ë²„ê¹…ìš©ìœ¼ë¡œ ì´ë¦„ë„ ì €ì¥ ê°€ëŠ¥
 
-        // Å°ÇÁ·¹ÀÓ °³¼ö
+        // í‚¤í”„ë ˆì„ ê°œìˆ˜
         uint32 posCount = (uint32)channel.positions.size();
         uint32 rotCount = (uint32)channel.rotations.size();
         uint32 sclCount = (uint32)channel.scales.size();
@@ -207,7 +207,7 @@ bool AnimConverter::WriteCustomAnimFile(const std::string& outputPath)
         ConverterUtils::WriteData(outFile, rotCount);
         ConverterUtils::WriteData(outFile, sclCount);
 
-        // Å°ÇÁ·¹ÀÓ µ¥ÀÌÅÍ (µ¢¾î¸®·Î ¾²±â)
+        // í‚¤í”„ë ˆì„ ë°ì´í„° (ë©ì–´ë¦¬ë¡œ ì“°ê¸°)
         if (posCount > 0) outFile.write(reinterpret_cast<const char*>(channel.positions.data()), sizeof(TempKeyPosition) * posCount);
         if (rotCount > 0) outFile.write(reinterpret_cast<const char*>(channel.rotations.data()), sizeof(TempKeyRotation) * rotCount);
         if (sclCount > 0) outFile.write(reinterpret_cast<const char*>(channel.scales.data()), sizeof(TempKeyScale) * sclCount);

@@ -10,7 +10,19 @@
 ModelUPtr Model::Load(const std::string& filename)
 {
     auto model = ModelUPtr(new Model());
-    if (!model->LoadByAssimp(filename)) return nullptr;
+
+    // 파일 확장명 비교 후 로드 : .mymodel로 로드하는 것을 추천
+    std::string ext = std::filesystem::path(filename).extension().string();
+    std::transform(ext.begin(), ext.end(), ext.begin(), ::tolower);
+    if (ext == ".mymodel")
+    {
+        if (!model->LoadByBinary(filename)) return nullptr;
+    }
+    else
+    {
+        if (!model->LoadByAssimp(filename)) return nullptr;
+    }
+
     return std::move(model);
 }
 
@@ -69,6 +81,126 @@ bool Model::LoadByAssimp(const std::string& filename)
     }
 
     ProcessNode(scene->mRootNode, scene);
+    return true;
+}
+
+bool Model::LoadByBinary(const std::string& filename)
+{
+    std::ifstream inFile(filename, std::ios::binary);
+    if (!inFile) 
+    { 
+        SPDLOG_ERROR("Failed to open model file: {}", filename); 
+        return false; 
+    }
+    
+    // [핵심] 현재 로드하는 .mymodel 파일의 디렉터리 경로를 구합니다.
+    // 예: "./Resources/Models/backpack/"
+    std::filesystem::path modelDir = std::filesystem::path(filename).parent_path();
+
+    // [약속된 순서대로 읽기]
+    uint32 magic, version, materialCount, meshCount;
+    bool hasSkeleton;
+    inFile.read((char*)&magic, sizeof(magic));
+    inFile.read((char*)&version, sizeof(version));
+    inFile.read((char*)&materialCount, sizeof(materialCount));
+    inFile.read((char*)&meshCount, sizeof(meshCount));
+    inFile.read((char*)&hasSkeleton, sizeof(hasSkeleton));
+
+    // 1. 스켈레톤 로드
+    if (hasSkeleton)
+    {
+        uint32 boneCount;
+        inFile.read((char*)&boneCount, sizeof(boneCount));
+        for (uint32 i = 0; i < boneCount; ++i)
+        {
+            uint32 nameLen;
+            inFile.read((char*)&nameLen, sizeof(nameLen));
+            std::string boneName(nameLen, '\0');
+            inFile.read(&boneName[0], nameLen);
+
+            BoneInfo info;
+            inFile.read((char*)&info, sizeof(BoneInfo));
+            m_boneInfoMap[boneName] = info;
+        }
+        m_BoneCounter = (int32)boneCount; // 카운터 갱신
+    }
+
+    // 2. 머티리얼 로드
+    m_materials.resize(materialCount);
+    for (uint32 i = 0; i < materialCount; ++i)
+    {
+        auto material = Material::Create();
+
+        // 텍스처 경로 읽기 헬퍼 람다
+        auto ReadPath = [&](std::ifstream& file) -> std::string {
+            uint32 len; file.read((char*)&len, sizeof(len));
+            std::string path(len, '\0'); file.read(&path[0], len);
+            return path;
+            };
+
+        // TODO : 텍스쳐 로드 수정 필요
+        std::string storedDiffuse = ReadPath(inFile);
+        std::string storedSpecular = ReadPath(inFile);
+
+        // TODO: 텍스처 로드 
+        // 1. 디퓨즈 맵 로드
+        if (!storedDiffuse.empty())
+        {
+            std::string texFilename = std::filesystem::path(storedDiffuse).filename().string();
+            std::string fullPath = (modelDir / texFilename).string();
+
+            auto image = Image::Load(fullPath);
+            if (image)
+                material->diffuse = Texture::CreateFromImage(image.get());
+            else
+                SPDLOG_ERROR("Failed to load diffuse texture: '{}'", fullPath);
+        }
+
+        // 2. 스페큘러 맵 로드
+        if (!storedSpecular.empty())
+        {
+            std::string texFilename = std::filesystem::path(storedSpecular).filename().string();
+            std::string fullPath = (modelDir / texFilename).string();
+
+            auto image = Image::Load(fullPath);
+            if (image)
+                material->specular = Texture::CreateFromImage(image.get());
+            else
+                SPDLOG_ERROR("Failed to load specular texture: '{}'", fullPath);
+        }
+        
+        // TODO : 이후 여러 텍스쳐 맵이 필요하다면 추가될 수 있음
+
+        m_materials[i] = std::move(material);
+    }
+
+    // 3. 메쉬 로드
+    m_meshes.reserve(meshCount);
+    for (uint32 i = 0; i < meshCount; ++i)
+    {
+        uint32 materialIndex, vertexCount, indexCount;
+        inFile.read((char*)&materialIndex, sizeof(materialIndex));
+        inFile.read((char*)&vertexCount, sizeof(vertexCount));
+        inFile.read((char*)&indexCount, sizeof(indexCount));
+
+        // 데이터 통째로 읽기 (매우 빠름!)
+        std::vector<Vertex> vertices(vertexCount);
+        std::vector<uint32> indices(indexCount);
+        inFile.read((char*)vertices.data(), sizeof(Vertex) * vertexCount);
+        inFile.read((char*)indices.data(), sizeof(uint32) * indexCount);
+
+        // GPU 버퍼 생성
+        auto mesh = Mesh::Create(vertices, indices, GL_TRIANGLES);
+        if (materialIndex < m_materials.size())
+        {
+            mesh->SetMaterial(m_materials[materialIndex]);
+        }
+        m_meshes.push_back(std::move(mesh));
+    }
+
+    inFile.close();
+    SPDLOG_INFO("Loaded custom model: {} ({} meshes, {} bones)",
+        filename, meshCount, m_boneInfoMap.size());
     return true;
 }
 

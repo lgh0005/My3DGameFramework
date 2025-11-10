@@ -1,5 +1,6 @@
 #pragma once
 #include <filesystem>
+#include <fstream>
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
@@ -41,6 +42,7 @@ private:
 private:
 	Model() = default;
 	bool LoadByAssimp(const std::string& filename);
+	bool LoadByBinary(const std::string& filename);
 	void ProcessMesh(aiMesh* mesh, const aiScene* scene);
 	void ProcessNode(aiNode* node, const aiScene* scene);
 	std::vector<MeshPtr> m_meshes;
