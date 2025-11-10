@@ -1,12 +1,61 @@
 #pragma once
 
-// TODO
-// 1. 모델 파일을 입력받는다.
-// 2. 받은 모델 파일을 우리의 파싱 파일로 변환하여 파일을 생성한다.
-// 3. 생성한 파일은 Engine/Model 클래스에서 읽고 모델 데이터를 
-// 구성해야 한다.
+#pragma region FORWARD_DECLARATION
+struct aiScene;
+struct aiNode;
+struct aiMesh;
+struct aiMaterial;
+enum aiTextureType : int32;
+#pragma endregion
+
+#pragma region CONVERT_STRUCTS
+struct TempMesh
+{
+    uint32_t materialIndex;
+    std::vector<Vertex> vertices;
+    std::vector<uint32_t> indices;
+};
+
+struct TempMaterial
+{
+    std::string diffuseMapPath;
+    std::string specularMapPath;
+    // ... (나중에 shininess 등 PBR 데이터 추가) ...
+};
+#pragma endregion
 
 class ModelConverter
 {
+public:
+    static bool Convert(const std::string& inputPath, 
+                        const std::string& outputPath);
 
+private:
+    ModelConverter() = default;
+    bool RunConversion(const std::string& inputPath, const std::string& outputPath);
+
+    // assimp 데이터 추출 메서드
+    void ProcessNode(aiNode* node, const aiScene* scene);
+    void ProcessMesh(aiMesh* mesh, const aiScene* scene);
+    TempMaterial ProcessMaterial(aiMaterial* material);
+    std::string GetTexturePath(aiMaterial* material, aiTextureType type);
+    void ExtractBoneWeightForVertices(std::vector<Vertex>& vertices, aiMesh* mesh);
+
+    // 커스텀 바이너리 파일 작성 메서드
+    bool WriteCustomModelFile(const std::string& outputPath);
+
+    // 뼈 헬퍼 메서드
+    void SetVertexBoneDataToDefault(Vertex& vertex);
+    void SetVertexBoneData(Vertex& vertex, int boneID, float weight);
+
+private:
+    std::vector<TempMesh>     m_meshes;     // 추출된 메쉬 데이터
+    std::vector<TempMaterial> m_materials;  // 추출된 머티리얼 데이터
+
+    std::unordered_map<std::string, BoneInfo> m_boneInfoMap;
+    int32 m_boneCounter = 0;
+    bool  m_hasSkeleton = false;
+
+    // 텍스처 경로를 찾기 위한 원본 모델 파일의 디렉터리
+    std::string m_modelDirectory;
 };
