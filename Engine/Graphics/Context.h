@@ -62,9 +62,12 @@ private:
     TransformUPtr m_cubeTransform2;
 
     // model properties
-    ModelUPtr m_model;
+    ModelUPtr m_model;    // 애니메이팅 모델
     TransformUPtr m_modelTransform;
     AnimatorUPtr m_animator;
+
+    ModelUPtr m_backpack; // 정적 모델
+    TransformUPtr m_backpackTransform;
      
     // TODO : 이후에 camera controller와 같은 곳에서 처리해야 할 내용
     CameraUPtr m_camera;

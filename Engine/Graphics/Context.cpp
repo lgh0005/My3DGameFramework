@@ -192,6 +192,16 @@ void Context::Render()
                 m_model->Draw(m_skinningProgram.get());
             }
             m_animator->UpdateAnimation();
+
+            // 모델 #2
+            {
+                m_lighting2->Use();
+                auto modelTransform = m_backpackTransform->GetModelMatrix();
+                auto transform = projection * view * modelTransform;
+                m_lighting2->SetUniform("transform", transform);
+                m_lighting2->SetUniform("modelTransform", modelTransform);
+                m_backpack->Draw(m_lighting2.get());
+            }
         }
     }
    
@@ -275,7 +285,6 @@ bool Context::Init()
         if (!image3)  return false;
         m_material.diffuse = Texture::CreateFromImage(image3.get());
 
-
         auto image4 = Image::Load("./Resources/Images/container2_specular.png");
         if (!image4)  return false;
         m_material.specular = Texture::CreateFromImage(image4.get());*/
@@ -321,7 +330,7 @@ bool Context::Init()
         m_camera->SetProjection(45.0f, (float)WINDOW_WIDTH / (float)WINDOW_HEIGHT,
             0.01f, 100.0f);
 
-        // 모델
+        // 모델 #1 
         m_model = Model::Load("./Resources/Models/spacesoldier/aliensoldier.fbx");
         if (!m_model) return false;
         m_modelTransform = Transform::Create();
@@ -340,6 +349,11 @@ bool Context::Init()
             if (!m_animator) return false;
         }
 
+        // 모델 #2
+        m_backpack = Model::Load("./Resources/Models/backpack/backpack.obj");
+        if (!m_backpack) return false;
+        m_backpackTransform = Transform::Create();
+        m_backpackTransform->SetPosition(glm::vec3(2.0f, 0.0f, 0.0f));
     }
 
     return true;

@@ -5,7 +5,7 @@ add_executable(Game
     main.cpp
 )
 
-# 2. [PCH 설정] GamePCH.h를 Game 타겟 전용(PRIVATE) PCH로 사용합니다.
+# 2. [PCH 설정] Game/pch.h를 Game 타겟 전용(PRIVATE) PCH로 사용합니다.
 target_precompile_headers(Game PRIVATE pch.h)
 
 # 3. [링크 설정] Game 타겟은 Engine 라이브러리가 필요합니다.

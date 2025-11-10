@@ -1,8 +1,9 @@
 #include "EnginePch.h"
 #include "Model.h"
 #include "Graphics/Mesh.h"
+#include "Graphics/VertexLayout.h"
 #include "Graphics/Material.h"
-#include "Graphics//Image.h"
+#include "Graphics/Image.h"
 #include "Graphics/Texture.h"
 #include "Graphics/Program.h"
 

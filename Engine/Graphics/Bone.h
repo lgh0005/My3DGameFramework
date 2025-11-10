@@ -1,6 +1,4 @@
 #pragma once
-#include <glm/glm.hpp>
-#include <glm/gtc/quaternion.hpp>
 
 #pragma region BONE_STRUCTS
 struct BoneInfo
