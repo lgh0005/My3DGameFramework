@@ -1,6 +1,8 @@
 #include "WindowManager.h"
 #include "EnginePch.h"
 #include "Graphics/Context.h"
+#include "Graphics/FrameBuffer.h"
+#include "Graphics/Texture.h"
 #include "Components/Camera.h"
 
 void WindowManager::Init(GLFWwindow* handle)
@@ -25,6 +27,11 @@ void WindowManager::HandleFramebufferSizeChange(Context& context, int32 width, i
         0.01f, 100.0f
     );
     glViewport(0, 0, width, height);
+
+    // 프레임 버퍼 세팅
+    //FramebufferUPtr frameBuffer = Framebuffer::Create
+    //(Texture::Create(width, height, GL_RGBA));
+    // context.SetFrameBuffer(std::move(frameBuffer));
 }
 
 void WindowManager::HandleWindowIconified(int32 iconified)

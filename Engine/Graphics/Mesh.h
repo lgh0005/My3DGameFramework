@@ -31,6 +31,7 @@ public:
 //==============*/
 public:
     static MeshUPtr CreateBox();
+    static MeshUPtr CreatePlane();
 
 private:
     Mesh() = default;

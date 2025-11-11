@@ -10,6 +10,7 @@
 #include "Graphics/Model.h"
 #include "Graphics/Animation.h"
 #include "Graphics/Material.h"
+#include "Graphics/FrameBuffer.h"
 
 #include "Components/Transform.h"
 #include "Components/Camera.h"
@@ -29,69 +30,10 @@ ContextUPtr Context::Create()
 
 void Context::Render()
 {
-    IMGUI.BeginFrame();
-    
+    // 프레임 버퍼 기반 렌더링 로직
     {
-        // imgui 컨텍스트들
-        {
-            // imgui context #1 : 카메라에 대한 imgui 창.
-            if (IMGUI.Begin("Camera Parameters")) {
-                if (ImGui::ColorEdit4("clear color", glm::value_ptr(m_clearColor)))
-                    glClearColor(m_clearColor.r, m_clearColor.g, m_clearColor.b, m_clearColor.a);
-
-                ImGui::Separator();
-
-                glm::vec3 cameraPos = m_camera->GetTransform().GetPosition();
-                bool posChanged = ImGui::DragFloat3("camera pos", glm::value_ptr(cameraPos), 0.01f);
-                bool rotChanged = ImGui::DragFloat("camera yaw", &m_cameraYaw, 0.5f);
-                rotChanged |= ImGui::DragFloat("camera pitch", &m_cameraPitch, 0.5f, -89.0f, 89.0f);
-
-                if (posChanged) m_camera->GetTransform().SetPosition(cameraPos);
-                if (rotChanged) m_camera->GetTransform().SetRotation(glm::vec3(m_cameraPitch, m_cameraYaw, 0.0f));
-
-                ImGui::Separator();
-                if (ImGui::Button("reset camera"))
-                {
-                    m_cameraYaw = 0.0f;
-                    m_cameraPitch = 0.0f;
-                    m_camera->GetTransform().SetPosition(glm::vec3(0.0f, 0.0f, 3.0f));
-                    m_camera->GetTransform().SetRotation(glm::vec3(m_cameraPitch, m_cameraYaw, 0.0f));
-                }
-            } IMGUI.End();
-
-            // imgui context #2 : 광원에 대한 imgui 창.
-            if (IMGUI.Begin("Light Parameters"))
-            {
-                glm::vec3 lightPos = m_spotLight->GetTransform().GetPosition();
-                if (ImGui::DragFloat3("position", glm::value_ptr(lightPos), 0.01f))
-                    m_spotLight->GetTransform().SetPosition(lightPos);
-
-                glm::vec3 lightDir = m_spotLight->GetDirection();
-                if (ImGui::DragFloat3("direction", glm::value_ptr(lightDir), 0.01))
-                    m_spotLight->SetDirection(lightDir);
-
-                glm::vec2 lightCutoff = m_spotLight->GetCutoff();
-                if (ImGui::DragFloat("cutoff", glm::value_ptr(lightCutoff), 0.1))
-                    m_spotLight->SetCutoff(lightCutoff);
-
-                float lightDist = m_spotLight->GetDistance();
-                if (ImGui::DragFloat("distance", &lightDist, 0.01))
-                    m_spotLight->SetDistance(lightDist);
-
-                glm::vec3 ambient = m_spotLight->GetAmbient();
-                if (ImGui::ColorEdit3("Ambient", glm::value_ptr(ambient)))
-                    m_spotLight->SetAmbient(ambient);
-
-                glm::vec3 diffuse = m_spotLight->GetDiffuse();
-                if (ImGui::ColorEdit3("Diffuse", glm::value_ptr(diffuse)))
-                    m_spotLight->SetDiffuse(diffuse);
-
-                glm::vec3 specular = m_spotLight->GetSpecular();
-                if (ImGui::ColorEdit3("Specular", glm::value_ptr(specular)))
-                    m_spotLight->SetSpecular(specular);
-
-            } IMGUI.End();
-        }
+        // 프레임 버퍼 바인딩
+        m_frameBuffer->Bind();
 
         // render context
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
@@ -244,9 +186,92 @@ void Context::Render()
                 }
             }
         }
+        
+        // 화면을 위에서 그린 내용으로 전환
+        Framebuffer::BindToDefault();
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+
+        m_postProgram->Use();
+        m_postProgram->SetUniform("transform", glm::scale(glm::mat4(1.0f), glm::vec3(2.0f, 2.0f, 1.0f)));
+        m_postProgram->SetUniform("gamma", m_gamma);
+        m_frameBuffer->GetColorAttachment()->Bind();
+        m_postProgram->SetUniform("tex", 0);
+        m_plane->Draw(m_postProgram.get());
     }
-   
-    IMGUI.EndFrame();
+
+    // imgui 컨텍스트들
+    {
+        IMGUI.BeginFrame();
+
+        {
+            // imgui context #1 : 카메라에 대한 imgui 창.
+            if (IMGUI.Begin("Camera Parameters"))
+            {
+                if (ImGui::ColorEdit4("clear color", glm::value_ptr(m_clearColor)))
+                    glClearColor(m_clearColor.r, m_clearColor.g, m_clearColor.b, m_clearColor.a);
+
+                ImGui::Separator();
+
+                glm::vec3 cameraPos = m_camera->GetTransform().GetPosition();
+                bool posChanged = ImGui::DragFloat3("camera pos", glm::value_ptr(cameraPos), 0.01f);
+                bool rotChanged = ImGui::DragFloat("camera yaw", &m_cameraYaw, 0.5f);
+                rotChanged |= ImGui::DragFloat("camera pitch", &m_cameraPitch, 0.5f, -89.0f, 89.0f);
+
+                if (posChanged) m_camera->GetTransform().SetPosition(cameraPos);
+                if (rotChanged) m_camera->GetTransform().SetRotation(glm::vec3(m_cameraPitch, m_cameraYaw, 0.0f));
+
+                ImGui::Separator();
+                if (ImGui::Button("reset camera"))
+                {
+                    m_cameraYaw = 0.0f;
+                    m_cameraPitch = 0.0f;
+                    m_camera->GetTransform().SetPosition(glm::vec3(0.0f, 0.0f, 3.0f));
+                    m_camera->GetTransform().SetRotation(glm::vec3(m_cameraPitch, m_cameraYaw, 0.0f));
+                }
+            } IMGUI.End();
+
+            // imgui context #2 : 광원에 대한 imgui 창.
+            if (IMGUI.Begin("Light Parameters"))
+            {
+                glm::vec3 lightPos = m_spotLight->GetTransform().GetPosition();
+                if (ImGui::DragFloat3("position", glm::value_ptr(lightPos), 0.01f))
+                    m_spotLight->GetTransform().SetPosition(lightPos);
+
+                glm::vec3 lightDir = m_spotLight->GetDirection();
+                if (ImGui::DragFloat3("direction", glm::value_ptr(lightDir), 0.01))
+                    m_spotLight->SetDirection(lightDir);
+
+                glm::vec2 lightCutoff = m_spotLight->GetCutoff();
+                if (ImGui::DragFloat("cutoff", glm::value_ptr(lightCutoff), 0.1))
+                    m_spotLight->SetCutoff(lightCutoff);
+
+                float lightDist = m_spotLight->GetDistance();
+                if (ImGui::DragFloat("distance", &lightDist, 0.01))
+                    m_spotLight->SetDistance(lightDist);
+
+                glm::vec3 ambient = m_spotLight->GetAmbient();
+                if (ImGui::ColorEdit3("Ambient", glm::value_ptr(ambient)))
+                    m_spotLight->SetAmbient(ambient);
+
+                glm::vec3 diffuse = m_spotLight->GetDiffuse();
+                if (ImGui::ColorEdit3("Diffuse", glm::value_ptr(diffuse)))
+                    m_spotLight->SetDiffuse(diffuse);
+
+                glm::vec3 specular = m_spotLight->GetSpecular();
+                if (ImGui::ColorEdit3("Specular", glm::value_ptr(specular)))
+                    m_spotLight->SetSpecular(specular);
+
+            } IMGUI.End();
+        }
+
+        // imgui context #3 : 포스트-프로세싱 imgui 창.
+        if (IMGUI.Begin("Gamma correction"))
+        {
+            ImGui::DragFloat("gamma", &m_gamma, 0.01f, 0.0f, 2.0f);
+        } IMGUI.End();
+
+        IMGUI.EndFrame();
+    }
 }
 
 bool Context::Init()
@@ -254,6 +279,7 @@ bool Context::Init()
     // 1. 큐브 생성
     {
         m_box = Mesh::CreateBox();
+        m_plane = Mesh::CreatePlane();
     }
 
     // 2. 렌더링 파이프라인 생성
@@ -308,7 +334,23 @@ bool Context::Init()
             if (!m_skinningProgram) return false;
         }
 
+        // 6. 포스트-프로세싱 셰이더
+        {
+            m_postProgram = Program::Create
+            (
+                "./Resources/Shaders/PostProcessing/postprocess.vert",
+                "./Resources/Shaders/PostProcessing/postprocess.frag"
+            );
+            if (!m_postProgram) return false;
+        }
+    
     } glClearColor(0.1f, 0.2f, 0.3f, 0.0f);
+
+    // 3. 프레임 버퍼 생성
+    {
+        m_frameBuffer = Framebuffer::Create(Texture::Create(WINDOW_WIDTH, WINDOW_HEIGHT, GL_RGBA));
+        if (!m_frameBuffer) false;
+    }
 
     // 이미지 로드
     {

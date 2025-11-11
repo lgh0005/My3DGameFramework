@@ -34,6 +34,7 @@ add_library(Engine STATIC
    "Graphics/Material.h"            "Graphics/Material.cpp"
    "Graphics/Bone.h"                "Graphics/Bone.cpp"
    "Graphics/Animation.h"           "Graphics/Animation.cpp"
+   "Graphics/FrameBuffer.h"         "Graphics/FrameBuffer.cpp"
 
    # Components
    "Components/Camera.h"            "Components/Camera.cpp"
@@ -47,7 +48,7 @@ add_library(Engine STATIC
    "Managers/TimeManager.h"         "Managers/TimeManager.cpp"
    "Managers/WindowManager.h"       "Managers/WindowManager.cpp"
    "Managers/InputManager.h"        "Managers/InputManager.cpp"
- )
+)
 
 # 2. [PCH 설정] EnginePCH.h를 PCH로 사용합니다.
 target_precompile_headers(Engine  PUBLIC EnginePCH.h)

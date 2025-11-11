@@ -9,6 +9,7 @@ CLASS_PTR(Transform)
 CLASS_PTR(Camera)
 CLASS_PTR(Model)
 CLASS_PTR(Material)
+CLASS_PTR(Framebuffer)
 
 CLASS_PTR(PointLight)
 CLASS_PTR(DirectionalLight)
@@ -32,6 +33,7 @@ public:
 
     // TEMP : 이후 씬과 컨텍스트를 통합한 구조 구축 필요
     Camera& GetCamera() { return *m_camera; }
+    Framebuffer& GetFrameBuffer() { return *m_frameBuffer; }
 
 private:
     Context() = default;
@@ -47,6 +49,13 @@ private:
 
     // 3. 애니메이션 프로그램
     ProgramUPtr m_skinningProgram; // 스키닝 전용 셰이더
+
+    // **[중요]** 4. 프레임 버퍼
+    // TODO : 이후에는 이를 바탕으로 렌더링을 수행할 예정
+    ProgramUPtr     m_postProgram;
+    FramebufferUPtr m_frameBuffer;
+    MeshUPtr        m_plane;
+    float           m_gamma     { 1.0f };
 
 // TEMP : 잠시 테스트
 private:
