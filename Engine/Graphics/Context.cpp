@@ -1,14 +1,15 @@
 ﻿#include "EnginePch.h"
 #include "Context.h"
+
 #include "Graphics/Shader.h"
 #include "Graphics/Program.h"
-
 #include "Graphics/VertexLayout.h"
 #include "Graphics/Mesh.h"
 #include "Graphics/Image.h"
 #include "Graphics/Texture.h"
 #include "Graphics/Model.h"
 #include "Graphics/Animation.h"
+#include "Graphics/Material.h"
 
 #include "Components/Transform.h"
 #include "Components/Camera.h"
@@ -90,17 +91,13 @@ void Context::Render()
                     m_spotLight->SetSpecular(specular);
 
             } IMGUI.End();
-
-            // imgui context #3 : 머티리얼에 대한 imgui 창 #2.
-            if (IMGUI.Begin("Material Parameters (Textures)"))
-            {
-                ImGui::DragFloat("Shininess", &m_material.shininess, 1.0f, 1.0f, 256.0f);
-            } IMGUI.End();
         }
 
         // render context
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
         glEnable(GL_DEPTH_TEST);
+        glEnable(GL_CULL_FACE);
+        glCullFace(GL_BACK);
 
         // 카메라 시점 행렬
         auto cameraPos = m_camera->GetTransform().GetPosition();
@@ -115,10 +112,14 @@ void Context::Render()
             m_lighting2->SetUniform("light.position", m_spotLight->GetTransform().GetPosition());
             m_lighting2->SetUniform("light.direction", m_spotLight->GetDirection());
             auto cutoff = m_spotLight->GetCutoff();
-            m_lighting2->SetUniform("light.cutoff", glm::vec2
+            m_lighting2->SetUniform
             (
-                cosf(glm::radians(cutoff[0])),
-                cosf(glm::radians(cutoff[0] + cutoff[1]))));
+                "light.cutoff", glm::vec2
+                (
+                    cosf(glm::radians(cutoff[0])),
+                    cosf(glm::radians(cutoff[0] + cutoff[1]))
+                )
+            );
 
             m_lighting2->SetUniform("light.attenuation", Utils::GetAttenuationCoeff(m_spotLight->GetDistance()));
             m_lighting2->SetUniform("light.ambient", m_spotLight->GetAmbient());
@@ -128,32 +129,14 @@ void Context::Render()
             m_lighting2->SetUniform("material.diffuse", 0);
             m_lighting2->SetUniform("material.specular", 1);
             glActiveTexture(GL_TEXTURE0);
-            m_material.diffuse->Bind();
+            m_lightMaterial->diffuse->Bind();
             glActiveTexture(GL_TEXTURE1);
-            m_material.specular->Bind();
-            m_lighting2->SetUniform("material.shininess", m_material.shininess);
+            m_lightMaterial->specular->Bind();
+            m_lighting2->SetUniform("material.shininess",  m_lightMaterial->shininess);
         }
 
         // 큐브 물체
         {
-            // 큐브 #1
-            m_cubeTransform1->SetRotation(glm::vec3(1.0f, 2.0f, 0.0f),
-                glm::radians((float)glfwGetTime() * 30.0f));
-            auto cubeModel1 = m_cubeTransform1->GetModelMatrix();
-            auto transform1 = projection * view * cubeModel1;
-            m_lighting2->SetUniform("transform", transform1);
-            m_lighting2->SetUniform("modelTransform", cubeModel1);
-            m_box->Draw(m_lighting2.get());
-
-            // 큐브 #2
-            m_cubeTransform2->SetRotation(glm::vec3(2.0f, 4.0f, 0.0f),
-                glm::radians((float)glfwGetTime() * 30.0f));
-            auto cubeModel2 = m_cubeTransform2->GetModelMatrix();
-            auto transform2 = projection * view * cubeModel2;
-            m_lighting2->SetUniform("transform", transform2);
-            m_lighting2->SetUniform("modelTransform", cubeModel2);
-            m_box->Draw(m_lighting2.get());
-
             // 조명 위치를 표시하는 큐브 #1
             {
                 m_spotLight->GetTransform().SetScale(glm::vec3(0.2f));
@@ -184,23 +167,81 @@ void Context::Render()
                 auto finalMatrices = m_animator->GetFinalBoneMatrices();
                 for (int i = 0; i < finalMatrices.size(); ++i)
                 {
-                    // "finalBoneMatrices[0]", "finalBoneMatrices[1]" ...
                     std::string uniformName = "finalBoneMatrices[" + std::to_string(i) + "]";
                     m_skinningProgram->SetUniform(uniformName, finalMatrices[i]);
                 }
 
                 m_model->Draw(m_skinningProgram.get());
+                m_animator->UpdateAnimation();
             }
-            m_animator->UpdateAnimation();
-
-            // 모델 #2
+            
+            // 큐브와 바닥
             {
+                // 셰이더 재설정
                 m_lighting2->Use();
-                auto modelTransform = m_backpackTransform->GetModelMatrix();
+
+                // 1. 바닥 그리기
+                auto modelTransform = m_groundTransform->GetModelMatrix();
                 auto transform = projection * view * modelTransform;
                 m_lighting2->SetUniform("transform", transform);
                 m_lighting2->SetUniform("modelTransform", modelTransform);
-                m_backpack->Draw(m_lighting2.get());
+                m_planeMaterial->SetToProgram(m_lighting2.get());
+                m_box->Draw(m_lighting2.get());
+
+                // 2. 큐브 #1 그리기
+                modelTransform = m_box1Transform->GetModelMatrix();
+                transform = projection * view * modelTransform;
+                m_lighting2->SetUniform("transform", transform);
+                m_lighting2->SetUniform("modelTransform", modelTransform);
+                m_box1Material->SetToProgram(m_lighting2.get());
+                m_box->Draw(m_lighting2.get());
+
+                // 외곽선이 있는 큐브
+                {
+                    glEnable(GL_STENCIL_TEST);
+                    glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+
+                    // 스텐실 테스트는 무조건 성공
+                    glStencilFunc(GL_ALWAYS, 1, 0xFF); 
+                    glDepthMask(GL_FALSE);
+                    glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
+                    {
+                        // 3. 큐브 #2 그리기
+                        modelTransform = m_box2Transform->GetModelMatrix();
+                        transform = projection * view * modelTransform;
+                        m_lighting2->SetUniform("transform", transform);
+                        m_lighting2->SetUniform("modelTransform", modelTransform);
+                        m_box2Material->SetToProgram(m_lighting2.get());
+                        m_box->Draw(m_lighting2.get());
+                    }
+
+                    // 단색 외곽선 큐브
+                    glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
+                    glStencilMask(0x00); // 스텐실 버퍼 쓰기 끄기
+                    glDepthMask(GL_TRUE); // 깊이 버퍼 쓰기/테스트 다시 켜기
+                    glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE); // 컬러 버퍼 쓰기 다시 켜기
+                    glEnable(GL_DEPTH_TEST);
+
+                    m_simpleProgram->Use();
+                    m_simpleProgram->SetUniform("color", glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
+                    m_simpleProgram->SetUniform("transform",
+                        transform* glm::scale(glm::mat4(1.0f), glm::vec3(1.02f, 1.02f, 1.02f)));
+                    m_box->Draw(m_simpleProgram.get());
+
+                    glStencilFunc(GL_EQUAL, 1, 0xFF);
+
+                    m_lighting2->Use(); // 셰이더 원복
+                    m_lighting2->SetUniform("transform", transform); // (Pass 1에서 쓴 값 재사용)
+                    m_lighting2->SetUniform("modelTransform", modelTransform); // (Pass 1에서 쓴 값 재사용)
+                    m_box2Material->SetToProgram(m_lighting2.get());
+                    m_box->Draw(m_lighting2.get());
+
+                    // --- 4. 상태 복구 ---
+                    glDisable(GL_STENCIL_TEST);
+                    glStencilMask(0xFF); // 기본값으로
+                    glStencilFunc(GL_ALWAYS, 1, 0xFF); // 기본값으로
+                    // glDepthMask, glColorMask는 이미 TRUE로 복구됨
+                }
             }
         }
     }
@@ -259,7 +300,8 @@ bool Context::Init()
 
         // 5. 모델 셰이더
         {
-            m_skinningProgram = Program::Create(
+            m_skinningProgram = Program::Create
+            (
                 "./Resources/Shaders/skinning.vert",
                 "./Resources/Shaders/skinning.frag"
             );
@@ -270,51 +312,35 @@ bool Context::Init()
 
     // 이미지 로드
     {
-        // 블록 나무 이미지 로드 후 텍스쳐 생성
-        auto image1 = Image::Load("./Resources/Images/container.jpg");
-        if (!image1)  return false;
-        m_texture1 = Texture::CreateFromImage(image1.get());
+        TexturePtr darkGrayTexture = Texture::CreateFromImage
+        (Image::CreateSingleColorImage(4, 4, glm::vec4(0.2f, 0.2f, 0.2f, 1.0f)).get());
+        TexturePtr grayTexture = Texture::CreateFromImage
+        (Image::CreateSingleColorImage(4, 4, glm::vec4(0.5f, 0.5f, 0.5f, 1.0f)).get());
 
-        // awesomeface 이미지 로드 후 텍스쳐 생성 (복수 이미지 로드)
-        auto image2 = Image::Load("./Resources/Images/awesomeface.png");
-        if (!image2)  return false;
-        m_texture2 = Texture::CreateFromImage(image2.get());
+        m_planeMaterial = Material::Create();
+        m_planeMaterial->diffuse = Texture::CreateFromImage(Image::Load("./Resources/Images/marble.jpg").get());
+        m_planeMaterial->specular = grayTexture;
+        m_planeMaterial->shininess = 128.0f;
 
-        // Material #2를 위한 머티리얼 맵들을 생성
-        /*auto image3 = Image::Load("./Resources/Images/container2.png");
-        if (!image3)  return false;
-        m_material.diffuse = Texture::CreateFromImage(image3.get());
+        m_box1Material = Material::Create();
+        m_box1Material->diffuse = Texture::CreateFromImage(Image::Load("./Resources/Images/container.jpg").get());
+        m_box1Material->specular = darkGrayTexture;
+        m_box1Material->shininess = 16.0f;
 
-        auto image4 = Image::Load("./Resources/Images/container2_specular.png");
-        if (!image4)  return false;
-        m_material.specular = Texture::CreateFromImage(image4.get());*/
+        m_box2Material = Material::Create();
+        m_box2Material->diffuse = Texture::CreateFromImage(Image::Load("./Resources/Images/container2.png").get());
+        m_box2Material->specular = Texture::CreateFromImage(Image::Load("./Resources/Images/container2_specular.png").get());
+        m_box2Material->shininess = 64.0f;
 
-        m_material.diffuse = Texture::CreateFromImage(
-            Image::CreateSingleColorImage(4, 4, glm::vec4(1.0f, 1.0f, 1.0f, 1.0f)).get());
-
-        m_material.specular = Texture::CreateFromImage(
-            Image::CreateSingleColorImage(4, 4, glm::vec4(0.5f, 0.5f, 0.5f, 1.0f)).get());
-            
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, m_texture1->Get());
-        glActiveTexture(GL_TEXTURE1);
-        glBindTexture(GL_TEXTURE_2D, m_texture2->Get());
-
-        m_program->Use();
-        m_program->SetUniform("tex", 0);
-        m_program->SetUniform("tex2", 1);
+        m_lightMaterial = Material::Create();
+        m_lightMaterial->diffuse = Texture::CreateFromImage
+        (Image::CreateSingleColorImage(4, 4, glm::vec4(1.0f, 1.0f, 1.0f, 1.0f)).get());
+        m_lightMaterial->specular = Texture::CreateFromImage
+        (Image::CreateSingleColorImage(4, 4, glm::vec4(0.5f, 0.5f, 0.5f, 1.0f)).get());
     }
 
     // 큐브의 Transform과 카메라 생성
     {
-        // 첫 번째 큐브 Transform
-        m_cubeTransform1 = Transform::Create();
-        m_cubeTransform1->SetPosition(glm::vec3(5.0f, 10.0f, 0.0f));
-
-        // 두 번째 큐브 Transform
-        m_cubeTransform2 = Transform::Create();
-        m_cubeTransform2->SetPosition(glm::vec3(2.0f, 2.0f, 0.0f));
-
         // 조명
         m_pointLight = PointLight::Create();
         m_pointLight->GetTransform().SetPosition(glm::vec3(3.0f, 3.0f, 3.0f));
@@ -322,22 +348,26 @@ bool Context::Init()
         m_directionalLight = DirectionalLight::Create();
 
         m_spotLight = SpotLight::Create();
-        m_spotLight->GetTransform().SetPosition(glm::vec3(3.0f, 3.0f, 3.0f));
+        m_spotLight->GetTransform().SetPosition(glm::vec3(1.0f, 4.0f, 4.0f));
+        m_spotLight->SetCutoff(glm::vec2(120.0f, 5.0f));
+        m_spotLight->SetDistance(128.0f);
 
         // 카메라
         m_camera = Camera::Create();
-        m_camera->GetTransform().SetPosition(glm::vec3(0.0f, 0.0f, 5.0f));
-        m_camera->SetProjection(45.0f, (float)WINDOW_WIDTH / (float)WINDOW_HEIGHT,
-            0.01f, 100.0f);
+        m_camera->GetTransform().SetPosition(glm::vec3(0.0f, 2.5f, 8.0f));
+        m_camera->SetProjection(45.0f, (float)WINDOW_WIDTH / (float)WINDOW_HEIGHT, 0.01f, 100.0f);
+
+        // IMPORTANT : 기본적인 Scene UI를 그릴 때 는 DEPTH_TEST를 꺼야한다.
 
         // 모델 #1 
         m_model = Model::Load("./Resources/Models/spacesoldier/aliensoldier.mymodel");
         if (!m_model) return false;
         m_modelTransform = Transform::Create();
-        m_modelTransform->SetScale(glm::vec3(0.01f));
+        m_modelTransform->SetPosition(glm::vec3(2.0f, 0.0f, -2.0f));
+        m_modelTransform->SetScale(glm::vec3(0.025f));
         {
             auto animation = Animation::Load(
-                "./Resources/Models/spacesoldier/Hip Hop Dancing.fbx", m_model.get());
+                "./Resources/Models/spacesoldier/Idle.fbx", m_model.get());
             if (!animation)
             {
                 SPDLOG_ERROR("Failed to load animation");
@@ -348,12 +378,21 @@ bool Context::Init()
             m_animator = Animator::Create(std::move(animation));
             if (!m_animator) return false;
         }
+    
+        // 박스와 바닥
+        m_box1Transform = Transform::Create();
+        m_box1Transform->SetPosition(glm::vec3(-1.0f, 0.75f, -4.0f));
+        m_box1Transform->SetRotation(glm::vec3(0.0f, 30.0f, 0.0f));
+        m_box1Transform->SetScale(glm::vec3(1.5f, 1.5f, 1.5f));
 
-        // 모델 #2
-        m_backpack = Model::Load("./Resources/Models/backpack/backpack.mymodel");
-        if (!m_backpack) return false;
-        m_backpackTransform = Transform::Create();
-        m_backpackTransform->SetPosition(glm::vec3(2.0f, 0.0f, 0.0f));
+        m_box2Transform = Transform::Create();
+        m_box2Transform->SetPosition(glm::vec3(0.0f, 0.75f, 2.0f));
+        m_box2Transform->SetRotation(glm::vec3(0.0f, 20.0f, 0.0f));
+        m_box2Transform->SetScale(glm::vec3(1.5f, 1.5f, 1.5f));
+
+        m_groundTransform = Transform::Create();
+        m_groundTransform->SetPosition(glm::vec3(0.0f, -0.5f, 0.0f));
+        m_groundTransform->SetScale(glm::vec3(10.0f, 1.0f, 10.0f));
     }
 
     return true;
