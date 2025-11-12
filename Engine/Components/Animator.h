@@ -1,11 +1,14 @@
 #pragma once
+#include "Components/Bases/Component.h"
 #include "Graphics/Animation.h"
 
 CLASS_PTR(Animator)
-class Animator
+class Animator : public Component
 {
 public:
 	static AnimatorUPtr Create(AnimationUPtr animation);
+	static const ComponentType s_ComponentType = ComponentType::Animator;
+	virtual ComponentType GetType() const override { return ComponentType::Animator; }
 
 	void UpdateAnimation();
 	void PlayAnimation(AnimationUPtr animation);

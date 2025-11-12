@@ -409,7 +409,7 @@ bool Context::Init()
         m_modelTransform->SetScale(glm::vec3(0.025f));
         {
             auto animation = Animation::Load(
-                "./Resources/Models/spacesoldier/Idle.fbx", m_model.get());
+                "./Resources/Models/spacesoldier/Hip Hop Dancing.fbx", m_model.get());
             if (!animation)
             {
                 SPDLOG_ERROR("Failed to load animation");
@@ -444,6 +444,8 @@ bool Context::Init()
 /*=====================//
 //  camera controller  //
 //=====================*/
+#pragma region Camera Controller
+
 void Context::ProcessInput(GLFWwindow* window)
 {
     if (!m_cameraControl) return;
@@ -512,3 +514,5 @@ void Context::MouseButton(int button, int action, double x, double y)
         }
     }
 }
+
+#pragma endregion

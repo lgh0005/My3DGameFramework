@@ -13,6 +13,9 @@ add_library(Engine STATIC
 
    # Core
    "Game.h"                         "Game.cpp"
+   # "Core/GameObject.h"              "Core/GameObject.cpp"
+   # "Core/Scene.h"                   "Core/Scene.cpp"
+   # "Core/Renderer.h"                "Core/Renderer.cpp"
        
    # Misc
    "Misc/Defines.h"
@@ -37,17 +40,21 @@ add_library(Engine STATIC
    "Graphics/FrameBuffer.h"         "Graphics/FrameBuffer.cpp"
 
    # Components
+   "Components/Bases/Component.h"   "Components/Bases/Component.cpp"
+   "Components/Bases/Light.h"       "Components/Bases/Light.cpp"
+
    "Components/Camera.h"            "Components/Camera.cpp"
    "Components/Transform.h"         "Components/Transform.cpp"
    "Components/DirectionalLight.h"  "Components/DirectionalLight.cpp"
    "Components/PointLight.h"        "Components/PointLight.cpp"
    "Components/SpotLight.h"         "Components/SpotLight.cpp"
-    "Components/Animator.h"         "Components/Animator.cpp"
+   "Components/Animator.h"          "Components/Animator.cpp"
+   "Components/MeshRenderer.h"      "Components/MeshRenderer.cpp"
 
    # Managers
    "Managers/TimeManager.h"         "Managers/TimeManager.cpp"
    "Managers/WindowManager.h"       "Managers/WindowManager.cpp"
-   "Managers/InputManager.h"        "Managers/InputManager.cpp"
+   "Managers/InputManager.h"        "Managers/InputManager.cpp"           
 )
 
 # 2. [PCH 설정] EnginePCH.h를 PCH로 사용합니다.

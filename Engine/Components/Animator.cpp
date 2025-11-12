@@ -1,7 +1,6 @@
 #include "EnginePch.h"
 #include "Animator.h"
-#include "Graphics/Animation.h"
-#include "Graphics//Bone.h"
+#include "Graphics/Bone.h"
 
 AnimatorUPtr Animator::Create(AnimationUPtr animation)
 {
@@ -57,13 +56,6 @@ void Animator::CalculateBoneTransform(const AssimpNodeData* node, glm::mat4 pare
 
 	glm::mat4 globalTransformation = parentTransform * nodeTransform;
 	auto& boneInfoMap = m_currentAnimation->GetBoneIDMap();
-
-	/*if (boneInfoMap.find(nodeName) != boneInfoMap.end())
-	{
-		int index = boneInfoMap[nodeName].id;
-		glm::mat4 offset = boneInfoMap[nodeName].offset;
-		m_finalBoneMatrices[index] = globalTransformation * offset;
-	}*/
 
 	auto it = boneInfoMap.find(nodeName);
 	if (it != boneInfoMap.end())

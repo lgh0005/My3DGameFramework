@@ -1,14 +1,18 @@
 #pragma once
+#include "Components/Bases/Component.h"
 
 #pragma region FORWARD_DECLARATION
 CLASS_PTR(Transform)
 #pragma endregion
 
 CLASS_PTR(Camera)
-class Camera
+class Camera : public Component
 {
 public:
 	static CameraUPtr Create();
+	static const ComponentType s_ComponentType = ComponentType::Camera;
+	virtual ComponentType GetType() const override { return ComponentType::Camera; }
+
 	void SetProjection(float fovDegrees, float aspectRatio, 
 					   float nearPlane, float farPlane);
 

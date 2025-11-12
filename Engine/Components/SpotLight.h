@@ -1,4 +1,5 @@
 #pragma once
+#include "Components/Bases/Light.h"
 
 // TODO : 이후에는 Deffered shading을 이용해서 다중 조명들을 그릴 방법을 적용.
 // 더 이후에는 Compute shading을 통해서 최적화를 할 수 있겠지만, 그건 이후에
@@ -9,39 +10,33 @@ CLASS_PTR(Transform)
 #pragma endregion
 
 CLASS_PTR(SpotLight)
-class SpotLight 
+class SpotLight : public Light
 {
 public:
 	static SpotLightUPtr Create();
+	static const ComponentType s_ComponentType = ComponentType::Light;
+	virtual LightType GetLightType() const override { return LightType::Spot; }
 
+	// TEMP : GameObject가 들고 있어야 할 컴포넌트
 	Transform& GetTransform() { return *m_transform; }
 	const Transform& GetTransform() const { return *m_transform; }
 
 	const glm::vec2 GetCutoff()				const { return m_cutoff; }
 	const float GetDistance()				const { return m_distance; }
 	const glm::vec3& GetDirection()			const { return m_direction; }
-	const glm::vec3& GetAmbient()			const { return m_ambient; }
-	const glm::vec3& GetDiffuse()			const { return m_diffuse; }
-	const glm::vec3& GetSpecular()			const { return m_specular; }
 
 	void SetCutoff(const glm::vec2& cutoff)		  { m_cutoff = cutoff; }
 	void SetDistance(float distance)			  { m_distance = distance; }
 	void SetDirection(const glm::vec3& direction) { m_direction = direction; }
-	void SetAmbient(const glm::vec3& ambient)     { m_ambient = ambient; }
-	void SetDiffuse(const glm::vec3& diffuse)     { m_diffuse = diffuse; }
-	void SetSpecular(const glm::vec3& specular)   { m_specular = specular; }
 
 private:
 	SpotLight() = default;
-	bool Init();
 
+	// TEMP : GameObject가 들고 있어야 할 컴포넌트
+	bool Init();
 	TransformUPtr m_transform;
 
 	glm::vec2 m_cutoff		{ 20.0f, 5.0f };
 	float m_distance		{ 32.0f };
-
 	glm::vec3 m_direction	{ glm::vec3(-0.2f, -1.0f, 0.3f) };
-	glm::vec3 m_ambient		{ glm::vec3(0.1f, 0.1f, 0.1f) };
-	glm::vec3 m_diffuse		{ glm::vec3(0.5f, 0.5f, 0.5f) };
-	glm::vec3 m_specular	{ glm::vec3(1.0f, 1.0f, 1.0f) };
 };
