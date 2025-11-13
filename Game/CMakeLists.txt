@@ -1,8 +1,13 @@
 # 1. "Game"이라는 이름의 실행 파일(.exe)을 만듭니다.
 add_executable(Game
 
+    # Core
     pch.h pch.cpp 
     main.cpp
+
+    # TEMP : 테스트 전용 개발 씬
+    "DevScene/DevScene.h"       "DevScene/DevScene.cpp"
+    "DevScene/DevRenderer.h"    "DevScene/DevRenderer.cpp"
 )
 
 # 2. [PCH 설정] Game/pch.h를 Game 타겟 전용(PRIVATE) PCH로 사용합니다.

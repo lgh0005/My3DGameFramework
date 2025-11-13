@@ -5,7 +5,14 @@
 #include "Components/Bases/Light.h"
 #include "Components/MeshRenderer.h"
 #include "Components/Camera.h"
-// #include "Components/Animator.h"
+#include "Components/Animator.h"
+
+SceneUPtr Scene::Create()
+{
+	auto scene = SceneUPtr(new Scene());
+	if (!scene->Init()) return nullptr;
+	return scene;
+}
 
 void Scene::AddGameObject(GameObjectUPtr gameObject)
 {
@@ -16,18 +23,6 @@ void Scene::AddGameObject(GameObjectUPtr gameObject)
 		// RTTI 회피를 위한 swtich-case 문으로 컴포넌트 분리
 		switch (comp->GetType())
 		{
-			case ComponentType::MeshRenderer:
-			{
-				m_meshes.push_back(static_cast<MeshRenderer*>(comp.get()));
-				break;
-			}
-
-			case ComponentType::Light:
-			{
-				m_lights.push_back(static_cast<Light*>(comp.get()));
-				break;
-			}
-
 			case ComponentType::Camera:
 			{
 				auto* camera = static_cast<Camera*>(comp.get());
@@ -40,13 +35,21 @@ void Scene::AddGameObject(GameObjectUPtr gameObject)
 				}
 				break;
 			}
-
+			case ComponentType::MeshRenderer:
+			{
+				m_meshes.push_back(static_cast<MeshRenderer*>(comp.get()));
+				break;
+			}
+			case ComponentType::Light:
+			{
+				m_lights.push_back(static_cast<Light*>(comp.get()));
+				break;
+			}
 			case ComponentType::Animator:
 			{
 				m_animators.push_back(static_cast<Animator*>(comp.get()));
 				break;
 			}
-
 			default: break;
 		}
 	}
@@ -56,18 +59,11 @@ void Scene::AddGameObject(GameObjectUPtr gameObject)
 
 void Scene::Update()
 {
-	// (나중에 추가할 Destroy/SetActive 로직을 고려해야 합니다)
+	// TODO : 나중에 추가할 Destroy/SetActive 로직을 고려
 
+	// TODO
 	// 1. 캐시된 m_animators 목록을 순회하며 애니메이션 업데이트
-	for (auto* animator : m_animators)
-	{
-		// (나중에 추가) if (animator->GetOwner()->IsActiveInHierarchy())
-
-		// Context::Render()에 있던 로직을 그대로 가져옵니다.
-		// (만약 UpdateAnimation이 deltaTime을 받는다면 수정 필요)
-		animator->UpdateAnimation();
-	}
-
+	// 
 	// 2. (미래) 스크립트 컴포넌트 업데이트
 	// for (auto* script : m_scripts)
 	// {

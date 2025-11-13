@@ -11,8 +11,8 @@ class MeshRenderer : public Component
 {
 public:
 	static MeshRendererUPtr Create(MeshPtr mesh, MaterialPtr material);
-	static const ComponentType s_Type = ComponentType::MeshRenderer;
-	virtual ComponentType GetType() const override { return s_Type; }
+	static const ComponentType s_ComponentType = ComponentType::MeshRenderer;
+	virtual ComponentType GetType() const override { return s_ComponentType; }
 
 	MeshPtr GetMesh() const { return m_mesh; }
 	MaterialPtr GetMaterial() const { return m_material; }

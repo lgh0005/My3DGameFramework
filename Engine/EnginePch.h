@@ -24,13 +24,17 @@
 #include "Misc/Types.h"
 #include "Misc/Utils.h"
 #include "Misc/ImguiManager.h"
-#define IMGUI	ImGuiManager::Instance()
+#define IMGUI	  ImGuiManager::Instance()
 
 // Managers
 #include "Managers/TimeManager.h"
 #include "Managers/WindowManager.h"
 #include "Managers/InputManager.h"
+#include "Managers/ResourceManager.h"
+#include "Managers/SceneManager.h"
 
-#define TIME	TimeManager::Instance()
-#define WINDOW	WindowManager::Instance()
-#define INPUT	InputManager::Instance()
+#define TIME	  TimeManager::Instance()
+#define WINDOW	  WindowManager::Instance()
+#define INPUT	  InputManager::Instance()
+#define RESOURCE  ResourceManager::Instance()
+#define SCENE	  SceneManager::Instance()

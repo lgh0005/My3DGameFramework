@@ -13,6 +13,7 @@ class Scene
 {
 public:
 	static SceneUPtr Create();
+	virtual ~Scene() = default;
 
 	void AddGameObject(GameObjectUPtr gameObject);
 	void Update();
@@ -30,15 +31,19 @@ public:
 
 protected:
 	Scene() = default;
+	
+	// 씬의 컨텍스트를 작성하는 메서드
+	virtual bool Init()			{ return true; }
 
 	// 모든 게임 오브젝트를 소유
 	std::vector<GameObjectUPtr> m_gameObjects;
 
 	// 컴포넌트 업데이트를 위한 참조 포인터
-	std::vector<MeshRenderer*> m_meshes;
-	std::vector<Light*> m_lights;
-	std::vector<Camera*> m_cameras;
-	std::vector<Animator*> m_animators;
+	std::vector<MeshRenderer*>  m_meshes;
+	std::vector<Light*>			m_lights;
+	std::vector<Camera*>		m_cameras;
+	std::vector<Animator*>		m_animators;
 
-	Camera* m_activeCamera	{ nullptr };
+	// 씬의 메인 렌더링 카메라
+	Camera* m_activeCamera		{ nullptr };
 };

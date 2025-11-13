@@ -3,7 +3,7 @@ find_package(glfw3 CONFIG REQUIRED)
 find_package(glm CONFIG REQUIRED)
 find_package(imgui CONFIG REQUIRED)
 find_package(spdlog CONFIG REQUIRED)
-find_package(imguizmo CONFIG REQUIRED)
+# find_package(imguizmo CONFIG REQUIRED)
 find_package(assimp CONFIG REQUIRED)
 
 add_library(Engine STATIC
@@ -13,8 +13,8 @@ add_library(Engine STATIC
 
    # Core
    "Game.h"                         "Game.cpp"
-   # "Core/GameObject.h"              "Core/GameObject.cpp"
-   # "Core/Scene.h"                   "Core/Scene.cpp"
+   "Core/GameObject.h"              "Core/GameObject.cpp"
+   "Core/Scene.h"                   "Core/Scene.cpp"
    # "Core/Renderer.h"                "Core/Renderer.cpp"
        
    # Misc
@@ -55,6 +55,8 @@ add_library(Engine STATIC
    "Managers/TimeManager.h"         "Managers/TimeManager.cpp"
    "Managers/WindowManager.h"       "Managers/WindowManager.cpp"
    "Managers/InputManager.h"        "Managers/InputManager.cpp"           
+   "Managers/ResourceManager.h"     "Managers/ResourceManager.cpp"
+   "Managers/SceneManager.h"        "Managers/SceneManager.cpp"
 )
 
 # 2. [PCH 설정] EnginePCH.h를 PCH로 사용합니다.
@@ -70,7 +72,7 @@ target_link_libraries(Engine PUBLIC
     glfw
     glm::glm
     imgui::imgui
-    imguizmo::imguizmo
+    # imguizmo::imguizmo
     spdlog::spdlog
     assimp::assimp
 )

@@ -20,6 +20,6 @@ public:
 	void HandleWindowIconified(int32 iconified);
 
 private:
-	GLFWwindow* m_handle;
-	bool m_isIconified	{ false };
+	GLFWwindow* m_handle	{ nullptr };
+	bool m_isIconified		{ false };
 };
