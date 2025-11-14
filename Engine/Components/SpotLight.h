@@ -17,10 +17,6 @@ public:
 	static const ComponentType s_ComponentType = ComponentType::Light;
 	virtual LightType GetLightType() const override { return LightType::Spot; }
 
-	// TEMP : GameObject가 들고 있어야 할 컴포넌트
-	Transform& GetTransform() { return *m_transform; }
-	const Transform& GetTransform() const { return *m_transform; }
-
 	const glm::vec2 GetCutoff()				const { return m_cutoff; }
 	const float GetDistance()				const { return m_distance; }
 	const glm::vec3& GetDirection()			const { return m_direction; }
@@ -31,10 +27,6 @@ public:
 
 private:
 	SpotLight() = default;
-
-	// TEMP : GameObject가 들고 있어야 할 컴포넌트
-	bool Init();
-	TransformUPtr m_transform;
 
 	glm::vec2 m_cutoff		{ 20.0f, 5.0f };
 	float m_distance		{ 32.0f };

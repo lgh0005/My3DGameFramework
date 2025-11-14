@@ -13,7 +13,7 @@ void Scene::AddGameObject(GameObjectUPtr gameObject)
 
 	for (const auto& comp : go->GetAllComponents()) 
 	{
-		// RTTI 회피를 위한 swtich-case 문으로 컴포넌트 분리
+		// swtich-case 문으로 컴포넌트 분리
 		switch (comp->GetType())
 		{
 			case ComponentType::Camera:
@@ -56,6 +56,14 @@ void Scene::Update()
 
 	// TODO
 	// 1. 캐시된 m_animators 목록을 순회하며 애니메이션 업데이트
+	for (auto* animator : m_animators)
+	{
+		// (나중에 추가) if (animator->GetOwner()->IsActiveInHierarchy())
+
+		// 기존 Context::Render()에 있던 애니메이션 업데이트 로직을
+		// Scene::Update()로 이동
+		animator->UpdateAnimation();
+	}
 	// 
 	// 2. (미래) 스크립트 컴포넌트 업데이트
 	// for (auto* script : m_scripts)

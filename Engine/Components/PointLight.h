@@ -17,19 +17,10 @@ public:
 	static const ComponentType s_ComponentType = ComponentType::Light;
 	virtual LightType GetLightType() const override { return LightType::Point; }
 
-	// TEMP : GameObject가 들고 있어야 할 컴포넌트
-	Transform& GetTransform() { return *m_transform; }
-	const Transform& GetTransform() const { return *m_transform; }
-
 	const float GetDistance() const { return m_distance; }
 	void SetDistance(float distance)			{ m_distance = distance; }
 
 private:
 	PointLight() = default;
-
-	// TEMP : GameObject가 들고 있어야 할 컴포넌트
-	bool Init();
-	TransformUPtr m_transform;
-
 	float     m_distance	{ 32.0f };
 };

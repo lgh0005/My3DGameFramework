@@ -20,9 +20,11 @@ class Component
 public:
 	virtual ~Component() = default;
 	virtual ComponentType GetType() const = 0;
+
 	void SetOwner(GameObject* gameObject);
 	GameObject* GetOwner() const;
-	Transform& GetTransform() const;
+	Transform& GetTransform();
+	const Transform& GetTransform() const;
 
 protected:
 	GameObject* m_owner	   { nullptr };

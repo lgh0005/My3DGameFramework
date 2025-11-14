@@ -1,10 +1,6 @@
 #pragma once
 #include "Components/Bases/Component.h"
 
-#pragma region FORWARD_DECLARATION
-CLASS_PTR(Transform)
-#pragma endregion
-
 CLASS_PTR(Camera)
 class Camera : public Component
 {
@@ -21,17 +17,8 @@ public:
 	void LookAt(const glm::vec3& target, 
 				const glm::vec3& up = glm::vec3(0.0f, 1.0f, 0.0f));
 
-	// TODO : 이후에는 GameObject가 들고 있는 Transform을 통해서
-	// 접근하여 가져와야 함. 현재는 카메라의 위치/방향을 조작할 때 사용.
-	Transform& GetTransform() { return *m_transform; }
-	const Transform& GetTransform() const { return *m_transform; }
-
 private:
 	Camera() = default;
-	bool Init();
-	// TODO : 이후에는 GameObject가 들고 있는 Transform을 통해서
-	// 접근하여 가져와야 함.
-	TransformUPtr m_transform;
 
 	float m_fovDegrees	{ 45.0f };
 	float m_aspectRatio	{ (float)WINDOW_WIDTH / (float)WINDOW_HEIGHT};

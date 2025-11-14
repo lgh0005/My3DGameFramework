@@ -12,6 +12,7 @@ CLASS_PTR(Light)
 class Light : public Component
 {
 public:
+    static const ComponentType s_ComponentType = ComponentType::Light;
     virtual ComponentType GetType() const override { return ComponentType::Light; }
     virtual LightType GetLightType() const = 0;
 

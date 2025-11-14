@@ -5,17 +5,7 @@
 CameraUPtr Camera::Create()
 {
     auto camera = CameraUPtr(new Camera());
-    if (!camera->Init()) return nullptr;
     return std::move(camera);
-}
-
-bool Camera::Init()
-{
-    m_transform = Transform::Create();
-    if (!m_transform) return false;
-
-    SetProjection(m_fovDegrees, m_aspectRatio, m_nearPlane, m_farPlane);
-    return true;
 }
 
 void Camera::SetProjection(float fovDegrees, float aspectRatio, 
@@ -26,24 +16,29 @@ void Camera::SetProjection(float fovDegrees, float aspectRatio,
     m_nearPlane = nearPlane;
     m_farPlane = farPlane;
 
-    m_projectionMatrix = glm::perspective(glm::radians(m_fovDegrees),
+    m_projectionMatrix = glm::perspective
+    (
+        glm::radians(m_fovDegrees),
         m_aspectRatio,
         m_nearPlane,
-        m_farPlane);
+        m_farPlane
+    );
 }
 
 glm::mat4 Camera::GetViewMatrix() const
 {
-    glm::vec3 position = m_transform->GetPosition();
-    glm::vec3 forward = m_transform->GetForwardVector();
-    glm::vec3 up = m_transform->GetUpVector();
+    const Transform& transform = GetTransform();
+    glm::vec3 position = transform.GetPosition();
+    glm::vec3 forward = transform.GetForwardVector();
+    glm::vec3 up = transform.GetUpVector();
     return glm::lookAt(position, position + forward, up);
 }
 
 void Camera::LookAt(const glm::vec3& target, const glm::vec3& up)
 {
-    glm::vec3 position = m_transform->GetPosition();
+    Transform& transform = GetTransform();
+    glm::vec3 position = transform.GetPosition();
     glm::vec3 direction = glm::normalize(target - position);
     glm::quat rotation = glm::quatLookAt(direction, up);
-    m_transform->SetRotation(rotation);
+    transform.SetRotation(rotation);
 }
