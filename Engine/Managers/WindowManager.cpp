@@ -19,13 +19,31 @@ void WindowManager::HandleFramebufferSizeChange(Context& context, int32 width, i
 
     // TODO : 이후에 context에서 카메라를 분리할 수 있는 수단을 마련해야 함
     SPDLOG_INFO("framebuffer size changed: ({} x {})", width, height);
-    Camera& camera = context.GetCamera();
+    /*Camera& camera = context.GetCamera();
     camera.SetProjection
     (
         45.0f,
         (float)width / (float)height,
         0.01f, 100.0f
-    );
+    );*/
+
+    Scene* activeScene = SCENE.GetActiveScene();
+    if (activeScene)
+    {
+        Camera* camera = activeScene->GetActiveCamera();
+
+        // 2. [핵심] 카메라가 nullptr이 아닌지 "반드시" 확인합니다.
+        if (camera)
+        {
+            // 3. 카메라가 존재할 때만 프로젝션을 업데이트합니다.
+            camera->SetProjection(
+                45.0f,
+                (float)width / (float)height,
+                0.01f, 100.0f
+            );
+        }
+    }
+
     glViewport(0, 0, width, height);
 
     // 프레임 버퍼 세팅

@@ -12,13 +12,12 @@ CLASS_PTR(Scene)
 class Scene
 {
 public:
-	static SceneUPtr Create();
 	virtual ~Scene() = default;
 
-	void AddGameObject(GameObjectUPtr gameObject);
 	void Update();
+	void AddGameObject(GameObjectUPtr gameObject);
 
-	const std::vector<MeshRenderer*>& GetRenderables() const { return m_meshes; }
+	const std::vector<MeshRenderer*>& GetAllMeshes() const { return m_meshes; }
 	const std::vector<Light*>& GetLights() const { return m_lights; }
 	const std::vector<Camera*>& GetAllCameras() const { return m_cameras; }
 
@@ -33,7 +32,7 @@ protected:
 	Scene() = default;
 	
 	// 씬의 컨텍스트를 작성하는 메서드
-	virtual bool Init()			{ return true; }
+	virtual bool Init()			= 0;
 
 	// 모든 게임 오브젝트를 소유
 	std::vector<GameObjectUPtr> m_gameObjects;

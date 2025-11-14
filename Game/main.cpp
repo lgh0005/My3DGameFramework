@@ -1,10 +1,17 @@
 #include "pch.h"
 #include "Game.h"
 
+// TEMP : 테스트 씬
+#include "DevScene/DevScene.h"
+#include "DevScene/DevRenderer.h"
+
 GameUPtr g_Game;
 
 int main()
 {
+	// 0. 씬 추가
+	SCENE.RegisterScene<DevScene, DevRenderer>("DevScene");
+
 	// 1. 게임 프로그램 시작
 	g_Game = Game::Create();
 	if (!g_Game)

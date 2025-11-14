@@ -10,14 +10,23 @@ void SceneManager::LoadScene(const std::string& name)
 		return;
 	}
 
-	m_activeScene.reset();
+	m_activeScene.scene.reset();
+	m_activeScene.renderer.reset();
 
 	m_activeScene = it->second();
-	if (m_activeScene) SPDLOG_INFO("Successfully loaded scene: {}", name);
-	else			   SPDLOG_ERROR("Failed to create scene instance: {}", name);
+	if (m_activeScene.scene && m_activeScene.renderer)
+	{
+		SPDLOG_INFO("Successfully loaded scene: {}", name);
+	}
+	else SPDLOG_ERROR("Failed to create scene instance: {}", name);
 }
 
 Scene* SceneManager::GetActiveScene() const
 {
-	return m_activeScene.get();
+	return m_activeScene.scene.get();
+}
+
+Renderer* SceneManager::GetActiveRenderer() const
+{
+	return m_activeScene.renderer.get();
 }

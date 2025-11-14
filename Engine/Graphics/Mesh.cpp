@@ -5,6 +5,8 @@
 #include "Graphics/Material.h"
 #include "Graphics/Program.h"
 
+Mesh::~Mesh() = default; // TODO : 나중에 어떻게 수정할 수 있는 지 고려 필요
+
 MeshUPtr Mesh::Create(const std::vector<Vertex>& vertices,
 	                  const std::vector<uint32>& indices,
 	                  uint32 primitiveType)

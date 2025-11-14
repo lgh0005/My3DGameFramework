@@ -15,7 +15,7 @@ add_library(Engine STATIC
    "Game.h"                         "Game.cpp"
    "Core/GameObject.h"              "Core/GameObject.cpp"
    "Core/Scene.h"                   "Core/Scene.cpp"
-   # "Core/Renderer.h"                "Core/Renderer.cpp"
+   "Core/Renderer.h"                "Core/Renderer.cpp"
        
    # Misc
    "Misc/Defines.h"

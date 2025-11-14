@@ -5,6 +5,7 @@
 // TODO : 
 // 1. Destroy
 // 2. SetActive
+// 3. DontDestroyOnLoad
 
 CLASS_PTR(GameObject)
 class GameObject 

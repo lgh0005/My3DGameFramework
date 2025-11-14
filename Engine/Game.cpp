@@ -102,6 +102,7 @@ void Game::Update()
 
         // 컨텍스트 업데이트
         m_context->ProcessInput(m_window);
+        m_context->Update();
         m_context->Render();
 
         glfwSwapBuffers(m_window);

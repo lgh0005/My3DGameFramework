@@ -12,6 +12,7 @@ CLASS_PTR(Mesh)
 class Mesh
 {
 public:
+    ~Mesh(); // TODO : 나중에 소멸자 어떻게 수정할 수 있는 지 고려 필요
     static MeshUPtr Create
     (
         const std::vector<Vertex>& vertices,

@@ -1,6 +1,6 @@
 #include "EnginePch.h"
 #include "Camera.h"
-#include "Transform.h"
+#include "Components/Transform.h"
 
 CameraUPtr Camera::Create()
 {

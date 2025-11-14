@@ -22,6 +22,7 @@ class Context
 {
 public:
     static ContextUPtr Create();
+    void Update();
     void Render();
     ~Context();
 
@@ -39,56 +40,77 @@ private:
     Context() = default;
     bool Init();
 
-    // 1. 기본 텍스쳐 프로그램
-    ProgramUPtr m_program;         // 이미지를 텍스쳐로 출력
-    ProgramUPtr m_simpleProgram;   // 그냥 하나의 단색만 출력
-
-    // 2. 조명 프로그램
-    ProgramUPtr m_lighting;        // 단색에 조명 효과
-    ProgramUPtr m_lighting2;       // 텍스쳐에 조명 효과
-
-    // 3. 애니메이션 프로그램
-    ProgramUPtr m_skinningProgram; // 스키닝 전용 셰이더
-
-    // **[중요]** 4. 프레임 버퍼
-    // TODO : 이후에는 이를 바탕으로 렌더링을 수행할 예정
-    ProgramUPtr     m_postProgram;
-    FramebufferUPtr m_frameBuffer;
-    MeshUPtr        m_plane;
-    float           m_gamma     { 1.0f };
-
-// TEMP : 잠시 테스트
 private:
+    // --- ImGui 제어용 임시 변수 ---
+    Camera* m_camera{ nullptr };
+    SpotLight* m_spotLight{ nullptr };
 
-    // 큐브 Mesh
-    MeshUPtr m_box;
-    MaterialPtr m_planeMaterial;
-    MaterialPtr m_box1Material;
-    MaterialPtr m_box2Material;
-    MaterialPtr m_lightMaterial;
+    // 카메라 제어용 변수
+    glm::vec4 m_clearColor{ glm::vec4(0.1f, 0.2f, 0.3f, 0.0f) };
+    float m_cameraPitch{ -20.0f };
+    float m_cameraYaw{ 0.0f };
+    bool  m_cameraControl{ false };
+    glm::vec2 m_prevMousePos{ glm::vec2(0.0f) };
 
-    // model properties
-    ModelUPtr m_model;       // 애니메이팅 모델
-    TransformUPtr m_modelTransform;
-    AnimatorUPtr m_animator;
+    // --- 후처리(Post-Processing) 리소스 ---
+    FramebufferUPtr m_frameBuffer; // [추가] 씬 렌더링용 FBO
+    MeshUPtr		m_plane;       // [추가] 후처리용 사각형
+    ProgramUPtr		m_postProgram; // [추가] 후처리 셰이더
+    float			m_gamma{ 1.0f }; // [추가] 감마 값
 
-    // box properties
-    TransformUPtr m_box1Transform;
-    TransformUPtr m_box2Transform;
-    TransformUPtr m_groundTransform;
-     
-    // TODO : 이후에 camera controller와 같은 곳에서 처리해야 할 내용
-    CameraUPtr m_camera;
-
-    // camera parameters
-    glm::vec4 m_clearColor      { glm::vec4(0.1f, 0.2f, 0.3f, 0.0f) };
-    float m_cameraPitch         { -20.0f };
-    float m_cameraYaw           { 0.0f };
-    bool  m_cameraControl       { false };
-    glm::vec2 m_prevMousePos    { glm::vec2(0.0f) };
-
-    // 임시 조명 컴포넌트들
-    PointLightUPtr              m_pointLight;
-    DirectionalLightUPtr        m_directionalLight;
-    SpotLightPtr                m_spotLight;
+#pragma region LEGACY_CODES
+//private:
+//    // 1. 기본 텍스쳐 프로그램
+//    ProgramUPtr m_program;         // 이미지를 텍스쳐로 출력
+//    ProgramUPtr m_simpleProgram;   // 그냥 하나의 단색만 출력
+//
+//    // 2. 조명 프로그램
+//    ProgramUPtr m_lighting;        // 단색에 조명 효과
+//    ProgramUPtr m_lighting2;       // 텍스쳐에 조명 효과
+//
+//    // 3. 애니메이션 프로그램
+//    ProgramUPtr m_skinningProgram; // 스키닝 전용 셰이더
+//
+//    // **[중요]** 4. 프레임 버퍼
+//    // TODO : 이후에는 이를 바탕으로 렌더링을 수행할 예정
+//    ProgramUPtr     m_postProgram;
+//    FramebufferUPtr m_frameBuffer;
+//    MeshUPtr        m_plane;
+//    float           m_gamma     { 1.0f };
+//
+//// TEMP : 잠시 테스트
+//private:
+//
+//    // 큐브 Mesh
+//    MeshUPtr m_box;
+//    MaterialPtr m_planeMaterial;
+//    MaterialPtr m_box1Material;
+//    MaterialPtr m_box2Material;
+//    MaterialPtr m_lightMaterial;
+//
+//    // model properties
+//    ModelUPtr m_model;       // 애니메이팅 모델
+//    TransformUPtr m_modelTransform;
+//    AnimatorUPtr m_animator;
+//
+//    // box properties
+//    TransformUPtr m_box1Transform;
+//    TransformUPtr m_box2Transform;
+//    TransformUPtr m_groundTransform;
+//     
+//    // TODO : 이후에 camera controller와 같은 곳에서 처리해야 할 내용
+//    CameraUPtr m_camera;
+//
+//    // camera parameters
+//    glm::vec4 m_clearColor      { glm::vec4(0.1f, 0.2f, 0.3f, 0.0f) };
+//    float m_cameraPitch         { -20.0f };
+//    float m_cameraYaw           { 0.0f };
+//    bool  m_cameraControl       { false };
+//    glm::vec2 m_prevMousePos    { glm::vec2(0.0f) };
+//
+//    // 임시 조명 컴포넌트들
+//    PointLightUPtr              m_pointLight;
+//    DirectionalLightUPtr        m_directionalLight;
+//    SpotLightPtr                m_spotLight;
+#pragma endregion
 };

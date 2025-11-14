@@ -7,13 +7,6 @@
 #include "Components/Camera.h"
 #include "Components/Animator.h"
 
-SceneUPtr Scene::Create()
-{
-	auto scene = SceneUPtr(new Scene());
-	if (!scene->Init()) return nullptr;
-	return scene;
-}
-
 void Scene::AddGameObject(GameObjectUPtr gameObject)
 {
 	auto* go = gameObject.get();

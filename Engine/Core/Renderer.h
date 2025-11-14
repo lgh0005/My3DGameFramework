@@ -10,8 +10,8 @@ class Renderer
 public:
     virtual ~Renderer() = default;
     virtual void Render(Scene* scene)            = 0;
-    virtual bool Init(int32 width, int32 height) = 0;
 
 protected:
+    virtual bool Init(int32 width, int32 height) = 0;
 	Renderer() = default;
 };
