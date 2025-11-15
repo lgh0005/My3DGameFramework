@@ -2,10 +2,10 @@
 #include "FrameBuffer.h"
 #include "Graphics/Texture.h"
 
-FramebufferUPtr Framebuffer::Create(const TexturePtr colorAttachment) 
+FramebufferUPtr Framebuffer::Create(int32 width, int32 height, int32 samples)
 {
     auto framebuffer = FramebufferUPtr(new Framebuffer());
-    if (!framebuffer->InitWithColorAttachment(colorAttachment)) return nullptr;
+    if (!framebuffer->Init(width, height, samples)) return nullptr;
     return std::move(framebuffer);
 }
 
@@ -16,48 +16,70 @@ void Framebuffer::BindToDefault()
 
 Framebuffer::~Framebuffer() 
 {
-    if (m_depthStencilBuffer) 
-        glDeleteRenderbuffers(1, &m_depthStencilBuffer);
-
-    if (m_framebuffer) 
-        glDeleteFramebuffers(1, &m_framebuffer);
+    if (m_msaaDepthStencilBuffer)
+        glDeleteRenderbuffers(1, &m_msaaDepthStencilBuffer);
+    if (m_msaaColorBuffer)
+        glDeleteRenderbuffers(1, &m_msaaColorBuffer);
+    if (m_msaaFbo)
+        glDeleteFramebuffers(1, &m_msaaFbo);
+    if (m_resolveFbo)
+        glDeleteFramebuffers(1, &m_resolveFbo);
 }
 
 void Framebuffer::Bind() const 
 {
-    glBindFramebuffer(GL_FRAMEBUFFER, m_framebuffer);
+    glBindFramebuffer(GL_FRAMEBUFFER, m_msaaFbo);
 }
 
-bool Framebuffer::InitWithColorAttachment(const TexturePtr colorAttachment) 
+void Framebuffer::Resolve() const
 {
-    // 1. 컬러 버퍼로 사용할 텍스쳐가 뭔지를 대입, 그 후 프레임버퍼로 바인딩
-    m_colorAttachment = colorAttachment;
-    glGenFramebuffers(1, &m_framebuffer);
-    glBindFramebuffer(GL_FRAMEBUFFER, m_framebuffer);
+    glBindFramebuffer(GL_READ_FRAMEBUFFER, m_msaaFbo);
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, m_resolveFbo);
+    glBlitFramebuffer(0, 0, m_width, m_height, 0, 0, m_width, m_height,
+        GL_COLOR_BUFFER_BIT, GL_NEAREST);
+}
 
-    // 2. 프레임 버퍼에 텍스쳐를 부착
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D,
-        colorAttachment->Get(), 0);
+bool Framebuffer::Init(int32 width, int32 height, int32 samples)
+{
+    m_width = width;
+    m_height = height;
+    m_samples = samples;
 
-    // 3. 깊이 버퍼와 스텐실 버퍼를 생성
-    // 먼저 렌더 버퍼를 만들고 그 버퍼를 어떤 버퍼로 활용할 것인지를 명시하고 있다.
-    glGenRenderbuffers(1, &m_depthStencilBuffer);
-    glBindRenderbuffer(GL_RENDERBUFFER, m_depthStencilBuffer);
+    // 1. MSAA 프레임 버퍼 생성
+    glGenFramebuffers(1, &m_msaaFbo);
+    glBindFramebuffer(GL_FRAMEBUFFER, m_msaaFbo);
 
-    // 3-1. 깊이 버퍼 생성 및 바인딩
-    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8,
-        colorAttachment->GetWidth(), colorAttachment->GetHeight());
-    glBindRenderbuffer(GL_RENDERBUFFER, 0);
+    // 1-1. MSAA 컬러 렌더버퍼 생성 및 부착
+    glGenRenderbuffers(1, &m_msaaColorBuffer);
+    glBindRenderbuffer(GL_RENDERBUFFER, m_msaaColorBuffer);
+    glRenderbufferStorageMultisample(GL_RENDERBUFFER, samples, GL_RGBA8, width, height);
+    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_RENDERBUFFER, m_msaaColorBuffer);
 
-    // 3-2. 스텐실 버퍼 생성 및 바인딩
-    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT,
-        GL_RENDERBUFFER, m_depthStencilBuffer);
+    // 1-2. MSAA 깊이/스텐실 렌더버퍼 생성 및 부착
+    glGenRenderbuffers(1, &m_msaaDepthStencilBuffer);
+    glBindRenderbuffer(GL_RENDERBUFFER, m_msaaDepthStencilBuffer);
+    glRenderbufferStorageMultisample(GL_RENDERBUFFER, samples, GL_DEPTH24_STENCIL8, width, height);
+    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, m_msaaDepthStencilBuffer);
 
-    // 4.프레임 버퍼 생성 여부 체크
-    auto result = glCheckFramebufferStatus(GL_FRAMEBUFFER);
-    if (result != GL_FRAMEBUFFER_COMPLETE) 
+    // 1-3. MSAA FBO 완성 검사
+    auto msaaResult = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+    if (msaaResult != GL_FRAMEBUFFER_COMPLETE)
     {
-        SPDLOG_ERROR("failed to create framebuffer: {}", result);
+        SPDLOG_ERROR("failed to create MSAA framebuffer: {}", msaaResult);
+        return false;
+    }
+
+    // 2. 프레임 버퍼 리졸빙 (Multisample -> 일반 2D Sample로 변경)
+    glGenFramebuffers(1, &m_resolveFbo);
+    glBindFramebuffer(GL_FRAMEBUFFER, m_resolveFbo);
+
+    m_resolveTexture = Texture::Create(width, height, GL_RGBA);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_resolveTexture->Get(), 0);
+
+    auto resolveResult = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+    if (resolveResult != GL_FRAMEBUFFER_COMPLETE)
+    {
+        SPDLOG_ERROR("failed to create Resolve framebuffer: {}", resolveResult);
         return false;
     }
 

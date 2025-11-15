@@ -179,6 +179,7 @@ void DevRenderer::Render(Scene* scene)
 	glDepthFunc(GL_LESS);
 
 	// --- 3단계: 후처리 (화면) ---
+	m_frameBuffer->Resolve();
 	Framebuffer::BindToDefault();
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glDisable(GL_DEPTH_TEST);
@@ -233,7 +234,7 @@ bool DevRenderer::Init(int32 width, int32 height)
 		m_plane = Mesh::CreatePlane();
 		if (!m_plane) return false;
 
-		m_frameBuffer = Framebuffer::Create(Texture::Create(width, height, GL_RGBA));
+		m_frameBuffer = Framebuffer::Create(width, height, 4);
 		if (!m_frameBuffer) return false;
 	}
 

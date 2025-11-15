@@ -8,19 +8,27 @@ CLASS_PTR(Framebuffer)
 class Framebuffer
 {
 public:
-	static FramebufferUPtr Create(const TexturePtr colorAttachment);
+	static FramebufferUPtr Create(int32 width, int32 height, int32 samples = 4);
 	static void BindToDefault();
 	~Framebuffer();
 
-	const uint32 Get() const { return m_framebuffer; }
+	const uint32 Get() const { return m_msaaFbo; }
 	void Bind() const;
-	const TexturePtr GetColorAttachment() const { return m_colorAttachment; }
+	void Resolve() const;
+	const TexturePtr GetColorAttachment() const { return m_resolveTexture; }
 
 private:
 	Framebuffer() = default;
-	bool InitWithColorAttachment(const TexturePtr colorAttachment);
+	bool Init(int32 width, int32 height, int32 samples);
 
-	uint32 m_framebuffer			{ 0 };
-	uint32 m_depthStencilBuffer		{ 0 };
-	TexturePtr m_colorAttachment;
+	int32 m_width						{ 0 };
+	int32 m_height						{ 0 };
+	int32 m_samples						{ 0 };
+
+	uint32 m_msaaFbo					{ 0 };
+	uint32 m_msaaColorBuffer			{ 0 };
+	uint32 m_msaaDepthStencilBuffer		{ 0 }; 
+
+	uint32 m_resolveFbo					{ 0 };
+	TexturePtr m_resolveTexture;
 };
