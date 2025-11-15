@@ -4,6 +4,7 @@
 #pragma region FORWARD_DECLARATION
 CLASS_PTR(Program)
 CLASS_PTR(Framebuffer)
+CLASS_PTR(CubeTexture)
 #pragma endregion
 
 // TODO 
@@ -31,8 +32,16 @@ private:
 	FramebufferUPtr m_frameBuffer; 
 	MeshUPtr		m_plane;       
 	ProgramUPtr		m_postProgram; 
-	float			m_gamma{ 0.85f };
+	float			m_gamma{ 0.65f };
 
-	// [추가] 셰이더가 m_lightMaterial을 사용하므로 임시로 추가
-	MaterialPtr m_lightMaterial;
+	/// <summary>
+	/// 스카이 및 환경 박스
+	/// </summary>
+	MeshUPtr		m_box;
+	// --- 스카이 박스 리소스 ---
+	CubeTextureUPtr m_cubeTexture;
+	ProgramUPtr		m_skyboxProgram;
+
+	// --- 환경맵 리소스 ---
+	ProgramUPtr m_envMapProgram;
 };

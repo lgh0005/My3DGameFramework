@@ -13,6 +13,8 @@
 #include "Graphics/FrameBuffer.h"
 #include "Graphics/Texture.h"
 #include "Graphics/Material.h"
+#include "Graphics/CubeTexture.h"
+#include "Graphics/Image.h"
 
 DevRendererUPtr DevRenderer::Create(int32 width, int32 height)
 {
@@ -41,7 +43,7 @@ void DevRenderer::Render(Scene* scene)
 
 	auto projection = camera->GetProjectionMatrix();
 	auto view = camera->GetViewMatrix();
-	auto cameraPos = camera->GetOwner()->GetTransform().GetPosition();
+	auto cameraPos = camera->GetTransform().GetPosition();
 
 	// --- 조명 유니폼 설정 : 현재는 하나의 조명만을 취급 ---
 	SpotLight* mainLight = nullptr;
@@ -144,7 +146,39 @@ void DevRenderer::Render(Scene* scene)
 		}
 	}
 
-	// --- 2단계: 후처리 (화면) ---
+	// --- 추가 : 환경맵 큐브 그리기 [테스트]
+	{
+		auto transform = Transform::Create();
+		transform->SetPosition(glm::vec3(-3.0f, 0.75f, 0.0f));
+		m_envMapProgram->Use();
+		m_envMapProgram->SetUniform("model", transform->GetModelMatrix());
+		m_envMapProgram->SetUniform("view", view);
+		m_envMapProgram->SetUniform("projection", projection);
+		m_envMapProgram->SetUniform("cameraPos", cameraPos);
+		m_cubeTexture->Bind();
+		m_envMapProgram->SetUniform("skybox", 0);
+		m_box->Draw(m_envMapProgram.get());
+	}
+
+	// --- 2단계: [핵심] 스카이박스 하드코딩 렌더링 ---
+	// (Scene과 무관하게 Renderer가 직접 실행)
+	glDepthFunc(GL_LEQUAL);
+	glCullFace(GL_FRONT);
+
+	m_skyboxProgram->Use();
+
+	auto skyboxView = glm::mat4(glm::mat3(view));
+	auto transform = projection * skyboxView;
+	m_skyboxProgram->SetUniform("transform", transform);
+
+	m_cubeTexture->Bind();
+	m_skyboxProgram->SetUniform("skybox", 0);
+	m_box->Draw(m_skyboxProgram.get());
+
+	glCullFace(GL_BACK);
+	glDepthFunc(GL_LESS);
+
+	// --- 3단계: 후처리 (화면) ---
 	Framebuffer::BindToDefault();
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glDisable(GL_DEPTH_TEST);
@@ -220,6 +254,41 @@ bool DevRenderer::Init(int32 width, int32 height)
 			"./Resources/Shaders/skinningLight.frag"
 		);
 		if (!m_skinningLightProgram) return false;
+	}
+
+	// 6. m_skybox 초기화
+	{
+		auto cubeRight = Image::Load("./Resources/Images/Skybox/right.jpg", false);
+		auto cubeLeft = Image::Load("./Resources/Images/Skybox/left.jpg", false);
+		auto cubeTop = Image::Load("./Resources/Images/Skybox/top.jpg", false);
+		auto cubeBottom = Image::Load("./Resources/Images/Skybox/bottom.jpg", false);
+		auto cubeFront = Image::Load("./Resources/Images/Skybox/front.jpg", false);
+		auto cubeBack = Image::Load("./Resources/Images/Skybox/back.jpg", false);
+		m_cubeTexture = CubeTexture::CreateFromImages({
+		  cubeRight.get(),
+		  cubeLeft.get(),
+		  cubeTop.get(),
+		  cubeBottom.get(),
+		  cubeFront.get(),
+		  cubeBack.get(),
+			});
+		m_box = Mesh::CreateBox();
+		if (!m_box) return false;
+		m_skyboxProgram = Program::Create
+		(
+			"./Resources/Shaders/Skybox/skybox.vert", 
+			"./Resources/Shaders/Skybox/skybox.frag"
+		);
+	}
+
+	// 7. m_envMapProgram 초기화
+	{
+		m_envMapProgram = Program::Create
+		(
+			"./Resources/Shaders/Environment/environment.vert",
+			"./Resources/Shaders/Environment/environment.frag"
+		);
+		if (!m_envMapProgram) return false;
 	}
 
 	return true;

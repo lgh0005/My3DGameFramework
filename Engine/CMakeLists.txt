@@ -38,6 +38,7 @@ add_library(Engine STATIC
    "Graphics/Bone.h"                "Graphics/Bone.cpp"
    "Graphics/Animation.h"           "Graphics/Animation.cpp"
    "Graphics/FrameBuffer.h"         "Graphics/FrameBuffer.cpp"
+   "Graphics/CubeTexture.h"         "Graphics/CubeTexture.cpp"
 
    # Components
    "Components/Bases/Component.h"   "Components/Bases/Component.cpp"

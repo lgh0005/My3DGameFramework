@@ -4,7 +4,7 @@ CLASS_PTR(Image)
 class Image
 {
 public:
-	static ImageUPtr Load(const std::string& filepath);
+	static ImageUPtr Load(const std::string& filepath, bool flipVertical = true);
 	static ImageUPtr Create(int32 width, int32 height, int32 channelCount = 4);
 	static ImageUPtr CreateSingleColorImage(int32 width,
 		int32 height, const glm::vec4& color);
@@ -17,7 +17,7 @@ public:
 
 private:
 	Image() = default;
-	bool LoadWithStb(const std::string& filepath);
+	bool LoadWithStb(const std::string& filepath, bool flipVertical);
 	bool Allocate(int32 width, int32 height, int32 channelCount);
 	int32  m_width			{ 0 };
 	int32  m_height			{ 0 };

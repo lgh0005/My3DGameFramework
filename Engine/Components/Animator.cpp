@@ -2,14 +2,14 @@
 #include "Animator.h"
 #include "Graphics/Bone.h"
 
-AnimatorUPtr Animator::Create(AnimationUPtr animation)
+AnimatorUPtr Animator::Create(AnimationPtr animation)
 {
 	auto animator = AnimatorUPtr(new Animator());
 	if (!animator->Init(std::move(animation))) return nullptr;
 	return animator;
 }
 
-bool Animator::Init(AnimationUPtr animation)
+bool Animator::Init(AnimationPtr animation)
 {
 	if (!animation)
 	{
@@ -36,7 +36,7 @@ void Animator::UpdateAnimation()
 	}
 }
 
-void Animator::PlayAnimation(AnimationUPtr animation)
+void Animator::PlayAnimation(AnimationPtr animation)
 {
 	m_currentAnimation = std::move(animation);
 	m_currentTime = 0.0f;

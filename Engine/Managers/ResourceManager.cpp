@@ -50,6 +50,24 @@ void ResourceManager::AddTexture(const std::string& name, TexturePtr texture)
 	m_textures[name] = texture;
 }
 
+void ResourceManager::AddModel(const std::string& name, ModelPtr model)
+{
+	if (m_models.find(name) != m_models.end())
+	{
+		SPDLOG_WARN("Model resource '{}' already exists. Overwriting.", name);
+	}
+	m_models[name] = model;
+}
+
+void ResourceManager::AddAnimation(const std::string& name, AnimationPtr animation)
+{
+	if (m_animations.find(name) != m_animations.end())
+	{
+		SPDLOG_WARN("Animation resource '{}' already exists. Overwriting.", name);
+	}
+	m_animations[name] = animation;
+}
+
 #pragma endregion
 
 /*==================//
@@ -106,4 +124,3 @@ AnimationPtr ResourceManager::GetAnimation(const std::string& name) const
 }
 
 #pragma endregion
-
