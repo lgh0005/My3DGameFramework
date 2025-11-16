@@ -1,6 +1,6 @@
 #include "EnginePch.h"
 #include "Model.h"
-#include "Graphics/Mesh.h"
+#include "Graphics/SkinnedMesh.h"
 #include "Graphics/VertexLayout.h"
 #include "Graphics/Material.h"
 #include "Graphics/Image.h"
@@ -183,14 +183,14 @@ bool Model::LoadByBinary(const std::string& filename)
         inFile.read((char*)&vertexCount, sizeof(vertexCount));
         inFile.read((char*)&indexCount, sizeof(indexCount));
 
-        // 데이터 통째로 읽기 (매우 빠름!)
-        std::vector<Vertex> vertices(vertexCount);
+        // 데이터 통째로 읽기
+        std::vector<SkinnedVertex> vertices(vertexCount);
         std::vector<uint32> indices(indexCount);
-        inFile.read((char*)vertices.data(), sizeof(Vertex) * vertexCount);
+        inFile.read((char*)vertices.data(), sizeof(SkinnedVertex) * vertexCount);
         inFile.read((char*)indices.data(), sizeof(uint32) * indexCount);
 
         // GPU 버퍼 생성
-        auto mesh = Mesh::Create(vertices, indices, GL_TRIANGLES);
+        auto mesh = SkinnedMesh::Create(vertices, indices, GL_TRIANGLES);
         if (materialIndex < m_materials.size())
         {
             mesh->SetMaterial(m_materials[materialIndex]);
@@ -209,7 +209,7 @@ void Model::ProcessMesh(aiMesh* mesh, const aiScene* scene)
     SPDLOG_INFO("process mesh: {}, #vert: {}, #face: {}",
         mesh->mName.C_Str(), mesh->mNumVertices, mesh->mNumFaces);
 
-    std::vector<Vertex> vertices;
+    std::vector<SkinnedVertex> vertices;
     vertices.resize(mesh->mNumVertices);
     for (uint32 i = 0; i < mesh->mNumVertices; i++) 
     {
@@ -234,7 +234,7 @@ void Model::ProcessMesh(aiMesh* mesh, const aiScene* scene)
     // 뼈 데이터 추출 및 정점 벡터 업데이트
     ExtractBoneWeightForVertices(vertices, mesh, scene);
 
-    auto glMesh = Mesh::Create(vertices, indices, GL_TRIANGLES);
+    auto glMesh = SkinnedMesh::Create(vertices, indices, GL_TRIANGLES);
     if (mesh->mMaterialIndex >= 0)
         glMesh->SetMaterial(m_materials[mesh->mMaterialIndex]);
     m_meshes.push_back(std::move(glMesh));
@@ -261,7 +261,7 @@ void Model::Draw(const Program* program) const
 /*===================//
 //  Bone properties  //
 //===================*/
-void Model::SetVertexBoneDataToDefault(Vertex& vertex)
+void Model::SetVertexBoneDataToDefault(SkinnedVertex& vertex)
 {
     for (int i = 0; i < MAX_BONE_INFLUENCE; i++)
     {
@@ -270,7 +270,7 @@ void Model::SetVertexBoneDataToDefault(Vertex& vertex)
     }
 }
 
-void Model::SetVertexBoneData(Vertex& vertex, int boneID, float weight)
+void Model::SetVertexBoneData(SkinnedVertex& vertex, int boneID, float weight)
 {
     // -1로 초기화된 첫 번째 빈 슬롯을 찾음
     for (int i = 0; i < MAX_BONE_INFLUENCE; ++i)
@@ -284,7 +284,7 @@ void Model::SetVertexBoneData(Vertex& vertex, int boneID, float weight)
     }
 }
 
-void Model::ExtractBoneWeightForVertices(std::vector<Vertex>& vertices, 
+void Model::ExtractBoneWeightForVertices(std::vector<SkinnedVertex>& vertices,
                                     aiMesh* mesh, const aiScene* scene)
 {
     // 1. 이 메쉬의 모든 뼈를 순회

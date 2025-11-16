@@ -3,6 +3,8 @@
 
 #include "Graphics/Program.h"
 #include "Graphics/Mesh.h"
+#include "Graphics/StaticMesh.h"
+#include "Graphics/SkinnedMesh.h"
 #include "Graphics/Material.h"
 #include "Graphics/Texture.h"
 #include "Graphics/Image.h"
@@ -27,7 +29,7 @@ bool DevScene::Init()
 	// 0. 기본 리소스들을 사전 로드
 	{
 		// 0-1. 큐브
-		auto boxMesh = Mesh::CreateBox();
+		auto boxMesh = StaticMesh::CreateBox();
 		RESOURCE.AddResource<Mesh>("Cube", std::move(boxMesh));
 
 		// 0-2. 모델과 애니메이션
@@ -209,7 +211,7 @@ bool DevScene::Init()
 			auto model = RESOURCE.GetResource<Model>("aliensoldier");
 			for (uint32 i = 0; i < model->GetMeshCount(); ++i)
 			{
-				MeshPtr mesh = model->GetMesh(i);
+				SkinnedMeshPtr mesh = model->GetMesh(i);
 				modelGo->AddComponent(MeshRenderer::Create(mesh, mesh->GetMaterial()));
 			}
 

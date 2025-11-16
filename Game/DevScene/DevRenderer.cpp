@@ -10,6 +10,8 @@
 #include "Core/GameObject.h"
 #include "Graphics/Program.h"
 #include "Graphics/Mesh.h"
+#include "Graphics/StaticMesh.h"
+#include "Graphics/SkinnedMesh.h"
 #include "Graphics/FrameBuffer.h"
 #include "Graphics/Texture.h"
 #include "Graphics/Material.h"
@@ -231,7 +233,7 @@ bool DevRenderer::Init(int32 width, int32 height)
 			"./Resources/Shaders/PostProcessing/postprocess.vert",
 			"./Resources/Shaders/PostProcessing/postprocess.frag"
 		);
-		m_plane = Mesh::CreatePlane();
+		m_plane = StaticMesh::CreatePlane();
 		if (!m_plane) return false;
 
 		m_frameBuffer = Framebuffer::Create(width, height, 4);
@@ -273,7 +275,7 @@ bool DevRenderer::Init(int32 width, int32 height)
 		  cubeFront.get(),
 		  cubeBack.get(),
 			});
-		m_box = Mesh::CreateBox();
+		m_box = StaticMesh::CreateBox();
 		if (!m_box) return false;
 		m_skyboxProgram = Program::Create
 		(

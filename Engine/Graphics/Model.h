@@ -8,7 +8,7 @@
 #include "Graphics/Bone.h"
 
 #pragma region FORWARD_DECLARATION
-CLASS_PTR(Mesh)
+CLASS_PTR(SkinnedMesh)
 CLASS_PTR(Material)
 CLASS_PTR(Program)
 #pragma endregion
@@ -19,7 +19,7 @@ class Model
 public:
 	static ModelUPtr Load(const std::string& filename);
 	uint32 GetMeshCount() const { return (uint32)m_meshes.size(); }
-	MeshPtr GetMesh(int index) const { return m_meshes[index]; }
+	SkinnedMeshPtr GetMesh(int index) const { return m_meshes[index]; }
 	void Draw(const Program* program) const;
 
 /*===================//
@@ -30,9 +30,9 @@ public: // TODO : public으로 열어둬야 하는거
 	int32& GetBoneCount() { return m_BoneCounter; }
 
 private:
-	void SetVertexBoneDataToDefault(Vertex& vertex);
-	void SetVertexBoneData(Vertex& vertex, int boneID, float weight);
-	void ExtractBoneWeightForVertices(std::vector<Vertex>& vertices,
+	void SetVertexBoneDataToDefault(SkinnedVertex& vertex);
+	void SetVertexBoneData(SkinnedVertex& vertex, int boneID, float weight);
+	void ExtractBoneWeightForVertices(std::vector<SkinnedVertex>& vertices,
 								 aiMesh* mesh, const aiScene* scene);
 
 private:
@@ -45,6 +45,6 @@ private:
 	bool LoadByBinary(const std::string& filename);
 	void ProcessMesh(aiMesh* mesh, const aiScene* scene);
 	void ProcessNode(aiNode* node, const aiScene* scene);
-	std::vector<MeshPtr> m_meshes;
+	std::vector<SkinnedMeshPtr> m_meshes;
 	std::vector<MaterialPtr> m_materials;
 };

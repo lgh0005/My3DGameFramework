@@ -3,7 +3,6 @@ find_package(glfw3 CONFIG REQUIRED)
 find_package(glm CONFIG REQUIRED)
 find_package(imgui CONFIG REQUIRED)
 find_package(spdlog CONFIG REQUIRED)
-# find_package(imguizmo CONFIG REQUIRED)
 find_package(assimp CONFIG REQUIRED)
 
 add_library(Engine STATIC
@@ -32,6 +31,8 @@ add_library(Engine STATIC
    "Graphics/Image.h"               "Graphics/Image.cpp"
    "Graphics/Texture.h"             "Graphics/Texture.cpp" 
    "Graphics/Mesh.h"                "Graphics/Mesh.cpp"
+   "Graphics/StaticMesh.h"          "Graphics/StaticMesh.cpp" 
+   "Graphics/SkinnedMesh.h"         "Graphics/SkinnedMesh.cpp"
    "Graphics/Vertex.h"              "Graphics/Vertex.cpp"
    "Graphics/Model.h"               "Graphics/Model.cpp"
    "Graphics/Material.h"            "Graphics/Material.cpp"
@@ -73,7 +74,6 @@ target_link_libraries(Engine PUBLIC
     glfw
     glm::glm
     imgui::imgui
-    # imguizmo::imguizmo
     spdlog::spdlog
     assimp::assimp
 )

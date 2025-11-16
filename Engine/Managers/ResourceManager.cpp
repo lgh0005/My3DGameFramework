@@ -1,5 +1,6 @@
 #include "EnginePch.h"
 #include "ResourceManager.h"
+#include "Graphics/StaticMesh.h"
 #include "Graphics/Mesh.h"
 #include "Graphics/Material.h"
 #include "Graphics/Program.h"

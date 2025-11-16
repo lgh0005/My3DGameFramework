@@ -1,7 +1,14 @@
 #pragma once
 #define MAX_BONE_INFLUENCE 4
 
-struct Vertex
+struct StaticVertex
+{
+    glm::vec3 position;
+    glm::vec3 normal;
+    glm::vec2 texCoord;
+};
+
+struct SkinnedVertex
 {
     glm::vec3 position;
     glm::vec3 normal;

@@ -3,6 +3,7 @@
 
 #pragma region FORWARD_DECLARATION
 CLASS_PTR(Mesh)
+CLASS_PTR(StaticMesh)
 CLASS_PTR(Material)
 #pragma endregion
 
@@ -11,6 +12,7 @@ class MeshRenderer : public Component
 {
 public:
 	static MeshRendererUPtr Create(MeshPtr mesh, MaterialPtr material);
+
 	static const ComponentType s_ComponentType = ComponentType::MeshRenderer;
 	virtual ComponentType GetType() const override { return s_ComponentType; }
 
@@ -21,7 +23,9 @@ public:
 
 private:
 	MeshRenderer() = default;
+
 	bool Init(MeshPtr mesh, MaterialPtr material);
+
 	MeshPtr m_mesh;
 	MaterialPtr m_material;
 };

@@ -1,6 +1,7 @@
 #pragma once
 
 #pragma region FORWARD_DECLARATION
+CLASS_PTR(StaticMesh)
 CLASS_PTR(Mesh)
 CLASS_PTR(Material)
 CLASS_PTR(Program)
@@ -36,12 +37,12 @@ private:
 	void AddAnimation(const std::string& name, AnimationPtr animation);
 
 private:
-	std::unordered_map<std::string, MeshPtr>	  m_meshes;
-	std::unordered_map<std::string, MaterialPtr>  m_materials;
-	std::unordered_map<std::string, ProgramPtr>   m_programs;
-	std::unordered_map<std::string, TexturePtr>   m_textures;
-	std::unordered_map<std::string, ModelPtr>     m_models;
-	std::unordered_map<std::string, AnimationPtr> m_animations;
+	std::unordered_map<std::string, MeshPtr>	   m_meshes;
+	std::unordered_map<std::string, MaterialPtr>   m_materials;
+	std::unordered_map<std::string, ProgramPtr>    m_programs;
+	std::unordered_map<std::string, TexturePtr>    m_textures;
+	std::unordered_map<std::string, ModelPtr>      m_models;
+	std::unordered_map<std::string, AnimationPtr>  m_animations;
 };
 
 /*==================//
