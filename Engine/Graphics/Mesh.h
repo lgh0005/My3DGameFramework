@@ -14,6 +14,7 @@ class Mesh
 public:
     virtual ~Mesh();
 
+    usize GetIndexCount() const { return m_indexCount; }
     const VertexLayout* GetVertexLayout() const { return m_vertexLayout.get(); }
     BufferPtr GetVertexBuffer() const { return m_vertexBuffer; }
     BufferPtr GetIndexBuffer() const { return m_indexBuffer; }
@@ -23,7 +24,7 @@ public:
 
 protected:
     Mesh() = default;
-
+    usize  m_indexCount;
     uint32 m_primitiveType;
     VertexLayoutUPtr m_vertexLayout;
     BufferPtr m_vertexBuffer;

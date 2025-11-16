@@ -37,9 +37,14 @@ void VertexLayout::SetAttribI(uint32 attribIndex, int count, uint32 type,
         type, stride, (const void*)offset);
 }
 
-void VertexLayout::DisableAttrib(int attribIndex) const
+void VertexLayout::SetAttribDivisor(uint32 attribIndex, uint32 divisor) const
 {
-    // TODO : 관련 함수 작성 필요
+    glVertexAttribDivisor(attribIndex, divisor);
+}
+
+void VertexLayout::DisableAttrib(uint32 attribIndex) const
+{
+    glDisableVertexAttribArray(attribIndex);
 }
 
 void VertexLayout::Init()

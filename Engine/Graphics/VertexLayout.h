@@ -13,7 +13,8 @@ public:
         bool normalized, usize stride, uint64 offset) const;
     void SetAttribI(uint32 attribIndex, int count, uint32 type,
                     usize stride, uint64 offset) const;
-    void DisableAttrib(int attribIndex) const;
+    void SetAttribDivisor(uint32 attribIndex, uint32 divisor) const;
+    void DisableAttrib(uint32 attribIndex) const;
 
 private:
     VertexLayout() = default;
