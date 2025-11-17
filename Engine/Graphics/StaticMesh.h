@@ -20,6 +20,7 @@ public:
         uint32 primitiveType = GL_TRIANGLES
     );
     virtual ~StaticMesh() override;
+    virtual MeshType GetMeshType() const override { return MeshType::Static; }
     virtual void Draw(const Program* program) const override;
 
 private:

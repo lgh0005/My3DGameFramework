@@ -1,4 +1,4 @@
-#include "../pch.h"
+ï»¿#include "../pch.h"
 #include "DevScene.h"
 
 #include "Graphics/Program.h"
@@ -10,6 +10,8 @@
 #include "Graphics/Image.h"
 #include "Graphics/Animation.h"
 #include "Graphics/Model.h"
+#include "Graphics/Buffer.h"
+#include "Graphics/InstancedMesh.h"
 #include "Components/Camera.h"
 #include "Core/GameObject.h"
 #include "Components/Transform.h"
@@ -26,20 +28,20 @@ DevSceneUPtr DevScene::Create()
 
 bool DevScene::Init()
 {
-	// 0. ±âº» ¸®¼Ò½ºµéÀ» »çÀü ·Îµå
+	// 0. ê¸°ë³¸ ë¦¬ì†ŒìŠ¤ë“¤ì„ ì‚¬ì „ ë¡œë“œ
 	{
-		// 0-1. Å¥ºê
+		// 0-1. íë¸Œ
 		auto boxMesh = StaticMesh::CreateBox();
 		RESOURCE.AddResource<Mesh>("Cube", std::move(boxMesh));
 
-		// 0-2. ¸ğµ¨°ú ¾Ö´Ï¸ŞÀÌ¼Ç
-		// TODO : ¼ø¼­ Á¾¼Ó¼ºÀ» Ç®¾î¼­ ÀÛ¼ºÇÒ ÇÊ¿ä ÀÖÀ½
+		// 0-2. ëª¨ë¸ê³¼ ì• ë‹ˆë©”ì´ì…˜
+		// TODO : ìˆœì„œ ì¢…ì†ì„±ì„ í’€ì–´ì„œ ì‘ì„±í•  í•„ìš” ìˆìŒ
 		auto model = Model::Load("./Resources/Models/spacesoldier/aliensoldier.mymodel");
 		auto anim = Animation::Load("./Resources/Models/spacesoldier/Hip Hop Dancing.fbx", model.get());
 		RESOURCE.AddResource<Animation>("hiphopDancing", std::move(anim));
 		RESOURCE.AddResource<Model>("aliensoldier", std::move(model));
 
-		// 0-3. ¸ÓÆ¼¸®¾ó 1
+		// 0-3. ë¨¸í‹°ë¦¬ì–¼ 1
 		{
 			TextureUPtr diffuseTexture = Texture::CreateFromImage
 			(Image::CreateSingleColorImage(4, 4, glm::vec4(1.0f, 1.0f, 1.0f, 1.0f)).get());
@@ -54,7 +56,7 @@ bool DevScene::Init()
 			RESOURCE.AddResource<Material>("LightMat", std::move(lightMat));
 		}
 
-		// 0-4. ¸ÓÆ¼¸®¾ó 2
+		// 0-4. ë¨¸í‹°ë¦¬ì–¼ 2
 		{
 			TextureUPtr diffuseTexture = Texture::CreateFromImage
 			(Image::Load("./Resources/Images/container.jpg").get());
@@ -69,7 +71,7 @@ bool DevScene::Init()
 			RESOURCE.AddResource<Material>("boxMat1", std::move(box1Mat));
 		}
 
-		// 0-5. ¸ÓÆ¼¸®¾ó 3
+		// 0-5. ë¨¸í‹°ë¦¬ì–¼ 3
 		{
 			TextureUPtr diffuseTexture = Texture::CreateFromImage
 			(Image::Load("./Resources/Images/container2.png").get());
@@ -84,7 +86,7 @@ bool DevScene::Init()
 			RESOURCE.AddResource<Material>("boxMat2", std::move(box2Mat));
 		}
 
-		// 0-6. ¸ÓÆ¼¸®¾ó 4
+		// 0-6. ë¨¸í‹°ë¦¬ì–¼ 4
 		{
 			TextureUPtr diffuseTexture = Texture::CreateFromImage
 			(Image::Load("./Resources/Images/marble.jpg").get());
@@ -98,11 +100,25 @@ bool DevScene::Init()
 			box4Mat->shininess = 16.0f;
 			RESOURCE.AddResource<Material>("boxMat3", std::move(box4Mat));
 		}
+
+		// 0-7. í’€ë–¼ê¸°
+		{
+			auto grassTexture = Texture::CreateFromImage
+			(Image::Load("./Resources/Images/grass.png").get());
+			if (!grassTexture) return false;
+
+			auto grassMat = Material::Create();
+			grassMat->diffuse = std::move(grassTexture);
+			RESOURCE.AddResource<Material>("grassMat", std::move(grassMat));
+
+			auto bladeMesh = StaticMesh::CreatePlane();
+			RESOURCE.AddResource<Mesh>("grassBlade", std::move(bladeMesh));
+		}
 	}
 
-	// 3. Ä«¸Ş¶ó GameObject »ı¼º
+	// 3. ì¹´ë©”ë¼ GameObject ìƒì„±
 	{
-		// GameObject »ı¼º ¹× ¾À¿¡ µî·Ï
+		// GameObject ìƒì„± ë° ì”¬ì— ë“±ë¡
 		auto cameraObj = GameObject::Create(); if (!cameraObj) return false;
 		auto camera = Camera::Create();		   if (!camera)	   return false;
 		auto* cameraPtr = camera.get();
@@ -116,7 +132,7 @@ bool DevScene::Init()
 		AddGameObject(std::move(cameraObj));
 	}
 
-	// Á¶¸í Å¥ºê
+	// ì¡°ëª… íë¸Œ
 	{
 		auto lightGo = GameObject::Create();
 		lightGo->SetName("SpotLight");
@@ -133,7 +149,7 @@ bool DevScene::Init()
 		AddGameObject(std::move(lightGo));
 	}
 
-	// 4. Å¥ºê »ı¼º #1
+	// 4. íë¸Œ ìƒì„± #1
 	{
 		auto cubeObj = GameObject::Create();
 		cubeObj->SetName("Box1");
@@ -149,7 +165,7 @@ bool DevScene::Init()
 		AddGameObject(std::move(cubeObj));
 	}
 
-	// 5. Å¥ºê »ı¼º #2
+	// 5. íë¸Œ ìƒì„± #2
 	{
 		auto cubeObj = GameObject::Create();
 		cubeObj->SetName("Box2");
@@ -165,7 +181,7 @@ bool DevScene::Init()
 		AddGameObject(std::move(cubeObj));
 	}
 
-	// 5. Å¥ºê »ı¼º #3
+	// 5. íë¸Œ ìƒì„± #3
 	{
 		auto cubeObj = GameObject::Create();
 		cubeObj->SetName("Box2");
@@ -181,7 +197,7 @@ bool DevScene::Init()
 		AddGameObject(std::move(cubeObj));
 	}
 
-	// 6. Å¥ºê »ı¼º #3
+	// 6. íë¸Œ ìƒì„± #3
 	{
 		auto cubeObj = GameObject::Create();
 		cubeObj->SetName("Ground");
@@ -196,7 +212,7 @@ bool DevScene::Init()
 		AddGameObject(std::move(cubeObj));
 	}
 
-	// 7. ¸ğµ¨
+	// 7. ëª¨ë¸
 	{
 		{
 			auto modelGo = GameObject::Create();
@@ -204,10 +220,10 @@ bool DevScene::Init()
 			modelGo->GetTransform().SetPosition(glm::vec3(2.0f, 0.0f, -2.0f));
 			modelGo->GetTransform().SetScale(glm::vec3(0.025f));
 
-			// 3. GameObject¿¡ Animator ÄÄÆ÷³ÍÆ® Ãß°¡
+			// 3. GameObjectì— Animator ì»´í¬ë„ŒíŠ¸ ì¶”ê°€
 			modelGo->AddComponent(Animator::Create(RESOURCE.GetResource<Animation>("hiphopDancing")));
 
-			// 4. Model ¾ÈÀÇ ¸ğµç Mesh Á¶°¢À» MeshRenderer ÄÄÆ÷³ÍÆ®·Î Ãß°¡
+			// 4. Model ì•ˆì˜ ëª¨ë“  Mesh ì¡°ê°ì„ MeshRenderer ì»´í¬ë„ŒíŠ¸ë¡œ ì¶”ê°€
 			auto model = RESOURCE.GetResource<Model>("aliensoldier");
 			for (uint32 i = 0; i < model->GetMeshCount(); ++i)
 			{
@@ -215,8 +231,51 @@ bool DevScene::Init()
 				modelGo->AddComponent(MeshRenderer::Create(mesh, mesh->GetMaterial()));
 			}
 
-			// 5. ¾À¿¡ GameObject µî·Ï
+			// 5. ì”¬ì— GameObject ë“±ë¡
 			AddGameObject(std::move(modelGo));
+		}
+
+		// 8. í’€ë–¼ê¸°
+		{
+			int32 grassCount = 10000;
+			auto bladeMesh = std::static_pointer_cast<StaticMesh>
+			(RESOURCE.GetResource<Mesh>("grassBlade"));
+			auto grassMat = RESOURCE.GetResource<Material>("grassMat");
+			if (!bladeMesh || !grassMat) return false;
+
+			std::vector<glm::vec3> instanceData;
+			instanceData.resize(grassCount);
+			srand((unsigned int)time(NULL));
+			for (int i = 0; i < grassCount; ++i)
+			{
+				float x = ((float)rand() / (float)RAND_MAX * 10.0f) - 5.0f; // -5 ~ +5 (ë°”ë‹¥ í¬ê¸°)
+				float z = ((float)rand() / (float)RAND_MAX * 10.0f) - 5.0f; // -5 ~ +5
+				float y_rot = glm::radians((float)rand() / (float)RAND_MAX * 360.0f);
+				instanceData[i] = glm::vec3(x, y_rot, z);
+			}
+
+			BufferPtr instanceBuffer = Buffer::CreateWithData
+			(
+				GL_ARRAY_BUFFER, GL_STATIC_DRAW,
+				instanceData.data(), sizeof(glm::vec3), instanceData.size()
+			);
+
+			auto instancedGrass = InstancedMesh::Create
+			(
+				bladeMesh,
+				instanceBuffer,
+				grassCount,
+				InstancedMesh::Vec3Layout() // "vec3" ì„¤ê³„ë„ ì‚¬ìš©
+			);
+			instancedGrass->SetMaterial(grassMat);
+
+			auto grassGo = GameObject::Create();
+			grassGo->SetName("Grass_Field");
+
+			auto renderer = MeshRenderer::Create(std::move(instancedGrass), grassMat);
+
+			grassGo->AddComponent(std::move(renderer));
+			AddGameObject(std::move(grassGo));
 		}
 	}
 

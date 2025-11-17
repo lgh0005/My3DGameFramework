@@ -1,4 +1,4 @@
-#include "../pch.h"
+ï»¿#include "../pch.h"
 #include "DevRenderer.h"
 
 #include "Core/Scene.h"
@@ -12,6 +12,7 @@
 #include "Graphics/Mesh.h"
 #include "Graphics/StaticMesh.h"
 #include "Graphics/SkinnedMesh.h"
+#include "Graphics/InstancedMesh.h"
 #include "Graphics/FrameBuffer.h"
 #include "Graphics/Texture.h"
 #include "Graphics/Material.h"
@@ -25,8 +26,8 @@ DevRendererUPtr DevRenderer::Create(int32 width, int32 height)
 	return std::move(devRenderer);
 }
 
-// TODO : ÀÌÈÄ¿¡´Â Deferred Shading ·ÎÁ÷¿¡ ¸Â´Â ÄÚµå·Î Àü¸é ¼öÁ¤ ÇÊ¿ä
-// ÇöÀç´Â ´Ù¸¥ ±×·¡ÇÈ½º ¿ä¼ÒµéÀ» ÇĞ½À ¹× ±¸ÇöÀ» À§ÇØ¼­ Forward ShadingÀ¸·Î ÁøÇà
+// TODO : ì´í›„ì—ëŠ” Deferred Shading ë¡œì§ì— ë§ëŠ” ì½”ë“œë¡œ ì „ë©´ ìˆ˜ì • í•„ìš”
+// í˜„ì¬ëŠ” ë‹¤ë¥¸ ê·¸ë˜í”½ìŠ¤ ìš”ì†Œë“¤ì„ í•™ìŠµ ë° êµ¬í˜„ì„ ìœ„í•´ì„œ Forward Shadingìœ¼ë¡œ ì§„í–‰
 void DevRenderer::Render(Scene* scene)
 {
 	auto* camera = scene->GetActiveCamera();
@@ -47,7 +48,7 @@ void DevRenderer::Render(Scene* scene)
 	auto view = camera->GetViewMatrix();
 	auto cameraPos = camera->GetTransform().GetPosition();
 
-	// --- Á¶¸í À¯´ÏÆû ¼³Á¤ : ÇöÀç´Â ÇÏ³ªÀÇ Á¶¸í¸¸À» Ãë±Ş ---
+	// --- ì¡°ëª… ìœ ë‹ˆí¼ ì„¤ì • : í˜„ì¬ëŠ” í•˜ë‚˜ì˜ ì¡°ëª…ë§Œì„ ì·¨ê¸‰ ---
 	SpotLight* mainLight = nullptr;
 	for (auto* light : lights) 
 	{
@@ -60,7 +61,7 @@ void DevRenderer::Render(Scene* scene)
 
 	if (mainLight)
 	{
-		// ¼ÎÀÌ´õ¿¡ °øÅëÀûÀ¸·Î Àû¿ëÇÒ Á¶¸í Á¤º¸
+		// ì…°ì´ë”ì— ê³µí†µì ìœ¼ë¡œ ì ìš©í•  ì¡°ëª… ì •ë³´
 		auto& lightTransform = mainLight->GetOwner()->GetTransform();
 		glm::vec3 lightPos = lightTransform.GetPosition();
 		glm::vec3 lightDir = lightTransform.GetForwardVector();
@@ -71,7 +72,7 @@ void DevRenderer::Render(Scene* scene)
 		glm::vec3 diffuse = mainLight->GetDiffuse();
 		glm::vec3 specular = mainLight->GetSpecular();
 
-		// m_lighting2 (Á¤Àû ¸Ş½Ã¿ë)
+		// m_lighting2 (ì •ì  ë©”ì‹œìš©)
 		m_lighting2->Use();
 		m_lighting2->SetUniform("viewPos", cameraPos);
 		m_lighting2->SetUniform("light.position", lightPos);
@@ -82,8 +83,8 @@ void DevRenderer::Render(Scene* scene)
 		m_lighting2->SetUniform("light.diffuse", diffuse);
 		m_lighting2->SetUniform("light.specular", specular);
 
-		// TODO : ÀÌÈÄ¿¡ Á¶¸íÀÇ ¿µÇâÀ» ¹Şµµ·Ï ¼ÎÀÌ´õ ¼öÁ¤ ÇÊ¿ä
-		// m_skinningProgram (¾Ö´Ï¸ŞÀÌ¼Ç ¸ğµ¨¿ë)
+		// TODO : ì´í›„ì— ì¡°ëª…ì˜ ì˜í–¥ì„ ë°›ë„ë¡ ì…°ì´ë” ìˆ˜ì • í•„ìš”
+		// m_skinningProgram (ì• ë‹ˆë©”ì´ì…˜ ëª¨ë¸ìš©)
 		m_skinningLightProgram->Use();
 		m_skinningLightProgram->SetUniform("viewPos", cameraPos);
 		m_skinningLightProgram->SetUniform("light.position", lightPos);
@@ -95,20 +96,75 @@ void DevRenderer::Render(Scene* scene)
 		m_skinningLightProgram->SetUniform("light.specular", specular);
 	}
 
-	// --- ·»´õ¸µ ·çÇÁ ---
+	m_grassInstancing->Use();
+	m_grassInstancing->SetUniform("projection", projection);
+	m_grassInstancing->SetUniform("view", view);
+
+	// --- ë Œë”ë§ ë£¨í”„ ---
+	//for (const auto* meshRenderer : renderables)
+	//{
+	//	GameObject* go = meshRenderer->GetOwner();
+	//	auto mesh = meshRenderer->GetMesh();
+	//	auto& transform = go->GetTransform();
+	//	auto material = meshRenderer->GetMaterial();
+	//	Animator* animator = go->GetComponent<Animator>();
+	//	if (!mesh || !material) continue;
+
+	//	if (go->GetComponent<Light>())
+	//	{
+	//		// --- ì¡°ëª… íë¸Œ ê·¸ë¦¬ê¸° ---
+	//		m_simpleProgram->Use();
+	//		auto lightModel = transform.GetModelMatrix();
+	//		auto lightMvp = projection * view * lightModel;
+	//		m_simpleProgram->SetUniform("transform", lightMvp);
+	//		if (mainLight && go == mainLight->GetOwner())
+	//			m_simpleProgram->SetUniform("color", glm::vec4(mainLight->GetAmbient() + mainLight->GetDiffuse(), 1.0f));
+	//		mesh->Draw(m_simpleProgram.get());
+	//	}
+	//	else if (animator)
+	//	{
+	//		// --- Skinning Path (ì• ë‹ˆë©”ì´ì…˜ ëª¨ë¸) ---
+	//		m_skinningLightProgram->Use();
+	//		auto AnimModel = transform.GetModelMatrix();
+	//		m_skinningLightProgram->SetUniform("projection", projection);
+	//		m_skinningLightProgram->SetUniform("view", view);
+	//		m_skinningLightProgram->SetUniform("model", AnimModel);
+
+	//		// finalBoneMatrices ìœ ë‹ˆí¼ ë°°ì—´ ì„¤ì •
+	//		auto finalMatrices = animator->GetFinalBoneMatrices();
+	//		for (int i = 0; i < finalMatrices.size(); ++i) 
+	//			m_skinningLightProgram->SetUniform("finalBoneMatrices[" + std::to_string(i) + "]", finalMatrices[i]);
+
+	//		// ì…°ì´ë”ê°€ "material.diffuse"ë¥¼ ì‚¬ìš©í•˜ë¯€ë¡œ ì¬ì§ˆ ì„¤ì •
+	//		material->SetToProgram(m_skinningLightProgram.get());
+	//		mesh->Draw(m_skinningLightProgram.get());
+	//	}
+	//	else
+	//	{
+	//		// --- Static Mesh Path (ë°”ë‹¥, íë¸Œ ë“±) ---
+	//		m_lighting2->Use();
+	//		auto modelTransform = transform.GetModelMatrix();
+	//		auto mvp = projection * view * modelTransform;
+	//		m_lighting2->SetUniform("transform", mvp);
+	//		m_lighting2->SetUniform("modelTransform", modelTransform);
+
+	//		material->SetToProgram(m_lighting2.get());
+	//		mesh->Draw(m_lighting2.get());
+	//	}
+	//}
 	for (const auto* meshRenderer : renderables)
 	{
 		GameObject* go = meshRenderer->GetOwner();
-		auto mesh = meshRenderer->GetMesh();
+		MeshPtr mesh = meshRenderer->GetMesh(); // â—ï¸ Mesh* (ë¶€ëª¨ í¬ì¸í„°)
 		auto& transform = go->GetTransform();
 		auto material = meshRenderer->GetMaterial();
-		Animator* animator = go->GetComponent<Animator>();
 		if (!mesh || !material) continue;
 
+		// 1ìˆœìœ„: ì¡°ëª… íë¸Œì¸ê°€?
 		if (go->GetComponent<Light>())
 		{
-			// --- Á¶¸í Å¥ºê ±×¸®±â ---
 			m_simpleProgram->Use();
+			material->SetToProgram(m_simpleProgram.get());
 			auto lightModel = transform.GetModelMatrix();
 			auto lightMvp = projection * view * lightModel;
 			m_simpleProgram->SetUniform("transform", lightMvp);
@@ -116,39 +172,61 @@ void DevRenderer::Render(Scene* scene)
 				m_simpleProgram->SetUniform("color", glm::vec4(mainLight->GetAmbient() + mainLight->GetDiffuse(), 1.0f));
 			mesh->Draw(m_simpleProgram.get());
 		}
-		else if (animator)
+		// 2ìˆœìœ„: Mesh íƒ€ì…ì„ ì§ì ‘ ê²€ì‚¬
+		else switch (mesh->GetMeshType())
 		{
-			// --- Skinning Path (¾Ö´Ï¸ŞÀÌ¼Ç ¸ğµ¨) ---
+		case MeshType::Instanced:
+		{
+			// --- Instancing Path (Grass) ---
+			m_grassInstancing->Use();
+			// (grass.fragê°€ "tex"ë¥¼ ì‚¬ìš©í•˜ë¯€ë¡œ, 
+			//  material->SetToProgramì´ diffuseë¥¼ "tex"ì— ë°”ì¸ë”©í•´ì•¼ í•¨)
+			material->SetToProgram(m_grassInstancing.get());
+			mesh->Draw(m_grassInstancing.get()); // 
+			break;
+		}
+		case MeshType::Skinned:
+		{
+			// --- Skinning Path ---
+			Animator* animator = go->GetComponent<Animator>();
+			if (!animator) continue;
+
 			m_skinningLightProgram->Use();
-			auto AnimModel = transform.GetModelMatrix();
 			m_skinningLightProgram->SetUniform("projection", projection);
 			m_skinningLightProgram->SetUniform("view", view);
+
+			material->SetToProgram(m_skinningLightProgram.get());
+
+			auto AnimModel = transform.GetModelMatrix();
 			m_skinningLightProgram->SetUniform("model", AnimModel);
 
-			// finalBoneMatrices À¯´ÏÆû ¹è¿­ ¼³Á¤
 			auto finalMatrices = animator->GetFinalBoneMatrices();
-			for (int i = 0; i < finalMatrices.size(); ++i) 
+			for (int i = 0; i < finalMatrices.size(); ++i)
 				m_skinningLightProgram->SetUniform("finalBoneMatrices[" + std::to_string(i) + "]", finalMatrices[i]);
 
-			// ¼ÎÀÌ´õ°¡ "material.diffuse"¸¦ »ç¿ëÇÏ¹Ç·Î ÀçÁú ¼³Á¤
-			material->SetToProgram(m_skinningLightProgram.get());
-			mesh->Draw(m_skinningLightProgram.get());
+			mesh->Draw(m_skinningLightProgram.get()); // â—ï¸ SkinnedMesh::Draw()
+			break;
 		}
-		else
+		case MeshType::Static:
 		{
-			// --- Static Mesh Path (¹Ù´Ú, Å¥ºê µî) ---
+			// --- Static Mesh Path (ë°”ë‹¥, íë¸Œ ë“±) ---
 			m_lighting2->Use();
+			m_lighting2->SetUniform("projection", projection);
+			m_lighting2->SetUniform("view", view);
+			material->SetToProgram(m_lighting2.get());
+
 			auto modelTransform = transform.GetModelMatrix();
 			auto mvp = projection * view * modelTransform;
 			m_lighting2->SetUniform("transform", mvp);
 			m_lighting2->SetUniform("modelTransform", modelTransform);
 
-			material->SetToProgram(m_lighting2.get());
-			mesh->Draw(m_lighting2.get());
+			mesh->Draw(m_lighting2.get()); // â—ï¸ StaticMesh::Draw()
+			break;
+		}
 		}
 	}
 
-	// --- Ãß°¡ : È¯°æ¸Ê Å¥ºê ±×¸®±â [Å×½ºÆ®]
+	// --- ì¶”ê°€ : í™˜ê²½ë§µ íë¸Œ ê·¸ë¦¬ê¸° [í…ŒìŠ¤íŠ¸]
 	{
 		auto transform = Transform::Create();
 		transform->SetPosition(glm::vec3(-3.0f, 0.75f, 0.0f));
@@ -162,8 +240,8 @@ void DevRenderer::Render(Scene* scene)
 		m_box->Draw(m_envMapProgram.get());
 	}
 
-	// --- 2´Ü°è: [ÇÙ½É] ½ºÄ«ÀÌ¹Ú½º ÇÏµåÄÚµù ·»´õ¸µ ---
-	// (Scene°ú ¹«°üÇÏ°Ô Renderer°¡ Á÷Á¢ ½ÇÇà)
+	// --- 2ë‹¨ê³„: [í•µì‹¬] ìŠ¤ì¹´ì´ë°•ìŠ¤ í•˜ë“œì½”ë”© ë Œë”ë§ ---
+	// (Sceneê³¼ ë¬´ê´€í•˜ê²Œ Rendererê°€ ì§ì ‘ ì‹¤í–‰)
 	glDepthFunc(GL_LEQUAL);
 	glCullFace(GL_FRONT);
 
@@ -180,7 +258,7 @@ void DevRenderer::Render(Scene* scene)
 	glCullFace(GL_BACK);
 	glDepthFunc(GL_LESS);
 
-	// --- 3´Ü°è: ÈÄÃ³¸® (È­¸é) ---
+	// --- 3ë‹¨ê³„: í›„ì²˜ë¦¬ (í™”ë©´) ---
 	m_frameBuffer->Resolve();
 	Framebuffer::BindToDefault();
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -197,7 +275,7 @@ void DevRenderer::Render(Scene* scene)
 
 bool DevRenderer::Init(int32 width, int32 height)
 {
-	// 1. m_simpleProgram ÃÊ±âÈ­
+	// 1. m_simpleProgram ì´ˆê¸°í™”
 	{
 		m_simpleProgram = Program::Create
 		(
@@ -207,7 +285,7 @@ bool DevRenderer::Init(int32 width, int32 height)
 		if (!m_simpleProgram) return false;
 	}
 
-	// 2. m_program ÃÊ±âÈ­
+	// 2. m_program ì´ˆê¸°í™”
 	{
 		m_lighting2 = Program::Create
 		(
@@ -217,7 +295,7 @@ bool DevRenderer::Init(int32 width, int32 height)
 		if (!m_lighting2) return false;
 	}
 
-	// 2. m_program ÃÊ±âÈ­
+	// 2. m_program ì´ˆê¸°í™”
 	{
 		m_program = Program::Create
 		(
@@ -227,7 +305,7 @@ bool DevRenderer::Init(int32 width, int32 height)
 		if (!m_program) return false;
 	}
 
-	// 3. ÇÁ·¹ÀÓ ¹öÆÛ »ı¼º
+	// 3. í”„ë ˆì„ ë²„í¼ ìƒì„±
 	{
 		m_postProgram = Program::Create(
 			"./Resources/Shaders/PostProcessing/postprocess.vert",
@@ -240,7 +318,7 @@ bool DevRenderer::Init(int32 width, int32 height)
 		if (!m_frameBuffer) return false;
 	}
 
-	// 4. m_skinningProgram ÃÊ±âÈ­
+	// 4. m_skinningProgram ì´ˆê¸°í™”
 	{
 		m_skinningProgram = Program::Create
 		("./Resources/Shaders/skinning.vert",
@@ -249,7 +327,7 @@ bool DevRenderer::Init(int32 width, int32 height)
 		if (!m_skinningProgram) return false;
 	}
 
-	// 5. m_skinningLightProgram ÃÊ±âÈ­
+	// 5. m_skinningLightProgram ì´ˆê¸°í™”
 	{
 		m_skinningLightProgram = Program::Create
 		(
@@ -259,7 +337,7 @@ bool DevRenderer::Init(int32 width, int32 height)
 		if (!m_skinningLightProgram) return false;
 	}
 
-	// 6. m_skybox ÃÊ±âÈ­
+	// 6. m_skybox ì´ˆê¸°í™”
 	{
 		auto cubeRight = Image::Load("./Resources/Images/Skybox/right.jpg", false);
 		auto cubeLeft = Image::Load("./Resources/Images/Skybox/left.jpg", false);
@@ -284,7 +362,7 @@ bool DevRenderer::Init(int32 width, int32 height)
 		);
 	}
 
-	// 7. m_envMapProgram ÃÊ±âÈ­
+	// 7. m_envMapProgram ì´ˆê¸°í™”
 	{
 		m_envMapProgram = Program::Create
 		(
@@ -292,6 +370,15 @@ bool DevRenderer::Init(int32 width, int32 height)
 			"./Resources/Shaders/Environment/environment.frag"
 		);
 		if (!m_envMapProgram) return false;
+	}
+
+	// 8. m_grassInstancing ì´ˆê¸°í™”
+	{
+		m_grassInstancing = Program::Create(
+			"./Resources/Shaders/Instancing/grass.vert",
+			"./Resources/Shaders/Instancing/grass.frag"
+		);
+		if (!m_grassInstancing) return false;
 	}
 
 	return true;

@@ -22,6 +22,7 @@ public:
         SetupFunc setupFunc
     );
 	virtual ~InstancedMesh() = default;
+    virtual MeshType GetMeshType() const override { return MeshType::Instanced; }
 	virtual void Draw(const Program* program) const override;
 
 private:

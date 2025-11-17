@@ -27,6 +27,7 @@ private:
 	ProgramUPtr m_lighting2;
 	ProgramUPtr m_skinningProgram;		// 조명 영향 없는 스키닝 셰이더
 	ProgramUPtr m_skinningLightProgram; // 조명 영향을 받는 스키닝 셰이더
+	ProgramUPtr m_grassInstancing;	    // 인스턴싱 테스트
 
 	// --- 후처리(Post-Processing) 리소스 ---
 	FramebufferUPtr m_frameBuffer; 

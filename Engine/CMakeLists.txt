@@ -33,6 +33,7 @@ add_library(Engine STATIC
    "Graphics/Mesh.h"                "Graphics/Mesh.cpp"
    "Graphics/StaticMesh.h"          "Graphics/StaticMesh.cpp" 
    "Graphics/SkinnedMesh.h"         "Graphics/SkinnedMesh.cpp"
+   "Graphics/InstancedMesh.h"       "Graphics/InstancedMesh.cpp"
    "Graphics/Vertex.h"              "Graphics/Vertex.cpp"
    "Graphics/Model.h"               "Graphics/Model.cpp"
    "Graphics/Material.h"            "Graphics/Material.cpp"
