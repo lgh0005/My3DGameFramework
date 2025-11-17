@@ -30,7 +30,7 @@ void WindowManager::HandleFramebufferSizeChange(Context& context, int32 width, i
     Scene* activeScene = SCENE.GetActiveScene();
     if (activeScene)
     {
-        Camera* camera = activeScene->GetActiveCamera();
+        Camera* camera = activeScene->GetMainCamera();
 
         // 2. [핵심] 카메라가 nullptr이 아닌지 "반드시" 확인합니다.
         if (camera)

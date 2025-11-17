@@ -144,7 +144,7 @@ bool Context::Init()
     Scene* activeScene = SCENE.GetActiveScene();
     if (activeScene)
     {
-        m_camera = activeScene->GetActiveCamera();
+        m_camera = activeScene->GetMainCamera();
 
         // 씬에서 스포트라이트를 찾아 m_spotLight에 캐시
         for (auto* light : activeScene->GetLights()) 
@@ -172,7 +172,7 @@ void Context::ProcessInput(GLFWwindow* window)
 
     // 1. m_camera에서 Transform 참조를 가져옵니다.
     Scene* scene = SCENE.GetActiveScene(); if (!scene) return;
-    Camera* camera = scene->GetActiveCamera(); if (!camera) return;
+    Camera* camera = scene->GetMainCamera(); if (!camera) return;
     auto& camTransform = camera->GetTransform();
 
     // 2. Transform에서 직접 방향 벡터를 가져옵니다.
@@ -202,7 +202,7 @@ void Context::MouseMove(double x, double y)
     if (!m_cameraControl) return;
 
     Scene* scene = SCENE.GetActiveScene(); if (!scene) return;
-    Camera* camera = scene->GetActiveCamera(); if (!camera) return;
+    Camera* camera = scene->GetMainCamera(); if (!camera) return;
 
     auto pos = glm::vec2((float)x, (float)y);
     auto deltaPos = pos - m_prevMousePos;

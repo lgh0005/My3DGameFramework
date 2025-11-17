@@ -1,14 +1,16 @@
-#pragma once
+ï»¿#pragma once
 #include "Core/Renderer.h"
 
 #pragma region FORWARD_DECLARATION
 CLASS_PTR(Program)
 CLASS_PTR(Framebuffer)
 CLASS_PTR(CubeTexture)
+CLASS_PTR(SpotLight)
+CLASS_PTR(ShadowMap)
 #pragma endregion
 
 // TODO 
-// 1. ÇÁ·¹ÀÓ ¹öÆÛ ±â¹İ ·»´õ¸µ
+// 1. í”„ë ˆì„ ë²„í¼ ê¸°ë°˜ ë Œë”ë§
 
 CLASS_PTR(DevRenderer)
 class DevRenderer : public Renderer
@@ -21,28 +23,30 @@ private:
 	DevRenderer() = default;
 	virtual bool Init(int32 width, int32 height) override;
 
+// TEMP : ì—­í• ì— ë§ê²Œ ìš°ì„  ë‚˜ëˆ”
 private:
-	ProgramUPtr m_program;
-	ProgramUPtr m_simpleProgram;
-	ProgramUPtr m_lighting2;
-	ProgramUPtr m_skinningProgram;		// Á¶¸í ¿µÇâ ¾ø´Â ½ºÅ°´× ¼ÎÀÌ´õ
-	ProgramUPtr m_skinningLightProgram; // Á¶¸í ¿µÇâÀ» ¹Ş´Â ½ºÅ°´× ¼ÎÀÌ´õ
-	ProgramUPtr m_grassInstancing;	    // ÀÎ½ºÅÏ½Ì Å×½ºÆ®
+	void RenderShadowPass(Scene* scene, Camera* camera, SpotLight* mainLight);
+	void RenderMainPass(Scene* scene, Camera* camera, SpotLight* mainLight);
+	void RenderSkyboxPass(Scene* scene, Camera* camera);
+	void RenderPostProcessingPass(Scene* scene, Camera* camera);
 
-	// --- ÈÄÃ³¸®(Post-Processing) ¸®¼Ò½º ---
+private:
+	// --- í›„ì²˜ë¦¬(Post-Processing) ë¦¬ì†ŒìŠ¤ ---
 	FramebufferUPtr m_frameBuffer; 
 	MeshUPtr		m_plane;       
 	ProgramUPtr		m_postProgram; 
-	float			m_gamma{ 0.65f };
+	float			m_gamma{ 1.0f };
 
-	/// <summary>
-	/// ½ºÄ«ÀÌ ¹× È¯°æ ¹Ú½º
-	/// </summary>
+	// --- ìŠ¤ì¹´ì´ ë° í™˜ê²½ ë°•ìŠ¤ ---
 	MeshUPtr		m_box;
-	// --- ½ºÄ«ÀÌ ¹Ú½º ¸®¼Ò½º ---
 	CubeTextureUPtr m_cubeTexture;
 	ProgramUPtr		m_skyboxProgram;
 
-	// --- È¯°æ¸Ê ¸®¼Ò½º ---
+	// --- í™˜ê²½ë§µ ë¦¬ì†ŒìŠ¤ ---
 	ProgramUPtr m_envMapProgram;
+
+	// --- ê·¸ë¦¼ì ë§¤í•‘ ë¦¬ì†ŒìŠ¤ ---
+	ShadowMapUPtr m_shadowMap;
+	ProgramUPtr	  m_shadowDepthProgram;
+	Light*		  m_mainLight;
 };

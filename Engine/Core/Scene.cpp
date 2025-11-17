@@ -7,6 +7,8 @@
 #include "Components/Camera.h"
 #include "Components/Animator.h"
 
+Scene::~Scene() = default;
+
 void Scene::AddGameObject(GameObjectUPtr gameObject)
 {
 	auto* go = gameObject.get();
@@ -20,19 +22,13 @@ void Scene::AddGameObject(GameObjectUPtr gameObject)
 			{
 				auto* camera = static_cast<Camera*>(comp.get());
 				m_cameras.push_back(camera);
-
-				// 씬에 추가된 첫 번째 카메라를 활성 카메라로 자동 설정
-				if (!m_activeCamera)
-				{
-					m_activeCamera = camera;
-				}
 				break;
 			}
-			case ComponentType::MeshRenderer:
-			{
-				m_meshes.push_back(static_cast<MeshRenderer*>(comp.get()));
-				break;
-			}
+			//case ComponentType::MeshRenderer:
+			//{
+			//	m_meshes.push_back(static_cast<MeshRenderer*>(comp.get()));
+			//	break;
+			//}
 			case ComponentType::Light:
 			{
 				m_lights.push_back(static_cast<Light*>(comp.get()));
@@ -48,6 +44,37 @@ void Scene::AddGameObject(GameObjectUPtr gameObject)
 	}
 
 	m_gameObjects.push_back(std::move(gameObject));
+}
+
+void Scene::AddRenderPass(const std::string& name, RenderPassUPtr renderPass)
+{
+	auto it = m_renderPasses.find(name);
+	if (it != m_renderPasses.end())
+		SPDLOG_WARN("RenderPass '{}' already exists. Overwriting.", name);
+	m_renderPasses[name] = std::move(renderPass);
+}
+
+bool Scene::Init()
+{
+	if (!CreateNessesaryRenderPasses())
+	{
+		SPDLOG_ERROR("failed to create render passes.");
+		return false;
+	}
+
+	if (!LoadNessesaryResources())
+	{
+		SPDLOG_ERROR("failed to load resources.");
+		return false;
+	}
+
+	if (!CreateSceneContext())
+	{
+		SPDLOG_ERROR("failed to create scene context.");
+		return false;
+	}
+
+	return true;
 }
 
 void Scene::Update()

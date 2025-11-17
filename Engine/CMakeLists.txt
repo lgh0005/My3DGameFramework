@@ -15,6 +15,7 @@ add_library(Engine STATIC
    "Core/GameObject.h"              "Core/GameObject.cpp"
    "Core/Scene.h"                   "Core/Scene.cpp"
    "Core/Renderer.h"                "Core/Renderer.cpp"
+   "Core/RenderPass.h"              "Core/RenderPass.cpp"
        
    # Misc
    "Misc/Defines.h"
@@ -41,6 +42,7 @@ add_library(Engine STATIC
    "Graphics/Animation.h"           "Graphics/Animation.cpp"
    "Graphics/FrameBuffer.h"         "Graphics/FrameBuffer.cpp"
    "Graphics/CubeTexture.h"         "Graphics/CubeTexture.cpp"
+   "Graphics/ShadowMap.h"           "Graphics/ShadowMap.cpp"
 
    # Components
    "Components/Bases/Component.h"   "Components/Bases/Component.cpp"

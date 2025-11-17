@@ -8,7 +8,7 @@ CLASS_PTR(Renderer)
 class Renderer
 {
 public:
-    virtual ~Renderer() = default;
+    virtual ~Renderer();
     virtual void Render(Scene* scene)            = 0;
 
 protected:

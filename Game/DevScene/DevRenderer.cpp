@@ -1,7 +1,8 @@
-﻿#include "../pch.h"
+﻿#include "pch.h"
 #include "DevRenderer.h"
 
 #include "Core/Scene.h"
+#include "Core/RenderPass.h"
 #include "Components/Camera.h"
 #include "Components/MeshRenderer.h"
 #include "Components/Transform.h"
@@ -18,6 +19,7 @@
 #include "Graphics/Material.h"
 #include "Graphics/CubeTexture.h"
 #include "Graphics/Image.h"
+#include "Graphics/ShadowMap.h"
 
 DevRendererUPtr DevRenderer::Create(int32 width, int32 height)
 {
@@ -30,281 +32,29 @@ DevRendererUPtr DevRenderer::Create(int32 width, int32 height)
 // 현재는 다른 그래픽스 요소들을 학습 및 구현을 위해서 Forward Shading으로 진행
 void DevRenderer::Render(Scene* scene)
 {
-	auto* camera = scene->GetActiveCamera();
+	// 메인 카메라 속성 가져오기
+	auto* camera = scene->GetMainCamera();
 	if (!camera) return;
 
-	const auto& lights = scene->GetLights();
-	const auto& renderables = scene->GetAllMeshes();
+	// 메인 조명 속성 가져오기
+	SpotLight* mainLight = static_cast<SpotLight*>(scene->GetMainLight());
+	// const auto& renderables = scene->GetAllMeshes();
 
-	m_frameBuffer->Bind();
+	// [패스 1] 그림자 패스: m_shadowMap에 깊이 정보 기록
+	RenderShadowPass(scene, camera, mainLight);
 
-	glClearColor(0.1f, 0.2f, 0.3f, 0.0f);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-	glEnable(GL_DEPTH_TEST);
-	glEnable(GL_CULL_FACE);
-	glCullFace(GL_BACK);
+	// [패스 2] 메인 씬 패스: m_frameBuffer에 씬 렌더링
+	RenderMainPass(scene, camera, mainLight);
 
-	auto projection = camera->GetProjectionMatrix();
-	auto view = camera->GetViewMatrix();
-	auto cameraPos = camera->GetTransform().GetPosition();
+	// [패스 3] 스카이박스 패스: m_frameBuffer에 스카이박스 덧그리기
+	RenderSkyboxPass(scene, camera);
 
-	// --- 조명 유니폼 설정 : 현재는 하나의 조명만을 취급 ---
-	SpotLight* mainLight = nullptr;
-	for (auto* light : lights) 
-	{
-		if (light->GetLightType() == LightType::Spot) 
-		{
-			mainLight = static_cast<SpotLight*>(light);
-			break;
-		}
-	}
-
-	if (mainLight)
-	{
-		// 셰이더에 공통적으로 적용할 조명 정보
-		auto& lightTransform = mainLight->GetOwner()->GetTransform();
-		glm::vec3 lightPos = lightTransform.GetPosition();
-		glm::vec3 lightDir = lightTransform.GetForwardVector();
-		glm::vec2 cutoff = mainLight->GetCutoff();
-		cutoff = glm::vec2(cosf(glm::radians(cutoff[0])), cosf(glm::radians(cutoff[0] + cutoff[1])));
-		glm::vec3 attenuation = Utils::GetAttenuationCoeff(mainLight->GetDistance());
-		glm::vec3 ambient = mainLight->GetAmbient();
-		glm::vec3 diffuse = mainLight->GetDiffuse();
-		glm::vec3 specular = mainLight->GetSpecular();
-
-		// m_lighting2 (정적 메시용)
-		m_lighting2->Use();
-		m_lighting2->SetUniform("viewPos", cameraPos);
-		m_lighting2->SetUniform("light.position", lightPos);
-		m_lighting2->SetUniform("light.direction", lightDir);
-		m_lighting2->SetUniform("light.cutoff", cutoff);
-		m_lighting2->SetUniform("light.attenuation", attenuation);
-		m_lighting2->SetUniform("light.ambient", ambient);
-		m_lighting2->SetUniform("light.diffuse", diffuse);
-		m_lighting2->SetUniform("light.specular", specular);
-
-		// TODO : 이후에 조명의 영향을 받도록 셰이더 수정 필요
-		// m_skinningProgram (애니메이션 모델용)
-		m_skinningLightProgram->Use();
-		m_skinningLightProgram->SetUniform("viewPos", cameraPos);
-		m_skinningLightProgram->SetUniform("light.position", lightPos);
-		m_skinningLightProgram->SetUniform("light.direction", lightDir);
-		m_skinningLightProgram->SetUniform("light.cutoff", cutoff);
-		m_skinningLightProgram->SetUniform("light.attenuation", attenuation);
-		m_skinningLightProgram->SetUniform("light.ambient", ambient);
-		m_skinningLightProgram->SetUniform("light.diffuse", diffuse);
-		m_skinningLightProgram->SetUniform("light.specular", specular);
-	}
-
-	m_grassInstancing->Use();
-	m_grassInstancing->SetUniform("projection", projection);
-	m_grassInstancing->SetUniform("view", view);
-
-	// --- 렌더링 루프 ---
-	//for (const auto* meshRenderer : renderables)
-	//{
-	//	GameObject* go = meshRenderer->GetOwner();
-	//	auto mesh = meshRenderer->GetMesh();
-	//	auto& transform = go->GetTransform();
-	//	auto material = meshRenderer->GetMaterial();
-	//	Animator* animator = go->GetComponent<Animator>();
-	//	if (!mesh || !material) continue;
-
-	//	if (go->GetComponent<Light>())
-	//	{
-	//		// --- 조명 큐브 그리기 ---
-	//		m_simpleProgram->Use();
-	//		auto lightModel = transform.GetModelMatrix();
-	//		auto lightMvp = projection * view * lightModel;
-	//		m_simpleProgram->SetUniform("transform", lightMvp);
-	//		if (mainLight && go == mainLight->GetOwner())
-	//			m_simpleProgram->SetUniform("color", glm::vec4(mainLight->GetAmbient() + mainLight->GetDiffuse(), 1.0f));
-	//		mesh->Draw(m_simpleProgram.get());
-	//	}
-	//	else if (animator)
-	//	{
-	//		// --- Skinning Path (애니메이션 모델) ---
-	//		m_skinningLightProgram->Use();
-	//		auto AnimModel = transform.GetModelMatrix();
-	//		m_skinningLightProgram->SetUniform("projection", projection);
-	//		m_skinningLightProgram->SetUniform("view", view);
-	//		m_skinningLightProgram->SetUniform("model", AnimModel);
-
-	//		// finalBoneMatrices 유니폼 배열 설정
-	//		auto finalMatrices = animator->GetFinalBoneMatrices();
-	//		for (int i = 0; i < finalMatrices.size(); ++i) 
-	//			m_skinningLightProgram->SetUniform("finalBoneMatrices[" + std::to_string(i) + "]", finalMatrices[i]);
-
-	//		// 셰이더가 "material.diffuse"를 사용하므로 재질 설정
-	//		material->SetToProgram(m_skinningLightProgram.get());
-	//		mesh->Draw(m_skinningLightProgram.get());
-	//	}
-	//	else
-	//	{
-	//		// --- Static Mesh Path (바닥, 큐브 등) ---
-	//		m_lighting2->Use();
-	//		auto modelTransform = transform.GetModelMatrix();
-	//		auto mvp = projection * view * modelTransform;
-	//		m_lighting2->SetUniform("transform", mvp);
-	//		m_lighting2->SetUniform("modelTransform", modelTransform);
-
-	//		material->SetToProgram(m_lighting2.get());
-	//		mesh->Draw(m_lighting2.get());
-	//	}
-	//}
-	for (const auto* meshRenderer : renderables)
-	{
-		GameObject* go = meshRenderer->GetOwner();
-		MeshPtr mesh = meshRenderer->GetMesh(); // ❗️ Mesh* (부모 포인터)
-		auto& transform = go->GetTransform();
-		auto material = meshRenderer->GetMaterial();
-		if (!mesh || !material) continue;
-
-		// 1순위: 조명 큐브인가?
-		if (go->GetComponent<Light>())
-		{
-			m_simpleProgram->Use();
-			material->SetToProgram(m_simpleProgram.get());
-			auto lightModel = transform.GetModelMatrix();
-			auto lightMvp = projection * view * lightModel;
-			m_simpleProgram->SetUniform("transform", lightMvp);
-			if (mainLight && go == mainLight->GetOwner())
-				m_simpleProgram->SetUniform("color", glm::vec4(mainLight->GetAmbient() + mainLight->GetDiffuse(), 1.0f));
-			mesh->Draw(m_simpleProgram.get());
-		}
-		// 2순위: Mesh 타입을 직접 검사
-		else switch (mesh->GetMeshType())
-		{
-		case MeshType::Instanced:
-		{
-			// --- Instancing Path (Grass) ---
-			m_grassInstancing->Use();
-			// (grass.frag가 "tex"를 사용하므로, 
-			//  material->SetToProgram이 diffuse를 "tex"에 바인딩해야 함)
-			material->SetToProgram(m_grassInstancing.get());
-			mesh->Draw(m_grassInstancing.get()); // 
-			break;
-		}
-		case MeshType::Skinned:
-		{
-			// --- Skinning Path ---
-			Animator* animator = go->GetComponent<Animator>();
-			if (!animator) continue;
-
-			m_skinningLightProgram->Use();
-			m_skinningLightProgram->SetUniform("projection", projection);
-			m_skinningLightProgram->SetUniform("view", view);
-
-			material->SetToProgram(m_skinningLightProgram.get());
-
-			auto AnimModel = transform.GetModelMatrix();
-			m_skinningLightProgram->SetUniform("model", AnimModel);
-
-			auto finalMatrices = animator->GetFinalBoneMatrices();
-			for (int i = 0; i < finalMatrices.size(); ++i)
-				m_skinningLightProgram->SetUniform("finalBoneMatrices[" + std::to_string(i) + "]", finalMatrices[i]);
-
-			mesh->Draw(m_skinningLightProgram.get()); // ❗️ SkinnedMesh::Draw()
-			break;
-		}
-		case MeshType::Static:
-		{
-			// --- Static Mesh Path (바닥, 큐브 등) ---
-			m_lighting2->Use();
-			m_lighting2->SetUniform("projection", projection);
-			m_lighting2->SetUniform("view", view);
-			material->SetToProgram(m_lighting2.get());
-
-			auto modelTransform = transform.GetModelMatrix();
-			auto mvp = projection * view * modelTransform;
-			m_lighting2->SetUniform("transform", mvp);
-			m_lighting2->SetUniform("modelTransform", modelTransform);
-
-			mesh->Draw(m_lighting2.get()); // ❗️ StaticMesh::Draw()
-			break;
-		}
-		}
-	}
-
-	// --- 추가 : 환경맵 큐브 그리기 [테스트]
-	{
-		auto transform = Transform::Create();
-		transform->SetPosition(glm::vec3(-3.0f, 0.75f, 0.0f));
-		m_envMapProgram->Use();
-		m_envMapProgram->SetUniform("model", transform->GetModelMatrix());
-		m_envMapProgram->SetUniform("view", view);
-		m_envMapProgram->SetUniform("projection", projection);
-		m_envMapProgram->SetUniform("cameraPos", cameraPos);
-		m_cubeTexture->Bind();
-		m_envMapProgram->SetUniform("skybox", 0);
-		m_box->Draw(m_envMapProgram.get());
-	}
-
-	// --- 2단계: [핵심] 스카이박스 하드코딩 렌더링 ---
-	// (Scene과 무관하게 Renderer가 직접 실행)
-	glDepthFunc(GL_LEQUAL);
-	glCullFace(GL_FRONT);
-
-	m_skyboxProgram->Use();
-
-	auto skyboxView = glm::mat4(glm::mat3(view));
-	auto transform = projection * skyboxView;
-	m_skyboxProgram->SetUniform("transform", transform);
-
-	m_cubeTexture->Bind();
-	m_skyboxProgram->SetUniform("skybox", 0);
-	m_box->Draw(m_skyboxProgram.get());
-
-	glCullFace(GL_BACK);
-	glDepthFunc(GL_LESS);
-
-	// --- 3단계: 후처리 (화면) ---
-	m_frameBuffer->Resolve();
-	Framebuffer::BindToDefault();
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	glDisable(GL_DEPTH_TEST);
-	glDisable(GL_CULL_FACE);
-
-	m_postProgram->Use();
-	m_postProgram->SetUniform("transform", glm::scale(glm::mat4(1.0f), glm::vec3(2.0f, 2.0f, 1.0f)));
-	m_postProgram->SetUniform("gamma", m_gamma);
-	m_frameBuffer->GetColorAttachment()->Bind();
-	m_postProgram->SetUniform("tex", 0);
-	m_plane->Draw(m_postProgram.get());
+	// [패스 4] 후처리 패스: m_frameBuffer의 결과를 화면에 Resolve
+	RenderPostProcessingPass(scene, camera);
 }
 
 bool DevRenderer::Init(int32 width, int32 height)
 {
-	// 1. m_simpleProgram 초기화
-	{
-		m_simpleProgram = Program::Create
-		(
-			"./Resources/Shaders/simple.vert",
-			"./Resources/Shaders/simple.frag"
-		);
-		if (!m_simpleProgram) return false;
-	}
-
-	// 2. m_program 초기화
-	{
-		m_lighting2 = Program::Create
-		(
-			"./Resources/Shaders/lighting2.vert", 
-			"./Resources/Shaders/lighting2.frag"
-		);
-		if (!m_lighting2) return false;
-	}
-
-	// 2. m_program 초기화
-	{
-		m_program = Program::Create
-		(
-			"./Resources/Shaders/texture.vert",
-			"./Resources/Shaders/texture.frag"
-		);
-		if (!m_program) return false;
-	}
-
 	// 3. 프레임 버퍼 생성
 	{
 		m_postProgram = Program::Create(
@@ -316,25 +66,6 @@ bool DevRenderer::Init(int32 width, int32 height)
 
 		m_frameBuffer = Framebuffer::Create(width, height, 4);
 		if (!m_frameBuffer) return false;
-	}
-
-	// 4. m_skinningProgram 초기화
-	{
-		m_skinningProgram = Program::Create
-		("./Resources/Shaders/skinning.vert",
-			"./Resources/Shaders/skinning.frag"
-		);
-		if (!m_skinningProgram) return false;
-	}
-
-	// 5. m_skinningLightProgram 초기화
-	{
-		m_skinningLightProgram = Program::Create
-		(
-			"./Resources/Shaders/skinningLight.vert",
-			"./Resources/Shaders/skinningLight.frag"
-		);
-		if (!m_skinningLightProgram) return false;
 	}
 
 	// 6. m_skybox 초기화
@@ -372,15 +103,111 @@ bool DevRenderer::Init(int32 width, int32 height)
 		if (!m_envMapProgram) return false;
 	}
 
-	// 8. m_grassInstancing 초기화
+	// 9. 셰도우 맾 초기화
 	{
-		m_grassInstancing = Program::Create(
-			"./Resources/Shaders/Instancing/grass.vert",
-			"./Resources/Shaders/Instancing/grass.frag"
+		m_shadowMap = ShadowMap::Create(1024, 1024);
+		m_shadowDepthProgram = Program::Create
+		(
+			"./Resources/Shaders/Shadow/Shadow.vert",
+			"./Resources/Shaders/Shadow/Shadow.frag"
 		);
-		if (!m_grassInstancing) return false;
+		if (!m_shadowDepthProgram) return false;
 	}
 
 	return true;
 }
 
+/*===================//
+//   render methods  //
+//===================*/
+void DevRenderer::RenderShadowPass(Scene* scene, Camera* camera, SpotLight* mainLight)
+{
+	if (!mainLight) return;
+	RenderPass* staticPass = scene->GetRenderPass("Static");
+	if (!staticPass) return;
+	const int32 SHADOW_WIDTH = 1024, SHADOW_HEIGHT = 1024;
+
+	auto& lightTransform = mainLight->GetTransform();
+	glm::vec3 lightPos = lightTransform.GetPosition();
+	glm::vec3 lightDir = lightTransform.GetForwardVector();
+	float fov = mainLight->GetCutoff()[0] * 2.0f;
+	float aspect = (float)SHADOW_WIDTH / (float)SHADOW_HEIGHT;
+	glm::mat4 lightProjection = glm::perspective(glm::radians(fov), aspect, 0.1f, mainLight->GetDistance());
+	glm::mat4 lightView = glm::lookAt(lightPos, lightPos + lightDir, glm::vec3(0.0f, 1.0f, 0.0f));
+	glm::mat4 lightSpaceMatrix = lightProjection * lightView;
+
+	glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
+	m_shadowMap->Bind();
+	glClear(GL_DEPTH_BUFFER_BIT);
+	glEnable(GL_DEPTH_TEST);
+	glCullFace(GL_FRONT);
+
+	// 1-3. 섀도우 맵 셰이더 설정 -> 지금 코드가 좀 더러울 수 있음
+	m_shadowDepthProgram->Use();
+	m_shadowDepthProgram->SetUniform("lightSpaceMatrix", lightSpaceMatrix);
+
+	for (const auto* meshRenderer : staticPass->GetRenderers())
+	{
+		// (Scene::AddRenderPass("Static", ...)에서 이미 필터링됨)
+		auto model = meshRenderer->GetTransform().GetModelMatrix();
+		m_shadowDepthProgram->SetUniform("model", model);
+		meshRenderer->GetMesh()->Draw(m_shadowDepthProgram.get());
+	}
+
+	glCullFace(GL_BACK);
+}
+
+void DevRenderer::RenderMainPass(Scene* scene, Camera* camera, SpotLight* mainLight)
+{
+	m_frameBuffer->Bind();
+	glViewport(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
+	glClearColor(0.1f, 0.2f, 0.3f, 0.0f);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_CULL_FACE);
+	glCullFace(GL_BACK);
+
+	for (const auto& [name, pass] : scene->GetRenderPasses())
+	{
+		pass->Render(scene, camera);
+	}
+}
+
+void DevRenderer::RenderSkyboxPass(Scene* scene, Camera* camera)
+{
+	glDepthFunc(GL_LEQUAL);
+	glCullFace(GL_FRONT);
+
+	m_skyboxProgram->Use();
+
+	auto projection = camera->GetProjectionMatrix();
+	auto view = camera->GetViewMatrix();
+	auto skyboxView = glm::mat4(glm::mat3(view));
+	auto transform = projection * skyboxView;
+	m_skyboxProgram->SetUniform("transform", transform);
+
+	m_cubeTexture->Bind();
+	m_skyboxProgram->SetUniform("skybox", 0);
+	m_box->Draw(m_skyboxProgram.get());
+
+	glCullFace(GL_BACK);
+	glDepthFunc(GL_LESS);
+}
+
+void DevRenderer::RenderPostProcessingPass(Scene* scene, Camera* camera)
+{
+	m_frameBuffer->Resolve();
+	Framebuffer::BindToDefault();
+	glViewport(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
+
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glDisable(GL_DEPTH_TEST);
+	glDisable(GL_CULL_FACE);
+
+	m_postProgram->Use();
+	m_postProgram->SetUniform("transform", glm::scale(glm::mat4(1.0f), glm::vec3(2.0f, 2.0f, 1.0f)));
+	m_postProgram->SetUniform("gamma", m_gamma);
+	m_frameBuffer->GetColorAttachment()->Bind();
+	m_postProgram->SetUniform("tex", 0);
+	m_plane->Draw(m_postProgram.get());
+}
