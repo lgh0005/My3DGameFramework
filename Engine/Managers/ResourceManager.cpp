@@ -5,6 +5,7 @@
 #include "Graphics/Material.h"
 #include "Graphics/Program.h"
 #include "Graphics/Texture.h"
+#include "Graphics/CubeTexture.h"
 #include "Graphics/Model.h"
 #include "Graphics/Animation.h"
 
@@ -33,15 +34,6 @@ void ResourceManager::AddMaterial(const std::string& name, MaterialPtr material)
 	m_materials[name] = material;
 }
 
-void ResourceManager::AddProgram(const std::string& name, ProgramPtr program)
-{
-	if (m_programs.find(name) != m_programs.end())
-	{
-		SPDLOG_WARN("Program resource '{}' already exists. Overwriting.", name);
-	}
-	m_programs[name] = program;
-}
-
 void ResourceManager::AddTexture(const std::string& name, TexturePtr texture)
 {
 	if (m_textures.find(name) != m_textures.end())
@@ -49,6 +41,15 @@ void ResourceManager::AddTexture(const std::string& name, TexturePtr texture)
 		SPDLOG_WARN("Texture resource '{}' already exists. Overwriting.", name);
 	}
 	m_textures[name] = texture;
+}
+
+void ResourceManager::AddCubeTexture(const std::string& name, CubeTexturePtr texture)
+{
+	if (m_cubeTextures.find(name) != m_cubeTextures.end())
+	{
+		SPDLOG_WARN("CubeTexture resource '{}' already exists. Overwriting.", name);
+	}
+	m_cubeTextures[name] = texture;
 }
 
 void ResourceManager::AddModel(const std::string& name, ModelPtr model)
@@ -92,19 +93,19 @@ MaterialPtr ResourceManager::GetMaterial(const std::string& name) const
 	return nullptr;
 }
 
-ProgramPtr ResourceManager::GetProgram(const std::string& name) const
-{
-	auto it = m_programs.find(name);
-	if (it != m_programs.end()) return it->second;
-	SPDLOG_ERROR("Failed to find Program resource: {}", name);
-	return nullptr;
-}
-
 TexturePtr ResourceManager::GetTexture(const std::string& name) const
 {
 	auto it = m_textures.find(name);
 	if (it != m_textures.end()) return it->second;
 	SPDLOG_ERROR("Failed to find Texture resource: {}", name);
+	return nullptr;
+}
+
+CubeTexturePtr ResourceManager::GetCubeTexture(const std::string& name) const
+{
+	auto it = m_cubeTextures.find(name);
+	if (it != m_cubeTextures.end()) return it->second;
+	SPDLOG_ERROR("Failed to find CubeTexture resource: {}", name);
 	return nullptr;
 }
 

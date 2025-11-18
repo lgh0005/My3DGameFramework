@@ -6,6 +6,7 @@ CLASS_PTR(Mesh)
 CLASS_PTR(Material)
 CLASS_PTR(Program)
 CLASS_PTR(Texture)
+CLASS_PTR(CubeTexture)
 CLASS_PTR(Model)
 CLASS_PTR(Animation)
 #pragma endregion
@@ -24,8 +25,8 @@ public:
 private:
 	MeshPtr GetMesh(const std::string& name) const;
 	MaterialPtr GetMaterial(const std::string& name) const;
-	ProgramPtr GetProgram(const std::string& name) const;
 	TexturePtr GetTexture(const std::string& name) const;
+	CubeTexturePtr GetCubeTexture(const std::string& name) const;
 	ModelPtr GetModel(const std::string& name) const;
 	AnimationPtr GetAnimation(const std::string& name) const;
 
@@ -33,14 +34,15 @@ private:
 	void AddMaterial(const std::string& name, MaterialPtr material);
 	void AddProgram(const std::string& name, ProgramPtr program);
 	void AddTexture(const std::string& name, TexturePtr texture);
+	void AddCubeTexture(const std::string& name, CubeTexturePtr texture);
 	void AddModel(const std::string& name, ModelPtr model);
 	void AddAnimation(const std::string& name, AnimationPtr animation);
 
 private:
 	std::unordered_map<std::string, MeshPtr>	   m_meshes;
 	std::unordered_map<std::string, MaterialPtr>   m_materials;
-	std::unordered_map<std::string, ProgramPtr>    m_programs;
 	std::unordered_map<std::string, TexturePtr>    m_textures;
+	std::unordered_map<std::string, CubeTexturePtr>m_cubeTextures;
 	std::unordered_map<std::string, ModelPtr>      m_models;
 	std::unordered_map<std::string, AnimationPtr>  m_animations;
 };
@@ -63,15 +65,15 @@ inline MaterialPtr ResourceManager::GetResource<Material>(const std::string& nam
 }
 
 template<>
-inline ProgramPtr ResourceManager::GetResource<Program>(const std::string& name) const
-{
-	return GetProgram(name);
-}
-
-template<>
 inline TexturePtr ResourceManager::GetResource<Texture>(const std::string& name) const
 {
 	return GetTexture(name);
+}
+
+template<>
+inline CubeTexturePtr ResourceManager::GetResource<CubeTexture>(const std::string& name) const
+{
+	return GetCubeTexture(name);
 }
 
 template<>
@@ -106,15 +108,15 @@ inline void ResourceManager::AddResource<Material>(const std::string& name, Mate
 }
 
 template<>
-inline void ResourceManager::AddResource<Program>(const std::string& name, ProgramPtr resource)
-{
-	AddProgram(name, resource);
-}
-
-template<>
 inline void ResourceManager::AddResource<Texture>(const std::string& name, TexturePtr resource)
 {
 	AddTexture(name, resource);
+}
+
+template<>
+inline void ResourceManager::AddResource<CubeTexture>(const std::string& name, CubeTexturePtr resource)
+{
+	AddCubeTexture(name, resource);
 }
 
 template<>

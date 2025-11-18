@@ -31,22 +31,9 @@ private:
 	void RenderPostProcessingPass(Scene* scene, Camera* camera);
 
 private:
-	// --- 후처리(Post-Processing) 리소스 ---
-	FramebufferUPtr m_frameBuffer; 
-	MeshUPtr		m_plane;       
-	ProgramUPtr		m_postProgram; 
-	float			m_gamma{ 1.0f };
-
-	// --- 스카이 및 환경 박스 ---
-	MeshUPtr		m_box;
-	CubeTextureUPtr m_cubeTexture;
-	ProgramUPtr		m_skyboxProgram;
-
-	// --- 환경맵 리소스 ---
-	ProgramUPtr m_envMapProgram;
 
 	// --- 그림자 매핑 리소스 ---
-	ShadowMapUPtr m_shadowMap;
-	ProgramUPtr	  m_shadowDepthProgram;
-	Light*		  m_mainLight;
+	ShadowMapUPtr	m_shadowMap;
+	ProgramUPtr		m_shadowDepthProgram;
+	Light*			m_mainLight;
 };

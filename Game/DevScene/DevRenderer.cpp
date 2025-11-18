@@ -21,6 +21,8 @@
 #include "Graphics/Image.h"
 #include "Graphics/ShadowMap.h"
 
+#include "RenderPasses/PostProcessingPass.h"
+
 DevRendererUPtr DevRenderer::Create(int32 width, int32 height)
 {
 	auto devRenderer = DevRendererUPtr(new DevRenderer());
@@ -55,54 +57,6 @@ void DevRenderer::Render(Scene* scene)
 
 bool DevRenderer::Init(int32 width, int32 height)
 {
-	// 3. 프레임 버퍼 생성
-	{
-		m_postProgram = Program::Create(
-			"./Resources/Shaders/PostProcessing/postprocess.vert",
-			"./Resources/Shaders/PostProcessing/postprocess.frag"
-		);
-		m_plane = StaticMesh::CreatePlane();
-		if (!m_plane) return false;
-
-		m_frameBuffer = Framebuffer::Create(width, height, 4);
-		if (!m_frameBuffer) return false;
-	}
-
-	// 6. m_skybox 초기화
-	{
-		auto cubeRight = Image::Load("./Resources/Images/Skybox/right.jpg", false);
-		auto cubeLeft = Image::Load("./Resources/Images/Skybox/left.jpg", false);
-		auto cubeTop = Image::Load("./Resources/Images/Skybox/top.jpg", false);
-		auto cubeBottom = Image::Load("./Resources/Images/Skybox/bottom.jpg", false);
-		auto cubeFront = Image::Load("./Resources/Images/Skybox/front.jpg", false);
-		auto cubeBack = Image::Load("./Resources/Images/Skybox/back.jpg", false);
-		m_cubeTexture = CubeTexture::CreateFromImages({
-		  cubeRight.get(),
-		  cubeLeft.get(),
-		  cubeTop.get(),
-		  cubeBottom.get(),
-		  cubeFront.get(),
-		  cubeBack.get(),
-			});
-		m_box = StaticMesh::CreateBox();
-		if (!m_box) return false;
-		m_skyboxProgram = Program::Create
-		(
-			"./Resources/Shaders/Skybox/skybox.vert", 
-			"./Resources/Shaders/Skybox/skybox.frag"
-		);
-	}
-
-	// 7. m_envMapProgram 초기화
-	{
-		m_envMapProgram = Program::Create
-		(
-			"./Resources/Shaders/Environment/environment.vert",
-			"./Resources/Shaders/Environment/environment.frag"
-		);
-		if (!m_envMapProgram) return false;
-	}
-
 	// 9. 셰도우 맾 초기화
 	{
 		m_shadowMap = ShadowMap::Create(1024, 1024);
@@ -159,13 +113,8 @@ void DevRenderer::RenderShadowPass(Scene* scene, Camera* camera, SpotLight* main
 
 void DevRenderer::RenderMainPass(Scene* scene, Camera* camera, SpotLight* mainLight)
 {
-	m_frameBuffer->Bind();
-	glViewport(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
-	glClearColor(0.1f, 0.2f, 0.3f, 0.0f);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-	glEnable(GL_DEPTH_TEST);
-	glEnable(GL_CULL_FACE);
-	glCullFace(GL_BACK);
+	auto postProcess = scene->GetRenderPass("PostProcess");
+	reinterpret_cast<PostProcessingRenderPass*>(postProcess)->BeginDraw();
 
 	for (const auto& [name, pass] : scene->GetRenderPasses())
 	{
@@ -175,39 +124,11 @@ void DevRenderer::RenderMainPass(Scene* scene, Camera* camera, SpotLight* mainLi
 
 void DevRenderer::RenderSkyboxPass(Scene* scene, Camera* camera)
 {
-	glDepthFunc(GL_LEQUAL);
-	glCullFace(GL_FRONT);
-
-	m_skyboxProgram->Use();
-
-	auto projection = camera->GetProjectionMatrix();
-	auto view = camera->GetViewMatrix();
-	auto skyboxView = glm::mat4(glm::mat3(view));
-	auto transform = projection * skyboxView;
-	m_skyboxProgram->SetUniform("transform", transform);
-
-	m_cubeTexture->Bind();
-	m_skyboxProgram->SetUniform("skybox", 0);
-	m_box->Draw(m_skyboxProgram.get());
-
-	glCullFace(GL_BACK);
-	glDepthFunc(GL_LESS);
+	scene->GetRenderPass("Skybox")->Render(scene, camera);
 }
 
 void DevRenderer::RenderPostProcessingPass(Scene* scene, Camera* camera)
 {
-	m_frameBuffer->Resolve();
-	Framebuffer::BindToDefault();
-	glViewport(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
-
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	glDisable(GL_DEPTH_TEST);
-	glDisable(GL_CULL_FACE);
-
-	m_postProgram->Use();
-	m_postProgram->SetUniform("transform", glm::scale(glm::mat4(1.0f), glm::vec3(2.0f, 2.0f, 1.0f)));
-	m_postProgram->SetUniform("gamma", m_gamma);
-	m_frameBuffer->GetColorAttachment()->Bind();
-	m_postProgram->SetUniform("tex", 0);
-	m_plane->Draw(m_postProgram.get());
+	auto postProcess = scene->GetRenderPass("PostProcess");
+	reinterpret_cast<PostProcessingRenderPass*>(postProcess)->Render(scene, camera);
 }

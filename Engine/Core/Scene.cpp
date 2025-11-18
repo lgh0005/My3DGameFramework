@@ -24,11 +24,6 @@ void Scene::AddGameObject(GameObjectUPtr gameObject)
 				m_cameras.push_back(camera);
 				break;
 			}
-			//case ComponentType::MeshRenderer:
-			//{
-			//	m_meshes.push_back(static_cast<MeshRenderer*>(comp.get()));
-			//	break;
-			//}
 			case ComponentType::Light:
 			{
 				m_lights.push_back(static_cast<Light*>(comp.get()));
@@ -56,15 +51,15 @@ void Scene::AddRenderPass(const std::string& name, RenderPassUPtr renderPass)
 
 bool Scene::Init()
 {
-	if (!CreateNessesaryRenderPasses())
-	{
-		SPDLOG_ERROR("failed to create render passes.");
-		return false;
-	}
-
 	if (!LoadNessesaryResources())
 	{
 		SPDLOG_ERROR("failed to load resources.");
+		return false;
+	}
+
+	if (!CreateNessesaryRenderPasses())
+	{
+		SPDLOG_ERROR("failed to create render passes.");
 		return false;
 	}
 

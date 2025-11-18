@@ -9,6 +9,7 @@
 #include "Graphics/SkinnedMesh.h"
 #include "Graphics/Material.h"
 #include "Graphics/Texture.h"
+#include "Graphics/CubeTexture.h"
 #include "Graphics/Image.h"
 #include "Graphics/Animation.h"
 #include "Graphics/Model.h"
@@ -24,6 +25,9 @@
 #include "RenderPasses/SimpleRenderPass.h"
 #include "RenderPasses/SkinningRenderPass.h"
 #include "RenderPasses/InstancedRenderPass.h"
+#include "RenderPasses/SkyboxRenderPass.h"
+#include "RenderPasses/EnvironmentRenderPass.h"
+#include "RenderPasses/PostProcessingPass.h"
 
 DevScene::~DevScene() = default;
 
@@ -34,52 +38,15 @@ DevSceneUPtr DevScene::Create()
 	return std::move(devScene);
 }
 
-bool DevScene::CreateNessesaryRenderPasses()
-{
-	// 1. StaticMesh 셰이더 (조명 O)
-	{
-		auto prog = Program::Create(
-			"./Resources/Shaders/lighting2.vert",
-			"./Resources/Shaders/lighting2.frag");
-		if (!prog) return false;
-		AddRenderPass("Static", StaticRenderPass::Create(std::move(prog)));
-	}
-
-	// 2. SkinnedMesh 셰이더 (조명 O)
-	{
-		auto prog = Program::Create(
-			"./Resources/Shaders/skinningLight.vert",
-			"./Resources/Shaders/skinningLight.frag");
-		if (!prog) return false;
-		AddRenderPass("Skinned", SkinningRenderPass::Create(std::move(prog)));
-	}
-
-	// 3. Instanced 셰이더 (잔디)
-	{
-		auto prog = Program::Create(
-			"./Resources/Shaders/Instancing/grass.vert",
-			"./Resources/Shaders/Instancing/grass.frag");
-		if (!prog) return false;
-		AddRenderPass("Instanced", InstancedRenderPass::Create(std::move(prog)));
-	}
-
-	// 4. Simple 셰이더 (조명 기즈모)
-	{
-		auto prog = Program::Create(
-			"./Resources/Shaders/simple.vert",
-			"./Resources/Shaders/simple.frag");
-		if (!prog) return false;
-		AddRenderPass("LightGizmo", SimpleRenderPass::Create(std::move(prog)));
-	}
-
-	return true;
-}
-
 bool DevScene::LoadNessesaryResources()
 {
 	// 0-1. 큐브 메쉬
 	auto boxMesh = StaticMesh::CreateBox();
 	RESOURCE.AddResource<Mesh>("Cube", std::move(boxMesh));
+
+	// 0-1. 평면 메쉬
+	auto planeMesh = StaticMesh::CreatePlane();
+	RESOURCE.AddResource<Mesh>("Plane", std::move(planeMesh));
 
 	// 0-2. 모델과 애니메이션
 	auto model = Model::Load("./Resources/Models/spacesoldier/aliensoldier.mymodel");
@@ -161,6 +128,111 @@ bool DevScene::LoadNessesaryResources()
 		RESOURCE.AddResource<Mesh>("grassBlade", std::move(bladeMesh));
 	}
 
+	// 8. 하늘 큐브맵
+	{
+		auto cubeRight = Image::Load("./Resources/Images/Skybox/right.jpg", false);
+		auto cubeLeft = Image::Load("./Resources/Images/Skybox/left.jpg", false);
+		auto cubeTop = Image::Load("./Resources/Images/Skybox/top.jpg", false);
+		auto cubeBottom = Image::Load("./Resources/Images/Skybox/bottom.jpg", false);
+		auto cubeFront = Image::Load("./Resources/Images/Skybox/front.jpg", false);
+		auto cubeBack = Image::Load("./Resources/Images/Skybox/back.jpg", false);
+
+		auto cubeTexture = CubeTexture::CreateFromImages({
+		  cubeRight.get(),cubeLeft.get(),
+		  cubeTop.get(), cubeBottom.get(),
+		  cubeFront.get(), cubeBack.get() });
+		if (!cubeTexture) return false;
+
+		RESOURCE.AddResource<CubeTexture>("SkyboxTexture", std::move(cubeTexture));
+	}
+
+	return true;
+}
+
+bool DevScene::CreateNessesaryRenderPasses()
+{
+	// 1. StaticMesh 셰이더 (조명 O)
+	{
+		auto prog = Program::Create(
+			"./Resources/Shaders/lighting2.vert",
+			"./Resources/Shaders/lighting2.frag");
+		if (!prog) return false;
+		AddRenderPass("Static", StaticRenderPass::Create(std::move(prog)));
+	}
+
+	// 2. SkinnedMesh 셰이더 (조명 O)
+	{
+		auto prog = Program::Create(
+			"./Resources/Shaders/skinningLight.vert",
+			"./Resources/Shaders/skinningLight.frag");
+		if (!prog) return false;
+		AddRenderPass("Skinned", SkinningRenderPass::Create(std::move(prog)));
+	}
+
+	// 3. Instanced 셰이더 (잔디)
+	{
+		auto prog = Program::Create(
+			"./Resources/Shaders/Instancing/grass.vert",
+			"./Resources/Shaders/Instancing/grass.frag");
+		if (!prog) return false;
+		AddRenderPass("Instanced", InstancedRenderPass::Create(std::move(prog)));
+	}
+
+	// 4. Simple 셰이더 (조명 기즈모)
+	{
+		auto prog = Program::Create(
+			"./Resources/Shaders/simple.vert",
+			"./Resources/Shaders/simple.frag");
+		if (!prog) return false;
+		AddRenderPass("LightGizmo", SimpleRenderPass::Create(std::move(prog)));
+	}
+
+	// 5. Skybox 셰이더 (하늘)
+	{
+		auto prog = Program::Create
+		(
+			"./Resources/Shaders/Skybox/skybox.vert",
+			"./Resources/Shaders/Skybox/skybox.frag");
+		if (!prog) return false;
+
+		MeshPtr boxMesh = RESOURCE.GetResource<Mesh>("Cube");
+		CubeTexturePtr cubeTex = RESOURCE.GetResource<CubeTexture>("SkyboxTexture");
+		auto skyboxRenderPass = SkyboxRenderPass::Create(std::move(prog), boxMesh, cubeTex);
+		AddRenderPass("Skybox", std::move(skyboxRenderPass));
+	}
+
+	// 6. 환경맵
+	{
+		auto prog = Program::Create
+		(
+			"./Resources/Shaders/Environment/environment.vert",
+			"./Resources/Shaders/Environment/environment.frag"
+		);
+		if (!prog) return false;
+		CubeTexturePtr cubeTex = RESOURCE.GetResource<CubeTexture>("SkyboxTexture");
+		if (!cubeTex) return false;
+
+		AddRenderPass("EnvMap", EnvironmentRenderPass::Create(std::move(prog), cubeTex));
+	}
+
+	// 7. PostProcessing 패스
+	{
+		auto prog = Program::Create(
+			"./Resources/Shaders/PostProcessing/postprocess.vert",
+			"./Resources/Shaders/PostProcessing/postprocess.frag");
+		if (!prog) return false;
+
+		MeshPtr planeMesh = RESOURCE.GetResource<Mesh>("Plane");
+		if (!planeMesh) return false;
+
+		AddRenderPass("PostProcess", PostProcessingRenderPass::Create
+		(
+			std::move(prog),
+			WINDOW_WIDTH, WINDOW_HEIGHT,
+			planeMesh
+		));
+	}
+
 	return true;
 }
 
@@ -170,6 +242,7 @@ bool DevScene::CreateSceneContext()
 	RenderPass* staticPass = GetRenderPass("Static");
 	RenderPass* skinnedPass = GetRenderPass("Skinned");
 	RenderPass* grassPass = GetRenderPass("Instanced");
+	RenderPass* envMapPass = GetRenderPass("EnvMap");
 
 	// 3. 카메라 GameObject 생성
 	{
@@ -182,7 +255,7 @@ bool DevScene::CreateSceneContext()
 		camera->SetProjection(45.0f, (float)WINDOW_WIDTH / (float)WINDOW_HEIGHT, 0.01f, 100.0f);
 		cameraObj->AddComponent(std::move(camera));
 
-		SetMainCamera(cameraPtr);
+		SetMainCamera(cameraPtr); // 메인 카메라로 설정
 
 		AddGameObject(std::move(cameraObj));
 	}
@@ -265,6 +338,25 @@ bool DevScene::CreateSceneContext()
 		auto meshRenderer = MeshRenderer::Create
 		(RESOURCE.GetResource<Mesh>("Cube"), RESOURCE.GetResource<Material>("boxMat3"));
 		staticPass->AddRenderer(meshRenderer.get());
+		cubeObj->AddComponent(std::move(meshRenderer));
+		AddGameObject(std::move(cubeObj));
+	}
+
+	// 7. 임시 환경맵 큐브
+	{
+		auto cubeObj = GameObject::Create();
+		cubeObj->SetName("EnvCube");
+		auto& cubeTransform = cubeObj->GetTransform();
+		cubeTransform.SetPosition(glm::vec3(-2.5f, 0.5f, 0.0f));
+		cubeTransform.SetScale(glm::vec3(1.0f));
+
+		// 그럼 텍스쳐는 어떻게 만들어야 하지?
+		auto meshRenderer = MeshRenderer::Create
+		(
+			RESOURCE.GetResource<Mesh>("Cube"),
+			RESOURCE.GetResource<Material>("boxMat1") // 임시 재질
+		);
+		envMapPass->AddRenderer(meshRenderer.get());
 		cubeObj->AddComponent(std::move(meshRenderer));
 		AddGameObject(std::move(cubeObj));
 	}

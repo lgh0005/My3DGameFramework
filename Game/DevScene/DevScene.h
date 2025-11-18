@@ -14,7 +14,7 @@ public:
 
 protected:
 	DevScene() = default;
-	virtual bool CreateNessesaryRenderPasses() override;
 	virtual bool LoadNessesaryResources()	   override;
+	virtual bool CreateNessesaryRenderPasses() override;
 	virtual bool CreateSceneContext()		   override;
 };

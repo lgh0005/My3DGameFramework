@@ -38,8 +38,8 @@ protected:
 	Scene() = default;
 	
 	// 씬의 컨텍스트를 작성하는 가상 함수들
-	virtual bool CreateNessesaryRenderPasses() = 0;
 	virtual bool LoadNessesaryResources()	   = 0;
+	virtual bool CreateNessesaryRenderPasses() = 0;
 	virtual bool CreateSceneContext()          = 0;
 	bool Init();
 
