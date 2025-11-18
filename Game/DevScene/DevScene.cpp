@@ -110,7 +110,7 @@ bool DevScene::LoadNessesaryResources()
 		auto box4Mat = Material::Create();
 		box4Mat->diffuse = std::move(diffuseTexture);
 		box4Mat->specular = std::move(specularTexture);
-		box4Mat->shininess = 16.0f;
+		box4Mat->shininess = 4.0f;
 		RESOURCE.AddResource<Material>("boxMat3", std::move(box4Mat));
 	}
 
@@ -154,8 +154,8 @@ bool DevScene::CreateNessesaryRenderPasses()
 	// 1. StaticMesh 셰이더 (조명 O)
 	{
 		auto prog = Program::Create(
-			"./Resources/Shaders/lighting2.vert",
-			"./Resources/Shaders/lighting2.frag");
+			"./Resources/Shaders/Default/forward_standard_static.vert",
+			"./Resources/Shaders/Default/forward_standard_static.frag");
 		if (!prog) return false;
 		AddRenderPass("Static", StaticRenderPass::Create(std::move(prog)));
 	}
@@ -163,8 +163,8 @@ bool DevScene::CreateNessesaryRenderPasses()
 	// 2. SkinnedMesh 셰이더 (조명 O)
 	{
 		auto prog = Program::Create(
-			"./Resources/Shaders/skinningLight.vert",
-			"./Resources/Shaders/skinningLight.frag");
+			"./Resources/Shaders/Default/forward_standard_skinned.vert",
+			"./Resources/Shaders/Default/forward_standard_skinned.frag");
 		if (!prog) return false;
 		AddRenderPass("Skinned", SkinningRenderPass::Create(std::move(prog)));
 	}
@@ -387,46 +387,46 @@ bool DevScene::CreateSceneContext()
 
 	// 8. 풀떼기
 	{
-		int32 grassCount = 10000;
-		auto bladeMesh = std::static_pointer_cast<StaticMesh>
-			(RESOURCE.GetResource<Mesh>("grassBlade"));
-		auto grassMat = RESOURCE.GetResource<Material>("grassMat");
-		if (!bladeMesh || !grassMat) return false;
+		//int32 grassCount = 10000;
+		//auto bladeMesh = std::static_pointer_cast<StaticMesh>
+		//	(RESOURCE.GetResource<Mesh>("grassBlade"));
+		//auto grassMat = RESOURCE.GetResource<Material>("grassMat");
+		//if (!bladeMesh || !grassMat) return false;
 
-		std::vector<glm::vec3> instanceData;
-		instanceData.resize(grassCount);
-		srand((unsigned int)time(NULL));
-		for (int i = 0; i < grassCount; ++i)
-		{
-			float x = ((float)rand() / (float)RAND_MAX * 10.0f) - 5.0f; // -5 ~ +5 (바닥 크기)
-			float z = ((float)rand() / (float)RAND_MAX * 10.0f) - 5.0f; // -5 ~ +5
-			float y_rot = glm::radians((float)rand() / (float)RAND_MAX * 360.0f);
-			instanceData[i] = glm::vec3(x, y_rot, z);
-		}
+		//std::vector<glm::vec3> instanceData;
+		//instanceData.resize(grassCount);
+		//srand((unsigned int)time(NULL));
+		//for (int i = 0; i < grassCount; ++i)
+		//{
+		//	float x = ((float)rand() / (float)RAND_MAX * 10.0f) - 5.0f; // -5 ~ +5 (바닥 크기)
+		//	float z = ((float)rand() / (float)RAND_MAX * 10.0f) - 5.0f; // -5 ~ +5
+		//	float y_rot = glm::radians((float)rand() / (float)RAND_MAX * 360.0f);
+		//	instanceData[i] = glm::vec3(x, y_rot, z);
+		//}
 
-		BufferPtr instanceBuffer = Buffer::CreateWithData
-		(
-			GL_ARRAY_BUFFER, GL_STATIC_DRAW,
-			instanceData.data(), sizeof(glm::vec3), instanceData.size()
-		);
+		//BufferPtr instanceBuffer = Buffer::CreateWithData
+		//(
+		//	GL_ARRAY_BUFFER, GL_STATIC_DRAW,
+		//	instanceData.data(), sizeof(glm::vec3), instanceData.size()
+		//);
 
-		auto instancedGrass = InstancedMesh::Create
-		(
-			bladeMesh,
-			instanceBuffer,
-			grassCount,
-			InstancedMesh::Vec3Layout()
-		);
-		instancedGrass->SetMaterial(grassMat);
+		//auto instancedGrass = InstancedMesh::Create
+		//(
+		//	bladeMesh,
+		//	instanceBuffer,
+		//	grassCount,
+		//	InstancedMesh::Vec3Layout()
+		//);
+		//instancedGrass->SetMaterial(grassMat);
 
-		auto grassGo = GameObject::Create();
-		grassGo->SetName("Grass_Field");
+		//auto grassGo = GameObject::Create();
+		//grassGo->SetName("Grass_Field");
+		//grassGo->GetTransform().SetPosition(glm::vec3(0.0f, 0.5f, 0.0f));
 
-		auto renderer = MeshRenderer::Create(std::move(instancedGrass), grassMat);
-
-		grassPass->AddRenderer(renderer.get());
-		grassGo->AddComponent(std::move(renderer));
-		AddGameObject(std::move(grassGo));
+		//auto renderer = MeshRenderer::Create(std::move(instancedGrass), grassMat);
+		//grassPass->AddRenderer(renderer.get());
+		//grassGo->AddComponent(std::move(renderer));
+		//AddGameObject(std::move(grassGo));
 	}
 
 	return true;

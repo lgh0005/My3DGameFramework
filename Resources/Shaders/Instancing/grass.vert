@@ -12,6 +12,7 @@ out vec2 texCoord;
 
 uniform mat4 projection;
 uniform mat4 view;
+uniform mat4 model;
 
 void main()
 {
@@ -29,8 +30,9 @@ void main()
 
     vec3 rotatedPos = (rotMat * vec4(aPos, 1.0)).xyz;
     vec3 finalPos = rotatedPos + vec3(aInstanceData.x, 0.0, aInstanceData.z);
+    vec4 worldPos = model * vec4(finalPos, 1.0);
     
-    gl_Position = projection * view * vec4(finalPos, 1.0);
+    gl_Position = projection * view * worldPos;
     
     FragPos_world = finalPos;
     Normal_world = (rotMat * vec4(aNormal, 0.0)).xyz;

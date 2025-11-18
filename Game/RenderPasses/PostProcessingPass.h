@@ -26,5 +26,5 @@ private:
     bool Init(ProgramUPtr program, int32 width, int32 height, MeshPtr planeMesh);
     MeshPtr m_plane;
     FramebufferUPtr m_frameBuffer;
-    float m_gamma{ 0.55f };
+    float m_gamma       { 0.75f };
 };

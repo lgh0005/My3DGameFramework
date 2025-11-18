@@ -102,7 +102,6 @@ void DevRenderer::RenderShadowPass(Scene* scene, Camera* camera, SpotLight* main
 
 	for (const auto* meshRenderer : staticPass->GetRenderers())
 	{
-		// (Scene::AddRenderPass("Static", ...)에서 이미 필터링됨)
 		auto model = meshRenderer->GetTransform().GetModelMatrix();
 		m_shadowDepthProgram->SetUniform("model", model);
 		meshRenderer->GetMesh()->Draw(m_shadowDepthProgram.get());

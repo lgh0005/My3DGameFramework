@@ -45,10 +45,9 @@ void Context::Render()
         activeRenderer->Render(activeScene);
     }
 
-    // 2. ImGui 렌더링 (Context가 담당)
+    // 2. ImGui 렌더링 (Context가 담당?)
     {
         IMGUI.BeginFrame();
-
         {
             // imgui context #1 : 카메라
             if (IMGUI.Begin("Camera Parameters"))
@@ -122,14 +121,20 @@ void Context::Render()
             } IMGUI.End();
         }
 
-        // imgui context #3 : 감마
         if (IMGUI.Begin("Gamma correction"))
         {
-            // [수정] 활성 렌더러의 GetGamma() 호출
-            if (activeRenderer)
+            auto* activeScene = SCENE.GetActiveScene();
+            auto* postProcessRenderPass = activeScene->GetRenderPass("PostProcess");
+            if (postProcessRenderPass)
             {
-                ImGui::DragFloat("gamma", &m_gamma, 0.01f, 0.0f, 2.0f);
+                ImGui::Text("Post-process renderer found. :)");
+                ImGui::Text("TOOD : Move to content side later..");
             }
+            else
+            {
+                ImGui::Text("No Post-process renderer here. :(");
+            }
+
         } IMGUI.End();
 
         IMGUI.EndFrame();

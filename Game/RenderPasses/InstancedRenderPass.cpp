@@ -36,6 +36,8 @@ void InstancedRenderPass::Render(Scene* scene, Camera* camera)
         material->SetToProgram(m_program.get());
 
         // (셰이더가 aInstanceOffset으로 직접 위치를 계산)
+        auto& transform = renderer->GetTransform();
+        m_program->SetUniform("model", transform.GetModelMatrix());
 
         mesh->Draw(m_program.get());
     }
