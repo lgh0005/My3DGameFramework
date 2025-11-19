@@ -22,14 +22,14 @@ uniform Light light;
 uniform vec3 viewPos;
 
 // C++ (Material::SetToProgram)에서 바인딩할 디퓨즈 텍스처
-struct Material 
+struct Material
 {
     sampler2D diffuse;
     sampler2D specular;
+    sampler2D emission;
     float shininess;
+    float emissionStrength;
 };
-
-// [수정] 2. 'material'이라는 이름으로 struct 유니폼을 선언합니다.
 uniform Material material;
 uniform sampler2D shadowMap;
 
@@ -100,5 +100,10 @@ void main()
     }
 
     result *= attenuation;
+
+    // emission
+    vec3 emission = texture(material.emission, texCoords).rgb * material.emissionStrength;
+    result += emission;
+
     fragColor = vec4(result, 1.0);
 }

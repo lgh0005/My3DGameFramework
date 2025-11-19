@@ -23,7 +23,9 @@ struct Material
 {
     sampler2D diffuse;
     sampler2D specular;
+    sampler2D emission;
     float shininess;
+    float emissionStrength;
 };
 uniform Material material;
 uniform sampler2D shadowMap;
@@ -102,5 +104,10 @@ void main()
     }
 
     result *= attenuation;
+
+    // emission
+    vec3 emission = texture(material.emission, texCoord).rgb * material.emissionStrength;
+    result += emission;
+
 	fragColor = vec4(result, 1.0);
 }

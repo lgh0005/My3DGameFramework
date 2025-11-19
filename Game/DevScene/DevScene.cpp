@@ -61,12 +61,16 @@ bool DevScene::LoadNessesaryResources()
 		(Image::CreateSingleColorImage(4, 4, glm::vec4(1.0f, 1.0f, 1.0f, 1.0f)).get());
 		TextureUPtr specularTexture = Texture::CreateFromImage
 		(Image::CreateSingleColorImage(4, 4, glm::vec4(0.5f, 0.5f, 0.5f, 1.0f)).get());
-		if (!diffuseTexture || !specularTexture) return false;
+		TextureUPtr emissionTexture = Texture::CreateFromImage
+		(Image::CreateSingleColorImage(4, 4, glm::vec4(0.0f, 0.0f, 0.0f, 1.0f)).get());
+		if (!diffuseTexture || !specularTexture || !emissionTexture) return false;
 
 		auto lightMat = Material::Create();
 		lightMat->diffuse = std::move(diffuseTexture);
 		lightMat->specular = std::move(specularTexture);
+		lightMat->emission = std::move(emissionTexture);
 		lightMat->shininess = 16.0f;
+		lightMat->emissionStrength = 0.0f;
 		RESOURCE.AddResource<Material>("LightMat", std::move(lightMat));
 	}
 
@@ -76,12 +80,16 @@ bool DevScene::LoadNessesaryResources()
 		(Image::Load("./Resources/Images/container.jpg").get());
 		TextureUPtr specularTexture = Texture::CreateFromImage
 		(Image::CreateSingleColorImage(4, 4, glm::vec4(0.5f, 0.5f, 0.5f, 1.0f)).get());
-		if (!diffuseTexture || !specularTexture) return false;
+		TextureUPtr emissionTexture = Texture::CreateFromImage
+		(Image::Load("./Resources/Images/matrix.jpg").get());
+		if (!diffuseTexture || !specularTexture || !emissionTexture) return false;
 
 		auto box1Mat = Material::Create();
 		box1Mat->diffuse = std::move(diffuseTexture);
 		box1Mat->specular = std::move(specularTexture);
+		box1Mat->emission = std::move(emissionTexture);
 		box1Mat->shininess = 16.0f;
+		box1Mat->emissionStrength = 2.0f;
 		RESOURCE.AddResource<Material>("boxMat1", std::move(box1Mat));
 	}
 
@@ -91,12 +99,16 @@ bool DevScene::LoadNessesaryResources()
 		(Image::Load("./Resources/Images/container2.png").get());
 		TextureUPtr specularTexture = Texture::CreateFromImage
 		(Image::Load("./Resources/Images/container2_specular.png").get());
-		if (!diffuseTexture || !specularTexture) return false;
+		TextureUPtr emissionTexture = Texture::CreateFromImage
+		(Image::Load("./Resources/Images/matrix.jpg").get());
+		if (!diffuseTexture || !specularTexture || !emissionTexture) return false;
 
 		auto box2Mat = Material::Create();
 		box2Mat->diffuse = std::move(diffuseTexture);
 		box2Mat->specular = std::move(specularTexture);
+		box2Mat->emission = std::move(emissionTexture);
 		box2Mat->shininess = 16.0f;
+		box2Mat->emissionStrength = 0.25f;
 		RESOURCE.AddResource<Material>("boxMat2", std::move(box2Mat));
 	}
 
@@ -106,12 +118,16 @@ bool DevScene::LoadNessesaryResources()
 		(Image::Load("./Resources/Images/marble.jpg").get());
 		TextureUPtr specularTexture = Texture::CreateFromImage
 		(Image::CreateSingleColorImage(4, 4, glm::vec4(0.25f, 0.25f, 0.25f, 1.0f)).get());
-		if (!diffuseTexture || !specularTexture) return false;
+		TextureUPtr emissionTexture = Texture::CreateFromImage
+		(Image::CreateSingleColorImage(4, 4, glm::vec4(0.0f, 0.0f, 0.0f, 1.0f)).get());
+		if (!diffuseTexture || !specularTexture || !emissionTexture) return false;
 
 		auto box4Mat = Material::Create();
 		box4Mat->diffuse = std::move(diffuseTexture);
 		box4Mat->specular = std::move(specularTexture);
-		box4Mat->shininess = 4.0f;
+		box4Mat->emission = std::move(emissionTexture);
+		box4Mat->shininess = 14.0f;
+		box4Mat->emissionStrength = 0.0f;
 		RESOURCE.AddResource<Material>("boxMat3", std::move(box4Mat));
 	}
 

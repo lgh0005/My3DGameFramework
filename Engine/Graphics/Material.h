@@ -11,7 +11,9 @@ public:
     static MaterialUPtr Create() { return MaterialUPtr(new Material()); }
     TexturePtr  diffuse;
     TexturePtr  specular;
-    float       shininess { 32.0f };
+    TexturePtr  emission;
+    float       shininess           { 32.0f };
+    float       emissionStrength    { 1.0f };
 
     void SetToProgram(const Program* program) const;
 
