@@ -7,7 +7,7 @@ CLASS_PTR(Framebuffer)
 #pragma endregion
 
 CLASS_PTR(PostProcessingRenderPass)
-class PostProcessingRenderPass : public RenderPass
+class PostProcessingRenderPass : public PostProcessPass
 {
     using Super = RenderPass;
 
@@ -19,12 +19,13 @@ public:
         MeshPtr planeMesh
     );
     virtual void Render(Scene* scene, Camera* camera) override;
-    void BeginDraw();
 
 private:
     PostProcessingRenderPass() = default;
-    bool Init(ProgramUPtr program, int32 width, int32 height, MeshPtr planeMesh);
-    MeshPtr m_plane;
-    FramebufferUPtr m_frameBuffer;
-    float m_gamma       { 0.75f };
+    bool Init
+    (
+        ProgramUPtr program, 
+        int32 width, int32 height, 
+        MeshPtr planeMesh
+    );
 };

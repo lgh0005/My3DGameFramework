@@ -28,6 +28,7 @@
 #include "RenderPasses/SkyboxRenderPass.h"
 #include "RenderPasses/EnvironmentRenderPass.h"
 #include "RenderPasses/PostProcessingPass.h"
+#include "RenderPasses/ShadowDepthRenderPass.h"
 
 DevScene::~DevScene() = default;
 
@@ -198,7 +199,7 @@ bool DevScene::CreateNessesaryRenderPasses()
 		MeshPtr boxMesh = RESOURCE.GetResource<Mesh>("Cube");
 		CubeTexturePtr cubeTex = RESOURCE.GetResource<CubeTexture>("SkyboxTexture");
 		auto skyboxRenderPass = SkyboxRenderPass::Create(std::move(prog), boxMesh, cubeTex);
-		AddRenderPass("Skybox", std::move(skyboxRenderPass));
+		SetSkyboxPass(std::move(skyboxRenderPass));
 	}
 
 	// 6. 환경맵
@@ -225,11 +226,30 @@ bool DevScene::CreateNessesaryRenderPasses()
 		MeshPtr planeMesh = RESOURCE.GetResource<Mesh>("Plane");
 		if (!planeMesh) return false;
 
-		AddRenderPass("PostProcess", PostProcessingRenderPass::Create
+		SetPostProcessPass(PostProcessingRenderPass::Create
 		(
 			std::move(prog),
 			WINDOW_WIDTH, WINDOW_HEIGHT,
 			planeMesh
+		));
+	}
+
+	// 8. 그림자 깊이 패스
+	{
+		auto progStatic = Program::Create(
+			"./Resources/Shaders/Shadow/static_shadow.vert",
+			"./Resources/Shaders/Shadow/static_shadow.frag"
+		); if (!progStatic) return false;
+		auto progSkinned = Program::Create(
+			"./Resources/Shaders/Shadow/skinned_shadow.vert",
+			"./Resources/Shaders/Shadow/skinned_shadow.frag"
+		); if (!progSkinned) return false;
+
+		SetShadowPass(ShadowDepthRenderPass::Create
+		(
+			std::move(progStatic),
+			std::move(progSkinned),
+			1024
 		));
 	}
 
@@ -269,7 +289,7 @@ bool DevScene::CreateSceneContext()
 		SetMainLight(lightComp.get());
 		lightGo->GetTransform().SetPosition(glm::vec3(1.0f, 4.0f, 4.0f));
 		lightGo->GetTransform().SetScale(glm::vec3(0.2f));
-		lightComp->SetCutoff(glm::vec2(120.0f, 5.0f));
+		lightComp->SetCutoff(glm::vec2(60.0, 5.0f));
 		lightComp->SetDistance(128.0f);
 		lightGo->AddComponent(std::move(lightComp));
 		auto renderer = MeshRenderer::Create
@@ -333,7 +353,7 @@ bool DevScene::CreateSceneContext()
 		cubeObj->SetName("Ground");
 		auto& cubeTransform = cubeObj->GetTransform();
 		cubeTransform.SetPosition(glm::vec3(0.0f, -0.5f, 0.0f));
-		cubeTransform.SetScale(glm::vec3(10.0f, 1.0f, 10.0f));
+		cubeTransform.SetScale(glm::vec3(100.0f, 1.0f, 100.0f));
 
 		auto meshRenderer = MeshRenderer::Create
 		(RESOURCE.GetResource<Mesh>("Cube"), RESOURCE.GetResource<Material>("boxMat3"));

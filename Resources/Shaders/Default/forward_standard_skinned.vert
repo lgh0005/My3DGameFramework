@@ -10,6 +10,7 @@ layout (location = 4) in vec4 aWeights;
 uniform mat4 projection;
 uniform mat4 view;
 uniform mat4 model;
+uniform mat4 lightSpaceMatrix;
 
 // 3. 뼈 행렬 배열 (Animator가 계산)
 const int MAX_BONES = 100;
@@ -17,9 +18,10 @@ const int MAX_BONE_INFLUENCE = 4; // Vertex.h와 일치
 uniform mat4 finalBoneMatrices[MAX_BONES];
 
 // 4. 프래그먼트 셰이더로 전달
-out vec2 TexCoords;
+out vec2 texCoords;
 out vec3 normal;   
 out vec3 position;
+out vec4 FragPosLightSpace;
 
 void main()
 {
@@ -54,11 +56,16 @@ void main()
         totalNormal = vec4(aNormal, 0.0f);
     }
 
+    vec4 worldPos = model * totalPosition;
+
     // 3. 모델, 뷰, 프로젝션 행렬을 적용하여 최종 위치 계산
-    gl_Position = projection * view * model * totalPosition;
+    gl_Position = projection * view * worldPos;
 
     // 4. 텍스처 좌표 전달
-    TexCoords = aTexCoord;
-    position = (model * totalPosition).xyz;
+    texCoords = aTexCoord;
+    position = worldPos.xyz;
     normal = normalize((transpose(inverse(model)) * totalNormal).xyz);
+
+    // 5. 월드 좌표 -> 빛 공간 좌표 변환
+    FragPosLightSpace = lightSpaceMatrix * worldPos;
 }

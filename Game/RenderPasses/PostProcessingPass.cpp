@@ -6,8 +6,8 @@
 #include "Graphics/Mesh.h"
 #include "Graphics/StaticMesh.h" 
 #include "Graphics/FrameBuffer.h"
-#include "Graphics/Texture.h"     
-#include "Components/Camera.h"     
+#include "Graphics/Texture.h"    
+#include "Components/Camera.h"
 
 PostProcessingRenderPassUPtr PostProcessingRenderPass::Create(ProgramUPtr program, 
 															  int32 width, int32 height,
@@ -26,16 +26,16 @@ bool PostProcessingRenderPass::Init(ProgramUPtr program, int32 width, int32 heig
 	return true;
 }
 
-void PostProcessingRenderPass::BeginDraw()
-{
-	m_frameBuffer->Bind();
-	glViewport(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
-	glClearColor(0.1f, 0.2f, 0.3f, 0.0f);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-	glEnable(GL_DEPTH_TEST);
-	glEnable(GL_CULL_FACE);
-	glCullFace(GL_BACK);
-}
+//void PostProcessingRenderPass::BeginDraw()
+//{
+//	m_frameBuffer->Bind();
+//	glViewport(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
+//	glClearColor(0.1f, 0.2f, 0.3f, 0.0f);
+//	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+//	glEnable(GL_DEPTH_TEST);
+//	glEnable(GL_CULL_FACE);
+//	glCullFace(GL_BACK);
+//}
 
 void PostProcessingRenderPass::Render(Scene* scene, Camera* camera)
 {

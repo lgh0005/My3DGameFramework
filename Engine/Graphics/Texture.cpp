@@ -42,6 +42,11 @@ void Texture::SetWrap(uint32 sWrap, uint32 tWrap) const
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, tWrap);
 }
 
+void Texture::SetBorderColor(const glm::vec4& color) const 
+{
+    glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, glm::value_ptr(color));
+}
+
 void Texture::CreateTexture()
 {
     glGenTextures(1, &m_texture);

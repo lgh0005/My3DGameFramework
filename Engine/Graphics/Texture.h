@@ -19,6 +19,7 @@ public:
 	void SetWrap(uint32 sWrap, uint32 tWrap) const;
 	void SetTextureFormat(int32 width, int32 height,
 						  uint32 format, uint32 type);
+	void SetBorderColor(const glm::vec4& color) const;
 
 	int32  GetWidth()	   const	{ return m_width; }
 	int32  GetHeight()	   const	{ return m_height; }

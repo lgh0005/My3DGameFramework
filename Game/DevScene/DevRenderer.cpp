@@ -40,7 +40,6 @@ void DevRenderer::Render(Scene* scene)
 
 	// 메인 조명 속성 가져오기
 	SpotLight* mainLight = static_cast<SpotLight*>(scene->GetMainLight());
-	// const auto& renderables = scene->GetAllMeshes();
 
 	// [패스 1] 그림자 패스: m_shadowMap에 깊이 정보 기록
 	RenderShadowPass(scene, camera, mainLight);
@@ -57,16 +56,16 @@ void DevRenderer::Render(Scene* scene)
 
 bool DevRenderer::Init(int32 width, int32 height)
 {
-	// 9. 셰도우 맾 초기화
-	{
-		m_shadowMap = ShadowMap::Create(1024, 1024);
-		m_shadowDepthProgram = Program::Create
-		(
-			"./Resources/Shaders/Shadow/Shadow.vert",
-			"./Resources/Shaders/Shadow/Shadow.frag"
-		);
-		if (!m_shadowDepthProgram) return false;
-	}
+	//// 9. 셰도우 맾 초기화
+	//{
+	//	m_shadowMap = ShadowMap::Create(1024, 1024);
+	//	m_shadowDepthProgram = Program::Create
+	//	(
+	//		"./Resources/Shaders/Shadow/Shadow.vert",
+	//		"./Resources/Shaders/Shadow/Shadow.frag"
+	//	);
+	//	if (!m_shadowDepthProgram) return false;
+	//}
 
 	return true;
 }
@@ -74,46 +73,29 @@ bool DevRenderer::Init(int32 width, int32 height)
 /*===================//
 //   render methods  //
 //===================*/
+// TODO : 만약에 그림자, Postprocessing 등이 없는 경우에 대해서도 따로 처리가 필요하다.
 void DevRenderer::RenderShadowPass(Scene* scene, Camera* camera, SpotLight* mainLight)
 {
-	if (!mainLight) return;
-	RenderPass* staticPass = scene->GetRenderPass("Static");
-	if (!staticPass) return;
-	const int32 SHADOW_WIDTH = 1024, SHADOW_HEIGHT = 1024;
-
-	auto& lightTransform = mainLight->GetTransform();
-	glm::vec3 lightPos = lightTransform.GetPosition();
-	glm::vec3 lightDir = lightTransform.GetForwardVector();
-	float fov = mainLight->GetCutoff()[0] * 2.0f;
-	float aspect = (float)SHADOW_WIDTH / (float)SHADOW_HEIGHT;
-	glm::mat4 lightProjection = glm::perspective(glm::radians(fov), aspect, 0.1f, mainLight->GetDistance());
-	glm::mat4 lightView = glm::lookAt(lightPos, lightPos + lightDir, glm::vec3(0.0f, 1.0f, 0.0f));
-	glm::mat4 lightSpaceMatrix = lightProjection * lightView;
-
-	glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
-	m_shadowMap->Bind();
-	glClear(GL_DEPTH_BUFFER_BIT);
-	glEnable(GL_DEPTH_TEST);
-	glCullFace(GL_FRONT);
-
-	// 1-3. 섀도우 맵 셰이더 설정 -> 지금 코드가 좀 더러울 수 있음
-	m_shadowDepthProgram->Use();
-	m_shadowDepthProgram->SetUniform("lightSpaceMatrix", lightSpaceMatrix);
-
-	for (const auto* meshRenderer : staticPass->GetRenderers())
-	{
-		auto model = meshRenderer->GetTransform().GetModelMatrix();
-		m_shadowDepthProgram->SetUniform("model", model);
-		meshRenderer->GetMesh()->Draw(m_shadowDepthProgram.get());
-	}
-
-	glCullFace(GL_BACK);
+	scene->GetShadowPass()->Render(scene, camera);
 }
 
 void DevRenderer::RenderMainPass(Scene* scene, Camera* camera, SpotLight* mainLight)
 {
-	auto postProcess = scene->GetRenderPass("PostProcess");
-	reinterpret_cast<PostProcessingRenderPass*>(postProcess)->BeginDraw();
+	scene->GetPostProcessPass()->BeginDraw();
+
+	ShadowPass* shadowPass = scene->GetShadowPass();
+	TexturePtr shadowMap = shadowPass->GetDepthMap();
+	glm::mat4 lightSpaceMatrix = shadowPass->GetLightSpaceMatrix();
+	glActiveTexture(GL_TEXTURE0 + 10);
+	glBindTexture(GL_TEXTURE_2D, shadowMap->Get());
+
+	for (const auto& [name, pass] : scene->GetRenderPasses())
+	{
+		auto& program = pass->GetProgram();
+		program.Use();
+		program.SetUniform("shadowMap", 10);
+		program.SetUniform("lightSpaceMatrix", lightSpaceMatrix);
+	}
 
 	for (const auto& [name, pass] : scene->GetRenderPasses())
 	{
@@ -123,11 +105,10 @@ void DevRenderer::RenderMainPass(Scene* scene, Camera* camera, SpotLight* mainLi
 
 void DevRenderer::RenderSkyboxPass(Scene* scene, Camera* camera)
 {
-	scene->GetRenderPass("Skybox")->Render(scene, camera);
+	scene->GetSkyboxPass()->Render(scene, camera);
 }
 
 void DevRenderer::RenderPostProcessingPass(Scene* scene, Camera* camera)
 {
-	auto postProcess = scene->GetRenderPass("PostProcess");
-	reinterpret_cast<PostProcessingRenderPass*>(postProcess)->Render(scene, camera);
+	scene->GetPostProcessPass()->Render(scene, camera);
 }

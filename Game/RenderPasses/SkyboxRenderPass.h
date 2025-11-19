@@ -10,7 +10,7 @@ CLASS_PTR(CubeTexture)
 #pragma endregion
 
 CLASS_PTR(SkyboxRenderPass)
-class SkyboxRenderPass : public RenderPass
+class SkyboxRenderPass : public SkyboxPass
 {
     using Super = RenderPass;
 
@@ -28,7 +28,4 @@ private:
         MeshPtr boxMesh,
         CubeTexturePtr cubeTexture
     );
-
-    MeshPtr m_cubeMesh;
-    CubeTexturePtr m_cubeTexture;
 };

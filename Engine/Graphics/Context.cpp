@@ -91,9 +91,6 @@ void Context::Render()
                     if (ImGui::DragFloat3("position", glm::value_ptr(lightPos), 0.01f))
                         lightTransform.SetPosition(lightPos);
 
-                    // [참고] SpotLight의 방향(Direction)은 이제 Transform의 회전값으로 제어해야 합니다.
-                    // (m_spotLight->GetDirection() / SetDirection()은 제거됨)
-                    // (예: ImGui::DragFloat3("rotation", ...)으로 lightTransform.SetRotation(...) 호출)
                     glm::vec3 currentRotation = lightTransform.GetRotationEuler();
                     bool rotationChanged = ImGui::DragFloat3("rotation", glm::value_ptr(currentRotation), 0.5f);
                     if (rotationChanged) lightTransform.SetRotation(currentRotation);
@@ -123,18 +120,7 @@ void Context::Render()
 
         if (IMGUI.Begin("Gamma correction"))
         {
-            auto* activeScene = SCENE.GetActiveScene();
-            auto* postProcessRenderPass = activeScene->GetRenderPass("PostProcess");
-            if (postProcessRenderPass)
-            {
-                ImGui::Text("Post-process renderer found. :)");
-                ImGui::Text("TOOD : Move to content side later..");
-            }
-            else
-            {
-                ImGui::Text("No Post-process renderer here. :(");
-            }
-
+            ImGui::Text("TODO : Move to content side later..");
         } IMGUI.End();
 
         IMGUI.EndFrame();
