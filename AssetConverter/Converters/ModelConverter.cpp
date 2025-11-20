@@ -18,7 +18,7 @@ bool ModelConverter::Convert(const std::string& inputPath,
 bool ModelConverter::RunConversion(const std::string& inputPath, const std::string& outputPath)
 {
 	Assimp::Importer importer;
-	const aiScene* scene = importer.ReadFile(inputPath, aiProcess_Triangulate);
+	const aiScene* scene = importer.ReadFile(inputPath, aiProcess_Triangulate | aiProcess_CalcTangentSpace);
 	if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
 	{
 		SPDLOG_ERROR("Assimp load failed: {}", importer.GetErrorString());
@@ -70,7 +70,7 @@ void ModelConverter::ProcessNode(aiNode* node, const aiScene* scene)
 void ModelConverter::ProcessMesh(aiMesh* mesh, const aiScene* scene)
 {
 	TempMesh tempMesh;
-	std::vector<Vertex> vertices;
+	std::vector<SkinnedVertex> vertices;
 
 	// 1. 정점 데이터 채우기
 	vertices.resize(mesh->mNumVertices);
@@ -84,6 +84,15 @@ void ModelConverter::ProcessMesh(aiMesh* mesh, const aiScene* scene)
 			v.texCoord = { mesh->mTextureCoords[0][i].x, mesh->mTextureCoords[0][i].y };
 		else
 			v.texCoord = { 0.0f, 0.0f };
+
+		if (mesh->mTangents)
+		{
+			v.tangent = { mesh->mTangents[i].x, mesh->mTangents[i].y, mesh->mTangents[i].z };
+		}
+		else
+		{
+			v.tangent = { 0.0f, 0.0f, 0.0f };
+		}
 	}
 
 	// 2. 인덱스 데이터 채우기
@@ -117,6 +126,8 @@ TempMaterial ModelConverter::ProcessMaterial(aiMaterial* material)
 	TempMaterial tempMat;
 	tempMat.diffuseMapPath = GetTexturePath(material, aiTextureType_DIFFUSE);
 	tempMat.specularMapPath = GetTexturePath(material, aiTextureType_SPECULAR);
+	tempMat.emissionMapPath = GetTexturePath(material, aiTextureType_EMISSIVE);
+	tempMat.normalMapPath = GetTexturePath(material, aiTextureType_NORMALS);
 	return tempMat;
 }
 
@@ -135,7 +146,7 @@ std::string ModelConverter::GetTexturePath(aiMaterial* material, aiTextureType t
 	return (std::filesystem::path(m_modelDirectory) / filenameOnly).string();
 }
 
-void ModelConverter::ExtractBoneWeightForVertices(std::vector<Vertex>& vertices, aiMesh* mesh)
+void ModelConverter::ExtractBoneWeightForVertices(std::vector<SkinnedVertex>& vertices, aiMesh* mesh)
 {
 	for (uint32 boneIndex = 0; boneIndex < mesh->mNumBones; ++boneIndex)
 	{
@@ -210,6 +221,8 @@ bool ModelConverter::WriteCustomModelFile(const std::string& outputPath)
 	{
 		ConverterUtils::WriteString(outFile, material.diffuseMapPath);
 		ConverterUtils::WriteString(outFile, material.specularMapPath);
+		ConverterUtils::WriteString(outFile, material.emissionMapPath);
+		ConverterUtils::WriteString(outFile, material.normalMapPath);
 	}
 
 	// --- 4. 메쉬 블록 쓰기 ---
@@ -224,7 +237,7 @@ bool ModelConverter::WriteCustomModelFile(const std::string& outputPath)
 
 		// 메쉬 데이터 (데이터 덩어리 통째로 쓰기)
 		outFile.write(reinterpret_cast<const char*>(mesh.vertices.data()),
-			sizeof(Vertex) * vertexCount);
+			sizeof(SkinnedVertex) * vertexCount);
 		outFile.write(reinterpret_cast<const char*>(mesh.indices.data()),
 			sizeof(uint32) * indexCount);
 	}
@@ -237,7 +250,7 @@ bool ModelConverter::WriteCustomModelFile(const std::string& outputPath)
 /*==================//
 //   bone helpers   //
 //==================*/
-void ModelConverter::SetVertexBoneDataToDefault(Vertex& vertex)
+void ModelConverter::SetVertexBoneDataToDefault(SkinnedVertex& vertex)
 {
 	for (int i = 0; i < MAX_BONE_INFLUENCE; i++)
 	{
@@ -246,7 +259,7 @@ void ModelConverter::SetVertexBoneDataToDefault(Vertex& vertex)
 	}
 }
 
-void ModelConverter::SetVertexBoneData(Vertex& vertex, int boneID, float weight)
+void ModelConverter::SetVertexBoneData(SkinnedVertex& vertex, int boneID, float weight)
 {
 	for (int i = 0; i < MAX_BONE_INFLUENCE; ++i)
 	{

@@ -1,4 +1,5 @@
 #pragma once
+#include "Graphics/Vertex.h"
 
 #pragma region FORWARD_DECLARATION
 struct aiScene;
@@ -12,7 +13,7 @@ enum aiTextureType : int32;
 struct TempMesh
 {
     uint32_t materialIndex;
-    std::vector<Vertex> vertices;
+    std::vector<SkinnedVertex> vertices;
     std::vector<uint32_t> indices;
 };
 
@@ -20,6 +21,8 @@ struct TempMaterial
 {
     std::string diffuseMapPath;
     std::string specularMapPath;
+    std::string emissionMapPath;
+    std::string normalMapPath;
     // ... (나중에 shininess 등 PBR 데이터 추가) ...
 };
 #pragma endregion
@@ -39,14 +42,14 @@ private:
     void ProcessMesh(aiMesh* mesh, const aiScene* scene);
     TempMaterial ProcessMaterial(aiMaterial* material);
     std::string GetTexturePath(aiMaterial* material, aiTextureType type);
-    void ExtractBoneWeightForVertices(std::vector<Vertex>& vertices, aiMesh* mesh);
+    void ExtractBoneWeightForVertices(std::vector<SkinnedVertex>& vertices, aiMesh* mesh);
 
     // 커스텀 바이너리 파일 작성 메서드
     bool WriteCustomModelFile(const std::string& outputPath);
 
     // 뼈 헬퍼 메서드
-    void SetVertexBoneDataToDefault(Vertex& vertex);
-    void SetVertexBoneData(Vertex& vertex, int boneID, float weight);
+    void SetVertexBoneDataToDefault(SkinnedVertex& vertex);
+    void SetVertexBoneData(SkinnedVertex& vertex, int boneID, float weight);
 
 private:
     std::vector<TempMesh>     m_meshes;     // 추출된 메쉬 데이터

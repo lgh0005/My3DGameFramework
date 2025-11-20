@@ -39,4 +39,5 @@ protected:
     BufferPtr m_vertexBuffer;
     BufferPtr m_indexBuffer;
     MaterialPtr m_material;
+    // glm::vec3 m_tangent;
 };

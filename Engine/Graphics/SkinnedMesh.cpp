@@ -35,8 +35,9 @@ void SkinnedMesh::Init(const std::vector<SkinnedVertex>& vertices,
     m_vertexLayout->SetAttrib(0, 3, GL_FLOAT, false, sizeof(SkinnedVertex), 0);
     m_vertexLayout->SetAttrib(1, 3, GL_FLOAT, false, sizeof(SkinnedVertex), offsetof(SkinnedVertex, normal));
     m_vertexLayout->SetAttrib(2, 2, GL_FLOAT, false, sizeof(SkinnedVertex), offsetof(SkinnedVertex, texCoord));
-    m_vertexLayout->SetAttribI(3, 4, GL_INT,         sizeof(SkinnedVertex), offsetof(SkinnedVertex, boneIDs));
-    m_vertexLayout->SetAttrib(4, 4, GL_FLOAT, false, sizeof(SkinnedVertex), offsetof(SkinnedVertex, weights));
+    m_vertexLayout->SetAttrib(3, 3, GL_FLOAT, false, sizeof(SkinnedVertex), offsetof(SkinnedVertex, tangent));
+    m_vertexLayout->SetAttribI(4, 4, GL_INT,         sizeof(SkinnedVertex), offsetof(SkinnedVertex, boneIDs));
+    m_vertexLayout->SetAttrib(5, 4, GL_FLOAT, false, sizeof(SkinnedVertex), offsetof(SkinnedVertex, weights));
 }
 
 void SkinnedMesh::Draw(const Program* program) const

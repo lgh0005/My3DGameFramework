@@ -28,6 +28,13 @@ void Material::SetToProgram(const Program* program) const
         emission->Bind();
         textureCount++;
     }
+    if (normal)
+    {
+        glActiveTexture(GL_TEXTURE0 + textureCount);
+        program->SetUniform("material.normal", textureCount);
+        normal->Bind();
+        textureCount++;
+    }
     glActiveTexture(GL_TEXTURE0);
 
     program->SetUniform("material.shininess", shininess);

@@ -23,6 +23,9 @@ add_executable(AssetConverter
 # 2. [PCH 설정] AssetConverter/pch.h를 AsssetConverter 타겟 전용(PRIVATE) PCH로 사용합니다.
 target_precompile_headers(AssetConverter PRIVATE pch.h)
 
+# 3. [경로 설정] pch의 위치를 알리기 위해 필요합니다.
+target_include_directories(AssetConverter PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
+
 # 3. [헤더 경로] 현재 폴더(CMAKE_CURRENT_SOURCE_DIR)를 include 검색 경로에 추가
 target_include_directories(AssetConverter PRIVATE 
     ${CMAKE_CURRENT_SOURCE_DIR},

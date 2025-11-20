@@ -4,6 +4,7 @@ in vec2 texCoords;
 in vec3 normal;
 in vec3 position;
 in vec4 FragPosLightSpace;
+in mat3 TBN;
 
 out vec4 fragColor;
 
@@ -27,6 +28,7 @@ struct Material
     sampler2D diffuse;
     sampler2D specular;
     sampler2D emission;
+    sampler2D normal;
     float shininess;
     float emissionStrength;
 };
@@ -83,7 +85,10 @@ void main()
 
     if (intensity > 0.0) 
     {
-        vec3 pixelNorm = normalize(normal);
+        vec3 normalMapValue = texture(material.normal, texCoords).rgb;
+        normalMapValue = normalMapValue * 2.0 - 1.0;
+        vec3 pixelNorm = normalize(TBN * normalMapValue);
+
         float diff = max(dot(pixelNorm, lightDir), 0.0);
         vec3 diffuse = diff * texColor * light.diffuse;
 

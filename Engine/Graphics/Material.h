@@ -12,6 +12,7 @@ public:
     TexturePtr  diffuse;
     TexturePtr  specular;
     TexturePtr  emission;
+    TexturePtr  normal;
     float       shininess           { 32.0f };
     float       emissionStrength    { 1.0f };
 

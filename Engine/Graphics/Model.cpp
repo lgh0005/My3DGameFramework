@@ -31,15 +31,13 @@ bool Model::LoadByAssimp(const std::string& filename)
     Assimp::Importer importer;
     // TODO : 어떤 모델은 UV 좌표가 올바르고 어떤 모델은 뒤집히는 것이 있는 모양이다.
     // auto scene = importer.ReadFile(filename, aiProcess_Triangulate | aiProcess_FlipUVs);
-    auto scene = importer.ReadFile(filename, aiProcess_Triangulate);
+    auto scene = importer.ReadFile(filename, aiProcess_Triangulate | aiProcess_CalcTangentSpace);
     if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode) 
     {
         SPDLOG_ERROR("failed to load model: {}", filename);
         return false;
     }
 
-    // TODO : 이후에 한 번 3D 모델 파일들을 작업용 포멧을 한 번 파싱한 다음
-    // 그것을 로드하도록 만들어야 한다.
     auto dirname = filename.substr(0, filename.find_last_of("/"));
     auto LoadTexture = [&](aiMaterial* material, aiTextureType type) -> TexturePtr 
     {
@@ -59,16 +57,21 @@ bool Model::LoadByAssimp(const std::string& filename)
         }
 
         auto fullPath = (std::filesystem::path(dirname) / filenameOnly).string();
-        SPDLOG_INFO("Loading texture [filesystem]: {}", fullPath);
 
+        auto cachedTex = RESOURCE.GetResource<Texture>(fullPath);
+        if (cachedTex) return cachedTex;
+
+        SPDLOG_INFO("Loading texture [filesystem]: {}", fullPath);
         auto image = Image::Load(fullPath);
         if (!image)
         {
             SPDLOG_WARN("Failed to load image: {}", fullPath);
             return nullptr;
         }
+        auto texture = Texture::CreateFromImage(image.get());
+        RESOURCE.AddResource<Texture>(fullPath, std::move(texture));
 
-        return Texture::CreateFromImage(image.get());
+        return RESOURCE.GetResource<Texture>(fullPath);
     };
 
     for (uint32 i = 0; i < scene->mNumMaterials; i++) 
@@ -77,6 +80,10 @@ bool Model::LoadByAssimp(const std::string& filename)
         auto glMaterial = Material::Create();
         glMaterial->diffuse = LoadTexture(material, aiTextureType_DIFFUSE);
         glMaterial->specular = LoadTexture(material, aiTextureType_SPECULAR);
+        glMaterial->emission = LoadTexture(material, aiTextureType_EMISSIVE);
+        glMaterial->normal = LoadTexture(material, aiTextureType_NORMALS);
+        if (glMaterial->emission) glMaterial->emissionStrength = 1.5f;
+        else glMaterial->emissionStrength = 0.0f;
         m_materials.push_back(std::move(glMaterial));
     }
 
@@ -141,6 +148,8 @@ bool Model::LoadByBinary(const std::string& filename)
         // TODO : 텍스쳐 로드 수정 필요
         std::string storedDiffuse = ReadPath(inFile);
         std::string storedSpecular = ReadPath(inFile);
+        std::string storedEmission = ReadPath(inFile);
+        std::string storedNormal = ReadPath(inFile);
 
         // TODO: 텍스처 로드 
         // 1. 디퓨즈 맵 로드
@@ -169,6 +178,42 @@ bool Model::LoadByBinary(const std::string& filename)
                 SPDLOG_ERROR("Failed to load specular texture: '{}'", fullPath);
         }
         
+        // 3. Emission 맵 로드
+        if (!storedEmission.empty())
+        {
+            std::string texFilename = std::filesystem::path(storedEmission).filename().string();
+            std::string fullPath = (modelDir / texFilename).string();
+
+            auto image = Image::Load(fullPath);
+            if (image) 
+            {
+                material->emission = Texture::CreateFromImage(image.get());
+                material->emissionStrength = 1.0f;
+            }
+            else 
+            {
+                SPDLOG_ERROR("Failed to load emission texture: '{}'", fullPath);
+                material->emissionStrength = 0.0f;
+            }
+        }
+        else
+        {
+            material->emissionStrength = 0.0f;
+        }
+
+        // 4. 노멀 맵 로드
+        if (!storedNormal.empty())
+        {
+            std::string texFilename = std::filesystem::path(storedNormal).filename().string();
+            std::string fullPath = (modelDir / texFilename).string();
+
+            auto image = Image::Load(fullPath);
+            if (image)
+                material->normal = Texture::CreateFromImage(image.get());
+            else
+                SPDLOG_ERROR("Failed to load normal texture: '{}'", fullPath);
+        }
+
         // TODO : 이후 여러 텍스쳐 맵이 필요하다면 추가될 수 있음
 
         m_materials[i] = std::move(material);
@@ -220,6 +265,16 @@ void Model::ProcessMesh(aiMesh* mesh, const aiScene* scene)
         v.position = glm::vec3(mesh->mVertices[i].x, mesh->mVertices[i].y, mesh->mVertices[i].z);
         v.normal = glm::vec3(mesh->mNormals[i].x, mesh->mNormals[i].y, mesh->mNormals[i].z);
         v.texCoord = glm::vec2(mesh->mTextureCoords[0][i].x, mesh->mTextureCoords[0][i].y);
+
+        // Tangent 벡터 추출
+        if (mesh->mTangents)
+        {
+            v.tangent = glm::vec3(mesh->mTangents[i].x, mesh->mTangents[i].y, mesh->mTangents[i].z);
+        }
+        else
+        {
+            v.tangent = glm::vec3(0.0f);
+        }
     }
 
     std::vector<uint32> indices;

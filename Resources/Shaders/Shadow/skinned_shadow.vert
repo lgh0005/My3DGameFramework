@@ -1,8 +1,8 @@
 #version 460 core
 
 layout (location = 0) in vec3 aPos;
-layout (location = 3) in ivec4 aBoneIds; 
-layout (location = 4) in vec4 aWeights;
+layout (location = 4) in ivec4 aBoneIds; 
+layout (location = 5) in vec4 aWeights;
 
 const int MAX_BONES = 100; // C++ 코드와 맞춰야 함
 const int MAX_BONE_INFLUENCE = 4;
