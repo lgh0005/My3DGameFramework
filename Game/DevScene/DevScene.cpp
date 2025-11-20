@@ -65,14 +65,18 @@ bool DevScene::LoadNessesaryResources()
 		(Image::CreateSingleColorImage(4, 4, glm::vec4(0.0f, 0.0f, 0.0f, 1.0f)).get());
 		TextureUPtr normalTexture = Texture::CreateFromImage
 		(Image::CreateSingleColorImage(4, 4, glm::vec4(0.5f, 0.5f, 1.0f, 1.0f)).get());
+		TextureUPtr heightTexture = Texture::CreateFromImage
+		(Image::CreateSingleColorImage(4, 4, glm::vec4(1.0f, 1.0f, 1.0f, 1.0f)).get());
 
 		auto lightMat = Material::Create();
 		lightMat->diffuse = std::move(diffuseTexture);
 		lightMat->specular = std::move(specularTexture);
 		lightMat->emission = std::move(emissionTexture);
 		lightMat->normal = std::move(normalTexture);
+		lightMat->height = std::move(heightTexture);
 		lightMat->shininess = 16.0f;
 		lightMat->emissionStrength = 0.0f;
+		lightMat->heightScale = 0.0f;
 		RESOURCE.AddResource<Material>("LightMat", std::move(lightMat));
 	}
 
@@ -86,14 +90,18 @@ bool DevScene::LoadNessesaryResources()
 		(Image::Load("./Resources/Images/matrix.jpg").get());
 		TextureUPtr normalTexture = Texture::CreateFromImage
 		(Image::CreateSingleColorImage(4, 4, glm::vec4(0.5f, 0.5f, 1.0f, 1.0f)).get());
+		TextureUPtr heightTexture = Texture::CreateFromImage
+		(Image::CreateSingleColorImage(4, 4, glm::vec4(1.0f, 1.0f, 1.0f, 1.0f)).get());
 
 		auto box1Mat = Material::Create();
 		box1Mat->diffuse = std::move(diffuseTexture);
 		box1Mat->specular = std::move(specularTexture);
 		box1Mat->emission = std::move(emissionTexture);
 		box1Mat->normal = std::move(normalTexture);
+		box1Mat->height = std::move(heightTexture);
 		box1Mat->shininess = 16.0f;
 		box1Mat->emissionStrength = 2.0f;
+		box1Mat->heightScale = 0.0f;
 		RESOURCE.AddResource<Material>("boxMat1", std::move(box1Mat));
 	}
 
@@ -107,14 +115,18 @@ bool DevScene::LoadNessesaryResources()
 		(Image::Load("./Resources/Images/matrix.jpg").get());
 		TextureUPtr normalTexture = Texture::CreateFromImage
 		(Image::CreateSingleColorImage(4, 4, glm::vec4(0.5f, 0.5f, 1.0f, 1.0f)).get());
+		TextureUPtr heightTexture = Texture::CreateFromImage
+		(Image::CreateSingleColorImage(4, 4, glm::vec4(1.0f, 1.0f, 1.0f, 1.0f)).get());
 
 		auto box2Mat = Material::Create();
 		box2Mat->diffuse = std::move(diffuseTexture);
 		box2Mat->specular = std::move(specularTexture);
 		box2Mat->emission = std::move(emissionTexture);
 		box2Mat->normal = std::move(normalTexture);
+		box2Mat->height = std::move(heightTexture);
 		box2Mat->shininess = 16.0f;
 		box2Mat->emissionStrength = 0.25f;
+		box2Mat->heightScale = 0.0f;
 		RESOURCE.AddResource<Material>("boxMat2", std::move(box2Mat));
 	}
 
@@ -128,14 +140,18 @@ bool DevScene::LoadNessesaryResources()
 		(Image::CreateSingleColorImage(4, 4, glm::vec4(0.0f, 0.0f, 0.0f, 1.0f)).get());
 		TextureUPtr normalTexture = Texture::CreateFromImage
 		(Image::CreateSingleColorImage(4, 4, glm::vec4(0.5f, 0.5f, 1.0f, 1.0f)).get());
+		TextureUPtr heightTexture = Texture::CreateFromImage
+		(Image::CreateSingleColorImage(4, 4, glm::vec4(1.0f, 1.0f, 1.0f, 1.0f)).get());
 
 		auto box4Mat = Material::Create();
 		box4Mat->diffuse = std::move(diffuseTexture);
 		box4Mat->specular = std::move(specularTexture);
 		box4Mat->emission = std::move(emissionTexture);
 		box4Mat->normal = std::move(normalTexture);
+		box4Mat->height = std::move(heightTexture);
 		box4Mat->shininess = 14.0f;
 		box4Mat->emissionStrength = 0.0f;
+		box4Mat->heightScale = 0.0f;
 		RESOURCE.AddResource<Material>("boxMat3", std::move(box4Mat));
 	}
 
@@ -149,15 +165,44 @@ bool DevScene::LoadNessesaryResources()
 		(Image::CreateSingleColorImage(4, 4, glm::vec4(0.0f, 0.0f, 0.0f, 1.0f)).get());
 		TextureUPtr normalTexture = Texture::CreateFromImage
 		(Image::Load("./Resources/Images/brickwall_normal.jpg").get());
+		TextureUPtr heightTexture = Texture::CreateFromImage
+		(Image::CreateSingleColorImage(4, 4, glm::vec4(1.0f, 1.0f, 1.0f, 1.0f)).get());
 
 		auto box5Mat = Material::Create();
 		box5Mat->diffuse = std::move(diffuseTexture);
 		box5Mat->specular = std::move(specularTexture);
 		box5Mat->emission = std::move(emissionTexture);
 		box5Mat->normal = std::move(normalTexture);
+		box5Mat->height = std::move(heightTexture);
 		box5Mat->shininess = 14.0f;
 		box5Mat->emissionStrength = 0.0f;
+		box5Mat->heightScale = 0.0f;
 		RESOURCE.AddResource<Material>("boxMat4", std::move(box5Mat));
+	}
+
+	// 머티리얼 6
+	{
+		TextureUPtr diffuseTexture = Texture::CreateFromImage
+		(Image::Load("./Resources/Images/toy_box_diffuse.png").get());
+		TextureUPtr specularTexture = Texture::CreateFromImage
+		(Image::CreateSingleColorImage(4, 4, glm::vec4(0.25f, 0.25f, 0.25f, 1.0f)).get());
+		TextureUPtr emissionTexture = Texture::CreateFromImage
+		(Image::CreateSingleColorImage(4, 4, glm::vec4(0.0f, 0.0f, 0.0f, 1.0f)).get());
+		TextureUPtr normalTexture = Texture::CreateFromImage
+		(Image::Load("./Resources/Images/toy_box_normal.png").get());
+		TextureUPtr heightTexture = Texture::CreateFromImage
+		(Image::Load("./Resources/Images/toy_box_disp.png").get());
+
+		auto box6Mat = Material::Create();
+		box6Mat->diffuse = std::move(diffuseTexture);
+		box6Mat->specular = std::move(specularTexture);
+		box6Mat->emission = std::move(emissionTexture);
+		box6Mat->normal = std::move(normalTexture);
+		box6Mat->height = std::move(heightTexture);
+		box6Mat->shininess = 14.0f;
+		box6Mat->emissionStrength = 0.0f;
+		box6Mat->heightScale = 0.065f;
+		RESOURCE.AddResource<Material>("boxMat5", std::move(box6Mat));
 	}
 
 	// 0-7. 풀떼기
@@ -387,6 +432,22 @@ bool DevScene::CreateSceneContext()
 
 		auto meshRenderer = MeshRenderer::Create
 		(RESOURCE.GetResource<Mesh>("Cube"), RESOURCE.GetResource<Material>("boxMat4"));
+		staticPass->AddRenderer(meshRenderer.get());
+		cubeObj->AddComponent(std::move(meshRenderer));
+		AddGameObject(std::move(cubeObj));
+	}
+
+	// 5. 큐브 생성 #4
+	{
+		auto cubeObj = GameObject::Create();
+		cubeObj->SetName("Box2");
+		auto& cubeTransform = cubeObj->GetTransform();
+		cubeTransform.SetPosition(glm::vec3(-1.0f, 1.05f, -9.0f));
+		cubeTransform.SetRotation(glm::vec3(0.0f, 70.0f, 0.0f));
+		cubeTransform.SetScale(glm::vec3(3.0f, 3.0f, 3.0f));
+
+		auto meshRenderer = MeshRenderer::Create
+		(RESOURCE.GetResource<Mesh>("Cube"), RESOURCE.GetResource<Material>("boxMat5"));
 		staticPass->AddRenderer(meshRenderer.get());
 		cubeObj->AddComponent(std::move(meshRenderer));
 		AddGameObject(std::move(cubeObj));

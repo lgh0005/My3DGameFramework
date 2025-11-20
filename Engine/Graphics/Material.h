@@ -13,8 +13,10 @@ public:
     TexturePtr  specular;
     TexturePtr  emission;
     TexturePtr  normal;
+    TexturePtr  height;
     float       shininess           { 32.0f };
     float       emissionStrength    { 1.0f };
+    float       heightScale         { 1.0f };
 
     void SetToProgram(const Program* program) const;
 

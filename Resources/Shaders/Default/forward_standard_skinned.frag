@@ -29,8 +29,10 @@ struct Material
     sampler2D specular;
     sampler2D emission;
     sampler2D normal;
+    sampler2D height;
     float shininess;
     float emissionStrength;
+    float heightScale;
 };
 uniform Material material;
 uniform sampler2D shadowMap;

@@ -10,7 +10,7 @@ uniform mat4 modelTransform;
 uniform mat4 lightSpaceMatrix;
 
 out vec3 normal;
-out vec2 texCoord;
+out vec2 texCoords;
 out vec3 position;
 out vec4 FragPosLightSpace;
 out mat3 TBN;
@@ -28,7 +28,7 @@ void main()
 	TBN = mat3(T, B, N);
 
 	normal = N;
-	texCoord = aTexCoord;
+	texCoords = aTexCoord;
 	position = worldPos.xyz;
 	FragPosLightSpace = lightSpaceMatrix * worldPos;
 }

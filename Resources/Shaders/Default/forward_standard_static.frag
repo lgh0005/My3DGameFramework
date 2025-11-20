@@ -1,7 +1,7 @@
 #version 460 core
 
 in vec3 normal;
-in vec2 texCoord;
+in vec2 texCoords;
 in vec3 position;
 in vec4 FragPosLightSpace;
 in mat3 TBN;
@@ -26,13 +26,59 @@ struct Material
     sampler2D specular;
     sampler2D emission;
     sampler2D normal;
+    sampler2D height;
     float shininess;
     float emissionStrength;
+    float heightScale;
 };
 uniform Material material;
 uniform sampler2D shadowMap;
 
 out vec4 fragColor;
+
+vec2 ParallaxMapping(vec2 texCoords, vec3 viewDir)
+{
+    // 1. 레이어 개수 설정 (Steep과 동일)
+    const float minLayers = 8.0;
+    const float maxLayers = 32.0;
+    float numLayers = mix(maxLayers, minLayers, abs(viewDir.z));  
+    
+    float layerDepth = 1.0 / numLayers;
+    float currentLayerDepth = 0.0;
+    
+    // P: 전체 이동 벡터
+    vec2 P = viewDir.xy / viewDir.z * material.heightScale; 
+    vec2 deltaTexCoords = P / numLayers;
+  
+    // 2. 초기값 설정
+    vec2  currentTexCoords     = texCoords;
+    float currentDepthMapValue = 1.0 - texture(material.height, currentTexCoords).r;
+      
+    // 3. Steep Parallax Loop (충돌 지점 찾기)
+    while (currentLayerDepth < currentDepthMapValue)
+    {
+        currentTexCoords -= deltaTexCoords;
+        currentDepthMapValue = 1.0 - texture(material.height, currentTexCoords).r;  
+        currentLayerDepth += layerDepth;  
+    }
+    
+    // 충돌 직전(prev) 좌표와 깊이 구하기
+    vec2 prevTexCoords = currentTexCoords + deltaTexCoords;
+
+    // afterDepth: 충돌 후 (현재 위치)에서의 (깊이 맵 값 - 현재 층 깊이) -> 음수
+    float afterDepth  = currentDepthMapValue - currentLayerDepth;
+    
+    // beforeDepth: 충돌 전 (이전 위치)에서의 (깊이 맵 값 - 이전 층 깊이) -> 양수
+    float beforeDepth = (1.0 - texture(material.height, prevTexCoords).r) - (currentLayerDepth - layerDepth);
+ 
+    // 두 깊이 차이를 이용해 가중치(weight) 계산
+    float weight = afterDepth / (afterDepth - beforeDepth);
+    
+    // 가중치를 이용해 정밀한 UV 좌표 계산 (Linear Interpolation)
+    vec2 finalTexCoords = prevTexCoords * weight + currentTexCoords * (1.0 - weight);
+
+    return finalTexCoords;
+}
 
 float ShadowCalculation(vec4 fragPosLightSpace, vec3 normal, vec3 lightDir)
 {
@@ -66,11 +112,23 @@ float ShadowCalculation(vec4 fragPosLightSpace, vec3 normal, vec3 lightDir)
 // 1. 광원에 따른 셰이더 필요
 void main() 
 {
-	// Ambient
+    // Tangent Space View Direction 계산
+    vec3 viewDirWorld = normalize(viewPos - position);
+    mat3 worldToTangent = transpose(TBN);
+    vec3 viewDirTangent = normalize(worldToTangent * viewDirWorld);
+
+    // Parallax Mapping 적용
+    vec2 texCoord = texCoords;
+    texCoord = ParallaxMapping(texCoords, viewDirTangent);
+    if(texCoords.x > 1.0 || texCoords.y > 1.0 || texCoords.x < 0.0 || texCoords.y < 0.0)
+        discard;
+
+    // 조명 연산
+	// 1. Ambient
 	vec3 texColor = texture(material.diffuse, texCoord).xyz;
     vec3 ambient = texColor * light.ambient;
 
-	// Attenuation and Diffuse
+	// 2. Attenuation and Diffuse
 	float dist = length(light.position - position);
     vec3 distPoly = vec3(1.0, dist, dist*dist);
     float attenuation = 1.0 / dot(distPoly, light.attenuation);

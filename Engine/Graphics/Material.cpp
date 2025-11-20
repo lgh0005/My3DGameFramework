@@ -6,7 +6,7 @@
 
 void Material::SetToProgram(const Program* program) const 
 {
-    int textureCount = 0;
+    int32 textureCount = 0;
     if (diffuse) 
     {
         glActiveTexture(GL_TEXTURE0 + textureCount);
@@ -35,8 +35,17 @@ void Material::SetToProgram(const Program* program) const
         normal->Bind();
         textureCount++;
     }
+    if (height)
+    {
+        glActiveTexture(GL_TEXTURE0 + textureCount);
+        program->SetUniform("material.height", textureCount);
+        height->Bind();
+        textureCount++;
+    }
+
     glActiveTexture(GL_TEXTURE0);
 
     program->SetUniform("material.shininess", shininess);
     program->SetUniform("material.emissionStrength", emissionStrength);
+    program->SetUniform("material.heightScale", heightScale);
 }
