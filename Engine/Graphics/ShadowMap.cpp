@@ -25,7 +25,7 @@ bool ShadowMap::Init(int32 width, int32 height)
     glGenFramebuffers(1, &m_framebuffer);
     Bind();
 
-    m_shadowMap = Texture::Create(width, height, GL_DEPTH_COMPONENT, GL_FLOAT);
+    m_shadowMap = Texture::Create(width, height, GL_DEPTH_COMPONENT, GL_DEPTH_COMPONENT, GL_FLOAT);
     m_shadowMap->SetFilter(GL_NEAREST, GL_NEAREST);
     m_shadowMap->SetWrap(GL_CLAMP_TO_BORDER, GL_CLAMP_TO_BORDER);
     m_shadowMap->SetBorderColor(glm::vec4(1.0f));

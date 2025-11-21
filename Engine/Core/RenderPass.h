@@ -62,5 +62,6 @@ public:
 protected:
 	MeshPtr m_plane;
 	FramebufferUPtr m_frameBuffer;
-	float m_gamma{ 0.75f };
+	float m_gamma{ 2.2f };
+	float m_exposure{ 1.0f };
 };

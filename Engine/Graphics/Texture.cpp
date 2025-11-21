@@ -4,9 +4,14 @@
 
 TextureUPtr Texture::Create(int32 width, int32 height, uint32 format, uint32 type)
 {
+    return Create(width, height, GL_RGBA16F, format, GL_FLOAT);
+}
+
+TextureUPtr Texture::Create(int32 width, int32 height, uint32 internalFormat, uint32 format, uint32 type)
+{
     auto texture = TextureUPtr(new Texture());
     texture->CreateTexture();
-    texture->SetTextureFormat(width, height, format, type);
+    texture->SetTextureFormat(width, height, internalFormat, format, type);
     texture->SetFilter(GL_LINEAR, GL_LINEAR);
     return std::move(texture);
 }
@@ -77,13 +82,14 @@ void Texture::SetTextureFromImage(const Image* image)
     glGenerateMipmap(GL_TEXTURE_2D);
 }
 
-void Texture::SetTextureFormat(int32 width, int32 height, uint32 format, uint32 type)
+void Texture::SetTextureFormat(int32 width, int32 height, 
+    uint32 internalFormal, uint32 format, uint32 type)
 {
     m_width  = width;
     m_height = height;
     m_format = format;
     m_type   = type;
 
-    glTexImage2D(GL_TEXTURE_2D, 0, m_format, m_width, m_height, 0,
-                 m_format, m_type, nullptr);
+    glTexImage2D(GL_TEXTURE_2D, 0, internalFormal, m_width, m_height, 0,
+        format, m_type, nullptr);
 }

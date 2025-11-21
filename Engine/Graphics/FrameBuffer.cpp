@@ -52,7 +52,7 @@ bool Framebuffer::Init(int32 width, int32 height, int32 samples)
     // 1-1. MSAA 컬러 렌더버퍼 생성 및 부착
     glGenRenderbuffers(1, &m_msaaColorBuffer);
     glBindRenderbuffer(GL_RENDERBUFFER, m_msaaColorBuffer);
-    glRenderbufferStorageMultisample(GL_RENDERBUFFER, samples, GL_RGBA8, width, height);
+    glRenderbufferStorageMultisample(GL_RENDERBUFFER, samples, GL_RGBA16F, width, height);
     glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_RENDERBUFFER, m_msaaColorBuffer);
 
     // 1-2. MSAA 깊이/스텐실 렌더버퍼 생성 및 부착

@@ -116,6 +116,6 @@ void ShadowDepthRenderPass::CalculateLightSpaceMatrix(Scene* scene)
 	glm::vec2 cutoff = mainLight->GetCutoff();
 	glm::vec3 up	 = glm::vec3(0.0f, 1.0f, 0.0f);
 	glm::mat4 lightView = glm::lookAt(lightPos, lightPos + lightDir, up);
-	glm::mat4 lightProj = glm::perspective(glm::radians((cutoff[0] + cutoff[1]) * 2.0f), 1.0f, 1.0f, 20.0f);
+	glm::mat4 lightProj = glm::perspective(glm::radians((cutoff[0] + cutoff[1]) * 2.0f), 1.0f, 1.0f, 100.0f);
 	m_lightSpaceMatrix = lightProj * lightView;
 }

@@ -29,4 +29,5 @@ protected:
     glm::vec3 m_ambient{ glm::vec3(0.1f, 0.1f, 0.1f) };
     glm::vec3 m_diffuse{ glm::vec3(0.5f, 0.5f, 0.5f) };
     glm::vec3 m_specular{ glm::vec3(1.0f, 1.0f, 1.0f) };
+    // TODO m_intensity를 추가해야 할까?
 };

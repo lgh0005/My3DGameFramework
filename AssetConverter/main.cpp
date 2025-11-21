@@ -10,10 +10,19 @@ void PrintUsage()
     std::cout << "  -m, --model <input model> <output file>\n";
     std::cout << "      Converts a model file (.fbx, .obj) to .mymodel format.\n";
     std::cout << "      Example: AssetConverter.exe -m backpack.obj backpack.mymodel\n\n";
+
     std::cout << "  -a, --anim <input animation> <base model> <output file>\n";
     std::cout << "      Converts an animation file (.fbx) to .myanim format.\n";
     std::cout << "      (Requires a base .mymodel file as reference!)\n";
     std::cout << "      Example: AssetConverter.exe -a run.fbx character.mymodel run.myanim\n";
+
+    std::cout << "  -t, --texture <input texture> <output file> [oetf]\n";
+    std::cout << "      Converts an image (.png, .jpg) to .ktx2 format using toktx.exe.\n";
+    std::cout << "      [oetf] mode: 'linear' (default) or 'srgb'.\n";
+    std::cout << "      - linear: For Normal, Roughness, Metallic, HDR maps.\n";
+    std::cout << "      - srgb:   For Albedo (Base Color) maps.\n";
+    std::cout << "      Example: AssetConverter.exe -t normal.png normal.ktx2 linear\n";
+    std::cout << "      Example: AssetConverter.exe -t color.png color.ktx2 srgb\n";
 }
 
 int main(int argc, char* argv[])
@@ -74,6 +83,21 @@ int main(int argc, char* argv[])
 
             SPDLOG_INFO("=== Animation Conversion Mode ===");
             success = AnimConverter::Convert(animInputPath, modelInputPath, outputPath);
+        }
+        else if (option == "-t" || option == "--texture")
+        {
+            if (argc < 4)
+            {
+                SPDLOG_ERROR("Texture conversion requires input and output file paths.");
+                PrintUsage();
+                return -1;
+            }
+
+            std::string inputPath = argv[2];
+            std::string outputPath = argv[3];
+
+            std::string oetfMode = "linear";
+
         }
         else
         {

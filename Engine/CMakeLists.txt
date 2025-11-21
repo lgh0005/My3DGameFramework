@@ -4,6 +4,7 @@ find_package(glm CONFIG REQUIRED)
 find_package(imgui CONFIG REQUIRED)
 find_package(spdlog CONFIG REQUIRED)
 find_package(assimp CONFIG REQUIRED)
+find_package(KTX CONFIG REQUIRED)
 
 add_library(Engine STATIC
 
@@ -79,6 +80,7 @@ target_link_libraries(Engine PUBLIC
     imgui::imgui
     spdlog::spdlog
     assimp::assimp
+    KTX::ktx
 )
 
 # 5. [컴파일 정의] Engine 타겟에 C++ 매크로를 정의합니다.
