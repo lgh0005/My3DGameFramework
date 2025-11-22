@@ -14,7 +14,8 @@ class PostProcessingRenderPass : public PostProcessPass
 public:
     static PostProcessingRenderPassUPtr Create
     (
-        ProgramUPtr program,
+        ProgramUPtr finalCompositeProgram,
+        ProgramUPtr blurProgram,
         int32 width, int32 height,
         MeshPtr planeMesh
     );
@@ -25,8 +26,12 @@ private:
     PostProcessingRenderPass() = default;
     bool Init
     (
-        ProgramUPtr program, 
+        ProgramUPtr finalCompositeProgram,
+        ProgramUPtr blurProgram,
         int32 width, int32 height, 
         MeshPtr planeMesh
     );
+
+    ProgramUPtr		m_blurProgram;
+    FramebufferUPtr m_pingPongFBOs[2];
 };

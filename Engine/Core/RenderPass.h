@@ -60,7 +60,7 @@ public:
 	void BeginDraw();
 
 protected:
-	MeshPtr m_plane;
+	MeshPtr			m_plane;
 	FramebufferUPtr m_frameBuffer;
 	float m_gamma{ 2.2f };
 	float m_exposure{ 1.0f };

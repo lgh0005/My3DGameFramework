@@ -82,7 +82,7 @@ bool Model::LoadByAssimp(const std::string& filename)
         glMaterial->specular = LoadTexture(material, aiTextureType_SPECULAR);
         glMaterial->emission = LoadTexture(material, aiTextureType_EMISSIVE);
         glMaterial->normal = LoadTexture(material, aiTextureType_NORMALS);
-        if (glMaterial->emission) glMaterial->emissionStrength = 1.5f;
+        if (glMaterial->emission) glMaterial->emissionStrength = 50000.0f;
         else glMaterial->emissionStrength = 0.0f;
         m_materials.push_back(std::move(glMaterial));
     }

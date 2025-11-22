@@ -51,7 +51,7 @@ bool DevScene::LoadNessesaryResources()
 
 	// 0-2. 모델과 애니메이션
 	auto model = Model::Load("./Resources/Models/spacesoldier/aliensoldier.mymodel");
-	auto anim = Animation::Load("./Resources/Models/spacesoldier/Hip Hop Dancing.fbx", model.get());
+	auto anim = Animation::Load("./Resources/Models/spacesoldier/Idle.fbx", model.get());
 	RESOURCE.AddResource<Animation>("hiphopDancing", std::move(anim));
 	RESOURCE.AddResource<Model>("aliensoldier", std::move(model));
 
@@ -100,7 +100,7 @@ bool DevScene::LoadNessesaryResources()
 		box1Mat->normal = std::move(normalTexture);
 		box1Mat->height = std::move(heightTexture);
 		box1Mat->shininess = 16.0f;
-		box1Mat->emissionStrength = 2.0f;
+		box1Mat->emissionStrength = 5.0f;
 		box1Mat->heightScale = 0.0f;
 		RESOURCE.AddResource<Material>("boxMat1", std::move(box1Mat));
 	}
@@ -125,7 +125,7 @@ bool DevScene::LoadNessesaryResources()
 		box2Mat->normal = std::move(normalTexture);
 		box2Mat->height = std::move(heightTexture);
 		box2Mat->shininess = 16.0f;
-		box2Mat->emissionStrength = 0.25f;
+		box2Mat->emissionStrength = 2.0f;
 		box2Mat->heightScale = 0.0f;
 		RESOURCE.AddResource<Material>("boxMat2", std::move(box2Mat));
 	}
@@ -313,12 +313,16 @@ bool DevScene::CreateNessesaryRenderPasses()
 			"./Resources/Shaders/PostProcessing/postprocess.frag");
 		if (!prog) return false;
 
+		auto blur = Program::Create(
+			"./Resources/Shaders/PostProcessing/blur.vert",
+			"./Resources/Shaders/PostProcessing/blur.frag");
+		if (!blur) return false;
 		MeshPtr planeMesh = RESOURCE.GetResource<Mesh>("Plane");
 		if (!planeMesh) return false;
 
 		SetPostProcessPass(PostProcessingRenderPass::Create
 		(
-			std::move(prog),
+			std::move(prog), std::move(blur),
 			WINDOW_WIDTH, WINDOW_HEIGHT,
 			planeMesh
 		));

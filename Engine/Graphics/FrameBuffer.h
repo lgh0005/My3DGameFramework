@@ -15,7 +15,7 @@ public:
 	const uint32 Get() const { return m_msaaFbo; }
 	void Bind() const;
 	void Resolve() const;
-	const TexturePtr GetColorAttachment() const { return m_resolveTexture; }
+	const TexturePtr GetColorAttachment(int32 index = 0) const;
 
 private:
 	Framebuffer() = default;
@@ -26,9 +26,9 @@ private:
 	int32 m_samples						{ 0 };
 
 	uint32 m_msaaFbo					{ 0 };
-	uint32 m_msaaColorBuffer			{ 0 };
 	uint32 m_msaaDepthStencilBuffer		{ 0 }; 
-
 	uint32 m_resolveFbo					{ 0 };
-	TexturePtr m_resolveTexture;
+
+	std::vector<TexturePtr> m_resolveTextures;
+	std::vector<uint32>		m_msaaColorBuffers;
 };

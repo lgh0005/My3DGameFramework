@@ -6,7 +6,8 @@ in vec3 position;
 in vec4 FragPosLightSpace;
 in mat3 TBN;
 
-uniform vec3 viewPos;
+layout (location = 0) out vec4 fragColor;
+layout (location = 1) out vec4 brightColor;
 
 struct Light 
 {
@@ -19,6 +20,7 @@ struct Light
     vec3 specular;
 };
 uniform Light light;
+uniform vec3 viewPos;
 
 struct Material
 {
@@ -33,8 +35,6 @@ struct Material
 };
 uniform Material material;
 uniform sampler2D shadowMap;
-
-out vec4 fragColor;
 
 vec2 ParallaxMapping(vec2 texCoords, vec3 viewDir)
 {
@@ -171,4 +171,11 @@ void main()
     result += emission;
 
 	fragColor = vec4(result, 1.0);
+
+    // brightColor ÃßÃâ
+    float brightness = dot(result, vec3(0.2126, 0.7152, 0.0722));
+    if (brightness > 1.0)
+        brightColor = vec4(result, 1.0);
+    else
+        brightColor = vec4(0.0, 0.0, 0.0, 1.0);
 }

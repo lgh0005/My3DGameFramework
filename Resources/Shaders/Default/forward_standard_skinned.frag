@@ -6,7 +6,8 @@ in vec3 position;
 in vec4 FragPosLightSpace;
 in mat3 TBN;
 
-out vec4 fragColor;
+layout (location = 0) out vec4 fragColor;
+layout (location = 1) out vec4 brightColor;
 
 struct Light 
 {
@@ -109,8 +110,20 @@ void main()
     result *= attenuation;
 
     // emission
-    vec3 emission = texture(material.emission, texCoords).rgb * material.emissionStrength;
+    // TODO : aliensoldier 한정 emission map의 밝기가 너무 낮아서 수식을 조금 수정한 것도 있음
+    // 다른 모델의 emission에 대해서는 이 수식이 너무 밝게 설정되는 것이 아닌지 확인 필요
+    vec3 emissionTex = texture(material.emission, texCoords).rgb;
+    emissionTex = pow(emissionTex, vec3(2.2));
+    emissionTex = emissionTex * 5.0;
+    vec3 emission = emissionTex * material.emissionStrength;
     result += emission;
 
     fragColor = vec4(result, 1.0);
+
+    // brightColor 추출
+    float brightness = dot(result, vec3(0.2126, 0.7152, 0.0722));
+    if (brightness > 0.4)
+        brightColor = vec4(result, 1.0);
+    else
+        brightColor = vec4(0.0, 0.0, 0.0, 1.0);
 }
