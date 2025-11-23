@@ -77,7 +77,6 @@ bool Game::Init()
     else SPDLOG_WARN("SPIR-V not supported on this system!");
 
     // 블렌딩 활성화
-    glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     // 매니저들 초기화

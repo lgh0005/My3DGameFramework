@@ -15,13 +15,13 @@ void Scene::AddGameObject(GameObjectUPtr gameObject)
 
 	for (const auto& comp : go->GetAllComponents()) 
 	{
+		// TODO : 이후에 다른 게임 컴포넌트들도 나열해야함
 		// swtich-case 문으로 컴포넌트 분리
 		switch (comp->GetType())
 		{
 			case ComponentType::Camera:
 			{
-				auto* camera = static_cast<Camera*>(comp.get());
-				m_cameras.push_back(camera);
+				m_cameras.push_back(static_cast<Camera*>(comp.get()));
 				break;
 			}
 			case ComponentType::Light:
@@ -74,7 +74,8 @@ bool Scene::Init()
 
 void Scene::Update()
 {
-	// TODO : 나중에 추가할 Destroy/SetActive 로직을 고려
+	// TODO : 
+	// 0. 나중에 추가할 Destroy/SetActive 로직을 고려
 
 	// TODO
 	// 1. 캐시된 m_animators 목록을 순회하며 애니메이션 업데이트

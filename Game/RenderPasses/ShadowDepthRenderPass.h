@@ -29,6 +29,7 @@ private:
 		int32 resolution
 	);
 
+	FramebufferUPtr m_gBuffer;
 	ProgramUPtr m_staticDepthProgram;
 	ProgramUPtr m_skinnedDepthProgram;
 };

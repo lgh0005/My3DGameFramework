@@ -20,7 +20,6 @@ public:
         MeshPtr planeMesh
     );
     virtual void Render(Scene* scene, Camera* camera) override;
-    void BeginDraw();
 
 private:
     PostProcessingRenderPass() = default;

@@ -43,4 +43,5 @@ private:
 public:
     static StaticMeshUPtr CreateBox();
     static StaticMeshUPtr CreatePlane();
+    static StaticMeshUPtr CreateNDCQuad();
 };

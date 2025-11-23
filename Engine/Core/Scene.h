@@ -19,6 +19,14 @@ public:
 	void AddGameObject(GameObjectUPtr gameObject);
 	void AddRenderPass(const std::string& name, RenderPassUPtr renderPass);
 
+	// TODO: 
+	// - GameObject 파괴를 위한 FlushDestroyQueue 필요
+	// - GameObject를 이름 등으로 찾는 FindGameObject 필요
+
+/*============================================//
+//   essential render pass getter & setters   //
+//============================================*/
+public:
 	auto& GetRenderPasses() const { return m_renderPasses; }
 	RenderPass* GetRenderPass(const std::string& name) { return m_renderPasses[name].get(); }
 	void SetShadowPass(ShadowPassUPtr pass) { m_shadowPass = std::move(pass); }
@@ -27,17 +35,21 @@ public:
 	SkyboxPass* GetSkyboxPass() const { return m_skyboxPass.get(); }
 	void SetPostProcessPass(PostProcessPassUPtr pass) { m_postProcessPass = std::move(pass); }
 	PostProcessPass* GetPostProcessPass() const { return m_postProcessPass.get(); }
+	void SetGeoemtryPass(GeometryPassUPtr pass) { m_geometryPass = std::move(pass); }
+	GeometryPass* GetGeometryPass() const { return m_geometryPass.get(); }
+	void SetDeferredLightingPass(DeferredLightingPassUPtr pass) { m_deferredLightPass = std::move(pass); }
+	DeferredLightingPass* GetDeferredLightingPass() const { return m_deferredLightPass.get(); }
 
+/*=======================================//
+//   scene property getter and setters   //
+//=======================================*/
+public:
 	const std::vector<Light*>& GetLights() const { return m_lights; }
 	const std::vector<Camera*>& GetAllCameras() const { return m_cameras; }
 	Camera* GetMainCamera() const { return m_mainCamera; }
 	void SetMainCamera(Camera* camera) { m_mainCamera = camera; }
 	Light* GetMainLight() const { return m_mainLight; }
 	void SetMainLight(Light* light) { m_mainLight = light; }
-
-	// TODO: 
-	// - GameObject 파괴를 위한 FlushDestroyQueue 필요
-	// - GameObject를 이름 등으로 찾는 FindGameObject 필요
 
 protected:
 	Scene() = default;
@@ -65,4 +77,6 @@ protected:
 	ShadowPassUPtr				m_shadowPass		{ nullptr };
 	SkyboxPassUPtr				m_skyboxPass		{ nullptr };
 	PostProcessPassUPtr			m_postProcessPass	{ nullptr };
+	GeometryPassUPtr			m_geometryPass	    { nullptr };
+	DeferredLightingPassUPtr    m_deferredLightPass { nullptr };
 };

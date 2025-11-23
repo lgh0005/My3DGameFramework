@@ -29,6 +29,8 @@
 #include "RenderPasses/EnvironmentRenderPass.h"
 #include "RenderPasses/PostProcessingPass.h"
 #include "RenderPasses/ShadowDepthRenderPass.h"
+#include "DeferredRenderPasses/GeometryRenderPass.h"
+#include "DeferredRenderPasses/DeferredLightRenderPass.h"
 
 DevScene::~DevScene() = default;
 
@@ -48,6 +50,10 @@ bool DevScene::LoadNessesaryResources()
 	// 0-1. 평면 메쉬
 	auto planeMesh = StaticMesh::CreatePlane();
 	RESOURCE.AddResource<Mesh>("Plane", std::move(planeMesh));
+
+	// 0-2. NDC 평면 메쉬
+	auto ndcPlaneMesh = StaticMesh::CreateNDCQuad();
+	RESOURCE.AddResource<Mesh>("NDC", std::move(ndcPlaneMesh));
 
 	// 0-2. 모델과 애니메이션
 	auto model = Model::Load("./Resources/Models/spacesoldier/aliensoldier.mymodel");
@@ -149,7 +155,7 @@ bool DevScene::LoadNessesaryResources()
 		box4Mat->emission = std::move(emissionTexture);
 		box4Mat->normal = std::move(normalTexture);
 		box4Mat->height = std::move(heightTexture);
-		box4Mat->shininess = 14.0f;
+		box4Mat->shininess = 1024.0f;
 		box4Mat->emissionStrength = 0.0f;
 		box4Mat->heightScale = 0.0f;
 		RESOURCE.AddResource<Material>("boxMat3", std::move(box4Mat));
@@ -317,7 +323,7 @@ bool DevScene::CreateNessesaryRenderPasses()
 			"./Resources/Shaders/PostProcessing/blur.vert",
 			"./Resources/Shaders/PostProcessing/blur.frag");
 		if (!blur) return false;
-		MeshPtr planeMesh = RESOURCE.GetResource<Mesh>("Plane");
+		MeshPtr planeMesh = RESOURCE.GetResource<Mesh>("NDC");
 		if (!planeMesh) return false;
 
 		SetPostProcessPass(PostProcessingRenderPass::Create
@@ -345,6 +351,39 @@ bool DevScene::CreateNessesaryRenderPasses()
 			std::move(progSkinned),
 			1024
 		));
+	}
+
+	// 9. G-Buffer 패스
+	{
+		auto progGeoStatic = Program::Create
+		(
+			"./Resources/Shaders/DeferredShading/gBuffer_static.vert",
+			"./Resources/Shaders/DeferredShading/gBuffer.frag"
+		);
+		auto progGeoSkinned = Program::Create
+		(
+			"./Resources/Shaders/DeferredShading/gBuffer_skinned.vert",
+			"./Resources/Shaders/DeferredShading/gBuffer.frag"
+		);
+		auto geo = GeometryRenderPass::Create
+		(
+			std::move(progGeoStatic), std::move(progGeoSkinned),
+			WINDOW_WIDTH, WINDOW_HEIGHT
+		); SetGeoemtryPass(std::move(geo));
+	}
+
+	// 10. Deferred Light 패스
+	{
+		auto progLight = Program::Create
+		(
+			"./Resources/Shaders/DeferredShading/deferred_light.vert",
+			"./Resources/Shaders/DeferredShading/deferred_light.frag"
+		);
+
+		auto light = DeferredLightPass::Create
+		(
+			std::move(progLight), RESOURCE.GetResource<Mesh>("NDC")
+		); SetDeferredLightingPass(std::move(light));
 	}
 
 	return true;

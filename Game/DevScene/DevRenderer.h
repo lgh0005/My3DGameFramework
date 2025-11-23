@@ -21,19 +21,8 @@ public:
 
 private:
 	DevRenderer() = default;
-	virtual bool Init(int32 width, int32 height) override;
 
 // TEMP : 역할에 맞게 우선 나눔
 private:
-	void RenderShadowPass(Scene* scene, Camera* camera, SpotLight* mainLight);
 	void RenderMainPass(Scene* scene, Camera* camera, SpotLight* mainLight);
-	void RenderSkyboxPass(Scene* scene, Camera* camera);
-	void RenderPostProcessingPass(Scene* scene, Camera* camera);
-
-private:
-
-	// --- 그림자 매핑 리소스 ---
-	ShadowMapUPtr	m_shadowMap;
-	ProgramUPtr		m_shadowDepthProgram;
-	Light*			m_mainLight;
 };

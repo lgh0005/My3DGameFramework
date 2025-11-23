@@ -1,0 +1,98 @@
+#version 460 core
+
+layout (location = 0) out vec4 gPosition;      // Attachment 0
+layout (location = 1) out vec4 gNormal;        // Attachment 1
+layout (location = 2) out vec4 gAlbedoSpec;    // Attachment 2 (RGB: Albedo, A: Specular)
+layout (location = 3) out vec4 gEmission;      // Attachment 3
+
+in vec3 FragPos;
+in vec2 TexCoords;
+in vec3 Normal;
+in mat3 TBN;
+
+uniform vec3 viewPos;
+
+struct Material {
+    sampler2D diffuse;
+    sampler2D specular;
+    sampler2D emission;
+    sampler2D normal;
+    sampler2D height;    
+    float shininess;      
+    float emissionStrength;
+    float heightScale;
+};
+uniform Material material;
+
+// Parallax Mapping 함수 (기존 로직 그대로)
+vec2 ParallaxMapping(vec2 texCoords, vec3 viewDir)
+{
+    const float minLayers = 8.0;
+    const float maxLayers = 32.0;
+    float numLayers = mix(maxLayers, minLayers, abs(viewDir.z));  
+    
+    float layerDepth = 1.0 / numLayers;
+    float currentLayerDepth = 0.0;
+    
+    vec2 P = viewDir.xy / viewDir.z * material.heightScale; 
+    vec2 deltaTexCoords = P / numLayers;
+  
+    vec2 currentTexCoords = texCoords;
+    float currentDepthMapValue = 1.0 - texture(material.height, currentTexCoords).r;
+      
+    while (currentLayerDepth < currentDepthMapValue)
+    {
+        currentTexCoords -= deltaTexCoords;
+        currentDepthMapValue = 1.0 - texture(material.height, currentTexCoords).r;  
+        currentLayerDepth += layerDepth;  
+    }
+    
+    vec2 prevTexCoords = currentTexCoords + deltaTexCoords;
+    float afterDepth  = currentDepthMapValue - currentLayerDepth;
+    float beforeDepth = (1.0 - texture(material.height, prevTexCoords).r) - (currentLayerDepth - layerDepth);
+ 
+    float weight = afterDepth / (afterDepth - beforeDepth);
+    vec2 finalTexCoords = prevTexCoords * weight + currentTexCoords * (1.0 - weight);
+
+    return finalTexCoords;
+}
+
+void main()
+{
+    vec2 texCoord = TexCoords;
+
+    // 1. TBN 재정렬 및 패럴랙스 매핑
+    vec3 T = normalize(TBN[0]);
+    vec3 B = normalize(TBN[1]);
+    vec3 N = normalize(TBN[2]);
+    mat3 orthoTBN = mat3(T, B, N);
+    if (material.heightScale > 0.001)
+    {
+        vec3 viewDir = normalize(viewPos - FragPos);
+        
+        // 찌그러진 TBN 대신, 복구된 orthoTBN을 사용해야 정확한 방향이 나옵니다.
+        mat3 worldToTangent = transpose(orthoTBN);
+        vec3 viewDirTangent = normalize(worldToTangent * viewDir);
+        texCoord = ParallaxMapping(TexCoords, viewDirTangent);
+    }
+
+    // 2. G-Buffer 데이터 저장 (조명 계산 X)
+    // [gPosition] 월드 좌표 저장
+    gPosition = vec4(FragPos, 1.0);
+
+    // [gNormal] 노멀 맵 적용 후 월드 기준 법선 저장
+    vec3 normalMapValue = texture(material.normal, texCoord).rgb;
+    normalMapValue = normalize(normalMapValue * 2.0 - 1.0);
+    gNormal.rgb = normalize(orthoTBN * normalMapValue);
+    gNormal.a = material.shininess;
+
+    // [gAlbedoSpec] Diffuse 색상 + Specular Intensity
+    gAlbedoSpec.rgb = texture(material.diffuse, texCoord).rgb;
+    gAlbedoSpec.a = texture(material.specular, texCoord).r;
+
+    // [gEmission] Emission 색상 저장
+    vec3 emissionTex = texture(material.emission, texCoord).rgb;
+    emissionTex = pow(emissionTex, vec3(2.2)); // 감마 보정
+    emissionTex = emissionTex * 5.0;           // 강도 뻥튀기
+    gEmission = vec4(emissionTex * material.emissionStrength, 1.0);
+}

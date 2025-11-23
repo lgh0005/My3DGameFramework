@@ -44,17 +44,6 @@ bool PostProcessingRenderPass::Init
 	return true;
 }
 
-void PostProcessingRenderPass::BeginDraw()
-{
-	m_frameBuffer->Bind();
-	glViewport(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
-	glClearColor(0.1f, 0.2f, 0.3f, 0.0f);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-	glEnable(GL_DEPTH_TEST);
-	glEnable(GL_CULL_FACE);
-	glCullFace(GL_BACK);
-}
-
 void PostProcessingRenderPass::Render(Scene* scene, Camera* camera)
 {
 	m_frameBuffer->Resolve();
@@ -69,7 +58,8 @@ void PostProcessingRenderPass::Render(Scene* scene, Camera* camera)
 	m_blurProgram->Use();
 	glDisable(GL_DEPTH_TEST);
 
-	m_blurProgram->SetUniform("transform", glm::scale(glm::mat4(1.0f), glm::vec3(2.0f, 2.0f, 1.0f)));
+	// TODO : CreateNDCQuad로 대체하여 더 이상 굳이 확대시킬 필요 없이 만들기.
+	// m_blurProgram->SetUniform("transform", glm::scale(glm::mat4(1.0f), glm::vec3(2.0f, 2.0f, 1.0f)));
 	for (uint32 i = 0; i < amount; i++)
 	{
 		m_pingPongFBOs[horizontal]->Bind();
@@ -100,7 +90,6 @@ void PostProcessingRenderPass::Render(Scene* scene, Camera* camera)
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	m_program->Use();
-	m_program->SetUniform("transform", glm::scale(glm::mat4(1.0f), glm::vec3(2.0f, 2.0f, 1.0f)));
 	m_program->SetUniform("gamma", m_gamma);
 	m_program->SetUniform("exposure", m_exposure);
 	m_program->SetUniform("bloom", true);

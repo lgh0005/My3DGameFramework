@@ -82,8 +82,13 @@ bool Model::LoadByAssimp(const std::string& filename)
         glMaterial->specular = LoadTexture(material, aiTextureType_SPECULAR);
         glMaterial->emission = LoadTexture(material, aiTextureType_EMISSIVE);
         glMaterial->normal = LoadTexture(material, aiTextureType_NORMALS);
-        if (glMaterial->emission) glMaterial->emissionStrength = 50000.0f;
+        glMaterial->height = LoadTexture(material, aiTextureType_HEIGHT);
+
+        if (glMaterial->emission) glMaterial->emissionStrength = 1.5f;
         else glMaterial->emissionStrength = 0.0f;
+        if (!glMaterial->height) glMaterial->heightScale = 0.0f;
+        else glMaterial->heightScale = 0.05f;
+
         m_materials.push_back(std::move(glMaterial));
     }
 
@@ -150,6 +155,7 @@ bool Model::LoadByBinary(const std::string& filename)
         std::string storedSpecular = ReadPath(inFile);
         std::string storedEmission = ReadPath(inFile);
         std::string storedNormal = ReadPath(inFile);
+        std::string storedHeight = ReadPath(inFile);
 
         // TODO: 텍스처 로드 
         // 1. 디퓨즈 맵 로드
@@ -177,7 +183,7 @@ bool Model::LoadByBinary(const std::string& filename)
             else
                 SPDLOG_ERROR("Failed to load specular texture: '{}'", fullPath);
         }
-        
+
         // 3. Emission 맵 로드
         if (!storedEmission.empty())
         {
@@ -185,12 +191,12 @@ bool Model::LoadByBinary(const std::string& filename)
             std::string fullPath = (modelDir / texFilename).string();
 
             auto image = Image::Load(fullPath);
-            if (image) 
+            if (image)
             {
                 material->emission = Texture::CreateFromImage(image.get());
                 material->emissionStrength = 1.0f;
             }
-            else 
+            else
             {
                 SPDLOG_ERROR("Failed to load emission texture: '{}'", fullPath);
                 material->emissionStrength = 0.0f;
@@ -212,6 +218,34 @@ bool Model::LoadByBinary(const std::string& filename)
                 material->normal = Texture::CreateFromImage(image.get());
             else
                 SPDLOG_ERROR("Failed to load normal texture: '{}'", fullPath);
+        }
+
+        // 5. 높이 맵 로드
+        if (!storedHeight.empty())
+        {
+            // [수정 1] storedNormal -> storedHeight 사용!
+            std::string texFilename = std::filesystem::path(storedHeight).filename().string();
+            std::string fullPath = (modelDir / texFilename).string();
+
+            auto image = Image::Load(fullPath);
+            if (image)
+            {
+                // [수정 2] material->normal -> material->height 대입!
+                material->height = Texture::CreateFromImage(image.get());
+
+                // [추가] 높이맵이 있으니 Scale 값을 줍니다.
+                material->heightScale = 0.05f;
+            }
+            else
+            {
+                SPDLOG_ERROR("Failed to load height texture: '{}'", fullPath);
+                material->heightScale = 0.0f;
+            }
+        }
+        else
+        {
+            // 높이맵이 없으면 Parallax를 꺼야 합니다.
+            material->heightScale = 0.0f;
         }
 
         // TODO : 이후 여러 텍스쳐 맵이 필요하다면 추가될 수 있음

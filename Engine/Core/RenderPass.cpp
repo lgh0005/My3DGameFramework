@@ -59,9 +59,24 @@ void PostProcessPass::BeginDraw()
 {
 	m_frameBuffer->Bind();
 	glViewport(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
-	glClearColor(0.1f, 0.2f, 0.3f, 0.0f);
+	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);
 	glCullFace(GL_BACK);
 }
+
+/*=========================//
+//   GeometryPass methods  //
+//=========================*/
+GeometryPass::~GeometryPass() = default;
+
+Framebuffer* GeometryPass::GetGBuffer()
+{
+	return m_gBuffer.get();
+}
+
+/*=================================//
+//   DeferredLightingPass methods  //
+//=================================*/
+DeferredLightingPass::~DeferredLightingPass() = default;

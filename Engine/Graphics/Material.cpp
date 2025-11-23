@@ -49,3 +49,4 @@ void Material::SetToProgram(const Program* program) const
     program->SetUniform("material.emissionStrength", emissionStrength);
     program->SetUniform("material.heightScale", heightScale);
 }
+

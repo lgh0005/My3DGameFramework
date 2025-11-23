@@ -23,6 +23,7 @@ struct TempMaterial
     std::string specularMapPath;
     std::string emissionMapPath;
     std::string normalMapPath;
+    std::string heightMapPath;
     // ... (나중에 shininess 등 PBR 데이터 추가) ...
 };
 #pragma endregion

@@ -26,6 +26,7 @@ protected:
 	std::vector<MeshRenderer*> m_renderers;
 };
 
+#pragma region FSSENTIAL_RENDER_PASSES
 CLASS_PTR(ShadowPass)
 class ShadowPass : public RenderPass
 {
@@ -58,6 +59,7 @@ class PostProcessPass : public RenderPass
 public:
 	virtual ~PostProcessPass();
 	void BeginDraw();
+	Framebuffer* GetFramebuffer() const { return m_frameBuffer.get(); }
 
 protected:
 	MeshPtr			m_plane;
@@ -65,3 +67,25 @@ protected:
 	float m_gamma{ 2.2f };
 	float m_exposure{ 1.0f };
 };
+
+CLASS_PTR(GeometryPass)
+class GeometryPass : public RenderPass
+{
+public:
+	virtual ~GeometryPass();
+	Framebuffer* GetGBuffer();
+
+protected:
+	FramebufferUPtr m_gBuffer;
+};
+
+CLASS_PTR(DeferredLightingPass)
+class DeferredLightingPass : public RenderPass
+{
+public:
+	virtual ~DeferredLightingPass();
+
+protected:
+	MeshPtr m_plane;
+};
+#pragma endregion

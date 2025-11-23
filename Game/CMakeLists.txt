@@ -17,6 +17,9 @@ add_executable(Game
     "RenderPasses/EnvironmentRenderPass.h"  "RenderPasses/EnvironmentRenderPass.cpp"
     "RenderPasses/PostProcessingPass.h"  "RenderPasses/PostProcessingPass.cpp"
     "RenderPasses/ShadowDepthRenderPass.h"  "RenderPasses/ShadowDepthRenderPass.cpp"
+
+    "DeferredRenderPasses/GeometryRenderPass.h"  "DeferredRenderPasses/GeometryRenderPass.cpp"
+    "DeferredRenderPasses/DeferredLightRenderPass.h"  "DeferredRenderPasses/DeferredLightRenderPass.cpp"
 )
 
 # 2. [PCH 설정] Game/pch.h를 Game 타겟 전용(PRIVATE) PCH로 사용합니다.

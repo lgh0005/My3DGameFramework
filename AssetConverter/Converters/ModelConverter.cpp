@@ -128,6 +128,7 @@ TempMaterial ModelConverter::ProcessMaterial(aiMaterial* material)
 	tempMat.specularMapPath = GetTexturePath(material, aiTextureType_SPECULAR);
 	tempMat.emissionMapPath = GetTexturePath(material, aiTextureType_EMISSIVE);
 	tempMat.normalMapPath = GetTexturePath(material, aiTextureType_NORMALS);
+	tempMat.heightMapPath = GetTexturePath(material, aiTextureType_HEIGHT);
 	return tempMat;
 }
 
@@ -223,6 +224,7 @@ bool ModelConverter::WriteCustomModelFile(const std::string& outputPath)
 		ConverterUtils::WriteString(outFile, material.specularMapPath);
 		ConverterUtils::WriteString(outFile, material.emissionMapPath);
 		ConverterUtils::WriteString(outFile, material.normalMapPath);
+		ConverterUtils::WriteString(outFile, material.heightMapPath);
 	}
 
 	// --- 4. 메쉬 블록 쓰기 ---

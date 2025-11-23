@@ -12,6 +12,5 @@ public:
     virtual void Render(Scene* scene)            = 0;
 
 protected:
-    virtual bool Init(int32 width, int32 height) = 0;
 	Renderer() = default;
 };

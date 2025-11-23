@@ -9,6 +9,13 @@ FramebufferUPtr Framebuffer::Create(int32 width, int32 height, int32 samples)
     return std::move(framebuffer);
 }
 
+FramebufferUPtr Framebuffer::CreateGBuffer(int32 width, int32 height)
+{
+    auto gBuffer = FramebufferUPtr(new Framebuffer());
+    if (!gBuffer->InitGBuffer(width, height)) return nullptr;
+    return std::move(gBuffer);
+}
+
 void Framebuffer::BindToDefault()
 {
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -26,13 +33,28 @@ Framebuffer::~Framebuffer()
         glDeleteFramebuffers(1, &m_resolveFbo);
 }
 
+const uint32 Framebuffer::Get() const
+{
+    if (m_samples > 1) return m_msaaFbo;
+    else return m_resolveFbo;
+}
+
 void Framebuffer::Bind() const 
 {
-    glBindFramebuffer(GL_FRAMEBUFFER, m_msaaFbo);
+    if (m_samples > 1)
+    {
+        glBindFramebuffer(GL_FRAMEBUFFER, m_msaaFbo);
+    }
+    else
+    {
+        glBindFramebuffer(GL_FRAMEBUFFER, m_resolveFbo);
+    }
 }
 
 void Framebuffer::Resolve() const
 {
+    if (m_samples <= 1) return;
+
     glBindFramebuffer(GL_READ_FRAMEBUFFER, m_msaaFbo);
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, m_resolveFbo);
     for (int i = 0; i < m_resolveTextures.size(); ++i)
@@ -115,5 +137,66 @@ bool Framebuffer::Init(int32 width, int32 height, int32 samples)
         return false;
 
     BindToDefault();
+    return true;
+}
+
+bool Framebuffer::InitGBuffer(int32 width, int32 height)
+{
+    m_width = width;
+    m_height = height;
+    m_samples = 1;
+    
+    glGenFramebuffers(1, &m_resolveFbo);
+    glBindFramebuffer(GL_FRAMEBUFFER, m_resolveFbo);
+
+    // Attachment 0: Position (RGB16F)
+    auto posTexture = Texture::Create(width, height, GL_RGBA16F, GL_RGBA, GL_FLOAT);
+    posTexture->SetFilter(GL_NEAREST, GL_NEAREST);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, posTexture->Get(), 0);
+    m_resolveTextures.push_back(std::move(posTexture));
+
+    // Attachment 1: Normal + shininess (RGB16F)
+    auto normTexture = Texture::Create(width, height, GL_RGBA16F, GL_RGBA, GL_FLOAT);
+    normTexture->SetFilter(GL_NEAREST, GL_NEAREST);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, normTexture->Get(), 0);
+    m_resolveTextures.push_back(std::move(normTexture));
+
+    // Attachment 2: Albedo + Specular (RGBA)
+    auto colorTexture = Texture::Create(width, height, GL_RGBA, GL_RGBA, GL_UNSIGNED_BYTE);
+    colorTexture->SetFilter(GL_NEAREST, GL_NEAREST);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT2, GL_TEXTURE_2D, colorTexture->Get(), 0);
+    m_resolveTextures.push_back(std::move(colorTexture));
+
+    // Attachment 3 : Emission
+    auto emissionTexture = Texture::Create(width, height, GL_RGBA16F, GL_RGBA, GL_FLOAT);
+    emissionTexture->SetFilter(GL_NEAREST, GL_NEAREST);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT3, GL_TEXTURE_2D, emissionTexture->Get(), 0);
+    m_resolveTextures.push_back(std::move(emissionTexture));
+
+    // Draw Buffers 설정
+    uint32 attachments[4] = 
+    {
+        GL_COLOR_ATTACHMENT0,
+        GL_COLOR_ATTACHMENT1,
+        GL_COLOR_ATTACHMENT2,
+        GL_COLOR_ATTACHMENT3
+    };
+    glDrawBuffers(4, attachments);
+
+    // Depth Attachment
+    glGenRenderbuffers(1, &m_msaaDepthStencilBuffer); // 변수 재활용
+    glBindRenderbuffer(GL_RENDERBUFFER, m_msaaDepthStencilBuffer);
+    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, width, height);
+    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, m_msaaDepthStencilBuffer);
+
+    // 완료 확인
+    auto gBufferResult = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+    if (gBufferResult != GL_FRAMEBUFFER_COMPLETE)
+    {
+        SPDLOG_ERROR("failed to create gBuffer: {}", gBufferResult); // 로그 출력
+        return false;
+    }
+
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
     return true;
 }
