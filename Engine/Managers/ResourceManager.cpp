@@ -81,7 +81,7 @@ MeshPtr ResourceManager::GetMesh(const std::string& name) const
 {
 	auto it = m_meshes.find(name);
 	if (it != m_meshes.end()) return it->second;
-	SPDLOG_ERROR("Failed to find Mesh resource: {}", name);
+	SPDLOG_WARN("Failed to find Mesh resource: {}", name);
 	return nullptr;
 }
 
@@ -89,7 +89,7 @@ MaterialPtr ResourceManager::GetMaterial(const std::string& name) const
 {
 	auto it = m_materials.find(name);
 	if (it != m_materials.end()) return it->second;
-	SPDLOG_ERROR("Failed to find Material resource: {}", name);
+	SPDLOG_WARN("Failed to find Material resource: {}", name);
 	return nullptr;
 }
 
@@ -97,7 +97,7 @@ TexturePtr ResourceManager::GetTexture(const std::string& name) const
 {
 	auto it = m_textures.find(name);
 	if (it != m_textures.end()) return it->second;
-	SPDLOG_ERROR("Failed to find Texture resource: {}", name);
+	SPDLOG_WARN("Failed to find Texture resource: {}", name);
 	return nullptr;
 }
 
@@ -105,7 +105,7 @@ CubeTexturePtr ResourceManager::GetCubeTexture(const std::string& name) const
 {
 	auto it = m_cubeTextures.find(name);
 	if (it != m_cubeTextures.end()) return it->second;
-	SPDLOG_ERROR("Failed to find CubeTexture resource: {}", name);
+	SPDLOG_WARN("Failed to find CubeTexture resource: {}", name);
 	return nullptr;
 }
 
@@ -113,7 +113,7 @@ ModelPtr ResourceManager::GetModel(const std::string& name) const
 {
 	auto it = m_models.find(name);
 	if (it != m_models.end()) return it->second;
-	SPDLOG_ERROR("Failed to find Model resource: {}", name);
+	SPDLOG_WARN("Failed to find Model resource: {}", name);
 	return nullptr;
 }
 
@@ -121,7 +121,7 @@ AnimationPtr ResourceManager::GetAnimation(const std::string& name) const
 {
 	auto it = m_animations.find(name);
 	if (it != m_animations.end()) return it->second;
-	SPDLOG_ERROR("Failed to find Model resource: {}", name);
+	SPDLOG_WARN("Failed to find Model resource: {}", name);
 	return nullptr;
 }
 

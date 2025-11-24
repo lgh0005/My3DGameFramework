@@ -66,7 +66,7 @@ void main()
     vec3 B = normalize(TBN[1]);
     vec3 N = normalize(TBN[2]);
     mat3 orthoTBN = mat3(T, B, N);
-    if (material.heightScale > 0.001)
+    if (material.heightScale > 0.0)
     {
         vec3 viewDir = normalize(viewPos - FragPos);
         

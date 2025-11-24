@@ -24,6 +24,52 @@ TextureUPtr Texture::CreateFromImage(const Image* image)
     return std::move(texture);
 }
 
+TextureUPtr Texture::CreateFromKtx(const std::string& ktxFilePath)
+{
+    ktxTexture* kTexture;
+    KTX_error_code result;
+    GLuint textureID = 0;
+    GLenum target;
+    GLenum glerror;
+
+    // 1. ktx 파일 로드
+    result = ktxTexture_CreateFromNamedFile
+    (
+        ktxFilePath.c_str(),
+        KTX_TEXTURE_CREATE_LOAD_IMAGE_DATA_BIT,
+        &kTexture
+    );
+    if (result != KTX_SUCCESS)
+    {
+        SPDLOG_ERROR("Failed to load KTX texture: {}", ktxFilePath);
+        return nullptr;
+    }
+
+    // 2. GPU 업로드
+    result = ktxTexture_GLUpload(kTexture, &textureID, &target, &glerror);
+    if (result != KTX_SUCCESS)
+    {
+        ktxTexture_Destroy(kTexture);
+        return nullptr;
+    }
+
+    auto texture = TextureUPtr(new Texture());
+    texture->m_texture = textureID;
+    texture->m_width = kTexture->baseWidth;
+    texture->m_height = kTexture->baseHeight;
+    texture->m_target = target;
+
+    GLint format = 0;
+    glBindTexture(target, textureID);
+    glGetTexLevelParameteriv(target, 0, GL_TEXTURE_INTERNAL_FORMAT, &format);
+    texture->m_format = format;
+
+    // 3. 메모리 해제
+    ktxTexture_Destroy(kTexture);
+
+    return std::move(texture);
+}
+
 Texture::~Texture()
 {
     if (m_texture)
@@ -32,29 +78,30 @@ Texture::~Texture()
 
 void Texture::Bind() const
 {
-    glBindTexture(GL_TEXTURE_2D, m_texture);
+    glBindTexture(m_target, m_texture);
 }
 
 void Texture::SetFilter(uint32 minFilter, uint32 magFilter) const
 {
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, minFilter);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, magFilter);
+    glTexParameteri(m_target, GL_TEXTURE_MIN_FILTER, minFilter);
+    glTexParameteri(m_target, GL_TEXTURE_MAG_FILTER, magFilter);
 }
 
 void Texture::SetWrap(uint32 sWrap, uint32 tWrap) const
 {
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, sWrap);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, tWrap);
+    glTexParameteri(m_target, GL_TEXTURE_WRAP_S, sWrap);
+    glTexParameteri(m_target, GL_TEXTURE_WRAP_T, tWrap);
 }
 
 void Texture::SetBorderColor(const glm::vec4& color) const 
 {
-    glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, glm::value_ptr(color));
+    glTexParameterfv(m_target, GL_TEXTURE_BORDER_COLOR, glm::value_ptr(color));
 }
 
 void Texture::CreateTexture()
 {
     glGenTextures(1, &m_texture);
+    m_target = GL_TEXTURE_2D;
     Bind();
     SetFilter(GL_LINEAR, GL_LINEAR);
     SetWrap(GL_CLAMP_TO_EDGE, GL_CLAMP_TO_EDGE);

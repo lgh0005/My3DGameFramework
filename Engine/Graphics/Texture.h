@@ -1,4 +1,5 @@
 #pragma once
+#include <ktx.h>
 
 #pragma region FORWARD_DECLARATION
 CLASS_PTR(Image)
@@ -8,17 +9,13 @@ CLASS_PTR(Texture)
 class Texture
 {
 public:
-	static TextureUPtr Create
-	(
-		int32 width, int32 height, 
-		uint32 format, uint32 type = GL_UNSIGNED_BYTE
-	);
-	static TextureUPtr Create
-	(
-		int32 width, int32 height,
-		uint32 internalFormat, uint32 format, uint32 type
-	);
+	static TextureUPtr Create(int32 width, int32 height, 
+							  uint32 format, uint32 type = GL_UNSIGNED_BYTE);
+	static TextureUPtr Create(int32 width, int32 height,
+							  uint32 internalFormat, uint32 format, uint32 type);
 	static TextureUPtr CreateFromImage(const Image* image);
+	static TextureUPtr CreateFromKtx(const std::string& ktxFilePath);
+
 	~Texture();
 
 	const uint32 Get() const	{ return m_texture; }
@@ -45,4 +42,5 @@ private:
 	int32	m_height		{ 0 };
 	uint32  m_type			{ GL_UNSIGNED_BYTE };
 	uint32	m_format		{ GL_RGBA };
+	GLenum  m_target		{ GL_TEXTURE_2D };
 };

@@ -38,54 +38,22 @@ bool Model::LoadByAssimp(const std::string& filename)
         return false;
     }
 
-    auto dirname = filename.substr(0, filename.find_last_of("/"));
-    auto LoadTexture = [&](aiMaterial* material, aiTextureType type) -> TexturePtr 
-    {
-        if (material->GetTextureCount(type) <= 0) return nullptr;
+    std::filesystem::path modelDir = std::filesystem::path(filename).parent_path();
 
-        aiString filepath;
-        if (material->GetTexture(type, 0, &filepath) != AI_SUCCESS) 
-            return nullptr;
-
-        std::filesystem::path texturePath(filepath.C_Str());
-        std::string filenameOnly = texturePath.filename().string();
-
-        if (filenameOnly.empty())
-        {
-            SPDLOG_WARN("Texture path was empty: {}", filepath.C_Str());
-            return nullptr;
-        }
-
-        auto fullPath = (std::filesystem::path(dirname) / filenameOnly).string();
-
-        auto cachedTex = RESOURCE.GetResource<Texture>(fullPath);
-        if (cachedTex) return cachedTex;
-
-        SPDLOG_INFO("Loading texture [filesystem]: {}", fullPath);
-        auto image = Image::Load(fullPath);
-        if (!image)
-        {
-            SPDLOG_WARN("Failed to load image: {}", fullPath);
-            return nullptr;
-        }
-        auto texture = Texture::CreateFromImage(image.get());
-        RESOURCE.AddResource<Texture>(fullPath, std::move(texture));
-
-        return RESOURCE.GetResource<Texture>(fullPath);
-    };
-
+    m_materials.clear();
     for (uint32 i = 0; i < scene->mNumMaterials; i++) 
     {
         auto material = scene->mMaterials[i];
         auto glMaterial = Material::Create();
-        glMaterial->diffuse = LoadTexture(material, aiTextureType_DIFFUSE);
-        glMaterial->specular = LoadTexture(material, aiTextureType_SPECULAR);
-        glMaterial->emission = LoadTexture(material, aiTextureType_EMISSIVE);
-        glMaterial->normal = LoadTexture(material, aiTextureType_NORMALS);
-        glMaterial->height = LoadTexture(material, aiTextureType_HEIGHT);
+        glMaterial->diffuse = LoadTextureFromAssimp(material, aiTextureType_DIFFUSE, modelDir);
+        glMaterial->specular = LoadTextureFromAssimp(material, aiTextureType_SPECULAR, modelDir);
+        glMaterial->emission = LoadTextureFromAssimp(material, aiTextureType_EMISSIVE, modelDir);
+        glMaterial->normal = LoadTextureFromAssimp(material, aiTextureType_NORMALS, modelDir);
+        glMaterial->height = LoadTextureFromAssimp(material, aiTextureType_HEIGHT, modelDir);
 
-        if (glMaterial->emission) glMaterial->emissionStrength = 1.5f;
+        if (glMaterial->emission) glMaterial->emissionStrength = 1.0f;
         else glMaterial->emissionStrength = 0.0f;
+
         if (!glMaterial->height) glMaterial->heightScale = 0.0f;
         else glMaterial->heightScale = 0.05f;
 
@@ -137,118 +105,40 @@ bool Model::LoadByBinary(const std::string& filename)
         m_BoneCounter = (int32)boneCount; // 카운터 갱신
     }
 
+    // 헬퍼: 바이너리 문자열 읽기
+    auto ReadPath = [&](std::ifstream& file) -> std::string {
+        uint32 len; file.read((char*)&len, sizeof(len));
+        if (len == 0) return "";
+        std::string path(len, '\0'); file.read(&path[0], len);
+        return path;
+        };
+
     // 2. 머티리얼 로드
     m_materials.resize(materialCount);
     for (uint32 i = 0; i < materialCount; ++i)
     {
         auto material = Material::Create();
 
-        // 텍스처 경로 읽기 헬퍼 람다
-        auto ReadPath = [&](std::ifstream& file) -> std::string {
-            uint32 len; file.read((char*)&len, sizeof(len));
-            std::string path(len, '\0'); file.read(&path[0], len);
-            return path;
-            };
-
-        // TODO : 텍스쳐 로드 수정 필요
+        // 파일에서 경로 문자열 읽기
         std::string storedDiffuse = ReadPath(inFile);
         std::string storedSpecular = ReadPath(inFile);
         std::string storedEmission = ReadPath(inFile);
         std::string storedNormal = ReadPath(inFile);
         std::string storedHeight = ReadPath(inFile);
 
-        // TODO: 텍스처 로드 
-        // 1. 디퓨즈 맵 로드
-        if (!storedDiffuse.empty())
-        {
-            std::string texFilename = std::filesystem::path(storedDiffuse).filename().string();
-            std::string fullPath = (modelDir / texFilename).string();
+        // [수정] 위에서 만든 헬퍼 함수로 깔끔하게 로드
+        material->diffuse = LoadTextureFromFile(storedDiffuse, modelDir);
+        material->specular = LoadTextureFromFile(storedSpecular, modelDir);
+        material->emission = LoadTextureFromFile(storedEmission, modelDir);
+        material->normal = LoadTextureFromFile(storedNormal, modelDir);
+        material->height = LoadTextureFromFile(storedHeight, modelDir);
 
-            auto image = Image::Load(fullPath);
-            if (image)
-                material->diffuse = Texture::CreateFromImage(image.get());
-            else
-                SPDLOG_ERROR("Failed to load diffuse texture: '{}'", fullPath);
-        }
+        // 파라미터 설정 (기존 로직 유지)
+        if (material->emission) material->emissionStrength = 1.0f;
+        else material->emissionStrength = 0.0f;
 
-        // 2. 스페큘러 맵 로드
-        if (!storedSpecular.empty())
-        {
-            std::string texFilename = std::filesystem::path(storedSpecular).filename().string();
-            std::string fullPath = (modelDir / texFilename).string();
-
-            auto image = Image::Load(fullPath);
-            if (image)
-                material->specular = Texture::CreateFromImage(image.get());
-            else
-                SPDLOG_ERROR("Failed to load specular texture: '{}'", fullPath);
-        }
-
-        // 3. Emission 맵 로드
-        if (!storedEmission.empty())
-        {
-            std::string texFilename = std::filesystem::path(storedEmission).filename().string();
-            std::string fullPath = (modelDir / texFilename).string();
-
-            auto image = Image::Load(fullPath);
-            if (image)
-            {
-                material->emission = Texture::CreateFromImage(image.get());
-                material->emissionStrength = 1.0f;
-            }
-            else
-            {
-                SPDLOG_ERROR("Failed to load emission texture: '{}'", fullPath);
-                material->emissionStrength = 0.0f;
-            }
-        }
-        else
-        {
-            material->emissionStrength = 0.0f;
-        }
-
-        // 4. 노멀 맵 로드
-        if (!storedNormal.empty())
-        {
-            std::string texFilename = std::filesystem::path(storedNormal).filename().string();
-            std::string fullPath = (modelDir / texFilename).string();
-
-            auto image = Image::Load(fullPath);
-            if (image)
-                material->normal = Texture::CreateFromImage(image.get());
-            else
-                SPDLOG_ERROR("Failed to load normal texture: '{}'", fullPath);
-        }
-
-        // 5. 높이 맵 로드
-        if (!storedHeight.empty())
-        {
-            // [수정 1] storedNormal -> storedHeight 사용!
-            std::string texFilename = std::filesystem::path(storedHeight).filename().string();
-            std::string fullPath = (modelDir / texFilename).string();
-
-            auto image = Image::Load(fullPath);
-            if (image)
-            {
-                // [수정 2] material->normal -> material->height 대입!
-                material->height = Texture::CreateFromImage(image.get());
-
-                // [추가] 높이맵이 있으니 Scale 값을 줍니다.
-                material->heightScale = 0.05f;
-            }
-            else
-            {
-                SPDLOG_ERROR("Failed to load height texture: '{}'", fullPath);
-                material->heightScale = 0.0f;
-            }
-        }
-        else
-        {
-            // 높이맵이 없으면 Parallax를 꺼야 합니다.
-            material->heightScale = 0.0f;
-        }
-
-        // TODO : 이후 여러 텍스쳐 맵이 필요하다면 추가될 수 있음
+        if (material->height) material->heightScale = 0.05f;
+        else material->heightScale = 0.0f;
 
         m_materials[i] = std::move(material);
     }
@@ -415,4 +305,77 @@ void Model::ExtractBoneWeightForVertices(std::vector<SkinnedVertex>& vertices,
             SetVertexBoneData(vertices[vertexId], boneID, weight);
         }
     }
+}
+
+TexturePtr Model::LoadTextureFromFile
+(
+    const std::string& relativePath, 
+    const std::filesystem::path& parentDir
+)
+{
+    if (relativePath.empty()) return nullptr;
+    
+    // 파일 이름만 추출
+    std::string filenameOnly = std::filesystem::path(relativePath).filename().string();
+    if (filenameOnly.empty()) return nullptr;
+
+    /*=======================//
+    //  ktx file extraction  //
+    //=======================*/
+    // 1. KTX 경로 구성 (예: .../wood.ktx)
+    std::filesystem::path ktxPath = parentDir / filenameOnly;
+    ktxPath.replace_extension(".ktx");
+    std::string ktxFullPath = ktxPath.string();
+
+    // 2. KTX 캐시 확인
+    auto cachedTex = RESOURCE.GetResource<Texture>(ktxFullPath);
+    if (cachedTex) return cachedTex;
+
+    // 3. KTX 파일 존재 여부 확인 및 로드
+    if (std::filesystem::exists(ktxPath))
+    {
+        auto texture = Texture::CreateFromKtx(ktxFullPath);
+        if (texture)
+        {
+            RESOURCE.AddResource<Texture>(ktxFullPath, std::move(texture));
+            return RESOURCE.GetResource<Texture>(ktxFullPath);
+        }
+    }
+
+    /*===========================//
+    //  png/jpg file extraction  //
+    //===========================*/
+    std::filesystem::path originalPath = parentDir / filenameOnly;
+    std::string originalFullPath = originalPath.string();
+
+    // 원래 경로로도 캐시 확인
+    cachedTex = RESOURCE.GetResource<Texture>(originalFullPath);
+    if (cachedTex) return cachedTex;
+
+    // 이미지 로드 시도
+    auto image = Image::Load(originalFullPath);
+    if (!image)
+    {
+        SPDLOG_ERROR("Failed to load texture image: {}", originalFullPath);
+        return nullptr;
+    }
+
+    auto texture = Texture::CreateFromImage(image.get());
+    RESOURCE.AddResource<Texture>(originalFullPath, std::move(texture));
+    return RESOURCE.GetResource<Texture>(originalFullPath);
+}
+
+TexturePtr Model::LoadTextureFromAssimp
+(
+    aiMaterial* material, 
+    aiTextureType type, 
+    const std::filesystem::path& parentDir
+)
+{
+    if (material->GetTextureCount(type) <= 0) return nullptr;
+
+    aiString filepath;
+    if (material->GetTexture(type, 0, &filepath) != AI_SUCCESS) return nullptr;
+
+    return LoadTextureFromFile(filepath.C_Str(), parentDir);
 }

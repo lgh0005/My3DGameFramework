@@ -1,4 +1,5 @@
 #pragma once
+#include <ktx.h>
 
 #pragma region FORWARD_DECLARATION
 CLASS_PTR(Image)
@@ -9,6 +10,7 @@ class CubeTexture
 {
 public:
     static CubeTextureUPtr CreateFromImages(const std::vector<Image*> images);
+    static CubeTextureUPtr CreateFromKtx(const std::string& ktxFilePath);
     ~CubeTexture();
 
     const uint32 Get() const { return m_texture; }

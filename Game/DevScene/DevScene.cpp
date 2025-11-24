@@ -88,12 +88,14 @@ bool DevScene::LoadNessesaryResources()
 
 	// 0-4. 머티리얼 2
 	{
-		TextureUPtr diffuseTexture = Texture::CreateFromImage
-		(Image::Load("./Resources/Images/container.jpg").get());
+		/*TextureUPtr diffuseTexture = Texture::CreateFromImage
+		(Image::Load("./Resources/Images/container.jpg").get());*/
+		TextureUPtr diffuseTexture = Texture::CreateFromKtx("./Resources/Images/baked/container.ktx");
 		TextureUPtr specularTexture = Texture::CreateFromImage
 		(Image::CreateSingleColorImage(4, 4, glm::vec4(0.5f, 0.5f, 0.5f, 1.0f)).get());
-		TextureUPtr emissionTexture = Texture::CreateFromImage
-		(Image::Load("./Resources/Images/matrix.jpg").get());
+		/*TextureUPtr emissionTexture = Texture::CreateFromImage
+		(Image::Load("./Resources/Images/matrix.jpg").get());*/
+		TextureUPtr emissionTexture = Texture::CreateFromKtx("./Resources/Images/baked/matrix.ktx");
 		TextureUPtr normalTexture = Texture::CreateFromImage
 		(Image::CreateSingleColorImage(4, 4, glm::vec4(0.5f, 0.5f, 1.0f, 1.0f)).get());
 		TextureUPtr heightTexture = Texture::CreateFromImage
@@ -113,12 +115,15 @@ bool DevScene::LoadNessesaryResources()
 
 	// 0-5. 머티리얼 3
 	{
-		TextureUPtr diffuseTexture = Texture::CreateFromImage
-		(Image::Load("./Resources/Images/container2.png").get());
-		TextureUPtr specularTexture = Texture::CreateFromImage
-		(Image::Load("./Resources/Images/container2_specular.png").get());
-		TextureUPtr emissionTexture = Texture::CreateFromImage
-		(Image::Load("./Resources/Images/matrix.jpg").get());
+		/*TextureUPtr diffuseTexture = Texture::CreateFromImage
+		(Image::Load("./Resources/Images/container2.png").get());*/
+		TextureUPtr diffuseTexture = Texture::CreateFromKtx("./Resources/Images/baked/container2.ktx");
+		TextureUPtr specularTexture = Texture::CreateFromKtx("./Resources/Images/baked/container2_specular.ktx");
+		/*TextureUPtr specularTexture = Texture::CreateFromImage
+		(Image::Load("./Resources/Images/container2_specular.png").get());*/
+		/*TextureUPtr emissionTexture = Texture::CreateFromImage
+		(Image::Load("./Resources/Images/matrix.jpg").get());*/
+		TextureUPtr emissionTexture = Texture::CreateFromKtx("./Resources/Images/baked/matrix.ktx");
 		TextureUPtr normalTexture = Texture::CreateFromImage
 		(Image::CreateSingleColorImage(4, 4, glm::vec4(0.5f, 0.5f, 1.0f, 1.0f)).get());
 		TextureUPtr heightTexture = Texture::CreateFromImage
@@ -138,8 +143,9 @@ bool DevScene::LoadNessesaryResources()
 
 	// 0-6. 머티리얼 4
 	{
-		TextureUPtr diffuseTexture = Texture::CreateFromImage
-		(Image::Load("./Resources/Images/marble.jpg").get());
+		/*TextureUPtr diffuseTexture = Texture::CreateFromImage
+		(Image::Load("./Resources/Images/marble.jpg").get());*/
+		TextureUPtr diffuseTexture = Texture::CreateFromKtx("./Resources/Images/baked/marble.ktx");
 		TextureUPtr specularTexture = Texture::CreateFromImage
 		(Image::CreateSingleColorImage(4, 4, glm::vec4(0.25f, 0.25f, 0.25f, 1.0f)).get());
 		TextureUPtr emissionTexture = Texture::CreateFromImage
@@ -165,6 +171,7 @@ bool DevScene::LoadNessesaryResources()
 	{
 		TextureUPtr diffuseTexture = Texture::CreateFromImage
 		(Image::Load("./Resources/Images/brickwall.jpg").get());
+		// TextureUPtr diffuseTexture = Texture::CreateFromKtx("./Resources/Images/baked/brickwall.ktx");
 		TextureUPtr specularTexture = Texture::CreateFromImage
 		(Image::CreateSingleColorImage(4, 4, glm::vec4(0.25f, 0.25f, 0.25f, 1.0f)).get());
 		TextureUPtr emissionTexture = Texture::CreateFromImage
@@ -180,7 +187,7 @@ bool DevScene::LoadNessesaryResources()
 		box5Mat->emission = std::move(emissionTexture);
 		box5Mat->normal = std::move(normalTexture);
 		box5Mat->height = std::move(heightTexture);
-		box5Mat->shininess = 14.0f;
+		box5Mat->shininess = 64.0f;
 		box5Mat->emissionStrength = 0.0f;
 		box5Mat->heightScale = 0.0f;
 		RESOURCE.AddResource<Material>("boxMat4", std::move(box5Mat));
@@ -227,20 +234,22 @@ bool DevScene::LoadNessesaryResources()
 
 	// 8. 하늘 큐브맵
 	{
-		auto cubeRight = Image::Load("./Resources/Images/Skybox/right.jpg", false);
+		/*auto cubeRight = Image::Load("./Resources/Images/Skybox/right.jpg", false);
 		auto cubeLeft = Image::Load("./Resources/Images/Skybox/left.jpg", false);
 		auto cubeTop = Image::Load("./Resources/Images/Skybox/top.jpg", false);
 		auto cubeBottom = Image::Load("./Resources/Images/Skybox/bottom.jpg", false);
 		auto cubeFront = Image::Load("./Resources/Images/Skybox/front.jpg", false);
-		auto cubeBack = Image::Load("./Resources/Images/Skybox/back.jpg", false);
+		auto cubeBack = Image::Load("./Resources/Images/Skybox/back.jpg", false);*/
 
-		auto cubeTexture = CubeTexture::CreateFromImages({
+		auto cubeSky = CubeTexture::CreateFromKtx("./Resources/Images/baked/sky.ktx");
+
+		/*auto cubeTexture = CubeTexture::CreateFromImages({
 		  cubeRight.get(),cubeLeft.get(),
 		  cubeTop.get(), cubeBottom.get(),
 		  cubeFront.get(), cubeBack.get() });
-		if (!cubeTexture) return false;
+		if (!cubeTexture) return false;*/
 
-		RESOURCE.AddResource<CubeTexture>("SkyboxTexture", std::move(cubeTexture));
+		RESOURCE.AddResource<CubeTexture>("SkyboxTexture", std::move(cubeSky));
 	}
 
 	return true;

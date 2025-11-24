@@ -45,6 +45,17 @@ private:
 	bool LoadByBinary(const std::string& filename);
 	void ProcessMesh(aiMesh* mesh, const aiScene* scene);
 	void ProcessNode(aiNode* node, const aiScene* scene);
+	TexturePtr LoadTextureFromFile
+	(
+		const std::string& relativePath, 
+		const std::filesystem::path& parentDir
+	);
+	TexturePtr LoadTextureFromAssimp
+	(
+		aiMaterial* material, 
+		aiTextureType type, 
+		const std::filesystem::path& parentDir
+	);
 	std::vector<SkinnedMeshPtr> m_meshes;
 	std::vector<MaterialPtr> m_materials;
 };

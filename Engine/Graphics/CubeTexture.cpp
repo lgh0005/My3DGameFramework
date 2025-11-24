@@ -1,4 +1,4 @@
-#include "EnginePch.h"
+﻿#include "EnginePch.h"
 #include "CubeTexture.h"
 #include "Graphics/Image.h"
 
@@ -6,6 +6,60 @@ CubeTextureUPtr CubeTexture::CreateFromImages(const std::vector<Image*> images)
 {
     auto texture = CubeTextureUPtr(new CubeTexture());
     if (!texture->InitFromImages(images)) return nullptr;
+    return std::move(texture);
+}
+
+CubeTextureUPtr CubeTexture::CreateFromKtx(const std::string& ktxFilePath)
+{
+    ktxTexture* kTexture;
+    KTX_error_code result;
+    GLuint textureID = 0;
+    GLenum target;
+    GLenum glerror;
+
+    // 1. KTX 파일 로드
+    result = ktxTexture_CreateFromNamedFile
+    (
+        ktxFilePath.c_str(),
+        KTX_TEXTURE_CREATE_LOAD_IMAGE_DATA_BIT,
+        &kTexture
+    );
+    if (result != KTX_SUCCESS)
+    {
+        SPDLOG_ERROR("Failed to load KTX cubemap: {}", ktxFilePath);
+        return nullptr;
+    }
+
+    // 2. 큐브맵 검증
+    if (!kTexture->isCubemap)
+    {
+        SPDLOG_ERROR("Texture is not a cubemap: {}", ktxFilePath);
+        ktxTexture_Destroy(kTexture);
+        return nullptr;
+    }
+
+    // 3. GPU 업로드
+    result = ktxTexture_GLUpload(kTexture, &textureID, &target, &glerror);
+    if (result != KTX_SUCCESS)
+    {
+        SPDLOG_ERROR("Failed to upload KTX cubemap: {}", ktxFilePath);
+        ktxTexture_Destroy(kTexture);
+        return nullptr;
+    }
+
+    auto texture = CubeTextureUPtr(new CubeTexture());
+    texture->m_texture = textureID;
+    
+    texture->Bind();
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+
+    // 4. 메모리 해제
+    ktxTexture_Destroy(kTexture);
+
     return std::move(texture);
 }
 
