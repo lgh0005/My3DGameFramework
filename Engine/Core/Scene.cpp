@@ -97,3 +97,13 @@ void Scene::Update()
 	// 3. (미래) 파괴가 예약된 오브젝트들 일괄 삭제
 	// FlushDestroyQueue();
 }
+
+/*============================================//
+//   essential render pass getter & setters   //
+//============================================*/
+RenderPass* Scene::GetRenderPass(const std::string& name)
+{
+	auto it = m_renderPasses.find(name);
+	if (it != m_renderPasses.end()) return it->second.get();
+	return nullptr;
+}

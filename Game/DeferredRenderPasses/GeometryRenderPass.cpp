@@ -68,20 +68,16 @@ void GeometryRenderPass::Render(Scene* scene, Camera* camera)
 		m_staticGeometryProgram->SetUniform("projection", projection);
 		m_staticGeometryProgram->SetUniform("viewPos", cameraPos);
 
-		auto staticPass = scene->GetRenderPass("Static");
-		if (staticPass)
+		for (const auto* renderer : m_renderers)
 		{
-			for (const auto* renderer : staticPass->GetRenderers())
-			{
-				MeshPtr mesh = renderer->GetMesh();
-				auto model = renderer->GetTransform().GetModelMatrix();
-				auto material = renderer->GetMaterial();
+			MeshPtr mesh = renderer->GetMesh();
+			auto model = renderer->GetTransform().GetModelMatrix();
+			auto material = renderer->GetMaterial();
 
-				material->SetToProgram(m_staticGeometryProgram.get());
-				m_staticGeometryProgram->SetUniform("model", model);
+			material->SetToProgram(m_staticGeometryProgram.get());
+			m_staticGeometryProgram->SetUniform("model", model);
 
-				mesh->Draw(m_staticGeometryProgram.get());
-			}
+			mesh->Draw(m_staticGeometryProgram.get());
 		}
 	}
 
@@ -93,27 +89,23 @@ void GeometryRenderPass::Render(Scene* scene, Camera* camera)
 		m_skinnedGeometryProgram->SetUniform("projection", projection);
 		m_skinnedGeometryProgram->SetUniform("viewPos", cameraPos);
 
-		auto skinnedPass = scene->GetRenderPass("Skinned");
-		if (skinnedPass)
+		for (const auto* renderer : m_skinnedMeshRenderers)
 		{
-			for (const auto* renderer : skinnedPass->GetRenderers())
-			{
-				GameObject* go = renderer->GetOwner();
-				MeshPtr mesh = renderer->GetMesh();
-				auto material = renderer->GetMaterial();
-				auto& transform = go->GetTransform();
-				Animator* animator = go->GetComponent<Animator>();
+			GameObject* go = renderer->GetOwner();
+			MeshPtr mesh = renderer->GetMesh();
+			auto material = renderer->GetMaterial();
+			auto& transform = go->GetTransform();
+			Animator* animator = go->GetComponent<Animator>();
 
-				material->SetToProgram(m_skinnedGeometryProgram.get());
+			material->SetToProgram(m_skinnedGeometryProgram.get());
 
-				auto finalMatrices = animator->GetFinalBoneMatrices();
-				for (int i = 0; i < finalMatrices.size(); ++i)
-					m_skinnedGeometryProgram->SetUniform("finalBoneMatrices[" + std::to_string(i) + "]", finalMatrices[i]);
+			auto finalMatrices = animator->GetFinalBoneMatrices();
+			for (int i = 0; i < finalMatrices.size(); ++i)
+				m_skinnedGeometryProgram->SetUniform("finalBoneMatrices[" + std::to_string(i) + "]", finalMatrices[i]);
 
-				m_skinnedGeometryProgram->SetUniform("model", transform.GetModelMatrix());
+			m_skinnedGeometryProgram->SetUniform("model", transform.GetModelMatrix());
 
-				mesh->Draw(m_skinnedGeometryProgram.get());
-			}
+			mesh->Draw(m_skinnedGeometryProgram.get());
 		}
 	}
 

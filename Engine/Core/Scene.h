@@ -28,7 +28,7 @@ public:
 //============================================*/
 public:
 	auto& GetRenderPasses() const { return m_renderPasses; }
-	RenderPass* GetRenderPass(const std::string& name) { return m_renderPasses[name].get(); }
+	RenderPass* GetRenderPass(const std::string& name);
 	void SetShadowPass(ShadowPassUPtr pass) { m_shadowPass = std::move(pass); }
 	ShadowPass* GetShadowPass() const { return m_shadowPass.get(); }
 	void SetSkyboxPass(SkyboxPassUPtr pass) { m_skyboxPass = std::move(pass); }

@@ -26,7 +26,7 @@ protected:
 	std::vector<MeshRenderer*> m_renderers;
 };
 
-#pragma region FSSENTIAL_RENDER_PASSES
+#pragma region ESSENTIAL_RENDER_PASSES
 CLASS_PTR(ShadowPass)
 class ShadowPass : public RenderPass
 {
@@ -74,9 +74,12 @@ class GeometryPass : public RenderPass
 public:
 	virtual ~GeometryPass();
 	Framebuffer* GetGBuffer();
+	void AddSkinnedMeshRenderer(MeshRenderer* skinnedMeshRenderer);
+	const std::vector<MeshRenderer*>& GetSkinnedMeshRenderers() const;
 
 protected:
 	FramebufferUPtr m_gBuffer;
+	std::vector<MeshRenderer*> m_skinnedMeshRenderers;
 };
 
 CLASS_PTR(DeferredLightingPass)

@@ -21,8 +21,4 @@ public:
 
 private:
 	DevRenderer() = default;
-
-// TEMP : 역할에 맞게 우선 나눔
-private:
-	void RenderMainPass(Scene* scene, Camera* camera, SpotLight* mainLight);
 };

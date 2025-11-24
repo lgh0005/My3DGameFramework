@@ -71,6 +71,16 @@ void PostProcessPass::BeginDraw()
 //=========================*/
 GeometryPass::~GeometryPass() = default;
 
+void GeometryPass::AddSkinnedMeshRenderer(MeshRenderer* skinnedMeshRenderer)
+{
+	m_skinnedMeshRenderers.push_back(skinnedMeshRenderer);
+}
+
+const std::vector<MeshRenderer*>& GeometryPass::GetSkinnedMeshRenderers() const
+{
+	return m_skinnedMeshRenderers;
+}
+
 Framebuffer* GeometryPass::GetGBuffer()
 {
 	return m_gBuffer.get();
