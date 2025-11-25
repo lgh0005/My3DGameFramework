@@ -1,19 +1,79 @@
-#pragma once
+ï»¿#pragma once
+#include "imgui.h"
+#include "imgui_impl_glfw.h"
+#include "imgui_impl_opengl3.h"
 
-#pragma region FORWARD_DECLARATION
-CLASS_PTR(Context)
-#pragma endregion
+enum class EInputEvent
+{
+	Pressed = 0,
+	Released = 1,
+	MAX
+};
 
-// TODO : ³ªÁß¿¡´Â ¿©·¯ ÀÌº¥Æ®¸¦ ¹Ş¾Æ¼­ Ã³¸®ÇÒ ¼ö ÀÖ´Â ±¸Á¶·Î
-// ¼öÁ¤ ÇÊ¿ä
+struct InputAction
+{
+	std::string Name;
+	std::vector<int32> MappedKeys;
+	std::vector<int32> MappedMouseButtons;
+	std::vector<std::function<void()>> Callbacks[(int32)EInputEvent::MAX];
+};
+
 class InputManager
 {
 	DECLARE_SINGLE(InputManager)
 
 public:
-	void HandleKeyEvent(int32 key, int32 scancode, int32 action, int32 mods);
-	void HandleCharEvent(uint32 ch);
-	void HandleScroll(double xOffset, double yOffset);
-	void HandleCursorMove(Context& context, double x, double y);
-	void HandleMouseButton(Context& context, int32 button, int32 action, int32 mod);
+	bool Init();
+	void Update();
+	void ClearListeners();
+
+	// ì¸í’‹ ë§¤í•‘
+	void MapAction(const std::string& actionName, int32 key);
+	void MapMouseAction(const std::string& actionName, int32 button);
+
+	// í´ë§ ë°©ì‹ì˜ ì¸í’‹ ì²˜ë¦¬
+	bool GetButton(const std::string& actionName);
+	bool GetButtonUp(const std::string& actionName);
+	bool GetButtonDown(const std::string& actionName);
+
+	// ì´ë²¤íŠ¸ ë“±ë¡ ë°©ì‹ì˜ ì¸í’‹ ì²˜ë¦¬
+	template<typename T>
+	void BindAction(const std::string& actionName, T* instance, void(T::* func)());
+
+private:
+	static void DispatchKey(GLFWwindow* window, 
+		int32 key, int32 scancode, int32 action, int32 mods);
+	static void DispatchMouse(GLFWwindow* window, 
+		int32 button, int32 action, int32 mods);
+
+private:
+	void OnKey(int32 key, int32 scancode, int32 action, int32 mods);
+	void OnMouse(int32 button, int32 action, int32 mods);
+	InputAction* GetOrCreateAction(const std::string& name);
+
+	std::unordered_map<std::string, InputAction> m_actions;
+	std::unordered_map<std::string, bool> m_prevActionStates;
+	InputAction* m_keyMap[GLFW_KEY_LAST + 1]			= { nullptr };
+	InputAction* m_mouseMap[GLFW_MOUSE_BUTTON_LAST + 1] = { nullptr };
+
+// TEMP : ImGUIë¡œ ë””ë²„ê·¸ë¥¼ í•  ë•Œ ì“°ì´ëŠ” ë©”ì„œë“œ.
+#pragma region FOR_IMGUI_DEBUG
+private:
+	static bool YieldKeyboardInputToImGUI(GLFWwindow* window, 
+		int32 key, int32 scancode, int32 action, int32 mods);
+	static bool YieldMouseInputToImGUI(GLFWwindow* window,
+		int32 button, int32 action, int32 mods);
+#pragma endregion
 };
+
+/*===================================//
+//   input manager template inlines  //
+//===================================*/
+#pragma region INPUT_MANAGER_INLINES
+template<typename T>
+inline void InputManager::BindAction(const std::string& actionName, T* instance, void(T::* func)())
+{
+	auto boundFunc = [instance, func]() { (instance->*func)(); };
+	GetOrCreateAction(actionName)->Callbacks[(int32)eventType].push_back(boundFunc);
+}
+#pragma endregion

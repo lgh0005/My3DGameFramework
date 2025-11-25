@@ -1,41 +1,106 @@
-#include "WindowManager.h"
+ï»¿#include "WindowManager.h"
 #include "EnginePch.h"
 #include "Graphics/Context.h"
 #include "Graphics/FrameBuffer.h"
 #include "Graphics/Texture.h"
 #include "Components/Camera.h"
 
-void WindowManager::Init(GLFWwindow* handle)
+bool WindowManager::Init()
 {
-	m_handle = handle;
+    // glfw ë¼ì´ë¸ŒëŸ¬ë¦¬ ì´ˆê¸°í™”
+    if (!glfwInit())
+    {
+        const char* description = nullptr;
+        glfwGetError(&description);
+        SPDLOG_ERROR("failed to initialize glfw: {}", description);
+        return false;
+    }
+
+    // OpenGL ë²„ì „ ì„¤ì •
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
+    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+
+    // glfw ìœˆë„ìš° ìƒì„±
+    SPDLOG_INFO("Create glfw window");
+    m_window = glfwCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, WINDOW_NAME, nullptr, nullptr);
+    if (!m_window)
+    {
+        SPDLOG_ERROR("failed to create glfw window");
+        glfwTerminate();
+        return false;
+    }
+    glfwMakeContextCurrent(m_window);
+    glfwSetWindowUserPointer(m_window, this); // TODO : glfw ìœˆë„ìš° í•¸ë“¤ ê´€ë¦¬ ì±…ì„ì„ ëˆ„êµ¬ì—ê²Œ ìœ„ì„?
+    glfwSwapInterval(0); // TEMP : v-sync ì ì‹œ ë„ê¸°
+
+    // gladë¥¼ í™œìš©í•œ OpenGL í•¨ìˆ˜ ë¡œë”©
+    if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
+    {
+        SPDLOG_ERROR("failed to initialize glad");
+        glfwTerminate();
+        return false;
+    }
+    auto glVersion = glGetString(GL_VERSION);
+    SPDLOG_INFO("OpenGL context version: {}", reinterpret_cast<const char*>(glVersion));
+
+    // TEMP : glfw ì½œë°± í•¨ìˆ˜ ë“±ë¡. ì´í›„ì— ì–´ë–»ê²Œ ì²˜ë¦¬ë¥¼ í•´ì•¼ í•  ì§€ ê³ ë¯¼ í•„ìš”
+    RegisterStaticEventCallbacks();
+
+    // SPIR-V í™•ì¥ ì§€ì› ì²´í¬
+    if (glfwExtensionSupported("GL_ARB_gl_spirv")) SPDLOG_INFO("SPIR-V supported!");
+    else SPDLOG_WARN("SPIR-V not supported on this system!");
+
+    // ë¸”ë Œë”© í™œì„±í™”
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+    return true;
 }
 
-void WindowManager::HandleFramebufferSizeChange(Context& context, int32 width, int32 height)
+WindowManager* WindowManager::GetWindowUserPtr()
+{
+    return static_cast<WindowManager*>(glfwGetWindowUserPointer(m_window));
+}
+
+void WindowManager::RegisterStaticEventCallbacks()
+{
+    glfwSetFramebufferSizeCallback(m_window, HandleFramebufferSizeChange);
+    glfwSetWindowIconifyCallback(m_window, HandleWindowIconified);
+}
+
+void WindowManager::DestroyWindow()
+{
+    // glfw ì •ë¦¬
+    glfwTerminate();
+    if (m_window)
+    {
+        glfwDestroyWindow(m_window);
+        m_window = nullptr;
+    }
+}
+
+/*=====================//
+//   window callbacks  //
+//=====================*/
+void WindowManager::HandleFramebufferSizeChange(GLFWwindow* window, int32 width, int32 height)
 {    
-    // ³ôÀÌ³ª ³Êºñ°¡ 0ÀÌ¶ó¸é ÇÁ·¹ÀÓ ¹öÆÛÀÇ Å©±â º¯È¯À» °Ç³Ê ¶Ú´Ù.
-    // TODO : ÀÌÈÄ¿¡ m_isIconified·Î Ã¼Å©¸¦ ÇØµµ µÇ´Â Áö glfwÀÇ Äİ¹é ÇÔ¼ö È£Ãâ ¼ø¼­¸¦
-    // °í·ÁÇØº» ´ÙÀ½¿¡ ¼öÁ¤ ¿©ºÎ¸¦ °ËÅäÇØ¾ß ÇÑ´Ù.
+    // ë†’ì´ë‚˜ ë„ˆë¹„ê°€ 0ì´ë¼ë©´ í”„ë ˆì„ ë²„í¼ì˜ í¬ê¸° ë³€í™˜ì„ ê±´ë„ˆ ë›´ë‹¤.
+    // TODO : ì´í›„ì— m_isIconifiedë¡œ ì²´í¬ë¥¼ í•´ë„ ë˜ëŠ” ì§€ glfwì˜ ì½œë°± í•¨ìˆ˜ í˜¸ì¶œ ìˆœì„œë¥¼
+    // ê³ ë ¤í•´ë³¸ ë‹¤ìŒì— ìˆ˜ì • ì—¬ë¶€ë¥¼ ê²€í† í•´ì•¼ í•œë‹¤.
     if (width == 0.0f || height == 0.0f) return;
 
-    // TODO : ÀÌÈÄ¿¡ context¿¡¼­ Ä«¸Ş¶ó¸¦ ºĞ¸®ÇÒ ¼ö ÀÖ´Â ¼ö´ÜÀ» ¸¶·ÃÇØ¾ß ÇÔ
+    // TODO : ì´í›„ì— contextì—ì„œ ì¹´ë©”ë¼ë¥¼ ë¶„ë¦¬í•  ìˆ˜ ìˆëŠ” ìˆ˜ë‹¨ì„ ë§ˆë ¨í•´ì•¼ í•¨
     SPDLOG_INFO("framebuffer size changed: ({} x {})", width, height);
-    /*Camera& camera = context.GetCamera();
-    camera.SetProjection
-    (
-        45.0f,
-        (float)width / (float)height,
-        0.01f, 100.0f
-    );*/
 
     Scene* activeScene = SCENE.GetActiveScene();
     if (activeScene)
     {
         Camera* camera = activeScene->GetMainCamera();
 
-        // 2. [ÇÙ½É] Ä«¸Ş¶ó°¡ nullptrÀÌ ¾Æ´ÑÁö "¹İµå½Ã" È®ÀÎÇÕ´Ï´Ù.
+        // 2. [í•µì‹¬] ì¹´ë©”ë¼ê°€ nullptrì´ ì•„ë‹Œì§€ "ë°˜ë“œì‹œ" í™•ì¸í•©ë‹ˆë‹¤.
         if (camera)
         {
-            // 3. Ä«¸Ş¶ó°¡ Á¸ÀçÇÒ ¶§¸¸ ÇÁ·ÎÁ§¼ÇÀ» ¾÷µ¥ÀÌÆ®ÇÕ´Ï´Ù.
+            // 3. ì¹´ë©”ë¼ê°€ ì¡´ì¬í•  ë•Œë§Œ í”„ë¡œì ì…˜ì„ ì—…ë°ì´íŠ¸í•©ë‹ˆë‹¤.
             camera->SetProjection(
                 45.0f,
                 (float)width / (float)height,
@@ -46,23 +111,22 @@ void WindowManager::HandleFramebufferSizeChange(Context& context, int32 width, i
 
     glViewport(0, 0, width, height);
 
-    // ÇÁ·¹ÀÓ ¹öÆÛ ¼¼ÆÃ
+    // TODO : í˜„ì¬ ë Œë”ë§ ì¤‘ì¸ ë Œë”ëŸ¬ì˜ í”„ë ˆì„ ë²„í¼ ì„¸íŒ… í•„ìš”
     //FramebufferUPtr frameBuffer = Framebuffer::Create
     //(Texture::Create(width, height, GL_RGBA));
     // context.SetFrameBuffer(std::move(frameBuffer));
 }
 
-void WindowManager::HandleWindowIconified(int32 iconified)
+void WindowManager::HandleWindowIconified(GLFWwindow* window, int32 iconified)
 {
     if (iconified == GLFW_TRUE)
     {
         SPDLOG_INFO("Window Minimized");
-        m_isIconified = true;
+        // m_isIconified = true;
     }
     else
     {
         SPDLOG_INFO("Window Restored");
-        m_isIconified = false;
+        // m_isIconified = false;
     }
 }
-

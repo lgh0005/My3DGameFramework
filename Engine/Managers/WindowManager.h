@@ -1,25 +1,34 @@
-#pragma once
+ï»¿#pragma once
 
 #pragma region FORWARD_DECLARATION
 CLASS_PTR(Context)
 #pragma endregion
 
-// TODO : ÇÊ¿äÇÏ´Ù¸é ¿©·¯ ÀÌº¥Æ®¸¦ ¹Ş¾Æ¼­ Ã³¸®ÇÒ ¼ö ÀÖ´Â ±¸Á¶·Î
-// ¼öÁ¤ ÇÊ¿ä
+// TODO : í•„ìš”í•˜ë‹¤ë©´ ì—¬ëŸ¬ ì´ë²¤íŠ¸ë¥¼ ë°›ì•„ì„œ ì²˜ë¦¬í•  ìˆ˜ ìˆëŠ” êµ¬ì¡°ë¡œ
+// ìˆ˜ì • í•„ìš”
 class WindowManager
 {
 	DECLARE_SINGLE(WindowManager)
 
 public:
-	void Init(GLFWwindow* handle);
-	GLFWwindow* GetHandle() { return m_handle; }
+	bool Init();
+	GLFWwindow* GetWindow() { return m_window; }
+	WindowManager* GetWindowUserPtr();
+	void DestroyWindow();
+
+	// TODO : í™•ì •ì ìœ¼ë¡œ ìˆì–´ì•¼ í•  ì½œë°± í•¨ìˆ˜ë“¤ì„ ê³¨ë¼ì„œ 
+	// TEMP : miscellaneous
 	bool IsInconified() { return m_isIconified; }
 
-	// TEMP : ÄÚµå¸¦ ¿Å°ÜµÒ.
-	void HandleFramebufferSizeChange(Context& context, int32 width, int32 height);
-	void HandleWindowIconified(int32 iconified);
+private:
+	// ë“±ë¡í•  ìˆ˜ ìˆë„ë¡ ìˆ˜ì • í•„ìš”
+	void RegisterStaticEventCallbacks();
+
+	// TEMP : static window event callback
+	static void HandleFramebufferSizeChange(GLFWwindow* window, int32 width, int32 height);
+	static void HandleWindowIconified(GLFWwindow* window, int32 iconified);
 
 private:
-	GLFWwindow* m_handle	{ nullptr };
+	GLFWwindow* m_window	{ nullptr };
 	bool m_isIconified		{ false };
 };

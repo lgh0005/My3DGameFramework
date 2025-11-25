@@ -13,7 +13,7 @@ class ImGuiManager
 	DECLARE_SINGLE(ImGuiManager)
 
 public:
-	void Init(GLFWwindow* handle, bool enable);
+	void Init(bool enable);
 	void ShutDown();
 	void BeginFrame();
 	void EndFrame();

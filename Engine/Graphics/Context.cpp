@@ -136,16 +136,7 @@ bool Context::Init()
     if (activeScene)
     {
         m_camera = activeScene->GetMainCamera();
-
-        // 씬에서 스포트라이트를 찾아 m_spotLight에 캐시
-        for (auto* light : activeScene->GetLights()) 
-        {
-            if (light->GetLightType() == LightType::Spot) 
-            {
-                m_spotLight = static_cast<SpotLight*>(light);
-                break;
-            }
-        }
+        m_spotLight = (SpotLight*)activeScene->GetMainLight();
     }
 
     return true;
@@ -155,7 +146,7 @@ bool Context::Init()
 /*=====================//
 //  camera controller  //
 //=====================*/
-#pragma region Camera Controller
+#pragma region CAMERA_CONTROLLER
 
 void Context::ProcessInput(GLFWwindow* window)
 {

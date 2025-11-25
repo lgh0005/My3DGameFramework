@@ -11,6 +11,7 @@ CLASS_PTR(Model)
 CLASS_PTR(Animation)
 #pragma endregion
 
+// TODO : 코드 좀 더 간소화 할 수 있다면 간소화 하기
 class ResourceManager
 {
 	DECLARE_SINGLE(ResourceManager)

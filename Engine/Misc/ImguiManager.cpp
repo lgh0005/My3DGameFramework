@@ -1,7 +1,7 @@
-#include "EnginePch.h"
+﻿#include "EnginePch.h"
 #include "ImguiManager.h"
 
-void ImGuiManager::Init(GLFWwindow* handle, bool enable)
+void ImGuiManager::Init(bool enable)
 {
 	if (!enable)
 	{
@@ -11,9 +11,8 @@ void ImGuiManager::Init(GLFWwindow* handle, bool enable)
 
 	ImGui::CreateContext();
 	ImGui::StyleColorsDark();
-	// ImGuizmo::SetImGuiContext(ImGui::GetCurrentContext());
 
-	ImGui_ImplGlfw_InitForOpenGL(handle, true);
+	ImGui_ImplGlfw_InitForOpenGL(WINDOW.GetWindow(), true);
 	ImGui_ImplOpenGL3_Init("#version 460 core");
 }
 
@@ -31,7 +30,6 @@ void ImGuiManager::BeginFrame()
 	ImGui_ImplOpenGL3_NewFrame();
 	ImGui_ImplGlfw_NewFrame();
 	ImGui::NewFrame();
-	// ImGuizmo::BeginFrame();
 }
 
 void ImGuiManager::EndFrame()
