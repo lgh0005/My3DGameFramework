@@ -9,9 +9,6 @@ CLASS_PTR(SpotLight)
 CLASS_PTR(ShadowMap)
 #pragma endregion
 
-// TODO 
-// 1. 프레임 버퍼 기반 렌더링
-
 CLASS_PTR(DevRenderer)
 class DevRenderer : public Renderer
 {
@@ -21,4 +18,7 @@ public:
 
 private:
 	DevRenderer() = default;
+
+	// TEMP : 디버그를 위한 ImGUIManager의 컨텍스트
+	void RenderImGUIContext(Scene* scene);
 };

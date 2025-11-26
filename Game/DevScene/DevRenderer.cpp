@@ -29,6 +29,8 @@ DevRendererUPtr DevRenderer::Create(int32 width, int32 height)
 	return std::move(devRenderer);
 }
 
+// TODO : 이후에는 이 Render의 동작을 SRP(StandartRenderPipeline)클래스로 따로 빼서
+// 이 일련의 동작들을 하나의 클래스로 만들 예정.
 void DevRenderer::Render(Scene* scene)
 {
 	/*====================================//
@@ -64,4 +66,86 @@ void DevRenderer::Render(Scene* scene)
 
 	// [패스 5] 후처리 패스: m_frameBuffer의 결과를 화면에 Resolve
 	scene->GetPostProcessPass()->Render(scene, camera);
+
+	// DEBUG : ImGUI 컨텍스트
+	RenderImGUIContext(scene);
 }
+
+/*============================//
+//   debug ui context method  //
+//============================*/
+#pragma region DEBUG_IMGUI_CONTEXT
+void DevRenderer::RenderImGUIContext(Scene* scene)
+{
+    // 1. 디버깅에 필요한 요소들
+    auto mainLight = static_cast<SpotLight*>(scene->GetMainLight());
+    auto postProcess = scene->GetPostProcessPass();
+
+    // 2. ImGui 렌더링 (Context가 담당?)
+    IMGUI.BeginFrame();
+
+    // imgui context #1 : 카메라
+    if (IMGUI.Begin("Camera Parameters"))
+    {
+        ImGui::Text("TODO : ClearColor or Skybox etc.");
+
+        // TODO : 이후에는 스카이박스, 단색의 하늘을 보여주는 로직
+        // 그리고 깊이, 노멀, 위치, ambient 맵도 선택하여 볼 수 있도록 설정할 수
+        // 있도록 수정 필요
+        glm::vec4 clearCol = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
+        if (ImGui::ColorEdit4("clear color", glm::value_ptr(clearCol)))
+            glClearColor(clearCol.r, clearCol.g, clearCol.b, clearCol.a);
+
+    } IMGUI.End();
+
+    // imgui context #2 : G-buffer 디버그
+    if (IMGUI.Begin("G-buffer Debug"))
+    {
+        ImGui::Text("TODO : Position, Normal, Ambient");
+    } IMGUI.End();
+
+    // imgui context #2 : 조명
+    if (IMGUI.Begin("Light Parameters"))
+    {
+        if (mainLight)
+        {
+            auto& lightTransform = mainLight->GetTransform();
+            glm::vec3 lightPos = lightTransform.GetPosition();
+            if (ImGui::DragFloat3("position", glm::value_ptr(lightPos), 0.01f))
+                lightTransform.SetPosition(lightPos);
+
+            glm::vec3 currentRotation = lightTransform.GetRotationEuler();
+            bool rotationChanged = ImGui::DragFloat3("rotation", glm::value_ptr(currentRotation), 0.5f);
+            if (rotationChanged) lightTransform.SetRotation(currentRotation);
+
+            glm::vec2 lightCutoff = mainLight->GetCutoff();
+            if (ImGui::DragFloat("cutoff", glm::value_ptr(lightCutoff), 0.1))
+                mainLight->SetCutoff(lightCutoff);
+
+            float lightDist = mainLight->GetDistance();
+            if (ImGui::DragFloat("distance", &lightDist, 0.01))
+                mainLight->SetDistance(lightDist);
+
+            glm::vec3 ambient = mainLight->GetAmbient();
+            if (ImGui::ColorEdit3("Ambient", glm::value_ptr(ambient)))
+                mainLight->SetAmbient(ambient);
+
+            glm::vec3 diffuse = mainLight->GetDiffuse();
+            if (ImGui::ColorEdit3("Diffuse", glm::value_ptr(diffuse)))
+                mainLight->SetDiffuse(diffuse);
+
+            glm::vec3 specular = mainLight->GetSpecular();
+            if (ImGui::ColorEdit3("Specular", glm::value_ptr(specular)))
+                mainLight->SetSpecular(specular);
+        }
+    } IMGUI.End();
+    // imgui context #2 : 조명
+    if (IMGUI.Begin("Post-Process"))
+    {
+        bool gammaChanged = ImGui::DragFloat("gamma", postProcess->GetGammaPtr(), 0.05f, 0.1f, 5.0f);
+        bool exposureChanged = ImGui::DragFloat("exposure", postProcess->GetExposurePtr(), 0.05f, 0.1f, 10.0f);
+    } IMGUI.End();
+
+    IMGUI.EndFrame();
+}
+#pragma endregion

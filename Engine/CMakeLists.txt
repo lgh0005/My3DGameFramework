@@ -18,7 +18,11 @@ add_library(Engine STATIC
    "Core/Scene.h"                   "Core/Scene.cpp"
    "Core/Renderer.h"                "Core/Renderer.cpp"
    "Core/RenderPass.h"              "Core/RenderPass.cpp"
+
+                 
        
+
+
    # Misc
    "Misc/Defines.h"
    "Misc/Types.h"
@@ -64,8 +68,7 @@ add_library(Engine STATIC
    "Managers/InputManager.h"        "Managers/InputManager.cpp"           
    "Managers/ResourceManager.h"     "Managers/ResourceManager.cpp"
    "Managers/SceneManager.h"        "Managers/SceneManager.cpp"
-  
-
+ 
 )
 
 # 2. [PCH 설정] EnginePCH.h를 PCH로 사용합니다.

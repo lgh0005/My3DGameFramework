@@ -32,6 +32,8 @@ protected:
 // 동작을 하는 클래스로 아얘 만들어 둘지 고려 필요.
 // 다만, 커스텀 렌더 패스들에 대한(Forward-Shading) 것들을 보장해줄
 // 필요가 있음.
+
+// 그전에 다중 조명이 잘 동작하는 지 부터 확인할 필요가 있음.
 #pragma region ESSENTIAL_RENDER_PASSES
 CLASS_PTR(ShadowPass)
 class ShadowPass : public RenderPass
@@ -41,8 +43,6 @@ public:
 	virtual void CalculateLightSpaceMatrix(Scene* scene) = 0;
 	TexturePtr GetDepthMap() const;
 	glm::mat4 GetLightSpaceMatrix() const;
-
-	// TEMP : 윈도우 리사이즈 대응 테스트
 	virtual void Resize(int32 width, int32 height) { }
 
 protected:
@@ -69,9 +69,11 @@ public:
 	virtual ~PostProcessPass();
 	void BeginDraw();
 	Framebuffer* GetFramebuffer() const { return m_frameBuffer.get(); }
-
-	// TEMP : 윈도우 리사이즈 대응 테스트
 	void Resize(int32 width, int32 height);
+
+	// DEBUG : IMGUI 테스트를 위한 포스트-프로세스 getter
+	float* GetGammaPtr() { return &m_gamma; }
+	float* GetExposurePtr() { return &m_exposure; }
 
 protected:
 	MeshPtr			m_plane;
@@ -89,8 +91,6 @@ public:
 	Framebuffer* GetGBuffer();
 	void AddSkinnedMeshRenderer(MeshRenderer* skinnedMeshRenderer);
 	const std::vector<MeshRenderer*>& GetSkinnedMeshRenderers() const;
-
-	// TEMP : 윈도우 리사이즈 대응 테스트
 	void Resize(int32 width, int32 height);
 
 protected:
