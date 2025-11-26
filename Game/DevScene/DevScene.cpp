@@ -32,6 +32,8 @@
 #include "DeferredRenderPasses/GeometryRenderPass.h"
 #include "DeferredRenderPasses/DeferredLightRenderPass.h"
 
+#include "Scripts/CameraController.h"
+
 DevScene::~DevScene() = default;
 
 DevSceneUPtr DevScene::Create()
@@ -415,9 +417,14 @@ bool DevScene::CreateSceneContext()
 		auto camera = Camera::Create();		   if (!camera)	   return false;
 		auto* cameraPtr = camera.get();
 
+		// 카메라 컴포넌트 생성 및 추가
 		cameraObj->GetTransform().SetPosition(glm::vec3(0.0f, 2.5f, 8.0f));
 		camera->SetProjection(45.0f, (float)WINDOW_WIDTH / (float)WINDOW_HEIGHT, 0.01f, 100.0f);
 		cameraObj->AddComponent(std::move(camera));
+
+		// 카메라 컨트롤러 생성 및 추가
+		auto cameraCtrl = CameraController::Create();
+		cameraObj->AddComponent(std::move(cameraCtrl));
 
 		SetMainCamera(cameraPtr); // 메인 카메라로 설정
 

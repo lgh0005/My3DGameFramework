@@ -1,7 +1,6 @@
 #include "EnginePch.h"
 #include "Game.h"
-#include "Graphics/Context.h"
-#include "Components/Camera.h"
+#include "Core/Context.h"
 
 Game::~Game() = default;
 Context& Game::GetContext() { return *m_context; }
@@ -50,13 +49,14 @@ void Game::Update()
         // 메니저 업데이트
         TIME.Update();
 
-        // TEMP : 인풋 업데이트
-        m_context->ProcessInput(handle);
-
         // 컨텍스트 업데이트
         m_context->Update();
         m_context->Render();
 
+        // 인풋 업데이트
+        INPUT.Update();
+
+        // 버퍼 스왑
         glfwSwapBuffers(handle);
     }
 }

@@ -1,5 +1,5 @@
 #pragma once
-#include "Components/Bases/Light.h"
+#include "Light.h"
 
 // TODO : 이후에는 Deffered shading을 이용해서 다중 조명들을 그릴 방법을 적용.
 // 더 이후에는 Compute shading을 통해서 최적화를 할 수 있겠지만, 그건 이후에

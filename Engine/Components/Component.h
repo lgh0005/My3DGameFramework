@@ -11,7 +11,8 @@ enum class ComponentType
 	Camera,
 	Light,
 	Transform,
-	MeshRenderer
+	MeshRenderer,
+	Script
 };
 
 CLASS_PTR(Component)

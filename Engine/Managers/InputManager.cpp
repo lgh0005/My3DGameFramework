@@ -72,6 +72,7 @@ bool InputManager::Init()
 	
     glfwSetKeyCallback(window, DispatchKey);
     glfwSetMouseButtonCallback(window, DispatchMouse);
+    glfwSetCursorPosCallback(window, DispatchCursorPos);
     return true;
 }
 
@@ -106,8 +107,6 @@ InputAction* InputManager::GetOrCreateAction(const std::string& name)
 void InputManager::DispatchKey(GLFWwindow* window, 
     int32 key, int32 scancode, int32 action, int32 mods)
 {
-    if (YieldKeyboardInputToImGUI(window, key, scancode, action, mods))
-        return;
     INPUT.OnKey(key, scancode, action, mods);
 }
 
@@ -139,9 +138,6 @@ void InputManager::OnKey(int32 key, int32 scancode, int32 action, int32 mods)
 void InputManager::DispatchMouse(GLFWwindow* window,
     int32 button, int32 action, int32 mods)
 {
-    if (YieldMouseInputToImGUI(window, button, action, mods))
-        return;
-
     INPUT.OnMouse(button, action, mods);
 }
 
@@ -168,21 +164,27 @@ void InputManager::OnMouse(int32 button, int32 action, int32 mods)
     }
 }
 
+void InputManager::DispatchCursorPos(GLFWwindow* window, double xpos, double ypos)
+{
+    INPUT.OnCursorPos(xpos, ypos);
+}
+
+void InputManager::OnCursorPos(double xpos, double ypos)
+{
+    m_mousePos = glm::vec2((float)xpos, (float)ypos);
+}
+
 /*====================//
 //   for imgui debug  //
 //====================*/
 #pragma region FOR_IMGUI_DEBUG
-bool InputManager::YieldKeyboardInputToImGUI(GLFWwindow* window,
-    int32 key, int32 scancode, int32 action, int32 mods)
+bool InputManager::YieldKeyboardInputToImGUI()
 {
-    ImGui_ImplGlfw_KeyCallback(window, key, scancode, action, mods);
     return ImGui::GetIO().WantCaptureKeyboard;
 }
 
-bool InputManager::YieldMouseInputToImGUI(GLFWwindow* window,
-    int32 button, int32 action, int32 mods)
+bool InputManager::YieldMouseInputToImGUI()
 {
-    ImGui_ImplGlfw_MouseButtonCallback(window, button, action, mods);
     return ImGui::GetIO().WantCaptureMouse;
 }
 #pragma endregion

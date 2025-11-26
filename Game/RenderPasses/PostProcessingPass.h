@@ -9,7 +9,7 @@ CLASS_PTR(Framebuffer)
 CLASS_PTR(PostProcessingRenderPass)
 class PostProcessingRenderPass : public PostProcessPass
 {
-    using Super = RenderPass;
+    using Super = PostProcessPass;
 
 public:
     static PostProcessingRenderPassUPtr Create

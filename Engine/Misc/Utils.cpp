@@ -1,6 +1,9 @@
 #include "EnginePch.h"
 #include "Utils.h"
 
+/*============================//
+//   조명 연산 전용 유틸 함수   //
+//============================*/
 // 조명 감쇠 함수 : 거리를 넣으면 그에 따른 조명 감쇠 계수를 계산해준다.
 // 경험적으로 얻은 계수에 대한 근사식
 glm::vec3 Utils::GetAttenuationCoeff(float distance)
@@ -24,6 +27,9 @@ glm::vec3 Utils::GetAttenuationCoeff(float distance)
 	return glm::vec3(kc, glm::max(kl, 0.0f), glm::max(kq * kq, 0.0f));
 }
 
+/*====================================//
+//   assimp 애니메이션 전용 유틸 함수   //
+//====================================*/
 glm::mat4 Utils::ConvertMatrixToGLMFormat(const aiMatrix4x4& from)
 {
 	glm::mat4 to;

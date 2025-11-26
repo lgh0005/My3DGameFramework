@@ -1,5 +1,5 @@
 #pragma once
-#include "Components/Bases/Component.h"
+#include "Component.h"
 
 CLASS_PTR(Camera)
 class Camera : public Component

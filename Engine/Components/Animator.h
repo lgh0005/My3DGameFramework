@@ -1,5 +1,5 @@
 #pragma once
-#include "Components/Bases/Component.h"
+#include "Component.h"
 #include "Graphics/Animation.h"
 
 CLASS_PTR(Animator)

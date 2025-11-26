@@ -17,4 +17,5 @@ protected:
     void BlitCopyDepth(Framebuffer* src, Framebuffer* dst, 
                        int32 width = WINDOW_WIDTH, 
                        int32 height = WINDOW_HEIGHT);
+    // virtual bool IsRenderReady(Scene* scene) const { return true; }
 };

@@ -25,9 +25,9 @@ private:
 	ScenePackage m_activeScene;
 };
 
-/*=================================//
-//   SceneManager template inlines //
-//=================================*/
+/*===================================//
+//   SceneManager template inlines   //
+//===================================*/
 template<typename T_Scene, typename T_Renderer>
 inline void SceneManager::RegisterScene(const std::string& name)
 {

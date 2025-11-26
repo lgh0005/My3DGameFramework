@@ -6,6 +6,7 @@
 #include "Graphics/Program.h"
 #include "Graphics/ShadowMap.h"
 #include "Graphics/FrameBuffer.h"
+#include "Graphics/Texture.h"
 
 /*=======================//
 //   RenderPass methods  //

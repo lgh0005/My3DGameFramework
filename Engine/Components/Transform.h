@@ -1,5 +1,5 @@
 #pragma once
-#include "Components/Bases/Component.h"
+#include "Component.h"
 
 // TODO:
 // 1. 이후에 부모와 자식의 관계는 transform을 통해서 찾을 수 있도록

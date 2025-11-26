@@ -1,5 +1,5 @@
 #pragma once
-#include "Components/Bases/Component.h"
+#include "Component.h"
 
 #pragma region FORWARD_DECLARATION
 CLASS_PTR(Mesh)
@@ -23,7 +23,6 @@ public:
 
 private:
 	MeshRenderer() = default;
-
 	bool Init(MeshPtr mesh, MaterialPtr material);
 
 	MeshPtr m_mesh;

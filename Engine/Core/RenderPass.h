@@ -18,6 +18,7 @@ public:
 	const std::vector<MeshRenderer*>& GetRenderers() const;
 	Program& GetProgram() const { return *m_program; }
 	virtual void Render(Scene* scene, Camera* camera) = 0;
+	// virtual void Resize(int32 width, int32 height) {}
 
 protected:
 	RenderPass() = default;
@@ -64,8 +65,8 @@ public:
 protected:
 	MeshPtr			m_plane;
 	FramebufferUPtr m_frameBuffer;
-	float m_gamma{ 2.2f };
-	float m_exposure{ 1.0f };
+	float m_gamma	  { 2.2f };
+	float m_exposure  { 1.0f };
 };
 
 CLASS_PTR(GeometryPass)

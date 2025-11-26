@@ -35,6 +35,7 @@ public:
 	bool GetButton(const std::string& actionName);
 	bool GetButtonUp(const std::string& actionName);
 	bool GetButtonDown(const std::string& actionName);
+	const glm::vec2& GetMousePos() const { return m_mousePos; }
 
 	// 이벤트 등록 방식의 인풋 처리
 	template<typename T>
@@ -45,24 +46,27 @@ private:
 		int32 key, int32 scancode, int32 action, int32 mods);
 	static void DispatchMouse(GLFWwindow* window, 
 		int32 button, int32 action, int32 mods);
+	static void DispatchCursorPos(GLFWwindow* window, 
+		double xpos, double ypos);
 
 private:
 	void OnKey(int32 key, int32 scancode, int32 action, int32 mods);
 	void OnMouse(int32 button, int32 action, int32 mods);
+	void OnCursorPos(double xpos, double ypos);
 	InputAction* GetOrCreateAction(const std::string& name);
 
 	std::unordered_map<std::string, InputAction> m_actions;
 	std::unordered_map<std::string, bool> m_prevActionStates;
 	InputAction* m_keyMap[GLFW_KEY_LAST + 1]			= { nullptr };
 	InputAction* m_mouseMap[GLFW_MOUSE_BUTTON_LAST + 1] = { nullptr };
+	glm::vec2 m_mousePos							   { 0.0f, 0.0f };
 
 // TEMP : ImGUI로 디버그를 할 때 쓰이는 메서드.
+// TODO : 이거 스택 오버플로우 일어나는데 관련 문제 해결 필요
 #pragma region FOR_IMGUI_DEBUG
 private:
-	static bool YieldKeyboardInputToImGUI(GLFWwindow* window, 
-		int32 key, int32 scancode, int32 action, int32 mods);
-	static bool YieldMouseInputToImGUI(GLFWwindow* window,
-		int32 button, int32 action, int32 mods);
+	static bool YieldKeyboardInputToImGUI();
+	static bool YieldMouseInputToImGUI();
 #pragma endregion
 };
 

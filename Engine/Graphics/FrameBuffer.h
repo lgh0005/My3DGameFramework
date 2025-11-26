@@ -18,6 +18,9 @@ public:
 	void Resolve() const;
 	const TexturePtr GetColorAttachment(int32 index = 0) const;
 
+	/*int32 GetWidth()  { return m_width; }
+	int32 GetHeight() { return m_height; }*/
+
 private:
 	Framebuffer() = default;
 	bool Init(int32 width, int32 height, int32 samples);

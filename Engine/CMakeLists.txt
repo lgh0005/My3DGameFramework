@@ -13,6 +13,7 @@ add_library(Engine STATIC
 
    # Core
    "Game.h"                         "Game.cpp"
+   "Core/Context.h"                 "Core/Context.cpp"
    "Core/GameObject.h"              "Core/GameObject.cpp"
    "Core/Scene.h"                   "Core/Scene.cpp"
    "Core/Renderer.h"                "Core/Renderer.cpp"
@@ -27,7 +28,6 @@ add_library(Engine STATIC
    # Graphics
    "Graphics/Shader.h"              "Graphics/Shader.cpp"
    "Graphics/Program.h"             "Graphics/Program.cpp"
-   "Graphics/Context.h"             "Graphics/Context.cpp"
    "Graphics/Buffer.h"              "Graphics/Buffer.cpp" 
    "Graphics/VertexLayout.h"        "Graphics/VertexLayout.cpp"
    "Graphics/Image.h"               "Graphics/Image.cpp"
@@ -46,8 +46,9 @@ add_library(Engine STATIC
    "Graphics/ShadowMap.h"           "Graphics/ShadowMap.cpp"
 
    # Components
-   "Components/Bases/Component.h"   "Components/Bases/Component.cpp"
-   "Components/Bases/Light.h"       "Components/Bases/Light.cpp"
+   "Components/Component.h"         "Components/Component.cpp"
+   "Components/Light.h"             "Components/Light.cpp"
+   "Components/Script.h"            "Components/Script.cpp"
 
    "Components/Camera.h"            "Components/Camera.cpp"
    "Components/Transform.h"         "Components/Transform.cpp"
@@ -63,7 +64,9 @@ add_library(Engine STATIC
    "Managers/InputManager.h"        "Managers/InputManager.cpp"           
    "Managers/ResourceManager.h"     "Managers/ResourceManager.cpp"
    "Managers/SceneManager.h"        "Managers/SceneManager.cpp"
- )
+  
+
+)
 
 # 2. [PCH 설정] EnginePCH.h를 PCH로 사용합니다.
 target_precompile_headers(Engine  PUBLIC EnginePCH.h)

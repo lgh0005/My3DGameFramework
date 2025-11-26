@@ -81,60 +81,100 @@ bool Framebuffer::Init(int32 width, int32 height, int32 samples)
     m_height = height;
     m_samples = samples;
 
-    // 1. MSAA 프레임 버퍼 생성
-    glGenFramebuffers(1, &m_msaaFbo);
-    glBindFramebuffer(GL_FRAMEBUFFER, m_msaaFbo);
-
-    // 1-1. MSAA 컬러 렌더버퍼 생성 및 부착
-    const int32 attachmentCount = 2;
-    std::vector<uint32> attachments;
-    for (int i = 0; i < attachmentCount; ++i)
+    // ==========================================
+    // 분기점: 샘플 수가 1 이하면 "일반 텍스처 FBO" 생성
+    // ==========================================
+    if (m_samples <= 1)
     {
-        uint32 colorBuffer;
-        glGenRenderbuffers(1, &colorBuffer);
-        glBindRenderbuffer(GL_RENDERBUFFER, colorBuffer);
+        // 1. 일반 FBO 생성 (Resolve FBO 변수 재활용)
+        glGenFramebuffers(1, &m_resolveFbo);
+        glBindFramebuffer(GL_FRAMEBUFFER, m_resolveFbo);
 
-        // 둘 다 HDR 포맷(GL_RGBA16F) 사용
-        glRenderbufferStorageMultisample(GL_RENDERBUFFER, samples, GL_RGBA16F, width, height);
-        glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i,
-            GL_RENDERBUFFER, colorBuffer);
+        // 2. 컬러 텍스처 생성 및 부착 (여기서 바로 텍스처에 그립니다)
+        const int32 attachmentCount = 2;
+        std::vector<uint32> attachments;
 
-        m_msaaColorBuffers.push_back(colorBuffer);
-        attachments.push_back(GL_COLOR_ATTACHMENT0 + i);
+        for (int i = 0; i < attachmentCount; ++i)
+        {
+            // [중요 수정] GL_RGBA16F 사용! (HDR 유지를 위해 필수)
+            auto texture = Texture::Create(width, height, GL_RGBA16F, GL_RGBA, GL_FLOAT);
+
+            // 필터링은 FXAA 등을 위해 선형(Linear)이 좋을 수 있으나,
+            // 픽셀 정확도를 위해 Nearest를 쓰기도 합니다. 취향껏 선택하세요.
+            texture->SetFilter(GL_LINEAR, GL_LINEAR);
+
+            glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i,
+                GL_TEXTURE_2D, texture->Get(), 0);
+
+            m_resolveTextures.push_back(std::move(texture));
+            attachments.push_back(GL_COLOR_ATTACHMENT0 + i);
+        }
+
+        // 3. 깊이/스텐실 렌더버퍼 (일반)
+        glGenRenderbuffers(1, &m_msaaDepthStencilBuffer); // 변수 재활용
+        glBindRenderbuffer(GL_RENDERBUFFER, m_msaaDepthStencilBuffer);
+        glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, width, height);
+        glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, m_msaaDepthStencilBuffer);
+
+        // 4. 드로우 버퍼 설정 및 확인
+        glDrawBuffers(attachmentCount, attachments.data());
+
+        if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+        {
+            SPDLOG_ERROR("FrameBuffer Init Failed!");
+            return false;
+        }
+
+        // m_msaaFbo는 사용 안 함 (0으로 초기화 추천)
+        m_msaaFbo = 0;
     }
-
-    // 1-2. MSAA 깊이/스텐실 렌더버퍼 생성 및 부착
-    glGenRenderbuffers(1, &m_msaaDepthStencilBuffer);
-    glBindRenderbuffer(GL_RENDERBUFFER, m_msaaDepthStencilBuffer);
-    glRenderbufferStorageMultisample(GL_RENDERBUFFER, samples, GL_DEPTH24_STENCIL8, width, height);
-    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, m_msaaDepthStencilBuffer);
-
-    glDrawBuffers(attachmentCount, attachments.data());
-    if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
-        return false;
-
-    // 1-3. 리졸브(Resolve) 프레임 버퍼 생성
-    auto msaaResult = glCheckFramebufferStatus(GL_FRAMEBUFFER);
-    if (msaaResult != GL_FRAMEBUFFER_COMPLETE)
+    // ==========================================
+    // 샘플 수가 1보다 크면 기존 로직 (MSAA) 수행
+    // (혹시 나중에 쓸 수도 있으니 남겨둠)
+    // ==========================================
+    else
     {
-        SPDLOG_ERROR("failed to create MSAA framebuffer: {}", msaaResult);
-        return false;
+        glGenFramebuffers(1, &m_msaaFbo);
+        glBindFramebuffer(GL_FRAMEBUFFER, m_msaaFbo);
+
+        const int32 attachmentCount = 2;
+        std::vector<uint32> attachments;
+        for (int i = 0; i < attachmentCount; ++i)
+        {
+            uint32 colorBuffer;
+            glGenRenderbuffers(1, &colorBuffer);
+            glBindRenderbuffer(GL_RENDERBUFFER, colorBuffer);
+            glRenderbufferStorageMultisample(GL_RENDERBUFFER, samples, GL_RGBA16F, width, height);
+            glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i, GL_RENDERBUFFER, colorBuffer);
+            m_msaaColorBuffers.push_back(colorBuffer);
+            attachments.push_back(GL_COLOR_ATTACHMENT0 + i);
+        }
+
+        glGenRenderbuffers(1, &m_msaaDepthStencilBuffer);
+        glBindRenderbuffer(GL_RENDERBUFFER, m_msaaDepthStencilBuffer);
+        glRenderbufferStorageMultisample(GL_RENDERBUFFER, samples, GL_DEPTH24_STENCIL8, width, height);
+        glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, m_msaaDepthStencilBuffer);
+
+        glDrawBuffers(attachmentCount, attachments.data());
+        if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+            return false;
+
+        // Resolve FBO 생성 부분
+        glGenFramebuffers(1, &m_resolveFbo);
+        glBindFramebuffer(GL_FRAMEBUFFER, m_resolveFbo);
+
+        for (int i = 0; i < attachmentCount; ++i)
+        {
+            // [중요 수정] 여기도 MSAA 결과를 받을 때 GL_RGBA16F로 받아야 HDR이 유지됩니다.
+            auto texture = Texture::Create(width, height, GL_RGBA16F, GL_RGBA, GL_FLOAT);
+            glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i, GL_TEXTURE_2D, texture->Get(), 0);
+            m_resolveTextures.push_back(std::move(texture));
+        }
+
+        glDrawBuffers(attachmentCount, attachments.data());
+        if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+            return false;
     }
-
-    glGenFramebuffers(1, &m_resolveFbo);
-    glBindFramebuffer(GL_FRAMEBUFFER, m_resolveFbo);
-
-    for (int i = 0; i < attachmentCount; ++i)
-    {
-        auto texture = Texture::Create(width, height, GL_RGBA);
-        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i,
-            GL_TEXTURE_2D, texture->Get(), 0);
-        m_resolveTextures.push_back(std::move(texture));
-    }
-
-    glDrawBuffers(attachmentCount, attachments.data());
-    if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
-        return false;
 
     BindToDefault();
     return true;

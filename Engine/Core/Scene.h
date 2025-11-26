@@ -3,10 +3,12 @@
 
 #pragma region FORWARD_DECLARATION
 CLASS_PTR(GameObject)
+CLASS_PTR(Component)
 CLASS_PTR(MeshRenderer)
 CLASS_PTR(Light)
 CLASS_PTR(Camera)
 CLASS_PTR(Animator)
+CLASS_PTR(Script)
 #pragma endregion
 
 CLASS_PTR(Scene)
@@ -15,13 +17,18 @@ class Scene
 public:
 	virtual ~Scene();
 
+	void Start();
 	void Update();
+
 	void AddGameObject(GameObjectUPtr gameObject);
 	void AddRenderPass(const std::string& name, RenderPassUPtr renderPass);
+	void RegisterComponent(Component* component);
 
-	// TODO: 
-	// - GameObject 파괴를 위한 FlushDestroyQueue 필요
-	// - GameObject를 이름 등으로 찾는 FindGameObject 필요
+	// void OnScreenResize(int32 width, int32 height);
+
+	// TODO : 
+	// ID를 바탕으로 오브젝트를 찾을 수 있는 방안을 마련해야함.
+	// 빠른 오브젝트 탐색 방안을 마련해야 한다.
 
 /*============================================//
 //   essential render pass getter & setters   //
@@ -53,7 +60,7 @@ public:
 
 protected:
 	Scene() = default;
-	
+
 	// 씬의 컨텍스트를 작성하는 가상 함수들
 	virtual bool LoadNessesaryResources()	   = 0;
 	virtual bool CreateNessesaryRenderPasses() = 0;
@@ -63,6 +70,11 @@ protected:
 	// 모든 게임 오브젝트를 소유
 	std::vector<GameObjectUPtr> m_gameObjects;
 
+	// 씬 가비지 콜렉팅
+	// TODO : GameObject 파괴를 위한 FlushDestroyQueue 구현 진행
+	void FlushDestroyQueue();
+	std::vector<GameObjectUPtr> m_destroyQueue;
+
 	// TEMP : 씬의 디폴트 속성들
 	Camera* m_mainCamera		{ nullptr };
 	Light* m_mainLight			{ nullptr };
@@ -71,6 +83,7 @@ protected:
 	std::vector<Light*>			m_lights;
 	std::vector<Camera*>		m_cameras;
 	std::vector<Animator*>		m_animators;
+	std::vector<Script*>        m_scripts;
 
 	// 렌더링 멤버들 : 일반 렌더링과 고정적으로 필요한 렌더링
 	std::unordered_map<std::string, RenderPassUPtr> m_renderPasses;

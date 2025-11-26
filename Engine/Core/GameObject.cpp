@@ -1,5 +1,8 @@
 #include "EnginePch.h"
 #include "GameObject.h"
+#include "Core/Scene.h"
+#include "Components/Component.h"
+#include "Components/Transform.h"
 
 GameObjectUPtr GameObject::Create()
 {
@@ -10,12 +13,11 @@ GameObjectUPtr GameObject::Create()
 
 bool GameObject::Init()
 {
+	// 기본적으로 Transform을 소유
 	auto transform = Transform::Create();
 	if (!transform) return false;
-
 	m_transform = transform.get();
 	AddComponent(std::move(transform));
-
 	return true;
 }
 

@@ -32,7 +32,7 @@ bool PostProcessingRenderPass::Init
 	m_blurProgram = std::move(blurProgram);
 	m_plane = planeMesh;
 
-	m_frameBuffer = Framebuffer::Create(width, height, 4);
+	m_frameBuffer = Framebuffer::Create(width, height, 1);
 	if (!m_frameBuffer) return false;
 
 	m_pingPongFBOs[0] = Framebuffer::Create(width, height, 1);
@@ -58,8 +58,6 @@ void PostProcessingRenderPass::Render(Scene* scene, Camera* camera)
 	m_blurProgram->Use();
 	glDisable(GL_DEPTH_TEST);
 
-	// TODO : CreateNDCQuad로 대체하여 더 이상 굳이 확대시킬 필요 없이 만들기.
-	// m_blurProgram->SetUniform("transform", glm::scale(glm::mat4(1.0f), glm::vec3(2.0f, 2.0f, 1.0f)));
 	for (uint32 i = 0; i < amount; i++)
 	{
 		m_pingPongFBOs[horizontal]->Bind();
@@ -93,6 +91,11 @@ void PostProcessingRenderPass::Render(Scene* scene, Camera* camera)
 	m_program->SetUniform("gamma", m_gamma);
 	m_program->SetUniform("exposure", m_exposure);
 	m_program->SetUniform("bloom", true);
+
+	// DEBUG : FXAA
+	m_program->SetUniform("inverseScreenSize",
+		glm::vec2(1.0f / (float)WINDOW_WIDTH, 1.0f / (float)WINDOW_HEIGHT));
+
 
 	glActiveTexture(GL_TEXTURE0);
 	sceneTexture->Bind();
