@@ -33,13 +33,20 @@ bool DeferredLightPass::Init(ProgramUPtr program, MeshPtr screenMesh)
 
 void DeferredLightPass::Render(Scene* scene, Camera* camera)
 {
+	// TEMP : [윈도우 리사이즈 대응] G-Buffer 정보는 어차피 필요하니 위에서 미리 가져옵니다.
+	auto geometryPass = scene->GetGeometryPass();
+	if (!geometryPass) return;
+	auto gBuffer = geometryPass->GetGBuffer();
+
 	// 1. 그리기 준비 (화면 혹은 포스트 프로세싱 FBO에 그림)
 	// TODO : 포스트 프로세서의 프레임 버퍼의 텍스쳐에 그림을 그리도록 만들 필요 있음
 	auto postProcessPass = scene->GetPostProcessPass();
 	if (postProcessPass)
 	{
-		// PostProcessing이 있으면 그쪽 FBO에 그립니다.
+		// TEMP : [윈도우 리사이즈 대응] PostProcessing이 있으면 그쪽 FBO에 그립니다.
 		postProcessPass->BeginDraw();
+		auto ppFBO = postProcessPass->GetFramebuffer();
+		glViewport(0, 0, ppFBO->GetWidth(), ppFBO->GetHeight());
 	}
 	else
 	{
@@ -47,15 +54,19 @@ void DeferredLightPass::Render(Scene* scene, Camera* camera)
 		// Depth Test는 끄거나, G-Buffer의 Depth를 복사해와야 하는데
 		// Lighting Pass 자체는 화면 덮어쓰기므로 일단 끕니다.
 		Framebuffer::BindToDefault();
+
+		// TEMP : [윈도우 리사이즈 대응]
+		glViewport(0, 0, gBuffer->GetWidth(), gBuffer->GetHeight());
+
 		glDisable(GL_DEPTH_TEST);
 		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT);
 	}
 
 	m_program->Use();
-	auto geometryPass = scene->GetGeometryPass();
+	/*auto geometryPass = scene->GetGeometryPass();
 	if (!geometryPass) return;
-	auto gBuffer = geometryPass->GetGBuffer();
+	auto gBuffer = geometryPass->GetGBuffer();*/
 
 	// Slot 0: Position
 	glActiveTexture(GL_TEXTURE0);
@@ -112,8 +123,6 @@ void DeferredLightPass::Render(Scene* scene, Camera* camera)
 			glm::vec2 cutoff = spot->GetCutoff();
 			cutoff = glm::vec2(cosf(glm::radians(cutoff[0])), cosf(glm::radians(cutoff[0] + cutoff[1])));
 			m_program->SetUniform("light.cutoff", cutoff);
-
-			// m_program->SetUniform("light.cutoff", spot->GetCutoff());
 			m_program->SetUniform("light.attenuation", Utils::GetAttenuationCoeff(spot->GetDistance()));
 		}
 	}

@@ -53,7 +53,7 @@ void DevRenderer::Render(Scene* scene)
 
 	auto gBuffer = scene->GetGeometryPass()->GetGBuffer();
 	auto postFBO = scene->GetPostProcessPass()->GetFramebuffer();
-	BlitCopyDepth(gBuffer, postFBO, WINDOW_WIDTH, WINDOW_HEIGHT);
+	BlitCopyDepth(gBuffer, postFBO, gBuffer->GetWidth(), gBuffer->GetHeight());
 
 	// [패스 3] 포워드 셰이딩 
 	for (const auto& [name, pass] : scene->GetRenderPasses())

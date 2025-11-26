@@ -11,7 +11,7 @@ public:
 
 	void SetProjection(float fovDegrees, float aspectRatio, 
 					   float nearPlane, float farPlane);
-
+	void SetAspectRatio(float aspectRatio);
 	glm::mat4 GetViewMatrix() const;
 	glm::mat4 GetProjectionMatrix() const { return m_projectionMatrix; }
 	void LookAt(const glm::vec3& target, 

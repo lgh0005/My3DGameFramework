@@ -50,7 +50,7 @@ void GeometryRenderPass::Render(Scene* scene, Camera* camera)
 	m_gBuffer->Bind();
 
 	// 2. 화면 클리어
-	glViewport(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
+	glViewport(0, 0, m_gBuffer->GetWidth(), m_gBuffer->GetHeight());
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glEnable(GL_DEPTH_TEST);
 	glDisable(GL_BLEND);

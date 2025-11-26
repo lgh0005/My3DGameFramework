@@ -84,7 +84,7 @@ void WindowManager::DestroyWindow()
 void WindowManager::HandleFramebufferSizeChange(GLFWwindow* window, int32 width, int32 height)
 {    
     // 높이나 너비가 0이라면 프레임 버퍼의 크기 변환을 건너 뛴다.
-    if (width == 0.0f || height == 0.0f) return;
+    if (width <= 0 || height <= 0) return;
 
     SPDLOG_INFO("framebuffer size changed: ({} x {})", width, height);
     
@@ -92,6 +92,7 @@ void WindowManager::HandleFramebufferSizeChange(GLFWwindow* window, int32 width,
     glViewport(0, 0, width, height);
 
     // TODO : 화면 크기에 맞게 종횡비를 맞추면서 렌더링
+    SCENE.GetActiveScene()->OnScreenResize(width, height);
 }
 
 void WindowManager::HandleWindowIconified(GLFWwindow* window, int32 iconified)

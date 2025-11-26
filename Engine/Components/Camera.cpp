@@ -25,6 +25,18 @@ void Camera::SetProjection(float fovDegrees, float aspectRatio,
     );
 }
 
+void Camera::SetAspectRatio(float aspectRatio)
+{
+    m_aspectRatio = aspectRatio;
+    m_projectionMatrix = glm::perspective
+    (
+        glm::radians(m_fovDegrees),
+        m_aspectRatio,
+        m_nearPlane,
+        m_farPlane
+    );
+}
+
 glm::mat4 Camera::GetViewMatrix() const
 {
     const Transform& transform = GetTransform();

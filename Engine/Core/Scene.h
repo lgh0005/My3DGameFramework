@@ -24,7 +24,7 @@ public:
 	void AddRenderPass(const std::string& name, RenderPassUPtr renderPass);
 	void RegisterComponent(Component* component);
 
-	// void OnScreenResize(int32 width, int32 height);
+	void OnScreenResize(int32 width, int32 height);
 
 	// TODO : 
 	// ID를 바탕으로 오브젝트를 찾을 수 있는 방안을 마련해야함.

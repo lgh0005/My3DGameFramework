@@ -57,7 +57,7 @@ void PostProcessingRenderPass::Render(Scene* scene, Camera* camera)
 
 	m_blurProgram->Use();
 	glDisable(GL_DEPTH_TEST);
-
+	glViewport(0, 0, m_frameBuffer->GetWidth(), m_frameBuffer->GetHeight());
 	for (uint32 i = 0; i < amount; i++)
 	{
 		m_pingPongFBOs[horizontal]->Bind();
@@ -83,7 +83,7 @@ void PostProcessingRenderPass::Render(Scene* scene, Camera* camera)
 	auto finalBloomTexture = m_pingPongFBOs[!horizontal]->GetColorAttachment(0);
 
 	Framebuffer::BindToDefault();
-	glViewport(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
+	glViewport(0, 0, m_frameBuffer->GetWidth(), m_frameBuffer->GetHeight());
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -93,8 +93,15 @@ void PostProcessingRenderPass::Render(Scene* scene, Camera* camera)
 	m_program->SetUniform("bloom", true);
 
 	// DEBUG : FXAA
-	m_program->SetUniform("inverseScreenSize",
-		glm::vec2(1.0f / (float)WINDOW_WIDTH, 1.0f / (float)WINDOW_HEIGHT));
+	m_program->SetUniform
+	(
+		"inverseScreenSize",
+		glm::vec2
+		(
+			1.0f / (float)m_frameBuffer->GetWidth(),
+			1.0f / (float)m_frameBuffer->GetHeight()
+		)
+	);
 
 
 	glActiveTexture(GL_TEXTURE0);

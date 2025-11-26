@@ -32,5 +32,5 @@ private:
     );
 
     ProgramUPtr		m_blurProgram;
-    FramebufferUPtr m_pingPongFBOs[2];
+    // FramebufferUPtr m_pingPongFBOs[2];
 };

@@ -68,8 +68,15 @@ void Scene::RegisterComponent(Component* component)
 	}
 }
 
-//void Scene::OnScreenResize(int32 width, int32 height)
-//{
+void Scene::OnScreenResize(int32 width, int32 height)
+{
+	auto* camera = GetMainCamera();
+	if (camera) camera->SetAspectRatio((float)width / (float)height);
+
+	if (m_geometryPass) m_geometryPass->Resize(width, height);
+	if (m_postProcessPass) m_postProcessPass->Resize(width, height);
+
+
 //	// 1. 카메라 프로젝션 업데이트 (WindowManager에 있던 로직 이동)
 //	// TODO : 카메라의 fov, near, far는 기존 자신의 것을 유지시켜야 함
 //	if (m_mainCamera)
@@ -88,7 +95,7 @@ void Scene::RegisterComponent(Component* component)
 //	{
 //		pass->Resize(width, height);
 //	}
-//}
+}
 
 bool Scene::Init()
 {

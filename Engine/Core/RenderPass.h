@@ -27,6 +27,11 @@ protected:
 	std::vector<MeshRenderer*> m_renderers;
 };
 
+// TODO : 지금은 추상 클래스로 따로 두고 있지만 이들은 
+// 동작 자체를 확정지은 렌더 패스로 만들어도 무방. 이후 아얘 확정된
+// 동작을 하는 클래스로 아얘 만들어 둘지 고려 필요.
+// 다만, 커스텀 렌더 패스들에 대한(Forward-Shading) 것들을 보장해줄
+// 필요가 있음.
 #pragma region ESSENTIAL_RENDER_PASSES
 CLASS_PTR(ShadowPass)
 class ShadowPass : public RenderPass
@@ -36,6 +41,9 @@ public:
 	virtual void CalculateLightSpaceMatrix(Scene* scene) = 0;
 	TexturePtr GetDepthMap() const;
 	glm::mat4 GetLightSpaceMatrix() const;
+
+	// TEMP : 윈도우 리사이즈 대응 테스트
+	virtual void Resize(int32 width, int32 height) { }
 
 protected:
 	glm::mat4     m_lightSpaceMatrix;
@@ -62,9 +70,13 @@ public:
 	void BeginDraw();
 	Framebuffer* GetFramebuffer() const { return m_frameBuffer.get(); }
 
+	// TEMP : 윈도우 리사이즈 대응 테스트
+	void Resize(int32 width, int32 height);
+
 protected:
 	MeshPtr			m_plane;
 	FramebufferUPtr m_frameBuffer;
+	FramebufferUPtr m_pingPongFBOs[2];
 	float m_gamma	  { 2.2f };
 	float m_exposure  { 1.0f };
 };
@@ -77,6 +89,9 @@ public:
 	Framebuffer* GetGBuffer();
 	void AddSkinnedMeshRenderer(MeshRenderer* skinnedMeshRenderer);
 	const std::vector<MeshRenderer*>& GetSkinnedMeshRenderers() const;
+
+	// TEMP : 윈도우 리사이즈 대응 테스트
+	void Resize(int32 width, int32 height);
 
 protected:
 	FramebufferUPtr m_gBuffer;

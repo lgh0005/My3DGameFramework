@@ -67,6 +67,21 @@ void PostProcessPass::BeginDraw()
 	glCullFace(GL_BACK);
 }
 
+// TEMP : 윈도우 리사이즈 대응 테스트
+void PostProcessPass::Resize(int32 width, int32 height)
+{
+	m_frameBuffer = Framebuffer::Create(width, height, 1);
+	m_pingPongFBOs[0] = Framebuffer::Create(width, height, 1);
+	m_pingPongFBOs[1] = Framebuffer::Create(width, height, 1);
+
+	if (m_program)
+	{
+		m_program->Use();
+		m_program->SetUniform("inverseScreenSize",
+			glm::vec2(1.0f / (float)width, 1.0f / (float)height));
+	}
+}
+
 /*=========================//
 //   GeometryPass methods  //
 //=========================*/
@@ -85,6 +100,12 @@ const std::vector<MeshRenderer*>& GeometryPass::GetSkinnedMeshRenderers() const
 Framebuffer* GeometryPass::GetGBuffer()
 {
 	return m_gBuffer.get();
+}
+
+// TEMP : 윈도우 리사이즈 대응 테스트
+void GeometryPass::Resize(int32 width, int32 height)
+{
+	m_gBuffer = Framebuffer::CreateGBuffer(width, height);
 }
 
 /*=================================//
