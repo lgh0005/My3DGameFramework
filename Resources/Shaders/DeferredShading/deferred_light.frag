@@ -13,8 +13,13 @@ uniform sampler2D gAlbedoSpec;
 uniform sampler2D gEmission;
 
 // [Shadow]
+// TEMP : UBO 테스트 중
+// uniform mat4 lightSpaceMatrix;
+layout (std140, binding = 2) uniform ShadowData
+{
+    mat4 lightSpaceMatrix; 
+};
 uniform sampler2D shadowMap;
-uniform mat4 lightSpaceMatrix;
 uniform vec3 viewPos;
 
 // [Light]

@@ -81,9 +81,9 @@ bool Framebuffer::Init(int32 width, int32 height, int32 samples)
     m_height = height;
     m_samples = samples;
 
-    // ==========================================
-    // 분기점: 샘플 수가 1 이하면 "일반 텍스처 FBO" 생성
-    // ==========================================
+    /*========================================//
+    //   샘플 수 1 이하 :  일반 텍스처 FBO 생성 //
+    //========================================*/
     if (m_samples <= 1)
     {
         // 1. 일반 FBO 생성 (Resolve FBO 변수 재활용)
@@ -96,7 +96,7 @@ bool Framebuffer::Init(int32 width, int32 height, int32 samples)
 
         for (int i = 0; i < attachmentCount; ++i)
         {
-            // [중요 수정] GL_RGBA16F 사용! (HDR 유지를 위해 필수)
+            // HDR 유지를 위해 GL_RGBA16F 사용
             auto texture = Texture::Create(width, height, GL_RGBA16F, GL_RGBA, GL_FLOAT);
 
             // 필터링은 FXAA 등을 위해 선형(Linear)이 좋을 수 있으나,
@@ -125,13 +125,13 @@ bool Framebuffer::Init(int32 width, int32 height, int32 samples)
             return false;
         }
 
-        // m_msaaFbo는 사용 안 함 (0으로 초기화 추천)
+        // m_msaaFbo는 사용 안 함 : 0으로 초기화
         m_msaaFbo = 0;
     }
-    // ==========================================
-    // 샘플 수가 1보다 크면 기존 로직 (MSAA) 수행
-    // (혹시 나중에 쓸 수도 있으니 남겨둠)
-    // ==========================================
+
+    /*================================//
+    //   샘플 수 2 이상 :  MSAA 수행   //
+    //================================*/
     else
     {
         glGenFramebuffers(1, &m_msaaFbo);
@@ -165,7 +165,7 @@ bool Framebuffer::Init(int32 width, int32 height, int32 samples)
 
         for (int i = 0; i < attachmentCount; ++i)
         {
-            // [중요 수정] 여기도 MSAA 결과를 받을 때 GL_RGBA16F로 받아야 HDR이 유지됩니다.
+            // 여기도 MSAA 결과를 받을 때 GL_RGBA16F로 받아야 HDR이 유지됩니다.
             auto texture = Texture::Create(width, height, GL_RGBA16F, GL_RGBA, GL_FLOAT);
             glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i, GL_TEXTURE_2D, texture->Get(), 0);
             m_resolveTextures.push_back(std::move(texture));

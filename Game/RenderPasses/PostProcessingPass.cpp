@@ -91,8 +91,6 @@ void PostProcessingRenderPass::Render(Scene* scene, Camera* camera)
 	m_program->SetUniform("gamma", m_gamma);
 	m_program->SetUniform("exposure", m_exposure);
 	m_program->SetUniform("bloom", true);
-
-	// DEBUG : FXAA
 	m_program->SetUniform
 	(
 		"inverseScreenSize",
@@ -102,7 +100,6 @@ void PostProcessingRenderPass::Render(Scene* scene, Camera* camera)
 			1.0f / (float)m_frameBuffer->GetHeight()
 		)
 	);
-
 
 	glActiveTexture(GL_TEXTURE0);
 	sceneTexture->Bind();

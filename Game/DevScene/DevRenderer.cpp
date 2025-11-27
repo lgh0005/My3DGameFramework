@@ -33,6 +33,12 @@ DevRendererUPtr DevRenderer::Create(int32 width, int32 height)
 // 이 일련의 동작들을 하나의 클래스로 만들 예정.
 void DevRenderer::Render(Scene* scene)
 {
+    // TEMP : UBO 테스트 중
+    /*==============//
+    //   test ubo   //
+    //==============*/
+    scene->PreRender();
+
 	/*====================================//
 	//   get essential scene properties   //
 	//====================================*/

@@ -2,30 +2,24 @@
 #include "Scene.h"
 
 #include "Core/GameObject.h"
+#include "Graphics/UniformBuffer.h"
 #include "Components/Component.h"
 #include "Components/Light.h"
 #include "Components/MeshRenderer.h"
 #include "Components/Camera.h"
 #include "Components/Animator.h"
 #include "Components/Script.h"
+#include "Components/Transform.h"
 
+Scene::Scene() = default;
 Scene::~Scene() = default;
 
 void Scene::AddGameObject(GameObjectUPtr gameObject)
 {
 	auto* go = gameObject.get();
-
-	// 1. Scene 설정
-	// go->SetScene(this);
-
-	// 2. 빠른 검색을 위해 ID 맵에 등록
-	// m_gameObjectMap[go->GetID()] = go;
-
-	// 3. 컴포넌트 등록
 	for (const auto& comp : go->GetAllComponents())
 		RegisterComponent(comp.get());
 
-	// 4. 소유권 이전 (Scene이 GameObject의 수명 관리)
 	m_gameObjects.push_back(std::move(gameObject));
 }
 
@@ -68,6 +62,26 @@ void Scene::RegisterComponent(Component* component)
 	}
 }
 
+void Scene::PreRender()
+{
+	// 1. 카메라 UBO 값 갱신
+	if (!m_mainCamera || !m_cameraUBO) return;
+
+	CameraData camData;
+	camData.view = m_mainCamera->GetViewMatrix();
+	camData.projection = m_mainCamera->GetProjectionMatrix();
+	camData.viewPos = m_mainCamera->GetTransform().GetPosition();
+	m_cameraUBO->SetData(&camData, sizeof(CameraData));
+
+	// TODO : 다른 UBO도 값 갱신 필요
+
+	// 3. 그림자 UBO 값 갱신
+	if (!m_shadowPass) return;
+	ShadowData shadowData;
+	shadowData.lightSpaceMatrix = m_shadowPass->GetLightSpaceMatrix();
+	m_shadowUBO->SetData(&shadowData, sizeof(ShadowData));
+}
+
 void Scene::OnScreenResize(int32 width, int32 height)
 {
 	auto* camera = GetMainCamera();
@@ -75,30 +89,18 @@ void Scene::OnScreenResize(int32 width, int32 height)
 
 	if (m_geometryPass) m_geometryPass->Resize(width, height);
 	if (m_postProcessPass) m_postProcessPass->Resize(width, height);
-
-
-//	// 1. 카메라 프로젝션 업데이트 (WindowManager에 있던 로직 이동)
-//	// TODO : 카메라의 fov, near, far는 기존 자신의 것을 유지시켜야 함
-//	if (m_mainCamera)
-//	{
-//		m_mainCamera->SetProjection
-//		(
-//			45.0f,
-//			(float)width / (float)height,
-//			0.01f, 100.0f
-//		);
-//	}
-//	if (m_geometryPass)      m_geometryPass->Resize(width, height);
-//	if (m_postProcessPass)   m_postProcessPass->Resize(width, height);
-//
-//	for (auto& [name, pass] : m_renderPasses)
-//	{
-//		pass->Resize(width, height);
-//	}
 }
 
 bool Scene::Init()
 {
+	// TODO : UBO 테스트 중. 이후에 SRP로 같이 넘어가야 함.
+	auto result = CreateRenderUBOs();
+	if (result != 0)
+	{
+		SPDLOG_ERROR("failed to create render ubo. {}", result);
+		return false;
+	}
+
 	if (!LoadNessesaryResources())
 	{
 		SPDLOG_ERROR("failed to load resources.");
@@ -118,6 +120,21 @@ bool Scene::Init()
 	}
 
 	return true;
+}
+
+// TEMP : UBO 테스트 중
+int32 Scene::CreateRenderUBOs()
+{
+	m_cameraUBO = Uniformbuffer::Create(sizeof(CameraData), UBO_POINT_CAMERA);
+	if (!m_cameraUBO) return 1;
+
+	m_lightUBO = Uniformbuffer::Create(sizeof(LightData), UBO_POINT_LIGHT);
+	if (!m_lightUBO) return 2;
+
+	m_shadowUBO = Uniformbuffer::Create(sizeof(ShadowData), UBO_POINT_SHADOW);
+	if (!m_shadowUBO) return 3;
+
+	return 0;
 }
 
 void Scene::Start()

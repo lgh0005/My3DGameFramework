@@ -64,9 +64,6 @@ void DeferredLightPass::Render(Scene* scene, Camera* camera)
 	}
 
 	m_program->Use();
-	/*auto geometryPass = scene->GetGeometryPass();
-	if (!geometryPass) return;
-	auto gBuffer = geometryPass->GetGBuffer();*/
 
 	// Slot 0: Position
 	glActiveTexture(GL_TEXTURE0);
@@ -96,7 +93,7 @@ void DeferredLightPass::Render(Scene* scene, Camera* camera)
 		glActiveTexture(GL_TEXTURE4);
 		shadowPass->GetDepthMap()->Bind();
 		m_program->SetUniform("shadowMap", 4);
-		m_program->SetUniform("lightSpaceMatrix", shadowPass->GetLightSpaceMatrix());
+		// m_program->SetUniform("lightSpaceMatrix", shadowPass->GetLightSpaceMatrix());
 	}
 
 	// 4. 조명(Light) 및 카메라 정보 전송

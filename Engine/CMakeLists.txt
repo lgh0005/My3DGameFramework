@@ -19,10 +19,6 @@ add_library(Engine STATIC
    "Core/Renderer.h"                "Core/Renderer.cpp"
    "Core/RenderPass.h"              "Core/RenderPass.cpp"
 
-                 
-       
-
-
    # Misc
    "Misc/Defines.h"
    "Misc/Types.h"
@@ -48,6 +44,8 @@ add_library(Engine STATIC
    "Graphics/FrameBuffer.h"         "Graphics/FrameBuffer.cpp"
    "Graphics/CubeTexture.h"         "Graphics/CubeTexture.cpp"
    "Graphics/ShadowMap.h"           "Graphics/ShadowMap.cpp"
+   "Graphics/UniformBuffer.h"       "Graphics/UniformBuffer.cpp"
+   "Graphics/Uniform.h"             "Graphics/Uniform.cpp"
 
    # Components
    "Components/Component.h"         "Components/Component.cpp"
@@ -68,7 +66,7 @@ add_library(Engine STATIC
    "Managers/InputManager.h"        "Managers/InputManager.cpp"           
    "Managers/ResourceManager.h"     "Managers/ResourceManager.cpp"
    "Managers/SceneManager.h"        "Managers/SceneManager.cpp"
- 
+
 )
 
 # 2. [PCH 설정] EnginePCH.h를 PCH로 사용합니다.

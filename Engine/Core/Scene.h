@@ -1,5 +1,6 @@
 #pragma once
 #include "Core/RenderPass.h"
+#include "Graphics/Uniform.h"
 
 #pragma region FORWARD_DECLARATION
 CLASS_PTR(GameObject)
@@ -9,6 +10,7 @@ CLASS_PTR(Light)
 CLASS_PTR(Camera)
 CLASS_PTR(Animator)
 CLASS_PTR(Script)
+CLASS_PTR(Uniformbuffer)
 #pragma endregion
 
 CLASS_PTR(Scene)
@@ -23,6 +25,7 @@ public:
 	void AddGameObject(GameObjectUPtr gameObject);
 	void AddRenderPass(const std::string& name, RenderPassUPtr renderPass);
 	void RegisterComponent(Component* component);
+	void PreRender();
 
 	void OnScreenResize(int32 width, int32 height);
 
@@ -59,7 +62,7 @@ public:
 	void SetMainLight(Light* light) { m_mainLight = light; }
 
 protected:
-	Scene() = default;
+	Scene();
 
 	// 씬의 컨텍스트를 작성하는 가상 함수들
 	virtual bool LoadNessesaryResources()	   = 0;
@@ -86,10 +89,16 @@ protected:
 	std::vector<Script*>        m_scripts;
 
 	// 렌더링 멤버들 : 일반 렌더링과 고정적으로 필요한 렌더링
+	// TODO : 이들을 한데 묶어 SRP로 둘 예정
 	std::unordered_map<std::string, RenderPassUPtr> m_renderPasses;
 	ShadowPassUPtr				m_shadowPass		{ nullptr };
 	SkyboxPassUPtr				m_skyboxPass		{ nullptr };
 	PostProcessPassUPtr			m_postProcessPass	{ nullptr };
 	GeometryPassUPtr			m_geometryPass	    { nullptr };
 	DeferredLightingPassUPtr    m_deferredLightPass { nullptr };
+
+	UniformbufferUPtr m_cameraUBO;
+	UniformbufferUPtr m_lightUBO;
+	UniformbufferUPtr m_shadowUBO;
+	int32 CreateRenderUBOs(); // TEMP : UBO 테스트 중
 };

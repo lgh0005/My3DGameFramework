@@ -8,7 +8,13 @@ const int MAX_BONES = 100; // C++ 코드와 맞춰야 함
 const int MAX_BONE_INFLUENCE = 4;
 
 // 유니폼 변수
-uniform mat4 lightSpaceMatrix;
+// TEMP : UBO 테스트 중
+// uniform mat4 lightSpaceMatrix;
+layout (std140, binding = 2) uniform ShadowData
+{
+    mat4 lightSpaceMatrix; 
+};
+
 uniform mat4 model;
 uniform mat4 finalBoneMatrices[MAX_BONES]; // 애니메이션 행렬 배열
 

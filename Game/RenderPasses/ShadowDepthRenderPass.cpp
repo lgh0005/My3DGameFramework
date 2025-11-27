@@ -60,7 +60,7 @@ void ShadowDepthRenderPass::Render(Scene* scene, Camera* camera)
 	if (m_staticDepthProgram)
 	{
 		m_staticDepthProgram->Use();
-		m_staticDepthProgram->SetUniform("lightSpaceMatrix", m_lightSpaceMatrix);
+		// m_staticDepthProgram->SetUniform("lightSpaceMatrix", m_lightSpaceMatrix);
 
 		// Scene에서 랜더 패스 'Static'에서 렌더러들을 가져옴
 		const auto& staticRenderers = scene->GetGeometryPass()->GetRenderers();
@@ -75,7 +75,7 @@ void ShadowDepthRenderPass::Render(Scene* scene, Camera* camera)
 	if (m_skinnedDepthProgram)
 	{
 		m_skinnedDepthProgram->Use();
-		m_skinnedDepthProgram->SetUniform("lightSpaceMatrix", m_lightSpaceMatrix);
+		// m_skinnedDepthProgram->SetUniform("lightSpaceMatrix", m_lightSpaceMatrix);
 
 		// Scene에서 랜더 패스 'Skinned'에서 렌더러들을 가져옴
 		const auto& skinnedRenderers = scene->GetGeometryPass()->GetSkinnedMeshRenderers();
