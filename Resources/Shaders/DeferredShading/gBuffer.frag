@@ -10,14 +10,12 @@ in vec2 TexCoords;
 in vec3 Normal;
 in mat3 TBN;
 
-// TEMP : UBO 테스트 중
 layout (std140, binding = 0) uniform CameraData
 {
     mat4 view;
     mat4 projection;
     vec3 viewPos;
 };
-// uniform vec3 viewPos;
 
 struct Material {
     sampler2D diffuse;

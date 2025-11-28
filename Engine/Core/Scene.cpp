@@ -5,6 +5,9 @@
 #include "Graphics/UniformBuffer.h"
 #include "Components/Component.h"
 #include "Components/Light.h"
+#include "Components/PointLight.h"
+#include "Components/SpotLight.h"
+#include "Components/DirectionalLight.h"
 #include "Components/MeshRenderer.h"
 #include "Components/Camera.h"
 #include "Components/Animator.h"
@@ -64,22 +67,86 @@ void Scene::RegisterComponent(Component* component)
 
 void Scene::PreRender()
 {
-	// 1. 카메라 UBO 값 갱신
-	if (!m_mainCamera || !m_cameraUBO) return;
+	// TODO : 이후 이 로직은 SRP로 이전될 예정
+	// 각각의 조명에 대해서 그림자 영향을 줄지 말지를 결정할 수 있겠지만,
+	// 당장은 그렇게 하진 않고 메인 조명인 Directional Light의 그림자
+	// 영향을 받도록 구성, 나머지 조명은 그림자가 없는 걸 전제로 구현.
 
-	CameraData camData;
-	camData.view = m_mainCamera->GetViewMatrix();
-	camData.projection = m_mainCamera->GetProjectionMatrix();
-	camData.viewPos = m_mainCamera->GetTransform().GetPosition();
-	m_cameraUBO->SetData(&camData, sizeof(CameraData));
+	// 1. 카메라 UBO
+	if (m_mainCamera && m_cameraUBO)
+	{
+		CameraData camData;
+		camData.view = m_mainCamera->GetViewMatrix();
+		camData.projection = m_mainCamera->GetProjectionMatrix();
+		camData.viewPos = m_mainCamera->GetTransform().GetPosition();
+		m_cameraUBO->SetData(&camData, sizeof(CameraData));
+	}
 
-	// TODO : 다른 UBO도 값 갱신 필요
+	// 2. 조명 UBO
+	if (m_mainLight && m_lightUBO)
+	{
+		LightData lightData = {};
+		lightData.viewPos = m_mainCamera->GetTransform().GetPosition();
+		int32 lightCount = 0;
 
-	// 3. 그림자 UBO 값 갱신
-	if (!m_shadowPass) return;
-	ShadowData shadowData;
-	shadowData.lightSpaceMatrix = m_shadowPass->GetLightSpaceMatrix();
-	m_shadowUBO->SetData(&shadowData, sizeof(ShadowData));
+		// TODO : m_mainLight에 대한 조명 속성을 넣어줘야 함
+
+		for (auto* light : m_lights)
+		{
+			if (lightCount >= MAX_LIGHTS) break;
+
+			auto& info = lightData.lights[lightCount];
+			auto& transform = light->GetTransform();
+
+			// [공통 속성]
+			info.position = transform.GetPosition();
+			info.direction = transform.GetForwardVector();
+			info.ambient = light->GetAmbient();
+			info.diffuse = light->GetDiffuse();
+			info.specular = light->GetSpecular();
+
+			// [타입별 속성]
+			switch (light->GetLightType())
+			{
+				case LightType::Directional:
+				{
+					info.type = 0;
+					info.attenuation = glm::vec3(1.0f, 0.0f, 0.0f);
+					info.cutoff = glm::vec2(0.0f, 0.0f);
+					info.shadowMapIndex = 0;
+					break;
+				}
+				
+				case LightType::Point:
+				{
+					info.type = 1;
+					auto point = static_cast<PointLight*>(light);
+					info.attenuation = point->GetAttenuation();
+					info.cutoff = glm::vec2(0.0f, 0.0f);
+					info.shadowMapIndex = -1;
+					break;
+				}
+
+				case LightType::Spot:
+				{
+					info.type = 2;
+					auto spot = static_cast<SpotLight*>(light);
+					glm::vec2 cutoff = spot->GetCutoff();
+					info.attenuation = spot->GetAttenuation();
+					info.cutoff.x = cosf(glm::radians(cutoff[0]));
+					info.cutoff.y = cosf(glm::radians(cutoff[0] + cutoff[1]));
+					info.shadowMapIndex = -1;
+					break;
+				}
+			}
+
+			// info.shadowMapIndex = -1;
+			lightCount++;
+		}
+
+		lightData.lightCount = lightCount;
+		m_lightUBO->SetData(&lightData, sizeof(LightData));
+	}
 }
 
 void Scene::OnScreenResize(int32 width, int32 height)
@@ -130,9 +197,6 @@ int32 Scene::CreateRenderUBOs()
 
 	m_lightUBO = Uniformbuffer::Create(sizeof(LightData), UBO_POINT_LIGHT);
 	if (!m_lightUBO) return 2;
-
-	m_shadowUBO = Uniformbuffer::Create(sizeof(ShadowData), UBO_POINT_SHADOW);
-	if (!m_shadowUBO) return 3;
 
 	return 0;
 }

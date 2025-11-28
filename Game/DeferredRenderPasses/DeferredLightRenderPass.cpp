@@ -85,7 +85,7 @@ void DeferredLightPass::Render(Scene* scene, Camera* camera)
 	gBuffer->GetColorAttachment(3)->Bind();
 	m_program->SetUniform("gEmission", 3);
 
-	// 2. Shadow Map 가져오기 & 바인딩
+	//// 2. Shadow Map 가져오기 & 바인딩
 	auto shadowPass = scene->GetShadowPass();
 	if (shadowPass)
 	{
@@ -93,38 +93,38 @@ void DeferredLightPass::Render(Scene* scene, Camera* camera)
 		glActiveTexture(GL_TEXTURE4);
 		shadowPass->GetDepthMap()->Bind();
 		m_program->SetUniform("shadowMap", 4);
-		// m_program->SetUniform("lightSpaceMatrix", shadowPass->GetLightSpaceMatrix());
+		m_program->SetUniform("lightSpaceMatrix", shadowPass->GetLightSpaceMatrix());
 	}
 
-	// 4. 조명(Light) 및 카메라 정보 전송
-	// 메인 라이트 하나만 처리한다고 가정 (여러 개면 반복문이나 UBO 사용)
-	// TODO : 본격적으로 Scene에 있는 조명 컴포넌트 벡터들을 통해서 조명 연산들을
-	// 누적시킬 필요가 있음.
-	Light* mainLight = scene->GetMainLight();
-	if (mainLight)
-	{
-		auto lightTransform = mainLight->GetTransform();
-		m_program->SetUniform("light.position", lightTransform.GetPosition());
-		m_program->SetUniform("light.direction", lightTransform.GetForwardVector()); // Spot/Dir Light용
-		m_program->SetUniform("light.ambient", mainLight->GetAmbient());
-		m_program->SetUniform("light.diffuse", mainLight->GetDiffuse());
-		m_program->SetUniform("light.specular", mainLight->GetSpecular());
+	//// 4. 조명(Light) 및 카메라 정보 전송
+	//// 메인 라이트 하나만 처리한다고 가정 (여러 개면 반복문이나 UBO 사용)
+	//// TODO : 본격적으로 Scene에 있는 조명 컴포넌트 벡터들을 통해서 조명 연산들을
+	//// 누적시킬 필요가 있음.
+	//Light* mainLight = scene->GetMainLight();
+	//if (mainLight)
+	//{
+	//	auto lightTransform = mainLight->GetTransform();
+	//	m_program->SetUniform("light.position", lightTransform.GetPosition());
+	//	m_program->SetUniform("light.direction", lightTransform.GetForwardVector()); // Spot/Dir Light용
+	//	m_program->SetUniform("light.ambient", mainLight->GetAmbient());
+	//	m_program->SetUniform("light.diffuse", mainLight->GetDiffuse());
+	//	m_program->SetUniform("light.specular", mainLight->GetSpecular());
 
-		// Attenuation, Cutoff 등 추가 속성 전송
-		// (SpotLight로 캐스팅해서 가져와야 할 수 있음)
-		if (mainLight->GetLightType() == LightType::Spot) // 예시
-		{
-			// TODO : 일부 조명 컴포넌트에 GetAttenuation 메서드를 래핑할 필요 있음
-			auto spot = static_cast<SpotLight*>(mainLight);
+	//	// Attenuation, Cutoff 등 추가 속성 전송
+	//	// (SpotLight로 캐스팅해서 가져와야 할 수 있음)
+	//	if (mainLight->GetLightType() == LightType::Spot) // 예시
+	//	{
+	//		// TODO : 일부 조명 컴포넌트에 GetAttenuation 메서드를 래핑할 필요 있음
+	//		auto spot = static_cast<SpotLight*>(mainLight);
 
-			glm::vec2 cutoff = spot->GetCutoff();
-			cutoff = glm::vec2(cosf(glm::radians(cutoff[0])), cosf(glm::radians(cutoff[0] + cutoff[1])));
-			m_program->SetUniform("light.cutoff", cutoff);
-			m_program->SetUniform("light.attenuation", Utils::GetAttenuationCoeff(spot->GetDistance()));
-		}
-	}
+	//		glm::vec2 cutoff = spot->GetCutoff();
+	//		cutoff = glm::vec2(cosf(glm::radians(cutoff[0])), cosf(glm::radians(cutoff[0] + cutoff[1])));
+	//		m_program->SetUniform("light.cutoff", cutoff);
+	//		m_program->SetUniform("light.attenuation", Utils::GetAttenuationCoeff(spot->GetDistance()));
+	//	}
+	//}
+	//m_program->SetUniform("viewPos", camera->GetTransform().GetPosition());
 
-	m_program->SetUniform("viewPos", camera->GetTransform().GetPosition());
 	m_plane->Draw(m_program.get());
 	glEnable(GL_DEPTH_TEST);
 }

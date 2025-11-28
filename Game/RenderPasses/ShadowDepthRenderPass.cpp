@@ -60,7 +60,7 @@ void ShadowDepthRenderPass::Render(Scene* scene, Camera* camera)
 	if (m_staticDepthProgram)
 	{
 		m_staticDepthProgram->Use();
-		// m_staticDepthProgram->SetUniform("lightSpaceMatrix", m_lightSpaceMatrix);
+		m_staticDepthProgram->SetUniform("lightSpaceMatrix", m_lightSpaceMatrix);
 
 		// Scene에서 랜더 패스 'Static'에서 렌더러들을 가져옴
 		const auto& staticRenderers = scene->GetGeometryPass()->GetRenderers();
@@ -75,7 +75,7 @@ void ShadowDepthRenderPass::Render(Scene* scene, Camera* camera)
 	if (m_skinnedDepthProgram)
 	{
 		m_skinnedDepthProgram->Use();
-		// m_skinnedDepthProgram->SetUniform("lightSpaceMatrix", m_lightSpaceMatrix);
+		m_skinnedDepthProgram->SetUniform("lightSpaceMatrix", m_lightSpaceMatrix);
 
 		// Scene에서 랜더 패스 'Skinned'에서 렌더러들을 가져옴
 		const auto& skinnedRenderers = scene->GetGeometryPass()->GetSkinnedMeshRenderers();
@@ -103,19 +103,85 @@ void ShadowDepthRenderPass::Render(Scene* scene, Camera* camera)
 
 void ShadowDepthRenderPass::CalculateLightSpaceMatrix(Scene* scene)
 {
-	// 1. 메인 조명 하나를 가져온다.
-	SpotLight* mainLight = static_cast<SpotLight*>(scene->GetMainLight());
+	//// 1. 메인 조명 하나를 가져온다.
+	//SpotLight* mainLight = static_cast<SpotLight*>(scene->GetMainLight());
+	//if (!mainLight) return;
+
+	//// 2. 조명 시점의 View/Projection 행렬 계산 (Light Space Matrix)
+	//auto& lightTransform = mainLight->GetTransform();
+	//glm::vec3 lightPos = lightTransform.GetPosition();
+	//glm::vec3 lightDir = lightTransform.GetForwardVector();
+
+	//// 3. 조명을 기준으로하는 투영 행렬을 계산
+	//glm::vec2 cutoff = mainLight->GetCutoff();
+	//glm::vec3 up	 = glm::vec3(0.0f, 1.0f, 0.0f);
+	//glm::mat4 lightView = glm::lookAt(lightPos, lightPos + lightDir, up);
+	//glm::mat4 lightProj = glm::perspective(glm::radians((cutoff[0] + cutoff[1]) * 2.0f), 1.0f, 1.0f, 100.0f);
+	//m_lightSpaceMatrix = lightProj * lightView;
+
+	// 1. 메인 조명 가져오기 (Light* 기본 클래스로 받음)
+	Light* mainLight = scene->GetMainLight();
 	if (!mainLight) return;
 
-	// 2. 조명 시점의 View/Projection 행렬 계산 (Light Space Matrix)
-	auto& lightTransform = mainLight->GetTransform();
-	glm::vec3 lightPos = lightTransform.GetPosition();
-	glm::vec3 lightDir = lightTransform.GetForwardVector();
+	auto& transform = mainLight->GetTransform();
+	glm::vec3 pos = transform.GetPosition();
+	glm::vec3 dir = transform.GetForwardVector();
+	glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f);
 
-	// 3. 조명을 기준으로하는 투영 행렬을 계산
-	glm::vec2 cutoff = mainLight->GetCutoff();
-	glm::vec3 up	 = glm::vec3(0.0f, 1.0f, 0.0f);
-	glm::mat4 lightView = glm::lookAt(lightPos, lightPos + lightDir, up);
-	glm::mat4 lightProj = glm::perspective(glm::radians((cutoff[0] + cutoff[1]) * 2.0f), 1.0f, 1.0f, 100.0f);
-	m_lightSpaceMatrix = lightProj * lightView;
+	glm::mat4 lightProjection;
+	glm::mat4 lightView = glm::lookAt(pos, pos + dir, up);
+
+	float size = 20.0f;
+	float nearPlane = 0.1f;
+	float farPlane = 1000.0f;
+	switch (mainLight->GetLightType())
+	{
+	case LightType::Directional:
+		lightProjection = glm::ortho(-size, size, -size, size, nearPlane, farPlane);
+		break;
+
+	case LightType::Spot:
+		glm::vec2 cutoff = static_cast<SpotLight*>(mainLight)->GetCutoff();
+		lightProjection = glm::perspective(glm::radians((cutoff[0] + cutoff[1]) * 2.0f), 1.0f, 1.0f, 100.0f);
+		break;
+
+	}
+
+	//// 2. 타입에 따른 분기
+	//if (mainLight->GetLightType() == LightType::Directional)
+	//{
+	//	// [Directional Light] -> 직교 투영 (Ortho)
+	//	// 태양 그림자는 "박스" 안에 있는 것만 그립니다.
+	//	// size가 너무 작으면 그림자가 잘리고, 너무 크면 해상도가 떨어집니다. (일단 20~50 정도 추천)
+	//	float size = 20.0f;
+	//	float nearPlane = 0.1f;
+	//	float farPlane = 100.0f;
+
+	//	// (좌, 우, 하, 상, 근, 원)
+	//	lightProjection = glm::ortho(-size, size, -size, size, nearPlane, farPlane);
+
+	//	// View 행렬: 조명 위치에서 바라보는 방향
+	//	// Directional은 위치가 상관없지만, 쉐도우 맵을 찍으려면 
+	//	// 씬을 감싸는 적절한 위치(pos)에 조명 오브젝트가 있어야 합니다.
+	//	lightView = glm::lookAt(pos, pos + dir, up);
+	//}
+	//else if (mainLight->GetLightType() == LightType::Spot)
+	//{
+	//	// [Spot Light] -> 원근 투영 (Perspective)
+	//	// 기존 코드 유지 (안전하게 캐스팅)
+	//	auto spot = static_cast<SpotLight*>(mainLight);
+
+	//	glm::vec2 cutoff = spot->GetCutoff();
+	//	// FOV는 Outer Cutoff 각도의 2배
+	//	float fov = cutoff[1] * 2.0f;
+	//	float aspect = 1.0f; // 텍스처가 정사각형이므로
+	//	float nearPlane = 0.1f;
+	//	float farPlane = spot->GetDistance(); // 조명 사거리만큼
+
+	//	lightProjection = glm::perspective(glm::radians(fov), aspect, nearPlane, farPlane);
+	//	lightView = glm::lookAt(pos, pos + dir, up);
+	//}
+
+	// 3. 결과 저장
+	m_lightSpaceMatrix = lightProjection * lightView;
 }

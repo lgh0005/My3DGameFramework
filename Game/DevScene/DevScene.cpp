@@ -18,7 +18,11 @@
 #include "Components/Camera.h"
 #include "Components/Transform.h"
 #include "Components/MeshRenderer.h"
+
 #include "Components/SpotLight.h"
+#include "Components/DirectionalLight.h"
+#include "Components/PointLight.h"
+
 #include "Components/Animator.h"
 
 #include "RenderPasses/StaticRenderPass.h"
@@ -261,24 +265,6 @@ bool DevScene::LoadNessesaryResources()
 
 bool DevScene::CreateNessesaryRenderPasses()
 {
-	// 1. StaticMesh 셰이더 (조명 O)
-	{
-		/*auto prog = Program::Create(
-			"./Resources/Shaders/Default/forward_standard_static.vert",
-			"./Resources/Shaders/Default/forward_standard_static.frag");
-		if (!prog) return false;
-		AddRenderPass("Static", StaticRenderPass::Create(std::move(prog)));*/
-	}
-
-	// 2. SkinnedMesh 셰이더 (조명 O)
-	{
-		/*auto prog = Program::Create(
-			"./Resources/Shaders/Default/forward_standard_skinned.vert",
-			"./Resources/Shaders/Default/forward_standard_skinned.frag");
-		if (!prog) return false;
-		AddRenderPass("Skinned", SkinningRenderPass::Create(std::move(prog)));*/
-	}
-
 	// 3. Instanced 셰이더 (잔디)
 	{
 		auto prog = Program::Create(
@@ -390,7 +376,7 @@ bool DevScene::CreateNessesaryRenderPasses()
 		auto progLight = Program::Create
 		(
 			"./Resources/Shaders/DeferredShading/deferred_light.vert",
-			"./Resources/Shaders/DeferredShading/deferred_light.frag"
+			"./Resources/Shaders/DeferredShading/deferred_light_ubo.frag"
 		);
 
 		auto light = DeferredLightPass::Create
@@ -431,7 +417,7 @@ bool DevScene::CreateSceneContext()
 		AddGameObject(std::move(cameraObj));
 	}
 
-	// 조명 큐브
+	// 조명 큐브 #2
 	{
 		auto lightGo = GameObject::Create();
 		lightGo->SetName("SpotLight");
@@ -442,6 +428,36 @@ bool DevScene::CreateSceneContext()
 		lightGo->GetTransform().SetScale(glm::vec3(0.2f));
 		lightComp->SetCutoff(glm::vec2(60.0, 5.0f));
 		lightComp->SetDistance(128.0f);
+		lightGo->AddComponent(std::move(lightComp));
+		auto renderer = MeshRenderer::Create
+		(RESOURCE.GetResource<Mesh>("Cube"), RESOURCE.GetResource<Material>("LightMat"));
+		lightPass->AddRenderer(renderer.get());
+		lightGo->AddComponent(std::move(renderer));
+		AddGameObject(std::move(lightGo));
+	}
+
+	// 조명 큐브 #1
+	{
+		auto lightGo = GameObject::Create();
+		lightGo->SetName("DirectionalLight");
+		auto lightComp = DirectionalLight::Create();
+		lightGo->GetTransform().SetPosition(glm::vec3(-1.0f, 3.0f, 7.0f));
+		lightGo->GetTransform().SetScale(glm::vec3(0.2f));
+		lightGo->AddComponent(std::move(lightComp));
+		auto renderer = MeshRenderer::Create
+		(RESOURCE.GetResource<Mesh>("Cube"), RESOURCE.GetResource<Material>("LightMat"));
+		lightPass->AddRenderer(renderer.get());
+		lightGo->AddComponent(std::move(renderer));
+		AddGameObject(std::move(lightGo));
+	}
+
+	// 조명 큐브 #3
+	{
+		auto lightGo = GameObject::Create();
+		lightGo->SetName("PointLight");
+		auto lightComp = PointLight::Create();
+		lightGo->GetTransform().SetPosition(glm::vec3(5.0f, 3.0f, 7.0f));
+		lightGo->GetTransform().SetScale(glm::vec3(0.2f));
 		lightGo->AddComponent(std::move(lightComp));
 		auto renderer = MeshRenderer::Create
 		(RESOURCE.GetResource<Mesh>("Cube"), RESOURCE.GetResource<Material>("LightMat"));
@@ -574,46 +590,46 @@ bool DevScene::CreateSceneContext()
 
 	// 8. 풀떼기
 	{
-		int32 grassCount = 10000;
-		auto bladeMesh = std::static_pointer_cast<StaticMesh>
-			(RESOURCE.GetResource<Mesh>("grassBlade"));
-		auto grassMat = RESOURCE.GetResource<Material>("grassMat");
-		if (!bladeMesh || !grassMat) return false;
+		//int32 grassCount = 10000;
+		//auto bladeMesh = std::static_pointer_cast<StaticMesh>
+		//	(RESOURCE.GetResource<Mesh>("grassBlade"));
+		//auto grassMat = RESOURCE.GetResource<Material>("grassMat");
+		//if (!bladeMesh || !grassMat) return false;
 
-		std::vector<glm::vec3> instanceData;
-		instanceData.resize(grassCount);
-		srand((unsigned int)time(NULL));
-		for (int i = 0; i < grassCount; ++i)
-		{
-			float x = ((float)rand() / (float)RAND_MAX * 10.0f) - 5.0f; // -5 ~ +5 (바닥 크기)
-			float z = ((float)rand() / (float)RAND_MAX * 10.0f) - 5.0f; // -5 ~ +5
-			float y_rot = glm::radians((float)rand() / (float)RAND_MAX * 360.0f);
-			instanceData[i] = glm::vec3(x, y_rot, z);
-		}
+		//std::vector<glm::vec3> instanceData;
+		//instanceData.resize(grassCount);
+		//srand((unsigned int)time(NULL));
+		//for (int i = 0; i < grassCount; ++i)
+		//{
+		//	float x = ((float)rand() / (float)RAND_MAX * 10.0f) - 5.0f; // -5 ~ +5 (바닥 크기)
+		//	float z = ((float)rand() / (float)RAND_MAX * 10.0f) - 5.0f; // -5 ~ +5
+		//	float y_rot = glm::radians((float)rand() / (float)RAND_MAX * 360.0f);
+		//	instanceData[i] = glm::vec3(x, y_rot, z);
+		//}
 
-		BufferPtr instanceBuffer = Buffer::CreateWithData
-		(
-			GL_ARRAY_BUFFER, GL_STATIC_DRAW,
-			instanceData.data(), sizeof(glm::vec3), instanceData.size()
-		);
+		//BufferPtr instanceBuffer = Buffer::CreateWithData
+		//(
+		//	GL_ARRAY_BUFFER, GL_STATIC_DRAW,
+		//	instanceData.data(), sizeof(glm::vec3), instanceData.size()
+		//);
 
-		auto instancedGrass = InstancedMesh::Create
-		(
-			bladeMesh,
-			instanceBuffer,
-			grassCount,
-			InstancedMesh::Vec3Layout()
-		);
-		instancedGrass->SetMaterial(grassMat);
+		//auto instancedGrass = InstancedMesh::Create
+		//(
+		//	bladeMesh,
+		//	instanceBuffer,
+		//	grassCount,
+		//	InstancedMesh::Vec3Layout()
+		//);
+		//instancedGrass->SetMaterial(grassMat);
 
-		auto grassGo = GameObject::Create();
-		grassGo->SetName("Grass_Field");
-		grassGo->GetTransform().SetPosition(glm::vec3(0.0f, 0.5f, 0.0f));
+		//auto grassGo = GameObject::Create();
+		//grassGo->SetName("Grass_Field");
+		//grassGo->GetTransform().SetPosition(glm::vec3(0.0f, 0.5f, 0.0f));
 
-		auto renderer = MeshRenderer::Create(std::move(instancedGrass), grassMat);
-		grassPass->AddRenderer(renderer.get());
-		grassGo->AddComponent(std::move(renderer));
-		AddGameObject(std::move(grassGo));
+		//auto renderer = MeshRenderer::Create(std::move(instancedGrass), grassMat);
+		//grassPass->AddRenderer(renderer.get());
+		//grassGo->AddComponent(std::move(renderer));
+		//AddGameObject(std::move(grassGo));
 	}
 
 	return true;

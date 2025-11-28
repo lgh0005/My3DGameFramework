@@ -12,7 +12,6 @@ out vec2 TexCoords;
 out vec3 Normal;
 out mat3 TBN;
 
-// TEMP : UBO 테스트 중
 layout (std140, binding = 0) uniform CameraData
 {
     mat4 view;
@@ -21,8 +20,6 @@ layout (std140, binding = 0) uniform CameraData
 };
 
 uniform mat4 model;
-// uniform mat4 view;
-// uniform mat4 projection;
 
 const int MAX_BONES = 100;
 const int MAX_BONE_INFLUENCE = 4;

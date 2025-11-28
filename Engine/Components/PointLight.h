@@ -18,6 +18,8 @@ public:
 	virtual LightType GetLightType() const override { return LightType::Point; }
 
 	const float GetDistance() const { return m_distance; }
+	const glm::vec3 GetAttenuation() const      { return Utils::GetAttenuationCoeff(m_distance); }
+
 	void SetDistance(float distance)			{ m_distance = distance; }
 
 private:

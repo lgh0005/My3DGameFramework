@@ -20,6 +20,7 @@ public:
 	const glm::vec2 GetCutoff()				const { return m_cutoff; }
 	const float GetDistance()				const { return m_distance; }
 	const glm::vec3& GetDirection()			const { return m_direction; }
+	const glm::vec3 GetAttenuation()        const { return Utils::GetAttenuationCoeff(m_distance); }
 
 	void SetCutoff(const glm::vec2& cutoff)		  { m_cutoff = cutoff; }
 	void SetDistance(float distance)			  { m_distance = distance; }
