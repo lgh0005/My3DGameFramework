@@ -12,6 +12,7 @@ out vec2 TexCoords;
 out vec3 Normal;
 out mat3 TBN;
 
+// Ä«¸Þ¶ó UBO
 layout (std140, binding = 0) uniform CameraData
 {
     mat4 view;

@@ -5,6 +5,7 @@
 CLASS_PTR(Mesh)
 CLASS_PTR(Framebuffer)
 CLASS_PTR(ShadowMap)
+CLASS_PTR(Light)
 #pragma endregion
 
 CLASS_PTR(ShadowDepthRenderPass)
@@ -18,7 +19,8 @@ public:
 		int32 resolution                  // 그림자 맵 해상도 (예: 1024)
 	);
 	virtual void Render(Scene* scene, Camera* camera) override;
-	virtual void CalculateLightSpaceMatrix(Scene* scene) override;
+	
+	glm::mat4 CalculateLightSpaceMatrix(Light* light);
 
 private:
 	ShadowDepthRenderPass() = default;
@@ -29,7 +31,6 @@ private:
 		int32 resolution
 	);
 
-	FramebufferUPtr m_gBuffer;
 	ProgramUPtr m_staticDepthProgram;
 	ProgramUPtr m_skinnedDepthProgram;
 };

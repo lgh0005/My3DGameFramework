@@ -35,10 +35,10 @@ const std::vector<MeshRenderer*>& RenderPass::GetRenderers() const
 //=======================*/
 ShadowPass::~ShadowPass() = default;
 
-TexturePtr ShadowPass::GetDepthMap() const
-{
-	return m_shadowMap->GetShadowMap();
-}
+//TexturePtr ShadowPass::GetDepthMap() const
+//{
+//	return m_shadowMap->GetShadowMap();
+//}
 
 glm::mat4 ShadowPass::GetLightSpaceMatrix() const
 {

@@ -58,6 +58,8 @@ public:
 	const std::vector<Camera*>& GetAllCameras() const { return m_cameras; }
 	Camera* GetMainCamera() const { return m_mainCamera; }
 	void SetMainCamera(Camera* camera) { m_mainCamera = camera; }
+
+	// TEMP : 디버그 전용
 	Light* GetMainLight() const { return m_mainLight; }
 	void SetMainLight(Light* light) { m_mainLight = light; }
 
@@ -80,6 +82,8 @@ protected:
 
 	// TEMP : 씬의 디폴트 속성들
 	Camera* m_mainCamera		{ nullptr };
+	
+	// TEMP : 디버그 전용 조명
 	Light* m_mainLight			{ nullptr };
 
 	// 컴포넌트 업데이트를 위한 참조 포인터
@@ -90,6 +94,7 @@ protected:
 
 	// 렌더링 멤버들 : 일반 렌더링과 고정적으로 필요한 렌더링
 	// TODO : 이들을 한데 묶어 SRP로 둘 예정
+#pragma region STANDART_RENDER_PIPELINE
 	std::unordered_map<std::string, RenderPassUPtr> m_renderPasses;
 	ShadowPassUPtr				m_shadowPass		{ nullptr };
 	SkyboxPassUPtr				m_skyboxPass		{ nullptr };
@@ -101,4 +106,5 @@ protected:
 	UniformbufferUPtr m_lightUBO;
 	UniformbufferUPtr m_shadowUBO;
 	int32 CreateRenderUBOs(); // TEMP : UBO 테스트 중
+#pragma endregion
 };

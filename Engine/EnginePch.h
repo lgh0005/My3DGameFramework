@@ -1,9 +1,9 @@
 #pragma once
 
 // C++
-#include <iostream>
 #include <string>
 #include <vector>
+#include <array>
 #include <unordered_map>
 
 // Logger

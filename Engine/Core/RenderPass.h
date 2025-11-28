@@ -40,15 +40,16 @@ class ShadowPass : public RenderPass
 {
 public:
 	virtual ~ShadowPass();
-	virtual void CalculateLightSpaceMatrix(Scene* scene) = 0;
+	// virtual void CalculateLightSpaceMatrix(Scene* scene) = 0;
 	TexturePtr GetDepthMap() const;
+	ShadowMap* GetShadowMap(int32 index) { return m_shadowMaps[index].get(); }
 	glm::mat4 GetLightSpaceMatrix() const;
 	virtual void Resize(int32 width, int32 height) { }
 
 protected:
 	glm::mat4     m_lightSpaceMatrix;
 	int32	      m_resolution;
-	ShadowMapUPtr m_shadowMap;
+	std::vector<ShadowMapUPtr> m_shadowMaps;
 };
 
 CLASS_PTR(SkyboxPass)

@@ -10,7 +10,7 @@ out vec2 TexCoords;
 out vec3 Normal;
 out mat3 TBN;
 
-// TEMP : UBO 테스트 중
+// 카메라 UBO
 layout (std140, binding = 0) uniform CameraData
 {
     mat4 view;
@@ -19,8 +19,6 @@ layout (std140, binding = 0) uniform CameraData
 };
 
 uniform mat4 model;
-// uniform mat4 view;
-// uniform mat4 projection;
 
 void main()
 {

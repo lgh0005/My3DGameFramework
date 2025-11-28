@@ -6,7 +6,8 @@
 #include "Graphics/Mesh.h"
 #include "Graphics/StaticMesh.h" 
 #include "Graphics/FrameBuffer.h"
-#include "Graphics/Texture.h"    
+#include "Graphics/Texture.h"   
+#include "Graphics/ShadowMap.h"
 #include "Components/Camera.h"
 #include "Components/SpotLight.h"
 #include "Components/Transform.h"
@@ -33,31 +34,23 @@ bool DeferredLightPass::Init(ProgramUPtr program, MeshPtr screenMesh)
 
 void DeferredLightPass::Render(Scene* scene, Camera* camera)
 {
-	// TEMP : [윈도우 리사이즈 대응] G-Buffer 정보는 어차피 필요하니 위에서 미리 가져옵니다.
+	// 1. G-Buffer 정보  가져오기
 	auto geometryPass = scene->GetGeometryPass();
 	if (!geometryPass) return;
 	auto gBuffer = geometryPass->GetGBuffer();
 
-	// 1. 그리기 준비 (화면 혹은 포스트 프로세싱 FBO에 그림)
-	// TODO : 포스트 프로세서의 프레임 버퍼의 텍스쳐에 그림을 그리도록 만들 필요 있음
+	// 2. 그리기 준비 (화면 혹은 포스트 프로세싱 FBO에 그림)
 	auto postProcessPass = scene->GetPostProcessPass();
 	if (postProcessPass)
 	{
-		// TEMP : [윈도우 리사이즈 대응] PostProcessing이 있으면 그쪽 FBO에 그립니다.
 		postProcessPass->BeginDraw();
 		auto ppFBO = postProcessPass->GetFramebuffer();
 		glViewport(0, 0, ppFBO->GetWidth(), ppFBO->GetHeight());
 	}
 	else
 	{
-		// 없으면 화면에 그립니다.
-		// Depth Test는 끄거나, G-Buffer의 Depth를 복사해와야 하는데
-		// Lighting Pass 자체는 화면 덮어쓰기므로 일단 끕니다.
 		Framebuffer::BindToDefault();
-
-		// TEMP : [윈도우 리사이즈 대응]
 		glViewport(0, 0, gBuffer->GetWidth(), gBuffer->GetHeight());
-
 		glDisable(GL_DEPTH_TEST);
 		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT);
@@ -85,46 +78,36 @@ void DeferredLightPass::Render(Scene* scene, Camera* camera)
 	gBuffer->GetColorAttachment(3)->Bind();
 	m_program->SetUniform("gEmission", 3);
 
-	//// 2. Shadow Map 가져오기 & 바인딩
+	// 2. Shadow Map 가져오기 & 바인딩
 	auto shadowPass = scene->GetShadowPass();
 	if (shadowPass)
 	{
-		// Slot 4: Shadow Map
-		glActiveTexture(GL_TEXTURE4);
-		shadowPass->GetDepthMap()->Bind();
-		m_program->SetUniform("shadowMap", 4);
-		m_program->SetUniform("lightSpaceMatrix", shadowPass->GetLightSpaceMatrix());
+		// 1. 텍스처 8장 바인딩
+		for (int i = 0; i < 8; ++i)
+		{
+			glActiveTexture(GL_TEXTURE4 + i);
+
+			// 부모 클래스의 메서드 바로 호출
+			auto sm = shadowPass->GetShadowMap(i);
+			if (sm) sm->GetShadowMap()->Bind();
+			std::string uniformName = "shadowMaps[" + std::to_string(i) + "]";
+			m_program->SetUniform(uniformName, 4 + i);
+		}
+
+		// 2. 행렬 전송 (이건 Light 컴포넌트에서 가져오므로 동일)
+		const auto& lights = scene->GetLights();
+		for (auto* light : lights)
+		{
+			int32 idx = light->GetShadowMapIndex();
+			if (idx >= 0 && idx < 8)
+			{
+				std::string uName = "lightSpaceMatrices[" + std::to_string(idx) + "]";
+				m_program->SetUniform(uName, light->GetLightSpaceMatrix());
+			}
+		}
 	}
 
-	//// 4. 조명(Light) 및 카메라 정보 전송
-	//// 메인 라이트 하나만 처리한다고 가정 (여러 개면 반복문이나 UBO 사용)
-	//// TODO : 본격적으로 Scene에 있는 조명 컴포넌트 벡터들을 통해서 조명 연산들을
-	//// 누적시킬 필요가 있음.
-	//Light* mainLight = scene->GetMainLight();
-	//if (mainLight)
-	//{
-	//	auto lightTransform = mainLight->GetTransform();
-	//	m_program->SetUniform("light.position", lightTransform.GetPosition());
-	//	m_program->SetUniform("light.direction", lightTransform.GetForwardVector()); // Spot/Dir Light용
-	//	m_program->SetUniform("light.ambient", mainLight->GetAmbient());
-	//	m_program->SetUniform("light.diffuse", mainLight->GetDiffuse());
-	//	m_program->SetUniform("light.specular", mainLight->GetSpecular());
-
-	//	// Attenuation, Cutoff 등 추가 속성 전송
-	//	// (SpotLight로 캐스팅해서 가져와야 할 수 있음)
-	//	if (mainLight->GetLightType() == LightType::Spot) // 예시
-	//	{
-	//		// TODO : 일부 조명 컴포넌트에 GetAttenuation 메서드를 래핑할 필요 있음
-	//		auto spot = static_cast<SpotLight*>(mainLight);
-
-	//		glm::vec2 cutoff = spot->GetCutoff();
-	//		cutoff = glm::vec2(cosf(glm::radians(cutoff[0])), cosf(glm::radians(cutoff[0] + cutoff[1])));
-	//		m_program->SetUniform("light.cutoff", cutoff);
-	//		m_program->SetUniform("light.attenuation", Utils::GetAttenuationCoeff(spot->GetDistance()));
-	//	}
-	//}
-	//m_program->SetUniform("viewPos", camera->GetTransform().GetPosition());
-
+	// 3. 그림 그리기
 	m_plane->Draw(m_program.get());
 	glEnable(GL_DEPTH_TEST);
 }

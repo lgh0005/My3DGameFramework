@@ -421,9 +421,8 @@ bool DevScene::CreateSceneContext()
 	{
 		auto lightGo = GameObject::Create();
 		lightGo->SetName("SpotLight");
-
 		auto lightComp = SpotLight::Create();
-		SetMainLight(lightComp.get());
+		lightComp->SetCastShadow(true);
 		lightGo->GetTransform().SetPosition(glm::vec3(1.0f, 4.0f, 4.0f));
 		lightGo->GetTransform().SetScale(glm::vec3(0.2f));
 		lightComp->SetCutoff(glm::vec2(60.0, 5.0f));
@@ -441,7 +440,10 @@ bool DevScene::CreateSceneContext()
 		auto lightGo = GameObject::Create();
 		lightGo->SetName("DirectionalLight");
 		auto lightComp = DirectionalLight::Create();
+		SetMainLight(lightComp.get());
+		lightComp->SetCastShadow(true);
 		lightGo->GetTransform().SetPosition(glm::vec3(-1.0f, 3.0f, 7.0f));
+		lightGo->GetTransform().SetRotation(glm::vec3(-128.0f, 0.0f, 0.0f));
 		lightGo->GetTransform().SetScale(glm::vec3(0.2f));
 		lightGo->AddComponent(std::move(lightComp));
 		auto renderer = MeshRenderer::Create

@@ -83,14 +83,14 @@ void Scene::PreRender()
 	}
 
 	// 2. 조명 UBO
-	if (m_mainLight && m_lightUBO)
+	if (m_lightUBO)
 	{
 		LightData lightData = {};
 		lightData.viewPos = m_mainCamera->GetTransform().GetPosition();
 		int32 lightCount = 0;
+		int32 shadowCasterCount = 0;
 
-		// TODO : m_mainLight에 대한 조명 속성을 넣어줘야 함
-
+		// 조명 데이터 주입 분류
 		for (auto* light : m_lights)
 		{
 			if (lightCount >= MAX_LIGHTS) break;
@@ -104,6 +104,20 @@ void Scene::PreRender()
 			info.ambient = light->GetAmbient();
 			info.diffuse = light->GetDiffuse();
 			info.specular = light->GetSpecular();
+			info.intensity = light->GetIntensity();
+
+			// [그림자 캐스팅 필요 판정]
+			if (light->IsCastShadow() && shadowCasterCount < MAX_SHADOW_CASTER)
+			{
+				info.shadowMapIndex = shadowCasterCount;
+				light->SetShadowMapIndex(shadowCasterCount);
+				shadowCasterCount++;
+			}
+			else
+			{
+				info.shadowMapIndex = -1;
+				light->SetShadowMapIndex(-1);
+			}
 
 			// [타입별 속성]
 			switch (light->GetLightType())
@@ -113,7 +127,6 @@ void Scene::PreRender()
 					info.type = 0;
 					info.attenuation = glm::vec3(1.0f, 0.0f, 0.0f);
 					info.cutoff = glm::vec2(0.0f, 0.0f);
-					info.shadowMapIndex = 0;
 					break;
 				}
 				
@@ -123,7 +136,6 @@ void Scene::PreRender()
 					auto point = static_cast<PointLight*>(light);
 					info.attenuation = point->GetAttenuation();
 					info.cutoff = glm::vec2(0.0f, 0.0f);
-					info.shadowMapIndex = -1;
 					break;
 				}
 
@@ -135,17 +147,17 @@ void Scene::PreRender()
 					info.attenuation = spot->GetAttenuation();
 					info.cutoff.x = cosf(glm::radians(cutoff[0]));
 					info.cutoff.y = cosf(glm::radians(cutoff[0] + cutoff[1]));
-					info.shadowMapIndex = -1;
 					break;
 				}
 			}
-
-			// info.shadowMapIndex = -1;
 			lightCount++;
 		}
 
 		lightData.lightCount = lightCount;
 		m_lightUBO->SetData(&lightData, sizeof(LightData));
+
+		// TODO : ShadowPass에 그림자를 그려야 하는 조명들을 알릴 필요 있음
+
 	}
 }
 
@@ -160,7 +172,7 @@ void Scene::OnScreenResize(int32 width, int32 height)
 
 bool Scene::Init()
 {
-	// TODO : UBO 테스트 중. 이후에 SRP로 같이 넘어가야 함.
+	// TODO : CreateRenderUBOs는 이후에 SRP로 같이 넘어가야 함.
 	auto result = CreateRenderUBOs();
 	if (result != 0)
 	{
@@ -204,7 +216,7 @@ int32 Scene::CreateRenderUBOs()
 void Scene::Start()
 {
 	// TODO : 이후에 컴포넌트가 필연적으로 Start가 필요하게 된다면
-	// 컴포넌트에 추가적인 가상 함수를 둘 필요가 있다.
+	// 컴포넌트에 추가적인 가상 함수를 둘 필요가 있는지 고려 필요.
 	// 특히 Awake, LateUpdate, FixedUpdate 등
 	// 2. 스크립트 컴포넌트 Start
 	for (auto* script : m_scripts)

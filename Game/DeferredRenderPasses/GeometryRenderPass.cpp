@@ -56,18 +56,10 @@ void GeometryRenderPass::Render(Scene* scene, Camera* camera)
 	glEnable(GL_DEPTH_TEST);
 	glDisable(GL_BLEND);
 
-	//// 3. 공통 행렬 및 카메라 데이터 준비
-	//glm::mat4 view = camera->GetViewMatrix();
-	//glm::mat4 projection = camera->GetProjectionMatrix();
-	//glm::vec3 cameraPos = camera->GetTransform().GetPosition();
-
-	// 4. Static Mesh 그리기 (정적 오브젝트)
+	// 3. Static Mesh 그리기 (정적 오브젝트)
 	if (m_staticGeometryProgram) 
 	{
 		m_staticGeometryProgram->Use();
-		/*m_staticGeometryProgram->SetUniform("view", view);
-		m_staticGeometryProgram->SetUniform("projection", projection);
-		m_staticGeometryProgram->SetUniform("viewPos", cameraPos);*/
 
 		for (const auto* renderer : m_renderers)
 		{
@@ -82,13 +74,10 @@ void GeometryRenderPass::Render(Scene* scene, Camera* camera)
 		}
 	}
 
-	// 5. Skinned Mesh 그리기 (애니메이션 오브젝트)
+	// 4. Skinned Mesh 그리기 (애니메이션 오브젝트)
 	if (m_skinnedGeometryProgram)
 	{
 		m_skinnedGeometryProgram->Use();
-		/*m_skinnedGeometryProgram->SetUniform("view", view);
-		m_skinnedGeometryProgram->SetUniform("projection", projection);
-		m_skinnedGeometryProgram->SetUniform("viewPos", cameraPos);*/
 
 		for (const auto* renderer : m_skinnedMeshRenderers)
 		{
@@ -103,13 +92,12 @@ void GeometryRenderPass::Render(Scene* scene, Camera* camera)
 			auto finalMatrices = animator->GetFinalBoneMatrices();
 			for (int i = 0; i < finalMatrices.size(); ++i)
 				m_skinnedGeometryProgram->SetUniform("finalBoneMatrices[" + std::to_string(i) + "]", finalMatrices[i]);
-
 			m_skinnedGeometryProgram->SetUniform("model", transform.GetModelMatrix());
 
 			mesh->Draw(m_skinnedGeometryProgram.get());
 		}
 	}
 
-	// 6. 그리기 완료 후 기본 프레임버퍼로 복귀
+	// 5. 그리기 완료 후 기본 프레임버퍼로 복귀
 	Framebuffer::BindToDefault();
 }

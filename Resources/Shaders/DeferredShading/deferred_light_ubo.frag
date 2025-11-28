@@ -12,13 +12,9 @@ uniform sampler2D gNormal;
 uniform sampler2D gAlbedoSpec;
 uniform sampler2D gEmission;
 
-// [Shadow]
-// 아직 단일 텍스처 사용 (나중에 Array로 변경 시 이 부분만 고치면 됨)
-uniform sampler2D shadowMap; 
-// 그림자 행렬은 UBO가 아니라 유니폼으로 받기로 했었나요? 
-// 아, Scene::PreRender에서 shadowMapIndex=0을 줬으니, 여기서 행렬을 어떻게 받을지가 관건입니다.
-// 지금은 일단 "그림자 끄기" 모드로 갈 것이므로, 행렬 변수는 선언만 해두거나 주석 처리합니다.
-uniform mat4 lightSpaceMatrix; 
+// [Shadow] - 배열로 변경!
+uniform sampler2D shadowMaps[8]; 
+uniform mat4 lightSpaceMatrices[8]; // 행렬도 배열로!
 
 // [Light UBO]
 struct LightInfo
@@ -28,11 +24,10 @@ struct LightInfo
     vec2 cutoff;        vec2  pad2;
     vec3 attenuation;   float pad3;
     vec3 ambient;       float pad4;
-    vec3 diffuse;       float pad5;
-    vec3 specular;      float pad6;
-    int type;           
-    int shadowMapIndex;
-    vec2 pad7;
+    vec3 diffuse;       float intensity;
+    vec3 specular;      float pad5;
+    int type;            
+    int shadowMapIndex; vec2 pad6;
 };
 
 #define MAX_LIGHTS 32
@@ -44,11 +39,14 @@ layout (std140, binding = 1) uniform LightData
     int lightCount;
 };
 
-// [그림자 계산]
-float ShadowCalculation(vec4 fragPosLightSpace, vec3 normal, vec3 lightDir)
+// [그림자 계산 핵심 로직] 
+// 텍스처를 인자로 받아서 처리하도록 분리
+float CalculateShadow(sampler2D shadowMap, vec4 fragPosLightSpace, vec3 normal, vec3 lightDir)
 {
     vec3 projCoords = fragPosLightSpace.xyz / fragPosLightSpace.w;
     projCoords = projCoords * 0.5 + 0.5;
+    
+    // 그림자 맵 범위 밖이면 그림자 없음
     if(projCoords.z > 1.0) return 0.0;
 
     float currentDepth = projCoords.z;
@@ -56,6 +54,8 @@ float ShadowCalculation(vec4 fragPosLightSpace, vec3 normal, vec3 lightDir)
 
     float shadow = 0.0;
     vec2 texelSize = 1.0 / textureSize(shadowMap, 0);
+    
+    // PCF (3x3 Sampling)
     for(int x = -1; x <= 1; ++x)
     {
         for(int y = -1; y <= 1; ++y)
@@ -68,8 +68,24 @@ float ShadowCalculation(vec4 fragPosLightSpace, vec3 normal, vec3 lightDir)
     return shadow;
 }
 
+// [그림자 맵 선택기]
+// Sampler Array Indexing 문제 방지를 위한 안전한 Switch문
+float GetShadowFactor(int index, vec4 fragPosLightSpace, vec3 normal, vec3 lightDir)
+{
+    // 인덱스에 따라 올바른 텍스처를 넘겨줌
+    if (index == 0) return CalculateShadow(shadowMaps[0], fragPosLightSpace, normal, lightDir);
+    if (index == 1) return CalculateShadow(shadowMaps[1], fragPosLightSpace, normal, lightDir);
+    if (index == 2) return CalculateShadow(shadowMaps[2], fragPosLightSpace, normal, lightDir);
+    if (index == 3) return CalculateShadow(shadowMaps[3], fragPosLightSpace, normal, lightDir);
+    if (index == 4) return CalculateShadow(shadowMaps[4], fragPosLightSpace, normal, lightDir);
+    if (index == 5) return CalculateShadow(shadowMaps[5], fragPosLightSpace, normal, lightDir);
+    if (index == 6) return CalculateShadow(shadowMaps[6], fragPosLightSpace, normal, lightDir);
+    if (index == 7) return CalculateShadow(shadowMaps[7], fragPosLightSpace, normal, lightDir);
+    return 0.0;
+}
+
 // [조명 계산 함수]
-vec3 CalcLight(int index, vec3 normal, vec3 fragPos, vec3 viewDir, vec3 albedo, float specInt, float shininess)
+vec3 LightCalculation(int index, vec3 normal, vec3 fragPos, vec3 viewDir, vec3 albedo, float specInt, float shininess)
 {
     LightInfo light = lights[index];
 
@@ -93,28 +109,35 @@ vec3 CalcLight(int index, vec3 normal, vec3 fragPos, vec3 viewDir, vec3 albedo, 
         attenuation = 1.0 / (light.attenuation.x + light.attenuation.y * dist + light.attenuation.z * dist * dist);
     }
 
-    // 4. Spot Intensity
-    float intensity = 1.0;
+    // 4. Spot Factor (이름 변경 주의: intensity -> spotFactor)
+    float spotFactor = 1.0;
     if (light.type == 2) // Spot
     {
         float theta = dot(lightDir, normalize(-light.direction));
-        float epsilon = light.cutoff.x - light.cutoff.y; // inner - outer
-        intensity = clamp((theta - light.cutoff.y) / epsilon, 0.0, 1.0);
+        float epsilon = light.cutoff.x - light.cutoff.y;
+        spotFactor = clamp((theta - light.cutoff.y) / epsilon, 0.0, 1.0);
     }
 
-    // 5. 그림자
+    // 5. 그림자 계산 (핵심 수정)
     float shadow = 0.0;
-    if (light.shadowMapIndex >= 0) 
+    int shadowIdx = light.shadowMapIndex;
+
+    // 인덱스가 유효할 때만 계산
+    if (shadowIdx >= 0 && shadowIdx < 8) 
     {
-        vec4 lightSpacePos = lightSpaceMatrix * vec4(fragPos, 1.0);
-        shadow = ShadowCalculation(lightSpacePos, normal, lightDir);
+        // 행렬 배열에서 가져옴
+        vec4 lightSpacePos = lightSpaceMatrices[shadowIdx] * vec4(fragPos, 1.0);
+        
+        // 텍스처 선택기를 통해 그림자 값 계산
+        shadow = GetShadowFactor(shadowIdx, lightSpacePos, normal, lightDir);
     }
    
     vec3 ambient = light.ambient * albedo;
     vec3 diffuse = light.diffuse * diff * albedo;
     vec3 specular = light.specular * spec * specInt;
 
-    return (ambient + (1.0 - shadow) * (diffuse + specular)) * attenuation * intensity;
+    // light.intensity 곱해주는 것 잊지 말기!
+    return (ambient + (1.0 - shadow) * (diffuse + specular)) * attenuation * spotFactor * light.intensity;
 }
 
 void main()
@@ -132,14 +155,17 @@ void main()
 
     for(int i = 0; i < lightCount; ++i)
     {
-        result += CalcLight(i, Normal, FragPos, viewDir, Albedo, SpecInt, Shininess);
+        result += LightCalculation(i, Normal, FragPos, viewDir, Albedo, SpecInt, Shininess);
     }
     
     result += Emission;
     FragColor = vec4(result, 1.0);
     
-    // Bloom...
+    // Bloom Threshold
     float brightness = dot(result, vec3(0.2126, 0.7152, 0.0722));
     if (brightness > 1.0) BrightColor = vec4(result, 1.0);
     else BrightColor = vec4(0.0, 0.0, 0.0, 1.0);
 }
+
+// ============================================================================
+

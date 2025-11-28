@@ -7,6 +7,7 @@
 #include "Components/MeshRenderer.h"
 #include "Components/Transform.h"
 #include "Components/SpotLight.h"
+#include "Components/DirectionalLight.h"
 #include "Components/Animator.h"
 #include "Core/GameObject.h"
 #include "Graphics/Program.h"
@@ -20,6 +21,7 @@
 #include "Graphics/CubeTexture.h"
 #include "Graphics/Image.h"
 #include "Graphics/ShadowMap.h"
+
 
 #include "RenderPasses/PostProcessingPass.h"
 
@@ -46,8 +48,8 @@ void DevRenderer::Render(Scene* scene)
 	auto* camera = scene->GetMainCamera();
 	if (!camera) return;
 
-	// 메인 조명 속성 가져오기
-	SpotLight* mainLight = static_cast<SpotLight*>(scene->GetMainLight());
+	//// 메인 조명 속성 가져오기
+	//SpotLight* mainLight = static_cast<SpotLight*>(scene->GetMainLight());
 
 	/*================================//
 	//   main scene rendergin logic   //
@@ -113,6 +115,7 @@ void DevRenderer::RenderImGUIContext(Scene* scene)
     // imgui context #2 : 조명
     if (IMGUI.Begin("Light Parameters"))
     {
+        ImGui::Text("TODO : multiple lights currently");
         if (mainLight)
         {
             auto& lightTransform = mainLight->GetTransform();
