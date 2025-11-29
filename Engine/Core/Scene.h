@@ -36,6 +36,7 @@ public:
 /*============================================//
 //   essential render pass getter & setters   //
 //============================================*/
+// TODO : 이들을 한데 묶어 SRP로 둘 예정
 public:
 	auto& GetRenderPasses() const { return m_renderPasses; }
 	RenderPass* GetRenderPass(const std::string& name);
@@ -63,6 +64,10 @@ public:
 	Light* GetMainLight() const { return m_mainLight; }
 	void SetMainLight(Light* light) { m_mainLight = light; }
 
+	// TEMP : 하늘 텍스쳐
+	void SetSkyboxTexture(CubeTexturePtr texture) { m_skyboxTexture = texture; }
+	CubeTexture* GetSkyboxTexture() const { return m_skyboxTexture.get(); }
+
 protected:
 	Scene();
 
@@ -83,7 +88,7 @@ protected:
 	// TEMP : 씬의 디폴트 속성들
 	Camera* m_mainCamera		{ nullptr };
 	
-	// TEMP : 디버그 전용 조명
+	// TEMP : 디버그 전용 조명 -> 디버그 전용으로 따로 뺄 필요가 있음
 	Light* m_mainLight			{ nullptr };
 
 	// 컴포넌트 업데이트를 위한 참조 포인터
@@ -92,9 +97,12 @@ protected:
 	std::vector<Animator*>		m_animators;
 	std::vector<Script*>        m_scripts;
 
+	// 하늘 텍스쳐
+	CubeTexturePtr				m_skyboxTexture;
+
 	// 렌더링 멤버들 : 일반 렌더링과 고정적으로 필요한 렌더링
 	// TODO : 이들을 한데 묶어 SRP로 둘 예정
-#pragma region STANDART_RENDER_PIPELINE
+#pragma region STANDARD_RENDER_PIPELINE
 	std::unordered_map<std::string, RenderPassUPtr> m_renderPasses;
 	ShadowPassUPtr				m_shadowPass		{ nullptr };
 	SkyboxPassUPtr				m_skyboxPass		{ nullptr };

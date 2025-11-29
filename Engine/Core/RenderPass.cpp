@@ -40,10 +40,10 @@ ShadowPass::~ShadowPass() = default;
 //	return m_shadowMap->GetShadowMap();
 //}
 
-glm::mat4 ShadowPass::GetLightSpaceMatrix() const
-{
-	return m_lightSpaceMatrix;
-}
+//glm::mat4 ShadowPass::GetLightSpaceMatrix() const
+//{
+//	return m_lightSpaceMatrix;
+//}
 
 /*===================//
 //   Skybox methods  //

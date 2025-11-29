@@ -28,7 +28,6 @@ public:
     BufferPtr GetVertexBuffer() const { return m_vertexBuffer; }
     void SetMaterial(MaterialPtr material) { m_material = material; }
     MaterialPtr GetMaterial() const { return m_material; }
-
     virtual void Draw(const Program* program) const = 0;
 
 protected:
@@ -39,5 +38,4 @@ protected:
     BufferPtr m_vertexBuffer;
     BufferPtr m_indexBuffer;
     MaterialPtr m_material;
-    // glm::vec3 m_tangent;
 };

@@ -18,6 +18,14 @@ add_library(Engine STATIC
    "Core/Scene.h"                   "Core/Scene.cpp"
    "Core/Renderer.h"                "Core/Renderer.cpp"
    "Core/RenderPass.h"              "Core/RenderPass.cpp"
+   "Core/StandardRenderPipeline.h"  "Core/StandardRenderPipeline.cpp"
+
+   "Core/RenderPasses/StandardShadowPass.h" "Core/RenderPasses/StandardShadowPass.cpp"
+   "Core/RenderPasses/StandardSkyboxPass.h" "Core/RenderPasses/StandardSkyboxPass.cpp"
+   "Core/RenderPasses/StandardPostProcessPass.h" "Core/RenderPasses/StandardPostProcessPass.cpp"
+   "Core/RenderPasses/StandardGeometryPass.h"  "Core/RenderPasses/StandardGeometryPass.cpp"
+   "Core/RenderPasses/StandardDeferredLightingPass.h"  "Core/RenderPasses/StandardDeferredLightingPass.cpp"
+   "Core/RenderPasses/StandardGlobalUniforms.h"  "Core/RenderPasses/StandardGlobalUniforms.cpp"
 
    # Misc
    "Misc/Defines.h"
@@ -66,7 +74,7 @@ add_library(Engine STATIC
    "Managers/InputManager.h"        "Managers/InputManager.cpp"           
    "Managers/ResourceManager.h"     "Managers/ResourceManager.cpp"
    "Managers/SceneManager.h"        "Managers/SceneManager.cpp"
-
+ 
 )
 
 # 2. [PCH 설정] EnginePCH.h를 PCH로 사용합니다.

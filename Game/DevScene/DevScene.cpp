@@ -435,23 +435,22 @@ bool DevScene::CreateSceneContext()
 		AddGameObject(std::move(lightGo));
 	}
 
-	// 조명 큐브 #1
-	{
-		auto lightGo = GameObject::Create();
-		lightGo->SetName("DirectionalLight");
-		auto lightComp = DirectionalLight::Create();
-		SetMainLight(lightComp.get());
-		lightComp->SetCastShadow(true);
-		lightGo->GetTransform().SetPosition(glm::vec3(-1.0f, 3.0f, 7.0f));
-		lightGo->GetTransform().SetRotation(glm::vec3(-128.0f, 0.0f, 0.0f));
-		lightGo->GetTransform().SetScale(glm::vec3(0.2f));
-		lightGo->AddComponent(std::move(lightComp));
-		auto renderer = MeshRenderer::Create
-		(RESOURCE.GetResource<Mesh>("Cube"), RESOURCE.GetResource<Material>("LightMat"));
-		lightPass->AddRenderer(renderer.get());
-		lightGo->AddComponent(std::move(renderer));
-		AddGameObject(std::move(lightGo));
-	}
+	//// 조명 큐브 #1
+	//{
+	//	auto lightGo = GameObject::Create();
+	//	lightGo->SetName("DirectionalLight");
+	//	auto lightComp = DirectionalLight::Create();
+	//	SetMainLight(lightComp.get());
+	//	lightGo->GetTransform().SetPosition(glm::vec3(-1.0f, 3.0f, 7.0f));
+	//	lightGo->GetTransform().SetRotation(glm::vec3(-128.0f, 0.0f, 0.0f));
+	//	lightGo->GetTransform().SetScale(glm::vec3(0.2f));
+	//	lightGo->AddComponent(std::move(lightComp));
+	//	auto renderer = MeshRenderer::Create
+	//	(RESOURCE.GetResource<Mesh>("Cube"), RESOURCE.GetResource<Material>("LightMat"));
+	//	lightPass->AddRenderer(renderer.get());
+	//	lightGo->AddComponent(std::move(renderer));
+	//	AddGameObject(std::move(lightGo));
+	//}
 
 	// 조명 큐브 #3
 	{

@@ -1,5 +1,5 @@
 #include "EnginePch.h"
-#include "ShadowDepthRenderPass.h"
+#include "StandardShadowPass.h"
 
 #include "Core/Scene.h"
 #include "Core/GameObject.h"
@@ -15,29 +15,30 @@
 #include "Components/MeshRenderer.h"
 #include "Components/Animator.h"
 
-ShadowDepthRenderPassUPtr ShadowDepthRenderPass::Create
-(
-	ProgramUPtr staticDepthProgram,
-	ProgramUPtr skinnedDepthProgram,
-	int32 resolution
-)
+StandardShadowPassUPtr StandardShadowPass::Create(int32 resolution)
 {
-	auto pass = ShadowDepthRenderPassUPtr(new ShadowDepthRenderPass());
-	if (!pass->Init(std::move(staticDepthProgram), std::move(skinnedDepthProgram), 
-		resolution)) return nullptr;
+	auto pass = StandardShadowPassUPtr(new StandardShadowPass());
+	if (!pass->Init(resolution)) return nullptr;
 	return std::move(pass);
 }
 
-bool ShadowDepthRenderPass::Init
-(
-	ProgramUPtr staticDepthProgram,
-	ProgramUPtr skinnedDepthProgram,
-	int32 resolution
-)
+bool StandardShadowPass::Init(int32 resolution)
 {
 	m_resolution = resolution;
-	m_staticDepthProgram  = std::move(staticDepthProgram);
-	m_skinnedDepthProgram = std::move(skinnedDepthProgram);
+
+	// TODO : 프로그램은 여기서 생성!
+	m_staticDepthProgram = Program::Create
+	(
+		"./Engine/Shaders/static_shadow.vert",
+		"./Engine/Shaders/static_shadow.frag"
+	);
+	m_skinnedDepthProgram = Program::Create
+	(
+		"./Engine/Shaders/skinned_shadow.vert",
+		"./Engine/Shaders/skinned_shadow.frag"
+	);
+	if (!m_staticDepthProgram || !m_skinnedDepthProgram)
+		return false;
 
 	m_shadowMaps.resize(MAX_SHADOW_CASTER);
 	for (int i = 0; i < MAX_SHADOW_CASTER; ++i)
@@ -53,12 +54,13 @@ bool ShadowDepthRenderPass::Init
 	return true;
 }
 
-void ShadowDepthRenderPass::Render(Scene* scene, Camera* camera)
+// TODO : Render 추상 메서드 생김새를 조금 다듬을 필요는 있음
+void StandardShadowPass::Render(Scene* scene, Camera* camera)
 {
 	// 1. 공통 설정
 	glEnable(GL_DEPTH_TEST);
 	glCullFace(GL_FRONT);
-	
+
 	// 2. 전체 조명 리스트 순회
 	for (auto* light : scene->GetLights())
 	{
@@ -123,17 +125,13 @@ void ShadowDepthRenderPass::Render(Scene* scene, Camera* camera)
 	}
 
 	glCullFace(GL_BACK);
-
 }
 
-// TODO : 인자로 Light*을 받아서 그 조명을 기준으로 연산할 수 있도록 수정 필요
-glm::mat4 ShadowDepthRenderPass::CalculateLightSpaceMatrix(Light* light)
+glm::mat4 StandardShadowPass::CalculateLightSpaceMatrix(Light* light)
 {
-	// TODO : 이후에 1번 항목은 삭제 예정
-	// 1. 메인 조명 가져오기 (Light* 기본 클래스로 받음)
 	if (!light) return glm::mat4(1.0f);
 
-	// 2. 조명의 타입 별로 조명 기준의 projection, view 행렬을 계산
+	// 행렬 연산에 필요한 것들을 가져오기
 	auto& transform = light->GetTransform();
 	glm::vec3 pos = transform.GetPosition();
 	glm::vec3 dir = transform.GetForwardVector();
@@ -141,7 +139,7 @@ glm::mat4 ShadowDepthRenderPass::CalculateLightSpaceMatrix(Light* light)
 	glm::mat4 lightProjection;
 	glm::mat4 lightView = glm::lookAt(pos, pos + dir, up);
 
-	// TODO : 씬의 크기에 따라 값을 적절히 조정할 필요가 있음
+	// 조명의 타입 별로 조명 기준의 projection, view 행렬을 계산
 	float size = 20.0f;
 	float nearPlane = 0.1f;
 	float farPlane = 100.0f;
@@ -153,10 +151,11 @@ glm::mat4 ShadowDepthRenderPass::CalculateLightSpaceMatrix(Light* light)
 
 	case LightType::Spot:
 		glm::vec2 cutoff = static_cast<SpotLight*>(light)->GetCutoff();
-		lightProjection = glm::perspective(glm::radians((cutoff[0] + cutoff[1]) * 2.0f), 
+		lightProjection = glm::perspective(glm::radians((cutoff[0] + cutoff[1]) * 2.0f),
 			1.0f, 1.0f, 100.0f);
 		break;
 	}
 
+	// 조명 기준의 VP 행렬 반환
 	return lightProjection * lightView;
 }

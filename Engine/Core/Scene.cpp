@@ -72,6 +72,8 @@ void Scene::PreRender()
 	// 당장은 그렇게 하진 않고 메인 조명인 Directional Light의 그림자
 	// 영향을 받도록 구성, 나머지 조명은 그림자가 없는 걸 전제로 구현.
 
+	// TODO : 코드 정리 필요
+
 	// 1. 카메라 UBO
 	if (m_mainCamera && m_cameraUBO)
 	{
@@ -155,9 +157,6 @@ void Scene::PreRender()
 
 		lightData.lightCount = lightCount;
 		m_lightUBO->SetData(&lightData, sizeof(LightData));
-
-		// TODO : ShadowPass에 그림자를 그려야 하는 조명들을 알릴 필요 있음
-
 	}
 }
 
