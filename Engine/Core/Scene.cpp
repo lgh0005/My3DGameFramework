@@ -26,14 +26,6 @@ void Scene::AddGameObject(GameObjectUPtr gameObject)
 	m_gameObjects.push_back(std::move(gameObject));
 }
 
-void Scene::AddRenderPass(const std::string& name, RenderPassUPtr renderPass)
-{
-	auto it = m_renderPasses.find(name);
-	if (it != m_renderPasses.end())
-		SPDLOG_WARN("RenderPass '{}' already exists. Overwriting.", name);
-	m_renderPasses[name] = std::move(renderPass);
-}
-
 void Scene::RegisterComponent(Component* component)
 {
 	if (!component) return;
@@ -65,120 +57,16 @@ void Scene::RegisterComponent(Component* component)
 	}
 }
 
-void Scene::PreRender()
-{
-	// TODO : 이후 이 로직은 SRP로 이전될 예정
-	// 각각의 조명에 대해서 그림자 영향을 줄지 말지를 결정할 수 있겠지만,
-	// 당장은 그렇게 하진 않고 메인 조명인 Directional Light의 그림자
-	// 영향을 받도록 구성, 나머지 조명은 그림자가 없는 걸 전제로 구현.
-
-	// TODO : 코드 정리 필요
-
-	// 1. 카메라 UBO
-	if (m_mainCamera && m_cameraUBO)
-	{
-		CameraData camData;
-		camData.view = m_mainCamera->GetViewMatrix();
-		camData.projection = m_mainCamera->GetProjectionMatrix();
-		camData.viewPos = m_mainCamera->GetTransform().GetPosition();
-		m_cameraUBO->SetData(&camData, sizeof(CameraData));
-	}
-
-	// 2. 조명 UBO
-	if (m_lightUBO)
-	{
-		LightData lightData = {};
-		lightData.viewPos = m_mainCamera->GetTransform().GetPosition();
-		int32 lightCount = 0;
-		int32 shadowCasterCount = 0;
-
-		// 조명 데이터 주입 분류
-		for (auto* light : m_lights)
-		{
-			if (lightCount >= MAX_LIGHTS) break;
-
-			auto& info = lightData.lights[lightCount];
-			auto& transform = light->GetTransform();
-
-			// [공통 속성]
-			info.position = transform.GetPosition();
-			info.direction = transform.GetForwardVector();
-			info.ambient = light->GetAmbient();
-			info.diffuse = light->GetDiffuse();
-			info.specular = light->GetSpecular();
-			info.intensity = light->GetIntensity();
-
-			// [그림자 캐스팅 필요 판정]
-			if (light->IsCastShadow() && shadowCasterCount < MAX_SHADOW_CASTER)
-			{
-				info.shadowMapIndex = shadowCasterCount;
-				light->SetShadowMapIndex(shadowCasterCount);
-				shadowCasterCount++;
-			}
-			else
-			{
-				info.shadowMapIndex = -1;
-				light->SetShadowMapIndex(-1);
-			}
-
-			// [타입별 속성]
-			switch (light->GetLightType())
-			{
-				case LightType::Directional:
-				{
-					info.type = 0;
-					info.attenuation = glm::vec3(1.0f, 0.0f, 0.0f);
-					info.cutoff = glm::vec2(0.0f, 0.0f);
-					break;
-				}
-				
-				case LightType::Point:
-				{
-					info.type = 1;
-					auto point = static_cast<PointLight*>(light);
-					info.attenuation = point->GetAttenuation();
-					info.cutoff = glm::vec2(0.0f, 0.0f);
-					break;
-				}
-
-				case LightType::Spot:
-				{
-					info.type = 2;
-					auto spot = static_cast<SpotLight*>(light);
-					glm::vec2 cutoff = spot->GetCutoff();
-					info.attenuation = spot->GetAttenuation();
-					info.cutoff.x = cosf(glm::radians(cutoff[0]));
-					info.cutoff.y = cosf(glm::radians(cutoff[0] + cutoff[1]));
-					break;
-				}
-			}
-			lightCount++;
-		}
-
-		lightData.lightCount = lightCount;
-		m_lightUBO->SetData(&lightData, sizeof(LightData));
-	}
-}
-
 void Scene::OnScreenResize(int32 width, int32 height)
 {
+	// TODO : 이후에는 다중 카메라에 대해서 모든 카메라가 리사이징 되어야함
 	auto* camera = GetMainCamera();
 	if (camera) camera->SetAspectRatio((float)width / (float)height);
-
-	if (m_geometryPass) m_geometryPass->Resize(width, height);
-	if (m_postProcessPass) m_postProcessPass->Resize(width, height);
+	// TODO : SRP가 Viewport를 책임짐
 }
 
 bool Scene::Init()
 {
-	// TODO : CreateRenderUBOs는 이후에 SRP로 같이 넘어가야 함.
-	auto result = CreateRenderUBOs();
-	if (result != 0)
-	{
-		SPDLOG_ERROR("failed to create render ubo. {}", result);
-		return false;
-	}
-
 	if (!LoadNessesaryResources())
 	{
 		SPDLOG_ERROR("failed to load resources.");
@@ -198,18 +86,6 @@ bool Scene::Init()
 	}
 
 	return true;
-}
-
-// TEMP : UBO 테스트 중
-int32 Scene::CreateRenderUBOs()
-{
-	m_cameraUBO = Uniformbuffer::Create(sizeof(CameraData), UBO_POINT_CAMERA);
-	if (!m_cameraUBO) return 1;
-
-	m_lightUBO = Uniformbuffer::Create(sizeof(LightData), UBO_POINT_LIGHT);
-	if (!m_lightUBO) return 2;
-
-	return 0;
 }
 
 void Scene::Start()
@@ -253,14 +129,4 @@ void Scene::Update()
 void Scene::FlushDestroyQueue()
 {
 	// TODO : 씬에 Destroy를 호출한 오브젝트를 정리
-}
-
-/*============================================//
-//   essential render pass getter & setters   //
-//============================================*/
-RenderPass* Scene::GetRenderPass(const std::string& name)
-{
-	auto it = m_renderPasses.find(name);
-	if (it != m_renderPasses.end()) return it->second.get();
-	return nullptr;
 }

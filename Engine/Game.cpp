@@ -1,9 +1,7 @@
 #include "EnginePch.h"
 #include "Game.h"
-#include "Core/Context.h"
 
 Game::~Game() = default;
-Context& Game::GetContext() { return *m_context; }
 
 GameUPtr Game::Create()
 {
@@ -20,18 +18,14 @@ bool Game::Init()
     auto handle = WINDOW.GetWindow();
 
     // 초기화가 필요한 다른 매니저들 초기화
+    RENDER.Init();
+
     INPUT.Init();
     TIME.Init();
     IMGUI.Init(true);
 
-    // Context 생성
-    m_context = Context::Create();
-    if (!m_context)
-    {
-        SPDLOG_ERROR("failed to create context");
-        WINDOW.DestroyWindow();
-        return false;
-    }
+    // 첫 씬 로드
+    SCENE.LoadScene("DevScene", "Standard");
 
     return true;
 }
@@ -50,8 +44,21 @@ void Game::Update()
         TIME.Update();
 
         // 컨텍스트 업데이트
-        m_context->Update();
-        m_context->Render();
+        // 2. 씬 로직 및 렌더링 (Context::Update/Render 통합)
+        if (auto scene = SCENE.GetActiveScene())
+        {
+            // 게임 로직 업데이트
+            scene->Update();
+
+            // 렌더링 수행 (RenderManager에게 위임)
+            RENDER.Render(scene);
+        }
+        else
+        {
+            // 씬이 없거나 로딩 중일 때 기본 화면 클리어
+            glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+            glClear(GL_COLOR_BUFFER_BIT);
+        }
 
         // 인풋 업데이트
         INPUT.Update();
@@ -63,17 +70,18 @@ void Game::Update()
 
 void Game::Shutdown()
 {
-    // Context 정리
-    m_context.reset();
-     
-    // spdlog 정리
-    SPDLOG_INFO("Program terminated successfully.");
-    spdlog::shutdown();
+    // 1. 렌더러 정리 (가장 중요! OpenGL 컨텍스트 살아있을 때)
+    RENDER.Clear();
 
     // 매니저 정리
     IMGUI.ShutDown();
-
+    RESOURCE.Clear();
+    
     // glfw 정리
     WINDOW.DestroyWindow();
+
+    // spdlog 정리
+    SPDLOG_INFO("Program terminated successfully.");
+    spdlog::shutdown();
 }
 

@@ -20,13 +20,13 @@ bool StandardPostProcessPass::Init(int32 width, int32 height)
 {
 	m_compositeProgram = Program::Create
 	(
-		"./Engine/Shaders/postprocess.vert",
-		"./Engine/Shaders/postprocess.frag"
+		"./Resources/Shaders/PostProcessing/postprocess.vert",
+		"./Resources/Shaders/PostProcessing/postprocess.frag"
 	);
 	m_blurProgram = Program::Create
 	(
-		"./Engine/Shaders/blur.vert",
-		"./Engine/Shaders/blur.frag"
+		"./Resources/Shaders/PostProcessing/blur.vert",
+		"./Resources/Shaders/PostProcessing/blur.frag"
 	);
 	if (!m_compositeProgram || !m_blurProgram) return false;
 
@@ -83,11 +83,11 @@ void StandardPostProcessPass::Render(Scene* scene, Camera* camera)
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	m_program->Use();
-	m_program->SetUniform("gamma", m_gamma);
-	m_program->SetUniform("exposure", m_exposure);
-	m_program->SetUniform("bloom", true);
-	m_program->SetUniform
+	m_compositeProgram->Use();
+	m_compositeProgram->SetUniform("gamma", m_gamma);
+	m_compositeProgram->SetUniform("exposure", m_exposure);
+	m_compositeProgram->SetUniform("bloom", true);
+	m_compositeProgram->SetUniform
 	(
 		"inverseScreenSize",
 		glm::vec2
@@ -99,13 +99,13 @@ void StandardPostProcessPass::Render(Scene* scene, Camera* camera)
 
 	glActiveTexture(GL_TEXTURE0);
 	sceneTexture->Bind();
-	m_program->SetUniform("tex", 0);
+	m_compositeProgram->SetUniform("tex", 0);
 
 	glActiveTexture(GL_TEXTURE1);
 	finalBloomTexture->Bind();
-	m_program->SetUniform("bloomBlur", 1);
+	m_compositeProgram->SetUniform("bloomBlur", 1);
 
-	m_plane->Draw(m_program.get());
+	m_plane->Draw(m_compositeProgram.get());
 }
 
 void StandardPostProcessPass::Resize(int32 width, int32 height)
@@ -120,4 +120,15 @@ void StandardPostProcessPass::Resize(int32 width, int32 height)
 		m_compositeProgram->SetUniform("inverseScreenSize",
 			glm::vec2(1.0f / (float)width, 1.0f / (float)height));
 	}
+}
+
+void StandardPostProcessPass::BeginDraw()
+{
+	m_frameBuffer->Bind();
+	glViewport(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
+	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_CULL_FACE);
+	glCullFace(GL_BACK);
 }

@@ -103,7 +103,7 @@ void StandardRenderPipeline::Render(Scene* scene)
 	BlitCopyDepth(gBuffer, postFBO, gBuffer->GetWidth(), gBuffer->GetHeight());
 
 	// [패스 3] 포워드 셰이딩 
-	for (const auto& [name, pass] : scene->GetRenderPasses())
+	for (const auto& [name, pass] : m_renderPasses)
 		pass->Render(scene, camera);
 
 	// [패스 4] 스카이박스 패스: m_frameBuffer에 스카이박스 덧그리기
@@ -113,4 +113,10 @@ void StandardRenderPipeline::Render(Scene* scene)
 	m_postProcessPass->Render(scene, camera);
 
 	// DEBUG : ImGUI 컨텍스트
+}
+
+void StandardRenderPipeline::OnResize(int32 width, int32 height)
+{
+	m_geometryPass->Resize(width, height);
+	m_postProcessPass->Resize(width, height);
 }

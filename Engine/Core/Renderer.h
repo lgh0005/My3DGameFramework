@@ -3,19 +3,29 @@
 #pragma region FORWARD_DECLARATION
 CLASS_PTR(Scene)
 CLASS_PTR(Framebuffer)
+CLASS_PTR(RenderPipeline)
 #pragma endregion
 
 CLASS_PTR(Renderer)
 class Renderer
 {
 public:
-    virtual ~Renderer();
-    virtual void Render(Scene* scene)            = 0;
+    static RendererUPtr Create();
+
+    void Render(Scene* scene);
+    void OnResize(int32 width, int32 height);
+    void SetPipeline(RenderPipelineUPtr pipeline);
+    
+    RenderPipeline* GetPipeline() const { return m_pipeline.get(); }
+    template<typename T>
+    T* GetPipeline() const
+    {
+        if (!m_pipeline) return nullptr;
+        return static_cast<T*>(m_pipeline.get());
+    }
 
 protected:
 	Renderer() = default;
-    void BlitCopyDepth(Framebuffer* src, Framebuffer* dst, 
-                       int32 width = WINDOW_WIDTH, 
-                       int32 height = WINDOW_HEIGHT);
-    // virtual bool IsRenderReady(Scene* scene) const { return true; }
+    void Init();
+    RenderPipelineUPtr m_pipeline;
 };

@@ -13,11 +13,12 @@ add_library(Engine STATIC
 
    # Core
    "Game.h"                         "Game.cpp"
-   "Core/Context.h"                 "Core/Context.cpp"
+   #"Core/Context.h"                 "Core/Context.cpp"
    "Core/GameObject.h"              "Core/GameObject.cpp"
    "Core/Scene.h"                   "Core/Scene.cpp"
    "Core/Renderer.h"                "Core/Renderer.cpp"
    "Core/RenderPass.h"              "Core/RenderPass.cpp"
+   "Core/RenderPipeline.h"          "Core/RenderPipeline.cpp"
    "Core/StandardRenderPipeline.h"  "Core/StandardRenderPipeline.cpp"
 
    "Core/RenderPasses/StandardShadowPass.h" "Core/RenderPasses/StandardShadowPass.cpp"
@@ -74,8 +75,8 @@ add_library(Engine STATIC
    "Managers/InputManager.h"        "Managers/InputManager.cpp"           
    "Managers/ResourceManager.h"     "Managers/ResourceManager.cpp"
    "Managers/SceneManager.h"        "Managers/SceneManager.cpp"
- 
-)
+   "Managers/RenderManager.h"       "Managers/RenderManager.cpp"
+ )
 
 # 2. [PCH 설정] EnginePCH.h를 PCH로 사용합니다.
 target_precompile_headers(Engine  PUBLIC EnginePCH.h)

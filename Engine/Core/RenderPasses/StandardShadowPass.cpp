@@ -3,6 +3,8 @@
 
 #include "Core/Scene.h"
 #include "Core/GameObject.h"
+#include "Core/StandardRenderPipeline.h"
+#include "Core/RenderPasses/StandardGeometryPass.h"
 #include "Graphics/Program.h"
 #include "Graphics/Mesh.h"
 #include "Graphics/StaticMesh.h" 
@@ -29,13 +31,13 @@ bool StandardShadowPass::Init(int32 resolution)
 	// TODO : 프로그램은 여기서 생성!
 	m_staticDepthProgram = Program::Create
 	(
-		"./Engine/Shaders/static_shadow.vert",
-		"./Engine/Shaders/static_shadow.frag"
+		"./Resources/Shaders/Shadow/static_shadow.vert",
+		"./Resources/Shaders/Shadow/static_shadow.frag"
 	);
 	m_skinnedDepthProgram = Program::Create
 	(
-		"./Engine/Shaders/skinned_shadow.vert",
-		"./Engine/Shaders/skinned_shadow.frag"
+		"./Resources/Shaders/Shadow/skinned_shadow.vert",
+		"./Resources/Shaders/Shadow/skinned_shadow.frag"
 	);
 	if (!m_staticDepthProgram || !m_skinnedDepthProgram)
 		return false;
@@ -62,6 +64,7 @@ void StandardShadowPass::Render(Scene* scene, Camera* camera)
 	glCullFace(GL_FRONT);
 
 	// 2. 전체 조명 리스트 순회
+	auto pipeline = (StandardRenderPipeline*)(RENDER.GetRenderer()->GetPipeline());
 	for (auto* light : scene->GetLights())
 	{
 		// 2-1. 그림자 캐스팅이 필요한 조명인지 검사
@@ -87,7 +90,7 @@ void StandardShadowPass::Render(Scene* scene, Camera* camera)
 			m_staticDepthProgram->Use();
 			m_staticDepthProgram->SetUniform("lightSpaceMatrix", lightSpaceMatrix);
 
-			const auto& staticRenderers = scene->GetGeometryPass()->GetRenderers();
+			const auto& staticRenderers = pipeline->GetGeometryPass()->GetStaticMeshRenderers();
 			for (const auto* renderer : staticRenderers)
 			{
 				auto model = renderer->GetTransform().GetModelMatrix();
@@ -103,7 +106,7 @@ void StandardShadowPass::Render(Scene* scene, Camera* camera)
 			m_skinnedDepthProgram->SetUniform("lightSpaceMatrix", lightSpaceMatrix);
 
 			// G-Buffer에서 그릴 대상 중 SkinnedMesh를 가져옴
-			const auto& skinnedRenderers = scene->GetGeometryPass()->GetSkinnedMeshRenderers();
+			const auto& skinnedRenderers = pipeline->GetGeometryPass()->GetSkinnedMeshRenderers();
 			for (const auto* renderer : skinnedRenderers)
 			{
 				GameObject* go = renderer->GetOwner();

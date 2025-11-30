@@ -50,9 +50,6 @@ bool WindowManager::Init()
     if (glfwExtensionSupported("GL_ARB_gl_spirv")) SPDLOG_INFO("SPIR-V supported!");
     else SPDLOG_WARN("SPIR-V not supported on this system!");
 
-    // 블렌딩 활성화
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
     return true;
 }
 
@@ -88,11 +85,11 @@ void WindowManager::HandleFramebufferSizeChange(GLFWwindow* window, int32 width,
 
     SPDLOG_INFO("framebuffer size changed: ({} x {})", width, height);
     
-    // 1. OpenGL 뷰포트 설정
-    glViewport(0, 0, width, height);
-
-    // TODO : 화면 크기에 맞게 종횡비를 맞추면서 렌더링
-    SCENE.GetActiveScene()->OnScreenResize(width, height);
+    // 1. 렌더러 (FBO 재생성, Viewport 설정)
+    RENDER.OnResize(width, height);
+   
+    // 2. 화면 크기에 맞게 종횡비를 맞추면서 렌더링
+    SCENE.OnScreenResize(width, height);
 }
 
 void WindowManager::HandleWindowIconified(GLFWwindow* window, int32 iconified)

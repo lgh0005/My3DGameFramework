@@ -25,13 +25,13 @@ bool StandardGeometryPass::Init(int32 width, int32 height)
 {
 	m_staticGeometryProgram = Program::Create
 	(
-		"./Engine/Shaders/gBuffer_static.vert",
-		"./Engine/Shaders/gBuffer.frag"
+		"./Resources/Shaders/DeferredShading/gBuffer_static.vert",
+		"./Resources/Shaders/DeferredShading/gBuffer.frag"
 	);
 	m_skinnedGeometryProgram = Program::Create
 	(
-		"../Engine/Shaders/gBuffer_skinned.vert",
-		"../Engine/Shaders/gBuffer.frag"
+		"./Resources/Shaders/DeferredShading/gBuffer_skinned.vert",
+		"./Resources/Shaders/DeferredShading/gBuffer.frag"
 	);
 	if (!m_staticGeometryProgram || !m_skinnedGeometryProgram) return false;
 
@@ -59,7 +59,7 @@ void StandardGeometryPass::Render(Scene* scene, Camera* camera)
 	{
 		m_staticGeometryProgram->Use();
 
-		for (const auto* renderer : m_renderers)
+		for (const auto* renderer : m_staticMeshRenderers)
 		{
 			MeshPtr mesh = renderer->GetMesh();
 			auto model = renderer->GetTransform().GetModelMatrix();

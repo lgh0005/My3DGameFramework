@@ -2,7 +2,9 @@
 #include "DevScene.h"
 
 #include "Core/GameObject.h"
-#include "Core/RenderPass.h"
+#include "Core/Renderer.h"
+#include "Core/StandardRenderPipeline.h"
+#include "Core/RenderPasses/StandardGeometryPass.h"
 #include "Graphics/Program.h"
 #include "Graphics/Mesh.h"
 #include "Graphics/StaticMesh.h"
@@ -18,23 +20,14 @@
 #include "Components/Camera.h"
 #include "Components/Transform.h"
 #include "Components/MeshRenderer.h"
-
 #include "Components/SpotLight.h"
 #include "Components/DirectionalLight.h"
 #include "Components/PointLight.h"
-
 #include "Components/Animator.h"
 
-#include "RenderPasses/StaticRenderPass.h"
-#include "RenderPasses/SimpleRenderPass.h"
-#include "RenderPasses/SkinningRenderPass.h"
 #include "RenderPasses/InstancedRenderPass.h"
-#include "RenderPasses/SkyboxRenderPass.h"
+#include "RenderPasses/SimpleRenderPass.h"
 #include "RenderPasses/EnvironmentRenderPass.h"
-#include "RenderPasses/PostProcessingPass.h"
-#include "RenderPasses/ShadowDepthRenderPass.h"
-#include "DeferredRenderPasses/GeometryRenderPass.h"
-#include "DeferredRenderPasses/DeferredLightRenderPass.h"
 
 #include "Scripts/CameraController.h"
 
@@ -265,13 +258,16 @@ bool DevScene::LoadNessesaryResources()
 
 bool DevScene::CreateNessesaryRenderPasses()
 {
+	auto pipeline = RENDER.GetRenderer()->GetPipeline();
+
 	// 3. Instanced 셰이더 (잔디)
 	{
 		auto prog = Program::Create(
 			"./Resources/Shaders/Instancing/grass.vert",
 			"./Resources/Shaders/Instancing/grass.frag");
 		if (!prog) return false;
-		AddRenderPass("Instanced", InstancedRenderPass::Create(std::move(prog)));
+		pipeline->AddRenderPass("Instanced", InstancedRenderPass::Create(std::move(prog)));
+		// AddRenderPass("Instanced", InstancedRenderPass::Create(std::move(prog)));
 	}
 
 	// 4. Simple 셰이더 (조명 기즈모)
@@ -280,21 +276,8 @@ bool DevScene::CreateNessesaryRenderPasses()
 			"./Resources/Shaders/simple.vert",
 			"./Resources/Shaders/simple.frag");
 		if (!prog) return false;
-		AddRenderPass("LightGizmo", SimpleRenderPass::Create(std::move(prog)));
-	}
-
-	// 5. Skybox 셰이더 (하늘)
-	{
-		auto prog = Program::Create
-		(
-			"./Resources/Shaders/Skybox/skybox.vert",
-			"./Resources/Shaders/Skybox/skybox.frag");
-		if (!prog) return false;
-
-		MeshPtr boxMesh = RESOURCE.GetResource<Mesh>("Cube");
-		CubeTexturePtr cubeTex = RESOURCE.GetResource<CubeTexture>("SkyboxTexture");
-		auto skyboxRenderPass = SkyboxRenderPass::Create(std::move(prog), boxMesh, cubeTex);
-		SetSkyboxPass(std::move(skyboxRenderPass));
+		pipeline->AddRenderPass("LightGizmo", SimpleRenderPass::Create(std::move(prog)));
+		// AddRenderPass("LightGizmo", SimpleRenderPass::Create(std::move(prog)));
 	}
 
 	// 6. 환경맵
@@ -307,82 +290,8 @@ bool DevScene::CreateNessesaryRenderPasses()
 		if (!prog) return false;
 		CubeTexturePtr cubeTex = RESOURCE.GetResource<CubeTexture>("SkyboxTexture");
 		if (!cubeTex) return false;
-
-		AddRenderPass("EnvMap", EnvironmentRenderPass::Create(std::move(prog), cubeTex));
-	}
-
-	// 7. PostProcessing 패스
-	{
-		auto prog = Program::Create(
-			"./Resources/Shaders/PostProcessing/postprocess.vert",
-			"./Resources/Shaders/PostProcessing/postprocess.frag");
-		if (!prog) return false;
-
-		auto blur = Program::Create(
-			"./Resources/Shaders/PostProcessing/blur.vert",
-			"./Resources/Shaders/PostProcessing/blur.frag");
-		if (!blur) return false;
-		MeshPtr planeMesh = RESOURCE.GetResource<Mesh>("NDC");
-		if (!planeMesh) return false;
-
-		SetPostProcessPass(PostProcessingRenderPass::Create
-		(
-			std::move(prog), std::move(blur),
-			WINDOW_WIDTH, WINDOW_HEIGHT,
-			planeMesh
-		));
-	}
-
-	// 8. 그림자 깊이 패스
-	{
-		auto progStatic = Program::Create(
-			"./Resources/Shaders/Shadow/static_shadow.vert",
-			"./Resources/Shaders/Shadow/static_shadow.frag"
-		); if (!progStatic) return false;
-		auto progSkinned = Program::Create(
-			"./Resources/Shaders/Shadow/skinned_shadow.vert",
-			"./Resources/Shaders/Shadow/skinned_shadow.frag"
-		); if (!progSkinned) return false;
-
-		SetShadowPass(ShadowDepthRenderPass::Create
-		(
-			std::move(progStatic),
-			std::move(progSkinned),
-			1024
-		));
-	}
-
-	// 9. G-Buffer 패스
-	{
-		auto progGeoStatic = Program::Create
-		(
-			"./Resources/Shaders/DeferredShading/gBuffer_static.vert",
-			"./Resources/Shaders/DeferredShading/gBuffer.frag"
-		);
-		auto progGeoSkinned = Program::Create
-		(
-			"./Resources/Shaders/DeferredShading/gBuffer_skinned.vert",
-			"./Resources/Shaders/DeferredShading/gBuffer.frag"
-		);
-		auto geo = GeometryRenderPass::Create
-		(
-			std::move(progGeoStatic), std::move(progGeoSkinned),
-			WINDOW_WIDTH, WINDOW_HEIGHT
-		); SetGeoemtryPass(std::move(geo));
-	}
-
-	// 10. Deferred Light 패스
-	{
-		auto progLight = Program::Create
-		(
-			"./Resources/Shaders/DeferredShading/deferred_light.vert",
-			"./Resources/Shaders/DeferredShading/deferred_light_ubo.frag"
-		);
-
-		auto light = DeferredLightPass::Create
-		(
-			std::move(progLight), RESOURCE.GetResource<Mesh>("NDC")
-		); SetDeferredLightingPass(std::move(light));
+		pipeline->AddRenderPass("EnvMap", EnvironmentRenderPass::Create(std::move(prog), cubeTex));
+		// AddRenderPass("EnvMap", EnvironmentRenderPass::Create(std::move(prog), cubeTex));
 	}
 
 	return true;
@@ -390,11 +299,16 @@ bool DevScene::CreateNessesaryRenderPasses()
 
 bool DevScene::CreateSceneContext()
 {
-	RenderPass* lightPass = GetRenderPass("LightGizmo");
-	RenderPass* grassPass = GetRenderPass("Instanced");
-	RenderPass* envMapPass = GetRenderPass("EnvMap");
+	auto pipeline = (StandardRenderPipeline*)(RENDER.GetRenderer()->GetPipeline());
 
-	GeometryPass* gPass = GetGeometryPass();
+	// 0. 하늘 설정
+	SetSkyboxTexture(RESOURCE.GetResource<CubeTexture>("SkyboxTexture"));
+
+	// TODO : Render Pipeline을 가져와야함.
+	RenderPass* lightPass = pipeline->GetRenderPass("LightGizmo");
+	RenderPass* grassPass = pipeline->GetRenderPass("Instanced");
+	RenderPass* envMapPass = pipeline->GetRenderPass("EnvMap");
+	auto* gPass = pipeline->GetGeometryPass();
 
 	// 3. 카메라 GameObject 생성
 	{
@@ -478,7 +392,7 @@ bool DevScene::CreateSceneContext()
 
 		auto meshRenderer = MeshRenderer::Create
 		(RESOURCE.GetResource<Mesh>("Cube"), RESOURCE.GetResource<Material>("boxMat1"));
-		gPass->AddRenderer(meshRenderer.get());
+		gPass->AddStaticMeshRenderer(meshRenderer.get());
 		cubeObj->AddComponent(std::move(meshRenderer));
 		AddGameObject(std::move(cubeObj));
 	}
@@ -494,7 +408,7 @@ bool DevScene::CreateSceneContext()
 
 		auto meshRenderer = MeshRenderer::Create
 		(RESOURCE.GetResource<Mesh>("Cube"), RESOURCE.GetResource<Material>("boxMat2"));
-		gPass->AddRenderer(meshRenderer.get());
+		gPass->AddStaticMeshRenderer(meshRenderer.get());
 		cubeObj->AddComponent(std::move(meshRenderer));
 		AddGameObject(std::move(cubeObj));
 	}
@@ -510,7 +424,7 @@ bool DevScene::CreateSceneContext()
 
 		auto meshRenderer = MeshRenderer::Create
 		(RESOURCE.GetResource<Mesh>("Cube"), RESOURCE.GetResource<Material>("boxMat4"));
-		gPass->AddRenderer(meshRenderer.get());
+		gPass->AddStaticMeshRenderer(meshRenderer.get());
 		cubeObj->AddComponent(std::move(meshRenderer));
 		AddGameObject(std::move(cubeObj));
 	}
@@ -526,7 +440,7 @@ bool DevScene::CreateSceneContext()
 
 		auto meshRenderer = MeshRenderer::Create
 		(RESOURCE.GetResource<Mesh>("Cube"), RESOURCE.GetResource<Material>("boxMat5"));
-		gPass->AddRenderer(meshRenderer.get());
+		gPass->AddStaticMeshRenderer(meshRenderer.get());
 		cubeObj->AddComponent(std::move(meshRenderer));
 		AddGameObject(std::move(cubeObj));
 	}
@@ -541,7 +455,7 @@ bool DevScene::CreateSceneContext()
 
 		auto meshRenderer = MeshRenderer::Create
 		(RESOURCE.GetResource<Mesh>("Cube"), RESOURCE.GetResource<Material>("boxMat3"));
-		gPass->AddRenderer(meshRenderer.get());
+		gPass->AddStaticMeshRenderer(meshRenderer.get());
 		cubeObj->AddComponent(std::move(meshRenderer));
 		AddGameObject(std::move(cubeObj));
 	}

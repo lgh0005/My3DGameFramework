@@ -2,6 +2,10 @@
 #include "StandardDeferredLightingPass.h"
 
 #include "Core/Scene.h"
+#include "Core/StandardRenderPipeline.h"
+#include "Core/RenderPasses/StandardGeometryPass.h"
+#include "Core/RenderPasses/StandardPostProcessPass.h"
+#include "Core/RenderPasses/StandardShadowPass.h"
 #include "Graphics/Program.h"
 #include "Graphics/Mesh.h"
 #include "Graphics/StaticMesh.h" 
@@ -23,8 +27,8 @@ bool StandardDeferredLightingPass::Init()
 {
 	m_deferredLightProgram = Program::Create
 	(
-		"./Engine/Shaders/deferred_light.vert",
-		"./Engine/Shaders/deferred_light_ubo.frag"
+		"./Resources/Shaders/DeferredShading/deferred_light.vert",
+		"./Resources/Shaders/DeferredShading/deferred_light_ubo.frag"
 	);
 	if (!m_deferredLightProgram) return false;
 
@@ -37,13 +41,15 @@ bool StandardDeferredLightingPass::Init()
 // TODO : Render 추상 메서드 생김새를 조금 다듬을 필요는 있음
 void StandardDeferredLightingPass::Render(Scene* scene, Camera* camera)
 {
+	auto pipeline = (StandardRenderPipeline*)(RENDER.GetRenderer()->GetPipeline());
+
 	// 1. G-Buffer 정보  가져오기
-	auto geometryPass = scene->GetGeometryPass();
+	auto geometryPass = pipeline->GetGeometryPass();
 	if (!geometryPass) return;
 	auto gBuffer = geometryPass->GetGBuffer();
 
 	// 2. 그리기 준비 (화면 혹은 포스트 프로세싱 FBO에 그림)
-	auto postProcessPass = scene->GetPostProcessPass();
+	auto postProcessPass = pipeline->GetPostProcessPass();
 	if (postProcessPass)
 	{
 		postProcessPass->BeginDraw();
@@ -82,7 +88,7 @@ void StandardDeferredLightingPass::Render(Scene* scene, Camera* camera)
 	m_deferredLightProgram->SetUniform("gEmission", 3);
 
 	// 2. Shadow Map 가져오기 & 바인딩
-	auto shadowPass = scene->GetShadowPass();
+	auto shadowPass = pipeline->GetShadowPass();
 	if (shadowPass)
 	{
 		// 1. 텍스처 8장 바인딩
@@ -111,6 +117,6 @@ void StandardDeferredLightingPass::Render(Scene* scene, Camera* camera)
 	}
 
 	// 3. 그림 그리기
-	m_plane->Draw(m_program.get());
+	m_plane->Draw(m_deferredLightProgram.get());
 	glEnable(GL_DEPTH_TEST);
 }

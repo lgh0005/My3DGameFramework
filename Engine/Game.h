@@ -15,9 +15,6 @@ public:
 	void Shutdown();
     ~Game();
 
-    Context& GetContext();
-
 private:
 	Game() = default;
-    ContextUPtr m_context  = nullptr;
 };

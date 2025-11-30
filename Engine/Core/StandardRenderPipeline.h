@@ -1,4 +1,5 @@
 #pragma once
+#include "RenderPipeline.h"
 
 #pragma region FORWARD_DECLARATION
 CLASS_PTR(StandardDeferredLightingPass)
@@ -11,11 +12,23 @@ CLASS_PTR(CubeTexture)
 #pragma endregion
 
 CLASS_PTR(StandardRenderPipeline)
-class StandardRenderPipeline
+class StandardRenderPipeline : public RenderPipeline
 {
 public:
 	static StandardRenderPipelineUPtr Create();
-	void Render(Scene* scene);
+	virtual void Render(Scene* scene)			     override;
+	virtual void OnResize(int32 width, int32 height) override;
+
+/*==================================//
+//   standard render pass getters   //
+//==================================*/
+public:
+	StandardShadowPass* GetShadowPass()        const { return m_shadowPass.get(); }
+	StandardSkyboxPass* GetSkyboxPass()        const { return m_skyboxPass.get(); }
+	StandardPostProcessPass* GetPostProcessPass()   const { return m_postProcessPass.get(); }
+	StandardGeometryPass* GetGeometryPass()      const { return m_geometryPass.get(); }
+	StandardDeferredLightingPass* GetDeferredLightPass() const { return m_deferredLightPass.get(); }
+	StandardGlobalUniforms* GetGlobalUniforms()    const { return m_globalUniforms.get(); }
 
 private:
 	StandardRenderPipeline() = default;
@@ -33,7 +46,5 @@ private:
 	StandardPostProcessPassUPtr		  m_postProcessPass	  { nullptr };
 	StandardGeometryPassUPtr		  m_geometryPass	  { nullptr };
 	StandardDeferredLightingPassUPtr  m_deferredLightPass { nullptr };
-
-	// ÇÊ¼ö ubo
 	StandardGlobalUniformsUPtr        m_globalUniforms	  { nullptr };
 };

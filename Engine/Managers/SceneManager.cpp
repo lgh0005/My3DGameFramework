@@ -1,33 +1,52 @@
 #include "EnginePch.h"
 #include "SceneManager.h"
 
-void SceneManager::LoadScene(const std::string& name)
+// TODO : 이 부분 수정 필요
+void SceneManager::LoadScene
+(
+	const std::string& scene,
+	const std::string& pipeline
+)
 {
-	auto it = m_scenes.find(name);
+	// 1. 등록된 씬을 먼저 찾기
+	auto it = m_scenes.find(scene);
 	if (it == m_scenes.end())
 	{
-		SPDLOG_ERROR("Failed to find scene registration for name: {}", name);
+		SPDLOG_ERROR("Failed to find scene registration for name: {}", scene);
 		return;
 	}
 
-	m_activeScene.scene.reset();
-	m_activeScene.renderer.reset();
+	// 2. 파이프 라인 교체
+	RENDER.SetPipeline(pipeline);
 
+	// 3. 기존 씬 정리
+	m_activeScene.reset();
+
+	// 4. 새 씬 생성 (Factory 호출)
 	m_activeScene = it->second();
-	if (m_activeScene.scene && m_activeScene.renderer)
+	if (m_activeScene)
 	{
-		m_activeScene.scene->Start();
-		SPDLOG_INFO("Successfully loaded scene: {}", name);
+		m_activeScene->Start();
+		
+		int32 width, height;
+		RENDER.UpdateViewport(&width, &height);
+		OnScreenResize(width, height);
+
+		SPDLOG_INFO("Successfully loaded scene: {}", scene);
 	}
-	else SPDLOG_ERROR("Failed to create scene instance: {}", name);
+	else
+	{
+		SPDLOG_ERROR("Failed to create scene instance: {}", scene);
+	}
 }
 
 Scene* SceneManager::GetActiveScene() const
 {
-	return m_activeScene.scene.get();
+	return m_activeScene.get();
 }
 
-Renderer* SceneManager::GetActiveRenderer() const
+void SceneManager::OnScreenResize(int32 width, int32 height)
 {
-	return m_activeScene.renderer.get();
+	if (m_activeScene)
+		m_activeScene->OnScreenResize(width, height);
 }

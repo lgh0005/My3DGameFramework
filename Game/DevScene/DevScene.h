@@ -1,10 +1,6 @@
 #pragma once
 #include "Core/Scene.h"
 
-#pragma region FORWARD_DECLARATION
-CLASS_PTR(Mesh)
-#pragma endregion
-
 CLASS_PTR(DevScene)
 class DevScene : public Scene
 {

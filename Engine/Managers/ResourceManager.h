@@ -23,6 +23,8 @@ public:
 	template<typename T>
 	void AddResource(const std::string& name, std::shared_ptr<T> resource);
 
+	void Clear();
+
 private:
 	MeshPtr GetMesh(const std::string& name) const;
 	MaterialPtr GetMaterial(const std::string& name) const;
@@ -33,7 +35,6 @@ private:
 
 	void AddMesh(const std::string& name, MeshPtr mesh);
 	void AddMaterial(const std::string& name, MaterialPtr material);
-	void AddProgram(const std::string& name, ProgramPtr program);
 	void AddTexture(const std::string& name, TexturePtr texture);
 	void AddCubeTexture(const std::string& name, CubeTexturePtr texture);
 	void AddModel(const std::string& name, ModelPtr model);
@@ -46,90 +47,75 @@ private:
 	std::unordered_map<std::string, CubeTexturePtr>m_cubeTextures;
 	std::unordered_map<std::string, ModelPtr>      m_models;
 	std::unordered_map<std::string, AnimationPtr>  m_animations;
+
+private:
+	template<typename T>
+	std::unordered_map<std::string, std::shared_ptr<T>>& GetMap();
+
+	template<typename T>
+	const std::unordered_map<std::string, std::shared_ptr<T>>& GetMap() const;
 };
 
-/*==================//
-//  getter inlines  //
-//==================*/
-#pragma region GETTER_INLINES
+/*====================================================//
+//  Template Implementations (구현부)                 //
+//====================================================*/
+#pragma region TEMPLATE_IMPLEMENTATIONS
 
-template<>
-inline MeshPtr ResourceManager::GetResource<Mesh>(const std::string& name) const
+template<typename T>
+inline void ResourceManager::AddResource(const std::string& name, std::shared_ptr<T> resource)
 {
-	return GetMesh(name);
+	// 컴파일 타임에 T에 맞는 Map을 가져옴
+	auto& map = GetMap<T>();
+
+	if (map.find(name) != map.end())
+	{
+		SPDLOG_WARN("Resource '{}' already exists. Overwriting.", name);
+	}
+	map[name] = resource;
 }
 
-template<>
-inline MaterialPtr ResourceManager::GetResource<Material>(const std::string& name) const
+template<typename T>
+inline std::shared_ptr<T> ResourceManager::GetResource(const std::string& name) const
 {
-	return GetMaterial(name);
-}
+	// const 버전의 GetMap 호출
+	const auto& map = GetMap<T>();
 
-template<>
-inline TexturePtr ResourceManager::GetResource<Texture>(const std::string& name) const
-{
-	return GetTexture(name);
-}
+	auto it = map.find(name);
+	if (it != map.end()) return it->second;
 
-template<>
-inline CubeTexturePtr ResourceManager::GetResource<CubeTexture>(const std::string& name) const
-{
-	return GetCubeTexture(name);
+	SPDLOG_WARN("Failed to find resource: {}", name);
+	return nullptr;
 }
-
-template<>
-inline ModelPtr ResourceManager::GetResource<Model>(const std::string& name) const
-{
-	return GetModel(name);
-}
-
-template<>
-inline AnimationPtr ResourceManager::GetResource<Animation>(const std::string& name) const
-{
-	return GetAnimation(name);
-}
-
 #pragma endregion
 
-/*========================//
-//  add resource inlines  //
-//========================*/
-#pragma region ADD_RESOURCE_INLINES
 
-template<>
-inline void ResourceManager::AddResource<Mesh>(const std::string& name, MeshPtr resource)
-{
-	AddMesh(name, resource);
-}
+/*============================//
+//  Template Specializations  //
+//============================*/
+#pragma region TEMPLATE_SPECIALIZATIONS
 
-template<>
-inline void ResourceManager::AddResource<Material>(const std::string& name, MaterialPtr resource)
-{
-	AddMaterial(name, resource);
-}
+// 1. Mesh 연결
+template<> inline std::unordered_map<std::string, MeshPtr>& ResourceManager::GetMap<Mesh>() { return m_meshes; }
+template<> inline const std::unordered_map<std::string, MeshPtr>& ResourceManager::GetMap<Mesh>() const { return m_meshes; }
 
-template<>
-inline void ResourceManager::AddResource<Texture>(const std::string& name, TexturePtr resource)
-{
-	AddTexture(name, resource);
-}
+// 2. Material 연결
+template<> inline std::unordered_map<std::string, MaterialPtr>& ResourceManager::GetMap<Material>() { return m_materials; }
+template<> inline const std::unordered_map<std::string, MaterialPtr>& ResourceManager::GetMap<Material>() const { return m_materials; }
 
-template<>
-inline void ResourceManager::AddResource<CubeTexture>(const std::string& name, CubeTexturePtr resource)
-{
-	AddCubeTexture(name, resource);
-}
+// 3. Texture 연결
+template<> inline std::unordered_map<std::string, TexturePtr>& ResourceManager::GetMap<Texture>() { return m_textures; }
+template<> inline const std::unordered_map<std::string, TexturePtr>& ResourceManager::GetMap<Texture>() const { return m_textures; }
 
-template<>
-inline void ResourceManager::AddResource<Model>(const std::string& name, ModelPtr resource)
-{
-	AddModel(name, resource);
-}
+// 4. CubeTexture 연결
+template<> inline std::unordered_map<std::string, CubeTexturePtr>& ResourceManager::GetMap<CubeTexture>() { return m_cubeTextures; }
+template<> inline const std::unordered_map<std::string, CubeTexturePtr>& ResourceManager::GetMap<CubeTexture>() const { return m_cubeTextures; }
 
-template<>
-inline void ResourceManager::AddResource<Animation>(const std::string& name, AnimationPtr resource)
-{
-	AddAnimation(name, resource);
-}
+// 5. Model 연결
+template<> inline std::unordered_map<std::string, ModelPtr>& ResourceManager::GetMap<Model>() { return m_models; }
+template<> inline const std::unordered_map<std::string, ModelPtr>& ResourceManager::GetMap<Model>() const { return m_models; }
+
+// 6. Animation 연결
+template<> inline std::unordered_map<std::string, AnimationPtr>& ResourceManager::GetMap<Animation>() { return m_animations; }
+template<> inline const std::unordered_map<std::string, AnimationPtr>& ResourceManager::GetMap<Animation>() const { return m_animations; }
 
 #pragma endregion
