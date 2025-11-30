@@ -27,8 +27,8 @@ bool StandardDeferredLightingPass::Init()
 {
 	m_deferredLightProgram = Program::Create
 	(
-		"./Resources/Shaders/DeferredShading/deferred_light.vert",
-		"./Resources/Shaders/DeferredShading/deferred_light_ubo.frag"
+		"./Resources/Shaders/Standard/Deferred_LightPass.vert",
+		"./Resources/Shaders/Standard/Deferred_LightPass.frag"
 	);
 	if (!m_deferredLightProgram) return false;
 
@@ -92,7 +92,7 @@ void StandardDeferredLightingPass::Render(Scene* scene, Camera* camera)
 	if (shadowPass)
 	{
 		// 1. 텍스처 8장 바인딩
-		for (int i = 0; i < 8; ++i)
+		for (int i = 0; i < MAX_SHADOW_CASTER; ++i)
 		{
 			glActiveTexture(GL_TEXTURE4 + i);
 

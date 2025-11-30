@@ -20,13 +20,13 @@ bool StandardPostProcessPass::Init(int32 width, int32 height)
 {
 	m_compositeProgram = Program::Create
 	(
-		"./Resources/Shaders/PostProcessing/postprocess.vert",
-		"./Resources/Shaders/PostProcessing/postprocess.frag"
+		"./Resources/Shaders/Standard/Post_PostProcess.vert",
+		"./Resources/Shaders/Standard/Post_PostProcess.frag"
 	);
 	m_blurProgram = Program::Create
 	(
-		"./Resources/Shaders/PostProcessing/blur.vert",
-		"./Resources/Shaders/PostProcessing/blur.frag"
+		"./Resources/Shaders/Standard/Post_Blur.vert",
+		"./Resources/Shaders/Standard/Post_Blur.frag"
 	);
 	if (!m_compositeProgram || !m_blurProgram) return false;
 

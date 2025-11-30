@@ -22,6 +22,9 @@ public:
 
     virtual void Render(Scene* scene, Camera* camera) override;
 
+    const std::vector<MeshRenderer*>& GetRenderers() const;
+    void AddRenderer(MeshRenderer* meshRenderer);
+
 private:
     EnvironmentRenderPass() = default;
     bool Init
@@ -31,4 +34,6 @@ private:
     );
 
     CubeTexturePtr m_cubeTexture;
+    ProgramUPtr m_envProgram;
+    std::vector<MeshRenderer*> m_renderers;
 };

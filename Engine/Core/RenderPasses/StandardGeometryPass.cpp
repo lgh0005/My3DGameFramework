@@ -25,13 +25,13 @@ bool StandardGeometryPass::Init(int32 width, int32 height)
 {
 	m_staticGeometryProgram = Program::Create
 	(
-		"./Resources/Shaders/DeferredShading/gBuffer_static.vert",
-		"./Resources/Shaders/DeferredShading/gBuffer.frag"
+		"./Resources/Shaders/Standard/Deferred_GeometryPass_Static.vert",
+		"./Resources/Shaders/Standard/Deferred_GeometryPass_Pixel.frag"
 	);
 	m_skinnedGeometryProgram = Program::Create
 	(
-		"./Resources/Shaders/DeferredShading/gBuffer_skinned.vert",
-		"./Resources/Shaders/DeferredShading/gBuffer.frag"
+		"./Resources/Shaders/Standard/Deferred_GeometryPass_Skinned.vert",
+		"./Resources/Shaders/Standard/Deferred_GeometryPass_Pixel.frag"
 	);
 	if (!m_staticGeometryProgram || !m_skinnedGeometryProgram) return false;
 

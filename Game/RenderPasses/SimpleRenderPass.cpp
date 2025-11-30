@@ -18,13 +18,20 @@ SimpleRenderPassUPtr SimpleRenderPass::Create(ProgramUPtr program)
     return std::move(pass);
 }
 
+bool SimpleRenderPass::Init(ProgramUPtr program)
+{
+    m_simpleProgram = std::move(program);
+    if (!m_simpleProgram) return false;
+    return true;
+}
+
 void SimpleRenderPass::Render(Scene* scene, Camera* camera)
 {
-    m_program->Use();
+    m_simpleProgram->Use();
+
+    //// TOOD : 이제 이것 역시도 UBO로 대체 할 필요 있음
     auto projection = camera->GetProjectionMatrix();
     auto view = camera->GetViewMatrix();
-    m_program->SetUniform("projection", projection);
-    m_program->SetUniform("view", view);
 
     for (const auto* renderer : m_renderers)
     {
@@ -33,15 +40,25 @@ void SimpleRenderPass::Render(Scene* scene, Camera* camera)
         auto& transform = go->GetTransform();
         auto material = renderer->GetMaterial();
 
-        material->SetToProgram(m_program.get());
+        material->SetToProgram(m_simpleProgram.get());
 
         auto lightModel = transform.GetModelMatrix();
         auto lightMvp = projection * view * lightModel;
-        m_program->SetUniform("transform", lightMvp);
+        m_simpleProgram->SetUniform("transform", lightMvp);
 
         // 색상을 하얀색(1.0, 1.0, 1.0, 1.0)으로 고정
-        m_program->SetUniform("color", glm::vec4(1.0f));
+        m_simpleProgram->SetUniform("color", glm::vec4(1.0f));
 
-        mesh->Draw(m_program.get());
+        mesh->Draw(m_simpleProgram.get());
     }
+}
+
+const std::vector<MeshRenderer*>& SimpleRenderPass::GetRenderers() const
+{
+    return m_renderers;
+}
+
+void SimpleRenderPass::AddRenderer(MeshRenderer* meshRenderer)
+{
+    m_renderers.push_back(meshRenderer);
 }

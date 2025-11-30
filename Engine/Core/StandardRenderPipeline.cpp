@@ -112,11 +112,24 @@ void StandardRenderPipeline::Render(Scene* scene)
 	// [패스 5] 후처리 패스: m_frameBuffer의 결과를 화면에 Resolve
 	m_postProcessPass->Render(scene, camera);
 
-	// DEBUG : ImGUI 컨텍스트
+	// [DEBUG] : ImGUI 컨텍스트
+	RenderIMGUIContext();
 }
 
 void StandardRenderPipeline::OnResize(int32 width, int32 height)
 {
 	m_geometryPass->Resize(width, height);
 	m_postProcessPass->Resize(width, height);
+}
+
+void StandardRenderPipeline::RenderIMGUIContext()
+{
+	IMGUI.BeginFrame();
+
+	if (IMGUI.Begin("Test Window"))
+	{
+		ImGui::Text("Hello world!");
+	} IMGUI.End();
+
+	IMGUI.EndFrame();
 }

@@ -19,8 +19,8 @@ bool StandardSkyboxPass::Init()
 {
 	m_skyboxProgram = Program::Create
 	(
-		"./Resources/Shaders/Skybox/skybox.vert",
-		"./Resources/Shaders/Skybox/skybox.frag"
+		"./Resources/Shaders/Standard/Sky_Skybox.vert",
+		"./Resources/Shaders/Standard/Sky_Skybox.frag"
 	);
 	if (!m_skyboxProgram) return false;
 

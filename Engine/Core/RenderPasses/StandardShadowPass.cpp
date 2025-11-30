@@ -28,16 +28,15 @@ bool StandardShadowPass::Init(int32 resolution)
 {
 	m_resolution = resolution;
 
-	// TODO : 프로그램은 여기서 생성!
 	m_staticDepthProgram = Program::Create
 	(
-		"./Resources/Shaders/Shadow/static_shadow.vert",
-		"./Resources/Shaders/Shadow/static_shadow.frag"
+		"./Resources/Shaders/Standard/Shadow_DepthPass_Static.vert",
+		"./Resources/Shaders/Standard/Shadow_DepthPass_Static.frag"
 	);
 	m_skinnedDepthProgram = Program::Create
 	(
-		"./Resources/Shaders/Shadow/skinned_shadow.vert",
-		"./Resources/Shaders/Shadow/skinned_shadow.frag"
+		"./Resources/Shaders/Standard/Shadow_DepthPass_Skinned.vert",
+		"./Resources/Shaders/Standard/Shadow_DepthPass_Skinned.frag"
 	);
 	if (!m_staticDepthProgram || !m_skinnedDepthProgram)
 		return false;

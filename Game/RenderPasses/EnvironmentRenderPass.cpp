@@ -15,15 +15,14 @@
 EnvironmentRenderPassUPtr EnvironmentRenderPass::Create(ProgramUPtr program, CubeTexturePtr cubeTexture)
 {
 	auto pass = EnvironmentRenderPassUPtr(new EnvironmentRenderPass());
-	if (!pass->Init(std::move(program), cubeTexture))
-		return nullptr;
+	if (!pass->Init(std::move(program), cubeTexture)) return nullptr;
 	return std::move(pass);
 }
 
 bool EnvironmentRenderPass::Init(ProgramUPtr program, CubeTexturePtr cubeTexture)
 {
-	if (!Super::Init(std::move(program)))
-		return false;
+	m_envProgram = std::move(program);
+	if (!m_envProgram) return false;
 
 	m_cubeTexture = cubeTexture;
 	if (!m_cubeTexture) return false;
@@ -39,14 +38,15 @@ void EnvironmentRenderPass::Render(Scene* scene, Camera* camera)
 
 	// TEMP : 이는 현재 큐브에 환경맵 텍스쳐를 입힌 것 뿐
 	// 이후에 PBR 기반 렌더링 시 다르게 사용할 수 있음
-	m_program->Use();
+	m_envProgram->Use();
 
-	m_program->SetUniform("view", view);
-	m_program->SetUniform("projection", projection);
-	m_program->SetUniform("cameraPos", cameraPos);
+	// TOOD : 이제 이것 역시도 UBO로 대체 할 필요 있음
+	m_envProgram->SetUniform("view", view);
+	m_envProgram->SetUniform("projection", projection);
+	m_envProgram->SetUniform("cameraPos", cameraPos);
 
 	m_cubeTexture->Bind();
-	m_program->SetUniform("skybox", 0);
+	m_envProgram->SetUniform("skybox", 0);
 
 	for (const auto* renderer : m_renderers)
 	{
@@ -54,7 +54,17 @@ void EnvironmentRenderPass::Render(Scene* scene, Camera* camera)
 		auto& transform = renderer->GetTransform();
 		if (!mesh) continue;
 
-		m_program->SetUniform("model", transform.GetModelMatrix());
-		mesh->Draw(m_program.get());
+		m_envProgram->SetUniform("model", transform.GetModelMatrix());
+		mesh->Draw(m_envProgram.get());
 	}
+}
+
+const std::vector<MeshRenderer*>& EnvironmentRenderPass::GetRenderers() const
+{
+	return m_renderers;
+}
+
+void EnvironmentRenderPass::AddRenderer(MeshRenderer* meshRenderer)
+{
+	m_renderers.push_back(meshRenderer);
 }

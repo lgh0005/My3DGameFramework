@@ -14,6 +14,12 @@ public:
     static SimpleRenderPassUPtr Create(ProgramUPtr program);
     virtual void Render(Scene* scene, Camera* camera) override;
 
+    const std::vector<MeshRenderer*>& GetRenderers() const;
+    void AddRenderer(MeshRenderer* meshRenderer);
+
 private:
     SimpleRenderPass() = default;
+    bool Init(ProgramUPtr program);
+    ProgramUPtr m_simpleProgram;
+    std::vector<MeshRenderer*> m_renderers;
 };

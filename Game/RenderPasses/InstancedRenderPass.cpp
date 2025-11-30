@@ -18,14 +18,21 @@ InstancedRenderPassUPtr InstancedRenderPass::Create(ProgramUPtr program)
     return std::move(pass);
 }
 
+bool InstancedRenderPass::Init(ProgramUPtr program)
+{
+    m_instanceProgram = std::move(program);
+    if (!m_instanceProgram) return false;
+    return true;
+}
+
 void InstancedRenderPass::Render(Scene* scene, Camera* camera)
 {
     // 1. 셰이더 및 공통 유니폼
-    m_program->Use();
+    m_instanceProgram->Use();
     auto projection = camera->GetProjectionMatrix();
     auto view = camera->GetViewMatrix();
-    m_program->SetUniform("projection", projection);
-    m_program->SetUniform("view", view);
+    m_instanceProgram->SetUniform("projection", projection);
+    m_instanceProgram->SetUniform("view", view);
 
     for (const auto* renderer : m_renderers)
     {
@@ -33,12 +40,22 @@ void InstancedRenderPass::Render(Scene* scene, Camera* camera)
         auto material = renderer->GetMaterial();
         if (!mesh || !material) continue;
 
-        material->SetToProgram(m_program.get());
+        material->SetToProgram(m_instanceProgram.get());
 
         // (셰이더가 aInstanceOffset으로 직접 위치를 계산)
         auto& transform = renderer->GetTransform();
-        m_program->SetUniform("model", transform.GetModelMatrix());
+        m_instanceProgram->SetUniform("model", transform.GetModelMatrix());
 
-        mesh->Draw(m_program.get());
+        mesh->Draw(m_instanceProgram.get());
     }
+}
+
+const std::vector<MeshRenderer*>& InstancedRenderPass::GetRenderers() const
+{
+    return m_renderers;
+}
+
+void InstancedRenderPass::AddRenderer(MeshRenderer* meshRenderer)
+{
+    m_renderers.push_back(meshRenderer);
 }

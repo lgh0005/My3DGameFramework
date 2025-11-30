@@ -263,8 +263,8 @@ bool DevScene::CreateNessesaryRenderPasses()
 	// 3. Instanced 셰이더 (잔디)
 	{
 		auto prog = Program::Create(
-			"./Resources/Shaders/Instancing/grass.vert",
-			"./Resources/Shaders/Instancing/grass.frag");
+			"./Resources/Shaders/grass.vert",
+			"./Resources/Shaders/grass.frag");
 		if (!prog) return false;
 		pipeline->AddRenderPass("Instanced", InstancedRenderPass::Create(std::move(prog)));
 		// AddRenderPass("Instanced", InstancedRenderPass::Create(std::move(prog)));
@@ -284,8 +284,8 @@ bool DevScene::CreateNessesaryRenderPasses()
 	{
 		auto prog = Program::Create
 		(
-			"./Resources/Shaders/Environment/environment.vert",
-			"./Resources/Shaders/Environment/environment.frag"
+			"./Resources/Shaders/environment.vert",
+			"./Resources/Shaders/environment.frag"
 		);
 		if (!prog) return false;
 		CubeTexturePtr cubeTex = RESOURCE.GetResource<CubeTexture>("SkyboxTexture");
@@ -305,9 +305,10 @@ bool DevScene::CreateSceneContext()
 	SetSkyboxTexture(RESOURCE.GetResource<CubeTexture>("SkyboxTexture"));
 
 	// TODO : Render Pipeline을 가져와야함.
-	RenderPass* lightPass = pipeline->GetRenderPass("LightGizmo");
-	RenderPass* grassPass = pipeline->GetRenderPass("Instanced");
-	RenderPass* envMapPass = pipeline->GetRenderPass("EnvMap");
+	// TODO : 정말로 다운캐스팅을 위한 템플릿 함수가 필요하려나..
+	SimpleRenderPass* lightPass = (SimpleRenderPass*)pipeline->GetRenderPass("LightGizmo");
+	InstancedRenderPass* grassPass = (InstancedRenderPass*)pipeline->GetRenderPass("Instanced");
+	EnvironmentRenderPass* envMapPass = (EnvironmentRenderPass*)pipeline->GetRenderPass("EnvMap");
 	auto* gPass = pipeline->GetGeometryPass();
 
 	// 3. 카메라 GameObject 생성
@@ -468,7 +469,6 @@ bool DevScene::CreateSceneContext()
 		cubeTransform.SetPosition(glm::vec3(-2.5f, 0.5f, 0.0f));
 		cubeTransform.SetScale(glm::vec3(1.0f));
 
-		// 그럼 텍스쳐는 어떻게 만들어야 하지?
 		auto meshRenderer = MeshRenderer::Create
 		(
 			RESOURCE.GetResource<Mesh>("Cube"),

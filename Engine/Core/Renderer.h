@@ -15,14 +15,7 @@ public:
     void Render(Scene* scene);
     void OnResize(int32 width, int32 height);
     void SetPipeline(RenderPipelineUPtr pipeline);
-    
     RenderPipeline* GetPipeline() const { return m_pipeline.get(); }
-    template<typename T>
-    T* GetPipeline() const
-    {
-        if (!m_pipeline) return nullptr;
-        return static_cast<T*>(m_pipeline.get());
-    }
 
 protected:
 	Renderer() = default;

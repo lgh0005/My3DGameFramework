@@ -47,4 +47,10 @@ private:
 	StandardGeometryPassUPtr		  m_geometryPass	  { nullptr };
 	StandardDeferredLightingPassUPtr  m_deferredLightPass { nullptr };
 	StandardGlobalUniformsUPtr        m_globalUniforms	  { nullptr };
+
+/*================================//
+//   IMGUI debug context method   //
+//================================*/
+private:
+	void RenderIMGUIContext();
 };
