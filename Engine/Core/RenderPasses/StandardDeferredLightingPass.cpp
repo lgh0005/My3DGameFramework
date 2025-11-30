@@ -1,4 +1,4 @@
-#include "EnginePch.h"
+ï»¿#include "EnginePch.h"
 #include "StandardDeferredLightingPass.h"
 
 #include "Core/Scene.h"
@@ -38,17 +38,17 @@ bool StandardDeferredLightingPass::Init()
 	return true;
 }
 
-// TODO : Render Ãß»ó ¸Ş¼­µå »ı±è»õ¸¦ Á¶±İ ´ÙµëÀ» ÇÊ¿ä´Â ÀÖÀ½
+// TODO : Render ì¶”ìƒ ë©”ì„œë“œ ìƒê¹€ìƒˆë¥¼ ì¡°ê¸ˆ ë‹¤ë“¬ì„ í•„ìš”ëŠ” ìˆìŒ
 void StandardDeferredLightingPass::Render(Scene* scene, Camera* camera)
 {
 	auto pipeline = (StandardRenderPipeline*)(RENDER.GetRenderer()->GetPipeline());
 
-	// 1. G-Buffer Á¤º¸  °¡Á®¿À±â
+	// 1. G-Buffer ì •ë³´  ê°€ì ¸ì˜¤ê¸°
 	auto geometryPass = pipeline->GetGeometryPass();
 	if (!geometryPass) return;
 	auto gBuffer = geometryPass->GetGBuffer();
 
-	// 2. ±×¸®±â ÁØºñ (È­¸é È¤Àº Æ÷½ºÆ® ÇÁ·Î¼¼½Ì FBO¿¡ ±×¸²)
+	// 2. ê·¸ë¦¬ê¸° ì¤€ë¹„ (í™”ë©´ í˜¹ì€ í¬ìŠ¤íŠ¸ í”„ë¡œì„¸ì‹± FBOì— ê·¸ë¦¼)
 	auto postProcessPass = pipeline->GetPostProcessPass();
 	if (postProcessPass)
 	{
@@ -87,23 +87,23 @@ void StandardDeferredLightingPass::Render(Scene* scene, Camera* camera)
 	gBuffer->GetColorAttachment(3)->Bind();
 	m_deferredLightProgram->SetUniform("gEmission", 3);
 
-	// 2. Shadow Map °¡Á®¿À±â & ¹ÙÀÎµù
+	// 2. Shadow Map ê°€ì ¸ì˜¤ê¸° & ë°”ì¸ë”©
 	auto shadowPass = pipeline->GetShadowPass();
 	if (shadowPass)
 	{
-		// 1. ÅØ½ºÃ³ 8Àå ¹ÙÀÎµù
+		// 1. í…ìŠ¤ì²˜ 8ì¥ ë°”ì¸ë”©
 		for (int i = 0; i < 8; ++i)
 		{
 			glActiveTexture(GL_TEXTURE4 + i);
 
-			// ºÎ¸ğ Å¬·¡½ºÀÇ ¸Ş¼­µå ¹Ù·Î È£Ãâ
+			// ë¶€ëª¨ í´ë˜ìŠ¤ì˜ ë©”ì„œë“œ ë°”ë¡œ í˜¸ì¶œ
 			auto sm = shadowPass->GetShadowMap(i);
 			if (sm) sm->GetShadowMap()->Bind();
 			std::string uniformName = "shadowMaps[" + std::to_string(i) + "]";
 			m_deferredLightProgram->SetUniform(uniformName, 4 + i);
 		}
 
-		// 2. Çà·Ä Àü¼Û (ÀÌ°Ç Light ÄÄÆ÷³ÍÆ®¿¡¼­ °¡Á®¿À¹Ç·Î µ¿ÀÏ)
+		// 2. í–‰ë ¬ ì „ì†¡ (ì´ê±´ Light ì»´í¬ë„ŒíŠ¸ì—ì„œ ê°€ì ¸ì˜¤ë¯€ë¡œ ë™ì¼)
 		const auto& lights = scene->GetLights();
 		for (auto* light : lights)
 		{
@@ -116,7 +116,7 @@ void StandardDeferredLightingPass::Render(Scene* scene, Camera* camera)
 		}
 	}
 
-	// 3. ±×¸² ±×¸®±â
+	// 3. ê·¸ë¦¼ ê·¸ë¦¬ê¸°
 	m_plane->Draw(m_deferredLightProgram.get());
 	glEnable(GL_DEPTH_TEST);
 }
