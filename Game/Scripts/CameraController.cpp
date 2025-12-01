@@ -14,14 +14,14 @@ void CameraController::Start()
     m_pitch = rotation.x;
     m_yaw = rotation.y;
 
-    INPUT.MapAction("MoveForward", GLFW_KEY_W);
-    INPUT.MapAction("MoveBackward", GLFW_KEY_S);
-    INPUT.MapAction("MoveLeft", GLFW_KEY_A);
-    INPUT.MapAction("MoveRight", GLFW_KEY_D);
-    INPUT.MapAction("MoveUp", GLFW_KEY_E);
-    INPUT.MapAction("MoveDown", GLFW_KEY_Q);
+    INPUT_MGR.MapAction("MoveForward", GLFW_KEY_W);
+    INPUT_MGR.MapAction("MoveBackward", GLFW_KEY_S);
+    INPUT_MGR.MapAction("MoveLeft", GLFW_KEY_A);
+    INPUT_MGR.MapAction("MoveRight", GLFW_KEY_D);
+    INPUT_MGR.MapAction("MoveUp", GLFW_KEY_E);
+    INPUT_MGR.MapAction("MoveDown", GLFW_KEY_Q);
 
-    INPUT.MapMouseAction("ControlCamera", GLFW_MOUSE_BUTTON_RIGHT);
+    INPUT_MGR.MapMouseAction("ControlCamera", GLFW_MOUSE_BUTTON_RIGHT);
 }
 
 void CameraController::Update()
@@ -36,37 +36,37 @@ void CameraController::HandleMovement(float dt)
     auto& transform = GetTransform();
     float speed = m_moveSpeed * dt;
 
-    if (INPUT.GetButton("MoveForward"))  
+    if (INPUT_MGR.GetButton("MoveForward"))
         transform.Translate(transform.GetForwardVector() * speed);
-    if (INPUT.GetButton("MoveBackward")) 
+    if (INPUT_MGR.GetButton("MoveBackward")) 
         transform.Translate(transform.GetForwardVector() * -speed);
 
-    if (INPUT.GetButton("MoveRight"))    
+    if (INPUT_MGR.GetButton("MoveRight"))    
         transform.Translate(transform.GetRightVector() * speed);
-    if (INPUT.GetButton("MoveLeft"))     
+    if (INPUT_MGR.GetButton("MoveLeft"))     
         transform.Translate(transform.GetRightVector() * -speed);
 
-    if (INPUT.GetButton("MoveUp"))       
+    if (INPUT_MGR.GetButton("MoveUp"))       
         transform.Translate(transform.GetUpVector() * speed);
-    if (INPUT.GetButton("MoveDown"))     
+    if (INPUT_MGR.GetButton("MoveDown"))     
         transform.Translate(transform.GetUpVector() * -speed);
 }
 
 void CameraController::HandleRotation(float dt)
 {
-    if (INPUT.GetButtonDown("ControlCamera"))
+    if (INPUT_MGR.GetButtonDown("ControlCamera"))
     {
         m_controlEnabled = true;
-        m_prevMousePos = INPUT.GetMousePos(); // 클릭 순간 튀는 현상 방지
+        m_prevMousePos = INPUT_MGR.GetMousePos(); // 클릭 순간 튀는 현상 방지
     }
-    else if (INPUT.GetButtonUp("ControlCamera"))
+    else if (INPUT_MGR.GetButtonUp("ControlCamera"))
     {
         m_controlEnabled = false;
     }
     if (!m_controlEnabled) return;
 
     // 마우스 델타 계산
-    glm::vec2 currentPos = INPUT.GetMousePos();
+    glm::vec2 currentPos = INPUT_MGR.GetMousePos();
     glm::vec2 delta = currentPos - m_prevMousePos;
     m_prevMousePos = currentPos;
 

@@ -19,6 +19,8 @@ public:
 	Scene* GetActiveScene() const;
 	void OnScreenResize(int32 width, int32 height);
 
+	void Clear();
+
 private:
 	std::unordered_map<std::string, SceneFactory> m_scenes;
 	SceneUPtr m_activeScene;

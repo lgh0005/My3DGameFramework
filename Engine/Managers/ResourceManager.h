@@ -9,9 +9,9 @@ CLASS_PTR(Texture)
 CLASS_PTR(CubeTexture)
 CLASS_PTR(Model)
 CLASS_PTR(Animation)
+CLASS_PTR(AudioClip)
 #pragma endregion
 
-// TODO : 코드 좀 더 간소화 할 수 있다면 간소화 하기
 class ResourceManager
 {
 	DECLARE_SINGLE(ResourceManager)
@@ -47,6 +47,7 @@ private:
 	std::unordered_map<std::string, CubeTexturePtr>m_cubeTextures;
 	std::unordered_map<std::string, ModelPtr>      m_models;
 	std::unordered_map<std::string, AnimationPtr>  m_animations;
+	std::unordered_map<std::string, AudioClipPtr>  m_audioClips;
 
 private:
 	template<typename T>
@@ -88,7 +89,6 @@ inline std::shared_ptr<T> ResourceManager::GetResource(const std::string& name) 
 }
 #pragma endregion
 
-
 /*============================//
 //  Template Specializations  //
 //============================*/
@@ -117,5 +117,9 @@ template<> inline const std::unordered_map<std::string, ModelPtr>& ResourceManag
 // 6. Animation 연결
 template<> inline std::unordered_map<std::string, AnimationPtr>& ResourceManager::GetMap<Animation>() { return m_animations; }
 template<> inline const std::unordered_map<std::string, AnimationPtr>& ResourceManager::GetMap<Animation>() const { return m_animations; }
+
+// 7. AudioClip 연결
+template<> inline std::unordered_map<std::string, AudioClipPtr>& ResourceManager::GetMap<AudioClip>() { return m_audioClips; }
+template<> inline const std::unordered_map<std::string, AudioClipPtr>& ResourceManager::GetMap<AudioClip>() const { return m_audioClips; }
 
 #pragma endregion

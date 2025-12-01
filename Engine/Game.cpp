@@ -20,8 +20,9 @@ bool Game::Init()
     // 초기화가 필요한 다른 매니저들 초기화
     RENDER.Init();
 
-    INPUT.Init();
+    INPUT_MGR.Init();
     TIME.Init();
+    AUDIO.Init();
     IMGUI.Init(true);
 
     // 첫 씬 로드
@@ -61,7 +62,7 @@ void Game::Update()
         }
 
         // 인풋 업데이트
-        INPUT.Update();
+        INPUT_MGR.Update();
 
         // 버퍼 스왑
         glfwSwapBuffers(handle);
@@ -70,11 +71,14 @@ void Game::Update()
 
 void Game::Shutdown()
 {
+    SCENE.Clear();
+
     // 1. 렌더러 정리 (가장 중요! OpenGL 컨텍스트 살아있을 때)
     RENDER.Clear();
 
     // 매니저 정리
     IMGUI.ShutDown();
+    AUDIO.Clear();
     RESOURCE.Clear();
     
     // glfw 정리

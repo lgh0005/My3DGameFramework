@@ -10,7 +10,8 @@ CLASS_PTR(Light)
 CLASS_PTR(Camera)
 CLASS_PTR(Animator)
 CLASS_PTR(Script)
-CLASS_PTR(Uniformbuffer)
+CLASS_PTR(AudioSource)
+CLASS_PTR(AudioListener)
 #pragma endregion
 
 CLASS_PTR(Scene)
@@ -67,6 +68,8 @@ protected:
 	std::vector<Camera*>		m_cameras;
 	std::vector<Animator*>		m_animators;
 	std::vector<Script*>        m_scripts;
+	std::vector<AudioSource*>   m_audioSources;
+	std::vector<AudioListener*> m_audioListeners;
 
 	// 하늘 텍스쳐
 	CubeTexturePtr				m_skyboxTexture;

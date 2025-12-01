@@ -13,7 +13,6 @@ add_library(Engine STATIC
 
    # Core
    "Game.h"                         "Game.cpp"
-   #"Core/Context.h"                 "Core/Context.cpp"
    "Core/GameObject.h"              "Core/GameObject.cpp"
    "Core/Scene.h"                   "Core/Scene.cpp"
    "Core/Renderer.h"                "Core/Renderer.cpp"
@@ -56,6 +55,9 @@ add_library(Engine STATIC
    "Graphics/UniformBuffer.h"       "Graphics/UniformBuffer.cpp"
    "Graphics/Uniform.h"             "Graphics/Uniform.cpp"
 
+   # Audio
+   "Audios/AudioClip.h"             "Audios/AudioClip.cpp"
+
    # Components
    "Components/Component.h"         "Components/Component.cpp"
    "Components/Light.h"             "Components/Light.cpp"
@@ -68,6 +70,8 @@ add_library(Engine STATIC
    "Components/SpotLight.h"         "Components/SpotLight.cpp"
    "Components/Animator.h"          "Components/Animator.cpp"
    "Components/MeshRenderer.h"      "Components/MeshRenderer.cpp"
+   "Components/AudioSource.h"       "Components/AudioSource.cpp"
+   "Components/AudioListener.h"       "Components/AudioListener.cpp"
 
    # Managers
    "Managers/TimeManager.h"         "Managers/TimeManager.cpp"
@@ -76,7 +80,8 @@ add_library(Engine STATIC
    "Managers/ResourceManager.h"     "Managers/ResourceManager.cpp"
    "Managers/SceneManager.h"        "Managers/SceneManager.cpp"
    "Managers/RenderManager.h"       "Managers/RenderManager.cpp"
- )
+   "Managers/AudioManager.h"        "Managers/AudioManager.cpp"
+ "Components/AudioListener.h")
 
 # 2. [PCH 설정] EnginePCH.h를 PCH로 사용합니다.
 target_precompile_headers(Engine  PUBLIC EnginePCH.h)

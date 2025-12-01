@@ -85,6 +85,8 @@ float GetShadowFactor(int index, vec4 fragPosLightSpace, vec3 normal, vec3 light
 }
 
 // [조명 계산 함수]
+// TODO : 조명 타입에 맞춰서 코드를 좀 더 명확히 써서 
+// 타입별로 어떻게 연산이 되는 것인지 조금은 명확히 작성 필요
 vec3 LightCalculation(int index, vec3 normal, vec3 fragPos, vec3 viewDir, vec3 albedo, float specInt, float shininess)
 {
     LightInfo light = lights[index];
@@ -166,6 +168,4 @@ void main()
     if (brightness > 1.0) BrightColor = vec4(result, 1.0);
     else BrightColor = vec4(0.0, 0.0, 0.0, 1.0);
 }
-
-// ============================================================================
 

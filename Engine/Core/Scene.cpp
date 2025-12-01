@@ -2,7 +2,6 @@
 #include "Scene.h"
 
 #include "Core/GameObject.h"
-#include "Graphics/UniformBuffer.h"
 #include "Components/Component.h"
 #include "Components/Light.h"
 #include "Components/PointLight.h"
@@ -13,6 +12,8 @@
 #include "Components/Animator.h"
 #include "Components/Script.h"
 #include "Components/Transform.h"
+#include "Components/AudioSource.h"
+#include "Components/AudioListener.h"
 
 Scene::Scene() = default;
 Scene::~Scene() = default;
@@ -53,6 +54,16 @@ void Scene::RegisterComponent(Component* component)
 		m_scripts.push_back(static_cast<Script*>(component));
 		break;
 	}
+	case ComponentType::AudioSource:
+	{
+		m_audioSources.push_back(static_cast<AudioSource*>(component));
+		break;
+	}
+	case ComponentType::AudioListener:
+	{
+		m_audioListeners.push_back(static_cast<AudioListener*>(component));
+		break;
+	}
 	default: return;
 	}
 }
@@ -62,7 +73,6 @@ void Scene::OnScreenResize(int32 width, int32 height)
 	// TODO : 이후에는 다중 카메라에 대해서 모든 카메라가 리사이징 되어야함
 	auto* camera = GetMainCamera();
 	if (camera) camera->SetAspectRatio((float)width / (float)height);
-	// TODO : SRP가 Viewport를 책임짐
 }
 
 bool Scene::Init()
@@ -106,6 +116,7 @@ void Scene::Update()
 	// 0. 나중에 추가할 Destroy/SetActive 로직을 고려
 
 	// TODO
+
 	// 1. 캐시된 m_animators 목록을 순회하며 애니메이션 업데이트
 	for (auto* animator : m_animators)
 	{
@@ -115,11 +126,26 @@ void Scene::Update()
 		// Scene::Update()로 이동
 		animator->UpdateAnimation();
 	}
+
+	// 전체적으로 컴포넌트가 계층적 위치에 따라 적용되도록 만들 필요가 있음
 	
 	// 2. 스크립트 컴포넌트 업데이트
 	for (auto* script : m_scripts)
 	{
 	     script->Update();
+	}
+
+	// 3. 오디오 소스 위치 갱신
+	for (auto* audioSource : m_audioSources)
+	{
+		audioSource->Update();
+	}
+
+	// 3. 오디오 리스너 위치 갱신
+	// TODO : 리스너는 단 하나만 있도록 유도 필요
+	for (auto* audioListener : m_audioListeners)
+	{
+		audioListener->Update();
 	}
 
 	// 3. 파괴가 예약된 오브젝트들 일괄 삭제

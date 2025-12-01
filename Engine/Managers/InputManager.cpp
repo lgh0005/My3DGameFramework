@@ -107,7 +107,7 @@ InputAction* InputManager::GetOrCreateAction(const std::string& name)
 void InputManager::DispatchKey(GLFWwindow* window, 
     int32 key, int32 scancode, int32 action, int32 mods)
 {
-    INPUT.OnKey(key, scancode, action, mods);
+    INPUT_MGR.OnKey(key, scancode, action, mods);
 }
 
 void InputManager::OnKey(int32 key, int32 scancode, int32 action, int32 mods)
@@ -138,7 +138,7 @@ void InputManager::OnKey(int32 key, int32 scancode, int32 action, int32 mods)
 void InputManager::DispatchMouse(GLFWwindow* window,
     int32 button, int32 action, int32 mods)
 {
-    INPUT.OnMouse(button, action, mods);
+    INPUT_MGR.OnMouse(button, action, mods);
 }
 
 void InputManager::OnMouse(int32 button, int32 action, int32 mods)
@@ -166,7 +166,7 @@ void InputManager::OnMouse(int32 button, int32 action, int32 mods)
 
 void InputManager::DispatchCursorPos(GLFWwindow* window, double xpos, double ypos)
 {
-    INPUT.OnCursorPos(xpos, ypos);
+    INPUT_MGR.OnCursorPos(xpos, ypos);
 }
 
 void InputManager::OnCursorPos(double xpos, double ypos)

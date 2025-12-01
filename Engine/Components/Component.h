@@ -12,7 +12,9 @@ enum class ComponentType
 	Light,
 	Transform,
 	MeshRenderer,
-	Script
+	Script,
+	AudioSource,
+	AudioListener
 };
 
 CLASS_PTR(Component)

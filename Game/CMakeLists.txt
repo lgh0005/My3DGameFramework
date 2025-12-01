@@ -7,19 +7,10 @@ add_executable(Game
 
     # TEMP : 테스트 전용 개발 씬
     "DevScene/DevScene.h"       "DevScene/DevScene.cpp"
-    # "DevScene/DevRenderer.h"    "DevScene/DevRenderer.cpp"
 
-    # "RenderPasses/StaticRenderPass.h" "RenderPasses/StaticRenderPass.cpp"
     "RenderPasses/SimpleRenderPass.h" "RenderPasses/SimpleRenderPass.cpp"
-    # "RenderPasses/SkinningRenderPass.h" "RenderPasses/SkinningRenderPass.cpp"
     "RenderPasses/InstancedRenderPass.h" "RenderPasses/InstancedRenderPass.cpp"
-    # "RenderPasses/SkyboxRenderPass.h"    "RenderPasses/SkyboxRenderPass.cpp"
     "RenderPasses/EnvironmentRenderPass.h"  "RenderPasses/EnvironmentRenderPass.cpp"
-    # "RenderPasses/PostProcessingPass.h"  "RenderPasses/PostProcessingPass.cpp"
-    # "RenderPasses/ShadowDepthRenderPass.h"  "RenderPasses/ShadowDepthRenderPass.cpp"
-
-    # "DeferredRenderPasses/GeometryRenderPass.h"  "DeferredRenderPasses/GeometryRenderPass.cpp"
-    # "DeferredRenderPasses/DeferredLightRenderPass.h"  "DeferredRenderPasses/DeferredLightRenderPass.cpp"
 
     "Scripts/CameraController.h"  "Scripts/CameraController.cpp"
 

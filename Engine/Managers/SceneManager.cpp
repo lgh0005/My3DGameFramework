@@ -50,3 +50,9 @@ void SceneManager::OnScreenResize(int32 width, int32 height)
 	if (m_activeScene)
 		m_activeScene->OnScreenResize(width, height);
 }
+
+void SceneManager::Clear()
+{
+	m_activeScene.reset();
+	m_scenes.clear();
+}

@@ -5,6 +5,7 @@
 #include "Core/Renderer.h"
 #include "Core/StandardRenderPipeline.h"
 #include "Core/RenderPasses/StandardGeometryPass.h"
+#include "Audios/AudioClip.h"
 #include "Graphics/Program.h"
 #include "Graphics/Mesh.h"
 #include "Graphics/StaticMesh.h"
@@ -24,6 +25,8 @@
 #include "Components/DirectionalLight.h"
 #include "Components/PointLight.h"
 #include "Components/Animator.h"
+#include "Components/AudioSource.h"
+#include "Components/AudioListener.h"
 
 #include "RenderPasses/InstancedRenderPass.h"
 #include "RenderPasses/SimpleRenderPass.h"
@@ -253,6 +256,18 @@ bool DevScene::LoadNessesaryResources()
 		RESOURCE.AddResource<CubeTexture>("SkyboxTexture", std::move(cubeSky));
 	}
 
+	// 9. sfx
+	{
+		auto sfx = AudioClip::LoadSFX("./Resources/Audios/gunshot.mp3");
+		RESOURCE.AddResource<AudioClip>("MySFX", std::move(sfx));
+	}
+
+	// 10. bgm
+	{
+		auto bgm = AudioClip::LoadBGM("./Resources/Audios/anubis.wav");
+		RESOURCE.AddResource<AudioClip>("MyBGM", std::move(bgm));
+	}
+
 	return true;
 }
 
@@ -326,6 +341,10 @@ bool DevScene::CreateSceneContext()
 		// 카메라 컨트롤러 생성 및 추가
 		auto cameraCtrl = CameraController::Create();
 		cameraObj->AddComponent(std::move(cameraCtrl));
+
+		// 오디오 리스너 생성 및 추가
+		auto audioListener = AudioListener::Create();
+		cameraObj->AddComponent(std::move(audioListener));
 
 		SetMainCamera(cameraPtr); // 메인 카메라로 설정
 
@@ -411,6 +430,12 @@ bool DevScene::CreateSceneContext()
 		(RESOURCE.GetResource<Mesh>("Cube"), RESOURCE.GetResource<Material>("boxMat2"));
 		gPass->AddStaticMeshRenderer(meshRenderer.get());
 		cubeObj->AddComponent(std::move(meshRenderer));
+
+		// TEMP : BGM 재생
+		auto audiSourc = AudioSource::Create(RESOURCE.GetResource<AudioClip>("MyBGM"));
+		audiSourc->Play();
+		cubeObj->AddComponent(std::move(audiSourc));
+
 		AddGameObject(std::move(cubeObj));
 	}
 
