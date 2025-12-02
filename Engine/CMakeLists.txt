@@ -26,6 +26,7 @@ add_library(Engine STATIC
    "Core/RenderPasses/StandardGeometryPass.h"  "Core/RenderPasses/StandardGeometryPass.cpp"
    "Core/RenderPasses/StandardDeferredLightingPass.h"  "Core/RenderPasses/StandardDeferredLightingPass.cpp"
    "Core/RenderPasses/StandardGlobalUniforms.h"  "Core/RenderPasses/StandardGlobalUniforms.cpp"
+   "Core/RenderPasses/StandardSSAOPass.h"       "Core/RenderPasses/StandardSSAOPass.cpp"
 
    # Misc
    "Misc/Defines.h"
@@ -81,7 +82,7 @@ add_library(Engine STATIC
    "Managers/SceneManager.h"        "Managers/SceneManager.cpp"
    "Managers/RenderManager.h"       "Managers/RenderManager.cpp"
    "Managers/AudioManager.h"        "Managers/AudioManager.cpp"
- "Components/AudioListener.h")
+)
 
 # 2. [PCH 설정] EnginePCH.h를 PCH로 사용합니다.
 target_precompile_headers(Engine  PUBLIC EnginePCH.h)

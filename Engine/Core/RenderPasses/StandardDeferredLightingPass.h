@@ -15,6 +15,7 @@ class StandardDeferredLightingPass : public RenderPass
 public:
 	static StandardDeferredLightingPassUPtr Create();
 	virtual void Render(Scene* scene, Camera* camera) override;
+	void SetSSAOTexture(Texture* ssaoTex) { m_ssaoTexture = ssaoTex; }
 
 private:
 	StandardDeferredLightingPass() = default;
@@ -22,4 +23,5 @@ private:
 
 	MeshPtr m_plane;
 	ProgramUPtr m_deferredLightProgram;
+	Texture* m_ssaoTexture{ nullptr };
 };

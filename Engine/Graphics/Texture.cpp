@@ -83,19 +83,29 @@ void Texture::Bind() const
 
 void Texture::SetFilter(uint32 minFilter, uint32 magFilter) const
 {
+    Bind();
     glTexParameteri(m_target, GL_TEXTURE_MIN_FILTER, minFilter);
     glTexParameteri(m_target, GL_TEXTURE_MAG_FILTER, magFilter);
 }
 
 void Texture::SetWrap(uint32 sWrap, uint32 tWrap) const
 {
+    Bind();
     glTexParameteri(m_target, GL_TEXTURE_WRAP_S, sWrap);
     glTexParameteri(m_target, GL_TEXTURE_WRAP_T, tWrap);
 }
 
 void Texture::SetBorderColor(const glm::vec4& color) const 
 {
+    Bind();
     glTexParameterfv(m_target, GL_TEXTURE_BORDER_COLOR, glm::value_ptr(color));
+}
+
+void Texture::SetData(const void* data, uint32 size)
+{
+    // size는 검증용으로 쓸 수 있지만 여기선 단순하게 전체 업로드라고 가정
+    Bind();
+    glTexSubImage2D(m_target, 0, 0, 0, m_width, m_height, m_format, m_type, data);
 }
 
 void Texture::CreateTexture()

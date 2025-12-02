@@ -5,6 +5,7 @@
 #include "Core/RenderPasses/StandardSkyboxPass.h"
 #include "Core/RenderPasses/StandardPostProcessPass.h"
 #include "Core/RenderPasses/StandardGeometryPass.h"
+#include "Core/RenderPasses/StandardSSAOPass.h"
 #include "Core/RenderPasses/StandardDeferredLightingPass.h"
 #include "Core/RenderPasses/StandardGlobalUniforms.h"
 
@@ -56,6 +57,10 @@ bool StandardRenderPipeline::Init()
 	m_deferredLightPass = StandardDeferredLightingPass::Create();
 	if (!m_deferredLightPass) return false;
 
+	// TEST : SSAO 패스 생성
+	m_ssaoPass = StandardSSAOPass::Create();
+	if (!m_ssaoPass) return false;
+
 	return true;
 }
 
@@ -96,6 +101,27 @@ void StandardRenderPipeline::Render(Scene* scene)
 
 	// [패스 2] 디퍼드 셰이딩 및 포스트 프로세스 프레임 버퍼에 깊이 복사
 	m_geometryPass->Render(scene, camera);
+
+	// [패스 3] SSAO
+	{
+		// 1. G-Buffer 가져오기
+		auto gBuffer = m_geometryPass->GetGBuffer();
+
+		// 2. [★핵심 수정★] SSAO 패스에 재료(텍스처) 넣어주기!
+		// 이 부분이 빠져서 SSAO가 작동을 안 하고 있었던 겁니다.
+		if (m_ssaoPass && gBuffer)
+		{
+			m_ssaoPass->SetGBufferInputs
+			(
+				gBuffer->GetColorAttachment(0).get(), // Position
+				gBuffer->GetColorAttachment(1).get()  // Normal
+			);
+		}
+		m_ssaoPass->Render(scene, camera);
+	}
+
+	// [패스 4] Deferred Lighting 패스
+	m_deferredLightPass->SetSSAOTexture(m_ssaoPass->GetSSAOResultTexture());
 	m_deferredLightPass->Render(scene, camera);
 
 	auto gBuffer = m_geometryPass->GetGBuffer();

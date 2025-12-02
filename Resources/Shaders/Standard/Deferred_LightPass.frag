@@ -16,6 +16,10 @@ uniform sampler2D gEmission;
 uniform sampler2D shadowMaps[8]; 
 uniform mat4 lightSpaceMatrices[8]; // 행렬도 배열로!
 
+// [SSAO sampler]
+uniform sampler2D ssaoTexture;
+uniform bool useSSAO;
+
 // [Light UBO]
 struct LightInfo
 {
@@ -87,7 +91,7 @@ float GetShadowFactor(int index, vec4 fragPosLightSpace, vec3 normal, vec3 light
 // [조명 계산 함수]
 // TODO : 조명 타입에 맞춰서 코드를 좀 더 명확히 써서 
 // 타입별로 어떻게 연산이 되는 것인지 조금은 명확히 작성 필요
-vec3 LightCalculation(int index, vec3 normal, vec3 fragPos, vec3 viewDir, vec3 albedo, float specInt, float shininess)
+vec3 LightCalculation(int index, vec3 normal, vec3 fragPos, vec3 viewDir, vec3 albedo, float specInt, float shininess, float ao)
 {
     LightInfo light = lights[index];
 
@@ -134,7 +138,7 @@ vec3 LightCalculation(int index, vec3 normal, vec3 fragPos, vec3 viewDir, vec3 a
         shadow = GetShadowFactor(shadowIdx, lightSpacePos, normal, lightDir);
     }
    
-    vec3 ambient = light.ambient * albedo;
+    vec3 ambient = light.ambient * albedo * ao;
     vec3 diffuse = light.diffuse * diff * albedo;
     vec3 specular = light.specular * spec * specInt;
 
@@ -152,16 +156,35 @@ void main()
     vec3 Emission = texture(gEmission, TexCoords).rgb;
     float Shininess = texture(gNormal, TexCoords).a; 
 
+    float ao = 1.0; // 기본값: 차폐 없음
+    if (useSSAO)
+    {
+        // 텍스처의 r 채널에 occlusion 값이 들어있음 (1.0 = 흰색 = 열림, 0.0 = 검은색 = 막힘)
+        ao = texture(ssaoTexture, TexCoords).r;
+    }
+
     vec3 viewDir = normalize(viewPos - FragPos);
     vec3 result = vec3(0.0);
 
     for(int i = 0; i < lightCount; ++i)
     {
-        result += LightCalculation(i, Normal, FragPos, viewDir, Albedo, SpecInt, Shininess);
+        result += LightCalculation(i, Normal, FragPos, viewDir, Albedo, SpecInt, Shininess, ao);
     }
     
     result += Emission;
-    FragColor = vec4(result, 1.0);
+    // =====================================================================
+    // [DEBUG] SSAO 적용 결과 확인용 코드
+    // =====================================================================
+    // 원래의 최종 결과 출력 코드를 주석 처리합니다.
+    // FragColor = vec4(result, 1.0);
+    
+    // 대신 ao 값을 R, G, B 채널에 모두 넣어서 흑백으로 출력합니다.
+    // useSSAO가 true일 때: 구석진 곳은 검은색(0.0), 트인 곳은 흰색(1.0)으로 나와야 성공입니다.
+    // useSSAO가 false일 때: 전체가 흰색(1.0)으로 나와야 합니다.
+    // vec3 debugPos = texture(gPosition, TexCoords).rgb;
+    FragColor = vec4(vec3(ao), 1.0); 
+
+    // =====================================================================
     
     // Bloom Threshold
     float brightness = dot(result, vec3(0.2126, 0.7152, 0.0722));

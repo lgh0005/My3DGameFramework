@@ -16,6 +16,13 @@ FramebufferUPtr Framebuffer::CreateGBuffer(int32 width, int32 height)
     return std::move(gBuffer);
 }
 
+FramebufferUPtr Framebuffer::CreateSSAO(int32 width, int32 height)
+{
+    auto fbo = FramebufferUPtr(new Framebuffer());
+    if (!fbo->InitSSAO(width, height)) return nullptr;
+    return std::move(fbo);
+}
+
 void Framebuffer::BindToDefault()
 {
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -236,6 +243,33 @@ bool Framebuffer::InitGBuffer(int32 width, int32 height)
         SPDLOG_ERROR("failed to create gBuffer: {}", gBufferResult); // 로그 출력
         return false;
     }
+
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    return true;
+}
+
+bool Framebuffer::InitSSAO(int32 width, int32 height)
+{
+    m_width = width;
+    m_height = height;
+    m_samples = 1;
+
+    glGenFramebuffers(1, &m_resolveFbo);
+    glBindFramebuffer(GL_FRAMEBUFFER, m_resolveFbo);
+
+    // SSAO는 GL_RED 채널만 있으면 충분합니다 (메모리 절약)
+    // 정밀도를 위해 GL_R16F 혹은 GL_RED 사용
+    auto texture = Texture::Create(width, height, GL_R16F, GL_RED, GL_FLOAT);
+    texture->SetFilter(GL_NEAREST, GL_NEAREST);
+
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, texture->Get(), 0);
+    m_resolveTextures.push_back(std::move(texture));
+
+    uint32 attachments[1] = { GL_COLOR_ATTACHMENT0 };
+    glDrawBuffers(1, attachments);
+
+    if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+        return false;
 
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     return true;

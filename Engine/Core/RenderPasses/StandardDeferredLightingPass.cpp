@@ -87,6 +87,19 @@ void StandardDeferredLightingPass::Render(Scene* scene, Camera* camera)
 	gBuffer->GetColorAttachment(3)->Bind();
 	m_deferredLightProgram->SetUniform("gEmission", 3);
 
+	// Slot 12 : SSAO Texture Binding
+	if (m_ssaoTexture)
+	{
+		glActiveTexture(GL_TEXTURE12);
+		m_ssaoTexture->Bind();
+		m_deferredLightProgram->SetUniform("ssaoTexture", 12);
+		m_deferredLightProgram->SetUniform("useSSAO", true);
+	}
+	else
+	{
+		m_deferredLightProgram->SetUniform("useSSAO", false);
+	}
+
 	// 2. Shadow Map 가져오기 & 바인딩
 	auto shadowPass = pipeline->GetShadowPass();
 	if (shadowPass)
@@ -119,4 +132,5 @@ void StandardDeferredLightingPass::Render(Scene* scene, Camera* camera)
 	// 3. 그림 그리기
 	m_plane->Draw(m_deferredLightProgram.get());
 	glEnable(GL_DEPTH_TEST);
+	m_ssaoTexture = nullptr;
 }

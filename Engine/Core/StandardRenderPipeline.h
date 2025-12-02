@@ -4,6 +4,7 @@
 #pragma region FORWARD_DECLARATION
 CLASS_PTR(StandardDeferredLightingPass)
 CLASS_PTR(StandardGeometryPass)
+CLASS_PTR(StandardSSAOPass)
 CLASS_PTR(StandardPostProcessPass)
 CLASS_PTR(StandardShadowPass)
 CLASS_PTR(StandardSkyboxPass)
@@ -25,6 +26,7 @@ public:
 public:
 	StandardShadowPass* GetShadowPass()        const { return m_shadowPass.get(); }
 	StandardSkyboxPass* GetSkyboxPass()        const { return m_skyboxPass.get(); }
+	StandardSSAOPass* GetSSAOPass()			   const { return m_ssaoPass.get(); }
 	StandardPostProcessPass* GetPostProcessPass()   const { return m_postProcessPass.get(); }
 	StandardGeometryPass* GetGeometryPass()      const { return m_geometryPass.get(); }
 	StandardDeferredLightingPass* GetDeferredLightPass() const { return m_deferredLightPass.get(); }
@@ -46,6 +48,7 @@ private:
 	StandardPostProcessPassUPtr		  m_postProcessPass	  { nullptr };
 	StandardGeometryPassUPtr		  m_geometryPass	  { nullptr };
 	StandardDeferredLightingPassUPtr  m_deferredLightPass { nullptr };
+	StandardSSAOPassUPtr			  m_ssaoPass		  { nullptr };
 	StandardGlobalUniformsUPtr        m_globalUniforms	  { nullptr };
 
 /*================================//
