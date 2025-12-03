@@ -281,7 +281,6 @@ bool DevScene::CreateNessesaryRenderPasses()
 			"./Resources/Shaders/grass.vert",
 			"./Resources/Shaders/grass.frag");
 		if (!prog) return false;
-		// pipeline->AddRenderPass("Instanced", InstancedRenderPass::Create(std::move(prog)));
 		AddCustomRenderPass("Instanced", InstancedRenderPass::Create(std::move(prog)));
 	}
 
@@ -291,7 +290,6 @@ bool DevScene::CreateNessesaryRenderPasses()
 			"./Resources/Shaders/simple.vert",
 			"./Resources/Shaders/simple.frag");
 		if (!prog) return false;
-		// pipeline->AddRenderPass("LightGizmo", SimpleRenderPass::Create(std::move(prog)));
 		AddCustomRenderPass("LightGizmo", SimpleRenderPass::Create(std::move(prog)));
 	}
 
@@ -305,7 +303,6 @@ bool DevScene::CreateNessesaryRenderPasses()
 		if (!prog) return false;
 		CubeTexturePtr cubeTex = RESOURCE.GetResource<CubeTexture>("SkyboxTexture");
 		if (!cubeTex) return false;
-		// pipeline->AddRenderPass("EnvMap", EnvironmentRenderPass::Create(std::move(prog), cubeTex));
 		AddCustomRenderPass("EnvMap", EnvironmentRenderPass::Create(std::move(prog), cubeTex));
 	}
 
@@ -324,7 +321,7 @@ bool DevScene::CreateSceneContext()
 	SimpleRenderPass* lightPass = (SimpleRenderPass*)GetCustomRenderPass("LightGizmo");
 	InstancedRenderPass* grassPass = (InstancedRenderPass*)GetCustomRenderPass("Instanced");
 	EnvironmentRenderPass* envMapPass = (EnvironmentRenderPass*)GetCustomRenderPass("EnvMap");
-	auto* gPass = pipeline->GetGeometryPass();
+	// auto* gPass = pipeline->GetGeometryPass();
 
 	// 3. 카메라 GameObject 생성
 	{
@@ -364,6 +361,7 @@ bool DevScene::CreateSceneContext()
 		lightGo->AddComponent(std::move(lightComp));
 		auto renderer = MeshRenderer::Create
 		(RESOURCE.GetResource<Mesh>("Cube"), RESOURCE.GetResource<Material>("LightMat"));
+		renderer->SetRenderStage(RenderStage::Forward);
 		lightPass->AddRenderer(renderer.get());
 		lightGo->AddComponent(std::move(renderer));
 		AddGameObject(std::move(lightGo));
@@ -396,6 +394,7 @@ bool DevScene::CreateSceneContext()
 		lightGo->AddComponent(std::move(lightComp));
 		auto renderer = MeshRenderer::Create
 		(RESOURCE.GetResource<Mesh>("Cube"), RESOURCE.GetResource<Material>("LightMat"));
+		renderer->SetRenderStage(RenderStage::Forward);
 		lightPass->AddRenderer(renderer.get());
 		lightGo->AddComponent(std::move(renderer));
 		AddGameObject(std::move(lightGo));
@@ -412,7 +411,7 @@ bool DevScene::CreateSceneContext()
 
 		auto meshRenderer = MeshRenderer::Create
 		(RESOURCE.GetResource<Mesh>("Cube"), RESOURCE.GetResource<Material>("boxMat1"));
-		gPass->AddStaticMeshRenderer(meshRenderer.get());
+		// gPass->AddStaticMeshRenderer(meshRenderer.get());
 		cubeObj->AddComponent(std::move(meshRenderer));
 		AddGameObject(std::move(cubeObj));
 	}
@@ -428,7 +427,7 @@ bool DevScene::CreateSceneContext()
 
 		auto meshRenderer = MeshRenderer::Create
 		(RESOURCE.GetResource<Mesh>("Cube"), RESOURCE.GetResource<Material>("boxMat2"));
-		gPass->AddStaticMeshRenderer(meshRenderer.get());
+		// gPass->AddStaticMeshRenderer(meshRenderer.get());
 		cubeObj->AddComponent(std::move(meshRenderer));
 
 		// TEMP : BGM 재생
@@ -450,7 +449,7 @@ bool DevScene::CreateSceneContext()
 
 		auto meshRenderer = MeshRenderer::Create
 		(RESOURCE.GetResource<Mesh>("Cube"), RESOURCE.GetResource<Material>("boxMat4"));
-		gPass->AddStaticMeshRenderer(meshRenderer.get());
+		// gPass->AddStaticMeshRenderer(meshRenderer.get());
 		cubeObj->AddComponent(std::move(meshRenderer));
 		AddGameObject(std::move(cubeObj));
 	}
@@ -466,7 +465,7 @@ bool DevScene::CreateSceneContext()
 
 		auto meshRenderer = MeshRenderer::Create
 		(RESOURCE.GetResource<Mesh>("Cube"), RESOURCE.GetResource<Material>("boxMat5"));
-		gPass->AddStaticMeshRenderer(meshRenderer.get());
+		// gPass->AddStaticMeshRenderer(meshRenderer.get());
 		cubeObj->AddComponent(std::move(meshRenderer));
 		AddGameObject(std::move(cubeObj));
 	}
@@ -481,7 +480,7 @@ bool DevScene::CreateSceneContext()
 
 		auto meshRenderer = MeshRenderer::Create
 		(RESOURCE.GetResource<Mesh>("Cube"), RESOURCE.GetResource<Material>("boxMat3"));
-		gPass->AddStaticMeshRenderer(meshRenderer.get());
+		// gPass->AddStaticMeshRenderer(meshRenderer.get());
 		cubeObj->AddComponent(std::move(meshRenderer));
 		AddGameObject(std::move(cubeObj));
 	}
@@ -499,6 +498,7 @@ bool DevScene::CreateSceneContext()
 			RESOURCE.GetResource<Mesh>("Cube"),
 			RESOURCE.GetResource<Material>("boxMat1") // 임시 재질
 		);
+		meshRenderer->SetRenderStage(RenderStage::Forward);
 		envMapPass->AddRenderer(meshRenderer.get());
 		cubeObj->AddComponent(std::move(meshRenderer));
 		AddGameObject(std::move(cubeObj));
@@ -520,7 +520,7 @@ bool DevScene::CreateSceneContext()
 		{
 			SkinnedMeshPtr mesh = model->GetMesh(i);
 			auto renderer = MeshRenderer::Create(mesh, mesh->GetMaterial());
-			gPass->AddSkinnedMeshRenderer(renderer.get());
+			// gPass->AddSkinnedMeshRenderer(renderer.get());
 			modelGo->AddComponent((std::move(renderer)));
 		}
 

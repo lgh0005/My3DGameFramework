@@ -3,6 +3,7 @@
 
 #include "Core/Scene.h"
 #include "Core/GameObject.h"
+#include "Core/RenderContext.h"
 #include "Graphics/Program.h"
 #include "Graphics/Mesh.h"
 #include "Graphics/Material.h"
@@ -15,6 +16,7 @@
 #include "Components/Animator.h"
 
 #include "SRP/StandardRenderPipeline.h"
+#include "SRP/StandardRenderContext.h"
 
 StandardGeometryPassUPtr StandardGeometryPass::Create(int32 width, int32 height)
 {
@@ -105,6 +107,64 @@ void StandardGeometryPass::Render(Scene* scene, Camera* camera)
 	// 5. 그리기 완료 후 기본 프레임버퍼로 복귀
 	Framebuffer::BindToDefault();
 }
+
+// TEST : Context에 있는 내용물을 잘 렌더링 하는 지 테스트
+void StandardGeometryPass::TestRender(RenderContext* context)
+{
+	// 1. G-Buffer FBO 바인딩
+	m_gBuffer->Bind();
+
+	// 2. 화면 클리어
+	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+	glViewport(0, 0, m_gBuffer->GetWidth(), m_gBuffer->GetHeight());
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glEnable(GL_DEPTH_TEST);
+	glDisable(GL_BLEND);
+
+	// 3. Static Mesh 그리기 (정적 오브젝트)
+	if (m_staticGeometryProgram)
+	{
+		m_staticGeometryProgram->Use();
+		for (const auto* renderer : context->GetStaticMeshRenderers())
+		{
+			MeshPtr mesh = renderer->GetMesh();
+			auto model = renderer->GetTransform().GetModelMatrix();
+			auto material = renderer->GetMaterial();
+
+			material->SetToProgram(m_staticGeometryProgram.get());
+			m_staticGeometryProgram->SetUniform("model", model);
+
+			mesh->Draw(m_staticGeometryProgram.get());
+		}
+	}
+
+	// 4. Skinned Mesh 그리기 (애니메이션 오브젝트)
+	if (m_skinnedGeometryProgram)
+	{
+		m_skinnedGeometryProgram->Use();
+		for (const auto* renderer : context->GetSkinnedMeshRenderers())
+		{
+			GameObject* go = renderer->GetOwner();
+			MeshPtr mesh = renderer->GetMesh();
+			auto material = renderer->GetMaterial();
+			auto& transform = go->GetTransform();
+			Animator* animator = go->GetComponent<Animator>();
+
+			material->SetToProgram(m_skinnedGeometryProgram.get());
+
+			auto finalMatrices = animator->GetFinalBoneMatrices();
+			for (int i = 0; i < finalMatrices.size(); ++i)
+				m_skinnedGeometryProgram->SetUniform("finalBoneMatrices[" + std::to_string(i) + "]", finalMatrices[i]);
+			m_skinnedGeometryProgram->SetUniform("model", transform.GetModelMatrix());
+
+			mesh->Draw(m_skinnedGeometryProgram.get());
+		}
+	}
+
+	// 5. 그리기 완료 후 기본 프레임버퍼로 복귀
+	Framebuffer::BindToDefault();
+}
+
 
 void StandardGeometryPass::Resize(int32 width, int32 height)
 {

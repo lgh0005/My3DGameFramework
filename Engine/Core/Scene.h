@@ -24,11 +24,10 @@ public:
 
 	void AddGameObject(GameObjectUPtr gameObject);
 	void RegisterComponent(Component* component);
-
 	void OnScreenResize(int32 width, int32 height);
 
-	// TODO : 빠른 오브젝트 탐색 방안을 마련해야 한다.
-	// 1. Find
+	// TODO : 추가해야 할 메서드
+	// 1. Find : 씬에서 특정 게임 오브젝트 찾는 메서드
 
 /*=======================================//
 //   scene property getter and setters   //
@@ -43,12 +42,17 @@ public:
 	void SetSkyboxTexture(CubeTexturePtr texture) { m_skyboxTexture = texture; }
 	CubeTexture* GetSkyboxTexture() const { return m_skyboxTexture.get(); }
 
-	auto& GetStaticMeshRenderers() { return m_staticMeshRenderers; }
-	auto& GetSkinnedMeshRenderers() { return m_skinnedMeshRenderers; }
-
 	RenderPass* GetCustomRenderPass(const std::string& name);
+
+/*================================//
+//   interface to renderContext   //
+//================================*/
+public:
 	void AddCustomRenderPass(const std::string& name, RenderPassUPtr pass);
 	auto& GetCustomRenderPasses() { return m_customPasses; }
+
+	auto& GetStaticMeshRenderers() { return m_staticMeshRenderers; }
+	auto& GetSkinnedMeshRenderers() { return m_skinnedMeshRenderers; }
 
 protected:
 	Scene();

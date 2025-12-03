@@ -17,6 +17,8 @@
 #include "Components/MeshRenderer.h"
 #include "Components/Animator.h"
 
+#include "SRP/StandardRenderContext.h"
+
 StandardShadowPassUPtr StandardShadowPass::Create(int32 resolution)
 {
 	auto pass = StandardShadowPassUPtr(new StandardShadowPass());
@@ -107,6 +109,77 @@ void StandardShadowPass::Render(Scene* scene, Camera* camera)
 			// G-Buffer에서 그릴 대상 중 SkinnedMesh를 가져옴
 			const auto& skinnedRenderers = pipeline->GetGeometryPass()->GetSkinnedMeshRenderers();
 			for (const auto* renderer : skinnedRenderers)
+			{
+				GameObject* go = renderer->GetOwner();
+				auto model = renderer->GetTransform().GetModelMatrix();
+				m_skinnedDepthProgram->SetUniform("model", model);
+
+				Animator* animator = go->GetComponent<Animator>();
+				if (animator)
+				{
+					auto finalMatrices = animator->GetFinalBoneMatrices();
+					for (int i = 0; i < finalMatrices.size(); ++i)
+						m_skinnedDepthProgram->SetUniform
+						("finalBoneMatrices[" + std::to_string(i) + "]", finalMatrices[i]);
+				}
+
+				renderer->GetMesh()->Draw(m_skinnedDepthProgram.get());
+			}
+		}
+	}
+
+	glCullFace(GL_BACK);
+}
+
+// TEST : Context에 있는 내용물을 잘 렌더링 하는 지 테스트
+void StandardShadowPass::TestRender(RenderContext* context)
+{
+	// 1. 공통 설정
+	glEnable(GL_DEPTH_TEST);
+	glCullFace(GL_FRONT);
+
+	// 2. 전체 조명 리스트 순회
+	for (auto* light : context->GetLights())
+	{
+		// 2-1. 그림자 캐스팅이 필요한 조명인지 검사
+		if (!light->IsCastShadow()) continue;
+
+		// 2-2. 그림자 맵 인덱스 검사
+		int32 shadowIdx = light->GetShadowMapIndex();
+		if (shadowIdx >= MAX_SHADOW_CASTER) continue;
+
+		// 2-3. 그림자 맵 바인딩
+		auto& currentShadowMap = m_shadowMaps[shadowIdx];
+		currentShadowMap->Bind();
+		glViewport(0, 0, m_resolution, m_resolution);
+		glClear(GL_DEPTH_BUFFER_BIT);
+
+		// 2-4. 조명 행렬 계산
+		glm::mat4 lightSpaceMatrix = CalculateLightSpaceMatrix(light);
+		light->SetLightSpaceMatrix(lightSpaceMatrix);
+
+		// 2-5. StaticMesh 렌더링
+		if (m_staticDepthProgram)
+		{
+			m_staticDepthProgram->Use();
+			m_staticDepthProgram->SetUniform("lightSpaceMatrix", lightSpaceMatrix);
+
+			for (const auto* renderer : context->GetStaticMeshRenderers())
+			{
+				auto model = renderer->GetTransform().GetModelMatrix();
+				m_staticDepthProgram->SetUniform("model", model);
+				renderer->GetMesh()->Draw(m_staticDepthProgram.get());
+			}
+		}
+
+		// 2-6. SkinnedMesh 렌더링
+		if (m_skinnedDepthProgram)
+		{
+			m_skinnedDepthProgram->Use();
+			m_skinnedDepthProgram->SetUniform("lightSpaceMatrix", lightSpaceMatrix);
+
+			// G-Buffer에서 그릴 대상 중 SkinnedMesh를 가져옴
+			for (const auto* renderer : context->GetSkinnedMeshRenderers())
 			{
 				GameObject* go = renderer->GetOwner();
 				auto model = renderer->GetTransform().GetModelMatrix();

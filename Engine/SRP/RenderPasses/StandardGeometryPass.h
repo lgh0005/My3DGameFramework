@@ -7,6 +7,7 @@ CLASS_PTR(Program)
 CLASS_PTR(Scene)
 CLASS_PTR(Camera)
 CLASS_PTR(Framebuffer)
+CLASS_PTR(RenderContext)
 #pragma endregion
 
 CLASS_PTR(StandardGeometryPass)
@@ -26,6 +27,9 @@ public:
 	Framebuffer* GetGBuffer() { return m_gBuffer.get(); }
 
 	virtual void Render(Scene* scene, Camera* camera) override;
+
+	// TEST : Context에 있는 내용물을 잘 렌더링 하는 지 테스트
+	void TestRender(RenderContext* context);
 
 	void Resize(int32 width, int32 height);
 

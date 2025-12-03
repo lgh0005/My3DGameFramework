@@ -65,10 +65,15 @@ void Scene::RegisterComponent(Component* component)
 			m_audioListeners.push_back(static_cast<AudioListener*>(component));
 			break;
 		}
+		// TODO : 중첩 switch-case문은 좋은 방식은 아니므로 
+		// 가독성을 위해 따로 함수로 뺄 필요 있음
 		case ComponentType::MeshRenderer:
 		{
 			auto meshRenderer = static_cast<MeshRenderer*>(component);
 			MeshType meshType = meshRenderer->GetMesh()->GetMeshType();
+			RenderStage stage = meshRenderer->GetRenderStage();
+
+			if (stage == RenderStage::Forward) return;
 
 			switch (meshType)
 			{
@@ -87,7 +92,9 @@ void Scene::RegisterComponent(Component* component)
 				{
 					// TODO : 메쉬의 어떤 속성을 다르게 하여 인스턴싱을
 					// 할 지는 모르기 때문에 이는 따로 처리할 필요가 있음
-					// 현재는 커스텀 렌더링 패스를 제작해서 넣는 것으로 함.
+					// 현재는 커스텀 포워드 렌더링 패스를 제작해서 넣는 것으로 함.
+					// 이쪽은 예를 들어, 조명의 영향을 받는 무수한 풀밭을 그리고 
+					// 싶을 때 활용할 수 있음.
 					break;
 				}
 			}

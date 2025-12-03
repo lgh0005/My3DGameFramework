@@ -18,6 +18,7 @@ add_library(Engine STATIC
    "Core/Renderer.h"                "Core/Renderer.cpp"
    "Core/RenderPass.h"              "Core/RenderPass.cpp"
    "Core/RenderPipeline.h"          "Core/RenderPipeline.cpp"
+   "Core/RenderContext.h"           "Core/RenderContext.cpp"
 
    # Standard Render Pipeline
    "SRP/RenderPasses/StandardShadowPass.h" "SRP/RenderPasses/StandardShadowPass.cpp"

@@ -28,6 +28,8 @@ public:
     BufferPtr GetVertexBuffer() const { return m_vertexBuffer; }
     void SetMaterial(MaterialPtr material) { m_material = material; }
     MaterialPtr GetMaterial() const { return m_material; }
+
+
     virtual void Draw(const Program* program) const = 0;
 
 protected:

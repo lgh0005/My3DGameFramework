@@ -85,10 +85,16 @@ void WindowManager::HandleFramebufferSizeChange(GLFWwindow* window, int32 width,
 
     SPDLOG_INFO("framebuffer size changed: ({} x {})", width, height);
     
-    // 1. 렌더러 (FBO 재생성, Viewport 설정)
+    /// <summary>
+    /// 1. 렌더러 (FBO 재생성, Viewport 설정)
+    /// WindowManager -> Renderer -> RenderPipeline을 타고 가서 Viewport를 변경
+    /// </summary>
     RENDER.OnResize(width, height);
    
-    // 2. 화면 크기에 맞게 종횡비를 맞추면서 렌더링
+    /// <summary>
+    /// 2. 화면 크기에 맞게 종횡비를 맞추면서 렌더링
+    /// Scene의 카메라 컴포넌트의 종횡비를 변경
+    /// </summary>
     SCENE.OnScreenResize(width, height);
 }
 
