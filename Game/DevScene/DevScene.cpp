@@ -3,8 +3,8 @@
 
 #include "Core/GameObject.h"
 #include "Core/Renderer.h"
-#include "Core/StandardRenderPipeline.h"
-#include "Core/RenderPasses/StandardGeometryPass.h"
+#include "SRP/StandardRenderPipeline.h"
+#include "SRP/RenderPasses/StandardGeometryPass.h"
 #include "Audios/AudioClip.h"
 #include "Graphics/Program.h"
 #include "Graphics/Mesh.h"
@@ -281,8 +281,8 @@ bool DevScene::CreateNessesaryRenderPasses()
 			"./Resources/Shaders/grass.vert",
 			"./Resources/Shaders/grass.frag");
 		if (!prog) return false;
-		pipeline->AddRenderPass("Instanced", InstancedRenderPass::Create(std::move(prog)));
-		// AddRenderPass("Instanced", InstancedRenderPass::Create(std::move(prog)));
+		// pipeline->AddRenderPass("Instanced", InstancedRenderPass::Create(std::move(prog)));
+		AddCustomRenderPass("Instanced", InstancedRenderPass::Create(std::move(prog)));
 	}
 
 	// 4. Simple 셰이더 (조명 기즈모)
@@ -291,8 +291,8 @@ bool DevScene::CreateNessesaryRenderPasses()
 			"./Resources/Shaders/simple.vert",
 			"./Resources/Shaders/simple.frag");
 		if (!prog) return false;
-		pipeline->AddRenderPass("LightGizmo", SimpleRenderPass::Create(std::move(prog)));
-		// AddRenderPass("LightGizmo", SimpleRenderPass::Create(std::move(prog)));
+		// pipeline->AddRenderPass("LightGizmo", SimpleRenderPass::Create(std::move(prog)));
+		AddCustomRenderPass("LightGizmo", SimpleRenderPass::Create(std::move(prog)));
 	}
 
 	// 6. 환경맵
@@ -305,8 +305,8 @@ bool DevScene::CreateNessesaryRenderPasses()
 		if (!prog) return false;
 		CubeTexturePtr cubeTex = RESOURCE.GetResource<CubeTexture>("SkyboxTexture");
 		if (!cubeTex) return false;
-		pipeline->AddRenderPass("EnvMap", EnvironmentRenderPass::Create(std::move(prog), cubeTex));
-		// AddRenderPass("EnvMap", EnvironmentRenderPass::Create(std::move(prog), cubeTex));
+		// pipeline->AddRenderPass("EnvMap", EnvironmentRenderPass::Create(std::move(prog), cubeTex));
+		AddCustomRenderPass("EnvMap", EnvironmentRenderPass::Create(std::move(prog), cubeTex));
 	}
 
 	return true;
@@ -321,9 +321,9 @@ bool DevScene::CreateSceneContext()
 
 	// TODO : Render Pipeline을 가져와야함.
 	// TODO : 정말로 다운캐스팅을 위한 템플릿 함수가 필요하려나..
-	SimpleRenderPass* lightPass = (SimpleRenderPass*)pipeline->GetRenderPass("LightGizmo");
-	InstancedRenderPass* grassPass = (InstancedRenderPass*)pipeline->GetRenderPass("Instanced");
-	EnvironmentRenderPass* envMapPass = (EnvironmentRenderPass*)pipeline->GetRenderPass("EnvMap");
+	SimpleRenderPass* lightPass = (SimpleRenderPass*)GetCustomRenderPass("LightGizmo");
+	InstancedRenderPass* grassPass = (InstancedRenderPass*)GetCustomRenderPass("Instanced");
+	EnvironmentRenderPass* envMapPass = (EnvironmentRenderPass*)GetCustomRenderPass("EnvMap");
 	auto* gPass = pipeline->GetGeometryPass();
 
 	// 3. 카메라 GameObject 생성

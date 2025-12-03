@@ -1,5 +1,5 @@
 #pragma once
-#include "RenderPipeline.h"
+#include "Core/RenderPipeline.h"
 
 #pragma region FORWARD_DECLARATION
 CLASS_PTR(StandardDeferredLightingPass)

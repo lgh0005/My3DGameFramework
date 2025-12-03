@@ -2,7 +2,7 @@
 #include "RenderManager.h"
 //#include "Core/Renderer.h"
 //#include "Core/RenderPipeline.h"
-#include "Core/StandardRenderPipeline.h"
+#include "SRP/StandardRenderPipeline.h"
 
 bool RenderManager::Init()
 {
@@ -33,7 +33,7 @@ void RenderManager::SetPipeline(const std::string& name)
 	m_renderer->SetPipeline(std::move(newPipeline));
 
 	// 리사이즈 동기화
-	int width, height;
+	int32 width, height;
 	glfwGetFramebufferSize(WINDOW.GetWindow(), &width, &height);
 	m_renderer->OnResize(width, height);
 

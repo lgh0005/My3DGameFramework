@@ -14,6 +14,8 @@
 #include "Components/SpotLight.h"
 #include "Components/Animator.h"
 
+#include "SRP/StandardRenderPipeline.h"
+
 StandardGeometryPassUPtr StandardGeometryPass::Create(int32 width, int32 height)
 {
 	auto pass = StandardGeometryPassUPtr(new StandardGeometryPass());
@@ -44,6 +46,8 @@ bool StandardGeometryPass::Init(int32 width, int32 height)
 // TODO : Render 추상 메서드 생김새를 조금 다듬을 필요는 있음
 void StandardGeometryPass::Render(Scene* scene, Camera* camera)
 {
+	auto pipeline = (StandardRenderPipeline*)(RENDER.GetRenderer()->GetPipeline());
+	auto geometryPass = pipeline->GetGeometryPass();
 	// 1. G-Buffer FBO 바인딩
 	m_gBuffer->Bind();
 
@@ -59,7 +63,8 @@ void StandardGeometryPass::Render(Scene* scene, Camera* camera)
 	{
 		m_staticGeometryProgram->Use();
 
-		for (const auto* renderer : m_staticMeshRenderers)
+		auto renderers = geometryPass->GetStaticMeshRenderers();
+		for (const auto* renderer : renderers)
 		{
 			MeshPtr mesh = renderer->GetMesh();
 			auto model = renderer->GetTransform().GetModelMatrix();
@@ -77,7 +82,8 @@ void StandardGeometryPass::Render(Scene* scene, Camera* camera)
 	{
 		m_skinnedGeometryProgram->Use();
 
-		for (const auto* renderer : m_skinnedMeshRenderers)
+		auto renderers = geometryPass->GetSkinnedMeshRenderers();
+		for (const auto* renderer : renderers)
 		{
 			GameObject* go = renderer->GetOwner();
 			MeshPtr mesh = renderer->GetMesh();

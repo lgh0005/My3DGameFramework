@@ -176,13 +176,13 @@ void main()
     // [DEBUG] SSAO 적용 결과 확인용 코드
     // =====================================================================
     // 원래의 최종 결과 출력 코드를 주석 처리합니다.
-    // FragColor = vec4(result, 1.0);
+    FragColor = vec4(result, 1.0);
     
     // 대신 ao 값을 R, G, B 채널에 모두 넣어서 흑백으로 출력합니다.
     // useSSAO가 true일 때: 구석진 곳은 검은색(0.0), 트인 곳은 흰색(1.0)으로 나와야 성공입니다.
     // useSSAO가 false일 때: 전체가 흰색(1.0)으로 나와야 합니다.
     // vec3 debugPos = texture(gPosition, TexCoords).rgb;
-    FragColor = vec4(vec3(ao), 1.0); 
+    // FragColor = vec4(vec3(ao), 1.0); 
 
     // =====================================================================
     

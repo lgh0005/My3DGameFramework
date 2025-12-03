@@ -1,6 +1,6 @@
 #include "pch.h"
 #include "Game.h"
-#include "Core/StandardRenderPipeline.h"
+#include "SRP/StandardRenderPipeline.h"
 
 // TEMP : Å×½ºÆ® ¾À
 #include "DevScene/DevScene.h"

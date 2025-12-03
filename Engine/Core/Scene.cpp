@@ -2,6 +2,7 @@
 #include "Scene.h"
 
 #include "Core/GameObject.h"
+#include "Graphics/Mesh.h"
 #include "Components/Component.h"
 #include "Components/Light.h"
 #include "Components/PointLight.h"
@@ -34,37 +35,65 @@ void Scene::RegisterComponent(Component* component)
 	// TODO : 이후에 다른 게임 컴포넌트들도 나열해야함
 	switch (component->GetType())
 	{
-	case ComponentType::Camera:
-	{
-		m_cameras.push_back(static_cast<Camera*>(component));
-		break;
-	}
-	case ComponentType::Light:
-	{
-		m_lights.push_back(static_cast<Light*>(component));
-		break;
-	}
-	case ComponentType::Animator:
-	{
-		m_animators.push_back(static_cast<Animator*>(component));
-		break;
-	}
-	case ComponentType::Script:
-	{
-		m_scripts.push_back(static_cast<Script*>(component));
-		break;
-	}
-	case ComponentType::AudioSource:
-	{
-		m_audioSources.push_back(static_cast<AudioSource*>(component));
-		break;
-	}
-	case ComponentType::AudioListener:
-	{
-		m_audioListeners.push_back(static_cast<AudioListener*>(component));
-		break;
-	}
-	default: return;
+		case ComponentType::Camera:
+		{
+			m_cameras.push_back(static_cast<Camera*>(component));
+			break;
+		}
+		case ComponentType::Light:
+		{
+			m_lights.push_back(static_cast<Light*>(component));
+			break;
+		}
+		case ComponentType::Animator:
+		{
+			m_animators.push_back(static_cast<Animator*>(component));
+			break;
+		}
+		case ComponentType::Script:
+		{
+			m_scripts.push_back(static_cast<Script*>(component));
+			break;
+		}
+		case ComponentType::AudioSource:
+		{
+			m_audioSources.push_back(static_cast<AudioSource*>(component));
+			break;
+		}
+		case ComponentType::AudioListener:
+		{
+			m_audioListeners.push_back(static_cast<AudioListener*>(component));
+			break;
+		}
+		case ComponentType::MeshRenderer:
+		{
+			auto meshRenderer = static_cast<MeshRenderer*>(component);
+			MeshType meshType = meshRenderer->GetMesh()->GetMeshType();
+
+			switch (meshType)
+			{
+				case MeshType::Static:
+				{
+					m_staticMeshRenderers.push_back(meshRenderer);
+					break;
+				}
+
+				case MeshType::Skinned:
+				{
+					m_skinnedMeshRenderers.push_back(meshRenderer);
+					break;
+				}
+				case MeshType::Instanced:
+				{
+					// TODO : 메쉬의 어떤 속성을 다르게 하여 인스턴싱을
+					// 할 지는 모르기 때문에 이는 따로 처리할 필요가 있음
+					// 현재는 커스텀 렌더링 패스를 제작해서 넣는 것으로 함.
+					break;
+				}
+			}
+			
+			break;
+		}
 	}
 }
 
@@ -155,4 +184,19 @@ void Scene::Update()
 void Scene::FlushDestroyQueue()
 {
 	// TODO : 씬에 Destroy를 호출한 오브젝트를 정리
+}
+
+RenderPass* Scene::GetCustomRenderPass(const std::string& name)
+{
+	auto it = m_customPasses.find(name);
+	if (it != m_customPasses.end()) return it->second.get();
+	return nullptr;
+}
+
+void Scene::AddCustomRenderPass(const std::string& name, RenderPassUPtr pass)
+{
+	if (m_customPasses.find(name) != m_customPasses.end())
+		SPDLOG_WARN("Custom random pass '{}' already exists. Overwriting.", name);
+
+	m_customPasses[name] = std::move(pass);
 }

@@ -1,13 +1,13 @@
 #include "EnginePch.h"
 #include "StandardRenderPipeline.h"
 
-#include "Core/RenderPasses/StandardShadowPass.h"
-#include "Core/RenderPasses/StandardSkyboxPass.h"
-#include "Core/RenderPasses/StandardPostProcessPass.h"
-#include "Core/RenderPasses/StandardGeometryPass.h"
-#include "Core/RenderPasses/StandardSSAOPass.h"
-#include "Core/RenderPasses/StandardDeferredLightingPass.h"
-#include "Core/RenderPasses/StandardGlobalUniforms.h"
+#include "SRP/RenderPasses/StandardShadowPass.h"
+#include "SRP/RenderPasses/StandardSkyboxPass.h"
+#include "SRP/RenderPasses/StandardPostProcessPass.h"
+#include "SRP/RenderPasses/StandardGeometryPass.h"
+#include "SRP/RenderPasses/StandardSSAOPass.h"
+#include "SRP/RenderPasses/StandardDeferredLightingPass.h"
+#include "SRP/StandardGlobalUniforms.h"
 
 #include "Core/Scene.h"
 #include "Core/GameObject.h"
@@ -128,8 +128,9 @@ void StandardRenderPipeline::Render(Scene* scene)
 	auto postFBO = m_postProcessPass->GetFramebuffer();
 	BlitCopyDepth(gBuffer, postFBO, gBuffer->GetWidth(), gBuffer->GetHeight());
 
-	// [패스 3] 포워드 셰이딩 
-	for (const auto& [name, pass] : m_renderPasses)
+	// [패스 3] 포워드 셰이딩
+
+	for (const auto& [name, pass] : scene->GetCustomRenderPasses())
 		pass->Render(scene, camera);
 
 	// [패스 4] 스카이박스 패스: m_frameBuffer에 스카이박스 덧그리기

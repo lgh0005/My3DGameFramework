@@ -18,15 +18,18 @@ add_library(Engine STATIC
    "Core/Renderer.h"                "Core/Renderer.cpp"
    "Core/RenderPass.h"              "Core/RenderPass.cpp"
    "Core/RenderPipeline.h"          "Core/RenderPipeline.cpp"
-   "Core/StandardRenderPipeline.h"  "Core/StandardRenderPipeline.cpp"
 
-   "Core/RenderPasses/StandardShadowPass.h" "Core/RenderPasses/StandardShadowPass.cpp"
-   "Core/RenderPasses/StandardSkyboxPass.h" "Core/RenderPasses/StandardSkyboxPass.cpp"
-   "Core/RenderPasses/StandardPostProcessPass.h" "Core/RenderPasses/StandardPostProcessPass.cpp"
-   "Core/RenderPasses/StandardGeometryPass.h"  "Core/RenderPasses/StandardGeometryPass.cpp"
-   "Core/RenderPasses/StandardDeferredLightingPass.h"  "Core/RenderPasses/StandardDeferredLightingPass.cpp"
-   "Core/RenderPasses/StandardGlobalUniforms.h"  "Core/RenderPasses/StandardGlobalUniforms.cpp"
-   "Core/RenderPasses/StandardSSAOPass.h"       "Core/RenderPasses/StandardSSAOPass.cpp"
+   # Standard Render Pipeline
+   "SRP/RenderPasses/StandardShadowPass.h" "SRP/RenderPasses/StandardShadowPass.cpp"
+   "SRP/RenderPasses/StandardSkyboxPass.h" "SRP/RenderPasses/StandardSkyboxPass.cpp"
+   "SRP/RenderPasses/StandardPostProcessPass.h" "SRP/RenderPasses/StandardPostProcessPass.cpp"
+   "SRP/RenderPasses/StandardGeometryPass.h"  "SRP/RenderPasses/StandardGeometryPass.cpp"
+   "SRP/RenderPasses/StandardDeferredLightingPass.h"  "SRP/RenderPasses/StandardDeferredLightingPass.cpp"
+   "SRP/RenderPasses/StandardSSAOPass.h"       "SRP/RenderPasses/StandardSSAOPass.cpp"
+
+   "SRP/StandardGlobalUniforms.h"    "SRP/StandardGlobalUniforms.cpp"
+   "SRP/StandardRenderContext.h"     "SRP/StandardRenderContext.cpp"
+   "SRP/StandardRenderPipeline.h"    "SRP/StandardRenderPipeline.cpp"
 
    # Misc
    "Misc/Defines.h"

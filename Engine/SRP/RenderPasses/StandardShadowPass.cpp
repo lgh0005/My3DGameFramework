@@ -3,8 +3,8 @@
 
 #include "Core/Scene.h"
 #include "Core/GameObject.h"
-#include "Core/StandardRenderPipeline.h"
-#include "Core/RenderPasses/StandardGeometryPass.h"
+#include "SRP/StandardRenderPipeline.h"
+#include "SRP/RenderPasses/StandardGeometryPass.h"
 #include "Graphics/Program.h"
 #include "Graphics/Mesh.h"
 #include "Graphics/StaticMesh.h" 

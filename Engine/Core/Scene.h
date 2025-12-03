@@ -43,6 +43,13 @@ public:
 	void SetSkyboxTexture(CubeTexturePtr texture) { m_skyboxTexture = texture; }
 	CubeTexture* GetSkyboxTexture() const { return m_skyboxTexture.get(); }
 
+	auto& GetStaticMeshRenderers() { return m_staticMeshRenderers; }
+	auto& GetSkinnedMeshRenderers() { return m_skinnedMeshRenderers; }
+
+	RenderPass* GetCustomRenderPass(const std::string& name);
+	void AddCustomRenderPass(const std::string& name, RenderPassUPtr pass);
+	auto& GetCustomRenderPasses() { return m_customPasses; }
+
 protected:
 	Scene();
 
@@ -70,7 +77,12 @@ protected:
 	std::vector<Script*>        m_scripts;
 	std::vector<AudioSource*>   m_audioSources;
 	std::vector<AudioListener*> m_audioListeners;
+	std::vector<MeshRenderer*>  m_staticMeshRenderers;
+	std::vector<MeshRenderer*>  m_skinnedMeshRenderers;
 
 	// ÇÏ´Ã ÅØ½ºÃÄ
 	CubeTexturePtr				m_skyboxTexture;
+
+	// Ä¿½ºÅÒ ·»´õ ÆÐ½º
+	std::unordered_map<std::string, RenderPassUPtr> m_customPasses;
 };
