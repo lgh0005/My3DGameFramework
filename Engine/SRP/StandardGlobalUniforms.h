@@ -2,6 +2,7 @@
 #include "Graphics/Uniform.h"
 
 #pragma region FORWARD_DECLARATION
+CLASS_PTR(RenderContext)
 CLASS_PTR(Uniformbuffer)
 CLASS_PTR(Camera)
 CLASS_PTR(Scene)
@@ -14,7 +15,7 @@ class StandardGlobalUniforms
 {
 public:
 	static StandardGlobalUniformsUPtr Create();
-	void PreRender(Scene* scene, Camera* camera);
+	void PreRender(RenderContext* context);
 	virtual ~StandardGlobalUniforms();
 
 private:

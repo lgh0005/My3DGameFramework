@@ -3,11 +3,15 @@
 
 #include <random>
 #include "Core/Scene.h"
+#include "Core/RenderContext.h"
 #include "Components/Camera.h"
 #include "Graphics/Texture.h"
 #include "Graphics/FrameBuffer.h"
 #include "Graphics/Program.h"
 #include "Graphics/StaticMesh.h"
+
+#include "SRP/StandardRenderPipeline.h"
+#include "SRP/StandardRenderContext.h"
 
 float lerp(float a, float b, float f) { return a + f * (b - a); }
 
@@ -166,5 +170,55 @@ void StandardSSAOPass::Render(Scene* scene, Camera* camera)
     m_screenQuad->Draw(m_ssaoBlurProgram.get());
 
     // Default FBO 복귀는 Pipeline에서 수행하거나 여기서 BindToDefault
+    Framebuffer::BindToDefault();
+}
+
+void StandardSSAOPass::TestRender(RenderContext* context)
+{
+    // 0. 자신의 렌더 패스에 활용되고 있는 RenderContext로 캐스팅
+    auto stdCtx = (StandardRenderContext*)context;
+    Camera* camera = stdCtx->GetCamera();
+    Texture* gPos = stdCtx->GetGBufferPosition();
+    Texture* gNormal = stdCtx->GetGBufferNormal();
+    if (!camera || !gPos || !gNormal) return;
+
+    m_ssaoFBO->Bind();
+    glClear(GL_COLOR_BUFFER_BIT);
+
+    m_ssaoProgram->Use();
+
+    // 텍스처 바인딩
+    glActiveTexture(GL_TEXTURE0); gPos->Bind();
+    glActiveTexture(GL_TEXTURE1); gNormal->Bind();
+    glActiveTexture(GL_TEXTURE2); m_noiseTexture->Bind();
+
+    m_ssaoProgram->SetUniform("gPosition", 0);
+    m_ssaoProgram->SetUniform("gNormal", 1);
+    m_ssaoProgram->SetUniform("texNoise", 2);
+
+    // 커널 데이터 전송
+    for (uint32 i = 0; i < 64; ++i)
+        m_ssaoProgram->SetUniform("samples[" + std::to_string(i) + "]", m_ssaoKernel[i]);
+
+    // 카메라 행렬 전송 (Context에서 가져온 카메라 사용)
+    m_ssaoProgram->SetUniform("projection", camera->GetProjectionMatrix());
+    m_ssaoProgram->SetUniform("view", camera->GetViewMatrix());
+
+    m_screenQuad->Draw(m_ssaoProgram.get());
+
+    // ----------------------
+    // 4. SSAO Blur
+    // ----------------------
+    m_ssaoBlurFBO->Bind();
+    glClear(GL_COLOR_BUFFER_BIT);
+
+    m_ssaoBlurProgram->Use();
+
+    glActiveTexture(GL_TEXTURE0);
+    m_ssaoFBO->GetColorAttachment(0)->Bind();
+    m_ssaoBlurProgram->SetUniform("ssaoInput", 0);
+
+    m_screenQuad->Draw(m_ssaoBlurProgram.get());
+
     Framebuffer::BindToDefault();
 }

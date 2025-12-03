@@ -2,6 +2,7 @@
 #include "StandardGlobalUniforms.h"
 #include "Graphics/UniformBuffer.h"
 #include "Core/Scene.h"
+#include "Core/RenderContext.h"
 #include "Components/Camera.h"
 #include "Components/Transform.h"
 #include "Components/Light.h"
@@ -26,10 +27,11 @@ bool StandardGlobalUniforms::Init()
 	return (m_cameraUBO && m_lightUBO);
 }
 
-void StandardGlobalUniforms::PreRender(Scene* scene, Camera* camera)
+void StandardGlobalUniforms::PreRender(RenderContext* context)
 {
-	// TODO
-	auto lights = scene->GetLights();
+	// 0. context로부터 필요한 정보 얻어오기
+	auto camera = context->GetCamera();
+	auto lights = context->GetLights();
 
 	// 1. 카메라 UBO
 	if (m_cameraUBO)

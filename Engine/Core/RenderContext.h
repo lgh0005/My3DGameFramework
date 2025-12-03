@@ -10,27 +10,32 @@ CLASS_PTR(Light)
 CLASS_PTR(RenderContext)
 class RenderContext
 {
+	using MeshVectorRawPtr = const std::vector<MeshRenderer*>*;
+	using LightVectorRawPtr = const std::vector<Light*>*;
+
 public:
 	virtual ~RenderContext();
-
-	void Reset(Scene* scene, Camera* camera); // , int32 width, int32 height);
-	void AddStaticMeshRenderer(MeshRenderer* renderer);
-	void AddSkinnedMeshRenderer(MeshRenderer* renderer);
-	void AddLight(Light* light);
+	void Reset(Scene* scene, Camera* camera);
 
 public:
 	Scene* GetScene() const { return m_currentScene; }
 	Camera* GetCamera() const { return m_currentCamera; }
 
-	const std::vector<MeshRenderer*>& GetStaticMeshRenderers() const { return m_staticMeshRenderers; }
-	const std::vector<MeshRenderer*>& GetSkinnedMeshRenderers() const { return m_skinnedMeshRenderers; }
-	const std::vector<Light*>& GetLights() const { return m_lights; }
+	const std::vector<MeshRenderer*>& GetStaticMeshRenderers() const { return m_culledStaticMeshRenderers; }
+	const std::vector<MeshRenderer*>& GetSkinnedMeshRenderers() const { return m_culledSkinnedMeshRenderers; }
+	const std::vector<Light*>& GetLights() const { return m_culledLights; }
 
 protected: 
 	Scene*  m_currentScene	   { nullptr };
 	Camera* m_currentCamera	   { nullptr };
 
-	std::vector<MeshRenderer*> m_staticMeshRenderers;
-	std::vector<MeshRenderer*> m_skinnedMeshRenderers;
-	std::vector<Light*>        m_lights;
+	// Source (Scene 원본 참조)
+	MeshVectorRawPtr	m_staticMeshRenderers;
+	MeshVectorRawPtr	m_skinnedMeshRenderers;
+	LightVectorRawPtr   m_lights;
+
+	// Result (실제 렌더링 목록)
+	std::vector<MeshRenderer*> m_culledStaticMeshRenderers;
+	std::vector<MeshRenderer*> m_culledSkinnedMeshRenderers;
+	std::vector<Light*>        m_culledLights;
 };

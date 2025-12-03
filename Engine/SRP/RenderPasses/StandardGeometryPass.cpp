@@ -111,6 +111,9 @@ void StandardGeometryPass::Render(Scene* scene, Camera* camera)
 // TEST : Context에 있는 내용물을 잘 렌더링 하는 지 테스트
 void StandardGeometryPass::TestRender(RenderContext* context)
 {
+	// 0. 자신의 렌더 패스에 활용되고 있는 RenderContext로 캐스팅
+	auto stdCtx = (StandardRenderContext*)context;
+
 	// 1. G-Buffer FBO 바인딩
 	m_gBuffer->Bind();
 
@@ -125,7 +128,7 @@ void StandardGeometryPass::TestRender(RenderContext* context)
 	if (m_staticGeometryProgram)
 	{
 		m_staticGeometryProgram->Use();
-		for (const auto* renderer : context->GetStaticMeshRenderers())
+		for (const auto* renderer : stdCtx->GetStaticMeshRenderers())
 		{
 			MeshPtr mesh = renderer->GetMesh();
 			auto model = renderer->GetTransform().GetModelMatrix();
@@ -142,7 +145,7 @@ void StandardGeometryPass::TestRender(RenderContext* context)
 	if (m_skinnedGeometryProgram)
 	{
 		m_skinnedGeometryProgram->Use();
-		for (const auto* renderer : context->GetSkinnedMeshRenderers())
+		for (const auto* renderer : stdCtx->GetSkinnedMeshRenderers())
 		{
 			GameObject* go = renderer->GetOwner();
 			MeshPtr mesh = renderer->GetMesh();
@@ -160,6 +163,9 @@ void StandardGeometryPass::TestRender(RenderContext* context)
 			mesh->Draw(m_skinnedGeometryProgram.get());
 		}
 	}
+
+	// 4. context에 gBuffer 캐싱
+	stdCtx->SetGBuffer(m_gBuffer.get());
 
 	// 5. 그리기 완료 후 기본 프레임버퍼로 복귀
 	Framebuffer::BindToDefault();

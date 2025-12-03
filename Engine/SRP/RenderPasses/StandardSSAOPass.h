@@ -8,6 +8,7 @@ CLASS_PTR(Texture)
 CLASS_PTR(Framebuffer)
 CLASS_PTR(Program)
 CLASS_PTR(StaticMesh)
+CLASS_PTR(RenderContext)
 #pragma endregion
 
 CLASS_PTR(StandardSSAOPass)
@@ -20,8 +21,13 @@ public:
 		int32 height = WINDOW_HEIGHT
 	);
 	virtual void Render(Scene* scene, Camera* camera) override;
+
+	// TEMP : 점진적 리팩토링을 위한 TestRender 추가
+	void TestRender(RenderContext* context);
+
 	void Resize(int32 width, int32 height);
 
+	// TODO : 이제 이 코드는 Legacy가 될 것임
 	void SetGBufferInputs(Texture* positionTex, Texture* normalTex)
 	{
 		m_gPosition = positionTex;
@@ -41,12 +47,13 @@ private:
 	std::vector<glm::vec3> m_ssaoKernel;
 	TextureUPtr            m_noiseTexture{ nullptr };
 
-	FramebufferUPtr        m_ssaoFBO{ nullptr }; // Raw SSAO
+	FramebufferUPtr        m_ssaoFBO{ nullptr };	 // Raw SSAO
 	FramebufferUPtr        m_ssaoBlurFBO{ nullptr }; // Blurred SSAO
 
 	ProgramUPtr            m_ssaoProgram{ nullptr };
 	ProgramUPtr            m_ssaoBlurProgram{ nullptr };
 
-	Texture* m_gPosition{ nullptr };
-	Texture* m_gNormal{ nullptr };
+	// TODO : Legacy Members (TestRender에서는 사용 안 함)
+	Texture*			   m_gPosition{ nullptr };
+	Texture*			   m_gNormal{ nullptr };
 };

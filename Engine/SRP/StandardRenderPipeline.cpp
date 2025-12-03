@@ -11,7 +11,6 @@
 
 #include "SRP/StandardRenderContext.h"
 
-
 #include "Core/Scene.h"
 #include "Core/GameObject.h"
 #include "Graphics/Program.h"
@@ -94,29 +93,31 @@ void StandardRenderPipeline::Render(Scene* scene)
 	if (!camera) return;
 
 	// 0. 스택 영역에 StandardRenderContext 생성
-	// TODO : 이후에는 이들이 CullingPass를 통해서 절두체 안에 있는 대상만 그림을 그리도록 만들어야 함
-	// TODO : Reset에 들어갈 width와 height은 WindowManager를 통해서 얻어와야 함.
 	StandardRenderContext context;
 	context.Reset(scene, scene->GetMainCamera());
 
+	// TODO : 이후에는 CullingPass를 통한 최적화 필요
+	// 지금은 그냥 씬에 있는 것을 그대로 복사.
+	{
+		const auto& staticSource = scene->GetStaticMeshRenderers();
+		for (auto* renderer : staticSource)
+			context.AddStaticMeshRenderer(renderer);
+
+		const auto& skinnedSource = scene->GetSkinnedMeshRenderers();
+		for (auto* renderer : skinnedSource)
+			context.AddSkinnedMeshRenderer(renderer);
+
+		const auto& lightSource = scene->GetLights();
+		for (auto* light : lightSource)
+			context.AddLight(light);
+	}
+
 	// 1. ubo 갱신
-	m_globalUniforms->PreRender(scene, camera);
+	m_globalUniforms->PreRender(&context);
 
 	/*================================//
 	//   main scene rendergin logic   //
 	//================================*/
-
-	// TODO : TestRenderer에다가 그냥 context에 있는 Renderer 또는 Lights를 
-	// 넘겨줬을 뿐인데 왜 blur가 깨지는 지 전혀 모르겠다.
-	// SOLUTION : 
-	// -> 그러니까 AddComponent하면서 GameObject에 AddObject하면서 한 번,
-	// lightPass에서 아마 관련 메쉬 렌더러를 또 추가하니까,
-	// 디퍼드에서 한 번 렌더링, 포워드에서 또 중복 렌더링이 되는 것이 문제.
-	// 오늘은 이걸 해결해보자.
-
-	// 문제는 이렇게 하면 무조건적으로 AddObject시 디퍼드로 렌더링을 하겠다는 것이
-	// 강제되버린다. 포워드 렌더링을 할 때는 Scene의 MeshRenderer에 들어가지 않도록
-	// 보장해줄 필요가 있다.
 
 	// [패스 1] 그림자 패스: m_shadowMap에 깊이 정보 기록
 	// m_shadowPass->Render(scene, camera);
@@ -127,38 +128,27 @@ void StandardRenderPipeline::Render(Scene* scene)
 	m_geometryPass->TestRender(&context);
 
 	// [패스 3] SSAO
-	{
-		// 1. G-Buffer 가져오기
-		auto gBuffer = m_geometryPass->GetGBuffer();
-		if (m_ssaoPass && gBuffer)
-		{
-			m_ssaoPass->SetGBufferInputs
-			(
-				gBuffer->GetColorAttachment(0).get(), // Position
-				gBuffer->GetColorAttachment(1).get()  // Normal
-			);
-		}
-		m_ssaoPass->Render(scene, camera);
-	}
+	context.SetGBuffer(m_geometryPass->GetGBuffer());
+	m_ssaoPass->TestRender(&context);
+	context.SetSSAOTexture(m_ssaoPass->GetSSAOResultTexture());
 
 	// [패스 4] Deferred Lighting 패스
-	m_deferredLightPass->SetSSAOTexture(m_ssaoPass->GetSSAOResultTexture());
-	m_deferredLightPass->Render(scene, camera);
+	m_deferredLightPass->TestRender(&context);
 
 	auto gBuffer = m_geometryPass->GetGBuffer();
 	auto postFBO = m_postProcessPass->GetFramebuffer();
 	BlitCopyDepth(gBuffer, postFBO, gBuffer->GetWidth(), gBuffer->GetHeight());
 
-	// [패스 3] 포워드 셰이딩
+	// [패스 5] 포워드 셰이딩
 	// TODO : 아마 여기에서 blur 처리가 멋대로 되고 있을 것임.
 	// 이는 blur와 관련된 layout을 꺼줄 필요가 있는 것이다. 이후 수정 필요.
 	for (const auto& [name, pass] : scene->GetCustomRenderPasses())
 		pass->Render(scene, camera);
 
-	// [패스 4] 스카이박스 패스: m_frameBuffer에 스카이박스 덧그리기
+	// [패스 6] 스카이박스 패스: m_frameBuffer에 스카이박스 덧그리기
 	m_skyboxPass->Render(scene, camera);
 
-	// [패스 5] 후처리 패스: m_frameBuffer의 결과를 화면에 Resolve
+	// [패스 7] 후처리 패스: m_frameBuffer의 결과를 화면에 Resolve
 	m_postProcessPass->Render(scene, camera);
 
 	// [DEBUG] : ImGUI 컨텍스트
