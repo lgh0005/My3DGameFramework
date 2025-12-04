@@ -6,6 +6,7 @@ CLASS_PTR(Framebuffer)
 CLASS_PTR(MeshRenderer)
 CLASS_PTR(Light)
 CLASS_PTR(Texture)
+CLASS_PTR(CubeTexture)
 #pragma endregion
 
 CLASS_PTR(StandardRenderContext)
@@ -26,6 +27,15 @@ public:
 	void SetSSAOTexture(Texture* texture) { m_ssaoTexture = texture; }
 	Texture* GetSSAOTexture() const { return m_ssaoTexture; }
 
+	void SetTargetFramebuffer(Framebuffer* fbo) { m_targetFramebuffer = fbo; }
+	Framebuffer* GetTargetFramebuffer() const { return m_targetFramebuffer; }
+
+	void SetShadowMap(int32 index, Texture* texture);
+	Texture* GetShadowMap(int32 index) const;
+
+	void SetSkyboxTexture(CubeTexture* texture) { m_skyboxTexture = texture; }
+	CubeTexture* GetSkyboxTexture() const { return m_skyboxTexture; }
+
 private:
 	Framebuffer* m_gBuffer{ nullptr };
 	Texture* m_gPosition{ nullptr };
@@ -33,6 +43,9 @@ private:
 	Texture* m_gAlbedoSpec{ nullptr };
 	Texture* m_gEmission{ nullptr };
 	Texture* m_ssaoTexture{ nullptr };
+	Framebuffer* m_targetFramebuffer{ nullptr };
+	Texture* m_shadowMaps[MAX_SHADOW_CASTER] = { nullptr, };
+	CubeTexture* m_skyboxTexture{ nullptr };
 
 // TEMP : CullingPass 구현 전, 그냥 씬에 있는 것을 그대로 복사.
 public:

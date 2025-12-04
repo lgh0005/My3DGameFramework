@@ -2,6 +2,7 @@
 #include "StandardRenderContext.h"
 #include "Graphics/Texture.h"
 #include "Graphics/FrameBuffer.h"
+#include "Graphics/CubeTexture.h"
 
 void StandardRenderContext::SetGBuffer(Framebuffer* gBuffer)
 {
@@ -17,7 +18,26 @@ void StandardRenderContext::SetGBuffer(Framebuffer* gBuffer)
 	{
 		m_gPosition = nullptr;
 		m_gNormal = nullptr;
+		m_gAlbedoSpec = nullptr;
+		m_gEmission = nullptr;
 	}
+}
+
+void StandardRenderContext::SetShadowMap(int32 index, Texture* texture)
+{
+	if (index >= 0 && index < MAX_SHADOW_CASTER)
+	{
+		m_shadowMaps[index] = texture;
+	}
+}
+
+Texture* StandardRenderContext::GetShadowMap(int32 index) const
+{
+	if (index >= 0 && index < MAX_SHADOW_CASTER)
+	{
+		return m_shadowMaps[index];
+	}
+	return nullptr;
 }
 
 // TEMP : CullingPass에서 직접적으로 수행할 작업들.

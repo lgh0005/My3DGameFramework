@@ -5,6 +5,7 @@
 CLASS_PTR(Scene)
 CLASS_PTR(Camera)
 CLASS_PTR(Framebuffer)
+CLASS_PTR(RenderContext)
 #pragma endregion
 
 CLASS_PTR(StandardPostProcessPass)
@@ -17,6 +18,9 @@ public:
 		int32 heigh = WINDOW_HEIGHT
 	);
 	virtual void Render(Scene* scene, Camera* camera) override;
+	
+	void TestRender(RenderContext* context);
+	
 	void BeginDraw();
 	void Resize(int32 width, int32 height);
 

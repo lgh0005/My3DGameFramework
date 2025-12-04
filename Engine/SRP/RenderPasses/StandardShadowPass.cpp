@@ -134,6 +134,13 @@ void StandardShadowPass::Render(Scene* scene, Camera* camera)
 // TEST : Context에 있는 내용물을 잘 렌더링 하는 지 테스트
 void StandardShadowPass::TestRender(RenderContext* context)
 {
+	// 0. Context 캐스팅 및 유효성 검사
+	auto stdCtx = (StandardRenderContext*)context;
+	auto lights = stdCtx->GetLights();
+	auto staticMeshes = stdCtx->GetStaticMeshRenderers();
+	auto skinnedMeshes = stdCtx->GetSkinnedMeshRenderers();
+	if (!stdCtx) return;
+
 	// 1. 공통 설정
 	glEnable(GL_DEPTH_TEST);
 	glCullFace(GL_FRONT);
@@ -164,7 +171,7 @@ void StandardShadowPass::TestRender(RenderContext* context)
 			m_staticDepthProgram->Use();
 			m_staticDepthProgram->SetUniform("lightSpaceMatrix", lightSpaceMatrix);
 
-			for (const auto* renderer : context->GetStaticMeshRenderers())
+			for (const auto* renderer : staticMeshes)
 			{
 				auto model = renderer->GetTransform().GetModelMatrix();
 				m_staticDepthProgram->SetUniform("model", model);
@@ -179,7 +186,7 @@ void StandardShadowPass::TestRender(RenderContext* context)
 			m_skinnedDepthProgram->SetUniform("lightSpaceMatrix", lightSpaceMatrix);
 
 			// G-Buffer에서 그릴 대상 중 SkinnedMesh를 가져옴
-			for (const auto* renderer : context->GetSkinnedMeshRenderers())
+			for (const auto* renderer : skinnedMeshes)
 			{
 				GameObject* go = renderer->GetOwner();
 				auto model = renderer->GetTransform().GetModelMatrix();
@@ -200,6 +207,21 @@ void StandardShadowPass::TestRender(RenderContext* context)
 	}
 
 	glCullFace(GL_BACK);
+
+	// 3. 그림자를 구운 텍스쳐를 Context에 등록
+	for (int i = 0; i < MAX_SHADOW_CASTER; ++i)
+	{
+		if (m_shadowMaps[i])
+		{
+			// ShadowMap 클래스 내부의 Texture를 가져옵니다.
+			Texture* tex = m_shadowMaps[i]->GetShadowMap().get();
+			stdCtx->SetShadowMap(i, tex);
+		}
+		else
+		{
+			stdCtx->SetShadowMap(i, nullptr);
+		}
+	}
 }
 
 glm::mat4 StandardShadowPass::CalculateLightSpaceMatrix(Light* light)

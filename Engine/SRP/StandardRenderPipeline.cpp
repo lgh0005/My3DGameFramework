@@ -94,7 +94,8 @@ void StandardRenderPipeline::Render(Scene* scene)
 
 	// 0. 스택 영역에 StandardRenderContext 생성
 	StandardRenderContext context;
-	context.Reset(scene, scene->GetMainCamera());
+	context.Reset(scene, camera);
+	context.SetSkyboxTexture(scene->GetSkyboxTexture());
 
 	// TODO : 이후에는 CullingPass를 통한 최적화 필요
 	// 지금은 그냥 씬에 있는 것을 그대로 복사.
@@ -133,6 +134,7 @@ void StandardRenderPipeline::Render(Scene* scene)
 	context.SetSSAOTexture(m_ssaoPass->GetSSAOResultTexture());
 
 	// [패스 4] Deferred Lighting 패스
+	context.SetTargetFramebuffer(m_postProcessPass->GetFramebuffer());
 	m_deferredLightPass->TestRender(&context);
 
 	auto gBuffer = m_geometryPass->GetGBuffer();
@@ -146,10 +148,10 @@ void StandardRenderPipeline::Render(Scene* scene)
 		pass->Render(scene, camera);
 
 	// [패스 6] 스카이박스 패스: m_frameBuffer에 스카이박스 덧그리기
-	m_skyboxPass->Render(scene, camera);
+	m_skyboxPass->TestRender(&context);
 
 	// [패스 7] 후처리 패스: m_frameBuffer의 결과를 화면에 Resolve
-	m_postProcessPass->Render(scene, camera);
+	m_postProcessPass->TestRender(&context);
 
 	// [DEBUG] : ImGUI 컨텍스트
 	RenderIMGUIContext();
