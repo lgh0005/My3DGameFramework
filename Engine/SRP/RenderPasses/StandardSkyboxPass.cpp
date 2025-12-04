@@ -33,33 +33,7 @@ bool StandardSkyboxPass::Init()
 	return true;
 };
 
-// TODO : Render 추상 메서드 생김새를 조금 다듬을 필요는 있음
-void StandardSkyboxPass::Render(Scene* scene, Camera* camera)
-{
-	auto skyTexture = scene->GetSkyboxTexture();
-	if (!skyTexture) return;
-
-	auto projection = camera->GetProjectionMatrix();
-	auto view = camera->GetViewMatrix();
-
-	glDepthFunc(GL_LEQUAL);
-	glCullFace(GL_FRONT);
-
-	m_skyboxProgram->Use();
-	auto skyboxView = glm::mat4(glm::mat3(view));
-	auto transform = projection * skyboxView;
-	m_skyboxProgram->SetUniform("transform", transform);
-
-	skyTexture->Bind();
-	m_skyboxProgram->SetUniform("skybox", 0);
-
-	m_cubeMesh->Draw(m_skyboxProgram.get());
-
-	glCullFace(GL_BACK);
-	glDepthFunc(GL_LESS);
-}
-
-void StandardSkyboxPass::TestRender(RenderContext* context)
+void StandardSkyboxPass::Render(RenderContext* context)
 {
 	// 0. 자신의 렌더 패스에 활용되고 있는 RenderContext로 캐스팅
 	auto stdCtx = (StandardRenderContext*)context;

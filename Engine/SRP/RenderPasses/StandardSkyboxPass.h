@@ -13,13 +13,11 @@ CLASS_PTR(RenderContext)
 #pragma endregion
 
 CLASS_PTR(StandardSkyboxPass)
-class StandardSkyboxPass : public RenderPass
+class StandardSkyboxPass : public ContextRenderPass
 {
 public:
 	static StandardSkyboxPassUPtr Create();
-	virtual void Render(Scene* scene, Camera* camera) override;
-
-	void TestRender(RenderContext* context);
+	virtual void Render(RenderContext* context) override;
 
 private:
 	StandardSkyboxPass() = default;

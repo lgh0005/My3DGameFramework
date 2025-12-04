@@ -1,5 +1,4 @@
 #pragma once
-#include "Core/RenderPass.h"
 #include "Graphics/Uniform.h"
 
 #pragma region FORWARD_DECLARATION
@@ -12,6 +11,7 @@ CLASS_PTR(Animator)
 CLASS_PTR(Script)
 CLASS_PTR(AudioSource)
 CLASS_PTR(AudioListener)
+CLASS_PTR(GeneralRenderPass)
 #pragma endregion
 
 CLASS_PTR(Scene)
@@ -42,13 +42,13 @@ public:
 	void SetSkyboxTexture(CubeTexturePtr texture) { m_skyboxTexture = texture; }
 	CubeTexture* GetSkyboxTexture() const { return m_skyboxTexture.get(); }
 
-	RenderPass* GetCustomRenderPass(const std::string& name);
+	GeneralRenderPass* GetCustomRenderPass(const std::string& name);
 
 /*================================//
 //   interface to renderContext   //
 //================================*/
 public:
-	void AddCustomRenderPass(const std::string& name, RenderPassUPtr pass);
+	void AddCustomRenderPass(const std::string& name, GeneralRenderPassUPtr pass);
 	auto& GetCustomRenderPasses() { return m_customPasses; }
 
 	auto& GetStaticMeshRenderers() { return m_staticMeshRenderers; }
@@ -87,6 +87,6 @@ protected:
 	// ÇÏ´Ã ÅØ½ºÃÄ
 	CubeTexturePtr				m_skyboxTexture;
 
-	// Ä¿½ºÅÒ ·»´õ ÆÐ½º
-	std::unordered_map<std::string, RenderPassUPtr> m_customPasses;
+	// Ä¿½ºÅÒ Æ÷¿öµå ·»´õ ÆÐ½º
+	std::unordered_map<std::string, GeneralRenderPassUPtr> m_customPasses;
 };

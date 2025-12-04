@@ -2,6 +2,7 @@
 #include "Scene.h"
 
 #include "Core/GameObject.h"
+#include "Core/RenderPass.h"
 #include "Graphics/Mesh.h"
 #include "Components/Component.h"
 #include "Components/Light.h"
@@ -193,14 +194,14 @@ void Scene::FlushDestroyQueue()
 	// TODO : 씬에 Destroy를 호출한 오브젝트를 정리
 }
 
-RenderPass* Scene::GetCustomRenderPass(const std::string& name)
+GeneralRenderPass* Scene::GetCustomRenderPass(const std::string& name)
 {
 	auto it = m_customPasses.find(name);
 	if (it != m_customPasses.end()) return it->second.get();
 	return nullptr;
 }
 
-void Scene::AddCustomRenderPass(const std::string& name, RenderPassUPtr pass)
+void Scene::AddCustomRenderPass(const std::string& name, GeneralRenderPassUPtr pass)
 {
 	if (m_customPasses.find(name) != m_customPasses.end())
 		SPDLOG_WARN("Custom random pass '{}' already exists. Overwriting.", name);

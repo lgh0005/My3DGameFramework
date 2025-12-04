@@ -9,7 +9,7 @@ CLASS_PTR(MeshRenderer)
 #pragma endregion
 
 CLASS_PTR(InstancedRenderPass)
-class InstancedRenderPass : public RenderPass
+class InstancedRenderPass : public GeneralRenderPass
 {
 public:
     static InstancedRenderPassUPtr Create(ProgramUPtr program);

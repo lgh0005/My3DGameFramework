@@ -12,7 +12,7 @@ CLASS_PTR(RenderContext)
 #pragma endregion
 
 CLASS_PTR(StandardSSAOPass)
-class StandardSSAOPass : public RenderPass
+class StandardSSAOPass : public ContextRenderPass
 {
 public:
 	static StandardSSAOPassUPtr Create
@@ -20,10 +20,7 @@ public:
 		int32 width = WINDOW_WIDTH, 
 		int32 height = WINDOW_HEIGHT
 	);
-	virtual void Render(Scene* scene, Camera* camera) override;
-
-	// TEMP : 점진적 리팩토링을 위한 TestRender 추가
-	void TestRender(RenderContext* context);
+	virtual void Render(RenderContext* context) override;
 
 	void Resize(int32 width, int32 height);
 

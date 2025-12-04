@@ -26,13 +26,13 @@ bool StandardSSAOPass::Init(int32 width, int32 height)
 {
     m_ssaoProgram = Program::Create
     (
-        "./Resources/Shaders/Standard/Test_SSAO.vert",
-        "./Resources/Shaders/Standard/Test_SSAO_pass.frag"
+        "./Resources/Shaders/Standard/SSAO.vert",
+        "./Resources/Shaders/Standard/SSAO_pass.frag"
     );
     m_ssaoBlurProgram = Program::Create
     (
-        "./Resources/Shaders/Standard/Test_SSAO.vert",
-        "./Resources/Shaders/Standard/Test_SSAO_blur.frag"
+        "./Resources/Shaders/Standard/SSAO.vert",
+        "./Resources/Shaders/Standard/SSAO_blur.frag"
     );
     if (!m_ssaoProgram || !m_ssaoBlurProgram) return false;
 
@@ -113,67 +113,7 @@ void StandardSSAOPass::GenerateNoiseTexture()
     m_noiseTexture->SetData(ssaoNoise.data());
 }
 
-void StandardSSAOPass::Render(Scene* scene, Camera* camera)
-{
-    if (!m_gPosition || !m_gNormal) return;
-
-    // ----------------------
-    // 1. SSAO Calculation
-    // ----------------------
-    m_ssaoFBO->Bind();
-    glClear(GL_COLOR_BUFFER_BIT); // Depth는 필요 없음
-
-    m_ssaoProgram->Use();
-
-    // G-Buffer Textures Bind
-    m_gPosition->Bind();       // slot 0 가정 (실제 구현에 따라 수정)
-    m_gNormal->Bind();         // slot 1 가정
-    m_noiseTexture->Bind();    // slot 2 가정
-
-    // Texture Slots Setting (셰이더 바인딩 번호와 일치시켜야 함)
-    // Texture 클래스의 Bind()는 활성화된 유닛에 바인딩하므로, 
-    // 실제로는 glActiveTexture를 호출해줘야 함. 
-    // 하지만 보여주신 Texture 클래스엔 Bind(slot)이 없고 Bind()만 있음.
-    // 따라서 아래와 같이 수동으로 바인딩하거나, Texture 클래스에 Bind(int slot) 추가 권장.
-
-    glActiveTexture(GL_TEXTURE0); m_gPosition->Bind();
-    glActiveTexture(GL_TEXTURE1); m_gNormal->Bind();
-    glActiveTexture(GL_TEXTURE2); m_noiseTexture->Bind();
-
-    m_ssaoProgram->SetUniform("gPosition", 0);
-    m_ssaoProgram->SetUniform("gNormal", 1);
-    m_ssaoProgram->SetUniform("texNoise", 2);
-
-    // Kernel
-    for (uint32 i = 0; i < 64; ++i)
-        m_ssaoProgram->SetUniform("samples[" + std::to_string(i) + "]", m_ssaoKernel[i]);
-
-    m_ssaoProgram->SetUniform("projection", camera->GetProjectionMatrix());
-    m_ssaoProgram->SetUniform("view", camera->GetViewMatrix());
-
-    // Render Quad (유틸리티 함수 사용 가정)
-    m_screenQuad->Draw(m_ssaoProgram.get());
-
-    // ----------------------
-    // 2. SSAO Blur
-    // ----------------------
-    m_ssaoBlurFBO->Bind();
-    glClear(GL_COLOR_BUFFER_BIT);
-
-    m_ssaoBlurProgram->Use();
-
-    glActiveTexture(GL_TEXTURE0);
-    m_ssaoFBO->GetColorAttachment(0)->Bind(); // Raw SSAO result
-    m_ssaoBlurProgram->SetUniform("ssaoInput", 0);
-
-    // [핵심] Blur 쉐이더로 다시 Quad 그리기
-    m_screenQuad->Draw(m_ssaoBlurProgram.get());
-
-    // Default FBO 복귀는 Pipeline에서 수행하거나 여기서 BindToDefault
-    Framebuffer::BindToDefault();
-}
-
-void StandardSSAOPass::TestRender(RenderContext* context)
+void StandardSSAOPass::Render(RenderContext* context)
 {
     // 0. 자신의 렌더 패스에 활용되고 있는 RenderContext로 캐스팅
     auto stdCtx = (StandardRenderContext*)context;

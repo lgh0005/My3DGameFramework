@@ -8,7 +8,7 @@ CLASS_PTR(Camera)
 #pragma endregion
 
 CLASS_PTR(SimpleRenderPass)
-class SimpleRenderPass : public RenderPass
+class SimpleRenderPass : public GeneralRenderPass
 {
 public:
     static SimpleRenderPassUPtr Create(ProgramUPtr program);

@@ -11,15 +11,12 @@ CLASS_PTR(RenderContext)
 #pragma endregion
 
 CLASS_PTR(StandardDeferredLightingPass)
-class StandardDeferredLightingPass : public RenderPass
+class StandardDeferredLightingPass : public ContextRenderPass
 {
 public:
 	static StandardDeferredLightingPassUPtr Create();
-	virtual void Render(Scene* scene, Camera* camera) override;
+	virtual void Render(RenderContext* context) override;
 	void SetSSAOTexture(Texture* ssaoTex) { m_ssaoTexture = ssaoTex; }
-
-	// TEST : Context에 있는 내용물을 잘 렌더링 하는 지 테스트
-	void TestRender(RenderContext* context);
 
 private:
 	StandardDeferredLightingPass() = default;

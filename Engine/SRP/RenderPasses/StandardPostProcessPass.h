@@ -9,7 +9,7 @@ CLASS_PTR(RenderContext)
 #pragma endregion
 
 CLASS_PTR(StandardPostProcessPass)
-class StandardPostProcessPass : public RenderPass
+class StandardPostProcessPass : public ContextRenderPass
 {
 public:
 	static StandardPostProcessPassUPtr Create
@@ -17,9 +17,7 @@ public:
 		int32 width = WINDOW_WIDTH,
 		int32 heigh = WINDOW_HEIGHT
 	);
-	virtual void Render(Scene* scene, Camera* camera) override;
-	
-	void TestRender(RenderContext* context);
+	virtual void Render(RenderContext* context) override;
 	
 	void BeginDraw();
 	void Resize(int32 width, int32 height);

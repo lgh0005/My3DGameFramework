@@ -11,7 +11,7 @@ CLASS_PTR(RenderContext)
 #pragma endregion
 
 CLASS_PTR(StandardGeometryPass)
-class StandardGeometryPass : public RenderPass
+class StandardGeometryPass : public ContextRenderPass
 {
 public:
 	static StandardGeometryPassUPtr Create
@@ -26,10 +26,7 @@ public:
 	const std::vector<MeshRenderer*>& GetStaticMeshRenderers() const;
 	Framebuffer* GetGBuffer() { return m_gBuffer.get(); }
 
-	virtual void Render(Scene* scene, Camera* camera) override;
-
-	// TEST : Context에 있는 내용물을 잘 렌더링 하는 지 테스트
-	void TestRender(RenderContext* context);
+	virtual void Render(RenderContext* context) override;
 
 	void Resize(int32 width, int32 height);
 

@@ -9,10 +9,8 @@ CLASS_PTR(CubeTexture)
 #pragma endregion
 
 CLASS_PTR(EnvironmentRenderPass)
-class EnvironmentRenderPass : public RenderPass
+class EnvironmentRenderPass : public GeneralRenderPass
 {
-    using Super = RenderPass;
-
 public:
     static EnvironmentRenderPassUPtr Create
     (

@@ -121,21 +121,19 @@ void StandardRenderPipeline::Render(Scene* scene)
 	//================================*/
 
 	// [패스 1] 그림자 패스: m_shadowMap에 깊이 정보 기록
-	// m_shadowPass->Render(scene, camera);
-	m_shadowPass->TestRender(&context);
+	m_shadowPass->Render(&context);
 
 	// [패스 2] 디퍼드 셰이딩 및 포스트 프로세스 프레임 버퍼에 깊이 복사
-	// m_geometryPass->Render(scene, camera);
-	m_geometryPass->TestRender(&context);
+	m_geometryPass->Render(&context);
 
 	// [패스 3] SSAO
 	context.SetGBuffer(m_geometryPass->GetGBuffer());
-	m_ssaoPass->TestRender(&context);
+	m_ssaoPass->Render(&context);
 	context.SetSSAOTexture(m_ssaoPass->GetSSAOResultTexture());
 
 	// [패스 4] Deferred Lighting 패스
 	context.SetTargetFramebuffer(m_postProcessPass->GetFramebuffer());
-	m_deferredLightPass->TestRender(&context);
+	m_deferredLightPass->Render(&context);
 
 	auto gBuffer = m_geometryPass->GetGBuffer();
 	auto postFBO = m_postProcessPass->GetFramebuffer();
@@ -148,10 +146,10 @@ void StandardRenderPipeline::Render(Scene* scene)
 		pass->Render(scene, camera);
 
 	// [패스 6] 스카이박스 패스: m_frameBuffer에 스카이박스 덧그리기
-	m_skyboxPass->TestRender(&context);
+	m_skyboxPass->Render(&context);
 
 	// [패스 7] 후처리 패스: m_frameBuffer의 결과를 화면에 Resolve
-	m_postProcessPass->TestRender(&context);
+	m_postProcessPass->Render(&context);
 
 	// [DEBUG] : ImGUI 컨텍스트
 	RenderIMGUIContext();
