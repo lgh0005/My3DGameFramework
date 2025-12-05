@@ -7,7 +7,8 @@
 #include "Graphics/Mesh.h"
 #include "Graphics/StaticMesh.h" 
 #include "Graphics/FrameBuffer.h"
-#include "Graphics/Texture.h"    
+#include "Graphics/Texture.h"
+#include "Graphics/Geometry.h"
 #include "Components/Camera.h"
 
 #include "SRP/StandardRenderContext.h"
@@ -33,7 +34,8 @@ bool StandardPostProcessPass::Init(int32 width, int32 height)
 	);
 	if (!m_compositeProgram || !m_blurProgram) return false;
 
-	m_plane = StaticMesh::CreateNDCQuad();
+	// m_plane = StaticMesh::CreateNDCQuad();
+	m_plane = GeometryGenerator::CreateNDCQuad();
 	if (!m_plane) return false;
 
 	m_frameBuffer = Framebuffer::Create(width, height, 1);

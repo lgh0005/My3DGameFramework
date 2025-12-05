@@ -9,6 +9,7 @@
 #include "Graphics/FrameBuffer.h"
 #include "Graphics/Program.h"
 #include "Graphics/StaticMesh.h"
+#include "Graphics/Geometry.h"
 
 #include "SRP/StandardRenderPipeline.h"
 #include "SRP/StandardRenderContext.h"
@@ -42,7 +43,7 @@ bool StandardSSAOPass::Init(int32 width, int32 height)
     if (!m_ssaoFBO || !m_ssaoBlurFBO) return false;
 
     // 2. 화면 전체를 덮는 Quad 생성
-    m_screenQuad = StaticMesh::CreateNDCQuad();
+    m_screenQuad = GeometryGenerator::CreateNDCQuad();
     if (!m_screenQuad) return false;
 
     GenerateKernel();

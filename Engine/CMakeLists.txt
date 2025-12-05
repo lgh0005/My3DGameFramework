@@ -59,6 +59,8 @@ add_library(Engine STATIC
    "Graphics/ShadowMap.h"           "Graphics/ShadowMap.cpp"
    "Graphics/UniformBuffer.h"       "Graphics/UniformBuffer.cpp"
    "Graphics/Uniform.h"             "Graphics/Uniform.cpp"
+   "Graphics/Frustum.h"             "Graphics/Frustum.cpp"
+   "Graphics/Geometry.h"            "Graphics/Geometry.cpp"
 
    # Audio
    "Audios/AudioClip.h"             "Audios/AudioClip.cpp"
@@ -86,6 +88,7 @@ add_library(Engine STATIC
    "Managers/SceneManager.h"        "Managers/SceneManager.cpp"
    "Managers/RenderManager.h"       "Managers/RenderManager.cpp"
    "Managers/AudioManager.h"        "Managers/AudioManager.cpp"
+ 
 )
 
 # 2. [PCH 설정] EnginePCH.h를 PCH로 사용합니다.

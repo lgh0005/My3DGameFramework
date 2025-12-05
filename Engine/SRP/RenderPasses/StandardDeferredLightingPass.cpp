@@ -6,6 +6,7 @@
 #include "SRP/RenderPasses/StandardGeometryPass.h"
 #include "SRP/RenderPasses/StandardPostProcessPass.h"
 #include "SRP/RenderPasses/StandardShadowPass.h"
+#include "Graphics/Geometry.h"
 #include "Graphics/Program.h"
 #include "Graphics/Mesh.h"
 #include "Graphics/StaticMesh.h" 
@@ -34,7 +35,7 @@ bool StandardDeferredLightingPass::Init()
 	);
 	if (!m_deferredLightProgram) return false;
 
-	m_plane = StaticMesh::CreateNDCQuad();
+	m_plane = GeometryGenerator::CreateNDCQuad();
 	if (!m_plane) return false;
 
 	return true;

@@ -18,6 +18,7 @@
 #include "Graphics/Model.h"
 #include "Graphics/Buffer.h"
 #include "Graphics/InstancedMesh.h"
+#include "Graphics/Geometry.h"
 #include "Components/Camera.h"
 #include "Components/Transform.h"
 #include "Components/MeshRenderer.h"
@@ -46,15 +47,15 @@ DevSceneUPtr DevScene::Create()
 bool DevScene::LoadNessesaryResources()
 {
 	// 0-1. 큐브 메쉬
-	auto boxMesh = StaticMesh::CreateBox();
+	auto boxMesh = GeometryGenerator::CreateBox();
 	RESOURCE.AddResource<Mesh>("Cube", std::move(boxMesh));
 
 	// 0-1. 평면 메쉬
-	auto planeMesh = StaticMesh::CreatePlane();
+	auto planeMesh = GeometryGenerator::CreatePlane();
 	RESOURCE.AddResource<Mesh>("Plane", std::move(planeMesh));
 
 	// 0-2. NDC 평면 메쉬
-	auto ndcPlaneMesh = StaticMesh::CreateNDCQuad();
+	auto ndcPlaneMesh = GeometryGenerator::CreateNDCQuad();
 	RESOURCE.AddResource<Mesh>("NDC", std::move(ndcPlaneMesh));
 
 	// 0-2. 모델과 애니메이션
@@ -232,7 +233,7 @@ bool DevScene::LoadNessesaryResources()
 		grassMat->emissionStrength = 0.0f;
 		RESOURCE.AddResource<Material>("grassMat", std::move(grassMat));
 
-		auto bladeMesh = StaticMesh::CreatePlane();
+		auto bladeMesh = GeometryGenerator::CreatePlane();
 		RESOURCE.AddResource<Mesh>("grassBlade", std::move(bladeMesh));
 	}
 

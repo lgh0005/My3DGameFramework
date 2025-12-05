@@ -7,6 +7,7 @@
 #include "Graphics/CubeTexture.h"
 #include "Graphics/Mesh.h"
 #include "Graphics/StaticMesh.h"
+#include "Graphics/Geometry.h"
 #include "Components/Camera.h"
 
 #include "SRP/StandardRenderContext.h"
@@ -27,7 +28,7 @@ bool StandardSkyboxPass::Init()
 	);
 	if (!m_skyboxProgram) return false;
 
-	m_cubeMesh = StaticMesh::CreateBox();
+	m_cubeMesh = GeometryGenerator::CreateBox();
 	if (!m_cubeMesh) return false;
 
 	return true;

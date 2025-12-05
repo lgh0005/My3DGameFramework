@@ -36,12 +36,4 @@ private:
         const std::vector<uint32>& indices,
         uint32 primitiveType
     );
-
-/*==============//
-//  mesh utils  //
-//==============*/
-public:
-    static StaticMeshUPtr CreateBox();
-    static StaticMeshUPtr CreatePlane();
-    static StaticMeshUPtr CreateNDCQuad();
 };
