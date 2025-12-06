@@ -49,3 +49,28 @@ glm::quat Utils::GetGLMQuat(const aiQuaternion& pOrientation)
 {
 	return glm::quat(pOrientation.w, pOrientation.x, pOrientation.y, pOrientation.z);
 }
+
+/*==================================//
+//   AABB 좌표를 얻어오는 유틸 함수   //
+//==================================*/
+glm::vec3 Utils::Min(const glm::vec3& a, const glm::vec3& b)
+{
+	// 각 성분별로 최솟값을 취하여 새로운 vec3를 생성
+	return glm::vec3
+	(
+		std::min<float>(a.x, b.x),
+		std::min<float>(a.y, b.y),
+		std::min<float>(a.z, b.z)
+	);
+}
+
+glm::vec3 Utils::Max(const glm::vec3& a, const glm::vec3& b)
+{
+	// 각 성분별로 최댓값을 취하여 새로운 vec3를 생성
+	return glm::vec3
+	(
+		glm::max<float>(a.x, b.x),
+		std::max<float>(a.y, b.y),
+		std::max<float>(a.z, b.z)
+	);
+}

@@ -59,7 +59,7 @@ bool DevScene::LoadNessesaryResources()
 	RESOURCE.AddResource<Mesh>("NDC", std::move(ndcPlaneMesh));
 
 	// 0-2. 모델과 애니메이션
-	auto model = Model::Load("./Resources/Models/spacesoldier/aliensoldier.mymodel");
+	auto model = Model::Load("./Resources/Models/spacesoldier/aliensoldier.fbx");
 	auto anim = Animation::Load("./Resources/Models/spacesoldier/Idle.fbx", model.get());
 	RESOURCE.AddResource<Animation>("hiphopDancing", std::move(anim));
 	RESOURCE.AddResource<Model>("aliensoldier", std::move(model));
@@ -572,6 +572,54 @@ bool DevScene::CreateSceneContext()
 		//grassGo->AddComponent(std::move(renderer));
 		//AddGameObject(std::move(grassGo));
 	}
+
+	// [Stress Test] 많은 수의 무작위 큐브 생성
+	// 목적: CPU Draw Call 병목 현상 확인 (약 5,000~6,000 Draw Calls 발생 예상)
+	// INFO : 컬링 없이 순수 렌더링으로 2500개 정도면 28ms 정도가 소요
+	// INFO : 컬링을 수행하면 14ms로 최적화
+	// INFO : 컬링 없이 순수 렌더링으로 1000개 정도면 14ms 정도가 소요
+	// INFO : 컬링을 수행하면 8ms로 최적화
+	// INFO : frstum의 margin 값에 영향을 받을 수 있음. 적정값은 2.0f에서 5.0f 정도?
+	// margin값을 너무 많이 주면 컬링이 잘 안되고 너무 적게 주면 그림자가 비정상적으로
+	// 없어지니(컬링이 엄격히 되니까) 적정값을 찾아서 수정 필요. (Frustum.h 참고)
+	//{
+	//	const int stressCount = 2500;
+	//	const float range = 40.0f; // 배치를 퍼뜨릴 범위 (-40 ~ +40)
+
+	//	auto cubeMesh = RESOURCE.GetResource<Mesh>("Cube");
+	//	auto cubeMat = RESOURCE.GetResource<Material>("boxMat1");
+
+	//	if (cubeMesh && cubeMat)
+	//	{
+	//		std::srand(static_cast<unsigned int>(std::time(nullptr)));
+
+	//		for (int i = 0; i < stressCount; ++i)
+	//		{
+	//			auto cubeObj = GameObject::Create();
+
+	//			// 1. 위치 및 회전 무작위 설정
+	//			float x = ((float)std::rand() / (float)RAND_MAX * range * 2.0f) - range;
+	//			float z = ((float)std::rand() / (float)RAND_MAX * range * 2.0f) - range;
+	//			float y = ((float)std::rand() / (float)RAND_MAX * 5.0f) + 1.0f; // 높이 1.0 ~ 6.0 공중 부양
+
+	//			float rotX = (float)(std::rand() % 360);
+	//			float rotY = (float)(std::rand() % 360);
+
+	//			auto& transform = cubeObj->GetTransform();
+	//			transform.SetPosition(glm::vec3(x, y, z));
+	//			transform.SetRotation(glm::vec3(rotX, rotY, 0.0f));
+	//			transform.SetScale(glm::vec3(0.5f)); // 크기는 0.5배로
+
+	//			// 2. MeshRenderer 컴포넌트 추가
+	//			// 중요: 인스턴싱이 아니라 개별 렌더러를 생성하여 부착함
+	//			auto meshRenderer = MeshRenderer::Create(cubeMesh, cubeMat);
+	//			cubeObj->AddComponent(std::move(meshRenderer));
+
+	//			// 3. 씬에 등록
+	//			AddGameObject(std::move(cubeObj));
+	//		}
+	//	}
+	//}
 
 	return true;
 }

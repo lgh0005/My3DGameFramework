@@ -9,6 +9,7 @@ class Frustum
 public:
 	static FrustumUPtr Create();
 	void Update(const glm::mat4& vp);
+	void SetMargin(float margin) { m_margin = margin; }
 	bool CheckBounds(const RenderBounds& bounds) const;
 
 private:
@@ -16,4 +17,5 @@ private:
 	void Init();
 
 	CullingPlane m_planes[6];
+	float m_margin	{ 2.0f };
 };

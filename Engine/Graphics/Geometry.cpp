@@ -6,7 +6,6 @@
 /*===================//
 //   Plane methods   //
 //===================*/
-
 CullingPlane::CullingPlane(const glm::vec3& normal, float dist)
     : m_normal(normal), m_distance(dist) {}
 
@@ -18,7 +17,7 @@ CullingPlane CullingPlane::Create(const glm::vec4& eq)
 void CullingPlane::Normalize()
 {
     float length = glm::length(m_normal);
-    if(length < glm::epsilon<float>()) return;
+    if (length < glm::epsilon<float>()) return;
 
     float invLength = 1.0f / length;
     m_normal *= invLength;
@@ -28,6 +27,13 @@ void CullingPlane::Normalize()
 float CullingPlane::GetDistanceToPoint(const glm::vec3& point) const
 {
     return glm::dot(m_normal, point) + m_distance;
+}
+
+// [DEBUG]
+void CullingPlane::Flip()
+{
+    m_normal *= -1.0f;
+    m_distance *= -1.0f;
 }
 
 /*==========================//
@@ -62,6 +68,23 @@ RenderBounds RenderBounds::Transform(const glm::mat4& mat) const
     newExtents.z = glm::abs(right.z) * m_extents.x + glm::abs(up.z) * m_extents.y + glm::abs(fwd.z) * m_extents.z;
 
     return RenderBounds::Create(newCenter, newExtents);
+}
+
+RenderBounds RenderBounds::Union(const RenderBounds& other) const
+{
+    // 1. 현재 bounds를 Min/Max 좌표로 변환
+    glm::vec3 minA = m_center - m_extents;
+    glm::vec3 maxA = m_center + m_extents;
+
+    // 2. other bounds를 Min/Max 좌표로 변환
+    glm::vec3 minB = other.m_center - other.m_extents;
+    glm::vec3 maxB = other.m_center + other.m_extents;
+
+    // 3. 두 Min/Max를 합쳐서 새로운 최종 Min/Max 계산 (Union)
+    glm::vec3 newMin = Utils::Min(minA, minB);
+    glm::vec3 newMax = Utils::Max(maxA, maxB);
+
+    return RenderBounds::CreateFromMinMax(newMin, newMax);
 }
 
 /*===============================//
@@ -112,7 +135,16 @@ StaticMeshUPtr GeometryGenerator::CreateBox()
       20, 22, 21, 22, 20, 23,
     };
 
+    glm::vec3 minBound(FLT_MAX);
+    glm::vec3 maxBound(-FLT_MAX);
+    for (const auto& v : vertices)
+    {
+        minBound = Utils::Min(minBound, v.position);
+        maxBound = Utils::Max(maxBound, v.position);
+    }
+
     auto mesh = StaticMesh::Create(vertices, indices, GL_TRIANGLES);
+    mesh->SetLocalBounds(RenderBounds::CreateFromMinMax(minBound, maxBound));
     if (!mesh) return nullptr;
 
     return std::move(mesh);
@@ -130,7 +162,16 @@ StaticMeshUPtr GeometryGenerator::CreatePlane()
 
     std::vector<uint32> indices = { 0, 1, 2, 2, 3, 0 };
 
+    glm::vec3 minBound(FLT_MAX);
+    glm::vec3 maxBound(-FLT_MAX);
+    for (const auto& v : vertices)
+    {
+        minBound = Utils::Min(minBound, v.position);
+        maxBound = Utils::Max(maxBound, v.position);
+    }
+
     auto mesh = StaticMesh::Create(vertices, indices, GL_TRIANGLES);
+    mesh->SetLocalBounds(RenderBounds::CreateFromMinMax(minBound, maxBound));
     if (!mesh) return nullptr;
 
     return std::move(mesh);
@@ -148,7 +189,16 @@ StaticMeshUPtr GeometryGenerator::CreateNDCQuad()
 
     std::vector<uint32> indices = { 0, 1, 2, 2, 3, 0 };
 
+    glm::vec3 minBound(FLT_MAX);
+    glm::vec3 maxBound(-FLT_MAX);
+    for (const auto& v : vertices)
+    {
+        minBound = Utils::Min(minBound, v.position);
+        maxBound = Utils::Max(maxBound, v.position);
+    }
+
     auto mesh = StaticMesh::Create(vertices, indices, GL_TRIANGLES);
+    mesh->SetLocalBounds(RenderBounds::CreateFromMinMax(minBound, maxBound));
     if (!mesh) return nullptr;
 
     return std::move(mesh);

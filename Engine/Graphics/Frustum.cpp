@@ -28,6 +28,7 @@ void Frustum::Update(const glm::mat4& vp)
     m_planes[Side::Right] = CullingPlane::Create(row3 - row0);
     m_planes[Side::Bottom] = CullingPlane::Create(row3 + row1);
     m_planes[Side::Top] = CullingPlane::Create(row3 - row1);
+
     m_planes[Side::Near] = CullingPlane::Create(row3 + row2);
     m_planes[Side::Far] = CullingPlane::Create(row3 - row2);
 
@@ -60,7 +61,7 @@ bool Frustum::CheckBounds(const RenderBounds& bounds) const
         // 중심까지의 거리(d)가 -r 보다 작다는 것은
         // AABB가 평면의 뒤쪽으로 반지름(r)보다 더 멀리 떨어져 있다는 뜻
         // 즉, 완전히 평면 바깥(Outside)임.
-        if (d < -r) return false;
+        if (d < -r - m_margin) return false;
     }
 
     // 모든 평면을 통과했으면(안쪽이거나 걸쳐있음) 그리기

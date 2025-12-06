@@ -126,7 +126,7 @@ bool Model::LoadByBinary(const std::string& filename)
         std::string storedNormal = ReadPath(inFile);
         std::string storedHeight = ReadPath(inFile);
 
-        // [수정] 위에서 만든 헬퍼 함수로 깔끔하게 로드
+        // 위에서 만든 헬퍼 함수로 깔끔하게 로드
         material->diffuse = LoadTextureFromFile(storedDiffuse, modelDir);
         material->specular = LoadTextureFromFile(storedSpecular, modelDir);
         material->emission = LoadTextureFromFile(storedEmission, modelDir);
@@ -180,13 +180,24 @@ void Model::ProcessMesh(aiMesh* mesh, const aiScene* scene)
 
     std::vector<SkinnedVertex> vertices;
     vertices.resize(mesh->mNumVertices);
+
+    glm::vec3 minBound(FLT_MAX);
+    glm::vec3 maxBound(-FLT_MAX);
+
+    // 1. 정점 순회 (데이터 추출 + AABB 계산 통합)
     for (uint32 i = 0; i < mesh->mNumVertices; i++) 
     {
         auto& v = vertices[i];
 
-        // 뼈 데이터를 기본값(-1)으로 초기화
+        // 1-1. 뼈 데이터 초기화
         SetVertexBoneDataToDefault(v);
+
+        // 1-2. 위치 설정 및 AABB 갱신
         v.position = glm::vec3(mesh->mVertices[i].x, mesh->mVertices[i].y, mesh->mVertices[i].z);
+        minBound = Utils::Min(minBound, v.position);
+        maxBound = Utils::Max(maxBound, v.position);
+
+        // 1-3. 노멀 및 텍스처 좌표 설정
         v.normal = glm::vec3(mesh->mNormals[i].x, mesh->mNormals[i].y, mesh->mNormals[i].z);
         v.texCoord = glm::vec2(mesh->mTextureCoords[0][i].x, mesh->mTextureCoords[0][i].y);
 
@@ -201,6 +212,7 @@ void Model::ProcessMesh(aiMesh* mesh, const aiScene* scene)
         }
     }
 
+    // 2. 인덱스 추출
     std::vector<uint32> indices;
     indices.resize(mesh->mNumFaces * 3);
     for (uint32 i = 0; i < mesh->mNumFaces; i++)
@@ -210,10 +222,19 @@ void Model::ProcessMesh(aiMesh* mesh, const aiScene* scene)
         indices[3 * i + 2] = mesh->mFaces[i].mIndices[2];
     }
 
-    // 뼈 데이터 추출 및 정점 벡터 업데이트
+    // 3. 뼈 데이터 추출 및 정점 벡터 업데이트
     ExtractBoneWeightForVertices(vertices, mesh, scene);
 
     auto glMesh = SkinnedMesh::Create(vertices, indices, GL_TRIANGLES);
+
+    // 1. AABB의 크기(차이) 계산
+    glm::vec3 boundDiff = maxBound - minBound;
+
+    // 2. 디버그 출력
+    SPDLOG_INFO("Mesh Name: {}, Diff X: {}, Diff Y: {}, Diff Z: {}",
+        mesh->mName.C_Str(), boundDiff.x, boundDiff.y, boundDiff.z);
+
+    glMesh->SetLocalBounds(RenderBounds::CreateFromMinMax(minBound, maxBound));
     if (mesh->mMaterialIndex >= 0)
         glMesh->SetMaterial(m_materials[mesh->mMaterialIndex]);
     m_meshes.push_back(std::move(glMesh));

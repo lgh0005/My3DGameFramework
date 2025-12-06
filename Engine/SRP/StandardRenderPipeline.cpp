@@ -1,6 +1,7 @@
 #include "EnginePch.h"
 #include "StandardRenderPipeline.h"
 
+#include "SRP/RenderPasses/StandardCullingPass.h"
 #include "SRP/RenderPasses/StandardShadowPass.h"
 #include "SRP/RenderPasses/StandardSkyboxPass.h"
 #include "SRP/RenderPasses/StandardPostProcessPass.h"
@@ -39,27 +40,31 @@ bool StandardRenderPipeline::Init()
 	m_globalUniforms = StandardGlobalUniforms::Create();
 	if (!m_globalUniforms) return false;
 
-	// 1. 셰도우 패스 생성
+	// 1. 컬링 패스 생성
+	m_cullingPass = StandardCullingPass::Create();
+	if (!m_cullingPass) return false;
+
+	// 2. 셰도우 패스 생성
 	m_shadowPass = StandardShadowPass::Create();
 	if (!m_shadowPass) return false;
 
-	// 2. 스카이박스 패스 생성
+	// 3. 스카이박스 패스 생성
 	m_skyboxPass = StandardSkyboxPass::Create();
 	if (!m_skyboxPass) return false;
 
-	// 3. 포스트-프로세스 패스 생성
+	// 4. 포스트-프로세스 패스 생성
 	m_postProcessPass = StandardPostProcessPass::Create();
 	if (!m_postProcessPass) return false;
 
-	// 4. G-buffer 패스 생성
+	// 5. G-buffer 패스 생성
 	m_geometryPass = StandardGeometryPass::Create();
 	if (!m_geometryPass) return false;
 
-	// 5. Light 패스 생성
+	// 6. Light 패스 생성
 	m_deferredLightPass = StandardDeferredLightingPass::Create();
 	if (!m_deferredLightPass) return false;
 
-	// TEST : SSAO 패스 생성
+	// 7 : SSAO 패스 생성
 	m_ssaoPass = StandardSSAOPass::Create();
 	if (!m_ssaoPass) return false;
 
@@ -97,21 +102,8 @@ void StandardRenderPipeline::Render(Scene* scene)
 	context.Reset(scene, camera);
 	context.SetSkyboxTexture(scene->GetSkyboxTexture());
 
-	// TODO : 이후에는 CullingPass를 통한 최적화 필요
-	// 지금은 그냥 씬에 있는 것을 그대로 복사.
-	{
-		const auto& staticSource = scene->GetStaticMeshRenderers();
-		for (auto* renderer : staticSource)
-			context.AddStaticMeshRenderer(renderer);
-
-		const auto& skinnedSource = scene->GetSkinnedMeshRenderers();
-		for (auto* renderer : skinnedSource)
-			context.AddSkinnedMeshRenderer(renderer);
-
-		const auto& lightSource = scene->GetLights();
-		for (auto* light : lightSource)
-			context.AddLight(light);
-	}
+	// [패스 0] 컬링 패스 : 절두체 범위 안에 있는 대상만 추리기
+	m_cullingPass->Render(&context);
 
 	// 1. ubo 갱신
 	m_globalUniforms->PreRender(&context);
@@ -119,7 +111,6 @@ void StandardRenderPipeline::Render(Scene* scene)
 	/*================================//
 	//   main scene rendergin logic   //
 	//================================*/
-
 	// [패스 1] 그림자 패스: m_shadowMap에 깊이 정보 기록
 	m_shadowPass->Render(&context);
 
@@ -162,6 +153,11 @@ void StandardRenderPipeline::OnResize(int32 width, int32 height)
 	m_ssaoPass->Resize(width, height);
 }
 
+/*======================//
+//  debug imgui method  //
+//======================*/
+#pragma region IMGUI_DEBUG_METHOD
+
 void StandardRenderPipeline::RenderIMGUIContext()
 {
 	IMGUI.BeginFrame();
@@ -173,3 +169,5 @@ void StandardRenderPipeline::RenderIMGUIContext()
 
 	IMGUI.EndFrame();
 }
+
+#pragma endregion

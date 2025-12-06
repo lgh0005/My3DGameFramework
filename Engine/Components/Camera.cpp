@@ -46,6 +46,16 @@ glm::mat4 Camera::GetViewMatrix() const
     return glm::lookAt(position, position + forward, up);
 }
 
+glm::mat4 Camera::GetProjectionMatrix() const
+{
+    return m_projectionMatrix;
+}
+
+glm::mat4 Camera::GetViewProjectionMatrix() const
+{
+    return m_projectionMatrix * GetViewMatrix();
+}
+
 void Camera::LookAt(const glm::vec3& target, const glm::vec3& up)
 {
     Transform& transform = GetTransform();

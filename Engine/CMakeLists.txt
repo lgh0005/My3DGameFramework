@@ -21,6 +21,7 @@ add_library(Engine STATIC
    "Core/RenderContext.h"           "Core/RenderContext.cpp"
 
    # Standard Render Pipeline
+   "SRP/RenderPasses/StandardCullingPass.h" "SRP/RenderPasses/StandardCullingPass.cpp"
    "SRP/RenderPasses/StandardShadowPass.h" "SRP/RenderPasses/StandardShadowPass.cpp"
    "SRP/RenderPasses/StandardSkyboxPass.h" "SRP/RenderPasses/StandardSkyboxPass.cpp"
    "SRP/RenderPasses/StandardPostProcessPass.h" "SRP/RenderPasses/StandardPostProcessPass.cpp"
@@ -89,7 +90,7 @@ add_library(Engine STATIC
    "Managers/RenderManager.h"       "Managers/RenderManager.cpp"
    "Managers/AudioManager.h"        "Managers/AudioManager.cpp"
  
-)
+ )
 
 # 2. [PCH 설정] EnginePCH.h를 PCH로 사용합니다.
 target_precompile_headers(Engine  PUBLIC EnginePCH.h)

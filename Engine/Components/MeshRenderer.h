@@ -1,5 +1,6 @@
 ﻿#pragma once
 #include "Component.h"
+#include "Graphics/Geometry.h"
 
 #pragma region FORWARD_DECLARATION
 CLASS_PTR(Mesh)
@@ -28,6 +29,8 @@ public:
 	void SetMaterial(MaterialPtr material) { m_material = material; }
 	RenderStage GetRenderStage() const { return m_renderStage; }
 	void SetRenderStage(RenderStage stage) { m_renderStage = stage; }
+
+	RenderBounds GetWorldBounds() const;
 
 private:
 	MeshRenderer() = default;

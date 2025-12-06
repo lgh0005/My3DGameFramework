@@ -17,5 +17,9 @@ public:
 	static glm::vec3 GetGLMVec(const aiVector3D& vec);
 	static glm::quat GetGLMQuat(const aiQuaternion& pOrientation);
 
+	// AABB 좌표를 얻어오는 유틸 함수
+	static glm::vec3 Min(const glm::vec3& a, const glm::vec3& b);
+	static glm::vec3 Max(const glm::vec3& a, const glm::vec3& b);
+
 	// Scene 스크립팅 API
 };

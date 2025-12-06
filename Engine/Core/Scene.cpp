@@ -161,7 +161,7 @@ void Scene::Update()
 
 		// 기존 Context::Render()에 있던 애니메이션 업데이트 로직을
 		// Scene::Update()로 이동
-		animator->UpdateAnimation();
+		animator->Update();
 	}
 
 	// 전체적으로 컴포넌트가 계층적 위치에 따라 적용되도록 만들 필요가 있음
