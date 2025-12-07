@@ -2,18 +2,24 @@
 add_executable(Game
 
     # Core
-    pch.h pch.cpp 
-    main.cpp
+    "pch.h"  "pch.cpp" 
+    "main.cpp"
 
-    # TEMP : 테스트 전용 개발 씬
-    "DevScene/DevScene.h"       "DevScene/DevScene.cpp"
+    # Application
+    "My3DGameFramework.h"       "My3DGameFramework.cpp"
 
-    "RenderPasses/SimpleRenderPass.h" "RenderPasses/SimpleRenderPass.cpp"
-    "RenderPasses/InstancedRenderPass.h" "RenderPasses/InstancedRenderPass.cpp"
-    "RenderPasses/EnvironmentRenderPass.h"  "RenderPasses/EnvironmentRenderPass.cpp"
+    # Standard Render Pipeline Sample Scene
+    "SRPSample/DevScene/DevScene.h"       "SRPSample/DevScene/DevScene.cpp"
 
-    "Scripts/CameraController.h"  "Scripts/CameraController.cpp"
+    "SRPSample/RenderPasses/SimpleRenderPass.h" "SRPSample/RenderPasses/SimpleRenderPass.cpp"
+    "SRPSample/RenderPasses/InstancedRenderPass.h" "SRPSample/RenderPasses/InstancedRenderPass.cpp"
+    "SRPSample/RenderPasses/EnvironmentRenderPass.h"  "SRPSample/RenderPasses/EnvironmentRenderPass.cpp"
 
+    "SRPSample/Scripts/CameraController.h"  "SRPSample/Scripts/CameraController.cpp"
+
+
+    # Univeral Render Pipeline Sample Scene
+    
 )
 
 # 2. [PCH 설정] Game/pch.h를 Game 타겟 전용(PRIVATE) PCH로 사용합니다.

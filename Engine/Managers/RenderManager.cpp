@@ -1,20 +1,11 @@
 #include "EnginePch.h"
 #include "RenderManager.h"
-//#include "Core/Renderer.h"
-//#include "Core/RenderPipeline.h"
 #include "SRP/StandardRenderPipeline.h"
 
 bool RenderManager::Init()
 {
-	// 1. 렌더러 생성
 	m_renderer = Renderer::Create();
 	if (!m_renderer) return false;
-
-	// TODO : 이제 이건 외부에서 수행해야 함.
-	// 2. 기본 파이프라인("Standard") 자동 등록 및 기본 렌더링 파이프라인 설정
-	RegisterPipeline<StandardRenderPipeline>("Standard");
-	SetPipeline("Standard");
-
 	return true;
 }
 

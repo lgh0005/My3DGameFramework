@@ -29,11 +29,11 @@
 #include "Components/AudioSource.h"
 #include "Components/AudioListener.h"
 
-#include "RenderPasses/InstancedRenderPass.h"
-#include "RenderPasses/SimpleRenderPass.h"
-#include "RenderPasses/EnvironmentRenderPass.h"
+#include "SRPSample/RenderPasses/InstancedRenderPass.h"
+#include "SRPSample/RenderPasses/SimpleRenderPass.h"
+#include "SRPSample/RenderPasses/EnvironmentRenderPass.h"
 
-#include "Scripts/CameraController.h"
+#include "SRPSample/Scripts/CameraController.h"
 
 DevScene::~DevScene() = default;
 

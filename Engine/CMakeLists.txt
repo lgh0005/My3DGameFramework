@@ -12,7 +12,7 @@ add_library(Engine STATIC
    "EnginePch.h"                    "EnginePch.cpp"
 
    # Core
-   "Game.h"                         "Game.cpp"
+   "Core/Application.h"             "Core/Application.cpp"
    "Core/GameObject.h"              "Core/GameObject.cpp"
    "Core/Scene.h"                   "Core/Scene.cpp"
    "Core/Renderer.h"                "Core/Renderer.cpp"
@@ -32,6 +32,9 @@ add_library(Engine STATIC
    "SRP/StandardGlobalUniforms.h"    "SRP/StandardGlobalUniforms.cpp"
    "SRP/StandardRenderContext.h"     "SRP/StandardRenderContext.cpp"
    "SRP/StandardRenderPipeline.h"    "SRP/StandardRenderPipeline.cpp"
+
+   # Universal Render Pipeline
+   "URP/UniversalRenderPipeline.h"   "URP/UniversalRenderPipeline.cpp"
 
    # Misc
    "Misc/Defines.h"
@@ -90,7 +93,7 @@ add_library(Engine STATIC
    "Managers/RenderManager.h"       "Managers/RenderManager.cpp"
    "Managers/AudioManager.h"        "Managers/AudioManager.cpp"
  
- )
+)
 
 # 2. [PCH 설정] EnginePCH.h를 PCH로 사용합니다.
 target_precompile_headers(Engine  PUBLIC EnginePCH.h)

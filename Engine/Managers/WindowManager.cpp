@@ -4,7 +4,7 @@
 #include "Graphics/Texture.h"
 #include "Components/Camera.h"
 
-bool WindowManager::Init()
+bool WindowManager::Init(int32 width, int32 height, const std::string& title)
 {
     // glfw 라이브러리 초기화
     if (!glfwInit())
@@ -22,7 +22,7 @@ bool WindowManager::Init()
 
     // glfw 윈도우 생성
     SPDLOG_INFO("Create glfw window");
-    m_window = glfwCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, WINDOW_NAME, nullptr, nullptr);
+    m_window = glfwCreateWindow(width, height, title.c_str(), nullptr, nullptr);
     if (!m_window)
     {
         SPDLOG_ERROR("failed to create glfw window");

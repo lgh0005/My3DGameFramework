@@ -1,31 +1,22 @@
 #include "pch.h"
-#include "Game.h"
-#include "SRP/StandardRenderPipeline.h"
-
-// TEMP : 테스트 씬
-#include "DevScene/DevScene.h"
-
-GameUPtr g_Game;
+#include "My3DGameFramework.h"
 
 int main()
 {
-	// 0. 씬 추가
-	SCENE.RegisterScene<DevScene>("DevScene");
-
-	// 1. 게임 프로그램 시작
-	// TODO : 처음으로 실행되어야 할 씬을 여기에서 주입
-	g_Game = Game::Create();
-	if (!g_Game)
+	// 1. 어플리케이션(엔진) 인스턴스 생성
+	auto app = My3DGameFramework::Create
+	(
+		WINDOW_WIDTH, WINDOW_HEIGHT,
+		WINDOW_NAME
+	);
+	if (!app)
 	{
-		SPDLOG_ERROR("failed to create Game.");
+		SPDLOG_CRITICAL("failed to create application instance.");
 		return 1;
 	}
 
-	// 2. 게임 로직 수행
-	g_Game->Update();
-
-	// 3. 게임 종료
-	g_Game->Shutdown();
+	// 2. 게임 실행
+	app->Run("DevLevel");
 
 	return 0;
 }

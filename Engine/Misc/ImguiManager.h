@@ -1,12 +1,7 @@
 #pragma once
-
 #include "imgui.h"
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
-
-// TODO : 이후에 ImGuizmo를 이용해서 오브젝트를 
-// 유니티처럼 쉽게 조절할 수 있도록 만들 필요가 있다.
-// #include "ImGuizmo.h"
 
 class ImGuiManager
 {

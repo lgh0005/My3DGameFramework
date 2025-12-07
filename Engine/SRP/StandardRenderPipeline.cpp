@@ -142,7 +142,9 @@ void StandardRenderPipeline::Render(Scene* scene)
 	// [패스 7] 후처리 패스: m_frameBuffer의 결과를 화면에 Resolve
 	m_postProcessPass->Render(&context);
 
-	// [DEBUG] : ImGUI 컨텍스트
+	/*=========================//
+	//   imgui debug context   //
+	//=========================*/
 	RenderIMGUIContext();
 }
 
@@ -164,7 +166,8 @@ void StandardRenderPipeline::RenderIMGUIContext()
 
 	if (IMGUI.Begin("Test Window"))
 	{
-		ImGui::Text("Hello world!");
+		ImGui::Text("Default Render Pipeline #1");
+		ImGui::Text("Standard Render Pipeline (legacy)");
 	} IMGUI.End();
 
 	IMGUI.EndFrame();

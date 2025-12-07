@@ -9,7 +9,7 @@ class WindowManager
 	DECLARE_SINGLE(WindowManager)
 
 public:
-	bool Init();
+	bool Init(int32 width, int32 height, const std::string& title);
 	GLFWwindow* GetWindow() { return m_window; }
 	WindowManager* GetWindowUserPtr();
 	void DestroyWindow();
