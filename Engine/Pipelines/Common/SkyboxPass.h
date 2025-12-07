@@ -1,6 +1,5 @@
 #pragma once
 #include "Core/RenderPass.h"
-
 #include "Graphics/Program.h"
 
 #pragma region FORWARD_DECLARATION
@@ -12,15 +11,15 @@ CLASS_PTR(Program)
 CLASS_PTR(RenderContext)
 #pragma endregion
 
-CLASS_PTR(StandardSkyboxPass)
-class StandardSkyboxPass : public ContextRenderPass
+CLASS_PTR(SkyboxPass)
+class SkyboxPass : public ContextRenderPass
 {
 public:
-	static StandardSkyboxPassUPtr Create();
+	static SkyboxPassUPtr Create();
 	virtual void Render(RenderContext* context) override;
 
 private:
-	StandardSkyboxPass() = default;
+	SkyboxPass() = default;
 	bool Init();
 
 	ProgramUPtr m_skyboxProgram;

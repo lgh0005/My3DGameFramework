@@ -11,30 +11,22 @@ CLASS_PTR(StaticMesh)
 CLASS_PTR(RenderContext)
 #pragma endregion
 
-CLASS_PTR(StandardSSAOPass)
-class StandardSSAOPass : public ContextRenderPass
+CLASS_PTR(SSAOPass)
+class SSAOPass : public ContextRenderPass
 {
 public:
-	static StandardSSAOPassUPtr Create
+	static SSAOPassUPtr Create
 	(
 		int32 width = WINDOW_WIDTH, 
 		int32 height = WINDOW_HEIGHT
 	);
 	virtual void Render(RenderContext* context) override;
-
 	void Resize(int32 width, int32 height);
-
-	// TODO : 이제 이 코드는 Legacy가 될 것임
-	void SetGBufferInputs(Texture* positionTex, Texture* normalTex)
-	{
-		m_gPosition = positionTex;
-		m_gNormal = normalTex;
-	}
 
 	Texture* GetSSAOResultTexture() const;
 
 private:
-	StandardSSAOPass() = default;
+	SSAOPass() = default;
 	bool Init(int32 width, int32 height);
 	void GenerateKernel();
 	void GenerateNoiseTexture();
@@ -49,8 +41,4 @@ private:
 
 	ProgramUPtr            m_ssaoProgram{ nullptr };
 	ProgramUPtr            m_ssaoBlurProgram{ nullptr };
-
-	// TODO : Legacy Members (TestRender에서는 사용 안 함)
-	Texture*			   m_gPosition{ nullptr };
-	Texture*			   m_gNormal{ nullptr };
 };

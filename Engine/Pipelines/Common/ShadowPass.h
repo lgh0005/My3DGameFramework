@@ -8,11 +8,11 @@ CLASS_PTR(ShadowMap)
 CLASS_PTR(RenderContext)
 #pragma endregion
 
-CLASS_PTR(StandardShadowPass)
-class StandardShadowPass : public ContextRenderPass
+CLASS_PTR(ShadowPass)
+class ShadowPass : public ContextRenderPass
 {
 public:
-	static StandardShadowPassUPtr Create(int32 resolution = 1024);
+	static ShadowPassUPtr Create(int32 resolution = 1024);
 	virtual void Render(RenderContext* context) override;
 	// virtual void Render(Scene* scene, Camera* camera) override;
 
@@ -21,7 +21,7 @@ public:
 	void Resize(int32 widht, int32 height);
 
 private:
-	StandardShadowPass() = default;
+	ShadowPass() = default;
 	bool Init(int32 resolution);
 
 	int32	      m_resolution;

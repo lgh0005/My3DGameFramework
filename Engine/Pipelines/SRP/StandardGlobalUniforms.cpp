@@ -1,7 +1,6 @@
 #include "EnginePch.h"
 #include "StandardGlobalUniforms.h"
 #include "Graphics/UniformBuffer.h"
-#include "Core/Scene.h"
 #include "Core/RenderContext.h"
 #include "Components/Camera.h"
 #include "Components/Transform.h"

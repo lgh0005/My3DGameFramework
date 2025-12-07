@@ -1,9 +1,8 @@
-#pragma once
+ï»¿#pragma once
 #include "Light.h"
 
-// TODO : ÀÌÈÄ¿¡´Â Deffered shadingÀ» ÀÌ¿ëÇØ¼­ ´ÙÁß Á¶¸íµéÀ» ±×¸± ¹æ¹ýÀ» Àû¿ë.
-// ´õ ÀÌÈÄ¿¡´Â Compute shadingÀ» ÅëÇØ¼­ ÃÖÀûÈ­¸¦ ÇÒ ¼ö ÀÖ°ÚÁö¸¸, ±×°Ç ÀÌÈÄ¿¡
-// Â÷±ÙÂ÷±Ù ´õ °øºÎÇÏ°í º¸°­ÇØº¸´Â °ÍÀ¸·Î ÇÑ´Ù.
+// TODO : ë” ì´í›„ì—ëŠ” Compute shadingì„ í†µí•´ì„œ ìµœì í™”ë¥¼ í•  ìˆ˜ ìžˆê² ì§€ë§Œ, ê·¸ê±´ ì´í›„ì—
+// ì°¨ê·¼ì°¨ê·¼ ë” ê³µë¶€í•˜ê³  ë³´ê°•í•´ë³´ëŠ” ê²ƒìœ¼ë¡œ í•œë‹¤.
 
 #pragma region FORWARD_DECLARATION
 CLASS_PTR(Transform)

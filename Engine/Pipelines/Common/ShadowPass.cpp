@@ -1,10 +1,10 @@
 #include "EnginePch.h"
-#include "StandardShadowPass.h"
+#include "ShadowPass.h"
 
 #include "Core/Scene.h"
 #include "Core/GameObject.h"
-#include "SRP/StandardRenderPipeline.h"
-#include "SRP/RenderPasses/StandardGeometryPass.h"
+#include "Pipelines/SRP/StandardRenderPipeline.h"
+#include "Pipelines/SRP/RenderPasses/StandardGeometryPass.h"
 #include "Graphics/Program.h"
 #include "Graphics/Mesh.h"
 #include "Graphics/StaticMesh.h" 
@@ -17,28 +17,28 @@
 #include "Components/MeshRenderer.h"
 #include "Components/Animator.h"
 
-#include "SRP/StandardRenderContext.h"
+#include "Pipelines/SRP/StandardRenderContext.h"
 
-StandardShadowPassUPtr StandardShadowPass::Create(int32 resolution)
+ShadowPassUPtr ShadowPass::Create(int32 resolution)
 {
-	auto pass = StandardShadowPassUPtr(new StandardShadowPass());
+	auto pass = ShadowPassUPtr(new ShadowPass());
 	if (!pass->Init(resolution)) return nullptr;
 	return std::move(pass);
 }
 
-bool StandardShadowPass::Init(int32 resolution)
+bool ShadowPass::Init(int32 resolution)
 {
 	m_resolution = resolution;
 
 	m_staticDepthProgram = Program::Create
 	(
-		"./Resources/Shaders/Standard/Shadow_DepthPass_Static.vert",
-		"./Resources/Shaders/Standard/Shadow_DepthPass_Static.frag"
+		"./Resources/Shaders/Common/Common_Shadow_DepthPass_Static.vert",
+		"./Resources/Shaders/Common/Common_Shadow_DepthPass_Static.frag"
 	);
 	m_skinnedDepthProgram = Program::Create
 	(
-		"./Resources/Shaders/Standard/Shadow_DepthPass_Skinned.vert",
-		"./Resources/Shaders/Standard/Shadow_DepthPass_Skinned.frag"
+		"./Resources/Shaders/Common/Common_Shadow_DepthPass_Skinned.vert",
+		"./Resources/Shaders/Common/Common_Shadow_DepthPass_Skinned.frag"
 	);
 	if (!m_staticDepthProgram || !m_skinnedDepthProgram)
 		return false;
@@ -58,7 +58,7 @@ bool StandardShadowPass::Init(int32 resolution)
 }
 
 // TEST : Context에 있는 내용물을 잘 렌더링 하는 지 테스트
-void StandardShadowPass::Render(RenderContext* context)
+void ShadowPass::Render(RenderContext* context)
 {
 	// 0. Context 캐스팅 및 유효성 검사
 	auto stdCtx = (StandardRenderContext*)context;
@@ -150,7 +150,7 @@ void StandardShadowPass::Render(RenderContext* context)
 	}
 }
 
-glm::mat4 StandardShadowPass::CalculateLightSpaceMatrix(Light* light)
+glm::mat4 ShadowPass::CalculateLightSpaceMatrix(Light* light)
 {
 	if (!light) return glm::mat4(1.0f);
 

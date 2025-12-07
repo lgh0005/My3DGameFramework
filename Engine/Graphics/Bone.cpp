@@ -28,7 +28,7 @@ bool Bone::Init(const std::string& name, int id, const aiNodeAnim* channel)
         aiVector3D aiPosition = channel->mPositionKeys[positionIndex].mValue;
         float timeStamp = channel->mPositionKeys[positionIndex].mTime;
         KeyPosition data;
-        data.position = Utils::GetGLMVec(aiPosition);
+        data.position = Utils::ConvertToGLMVec(aiPosition);
         data.timeStamp = timeStamp;
         m_positions.push_back(data);
     }
@@ -39,7 +39,7 @@ bool Bone::Init(const std::string& name, int id, const aiNodeAnim* channel)
         aiQuaternion aiOrientation = channel->mRotationKeys[rotationIndex].mValue;
         float timeStamp = channel->mRotationKeys[rotationIndex].mTime;
         KeyRotation data;
-        data.orientation = Utils::GetGLMQuat(aiOrientation);
+        data.orientation = Utils::ConvertToGLMQuat(aiOrientation);
         data.timeStamp = timeStamp;
         m_rotations.push_back(data);
     }
@@ -50,7 +50,7 @@ bool Bone::Init(const std::string& name, int id, const aiNodeAnim* channel)
         aiVector3D scale = channel->mScalingKeys[keyIndex].mValue;
         float timeStamp = channel->mScalingKeys[keyIndex].mTime;
         KeyScale data;
-        data.scale = Utils::GetGLMVec(scale);
+        data.scale = Utils::ConvertToGLMVec(scale);
         data.timeStamp = timeStamp;
         m_scales.push_back(data);
     }

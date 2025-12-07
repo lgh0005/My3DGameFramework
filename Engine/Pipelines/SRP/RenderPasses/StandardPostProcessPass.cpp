@@ -11,7 +11,7 @@
 #include "Graphics/Geometry.h"
 #include "Components/Camera.h"
 
-#include "SRP/StandardRenderContext.h"
+#include "Pipelines/SRP/StandardRenderContext.h"
 
 StandardPostProcessPassUPtr StandardPostProcessPass::Create(int32 width, int32 height)
 {
@@ -24,13 +24,13 @@ bool StandardPostProcessPass::Init(int32 width, int32 height)
 {
 	m_compositeProgram = Program::Create
 	(
-		"./Resources/Shaders/Standard/Post_PostProcess.vert",
-		"./Resources/Shaders/Standard/Post_PostProcess.frag"
+		"./Resources/Shaders/Standard/Standard_Post_PostProcess.vert",
+		"./Resources/Shaders/Standard/Standard_Post_PostProcess.frag"
 	);
 	m_blurProgram = Program::Create
 	(
-		"./Resources/Shaders/Standard/Post_Blur.vert",
-		"./Resources/Shaders/Standard/Post_Blur.frag"
+		"./Resources/Shaders/Standard/Standard_Post_Blur.vert",
+		"./Resources/Shaders/Standard/Standard_Post_Blur.frag"
 	);
 	if (!m_compositeProgram || !m_blurProgram) return false;
 

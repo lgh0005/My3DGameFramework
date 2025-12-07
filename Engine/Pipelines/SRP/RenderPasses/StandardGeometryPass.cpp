@@ -15,8 +15,8 @@
 #include "Components/SpotLight.h"
 #include "Components/Animator.h"
 
-#include "SRP/StandardRenderPipeline.h"
-#include "SRP/StandardRenderContext.h"
+#include "Pipelines/SRP/StandardRenderPipeline.h"
+#include "Pipelines/SRP/StandardRenderContext.h"
 
 StandardGeometryPassUPtr StandardGeometryPass::Create(int32 width, int32 height)
 {
@@ -29,13 +29,13 @@ bool StandardGeometryPass::Init(int32 width, int32 height)
 {
 	m_staticGeometryProgram = Program::Create
 	(
-		"./Resources/Shaders/Standard/Deferred_GeometryPass_Static.vert",
-		"./Resources/Shaders/Standard/Deferred_GeometryPass_Pixel.frag"
+		"./Resources/Shaders/Standard/Standard_Deferred_GeometryPass_Static.vert",
+		"./Resources/Shaders/Standard/Standard_Deferred_GeometryPass.frag"
 	);
 	m_skinnedGeometryProgram = Program::Create
 	(
-		"./Resources/Shaders/Standard/Deferred_GeometryPass_Skinned.vert",
-		"./Resources/Shaders/Standard/Deferred_GeometryPass_Pixel.frag"
+		"./Resources/Shaders/Standard/Standard_Deferred_GeometryPass_Skinned.vert",
+		"./Resources/Shaders/Standard/Standard_Deferred_GeometryPass.frag"
 	);
 	if (!m_staticGeometryProgram || !m_skinnedGeometryProgram) return false;
 

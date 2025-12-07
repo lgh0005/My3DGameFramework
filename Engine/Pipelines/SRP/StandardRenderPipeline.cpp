@@ -1,16 +1,15 @@
 #include "EnginePch.h"
 #include "StandardRenderPipeline.h"
 
-#include "SRP/RenderPasses/StandardCullingPass.h"
-#include "SRP/RenderPasses/StandardShadowPass.h"
-#include "SRP/RenderPasses/StandardSkyboxPass.h"
-#include "SRP/RenderPasses/StandardPostProcessPass.h"
-#include "SRP/RenderPasses/StandardGeometryPass.h"
-#include "SRP/RenderPasses/StandardSSAOPass.h"
-#include "SRP/RenderPasses/StandardDeferredLightingPass.h"
-#include "SRP/StandardGlobalUniforms.h"
-
-#include "SRP/StandardRenderContext.h"
+#include "Pipelines/Common/CullingPass.h"
+#include "Pipelines/Common/ShadowPass.h"
+#include "Pipelines/Common/SkyboxPass.h"
+#include "Pipelines/Common/SSAOPass.h"
+#include "Pipelines/SRP/RenderPasses/StandardPostProcessPass.h"
+#include "Pipelines/SRP/RenderPasses/StandardGeometryPass.h"
+#include "Pipelines/SRP/RenderPasses/StandardDeferredLightingPass.h"
+#include "Pipelines/SRP/StandardGlobalUniforms.h"
+#include "Pipelines/SRP/StandardRenderContext.h"
 
 #include "Core/Scene.h"
 #include "Core/GameObject.h"
@@ -36,37 +35,37 @@ StandardRenderPipelineUPtr StandardRenderPipeline::Create()
 
 bool StandardRenderPipeline::Init()
 {
-	// 0. UBO 생성
+	// UBO 생성
 	m_globalUniforms = StandardGlobalUniforms::Create();
 	if (!m_globalUniforms) return false;
 
-	// 1. 컬링 패스 생성
-	m_cullingPass = StandardCullingPass::Create();
+	// 컬링 패스 생성
+	m_cullingPass = CullingPass::Create();
 	if (!m_cullingPass) return false;
 
-	// 2. 셰도우 패스 생성
-	m_shadowPass = StandardShadowPass::Create();
+	// 셰도우 패스 생성
+	m_shadowPass = ShadowPass::Create();
 	if (!m_shadowPass) return false;
 
-	// 3. 스카이박스 패스 생성
-	m_skyboxPass = StandardSkyboxPass::Create();
+	// 스카이박스 패스 생성
+	m_skyboxPass = SkyboxPass::Create();
 	if (!m_skyboxPass) return false;
 
-	// 4. 포스트-프로세스 패스 생성
+	// SSAO 패스 생성
+	m_ssaoPass = SSAOPass::Create();
+	if (!m_ssaoPass) return false;
+
+	// 포스트-프로세스 패스 생성
 	m_postProcessPass = StandardPostProcessPass::Create();
 	if (!m_postProcessPass) return false;
 
-	// 5. G-buffer 패스 생성
+	// G-buffer 패스 생성
 	m_geometryPass = StandardGeometryPass::Create();
 	if (!m_geometryPass) return false;
 
-	// 6. Light 패스 생성
+	// Light 패스 생성
 	m_deferredLightPass = StandardDeferredLightingPass::Create();
 	if (!m_deferredLightPass) return false;
-
-	// 7 : SSAO 패스 생성
-	m_ssaoPass = StandardSSAOPass::Create();
-	if (!m_ssaoPass) return false;
 
 	return true;
 }

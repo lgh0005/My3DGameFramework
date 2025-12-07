@@ -33,6 +33,7 @@ bool InstancedMesh::Init(StaticMeshPtr baseMesh, BufferPtr instanceBuffer,
     // TODO : 현재는 StaticMesh를 전제로 인스턴싱을 수행.
     // 이후에는 "다른 애니메이션에 같은 모델"을 인스턴싱 해야 할 수도 있음.
     // 1. 부모의 멤버를 baseMesh의 것으로 설정 (포인터 공유)
+    // 2. 기회가 된다면 SSBO를 이용한 "애니메이션 모델 인스턴싱"도 이론적으로 가능함.
     m_vertexBuffer = baseMesh->GetVertexBuffer();
     m_indexBuffer = baseMesh->GetIndexBuffer();
     m_indexCount = baseMesh->GetIndexCount();

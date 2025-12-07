@@ -152,9 +152,7 @@ void Scene::Update()
 	// TODO : 
 	// 0. 나중에 추가할 Destroy/SetActive 로직을 고려
 
-	// TODO
-
-	// 1. 캐시된 m_animators 목록을 순회하며 애니메이션 업데이트
+	// 1. m_animators 목록을 순회하며 애니메이션 업데이트
 	for (auto* animator : m_animators)
 	{
 		// (나중에 추가) if (animator->GetOwner()->IsActiveInHierarchy())

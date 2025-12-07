@@ -67,7 +67,7 @@ protected:
 	std::vector<GameObjectUPtr> m_gameObjects;
 
 	// 삭제 대기열
-	// TODO : GameObject 파괴를 위한 FlushDestroyQueue 구현 진행
+	// TODO : GameObject 파괴를 위한 FlushDestroyQueue 구현 진행 필요
 	void FlushDestroyQueue();
 	std::vector<GameObjectUPtr> m_destroyQueue;
 

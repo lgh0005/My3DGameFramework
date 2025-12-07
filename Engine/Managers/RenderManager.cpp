@@ -1,6 +1,5 @@
 #include "EnginePch.h"
 #include "RenderManager.h"
-#include "SRP/StandardRenderPipeline.h"
 
 bool RenderManager::Init()
 {

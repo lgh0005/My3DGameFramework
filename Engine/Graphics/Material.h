@@ -6,9 +6,11 @@ CLASS_PTR(Program)
 #pragma endregion
 
 CLASS_PTR(Material);
-class Material {
+class Material 
+{
 public:
     static MaterialUPtr Create() { return MaterialUPtr(new Material()); }
+
     TexturePtr  diffuse;
     TexturePtr  specular;
     TexturePtr  emission;

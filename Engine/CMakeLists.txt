@@ -20,21 +20,25 @@ add_library(Engine STATIC
    "Core/RenderPipeline.h"          "Core/RenderPipeline.cpp"
    "Core/RenderContext.h"           "Core/RenderContext.cpp"
 
-   # Standard Render Pipeline
-   "SRP/RenderPasses/StandardCullingPass.h" "SRP/RenderPasses/StandardCullingPass.cpp"
-   "SRP/RenderPasses/StandardShadowPass.h" "SRP/RenderPasses/StandardShadowPass.cpp"
-   "SRP/RenderPasses/StandardSkyboxPass.h" "SRP/RenderPasses/StandardSkyboxPass.cpp"
-   "SRP/RenderPasses/StandardPostProcessPass.h" "SRP/RenderPasses/StandardPostProcessPass.cpp"
-   "SRP/RenderPasses/StandardGeometryPass.h"  "SRP/RenderPasses/StandardGeometryPass.cpp"
-   "SRP/RenderPasses/StandardDeferredLightingPass.h"  "SRP/RenderPasses/StandardDeferredLightingPass.cpp"
-   "SRP/RenderPasses/StandardSSAOPass.h"       "SRP/RenderPasses/StandardSSAOPass.cpp"
+   # Common Render Passes
+   "Pipelines/Common/CullingPass.h" "Pipelines/Common/CullingPass.cpp"
+   "Pipelines/Common/SkyboxPass.h"  "Pipelines/Common/SkyboxPass.cpp"
+   "Pipelines/Common/SSAOPass.h"    "Pipelines/Common/SSAOPass.cpp"
+   "Pipelines/Common/ShadowPass.h"  "Pipelines/Common/ShadowPass.cpp"
 
-   "SRP/StandardGlobalUniforms.h"    "SRP/StandardGlobalUniforms.cpp"
-   "SRP/StandardRenderContext.h"     "SRP/StandardRenderContext.cpp"
-   "SRP/StandardRenderPipeline.h"    "SRP/StandardRenderPipeline.cpp"
+   # Standard Render Pipeline
+   "Pipelines/SRP/RenderPasses/StandardPostProcessPass.h" "Pipelines/SRP/RenderPasses/StandardPostProcessPass.cpp"
+   "Pipelines/SRP/RenderPasses/StandardGeometryPass.h"  "Pipelines/SRP/RenderPasses/StandardGeometryPass.cpp"
+   "Pipelines/SRP/RenderPasses/StandardDeferredLightingPass.h"  "Pipelines/SRP/RenderPasses/StandardDeferredLightingPass.cpp"
+
+   "Pipelines/SRP/StandardGlobalUniforms.h"    "Pipelines/SRP/StandardGlobalUniforms.cpp"
+   "Pipelines/SRP/StandardRenderContext.h"     "Pipelines/SRP/StandardRenderContext.cpp"
+   "Pipelines/SRP/StandardRenderPipeline.h"    "Pipelines/SRP/StandardRenderPipeline.cpp"
 
    # Universal Render Pipeline
-   "URP/UniversalRenderPipeline.h"   "URP/UniversalRenderPipeline.cpp"
+   "Pipelines/URP/UniversalRenderPipeline.h"   "Pipelines/URP/UniversalRenderPipeline.cpp"
+   "Pipelines/URP/UniversalGlobalUniforms.h"   "Pipelines/URP/UniversalGlobalUniforms.cpp"
+   "Pipelines/URP/UniversalRenderContext.h"    "Pipelines/URP/UniversalRenderContext.cpp"
 
    # Misc
    "Misc/Defines.h"
@@ -93,7 +97,7 @@ add_library(Engine STATIC
    "Managers/RenderManager.h"       "Managers/RenderManager.cpp"
    "Managers/AudioManager.h"        "Managers/AudioManager.cpp"
  
-)
+ )
 
 # 2. [PCH 설정] EnginePCH.h를 PCH로 사용합니다.
 target_precompile_headers(Engine  PUBLIC EnginePCH.h)

@@ -25,7 +25,7 @@ public:
 /*===================//
 //  Bone properties  //
 //===================*/
-public: // TODO : public으로 열어둬야 하는거 
+public:
 	auto& GetBoneInfoMap() { return m_boneInfoMap; }
 	int32& GetBoneCount() { return m_BoneCounter; }
 

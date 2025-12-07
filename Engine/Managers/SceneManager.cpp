@@ -1,7 +1,6 @@
 #include "EnginePch.h"
 #include "SceneManager.h"
 
-// TODO : 이 부분 수정 필요
 void SceneManager::LoadScene
 (
 	const std::string& scene,

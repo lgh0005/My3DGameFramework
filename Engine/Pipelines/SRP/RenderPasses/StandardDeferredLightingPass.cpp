@@ -1,11 +1,13 @@
 ﻿#include "EnginePch.h"
 #include "StandardDeferredLightingPass.h"
 
+#include "Pipelines/Common/ShadowPass.h"
+
+#include "Pipelines/SRP/StandardRenderPipeline.h"
+#include "Pipelines/SRP/RenderPasses/StandardGeometryPass.h"
+#include "Pipelines/SRP/RenderPasses/StandardPostProcessPass.h"
+
 #include "Core/Scene.h"
-#include "SRP/StandardRenderPipeline.h"
-#include "SRP/RenderPasses/StandardGeometryPass.h"
-#include "SRP/RenderPasses/StandardPostProcessPass.h"
-#include "SRP/RenderPasses/StandardShadowPass.h"
 #include "Graphics/Geometry.h"
 #include "Graphics/Program.h"
 #include "Graphics/Mesh.h"
@@ -17,7 +19,7 @@
 #include "Components/SpotLight.h"
 #include "Components/Transform.h"
 
-#include "SRP/StandardRenderContext.h"
+#include "Pipelines/SRP/StandardRenderContext.h"
 
 StandardDeferredLightingPassUPtr StandardDeferredLightingPass::Create()
 {
@@ -30,8 +32,8 @@ bool StandardDeferredLightingPass::Init()
 {
 	m_deferredLightProgram = Program::Create
 	(
-		"./Resources/Shaders/Standard/Deferred_LightPass.vert",
-		"./Resources/Shaders/Standard/Deferred_LightPass.frag"
+		"./Resources/Shaders/Standard/Standard_Deferred_LightPass.vert",
+		"./Resources/Shaders/Standard/Standard_Deferred_LightPass.frag"
 	);
 	if (!m_deferredLightProgram) return false;
 

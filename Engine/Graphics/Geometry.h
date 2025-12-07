@@ -61,4 +61,9 @@ public:
 	static StaticMeshUPtr CreateBox();
 	static StaticMeshUPtr CreatePlane();
 	static StaticMeshUPtr CreateNDCQuad();
+	static StaticMeshUPtr CreateSphere
+	(
+		uint32 latiSegmentCount = 16,
+		uint32 longiSegmentCount = 32
+	);
 };

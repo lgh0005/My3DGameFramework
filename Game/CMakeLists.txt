@@ -10,17 +10,16 @@ add_executable(Game
 
     # Standard Render Pipeline Sample Scene
     "SRPSample/DevScene/DevScene.h"       "SRPSample/DevScene/DevScene.cpp"
-
     "SRPSample/RenderPasses/SimpleRenderPass.h" "SRPSample/RenderPasses/SimpleRenderPass.cpp"
     "SRPSample/RenderPasses/InstancedRenderPass.h" "SRPSample/RenderPasses/InstancedRenderPass.cpp"
     "SRPSample/RenderPasses/EnvironmentRenderPass.h"  "SRPSample/RenderPasses/EnvironmentRenderPass.cpp"
-
     "SRPSample/Scripts/CameraController.h"  "SRPSample/Scripts/CameraController.cpp"
 
 
     # Univeral Render Pipeline Sample Scene
-    
-)
+    "URPSample/DevScene/PBRScene.h"    "URPSample/DevScene/PBRScene.cpp"
+    "URPSample/RenderPasses/TestRenderPass.h"   "URPSample/RenderPasses/TestRenderPass.cpp"
+ )
 
 # 2. [PCH 설정] Game/pch.h를 Game 타겟 전용(PRIVATE) PCH로 사용합니다.
 target_precompile_headers(Game PRIVATE pch.h)

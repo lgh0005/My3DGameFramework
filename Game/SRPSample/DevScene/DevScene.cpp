@@ -3,9 +3,6 @@
 
 #include "Core/GameObject.h"
 #include "Core/Renderer.h"
-#include "SRP/StandardRenderPipeline.h"
-#include "SRP/RenderPasses/StandardGeometryPass.h"
-#include "Audios/AudioClip.h"
 #include "Graphics/Program.h"
 #include "Graphics/Mesh.h"
 #include "Graphics/StaticMesh.h"
@@ -19,6 +16,8 @@
 #include "Graphics/Buffer.h"
 #include "Graphics/InstancedMesh.h"
 #include "Graphics/Geometry.h"
+#include "Audios/AudioClip.h"
+
 #include "Components/Camera.h"
 #include "Components/Transform.h"
 #include "Components/MeshRenderer.h"
@@ -46,6 +45,8 @@ DevSceneUPtr DevScene::Create()
 
 bool DevScene::LoadNessesaryResources()
 {
+	// TODO : 이젠 웬만하면 이미지는 ktx를 쓰는 것을 권장
+
 	// 0-1. 큐브 메쉬
 	auto boxMesh = GeometryGenerator::CreateBox();
 	RESOURCE.AddResource<Mesh>("Cube", std::move(boxMesh));
@@ -61,8 +62,8 @@ bool DevScene::LoadNessesaryResources()
 	// 0-2. 모델과 애니메이션
 	auto model = Model::Load("./Resources/Models/spacesoldier/aliensoldier.fbx");
 	auto anim = Animation::Load("./Resources/Models/spacesoldier/Idle.fbx", model.get());
-	RESOURCE.AddResource<Animation>("hiphopDancing", std::move(anim));
 	RESOURCE.AddResource<Model>("aliensoldier", std::move(model));
+	RESOURCE.AddResource<Animation>("hiphopDancing", std::move(anim));
 
 	// 0-3. 머티리얼 1
 	{
@@ -276,7 +277,7 @@ bool DevScene::CreateNessesaryRenderPasses()
 {
 	auto pipeline = RENDER.GetRenderer()->GetPipeline();
 
-	// 3. Instanced 셰이더 (잔디)
+	// 1. Instanced 셰이더 (잔디)
 	{
 		auto prog = Program::Create(
 			"./Resources/Shaders/grass.vert",
@@ -285,7 +286,7 @@ bool DevScene::CreateNessesaryRenderPasses()
 		AddCustomRenderPass("Instanced", InstancedRenderPass::Create(std::move(prog)));
 	}
 
-	// 4. Simple 셰이더 (조명 기즈모)
+	// 2. Simple 셰이더 (조명 기즈모)
 	{
 		auto prog = Program::Create(
 			"./Resources/Shaders/simple.vert",
@@ -294,7 +295,7 @@ bool DevScene::CreateNessesaryRenderPasses()
 		AddCustomRenderPass("LightGizmo", SimpleRenderPass::Create(std::move(prog)));
 	}
 
-	// 6. 환경맵
+	// 3. 환경맵
 	{
 		auto prog = Program::Create
 		(
@@ -312,17 +313,12 @@ bool DevScene::CreateNessesaryRenderPasses()
 
 bool DevScene::CreateSceneContext()
 {
-	auto pipeline = (StandardRenderPipeline*)(RENDER.GetRenderer()->GetPipeline());
-
 	// 0. 하늘 설정
 	SetSkyboxTexture(RESOURCE.GetResource<CubeTexture>("SkyboxTexture"));
 
-	// TODO : Render Pipeline을 가져와야함.
-	// TODO : 정말로 다운캐스팅을 위한 템플릿 함수가 필요하려나..
 	SimpleRenderPass* lightPass = (SimpleRenderPass*)GetCustomRenderPass("LightGizmo");
 	InstancedRenderPass* grassPass = (InstancedRenderPass*)GetCustomRenderPass("Instanced");
 	EnvironmentRenderPass* envMapPass = (EnvironmentRenderPass*)GetCustomRenderPass("EnvMap");
-	// auto* gPass = pipeline->GetGeometryPass();
 
 	// 3. 카메라 GameObject 생성
 	{

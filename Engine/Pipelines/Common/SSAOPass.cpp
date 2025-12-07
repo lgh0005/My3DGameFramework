@@ -1,5 +1,5 @@
 #include "EnginePch.h"
-#include "StandardSSAOPass.h"
+#include "SSAOPass.h"
 
 #include <random>
 #include "Core/Scene.h"
@@ -11,29 +11,27 @@
 #include "Graphics/StaticMesh.h"
 #include "Graphics/Geometry.h"
 
-#include "SRP/StandardRenderPipeline.h"
-#include "SRP/StandardRenderContext.h"
+#include "Pipelines/SRP/StandardRenderPipeline.h"
+#include "Pipelines/SRP/StandardRenderContext.h"
 
-float lerp(float a, float b, float f) { return a + f * (b - a); }
-
-StandardSSAOPassUPtr StandardSSAOPass::Create(int32 width, int32 height)
+SSAOPassUPtr SSAOPass::Create(int32 width, int32 height)
 {
-    auto pass = StandardSSAOPassUPtr(new StandardSSAOPass());
+    auto pass = SSAOPassUPtr(new SSAOPass());
     if (!pass->Init(width, height)) return nullptr;
     return std::move(pass);
 }
 
-bool StandardSSAOPass::Init(int32 width, int32 height)
+bool SSAOPass::Init(int32 width, int32 height)
 {
     m_ssaoProgram = Program::Create
     (
-        "./Resources/Shaders/Standard/SSAO.vert",
-        "./Resources/Shaders/Standard/SSAO_pass.frag"
+        "./Resources/Shaders/Common/Common_SSAO.vert",
+        "./Resources/Shaders/Common/Common_SSAO_pass.frag"
     );
     m_ssaoBlurProgram = Program::Create
     (
-        "./Resources/Shaders/Standard/SSAO.vert",
-        "./Resources/Shaders/Standard/SSAO_blur.frag"
+        "./Resources/Shaders/Common/Common_SSAO.vert",
+        "./Resources/Shaders/Common/Common_SSAO_blur.frag"
     );
     if (!m_ssaoProgram || !m_ssaoBlurProgram) return false;
 
@@ -42,7 +40,7 @@ bool StandardSSAOPass::Init(int32 width, int32 height)
     m_ssaoBlurFBO = Framebuffer::CreateSSAO(width, height);
     if (!m_ssaoFBO || !m_ssaoBlurFBO) return false;
 
-    // 2. 화면 전체를 덮는 Quad 생성
+    // 화면 전체를 덮는 Quad 생성
     m_screenQuad = GeometryGenerator::CreateNDCQuad();
     if (!m_screenQuad) return false;
 
@@ -52,27 +50,28 @@ bool StandardSSAOPass::Init(int32 width, int32 height)
     return true;
 }
 
-void StandardSSAOPass::Resize(int32 width, int32 height)
+void SSAOPass::Resize(int32 width, int32 height)
 {
     // FBO 재생성 (단순하게 새로 만듦)
     m_ssaoFBO = Framebuffer::CreateSSAO(width, height);
     m_ssaoBlurFBO = Framebuffer::CreateSSAO(width, height);
 }
 
-Texture* StandardSSAOPass::GetSSAOResultTexture() const
+Texture* SSAOPass::GetSSAOResultTexture() const
 {
     // Framebuffer 클래스에 GetColorAttachment가 있으므로 이를 활용
     return m_ssaoBlurFBO->GetColorAttachment(0).get();
 }
 
-void StandardSSAOPass::GenerateKernel()
+void SSAOPass::GenerateKernel()
 {
     std::uniform_real_distribution<float> randomFloats(0.0, 1.0);
     std::default_random_engine generator;
 
     for (uint32 i = 0; i < 64; ++i)
     {
-        glm::vec3 sample(
+        glm::vec3 sample
+        (
             randomFloats(generator) * 2.0 - 1.0,
             randomFloats(generator) * 2.0 - 1.0,
             randomFloats(generator)
@@ -81,14 +80,14 @@ void StandardSSAOPass::GenerateKernel()
         sample *= randomFloats(generator);
 
         float scale = float(i) / 64.0;
-        scale = lerp(0.1f, 1.0f, scale * scale);
+        scale = Utils::Lerp(0.1f, 1.0f, scale * scale);
         sample *= scale;
 
         m_ssaoKernel.push_back(sample);
     }
 }
 
-void StandardSSAOPass::GenerateNoiseTexture()
+void SSAOPass::GenerateNoiseTexture()
 {
     std::uniform_real_distribution<float> randomFloats(0.0, 1.0);
     std::default_random_engine generator;
@@ -114,7 +113,7 @@ void StandardSSAOPass::GenerateNoiseTexture()
     m_noiseTexture->SetData(ssaoNoise.data());
 }
 
-void StandardSSAOPass::Render(RenderContext* context)
+void SSAOPass::Render(RenderContext* context)
 {
     // 0. 자신의 렌더 패스에 활용되고 있는 RenderContext로 캐스팅
     auto stdCtx = (StandardRenderContext*)context;
@@ -147,9 +146,7 @@ void StandardSSAOPass::Render(RenderContext* context)
 
     m_screenQuad->Draw(m_ssaoProgram.get());
 
-    // ----------------------
-    // 4. SSAO Blur
-    // ----------------------
+    // SSAO Blur
     m_ssaoBlurFBO->Bind();
     glClear(GL_COLOR_BUFFER_BIT);
 

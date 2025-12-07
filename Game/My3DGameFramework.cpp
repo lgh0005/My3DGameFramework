@@ -2,8 +2,11 @@
 #include "My3DGameFramework.h"
 
 // [사용자 정의 컨텐츠 헤더들]
-#include "SRP/StandardRenderPipeline.h"
+#include "Pipelines/SRP/StandardRenderPipeline.h"
 #include "SRPSample/DevScene/DevScene.h"
+
+#include "Pipelines/URP/UniversalRenderPipeline.h"
+#include "URPSample/DevScene/PBRScene.h"
 
 My3DGameFramework::My3DGameFramework() = default;
 
@@ -18,4 +21,10 @@ void My3DGameFramework::OnInit()
     );
 
     // 1. TODO : URP 전용 씬을 만들어서 추가해야 함.
+    RegisterLevel<PBRScene, UniversalRenderPipeline>
+    (
+        "PBRLevel",
+        "PBRScene",
+        "Universal"
+    );
 }

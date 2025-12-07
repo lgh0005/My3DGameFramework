@@ -4,6 +4,7 @@
 CLASS_PTR(Texture)
 #pragma endregion
 
+// TODO : 이제 PBR 전용 GBuffer, SRP 전용 GBuffer를 따로 분리할 필요가 있다
 CLASS_PTR(Framebuffer)
 class Framebuffer
 {

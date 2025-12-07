@@ -24,13 +24,13 @@ glm::vec3 Utils::GetAttenuationCoeff(float distance)
 	float kl = glm::dot(linear_coeff, dvec);
 	float kq = glm::dot(quad_coeff, dvec);
 
-	return glm::vec3(kc, glm::max(kl, 0.0f), glm::max(kq * kq, 0.0f));
+	return glm::vec3(kc, glm::max<float>(kl, 0.0f), glm::max<float>(kq * kq, 0.0f));
 }
 
-/*====================================//
-//   assimp 애니메이션 전용 유틸 함수   //
-//====================================*/
-glm::mat4 Utils::ConvertMatrixToGLMFormat(const aiMatrix4x4& from)
+/*============================//
+//   assimp to glm 유틸 함수   //
+//============================*/
+glm::mat4 Utils::ConvertToGLMMat4(const aiMatrix4x4& from)
 {
 	glm::mat4 to;
 	to[0][0] = from.a1; to[1][0] = from.a2; to[2][0] = from.a3; to[3][0] = from.a4;
@@ -40,14 +40,22 @@ glm::mat4 Utils::ConvertMatrixToGLMFormat(const aiMatrix4x4& from)
 	return to;
 }
 
-glm::vec3 Utils::GetGLMVec(const aiVector3D& vec)
+glm::vec3 Utils::ConvertToGLMVec(const aiVector3D& vec)
 {
 	return glm::vec3(vec.x, vec.y, vec.z);
 }
 
-glm::quat Utils::GetGLMQuat(const aiQuaternion& pOrientation)
+glm::quat Utils::ConvertToGLMQuat(const aiQuaternion& pOrientation)
 {
 	return glm::quat(pOrientation.w, pOrientation.x, pOrientation.y, pOrientation.z);
+}
+
+/*===============================//
+//   SSAO 연산을 위한 Lerp 함수   //
+//===============================*/
+float Utils::Lerp(float a, float b, float f)
+{
+	return a + f * (b - a);
 }
 
 /*==================================//

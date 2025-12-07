@@ -1,28 +1,28 @@
 #include "EnginePch.h"
-#include "StandardCullingPass.h"
-#include "SRP/StandardRenderContext.h"
+#include "CullingPass.h"
+#include "Pipelines/SRP/StandardRenderContext.h"
 #include "Core/Scene.h"
 #include "Components/MeshRenderer.h"
 #include "Components/Camera.h"
 
-StandardCullingPass::StandardCullingPass() = default;
-StandardCullingPass::~StandardCullingPass() = default;
+CullingPass::CullingPass() = default;
+CullingPass::~CullingPass() = default;
 
-StandardCullingPassUPtr StandardCullingPass::Create()
+CullingPassUPtr CullingPass::Create()
 {
-    auto pass = StandardCullingPassUPtr(new StandardCullingPass());
+    auto pass = CullingPassUPtr(new CullingPass());
     if (!pass->Init()) return nullptr;
     return std::move(pass);
 }
 
-bool StandardCullingPass::Init()
+bool CullingPass::Init()
 {
     m_frustum = Frustum::Create();
     if (!m_frustum) return false;
     return true;
 }
 
-void StandardCullingPass::Render(RenderContext* context)
+void CullingPass::Render(RenderContext* context)
 {
     // Context는 StandardRenderContext로 다운캐스팅 가능하다고 가정
     StandardRenderContext* stdContext = (StandardRenderContext*)context;

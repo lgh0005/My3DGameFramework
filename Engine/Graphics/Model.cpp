@@ -29,8 +29,8 @@ ModelUPtr Model::Load(const std::string& filename)
 bool Model::LoadByAssimp(const std::string& filename)
 {
     Assimp::Importer importer;
-    // TODO : 어떤 모델은 UV 좌표가 올바르고 어떤 모델은 뒤집히는 것이 있는 모양이다.
-    // auto scene = importer.ReadFile(filename, aiProcess_Triangulate | aiProcess_FlipUVs);
+    // INFO : 어떤 모델은 UV 좌표가 올바르고 어떤 모델은 뒤집히는 것이 있는 모양이다.
+    // 텍스쳐가 이상하게 뒤집한다면 파일 단에서 수정을 한 후 적용한다.
     auto scene = importer.ReadFile(filename, aiProcess_Triangulate | aiProcess_CalcTangentSpace);
     if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode) 
     {
@@ -299,7 +299,7 @@ void Model::ExtractBoneWeightForVertices(std::vector<SkinnedVertex>& vertices,
             // 3. 새 뼈라면, 새 ID와 오프셋을 맵에 등록
             BoneInfo newBoneInfo;
             newBoneInfo.id = m_BoneCounter;
-            newBoneInfo.offset = Utils::ConvertMatrixToGLMFormat(mesh->mBones[boneIndex]->mOffsetMatrix);
+            newBoneInfo.offset = Utils::ConvertToGLMMat4(mesh->mBones[boneIndex]->mOffsetMatrix);
             m_boneInfoMap[boneName] = newBoneInfo;
 
             boneID = m_BoneCounter;

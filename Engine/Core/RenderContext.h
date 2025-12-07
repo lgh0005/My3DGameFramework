@@ -35,6 +35,8 @@ protected:
 	LightVectorRawPtr   m_lights;
 
 	// Result (실제 렌더링 목록)
+	// TODO : Light은 그냥 씬에 있는 걸 쓰도록 수정 필요
+	// 지금 당장 조명을 컬링할 생각은 없음
 	std::vector<MeshRenderer*> m_culledStaticMeshRenderers;
 	std::vector<MeshRenderer*> m_culledSkinnedMeshRenderers;
 	std::vector<Light*>        m_culledLights;

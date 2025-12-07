@@ -3,7 +3,7 @@
 #include "Core/Scene.h"
 #include "Graphics/FrameBuffer.h"
 #include "Core/RenderPipeline.h"
-#include "SRP/StandardRenderPipeline.h"
+#include "Pipelines/SRP/StandardRenderPipeline.h"
 
 RendererUPtr Renderer::Create()
 {

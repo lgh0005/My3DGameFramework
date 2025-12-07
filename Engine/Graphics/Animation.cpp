@@ -146,7 +146,7 @@ void Animation::ReadHeirarchyData(AssimpNodeData& dest, const aiNode* src)
 	if (!src) return;
 
 	dest.name = src->mName.data;
-	dest.transformation = Utils::ConvertMatrixToGLMFormat(src->mTransformation);
+	dest.transformation = Utils::ConvertToGLMMat4(src->mTransformation);
 	dest.childrenCount = src->mNumChildren;
 
 	for (int32 i = 0; i < src->mNumChildren; i++)

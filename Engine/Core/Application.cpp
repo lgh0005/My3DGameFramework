@@ -11,8 +11,6 @@ bool Application::Init(int32 width, int32 height, const std::string& title)
 	SPDLOG_INFO("Engine Initialization Started...");
 
 	// 1. 윈도우 생성 (가장 먼저 되어야 함)
-	// TODO : WindowManager의 초기화는 외부에서
-	// 윈도우 속성(너비,높이,윈도우 이름)을 수정할 수 있도록 수정 필요
 	if (!WINDOW.Init(width, height, title))
 	{
 		SPDLOG_ERROR("Window Init Failed!");

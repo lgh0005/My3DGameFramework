@@ -2,13 +2,13 @@
 #include "Core/RenderPipeline.h"
 
 #pragma region FORWARD_DECLARATION
-CLASS_PTR(StandardCullingPass)
+CLASS_PTR(CullingPass)
+CLASS_PTR(ShadowPass)
+CLASS_PTR(SkyboxPass)
+CLASS_PTR(SSAOPass)
 CLASS_PTR(StandardDeferredLightingPass)
 CLASS_PTR(StandardGeometryPass)
-CLASS_PTR(StandardSSAOPass)
 CLASS_PTR(StandardPostProcessPass)
-CLASS_PTR(StandardShadowPass)
-CLASS_PTR(StandardSkyboxPass)
 CLASS_PTR(StandardGlobalUniforms)
 #pragma endregion
 
@@ -30,14 +30,16 @@ private:
 		int32 height = WINDOW_HEIGHT
 	);
 
-	// 필수 렌더 패스
-	StandardCullingPassUPtr		      m_cullingPass		  { nullptr };
-	StandardShadowPassUPtr		      m_shadowPass		  { nullptr };
-	StandardSkyboxPassUPtr			  m_skyboxPass		  { nullptr };
+	// 공통 필수 렌더 패스
+	CullingPassUPtr		      m_cullingPass		  { nullptr };
+	ShadowPassUPtr		      m_shadowPass		  { nullptr };
+	SkyboxPassUPtr			  m_skyboxPass		  { nullptr };
+	SSAOPassUPtr			  m_ssaoPass		  { nullptr };
+
+	// SRP 필수 렌더 패스
 	StandardPostProcessPassUPtr		  m_postProcessPass	  { nullptr };
 	StandardGeometryPassUPtr		  m_geometryPass	  { nullptr };
 	StandardDeferredLightingPassUPtr  m_deferredLightPass { nullptr };
-	StandardSSAOPassUPtr			  m_ssaoPass		  { nullptr };
 	StandardGlobalUniformsUPtr        m_globalUniforms	  { nullptr };
 
 /*================================//
