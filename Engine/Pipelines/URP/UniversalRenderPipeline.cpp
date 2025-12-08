@@ -1,6 +1,10 @@
 #include "EnginePch.h"
 #include "UniversalRenderPipeline.h"
 
+#include "Pipelines/Common/CullingPass.h"
+#include "Pipelines/URP/UniversalGlobalUniforms.h"
+#include "Pipelines/URP/UniversalRenderContext.h"
+
 #include "Core/Scene.h"
 #include "Core/GameObject.h"
 #include "Core/RenderPass.h"
@@ -26,13 +30,27 @@ UniversalRenderPipelineUPtr UniversalRenderPipeline::Create()
 
 bool UniversalRenderPipeline::Init()
 {
-	// TODO : PBR 렌더링을 위한 URP 렌더패스들을 Create
+	// UBO 생성
+	m_globalUniforms = UniversalGlobalUniforms::Create();
+	if (!m_globalUniforms) return false;
+
+	// 컬링 패스 생성
+	m_cullingPass = CullingPass::Create();
+	if (!m_cullingPass) return false;
 
 	return true;
 }
 
 void UniversalRenderPipeline::Render(Scene* scene)
 {
+	// TEMP : 첫 뷰포트 설정.
+	int width, height;
+	glfwGetFramebufferSize(WINDOW.GetWindow(), &width, &height);
+	glViewport(0, 0, width, height);
+	glClearColor(0.1f, 0.1f, 0.15f, 1.0f);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glEnable(GL_DEPTH_TEST);
+
 	// TODO : PBR 렌더링을 위한 URP 렌더패스들 지나면서 Context 기반 렌더링 수행
 	/*====================================//
 	//   get essential scene properties   //
@@ -41,23 +59,15 @@ void UniversalRenderPipeline::Render(Scene* scene)
 	auto* camera = scene->GetMainCamera();
 	if (!camera) return;
 
-	// TEMP : 뷰포트 설정 (이게 없으면 윈도우 크기가 0x0이거나 이상하게 잡혀서 안 보임)
-	// 매 프레임 창 크기에 맞춰 갱신해주는 것이 안전합니다.
-	// 지금은 고정 Context 렌더 패스를 추가하지 않아서 뷰포트 설정을 일단 여기서 해주긴 해야함
-	{
-		int width, height;
-		glfwGetFramebufferSize(WINDOW.GetWindow(), &width, &height);
-		glViewport(0, 0, width, height);
+	// 0. 스택 영역에 StandardRenderContext 생성
+	UniversalRenderContext context;
+	context.Reset(scene, camera);
 
-		// 2. 화면 클리어 (이게 없으면 이전 프레임 잔상 위에 그리거나 검은 화면)
-		//    배경색을 약간 밝게(남색) 해서 검은색 구체라도 보이게 합니다.
-		glClearColor(0.1f, 0.1f, 0.15f, 1.0f);
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	// [패스 0] 컬링 패스 : 절두체 범위 안에 있는 대상만 추리기
+	m_cullingPass->Render(&context);
 
-		// 3. 깊이 테스트 켜기 (3D 렌더링 필수)
-		//    ImGui가 이걸 꺼버리는 경우가 있어서, 3D 그리기 전에 반드시 켜줘야 합니다.
-		glEnable(GL_DEPTH_TEST);
-	}
+	// 1. ubo 갱신
+	m_globalUniforms->PreRender(&context);
 
 	// [패스 5] 포워드 셰이딩
 	for (const auto& [name, pass] : scene->GetCustomRenderPasses())

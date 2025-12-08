@@ -7,6 +7,11 @@
 #include "Graphics/Vertex.h"
 #include "Graphics/Bone.h"
 
+// TODO :
+// IMPORTANT : 지금 이 Model 클래스는 움직이는 모델 한정에서만
+// 로드를 지원하고 있다. 정적 물체에 대한 로드도 지원할 수 있도록
+// 수정이 필요하다.
+
 #pragma region FORWARD_DECLARATION
 CLASS_PTR(SkinnedMesh)
 CLASS_PTR(Material)

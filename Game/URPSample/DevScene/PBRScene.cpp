@@ -51,29 +51,13 @@ bool PBRScene::LoadNessesaryResources()
 
 	// 간단한 머티리얼
 	{
-		TextureUPtr diffuseTexture = Texture::CreateFromImage
-		(Image::CreateSingleColorImage(4, 4, glm::vec4(1.0f, 1.0f, 1.0f, 1.0f)).get());
-		TextureUPtr specularTexture = Texture::CreateFromImage
-		(Image::CreateSingleColorImage(4, 4, glm::vec4(0.5f, 0.5f, 0.5f, 1.0f)).get());
-		TextureUPtr emissionTexture = Texture::CreateFromImage
-		(Image::CreateSingleColorImage(4, 4, glm::vec4(0.0f, 0.0f, 0.0f, 1.0f)).get());
-		TextureUPtr normalTexture = Texture::CreateFromImage
-		(Image::CreateSingleColorImage(4, 4, glm::vec4(0.5f, 0.5f, 1.0f, 1.0f)).get());
-		TextureUPtr heightTexture = Texture::CreateFromImage
-		(Image::CreateSingleColorImage(4, 4, glm::vec4(1.0f, 1.0f, 1.0f, 1.0f)).get());
-
 		auto simpleMat = Material::Create();
 		if (!simpleMat) return false;
-
-		simpleMat->diffuse = std::move(diffuseTexture);
-		simpleMat->specular = std::move(specularTexture);
-		simpleMat->emission = std::move(emissionTexture);
-		simpleMat->normal = std::move(normalTexture);
-		simpleMat->height = std::move(heightTexture);
+		simpleMat->roughness = Texture::CreateFromFloat(0.15f);
+		simpleMat->metallic = Texture::CreateFromFloat(1.0f);
 		simpleMat->shininess = 16.0f;
 		simpleMat->emissionStrength = 0.0f;
 		simpleMat->heightScale = 0.0f;
-
 		RESOURCE.AddResource<Material>("LightMat", std::move(simpleMat));
 	}
 
@@ -86,8 +70,8 @@ bool PBRScene::CreateNessesaryRenderPasses()
 	{
 		auto prog = Program::Create
 		(
-			"./Resources/Shaders/Universal/test_simple_shader.vert",
-			"./Resources/Shaders/Universal/test_simple_shader.frag"
+			"./Resources/Shaders/Universal/test_pbr.vert",
+			"./Resources/Shaders/Universal/test_pbr.frag"
 		); if (!prog) return false;
 		AddCustomRenderPass("SimpleDimple", TestRenderPass::Create(std::move(prog)));
 	}
@@ -120,41 +104,156 @@ bool PBRScene::CreateSceneContext()
 		AddGameObject(std::move(cameraObj));
 	}
 
-
-	// 2. 구 49개
+	// 2. 조명 추가 1
 	{
-		// 리소스 가져오기 (LoadNessesaryResources에서 로드한 것들)
+		auto lightGo = GameObject::Create();
+		lightGo->SetName("PointLight1");
+		auto lightComp = PointLight::Create();
+		lightGo->GetTransform().SetPosition(glm::vec3(5.0f, 5.0f, 4.0f));
+		lightGo->GetTransform().SetScale(glm::vec3(0.2f));
+		lightGo->AddComponent(std::move(lightComp));
+		AddGameObject(std::move(lightGo));
+	}
+
+	// 2. 조명 추가 2
+	{
+		auto lightGo = GameObject::Create();
+		lightGo->SetName("PointLight2");
+		auto lightComp = PointLight::Create();
+		lightGo->GetTransform().SetPosition(glm::vec3(-4.0f, 5.0f, 5.0f));
+		lightGo->GetTransform().SetScale(glm::vec3(0.2f));
+		lightGo->AddComponent(std::move(lightComp));
+		AddGameObject(std::move(lightGo));
+	}
+
+	// 2. 조명 추가 3
+	{
+		auto lightGo = GameObject::Create();
+		lightGo->SetName("PointLight3");
+		auto lightComp = PointLight::Create();
+		lightGo->GetTransform().SetPosition(glm::vec3(-4.0f, -6.0f, 6.0f));
+		lightGo->GetTransform().SetScale(glm::vec3(0.2f));
+		lightGo->AddComponent(std::move(lightComp));
+		AddGameObject(std::move(lightGo));
+	}
+
+	// 2. 조명 추가 4
+	{
+		auto lightGo = GameObject::Create();
+		lightGo->SetName("PointLight4");
+		auto lightComp = PointLight::Create();
+		lightGo->GetTransform().SetPosition(glm::vec3(5.0f, -6.0f, 7.0f));
+		lightGo->GetTransform().SetScale(glm::vec3(0.2f));
+		lightGo->AddComponent(std::move(lightComp));
+		AddGameObject(std::move(lightGo));
+	}
+
+	//// 3. 구 49개
+	//{
+	//	// 리소스 가져오기 (LoadNessesaryResources에서 로드한 것들)
+	//	auto sphereMesh = RESOURCE.GetResource<Mesh>("Sphere");
+	//	auto lightMat = RESOURCE.GetResource<Material>("LightMat");
+
+	//	// 7x7 그리드 생성 루프
+	//	const int sphereCount = 7;
+	//	const float offset = 1.4f;
+
+	//	for (int row = 0; row < sphereCount; row++)
+	//	{
+	//		// 중앙 정렬을 위한 Y 좌표 계산
+	//		float y = ((float)row - (float)(sphereCount - 1) * 0.5f) * offset;
+
+	//		for (int col = 0; col < sphereCount; col++)
+	//		{
+	//			// 중앙 정렬을 위한 X 좌표 계산
+	//			float x = ((float)col - (float)(sphereCount - 1) * 0.5f) * offset;
+
+	//			// GameObject 생성
+	//			auto sphereObj = GameObject::Create();
+
+	//			// Transform 설정
+	//			sphereObj->GetTransform().SetPosition(glm::vec3(x, y, 0.0f));
+
+	//			// MeshRenderer 컴포넌트 생성
+	//			auto mr = MeshRenderer::Create(sphereMesh, lightMat);
+	//			mr->SetMesh(sphereMesh);
+	//			mr->SetMaterial(lightMat);
+
+	//			lightPass->AddRenderer(mr.get());
+
+	//			// 컴포넌트 및 오브젝트 등록
+	//			sphereObj->AddComponent(std::move(mr));
+	//			AddGameObject(std::move(sphereObj));
+	//		}
+	//	}
+	//}
+
+	// 3. 구 49개 (PBR Chart)
+	{
+		// 리소스 가져오기
 		auto sphereMesh = RESOURCE.GetResource<Mesh>("Sphere");
-		auto lightMat = RESOURCE.GetResource<Material>("LightMat");
 
-		// 7x7 그리드 생성 루프
-		const int sphereCount = 7;
-		const float offset = 1.4f;
+		// [최적화] 모든 구가 공유할 기본 텍스처는 미리 만들어둡니다.
+		// 빨간색 알베도 (R=1.0, G=0.0, B=0.0)
+		TexturePtr sharedAlbedo = Texture::CreateFromImage(
+			Image::CreateSingleColorImage(1, 1, glm::vec4(1.0f, 0.0f, 0.0f, 1.0f)).get()
+		);
 
-		for (int row = 0; row < sphereCount; row++)
+		// AO는 1.0 (그림자 없음)
+		auto sharedAO = Texture::CreateFromFloat(1.0f);
+
+		// 7x7 그리드 설정
+		const int rows = 7;
+		const int cols = 7;
+		const float spacing = 1.4f;
+
+		for (int row = 0; row < rows; ++row)
 		{
-			// 중앙 정렬을 위한 Y 좌표 계산
-			float y = ((float)row - (float)(sphereCount - 1) * 0.5f) * offset;
+			// [Metallic 계산]
+			// row가 0(맨 아래) -> 6(맨 위)으로 갈수록 0.0 -> 1.0 증가
+			// "좌상단이 메탈릭이 높고" -> 위쪽(Row가 큰 쪽)이 금속
+			float metallicValue = (float)row / (float)(rows - 1);
 
-			for (int col = 0; col < sphereCount; col++)
+			// Y 좌표 계산 (중앙 정렬)
+			float y = ((float)row - (float)(rows - 1) * 0.5f) * spacing;
+
+			for (int col = 0; col < cols; ++col)
 			{
-				// 중앙 정렬을 위한 X 좌표 계산
-				float x = ((float)col - (float)(sphereCount - 1) * 0.5f) * offset;
+				// [Roughness 계산]
+				// col이 0(맨 왼쪽) -> 6(맨 오른쪽)으로 갈수록 0.0 -> 1.0 증가
+				// "좌상단이 러프니스가 낮고" -> 왼쪽(Col이 작은 쪽)이 매끈함
+				// *주의: Roughness 0.0은 수학적으로 문제가 될 수 있어 0.05부터 시작
+				float roughnessValue = glm::clamp((float)col / (float)(cols - 1), 0.05f, 1.0f);
 
-				// GameObject 생성
+				// X 좌표 계산
+				float x = ((float)col - (float)(cols - 1) * 0.5f) * spacing;
+
+				// 1. GameObject 생성
 				auto sphereObj = GameObject::Create();
-
-				// Transform 설정
 				sphereObj->GetTransform().SetPosition(glm::vec3(x, y, 0.0f));
 
-				// MeshRenderer 컴포넌트 생성
-				auto mr = MeshRenderer::Create(sphereMesh, lightMat);
-				mr->SetMesh(sphereMesh);
-				mr->SetMaterial(lightMat);
+				// 2. [핵심] 인스턴스별 고유 머티리얼 생성
+				auto instanceMat = Material::Create();
 
-				lightPass->AddRenderer(mr.get());
+				// 공유 텍스처 재사용 (메모리 절약)
+				instanceMat->diffuse = sharedAlbedo; // Albedo
+				instanceMat->ao = sharedAO;          // AO
 
-				// 컴포넌트 및 오브젝트 등록
+				// 고유 텍스처 생성 (Texture::CreateFromFloat 활용)
+				instanceMat->metallic = Texture::CreateFromFloat(metallicValue);
+				instanceMat->roughness = Texture::CreateFromFloat(roughnessValue);
+
+				// 기타 속성 초기화
+				instanceMat->normal = nullptr; // 없으면 Blue 자동 바인딩
+				instanceMat->emission = nullptr;
+				instanceMat->emissionStrength = 0.0f;
+
+				// 3. 렌더러 생성 및 등록
+				// MeshRenderer가 Material의 소유권(shared_ptr 등)을 잘 관리한다고 가정
+				auto mr = MeshRenderer::Create(sphereMesh, std::move(instanceMat));
+
+				lightPass->AddRenderer(mr.get()); // 렌더 패스에 등록
+
 				sphereObj->AddComponent(std::move(mr));
 				AddGameObject(std::move(sphereObj));
 			}

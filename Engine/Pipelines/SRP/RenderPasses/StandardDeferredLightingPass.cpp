@@ -118,7 +118,7 @@ void StandardDeferredLightingPass::Render(RenderContext* context)
 
 	// 6. Light Matrices 전송(Context의 Culled List 사용)
 	// Scene 전체 조명이 아니라, Context에 담긴 조명만 처리
-	const auto& lights = stdCtx->GetLights();
+	const auto& lights = stdCtx->GetScene()->GetLights();
 	for (auto* light : lights)
 	{
 		int32 idx = light->GetShadowMapIndex();

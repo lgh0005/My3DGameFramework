@@ -14,7 +14,6 @@ class ShadowPass : public ContextRenderPass
 public:
 	static ShadowPassUPtr Create(int32 resolution = 1024);
 	virtual void Render(RenderContext* context) override;
-	// virtual void Render(Scene* scene, Camera* camera) override;
 
 	glm::mat4 CalculateLightSpaceMatrix(Light* light);
 	ShadowMap* GetShadowMap(int32 index) { return m_shadowMaps[index].get(); }

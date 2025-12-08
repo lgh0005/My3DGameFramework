@@ -11,14 +11,13 @@ class UniversalGlobalUniforms : public GlobalUniforms
 {
 public:
 	static UniversalGlobalUniformsUPtr Create();
-	virtual ~UniversalGlobalUniforms() = default;
+	virtual ~UniversalGlobalUniforms();
 	virtual void PreRender(RenderContext* context) override;
 
 private:
 	UniversalGlobalUniforms();
 	bool Init();
 
-	// TODO : SRP와 다르게 추가해야 할 ubo가 뭔지 고려 필요
 	UniformbufferUPtr m_cameraUBO;
 	UniformbufferUPtr m_lightUBO;
 };

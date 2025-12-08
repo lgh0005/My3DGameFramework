@@ -50,7 +50,7 @@ void CullingPass::Render(RenderContext* context)
 
     // 4. Light는 컬링하지 않고 모두 포함 (조명 범위는 Geometry Pass 결과에 의존)
     //    LightSource는 LightPass가 사용하므로 그대로 복사합니다.
-    
+    // TODO : 이후에 Light Volume에 의한 최적화를 위해 일단 그대로 둔다.
     const auto& lightSource = scene->GetLights();
     for (auto* light : lightSource) stdContext->AddLight(light);
 }

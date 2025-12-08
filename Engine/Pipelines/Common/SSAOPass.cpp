@@ -47,6 +47,11 @@ bool SSAOPass::Init(int32 width, int32 height)
     GenerateKernel();
     GenerateNoiseTexture();
 
+    // 커널은 초기화할 때 한 번 만 전송
+    m_ssaoProgram->Use();
+    for (uint32 i = 0; i < 64; ++i)
+        m_ssaoProgram->SetUniform("samples[" + std::to_string(i) + "]", m_ssaoKernel[i]);
+
     return true;
 }
 
@@ -135,10 +140,6 @@ void SSAOPass::Render(RenderContext* context)
     m_ssaoProgram->SetUniform("gPosition", 0);
     m_ssaoProgram->SetUniform("gNormal", 1);
     m_ssaoProgram->SetUniform("texNoise", 2);
-
-    // 커널 데이터 전송
-    for (uint32 i = 0; i < 64; ++i)
-        m_ssaoProgram->SetUniform("samples[" + std::to_string(i) + "]", m_ssaoKernel[i]);
 
     // 카메라 행렬 전송 (Context에서 가져온 카메라 사용)
     m_ssaoProgram->SetUniform("projection", camera->GetProjectionMatrix());

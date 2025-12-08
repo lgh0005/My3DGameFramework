@@ -17,12 +17,17 @@ layout (std140, binding = 0) uniform CameraData
     vec3 viewPos;
 };
 
-struct Material {
+struct Material 
+{
     sampler2D diffuse;
     sampler2D specular;
     sampler2D emission;
     sampler2D normal;
-    sampler2D height;    
+    sampler2D height;   
+    sampler2D ao;      
+    sampler2D metallic;
+    sampler2D roughness;
+
     float shininess;      
     float emissionStrength;
     float heightScale;
@@ -81,17 +86,27 @@ void main()
         texCoord = ParallaxMapping(TexCoords, viewDirTangent);
     }
 
-    // 2. G-Buffer 데이터 저장 (조명 계산 X)
-    // [gPosition] 월드 좌표 저장
-    gPosition = vec4(FragPos, 1.0);
+    // 2. 텍스처 샘플링
+    // AO 맵 샘플링 (Legacy 모드에서도 AO는 쓸 거니까 읽습니다!)
+    float ao = texture(material.ao, texCoord).r;
 
-    // [gNormal] 노멀 맵 적용 후 월드 기준 법선 저장
+    // 3. G-Buffer 데이터 저장
+    // RGB: 월드 좌표
+    // A: Ambient Occlusion (AO)
+    gPosition.rgb = FragPos;
+    gPosition.a = ao;
+
+    // [gNormal]
+    // RGB: 노멀
+    // A: Shininess (Legacy용)
     vec3 normalMapValue = texture(material.normal, texCoord).rgb;
     normalMapValue = normalize(normalMapValue * 2.0 - 1.0);
     gNormal.rgb = normalize(orthoTBN * normalMapValue);
     gNormal.a = material.shininess;
 
-    // [gAlbedoSpec] Diffuse 색상 + Specular Intensity
+    // [gAlbedoSpec]
+    // RGB: Albedo
+    // A: Specular Intensity (Legacy용)
     gAlbedoSpec.rgb = texture(material.diffuse, texCoord).rgb;
     gAlbedoSpec.a = texture(material.specular, texCoord).r;
 

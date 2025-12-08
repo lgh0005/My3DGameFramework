@@ -82,33 +82,33 @@ void StandardGlobalUniforms::PreRender(RenderContext* context)
 			// [타입별 속성]
 			switch (light->GetLightType())
 			{
-			case LightType::Directional:
-			{
-				info.type = 0;
-				info.attenuation = glm::vec3(1.0f, 0.0f, 0.0f);
-				info.cutoff = glm::vec2(0.0f, 0.0f);
-				break;
-			}
+				case LightType::Directional:
+				{
+					info.type = 0;
+					info.attenuation = glm::vec3(1.0f, 0.0f, 0.0f);
+					info.cutoff = glm::vec2(0.0f, 0.0f);
+					break;
+				}
 
-			case LightType::Point:
-			{
-				info.type = 1;
-				auto point = static_cast<PointLight*>(light);
-				info.attenuation = point->GetAttenuation();
-				info.cutoff = glm::vec2(0.0f, 0.0f);
-				break;
-			}
+				case LightType::Point:
+				{
+					info.type = 1;
+					auto point = static_cast<PointLight*>(light);
+					info.attenuation = point->GetAttenuation();
+					info.cutoff = glm::vec2(0.0f, 0.0f);
+					break;
+				}
 
-			case LightType::Spot:
-			{
-				info.type = 2;
-				auto spot = static_cast<SpotLight*>(light);
-				glm::vec2 cutoff = spot->GetCutoff();
-				info.attenuation = spot->GetAttenuation();
-				info.cutoff.x = cosf(glm::radians(cutoff[0]));
-				info.cutoff.y = cosf(glm::radians(cutoff[0] + cutoff[1]));
-				break;
-			}
+				case LightType::Spot:
+				{
+					info.type = 2;
+					auto spot = static_cast<SpotLight*>(light);
+					glm::vec2 cutoff = spot->GetCutoff();
+					info.attenuation = spot->GetAttenuation();
+					info.cutoff.x = cosf(glm::radians(cutoff[0]));
+					info.cutoff.y = cosf(glm::radians(cutoff[0] + cutoff[1]));
+					break;
+				}
 			}
 			lightCount++;
 		}

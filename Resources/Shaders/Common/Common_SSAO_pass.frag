@@ -4,8 +4,8 @@ out float FragColor;
 in vec2 TexCoords;
 
 // C++에서 바인딩한 텍스처들
-uniform sampler2D gPosition; // View Space Position (필수)
-uniform sampler2D gNormal;   // View Space Normal (필수)
+uniform sampler2D gPosition; // World Position (필수)
+uniform sampler2D gNormal;   // World Normal (필수)
 uniform sampler2D texNoise;  // 4x4 Noise Texture
 
 uniform vec3 samples[64];    // Kernel Samples
@@ -15,8 +15,7 @@ uniform mat4 view;           // Projection view
 // SSAO 파라미터 (필요하면 Uniform으로 빼서 런타임 조절 가능)
 const int kernelSize = 64;
 const float radius = 0.5;    // 차폐 검사 반경
-const float bias = 0.025;    // 깊이 정밀도 문제 해결을 위한 바이어스
-
+const float bias = 0.0025;    // 깊이 정밀도 문제 해결을 위한 바이어스
 
 void main()
 {

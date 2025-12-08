@@ -16,6 +16,7 @@ public:
 	static TextureUPtr CreateFromImage(const Image* image);
 	static TextureUPtr CreateFromKtx(const std::string& ktxFilePath);
 
+public:
 	~Texture();
 
 	const uint32 Get() const	{ return m_texture; }
@@ -32,11 +33,13 @@ public:
 	uint32 GetType()	   const    { return m_type; }
 	uint32 GetFormat()     const	{ return m_format; }
 
+
 private:
 	Texture() = default;
 	void CreateTexture();
 	void SetTextureFromImage(const Image* image);
 	void SetTextureFormat(int32 width, int32 height, uint32 format);
+	static TexturePtr Create1x1Texture(const std::vector<uint8>& colorData);
 
 	uint32	m_texture		{ 0 };
 	int32	m_width			{ 0 };
@@ -44,4 +47,19 @@ private:
 	uint32  m_type			{ GL_UNSIGNED_BYTE };
 	uint32	m_format		{ GL_RGBA };
 	GLenum  m_target		{ GL_TEXTURE_2D };
+
+	static TexturePtr s_whiteTex;
+	static TexturePtr s_grayTex;
+	static TexturePtr s_blackTex;
+	static TexturePtr s_blueTex;
+
+/*===================//
+//   texture utils   //
+//===================*/
+public:
+	static TexturePtr CreateWhite();
+	static TexturePtr CreateGray();
+	static TexturePtr CreateBlack();
+	static TexturePtr CreateBlue();
+	static TexturePtr CreateFromFloat(float value);
 };

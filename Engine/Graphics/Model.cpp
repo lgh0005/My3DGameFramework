@@ -168,16 +168,11 @@ bool Model::LoadByBinary(const std::string& filename)
     }
 
     inFile.close();
-    SPDLOG_INFO("Loaded custom model: {} ({} meshes, {} bones)",
-        filename, meshCount, m_boneInfoMap.size());
     return true;
 }
 
 void Model::ProcessMesh(aiMesh* mesh, const aiScene* scene)
 {
-    SPDLOG_INFO("process mesh: {}, #vert: {}, #face: {}",
-        mesh->mName.C_Str(), mesh->mNumVertices, mesh->mNumFaces);
-
     std::vector<SkinnedVertex> vertices;
     vertices.resize(mesh->mNumVertices);
 
@@ -229,10 +224,6 @@ void Model::ProcessMesh(aiMesh* mesh, const aiScene* scene)
 
     // 1. AABB의 크기(차이) 계산
     glm::vec3 boundDiff = maxBound - minBound;
-
-    // 2. 디버그 출력
-    SPDLOG_INFO("Mesh Name: {}, Diff X: {}, Diff Y: {}, Diff Z: {}",
-        mesh->mName.C_Str(), boundDiff.x, boundDiff.y, boundDiff.z);
 
     glMesh->SetLocalBounds(RenderBounds::CreateFromMinMax(minBound, maxBound));
     if (mesh->mMaterialIndex >= 0)

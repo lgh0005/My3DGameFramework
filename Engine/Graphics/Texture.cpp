@@ -2,6 +2,9 @@
 #include "Texture.h"
 #include "Graphics/Image.h"
 
+/*====================================//
+//   default texture create methods   //
+//====================================*/
 TextureUPtr Texture::Create(int32 width, int32 height, uint32 format, uint32 type)
 {
     return Create(width, height, GL_RGBA16F, format, GL_FLOAT);
@@ -70,6 +73,9 @@ TextureUPtr Texture::CreateFromKtx(const std::string& ktxFilePath)
     return std::move(texture);
 }
 
+/*=============================//
+//   default texture setters   //
+//=============================*/
 Texture::~Texture()
 {
     if (m_texture)
@@ -149,4 +155,58 @@ void Texture::SetTextureFormat(int32 width, int32 height,
 
     glTexImage2D(GL_TEXTURE_2D, 0, internalFormal, m_width, m_height, 0,
         format, m_type, nullptr);
+}
+
+/*===================//
+//   texture utils   //
+//===================*/
+TexturePtr Texture::s_whiteTex = nullptr;
+TexturePtr Texture::s_grayTex = nullptr;
+TexturePtr Texture::s_blackTex = nullptr;
+TexturePtr Texture::s_blueTex = nullptr;
+
+TexturePtr Texture::Create1x1Texture(const std::vector<uint8>& colorData)
+{
+    auto texture = Texture::Create(1, 1, GL_RGBA8, GL_RGBA, GL_UNSIGNED_BYTE);
+    texture->SetData(colorData.data(), (uint32)colorData.size());
+    return std::move(texture);
+}
+
+TexturePtr Texture::CreateWhite()
+{
+    if (s_whiteTex) return s_whiteTex;
+    std::vector<uint8> data = { 255, 255, 255, 255 };
+    s_whiteTex = Create1x1Texture(data);
+    return s_whiteTex;
+}
+
+TexturePtr Texture::CreateGray()
+{
+    if (s_grayTex) return s_grayTex;
+    std::vector<uint8> data = { 128, 128, 128, 255 };
+    s_grayTex = Create1x1Texture(data);
+    return s_grayTex;
+}
+
+TexturePtr Texture::CreateBlack()
+{
+    if (s_blackTex) return s_blackTex;
+    std::vector<uint8> data = { 0, 0, 0, 255 };
+    s_blackTex = Create1x1Texture(data);
+    return s_blackTex;
+}
+
+TexturePtr Texture::CreateBlue()
+{
+    if (s_blueTex) return s_blueTex;
+    std::vector<uint8> data = { 128, 128, 255, 255 };
+    s_blueTex = Create1x1Texture(data);
+    return s_blueTex;
+}
+
+TexturePtr Texture::CreateFromFloat(float value)
+{
+    uint8 val = static_cast<uint8>(glm::clamp(value, 0.0f, 1.0f) * 255.0f);
+    std::vector<uint8> data = { val, val, val, 255 };
+    return Create1x1Texture(data);
 }

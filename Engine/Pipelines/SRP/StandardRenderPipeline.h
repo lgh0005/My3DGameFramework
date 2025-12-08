@@ -40,6 +40,8 @@ private:
 	StandardPostProcessPassUPtr		  m_postProcessPass	  { nullptr };
 	StandardGeometryPassUPtr		  m_geometryPass	  { nullptr };
 	StandardDeferredLightingPassUPtr  m_deferredLightPass { nullptr };
+
+	// SRP 공통 유니폼 변수 버퍼
 	StandardGlobalUniformsUPtr        m_globalUniforms	  { nullptr };
 
 /*================================//

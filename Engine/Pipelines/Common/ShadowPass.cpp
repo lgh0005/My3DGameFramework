@@ -72,7 +72,7 @@ void ShadowPass::Render(RenderContext* context)
 	glCullFace(GL_FRONT);
 
 	// 2. 전체 조명 리스트 순회
-	for (auto* light : context->GetLights())
+	for (auto* light : lights)
 	{
 		// 2-1. 그림자 캐스팅이 필요한 조명인지 검사
 		if (!light->IsCastShadow()) continue;

@@ -22,6 +22,15 @@ bool TestRenderPass::Init(ProgramUPtr program)
 {
     m_simpleProgram = std::move(program);
     if (!m_simpleProgram) return false;
+
+    // [초기화] 텍스처 슬롯 번호는 변하지 않으므로 한 번만 세팅
+    m_simpleProgram->Use();
+    m_simpleProgram->SetUniform("material.albedoMap", (int)TextureSlot::SLOT_ALBEDO);
+    m_simpleProgram->SetUniform("material.normalMap", (int)TextureSlot::SLOT_NORMAL);
+    m_simpleProgram->SetUniform("material.metallicMap", (int)TextureSlot::SLOT_METALLIC);
+    m_simpleProgram->SetUniform("material.roughnessMap", (int)TextureSlot::SLOT_ROUGHNESS);
+    m_simpleProgram->SetUniform("material.aoMap", (int)TextureSlot::SLOT_AO);
+
     return true;
 }
 
@@ -29,26 +38,17 @@ void TestRenderPass::Render(Scene* scene, Camera* camera)
 {
     m_simpleProgram->Use();
 
-    //// TOOD : 이제 이것 역시도 UBO로 대체 할 필요 있음
-    auto projection = camera->GetProjectionMatrix();
-    auto view = camera->GetViewMatrix();
-
     for (const auto* renderer : m_renderers)
     {
         GameObject* go = renderer->GetOwner();
         MeshPtr mesh = renderer->GetMesh();
         auto& transform = go->GetTransform();
         auto material = renderer->GetMaterial();
-
         material->SetToProgram(m_simpleProgram.get());
 
-        // 위치 설정
-        auto lightModel = transform.GetModelMatrix();
-        auto lightMvp = projection * view * lightModel;
-        m_simpleProgram->SetUniform("transform", lightMvp);
-
-        // 색상 설정
-        m_simpleProgram->SetUniform("color", glm::vec4(0.5, 0.0f, 1.0, 0.7f));
+        // 2. 모델 행렬 전송
+        auto modelMatrix = transform.GetModelMatrix();
+        m_simpleProgram->SetUniform("model", modelMatrix);
 
         mesh->Draw(m_simpleProgram.get());
     }
