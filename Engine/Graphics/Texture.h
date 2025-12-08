@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include <ktx.h>
 
 #pragma region FORWARD_DECLARATION
@@ -61,5 +61,9 @@ public:
 	static TexturePtr CreateGray();
 	static TexturePtr CreateBlack();
 	static TexturePtr CreateBlue();
+
+	// TODO : CreateFromImage에서
+	// 단색 이미지를 바탕으로 만들 수 있기에 이 함수는
+	// 테스트 용으로 두도록 하겠음.
 	static TexturePtr CreateFromFloat(float value);
 };

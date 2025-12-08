@@ -61,6 +61,22 @@ bool PBRScene::LoadNessesaryResources()
 		RESOURCE.AddResource<Material>("LightMat", std::move(simpleMat));
 	}
 
+	// 쇠공 머티리얼
+	{
+		// TODO : 이후에는 ktx로 한 번 구울 필요가 있음.
+		auto rustedIronMat = Material::Create();
+		if (!rustedIronMat) return false;
+		rustedIronMat->diffuse = Texture::CreateFromImage
+		(Image::Load("./Resources/Images/rustediron/rustediron2_basecolor.png").get());
+		rustedIronMat->roughness = Texture::CreateFromImage
+		(Image::Load("./Resources/Images/rustediron/rustediron2_roughness.png").get());
+		rustedIronMat->metallic = Texture::CreateFromImage
+		(Image::Load("./Resources/Images/rustediron/rustediron2_metallic.png").get());
+		rustedIronMat->normal = Texture::CreateFromImage
+		(Image::Load("./Resources/Images/rustediron/rustediron2_normal.png").get());
+		RESOURCE.AddResource<Material>("Rusted_Iron", std::move(rustedIronMat));
+	}
+
 	return true;
 }
 
@@ -148,46 +164,6 @@ bool PBRScene::CreateSceneContext()
 		AddGameObject(std::move(lightGo));
 	}
 
-	//// 3. 구 49개
-	//{
-	//	// 리소스 가져오기 (LoadNessesaryResources에서 로드한 것들)
-	//	auto sphereMesh = RESOURCE.GetResource<Mesh>("Sphere");
-	//	auto lightMat = RESOURCE.GetResource<Material>("LightMat");
-
-	//	// 7x7 그리드 생성 루프
-	//	const int sphereCount = 7;
-	//	const float offset = 1.4f;
-
-	//	for (int row = 0; row < sphereCount; row++)
-	//	{
-	//		// 중앙 정렬을 위한 Y 좌표 계산
-	//		float y = ((float)row - (float)(sphereCount - 1) * 0.5f) * offset;
-
-	//		for (int col = 0; col < sphereCount; col++)
-	//		{
-	//			// 중앙 정렬을 위한 X 좌표 계산
-	//			float x = ((float)col - (float)(sphereCount - 1) * 0.5f) * offset;
-
-	//			// GameObject 생성
-	//			auto sphereObj = GameObject::Create();
-
-	//			// Transform 설정
-	//			sphereObj->GetTransform().SetPosition(glm::vec3(x, y, 0.0f));
-
-	//			// MeshRenderer 컴포넌트 생성
-	//			auto mr = MeshRenderer::Create(sphereMesh, lightMat);
-	//			mr->SetMesh(sphereMesh);
-	//			mr->SetMaterial(lightMat);
-
-	//			lightPass->AddRenderer(mr.get());
-
-	//			// 컴포넌트 및 오브젝트 등록
-	//			sphereObj->AddComponent(std::move(mr));
-	//			AddGameObject(std::move(sphereObj));
-	//		}
-	//	}
-	//}
-
 	// 3. 구 49개 (PBR Chart)
 	{
 		// 리소스 가져오기
@@ -209,22 +185,10 @@ bool PBRScene::CreateSceneContext()
 
 		for (int row = 0; row < rows; ++row)
 		{
-			// [Metallic 계산]
-			// row가 0(맨 아래) -> 6(맨 위)으로 갈수록 0.0 -> 1.0 증가
-			// "좌상단이 메탈릭이 높고" -> 위쪽(Row가 큰 쪽)이 금속
-			float metallicValue = (float)row / (float)(rows - 1);
-
-			// Y 좌표 계산 (중앙 정렬)
 			float y = ((float)row - (float)(rows - 1) * 0.5f) * spacing;
 
 			for (int col = 0; col < cols; ++col)
 			{
-				// [Roughness 계산]
-				// col이 0(맨 왼쪽) -> 6(맨 오른쪽)으로 갈수록 0.0 -> 1.0 증가
-				// "좌상단이 러프니스가 낮고" -> 왼쪽(Col이 작은 쪽)이 매끈함
-				// *주의: Roughness 0.0은 수학적으로 문제가 될 수 있어 0.05부터 시작
-				float roughnessValue = glm::clamp((float)col / (float)(cols - 1), 0.05f, 1.0f);
-
 				// X 좌표 계산
 				float x = ((float)col - (float)(cols - 1) * 0.5f) * spacing;
 
@@ -232,26 +196,8 @@ bool PBRScene::CreateSceneContext()
 				auto sphereObj = GameObject::Create();
 				sphereObj->GetTransform().SetPosition(glm::vec3(x, y, 0.0f));
 
-				// 2. [핵심] 인스턴스별 고유 머티리얼 생성
-				auto instanceMat = Material::Create();
-
-				// 공유 텍스처 재사용 (메모리 절약)
-				instanceMat->diffuse = sharedAlbedo; // Albedo
-				instanceMat->ao = sharedAO;          // AO
-
-				// 고유 텍스처 생성 (Texture::CreateFromFloat 활용)
-				instanceMat->metallic = Texture::CreateFromFloat(metallicValue);
-				instanceMat->roughness = Texture::CreateFromFloat(roughnessValue);
-
-				// 기타 속성 초기화
-				instanceMat->normal = nullptr; // 없으면 Blue 자동 바인딩
-				instanceMat->emission = nullptr;
-				instanceMat->emissionStrength = 0.0f;
-
-				// 3. 렌더러 생성 및 등록
-				// MeshRenderer가 Material의 소유권(shared_ptr 등)을 잘 관리한다고 가정
-				auto mr = MeshRenderer::Create(sphereMesh, std::move(instanceMat));
-
+				// 2. MeshRendere 생성
+				auto mr = MeshRenderer::Create(sphereMesh, RESOURCE.GetResource<Material>("Rusted_Iron"));
 				lightPass->AddRenderer(mr.get()); // 렌더 패스에 등록
 
 				sphereObj->AddComponent(std::move(mr));
