@@ -47,7 +47,8 @@ uniform Material material;
 const float PI = 3.14159265359;
 
 // --- PBR Helper Functions ---
-float DistributionGGX(vec3 normal, vec3 halfDir, float roughness) {
+float DistributionGGX(vec3 normal, vec3 halfDir, float roughness) 
+{
     float a = roughness * roughness;
     float a2 = a * a;
     float dotNH = max(dot(normal, halfDir), 0.0);
@@ -56,13 +57,15 @@ float DistributionGGX(vec3 normal, vec3 halfDir, float roughness) {
     return a2 / (PI * denom * denom);
 }
 
-float GeometrySchlickGGX(float dotNV, float roughness) {
+float GeometrySchlickGGX(float dotNV, float roughness) 
+{
     float r = (roughness + 1.0);
     float k = (r * r) / 8.0;
     return dotNV / (dotNV * (1.0 - k) + k);
 }
 
-float GeometrySmith(vec3 normal, vec3 viewDir, vec3 lightDir, float roughness) {
+float GeometrySmith(vec3 normal, vec3 viewDir, vec3 lightDir, float roughness) 
+{
     float dotNV = max(dot(normal, viewDir), 0.0);
     float dotNL = max(dot(normal, lightDir), 0.0);
     float ggx2 = GeometrySchlickGGX(dotNV, roughness);
@@ -137,7 +140,7 @@ void main()
            
         vec3 numerator    = NDF * G * F; 
         float denominator = 4.0 * max(dot(N, V), 0.0) * max(dot(N, L), 0.0) + 0.0001;
-        vec3 specular = numerator / denominator;
+        vec3 specular     = numerator / denominator;
         
         vec3 kS = F;
         vec3 kD = vec3(1.0) - kS;

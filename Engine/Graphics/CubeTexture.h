@@ -10,7 +10,8 @@ class CubeTexture
 {
 public:
     static CubeTextureUPtr CreateFromImages(const std::vector<Image*> images);
-    static CubeTextureUPtr CreateFromKtx(const std::string& ktxFilePath);
+    static CubeTextureUPtr CreateFromKtxImage(const std::string& ktxFilePath);
+    static CubeTextureUPtr CreateFromKtxHDR(const std::string& ktxFilePath);
     ~CubeTexture();
 
     const uint32 Get() const { return m_texture; }
@@ -18,5 +19,7 @@ public:
 private:
     CubeTexture() {}
     bool InitFromImages(const std::vector<Image*> images);
+    static CubeTextureUPtr LoadKtx(const std::string& ktxFilePath);
+
     uint32 m_texture    { 0 };
 };

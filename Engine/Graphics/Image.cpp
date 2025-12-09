@@ -3,6 +3,9 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include "Misc/stb_image.h"
 
+/*==================================//
+//  default image creation methods  //
+//==================================*/
 ImageUPtr Image::Load(const std::string& filepath, bool flipVertical)
 {
     auto image = ImageUPtr(new Image());
@@ -10,10 +13,17 @@ ImageUPtr Image::Load(const std::string& filepath, bool flipVertical)
     return move(image);
 }
 
-ImageUPtr Image::Create(int32 width, int32 height, int32 channelCount)
+ImageUPtr Image::LoadHDR(const std::string& filepath, bool flipVertical)
 {
     auto image = ImageUPtr(new Image());
-    if (!image->Allocate(width, height, channelCount)) return nullptr;
+    if (!image->LoadWithStbFloat(filepath, flipVertical)) return nullptr;
+    return move(image);
+}
+
+ImageUPtr Image::Create(int32 width, int32 height, int32 channelCount, int32 bytePerChannel)
+{
+    auto image = ImageUPtr(new Image());
+    if (!image->Allocate(width, height, channelCount, bytePerChannel)) return nullptr;
     return std::move(image);
 }
 
@@ -32,9 +42,13 @@ ImageUPtr Image::CreateSingleColorImage(int32 width, int32 height, const glm::ve
     return std::move(image);
 }
 
+/*==============================//
+//  default image load methods  //
+//==============================*/
 Image::~Image()
 {
-    if (m_data) {
+    if (m_data)
+    {
         stbi_image_free(m_data);
     }
 }
@@ -42,6 +56,8 @@ Image::~Image()
 bool Image::LoadWithStb(const std::string& filepath, bool flipVertical)
 {
     stbi_set_flip_vertically_on_load(flipVertical);
+
+    m_bytePerChannel = 1;
     m_data = stbi_load(filepath.c_str(), &m_width, &m_height, &m_channelCount, 0);
     if (!m_data)
     {
@@ -51,11 +67,29 @@ bool Image::LoadWithStb(const std::string& filepath, bool flipVertical)
     return true;
 }
 
-bool Image::Allocate(int32 width, int32 height, int32 channelCount)
+bool Image::LoadWithStbFloat(const std::string& filepath, bool flipVertical)
+{
+    stbi_set_flip_vertically_on_load(flipVertical);
+
+    m_bytePerChannel = 4;
+    m_data = (uint8*)stbi_loadf(filepath.c_str(), &m_width, &m_height, &m_channelCount, 0);
+    if (!m_data)
+    {
+        SPDLOG_ERROR("failed to load HDR image: {}", filepath);
+        return false;
+    }
+    return true;
+}
+
+bool Image::Allocate(int32 width, int32 height, int32 channelCount, int32 bytePerChannel)
 {
     m_width = width;
     m_height = height;
     m_channelCount = channelCount;
-    m_data = (uint8*)malloc(m_width * m_height * m_channelCount);
+    m_bytePerChannel = bytePerChannel;
+
+    usize size = (usize)m_width * m_height * m_channelCount * m_bytePerChannel;
+    m_data = (uint8*)malloc(size);
+
     return m_data ? true : false;
 }

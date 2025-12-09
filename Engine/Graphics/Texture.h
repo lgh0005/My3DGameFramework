@@ -14,7 +14,9 @@ public:
 	static TextureUPtr Create(int32 width, int32 height,
 							  uint32 internalFormat, uint32 format, uint32 type);
 	static TextureUPtr CreateFromImage(const Image* image);
-	static TextureUPtr CreateFromKtx(const std::string& ktxFilePath);
+	static TextureUPtr CreateFromHDR(const Image* image);
+	static TextureUPtr CreateFromKtxImage(const std::string& ktxFilePath);
+	static TextureUPtr CreateFromKtxHDR(const std::string& ktxFilePath);
 
 public:
 	~Texture();
@@ -39,6 +41,7 @@ private:
 	void CreateTexture();
 	void SetTextureFromImage(const Image* image);
 	void SetTextureFormat(int32 width, int32 height, uint32 format);
+	static TextureUPtr LoadKtx(const std::string& ktxFilePath);
 	static TexturePtr Create1x1Texture(const std::vector<uint8>& colorData);
 
 	uint32	m_texture		{ 0 };

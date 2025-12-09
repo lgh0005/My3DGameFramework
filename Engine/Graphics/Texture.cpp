@@ -27,48 +27,62 @@ TextureUPtr Texture::CreateFromImage(const Image* image)
     return std::move(texture);
 }
 
-TextureUPtr Texture::CreateFromKtx(const std::string& ktxFilePath)
+TextureUPtr Texture::CreateFromHDR(const Image* image)
 {
-    ktxTexture* kTexture;
-    KTX_error_code result;
-    GLuint textureID = 0;
-    GLenum target;
-    GLenum glerror;
-
-    // 1. ktx 파일 로드
-    result = ktxTexture_CreateFromNamedFile
-    (
-        ktxFilePath.c_str(),
-        KTX_TEXTURE_CREATE_LOAD_IMAGE_DATA_BIT,
-        &kTexture
-    );
-    if (result != KTX_SUCCESS)
-    {
-        SPDLOG_ERROR("Failed to load KTX texture: {}", ktxFilePath);
-        return nullptr;
-    }
-
-    // 2. GPU 업로드
-    result = ktxTexture_GLUpload(kTexture, &textureID, &target, &glerror);
-    if (result != KTX_SUCCESS)
-    {
-        ktxTexture_Destroy(kTexture);
-        return nullptr;
-    }
-
     auto texture = TextureUPtr(new Texture());
-    texture->m_texture = textureID;
-    texture->m_width = kTexture->baseWidth;
-    texture->m_height = kTexture->baseHeight;
-    texture->m_target = target;
+    texture->CreateTexture();
 
-    GLint format = 0;
-    glBindTexture(target, textureID);
-    glGetTexLevelParameteriv(target, 0, GL_TEXTURE_INTERNAL_FORMAT, &format);
-    texture->m_format = format;
+    GLenum internalFormat = GL_RGB16F;
+    GLenum format = GL_RGB;
 
-    // 3. 메모리 해제
-    ktxTexture_Destroy(kTexture);
+    // 채널 수에 따른 포맷 결정
+    if (image->GetChannelCount() == 4)
+    {
+        internalFormat = GL_RGBA16F;
+        format = GL_RGBA;
+    }
+    else if (image->GetChannelCount() == 3)
+    {
+        internalFormat = GL_RGB16F;
+        format = GL_RGB;
+    }
+
+    // HDR 데이터는 float 타입이므로 GL_FLOAT 명시
+    texture->SetTextureFormat(image->GetWidth(), image->GetHeight(),
+        internalFormat, format, GL_FLOAT);
+
+    // 데이터 업로드
+    texture->SetData(image->GetData());
+
+    // HDR용 파라미터 설정
+    texture->SetWrap(GL_CLAMP_TO_EDGE, GL_CLAMP_TO_EDGE);
+    texture->SetFilter(GL_LINEAR, GL_LINEAR);
+
+    return std::move(texture);
+}
+
+TextureUPtr Texture::CreateFromKtxImage(const std::string& ktxFilePath)
+{
+    // 1. 공통 로더 호출
+    auto texture = LoadKtx(ktxFilePath);
+    if (!texture) return nullptr;
+
+    // 2. 일반 텍스쳐 설정: 반복(Repeat) 허용, Mipmap 사용
+    texture->SetWrap(GL_REPEAT, GL_REPEAT);
+    texture->SetFilter(GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR);
+
+    return std::move(texture);
+}
+
+TextureUPtr Texture::CreateFromKtxHDR(const std::string& ktxFilePath)
+{
+    // 1. 공통 로더 호출
+    auto texture = LoadKtx(ktxFilePath);
+    if (!texture) return nullptr;
+
+    // 2. HDR 설정: 모서리 Clamp 필수, Linear 필터링 (Mipmap은 상황에 따라 다름)
+    texture->SetWrap(GL_CLAMP_TO_EDGE, GL_CLAMP_TO_EDGE);
+    texture->SetFilter(GL_LINEAR, GL_LINEAR);
 
     return std::move(texture);
 }
@@ -164,6 +178,50 @@ TexturePtr Texture::s_whiteTex = nullptr;
 TexturePtr Texture::s_grayTex = nullptr;
 TexturePtr Texture::s_blackTex = nullptr;
 TexturePtr Texture::s_blueTex = nullptr;
+
+TextureUPtr Texture::LoadKtx(const std::string& ktxFilePath)
+{
+    ktxTexture* kTexture;
+    KTX_error_code result;
+    GLuint textureID = 0;
+    GLenum target;
+    GLenum glerror;
+
+    result = ktxTexture_CreateFromNamedFile
+    (
+        ktxFilePath.c_str(),
+        KTX_TEXTURE_CREATE_LOAD_IMAGE_DATA_BIT,
+        &kTexture
+    );
+    if (result != KTX_SUCCESS) 
+    {
+        SPDLOG_ERROR("Failed to load KTX texture: {}", ktxFilePath);
+        return nullptr;
+    }
+
+    // GPU 업로드
+    result = ktxTexture_GLUpload(kTexture, &textureID, &target, &glerror);
+    if (result != KTX_SUCCESS) 
+    {
+        ktxTexture_Destroy(kTexture);
+        return nullptr;
+    }
+
+    auto texture = TextureUPtr(new Texture());
+    texture->m_texture = textureID;
+    texture->m_width = kTexture->baseWidth;
+    texture->m_height = kTexture->baseHeight;
+    texture->m_target = target;
+
+    // 포맷 정보 저장
+    GLint format = 0;
+    glBindTexture(target, textureID);
+    glGetTexLevelParameteriv(target, 0, GL_TEXTURE_INTERNAL_FORMAT, &format);
+    texture->m_format = format;
+
+    ktxTexture_Destroy(kTexture);
+    return std::move(texture);
+}
 
 TexturePtr Texture::Create1x1Texture(const std::vector<uint8>& colorData)
 {

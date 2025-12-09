@@ -435,7 +435,7 @@ TexturePtr Model::LoadTextureFromFile
     // 3. KTX 파일 존재 여부 확인 및 로드
     if (std::filesystem::exists(ktxPath))
     {
-        auto texture = Texture::CreateFromKtx(ktxFullPath);
+        auto texture = Texture::CreateFromKtxImage(ktxFullPath);
         if (texture)
         {
             RESOURCE.AddResource<Texture>(ktxFullPath, std::move(texture));

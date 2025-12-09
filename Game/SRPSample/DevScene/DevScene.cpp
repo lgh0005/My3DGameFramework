@@ -84,10 +84,10 @@ bool DevScene::LoadNessesaryResources()
 	{
 		/*TextureUPtr diffuseTexture = Texture::CreateFromImage
 		(Image::Load("./Resources/Images/container.jpg").get());*/
-		TextureUPtr diffuseTexture = Texture::CreateFromKtx("./Resources/Images/baked/container.ktx");
+		TextureUPtr diffuseTexture = Texture::CreateFromKtxImage("./Resources/Images/baked/container.ktx");
 		/*TextureUPtr emissionTexture = Texture::CreateFromImage
 		(Image::Load("./Resources/Images/matrix.jpg").get());*/
-		TextureUPtr emissionTexture = Texture::CreateFromKtx("./Resources/Images/baked/matrix.ktx");
+		TextureUPtr emissionTexture = Texture::CreateFromKtxImage("./Resources/Images/baked/matrix.ktx");
 
 		auto box1Mat = Material::Create();
 		box1Mat->diffuse = std::move(diffuseTexture);
@@ -102,13 +102,13 @@ bool DevScene::LoadNessesaryResources()
 	{
 		/*TextureUPtr diffuseTexture = Texture::CreateFromImage
 		(Image::Load("./Resources/Images/container2.png").get());*/
-		TextureUPtr diffuseTexture = Texture::CreateFromKtx("./Resources/Images/baked/container2.ktx");
-		TextureUPtr specularTexture = Texture::CreateFromKtx("./Resources/Images/baked/container2_specular.ktx");
+		TextureUPtr diffuseTexture = Texture::CreateFromKtxImage("./Resources/Images/baked/container2.ktx");
+		TextureUPtr specularTexture = Texture::CreateFromKtxImage("./Resources/Images/baked/container2_specular.ktx");
 		/*TextureUPtr specularTexture = Texture::CreateFromImage
 		(Image::Load("./Resources/Images/container2_specular.png").get());*/
 		/*TextureUPtr emissionTexture = Texture::CreateFromImage
 		(Image::Load("./Resources/Images/matrix.jpg").get());*/
-		TextureUPtr emissionTexture = Texture::CreateFromKtx("./Resources/Images/baked/matrix.ktx");
+		TextureUPtr emissionTexture = Texture::CreateFromKtxImage("./Resources/Images/baked/matrix.ktx");
 
 		auto box2Mat = Material::Create();
 		box2Mat->diffuse = std::move(diffuseTexture);
@@ -123,7 +123,7 @@ bool DevScene::LoadNessesaryResources()
 	// 0-6. 머티리얼 4
 	{
 		/*TextureUPtr diffuseTexture = Texture::CreateFromImage(Image::Load("./Resources/Images/marble.jpg").get());*/
-		TextureUPtr diffuseTexture = Texture::CreateFromKtx("./Resources/Images/baked/marble.ktx");
+		TextureUPtr diffuseTexture = Texture::CreateFromKtxImage("./Resources/Images/baked/marble.ktx");
 
 		auto box4Mat = Material::Create();
 		box4Mat->diffuse = std::move(diffuseTexture);
@@ -193,7 +193,7 @@ bool DevScene::LoadNessesaryResources()
 		auto cubeFront = Image::Load("./Resources/Images/Skybox/front.jpg", false);
 		auto cubeBack = Image::Load("./Resources/Images/Skybox/back.jpg", false);*/
 
-		auto cubeSky = CubeTexture::CreateFromKtx("./Resources/Images/baked/sky.ktx");
+		auto cubeSky = CubeTexture::CreateFromKtxImage("./Resources/Images/baked/sky.ktx");
 
 		/*auto cubeTexture = CubeTexture::CreateFromImages({
 		  cubeRight.get(),cubeLeft.get(),

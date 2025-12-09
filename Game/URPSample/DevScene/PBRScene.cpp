@@ -28,7 +28,8 @@
 #include "Components/AudioSource.h"
 #include "Components/AudioListener.h"
 
-#include "URPSample/RenderPasses/TestRenderPass.h"
+#include "URPSample/RenderPasses/HDRRenderPass.h"
+#include "URPSample/RenderPasses/SphericalToCubePass.h"
 #include "SRPSample/Scripts/CameraController.h"
 
 PBRScene::~PBRScene() = default;
@@ -42,6 +43,13 @@ PBRSceneUPtr PBRScene::Create()
 
 bool PBRScene::LoadNessesaryResources()
 {
+	// 큐브 메쉬
+	{
+		auto cubeMesh = GeometryGenerator::CreateBox();
+		if (!cubeMesh) return false;
+		RESOURCE.AddResource<Mesh>("Cube", std::move(cubeMesh));
+	}
+
 	// 구 메쉬
 	{
 		auto sphereMesh = GeometryGenerator::CreateSphere();
@@ -77,6 +85,15 @@ bool PBRScene::LoadNessesaryResources()
 		RESOURCE.AddResource<Material>("Rusted_Iron", std::move(rustedIronMat));
 	}
 
+	// HDR 큐브맵 머티리얼
+	{
+		auto hdrCubeMat = Material::Create();
+		if (!hdrCubeMat) return false;
+		hdrCubeMat->diffuse = Texture::CreateFromHDR
+		(Image::LoadHDR("./Resources/Images/IBL/mirrored_hall_4k.hdr").get());
+		RESOURCE.AddResource<Material>("hdrCubeMat", std::move(hdrCubeMat));
+	}
+
 	return true;
 }
 
@@ -89,7 +106,17 @@ bool PBRScene::CreateNessesaryRenderPasses()
 			"./Resources/Shaders/Universal/test_pbr.vert",
 			"./Resources/Shaders/Universal/test_pbr.frag"
 		); if (!prog) return false;
-		AddCustomRenderPass("SimpleDimple", TestRenderPass::Create(std::move(prog)));
+		AddCustomRenderPass("simpleHDR", HDRRenderPass::Create(std::move(prog)));
+	}
+
+	// Spherical map을 큐브에 입히는 간단한 렌더 패스
+	{
+		auto prog = Program::Create
+		(
+			"./Resources/Shaders/Universal/spherical_map.vert",
+			"./Resources/Shaders/Universal/spherical_map.frag"
+		); if (!prog) return false;
+		AddCustomRenderPass("SphericalToCube", SphericalToCubePass::Create(std::move(prog)));
 	}
 
 	return true;
@@ -98,8 +125,8 @@ bool PBRScene::CreateNessesaryRenderPasses()
 bool PBRScene::CreateSceneContext()
 {
 	// 0. 추가한 렌더패스 가져오기
-	TestRenderPass* lightPass = (TestRenderPass*)GetCustomRenderPass("SimpleDimple");
-	
+	HDRRenderPass* hdrPass = (HDRRenderPass*)GetCustomRenderPass("simpleHDR");
+	SphericalToCubePass* stcPass = (SphericalToCubePass*)GetCustomRenderPass("SphericalToCube");
 
 	// 1. 카메라 오브젝트 추가
 	{
@@ -121,48 +148,51 @@ bool PBRScene::CreateSceneContext()
 		AddGameObject(std::move(cameraObj));
 	}
 
-	// 2. 조명 추가 1
+	// 2. 조명 추가
 	{
-		auto lightGo = GameObject::Create();
-		lightGo->SetName("PointLight1");
-		auto lightComp = PointLight::Create();
-		lightGo->GetTransform().SetPosition(glm::vec3(5.0f, 5.0f, 4.0f));
-		lightGo->GetTransform().SetScale(glm::vec3(0.2f));
-		lightGo->AddComponent(std::move(lightComp));
-		AddGameObject(std::move(lightGo));
-	}
+		// 2. 조명 추가 1
+		{
+			auto lightGo = GameObject::Create();
+			lightGo->SetName("PointLight1");
+			auto lightComp = PointLight::Create();
+			lightGo->GetTransform().SetPosition(glm::vec3(5.0f, 5.0f, 4.0f));
+			lightGo->GetTransform().SetScale(glm::vec3(0.2f));
+			lightGo->AddComponent(std::move(lightComp));
+			AddGameObject(std::move(lightGo));
+		}
 
-	// 2. 조명 추가 2
-	{
-		auto lightGo = GameObject::Create();
-		lightGo->SetName("PointLight2");
-		auto lightComp = PointLight::Create();
-		lightGo->GetTransform().SetPosition(glm::vec3(-4.0f, 5.0f, 5.0f));
-		lightGo->GetTransform().SetScale(glm::vec3(0.2f));
-		lightGo->AddComponent(std::move(lightComp));
-		AddGameObject(std::move(lightGo));
-	}
+		// 2. 조명 추가 2
+		{
+			auto lightGo = GameObject::Create();
+			lightGo->SetName("PointLight2");
+			auto lightComp = PointLight::Create();
+			lightGo->GetTransform().SetPosition(glm::vec3(-4.0f, 5.0f, 5.0f));
+			lightGo->GetTransform().SetScale(glm::vec3(0.2f));
+			lightGo->AddComponent(std::move(lightComp));
+			AddGameObject(std::move(lightGo));
+		}
 
-	// 2. 조명 추가 3
-	{
-		auto lightGo = GameObject::Create();
-		lightGo->SetName("PointLight3");
-		auto lightComp = PointLight::Create();
-		lightGo->GetTransform().SetPosition(glm::vec3(-4.0f, -6.0f, 6.0f));
-		lightGo->GetTransform().SetScale(glm::vec3(0.2f));
-		lightGo->AddComponent(std::move(lightComp));
-		AddGameObject(std::move(lightGo));
-	}
+		// 2. 조명 추가 3
+		{
+			auto lightGo = GameObject::Create();
+			lightGo->SetName("PointLight3");
+			auto lightComp = PointLight::Create();
+			lightGo->GetTransform().SetPosition(glm::vec3(-4.0f, -6.0f, 6.0f));
+			lightGo->GetTransform().SetScale(glm::vec3(0.2f));
+			lightGo->AddComponent(std::move(lightComp));
+			AddGameObject(std::move(lightGo));
+		}
 
-	// 2. 조명 추가 4
-	{
-		auto lightGo = GameObject::Create();
-		lightGo->SetName("PointLight4");
-		auto lightComp = PointLight::Create();
-		lightGo->GetTransform().SetPosition(glm::vec3(5.0f, -6.0f, 7.0f));
-		lightGo->GetTransform().SetScale(glm::vec3(0.2f));
-		lightGo->AddComponent(std::move(lightComp));
-		AddGameObject(std::move(lightGo));
+		// 2. 조명 추가 4
+		{
+			auto lightGo = GameObject::Create();
+			lightGo->SetName("PointLight4");
+			auto lightComp = PointLight::Create();
+			lightGo->GetTransform().SetPosition(glm::vec3(5.0f, -6.0f, 7.0f));
+			lightGo->GetTransform().SetScale(glm::vec3(0.2f));
+			lightGo->AddComponent(std::move(lightComp));
+			AddGameObject(std::move(lightGo));
+		}
 	}
 
 	// 3. 구 49개 (PBR Chart)
@@ -199,12 +229,23 @@ bool PBRScene::CreateSceneContext()
 
 				// 2. MeshRendere 생성
 				auto mr = MeshRenderer::Create(sphereMesh, RESOURCE.GetResource<Material>("Rusted_Iron"));
-				lightPass->AddRenderer(mr.get()); // 렌더 패스에 등록
+				hdrPass->AddRenderer(mr.get()); // 렌더 패스에 등록
 
 				sphereObj->AddComponent(std::move(mr));
 				AddGameObject(std::move(sphereObj));
 			}
 		}
+	}
+
+	// 4. Spherical map을 입은 큐브
+	{
+		auto cube = GameObject::Create();
+		cube->GetTransform().SetPosition(glm::vec3(0.0f, 0.0f, 4.0f));
+		auto renderer = MeshRenderer::Create
+		(RESOURCE.GetResource<Mesh>("Cube"), RESOURCE.GetResource<Material>("hdrCubeMat"));
+		stcPass->AddRenderer(renderer.get());
+		cube->AddComponent(std::move(renderer));
+		AddGameObject(std::move(cube));
 	}
 
 	return true;
