@@ -111,7 +111,7 @@ void main()
     gAlbedoSpec.a = texture(material.specular, texCoord).r;
 
     // [gEmission] Emission 색상 저장
-    // TODO : emission이 너무 강한 것이 아닌 지 고려 필요
+    // TODO : emission 파라미터 설정 필요
     vec3 emissionTex = texture(material.emission, texCoord).rgb;
     emissionTex = pow(emissionTex, vec3(2.2)); // 감마 보정
     emissionTex = emissionTex * 5.0;           // 강도 뻥튀기

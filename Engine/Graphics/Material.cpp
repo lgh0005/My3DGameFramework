@@ -66,46 +66,7 @@ void Material::SetToProgram(const Program* program) const
     if (roughness) roughness->Bind();
     else Texture::CreateGray()->Bind();
 
-    /*int32 textureCount = 0;
-    if (diffuse)
-    {
-        glActiveTexture(GL_TEXTURE0 + textureCount);
-        program->SetUniform("material.diffuse", textureCount);
-        diffuse->Bind();
-        textureCount++;
-    }
-    if (specular) 
-    {
-        glActiveTexture(GL_TEXTURE0 + textureCount);
-        program->SetUniform("material.specular", textureCount);
-        specular->Bind();
-        textureCount++;
-    }
-    if (emission)
-    {
-        glActiveTexture(GL_TEXTURE0 + textureCount);
-        program->SetUniform("material.emission", textureCount);
-        emission->Bind();
-        textureCount++;
-    }
-    if (normal)
-    {
-        glActiveTexture(GL_TEXTURE0 + textureCount);
-        program->SetUniform("material.normal", textureCount);
-        normal->Bind();
-        textureCount++;
-    }
-    if (height)
-    {
-        glActiveTexture(GL_TEXTURE0 + textureCount);
-        program->SetUniform("material.height", textureCount);
-        height->Bind();
-        textureCount++;
-    }*/
-
     glActiveTexture(GL_TEXTURE0);
-
-
     program->SetUniform("material.shininess", shininess);
     program->SetUniform("material.emissionStrength", emissionStrength);
     program->SetUniform("material.heightScale", heightScale);

@@ -61,15 +61,15 @@ bool DevScene::LoadNessesaryResources()
 
 	// 0-2. 모델과 애니메이션 #1
 	{
-		auto model = Model::Load("./Resources/Models/spacesoldier/aliensoldier.fbx");
+		auto model = Model::Load("./Resources/Models/spacesoldier/aliensoldier.mymodel");
 		auto anim = Animation::Load("./Resources/Models/spacesoldier/Idle.fbx", model.get());
 		RESOURCE.AddResource<Model>("aliensoldier", std::move(model));
 		RESOURCE.AddResource<Animation>("hiphopDancing", std::move(anim));
 	}
 
 	//// 가방 모델
-	//auto backpack = Model::Load("./Resources/Models/backpack/backpack.obj");
-	//RESOURCE.AddResource<Model>("backpack", std::move(backpack));
+	auto backpack = Model::Load("./Resources/Models/backpack/backpack.obj");
+	RESOURCE.AddResource<Model>("backpack", std::move(backpack));
 
 	// 0-3. 머티리얼 1
 	{
@@ -459,7 +459,7 @@ bool DevScene::CreateSceneContext()
 		auto model = RESOURCE.GetResource<Model>("aliensoldier");
 		for (uint32 i = 0; i < model->GetMeshCount(); ++i)
 		{
-			SkinnedMeshPtr mesh = model->GetMesh(i);
+			SkinnedMeshPtr mesh = model->GetSkinnedMesh(i);
 			auto renderer = MeshRenderer::Create(mesh, mesh->GetMaterial());
 			modelGo->AddComponent((std::move(renderer)));
 		}
@@ -470,44 +470,44 @@ bool DevScene::CreateSceneContext()
 
 	// 8. 모델 #1
 	{
+		//auto modelGo = GameObject::Create();
+		//modelGo->SetName("Soldier");
+		//modelGo->GetTransform().SetPosition(glm::vec3(2.0f, 0.0f, -2.0f));
+		//modelGo->GetTransform().SetScale(glm::vec3(0.025f));
+
+		//// 3. GameObject에 Animator 컴포넌트 추가
+		//modelGo->AddComponent(Animator::Create(RESOURCE.GetResource<Animation>("hiphopDancing")));
+
+		//// 4. Model 안의 모든 Mesh 조각을 MeshRenderer 컴포넌트로 추가
+		//auto model = RESOURCE.GetResource<Model>("aliensoldier");
+		//for (uint32 i = 0; i < model->GetMeshCount(); ++i)
+		//{
+		//	SkinnedMeshPtr mesh = model->GetMesh(i);
+		//	auto renderer = MeshRenderer::Create(mesh, mesh->GetMaterial());
+		//	modelGo->AddComponent((std::move(renderer)));
+		//}
+
+		//// 5. 씬에 GameObject 등록
+		//AddGameObject(std::move(modelGo));
+	}
+
+	// 가방
+	{
 		auto modelGo = GameObject::Create();
-		modelGo->SetName("Soldier");
-		modelGo->GetTransform().SetPosition(glm::vec3(2.0f, 0.0f, -2.0f));
-		modelGo->GetTransform().SetScale(glm::vec3(0.025f));
+		modelGo->SetName("Backpack");
+		modelGo->GetTransform().SetPosition(glm::vec3(7.0f, 1.0f, -6.0f));
+		modelGo->GetTransform().SetScale(glm::vec3(0.5f));
 
-		// 3. GameObject에 Animator 컴포넌트 추가
-		modelGo->AddComponent(Animator::Create(RESOURCE.GetResource<Animation>("hiphopDancing")));
-
-		// 4. Model 안의 모든 Mesh 조각을 MeshRenderer 컴포넌트로 추가
-		auto model = RESOURCE.GetResource<Model>("aliensoldier");
+		auto model = RESOURCE.GetResource<Model>("backpack");
 		for (uint32 i = 0; i < model->GetMeshCount(); ++i)
 		{
-			SkinnedMeshPtr mesh = model->GetMesh(i);
+			StaticMeshPtr mesh = model->GetStaticMesh(i);
 			auto renderer = MeshRenderer::Create(mesh, mesh->GetMaterial());
 			modelGo->AddComponent((std::move(renderer)));
 		}
 
-		// 5. 씬에 GameObject 등록
 		AddGameObject(std::move(modelGo));
 	}
-
-	//// 가방
-	//{
-	//	auto modelGo = GameObject::Create();
-	//	modelGo->SetName("Backpack");
-	//	modelGo->GetTransform().SetPosition(glm::vec3(7.0f, 0.0f, -6.0f));
-	//	modelGo->GetTransform().SetScale(glm::vec3(0.5f));
-
-	//	auto model = RESOURCE.GetResource<Model>("backpack");
-	//	for (uint32 i = 0; i < model->GetMeshCount(); ++i)
-	//	{
-	//		SkinnedMeshPtr mesh = model->GetMesh(i);
-	//		auto renderer = MeshRenderer::Create(mesh, mesh->GetMaterial());
-	//		modelGo->AddComponent((std::move(renderer)));
-	//	}
-
-	//	AddGameObject(std::move(modelGo));
-	//}
 
 	// 8. 풀떼기
 	{
@@ -600,6 +600,8 @@ bool DevScene::CreateSceneContext()
 	//		}
 	//	}
 	//}
+
+	auto staticMeshes = GetStaticMeshRenderers();
 
 	return true;
 }

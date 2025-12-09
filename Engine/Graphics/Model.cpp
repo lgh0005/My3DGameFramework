@@ -1,11 +1,23 @@
 #include "EnginePch.h"
 #include "Model.h"
+#include "Graphics/Mesh.h"
+#include "Graphics/StaticMesh.h"
 #include "Graphics/SkinnedMesh.h"
 #include "Graphics/VertexLayout.h"
 #include "Graphics/Material.h"
 #include "Graphics/Image.h"
 #include "Graphics/Texture.h"
 #include "Graphics/Program.h"
+
+SkinnedMeshPtr Model::GetSkinnedMesh(int index) const
+{
+    return std::static_pointer_cast<SkinnedMesh>(m_meshes[index]);
+}
+
+StaticMeshPtr Model::GetStaticMesh(int index) const
+{
+    return std::static_pointer_cast<StaticMesh>(m_meshes[index]);
+}
 
 ModelUPtr Model::Load(const std::string& filename)
 {
@@ -49,7 +61,32 @@ bool Model::LoadByAssimp(const std::string& filename)
         glMaterial->specular = LoadTextureFromAssimp(material, aiTextureType_SPECULAR, modelDir);
         glMaterial->emission = LoadTextureFromAssimp(material, aiTextureType_EMISSIVE, modelDir);
         glMaterial->normal = LoadTextureFromAssimp(material, aiTextureType_NORMALS, modelDir);
-        glMaterial->height = LoadTextureFromAssimp(material, aiTextureType_HEIGHT, modelDir);
+        glMaterial->metallic = LoadTextureFromAssimp(material, aiTextureType_METALNESS, modelDir);
+        glMaterial->roughness = LoadTextureFromAssimp(material, aiTextureType_DIFFUSE_ROUGHNESS, modelDir);
+        glMaterial->ao = LoadTextureFromAssimp(material, aiTextureType_AMBIENT_OCCLUSION, modelDir);
+
+        // IFNO : obj를 로드할 때 normal을 height에 넣어야 작동되는 경우가 있음.
+        // 그에 대한 방어 코드를 작성
+        // TODO : 간혹 Diffuse맵만 상하를 반전시켜야 올바르게 로드가 될 수 있음.
+        // 텍스쳐에 대한 것은 이미지를 적절히 뒤집에서 UV를 맞춰줄 필요가 있음.
+#pragma region OBJ_EXTENSION_COMPATIBLE
+        // Normal을 aiTextureType_HEIGHT로 우선 로드
+        if (!glMaterial->normal)
+        {
+            glMaterial->normal = LoadTextureFromAssimp(material, aiTextureType_HEIGHT, modelDir);
+        }
+
+        // 그 후, Height 로드
+        TexturePtr tempHeight = LoadTextureFromAssimp(material, aiTextureType_HEIGHT, modelDir);
+        if (tempHeight != glMaterial->normal)
+        {
+            glMaterial->height = tempHeight;
+        }
+        else
+        {
+            glMaterial->height = nullptr; // 납치됐으면 Height 슬롯은 비워줌
+        }
+#pragma endregion
 
         if (glMaterial->emission) glMaterial->emissionStrength = 1.0f;
         else glMaterial->emissionStrength = 0.0f;
@@ -114,6 +151,8 @@ bool Model::LoadByBinary(const std::string& filename)
         };
 
     // 2. 머티리얼 로드
+    // TODO : PBR 관련 텍스쳐도 로드해야 함.
+    // TODO : 만일 이들이 없을 경우에 대한 조치도 필요. (기본값으로 들어가도록 수정 필요)
     m_materials.resize(materialCount);
     for (uint32 i = 0; i < materialCount; ++i)
     {
@@ -152,19 +191,30 @@ bool Model::LoadByBinary(const std::string& filename)
         inFile.read((char*)&vertexCount, sizeof(vertexCount));
         inFile.read((char*)&indexCount, sizeof(indexCount));
 
-        // 데이터 통째로 읽기
-        std::vector<SkinnedVertex> vertices(vertexCount);
         std::vector<uint32> indices(indexCount);
-        inFile.read((char*)vertices.data(), sizeof(SkinnedVertex) * vertexCount);
-        inFile.read((char*)indices.data(), sizeof(uint32) * indexCount);
 
-        // GPU 버퍼 생성
-        auto mesh = SkinnedMesh::Create(vertices, indices, GL_TRIANGLES);
-        if (materialIndex < m_materials.size())
+        if (hasSkeleton)
         {
-            mesh->SetMaterial(m_materials[materialIndex]);
+            // 뼈가 있어서 애니메이션이 가능한 모델
+            std::vector<SkinnedVertex> vertices(vertexCount);
+            inFile.read((char*)vertices.data(), sizeof(SkinnedVertex) * vertexCount);
+            inFile.read((char*)indices.data(), sizeof(uint32) * indexCount);
+
+            auto mesh = SkinnedMesh::Create(vertices, indices, GL_TRIANGLES);
+            if (materialIndex < m_materials.size()) mesh->SetMaterial(m_materials[materialIndex]);
+            m_meshes.push_back(std::move(mesh));
         }
-        m_meshes.push_back(std::move(mesh));
+        else
+        {
+            // 뼈가 없어서 움직이지 않는 정적 모델
+            std::vector<StaticVertex> vertices(vertexCount);
+            inFile.read((char*)vertices.data(), sizeof(StaticVertex)* vertexCount);
+            inFile.read((char*)indices.data(), sizeof(uint32)* indexCount);
+
+            auto mesh = StaticMesh::Create(vertices, indices, GL_TRIANGLES);
+            if (materialIndex < m_materials.size()) mesh->SetMaterial(m_materials[materialIndex]);
+            m_meshes.push_back(std::move(mesh));
+        }
     }
 
     inFile.close();
@@ -173,41 +223,10 @@ bool Model::LoadByBinary(const std::string& filename)
 
 void Model::ProcessMesh(aiMesh* mesh, const aiScene* scene)
 {
-    std::vector<SkinnedVertex> vertices;
-    vertices.resize(mesh->mNumVertices);
-
     glm::vec3 minBound(FLT_MAX);
     glm::vec3 maxBound(-FLT_MAX);
 
-    // 1. 정점 순회 (데이터 추출 + AABB 계산 통합)
-    for (uint32 i = 0; i < mesh->mNumVertices; i++) 
-    {
-        auto& v = vertices[i];
-
-        // 1-1. 뼈 데이터 초기화
-        SetVertexBoneDataToDefault(v);
-
-        // 1-2. 위치 설정 및 AABB 갱신
-        v.position = glm::vec3(mesh->mVertices[i].x, mesh->mVertices[i].y, mesh->mVertices[i].z);
-        minBound = Utils::Min(minBound, v.position);
-        maxBound = Utils::Max(maxBound, v.position);
-
-        // 1-3. 노멀 및 텍스처 좌표 설정
-        v.normal = glm::vec3(mesh->mNormals[i].x, mesh->mNormals[i].y, mesh->mNormals[i].z);
-        v.texCoord = glm::vec2(mesh->mTextureCoords[0][i].x, mesh->mTextureCoords[0][i].y);
-
-        // Tangent 벡터 추출
-        if (mesh->mTangents)
-        {
-            v.tangent = glm::vec3(mesh->mTangents[i].x, mesh->mTangents[i].y, mesh->mTangents[i].z);
-        }
-        else
-        {
-            v.tangent = glm::vec3(0.0f);
-        }
-    }
-
-    // 2. 인덱스 추출
+    // 인덱스 추출
     std::vector<uint32> indices;
     indices.resize(mesh->mNumFaces * 3);
     for (uint32 i = 0; i < mesh->mNumFaces; i++)
@@ -217,18 +236,85 @@ void Model::ProcessMesh(aiMesh* mesh, const aiScene* scene)
         indices[3 * i + 2] = mesh->mFaces[i].mIndices[2];
     }
 
-    // 3. 뼈 데이터 추출 및 정점 벡터 업데이트
-    ExtractBoneWeightForVertices(vertices, mesh, scene);
+    if (mesh->mNumBones > 0)
+    {
+        // 뼈가 있어서 애니메이션이 가능한 모델
+        std::vector<SkinnedVertex> vertices;
+        vertices.resize(mesh->mNumVertices);
 
-    auto glMesh = SkinnedMesh::Create(vertices, indices, GL_TRIANGLES);
+        for (uint32 i = 0; i < mesh->mNumVertices; i++)
+        {
+            auto& v = vertices[i];
+            SetVertexBoneDataToDefault(v);
 
-    // 1. AABB의 크기(차이) 계산
-    glm::vec3 boundDiff = maxBound - minBound;
+            v.position = glm::vec3(mesh->mVertices[i].x, mesh->mVertices[i].y, mesh->mVertices[i].z);
+            v.normal = glm::vec3(mesh->mNormals[i].x, mesh->mNormals[i].y, mesh->mNormals[i].z);
+            if (mesh->mTextureCoords[0])
+            {
+                v.texCoord = glm::vec2(mesh->mTextureCoords[0][i].x, mesh->mTextureCoords[0][i].y);
+            }
+            else
+            {
+                v.texCoord = glm::vec2(0.0f);
+            }
 
-    glMesh->SetLocalBounds(RenderBounds::CreateFromMinMax(minBound, maxBound));
-    if (mesh->mMaterialIndex >= 0)
-        glMesh->SetMaterial(m_materials[mesh->mMaterialIndex]);
-    m_meshes.push_back(std::move(glMesh));
+            if (mesh->mTangents)
+            {
+                v.tangent = glm::vec3(mesh->mTangents[i].x, mesh->mTangents[i].y, mesh->mTangents[i].z);
+            }
+            else
+            {
+                v.tangent = glm::vec3(0.0f);
+            }
+
+            minBound = Utils::Min(minBound, v.position);
+            maxBound = Utils::Max(maxBound, v.position);
+        }
+
+        // 뼈 가중치 추출 (정적 메쉬엔 없음)
+        ExtractBoneWeightForVertices(vertices, mesh, scene);
+
+        auto glMesh = SkinnedMesh::Create(vertices, indices, GL_TRIANGLES);
+        glMesh->SetLocalBounds(RenderBounds::CreateFromMinMax(minBound, maxBound));
+        if (mesh->mMaterialIndex >= 0) glMesh->SetMaterial(m_materials[mesh->mMaterialIndex]);
+
+        m_meshes.push_back(std::move(glMesh));
+    }
+    else
+    {
+        // 뼈가 없어서 움직이지 않는 정적 모델
+        std::vector<StaticVertex> vertices;
+        vertices.resize(mesh->mNumVertices);
+
+        for (uint32 i = 0; i < mesh->mNumVertices; i++)
+        {
+            auto& v = vertices[i];
+            v.position = glm::vec3(mesh->mVertices[i].x, mesh->mVertices[i].y, mesh->mVertices[i].z);
+            v.normal = glm::vec3(mesh->mNormals[i].x, mesh->mNormals[i].y, mesh->mNormals[i].z);
+            if (mesh->mTextureCoords[0])
+                v.texCoord = glm::vec2(mesh->mTextureCoords[0][i].x, mesh->mTextureCoords[0][i].y);
+            else
+                v.texCoord = glm::vec2(0.0f);
+
+            if (mesh->mTangents)
+            {
+                v.tangent = glm::vec3(mesh->mTangents[i].x, mesh->mTangents[i].y, mesh->mTangents[i].z);
+            }
+            else
+            {
+                v.tangent = glm::vec3(0.0f);
+            }
+
+            minBound = Utils::Min(minBound, v.position);
+            maxBound = Utils::Max(maxBound, v.position);
+        }
+
+        auto glMesh = StaticMesh::Create(vertices, indices, GL_TRIANGLES);
+        glMesh->SetLocalBounds(RenderBounds::CreateFromMinMax(minBound, maxBound));
+        if (mesh->mMaterialIndex >= 0) glMesh->SetMaterial(m_materials[mesh->mMaterialIndex]);
+
+        m_meshes.push_back(std::move(glMesh));
+    }
 }
 
 void Model::ProcessNode(aiNode* node, const aiScene* scene)
@@ -319,6 +405,9 @@ void Model::ExtractBoneWeightForVertices(std::vector<SkinnedVertex>& vertices,
     }
 }
 
+/*========================//
+//  texture load methods  //
+//========================*/
 TexturePtr Model::LoadTextureFromFile
 (
     const std::string& relativePath, 

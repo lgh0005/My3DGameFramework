@@ -9,8 +9,8 @@ public:
     
     ~Buffer();
     uint32 Get() const { return m_buffer; }
-    size_t GetStride() const { return m_stride; }
-    size_t GetCount() const { return m_count; }
+    usize GetStride() const { return m_stride; }
+    usize GetCount() const { return m_count; }
     void Bind() const;
 
 private:

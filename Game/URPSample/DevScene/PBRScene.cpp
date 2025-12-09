@@ -99,6 +99,7 @@ bool PBRScene::CreateSceneContext()
 {
 	// 0. 추가한 렌더패스 가져오기
 	TestRenderPass* lightPass = (TestRenderPass*)GetCustomRenderPass("SimpleDimple");
+	
 
 	// 1. 카메라 오브젝트 추가
 	{

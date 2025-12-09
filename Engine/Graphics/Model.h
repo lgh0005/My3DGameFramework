@@ -13,7 +13,9 @@
 // 수정이 필요하다.
 
 #pragma region FORWARD_DECLARATION
+CLASS_PTR(Mesh)
 CLASS_PTR(SkinnedMesh)
+CLASS_PTR(StaticMesh)
 CLASS_PTR(Material)
 CLASS_PTR(Program)
 #pragma endregion
@@ -24,7 +26,8 @@ class Model
 public:
 	static ModelUPtr Load(const std::string& filename);
 	uint32 GetMeshCount() const { return (uint32)m_meshes.size(); }
-	SkinnedMeshPtr GetMesh(int index) const { return m_meshes[index]; }
+	SkinnedMeshPtr GetSkinnedMesh(int index) const;
+	StaticMeshPtr GetStaticMesh(int index) const;
 	void Draw(const Program* program) const;
 
 /*===================//
@@ -61,6 +64,6 @@ private:
 		aiTextureType type, 
 		const std::filesystem::path& parentDir
 	);
-	std::vector<SkinnedMeshPtr> m_meshes;
+	std::vector<MeshPtr> m_meshes;
 	std::vector<MaterialPtr> m_materials;
 };
