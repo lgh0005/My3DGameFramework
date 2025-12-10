@@ -44,6 +44,9 @@ struct Material {
 };
 uniform Material material;
 
+uniform samplerCube irradianceMap;
+uniform int useIBL; // 잠시 차이를 비교하기 위한 임시 유니폼
+
 const float PI = 3.14159265359;
 
 // --- PBR Helper Functions ---
@@ -73,9 +76,16 @@ float GeometrySmith(vec3 normal, vec3 viewDir, vec3 lightDir, float roughness)
     return ggx1 * ggx2;
 }
 
-vec3 FresnelSchlick(float cosTheta, vec3 F0) {
-    return F0 + (1.0 - F0) * pow(1.0 - cosTheta, 5.0);
+vec3 FresnelSchlick(float cosTheta, vec3 F0) 
+{
+     return F0 + (1.0 - F0) * pow(1.0 - cosTheta, 5.0);
 }
+
+vec3 FresnelSchlickRoughness(float cosTheta, vec3 F0, float roughness) 
+{
+    return F0 + (max(vec3(1.0 - roughness), F0) - F0) * pow(1.0 - cosTheta, 5.0);
+}
+// --- PBR Helper Functions --- 
 
 void main()
 {
@@ -150,7 +160,57 @@ void main()
         Lo += (kD * albedo / PI + specular) * radiance * NdotL;
     }   
     
-    vec3 ambient = vec3(0.03) * albedo * ao;
+    // vec3 ambient = vec3(0.03) * albedo * ao;
+
+    // [수정 후] Diffuse IBL (Irradiance Map) 적용
+    // ------------------------------------------------------------------
+    // 1. IBL용 kS (Fresnel) 계산: 시선 각도(NdotV)와 거칠기 사용
+   // vec3 kS = FresnelSchlickRoughness(max(dot(N, V), 0.0), F0, roughness);
+    
+    // 2. kD (Diffuse 비율) 계산: 에너지 보존 법칙
+  //  vec3 kD = 1.0 - kS;
+  //  kD *= (1.0 - metallic); // 금속은 Diffuse가 없음
+    
+    // 3. Irradiance Map 샘플링 (법선 N 방향의 평균 빛 에너지)
+  //  vec3 irradiance = texture(irradianceMap, N).rgb;
+  //  vec3 diffuse    = irradiance * albedo;
+    
+    // 4. 최종 Ambient = (Diffuse 성분) * AO
+    // (나중에 Specular IBL이 추가되면 여기에 + specularPart 가 붙습니다)
+ //   vec3 ambient = (kD * diffuse) * ao;
+    // ------------------------------------------------------------------
+
+    //
+
+    vec3 ambient = vec3(0.0);
+
+    if (useIBL > 0) 
+    {
+        // [ON] Diffuse IBL (Irradiance Map) 적용
+        
+        // 1. IBL용 kS (Fresnel) 계산
+        vec3 kS = FresnelSchlickRoughness(max(dot(N, V), 0.0), F0, roughness);
+        
+        // 2. kD (Diffuse 비율) 계산
+        vec3 kD = 1.0 - kS;
+        kD *= (1.0 - metallic); // 금속은 Diffuse 0
+        
+        // 3. Irradiance Map 샘플링
+        vec3 irradiance = texture(irradianceMap, N).rgb;
+        vec3 diffuse    = irradiance * albedo;
+        
+        // 4. 최종 Ambient
+        ambient = (kD * diffuse) * ao;
+    }
+    else
+    {
+        // [OFF] 단순 상수 Ambient (기존 방식)
+        // 아주 약한 빛만 줌 (0.03)
+        ambient = vec3(0.03) * albedo * ao;
+    }
+
+    //
+
     vec3 color = ambient + Lo;
 
     // HDR Tone Mapping & Gamma Correction

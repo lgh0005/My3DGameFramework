@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 #include "Graphics/Uniform.h"
 
 #pragma region FORWARD_DECLARATION
@@ -26,8 +26,8 @@ public:
 	void RegisterComponent(Component* component);
 	void OnScreenResize(int32 width, int32 height);
 
-	// TODO : Ãß°¡ÇØ¾ß ÇÒ ¸Ş¼­µå
-	// 1. Find : ¾À¿¡¼­ Æ¯Á¤ °ÔÀÓ ¿ÀºêÁ§Æ® Ã£´Â ¸Ş¼­µå
+	// TODO : ì¶”ê°€í•´ì•¼ í•  ë©”ì„œë“œ
+	// 1. Find : ì”¬ì—ì„œ íŠ¹ì • ê²Œì„ ì˜¤ë¸Œì íŠ¸ ì°¾ëŠ” ë©”ì„œë“œ
 
 /*=======================================//
 //   scene property getter and setters   //
@@ -39,10 +39,18 @@ public:
 	Camera* GetMainCamera() const { return m_mainCamera; }
 	void SetMainCamera(Camera* camera) { m_mainCamera = camera; }
 
+	GeneralRenderPass* GetCustomRenderPass(const std::string& name);
+
+	// TODO : ì´í›„ì— SceneEnvironment ë„ì… ê°€ëŠ¥
+#pragma region SCENE_ENVIRONMENT_METHODS
+	// ì§€ê¸ˆì€ SRP, PBRê³¼ ê´€ë ¨ì—†ì´ ì¼ë‹¨ í•˜ëŠ˜ê³¼ ê´€ë ¨ëœ í…ìŠ¤ì³ì˜ getter/setterë¥¼ ì—¬ê¸°ì—
+	// ì ì–´ë‘ê² ìŒ
 	void SetSkyboxTexture(CubeTexturePtr texture) { m_skyboxTexture = texture; }
 	CubeTexture* GetSkyboxTexture() const { return m_skyboxTexture.get(); }
 
-	GeneralRenderPass* GetCustomRenderPass(const std::string& name);
+	void SetIrradianceTexture(CubeTexturePtr texture) { m_irradianceTexture = texture; }
+	CubeTexture* GetIrradianceTexture() const { return m_irradianceTexture.get(); }
+#pragma endregion
 
 /*================================//
 //   interface to renderContext   //
@@ -57,24 +65,24 @@ public:
 protected:
 	Scene();
 
-	// ¾ÀÀÇ ÄÁÅØ½ºÆ®¸¦ ÀÛ¼ºÇÏ´Â °¡»ó ÇÔ¼öµé
+	// ì”¬ì˜ ì»¨í…ìŠ¤íŠ¸ë¥¼ ì‘ì„±í•˜ëŠ” ê°€ìƒ í•¨ìˆ˜ë“¤
 	virtual bool LoadNessesaryResources()	   = 0;
 	virtual bool CreateNessesaryRenderPasses() = 0;
 	virtual bool CreateSceneContext()          = 0;
 	bool Init();
 
-	// °ÔÀÓ ¿ÀºêÁ§Æ® ¼ÒÀ¯±Ç
+	// ê²Œì„ ì˜¤ë¸Œì íŠ¸ ì†Œìœ ê¶Œ
 	std::vector<GameObjectUPtr> m_gameObjects;
 
-	// »èÁ¦ ´ë±â¿­
-	// TODO : GameObject ÆÄ±«¸¦ À§ÇÑ FlushDestroyQueue ±¸Çö ÁøÇà ÇÊ¿ä
+	// ì‚­ì œ ëŒ€ê¸°ì—´
+	// TODO : GameObject íŒŒê´´ë¥¼ ìœ„í•œ FlushDestroyQueue êµ¬í˜„ ì§„í–‰ í•„ìš”
 	void FlushDestroyQueue();
 	std::vector<GameObjectUPtr> m_destroyQueue;
 
-	// ÁÖ¿ä ÂüÁ¶ (Ä³½Ì)
+	// ì£¼ìš” ì°¸ì¡° (ìºì‹±)
 	Camera* m_mainCamera		{ nullptr };
 
-	// ÄÄÆ÷³ÍÆ® ¾÷µ¥ÀÌÆ®¸¦ À§ÇÑ ÂüÁ¶ Æ÷ÀÎÅÍ º¤ÅÍ
+	// ì»´í¬ë„ŒíŠ¸ ì—…ë°ì´íŠ¸ë¥¼ ìœ„í•œ ì°¸ì¡° í¬ì¸í„° ë²¡í„°
 	std::vector<Light*>			m_lights;
 	std::vector<Camera*>		m_cameras;
 	std::vector<Animator*>		m_animators;
@@ -84,9 +92,14 @@ protected:
 	std::vector<MeshRenderer*>  m_staticMeshRenderers;
 	std::vector<MeshRenderer*>  m_skinnedMeshRenderers;
 
-	// ÇÏ´Ã ÅØ½ºÃÄ
+	// í•˜ëŠ˜ í…ìŠ¤ì³
+	// TODO : ì´í›„ì— SRPì™€ PBR ëª¨ë‘ë¥¼ ê³ ë ¤í•˜ì—¬ ì—¬ê¸°ì— ëŠ˜ì–´ë‚˜ëŠ”
+	// í¬ì¸í„° ë©¤ë²„ë“¤ì„ í•˜ë‚˜ì˜ SceneEnvironmentê³¼ ê°™ì€ êµ¬ì¡°ì²´ë¡œ
+	// ë¬¶ì–´ì„œ ê´€ë¦¬í•  ìˆ˜ë„ ìˆìŒ.
+	// ê° ë§µë“¤ì— ëŒ€í•œ setterì™€ getterë¥¼ ë‹¬ì•„ë‘” í´ë˜ìŠ¤ë¡œ ê´€ë¦¬í•˜ë©´ í¸ë¦¬í•  ìˆ˜ ìˆìŒ.
 	CubeTexturePtr				m_skyboxTexture;
+	CubeTexturePtr			    m_irradianceTexture;
 
-	// Ä¿½ºÅÒ Æ÷¿öµå ·»´õ ÆĞ½º
+	// ì»¤ìŠ¤í…€ í¬ì›Œë“œ ë Œë” íŒ¨ìŠ¤
 	std::unordered_map<std::string, GeneralRenderPassUPtr> m_customPasses;
 };

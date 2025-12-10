@@ -7,6 +7,7 @@ CLASS_PTR(Scene)
 CLASS_PTR(Camera)
 #pragma endregion
 
+// TODO : 이후에 URP의 DeferredLightingPass로 승격되어야 할 렌더 패스
 CLASS_PTR(HDRRenderPass)
 class HDRRenderPass : public GeneralRenderPass
 {

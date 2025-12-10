@@ -62,6 +62,19 @@ bool PBRScene::LoadNessesaryResources()
 		RESOURCE.AddResource<Mesh>("Sphere", std::move(sphereMesh));
 	}
 
+	// 단색 머티리얼
+	{
+		auto solidColorMat = Material::Create();
+		if (!solidColorMat) return false;
+		solidColorMat->diffuse = Texture::CreateFromImage(Image::CreateSingleColorImage
+		(4, 4, glm::vec4(0.75f, 0.1f, 0.2f, 1.0f)).get());
+		solidColorMat->metallic = Texture::CreateFromImage(Image::CreateSingleColorImage
+		(4, 4, glm::vec4(0.85f, 0.85f, 0.85f, 1.0f)).get());
+		solidColorMat->roughness = Texture::CreateFromImage(Image::CreateSingleColorImage
+		(4, 4, glm::vec4(0.25f, 0.35f, 0.25f, 1.0f)).get());
+		RESOURCE.AddResource<Material>("solidColor", std::move(solidColorMat));
+	}
+
 	// 쇠공 머티리얼
 	{
 		// TODO : 이후에는 ktx로 한 번 구울 필요가 있음.
@@ -92,7 +105,9 @@ bool PBRScene::LoadNessesaryResources()
 		auto hdrImage = Image::LoadHDR("./Resources/Images/IBL/mirrored_hall_4k.hdr");
 		auto hdrTex = Texture::CreateFromHDR(hdrImage.get());
 		auto bakedCubemap = IBLUtils::CreateCubemapFromHDR(hdrTex.get());
-		if (bakedCubemap) SetSkyboxTexture(std::move(bakedCubemap));
+		auto bakedDiffuse = IBLUtils::CreateIrradianceMap(bakedCubemap.get());
+		SetSkyboxTexture(std::move(bakedCubemap));
+		SetIrradianceTexture(std::move(bakedDiffuse));
 	}
 	
 	return true;
@@ -243,7 +258,7 @@ bool PBRScene::CreateSceneContext()
 				sphereObj->GetTransform().SetPosition(glm::vec3(x, y, 0.0f));
 
 				// 2. MeshRendere 생성
-				auto mr = MeshRenderer::Create(sphereMesh, RESOURCE.GetResource<Material>("Rusted_Iron"));
+				auto mr = MeshRenderer::Create(sphereMesh, RESOURCE.GetResource<Material>("solidColor"));
 				hdrPass->AddRenderer(mr.get()); // 렌더 패스에 등록
 
 				sphereObj->AddComponent(std::move(mr));
@@ -252,16 +267,16 @@ bool PBRScene::CreateSceneContext()
 		}
 	}
 
-	// 4. Spherical map을 입은 큐브
-	{
-		auto cube = GameObject::Create();
-		cube->GetTransform().SetPosition(glm::vec3(0.0f, 0.0f, 4.0f));
-		auto renderer = MeshRenderer::Create
-		(RESOURCE.GetResource<Mesh>("Cube"), RESOURCE.GetResource<Material>("hdrCubeMat"));
-		stcPass->AddRenderer(renderer.get());
-		cube->AddComponent(std::move(renderer));
-		AddGameObject(std::move(cube));
-	}
+	//// 4. Spherical map을 입은 큐브
+	//{
+	//	auto cube = GameObject::Create();
+	//	cube->GetTransform().SetPosition(glm::vec3(0.0f, 0.0f, 4.0f));
+	//	auto renderer = MeshRenderer::Create
+	//	(RESOURCE.GetResource<Mesh>("Cube"), RESOURCE.GetResource<Material>("hdrCubeMat"));
+	//	stcPass->AddRenderer(renderer.get());
+	//	cube->AddComponent(std::move(renderer));
+	//	AddGameObject(std::move(cube));
+	//}
 
 	return true;
 }

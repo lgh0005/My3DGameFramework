@@ -5,6 +5,7 @@
 #include "Graphics/Program.h"
 #include "Graphics/Mesh.h"
 #include "Graphics/Material.h"
+#include "Graphics/CubeTexture.h"
 #include "Components/Camera.h"
 #include "Components/MeshRenderer.h"
 #include "Components/Transform.h"
@@ -30,13 +31,24 @@ bool HDRRenderPass::Init(ProgramUPtr program)
     m_simpleProgram->SetUniform("material.metallicMap", (int)TextureSlot::SLOT_METALLIC);
     m_simpleProgram->SetUniform("material.roughnessMap", (int)TextureSlot::SLOT_ROUGHNESS);
     m_simpleProgram->SetUniform("material.aoMap", (int)TextureSlot::SLOT_AO);
-
+    m_simpleProgram->SetUniform("irradianceMap", 10);
+    m_simpleProgram->SetUniform("useIBL", 0);
     return true;
 }
 
 void HDRRenderPass::Render(Scene* scene, Camera* camera)
 {
     m_simpleProgram->Use();
+
+    // Irradiance 적용
+    auto* irradianceMap = scene->GetIrradianceTexture();
+    if (irradianceMap)
+    {
+        glActiveTexture(GL_TEXTURE10);
+        irradianceMap->Bind();
+    }
+
+    // 모델 그리기
     for (const auto* renderer : m_renderers)
     {
         GameObject* go = renderer->GetOwner();

@@ -13,7 +13,7 @@ public:
     // TODO
     // 2. Diffuse¿ë (Irradiance Map) »ý¼º
     // Å¥ºê¸ÊÀ» ³ÖÀ¸¸é, Èå¸´ÇÏ°Ô ¹¶°³Áø »õ Å¥ºê¸ÊÀ» ¸®ÅÏ
-    // static CubeTexturePtr CreateIrradianceMap(CubeTexture* source);
+    static CubeTexturePtr CreateIrradianceMap(CubeTexture* src);
 
     // 3. Specular¿ë (Prefiltered Map) »ý¼º
     // °ÅÄ¥±âº°·Î ¹Ó¸ÊÀÌ »ý¼ºµÈ Å¥ºê¸Ê ¸®ÅÏ
