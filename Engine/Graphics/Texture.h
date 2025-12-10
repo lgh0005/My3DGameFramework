@@ -25,7 +25,7 @@ public:
 	void Bind() const;
 	void SetFilter(uint32 minFilter, uint32 magFilter) const;
 	void SetWrap(uint32 sWrap, uint32 tWrap) const;
-	void SetTextureFormat(int32 width, int32 height, uint32 internalFormal,
+	void SetTextureFormat(int32 width, int32 height, uint32 internalFormat,
 						  uint32 format, uint32 type);
 	void SetBorderColor(const glm::vec4& color) const;
 	void SetData(const void* data, uint32 size = 0);
@@ -35,14 +35,13 @@ public:
 	uint32 GetType()	   const    { return m_type; }
 	uint32 GetFormat()     const	{ return m_format; }
 
-
 private:
 	Texture() = default;
 	void CreateTexture();
 	void SetTextureFromImage(const Image* image);
 	void SetTextureFormat(int32 width, int32 height, uint32 format);
 	static TextureUPtr LoadKtx(const std::string& ktxFilePath);
-	static TexturePtr Create1x1Texture(const std::vector<uint8>& colorData);
+	static TexturePtr Create4x4Texture(const std::vector<uint8>& colorData);
 
 	uint32	m_texture		{ 0 };
 	int32	m_width			{ 0 };
@@ -65,8 +64,8 @@ public:
 	static TexturePtr CreateBlack();
 	static TexturePtr CreateBlue();
 
-	// TODO : CreateFromImage에서
-	// 단색 이미지를 바탕으로 만들 수 있기에 이 함수는
-	// 테스트 용으로 두도록 하겠음.
-	static TexturePtr CreateFromFloat(float value);
+	//// TODO : CreateFromImage에서
+	//// 단색 이미지를 바탕으로 만들 수 있기에 이 함수는
+	//// 테스트 용으로 두도록 하겠음.
+	//static TexturePtr CreateFromFloat(float value);
 };

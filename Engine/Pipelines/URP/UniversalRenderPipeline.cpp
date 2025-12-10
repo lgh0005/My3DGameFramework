@@ -70,6 +70,7 @@ void UniversalRenderPipeline::Render(Scene* scene)
 	m_globalUniforms->PreRender(&context);
 
 	// [패스 5] 포워드 셰이딩
+	auto& cnt = scene->GetCustomRenderPasses();
 	for (const auto& [name, pass] : scene->GetCustomRenderPasses())
 		pass->Render(scene, camera);
 

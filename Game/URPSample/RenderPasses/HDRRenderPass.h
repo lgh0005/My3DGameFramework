@@ -20,6 +20,7 @@ public:
 private:
 	HDRRenderPass() = default;
 	bool Init(ProgramUPtr program);
+
 	ProgramUPtr m_simpleProgram;
 	std::vector<MeshRenderer*> m_renderers;
 };

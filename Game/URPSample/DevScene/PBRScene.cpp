@@ -4,6 +4,7 @@
 #include "Core/GameObject.h"
 #include "Core/Renderer.h"
 #include "Graphics/Program.h"
+#include "Graphics/CubeFramebuffer.h"
 #include "Graphics/Mesh.h"
 #include "Graphics/StaticMesh.h"
 #include "Graphics/SkinnedMesh.h"
@@ -30,6 +31,7 @@
 
 #include "URPSample/RenderPasses/HDRRenderPass.h"
 #include "URPSample/RenderPasses/SphericalToCubePass.h"
+#include "URPSample/RenderPasses/HDRSkyboxPass.h"
 #include "SRPSample/Scripts/CameraController.h"
 
 PBRScene::~PBRScene() = default;
@@ -57,18 +59,6 @@ bool PBRScene::LoadNessesaryResources()
 		RESOURCE.AddResource<Mesh>("Sphere", std::move(sphereMesh));
 	}
 
-	// 간단한 머티리얼
-	{
-		auto simpleMat = Material::Create();
-		if (!simpleMat) return false;
-		simpleMat->roughness = Texture::CreateFromFloat(0.15f);
-		simpleMat->metallic = Texture::CreateFromFloat(1.0f);
-		simpleMat->shininess = 16.0f;
-		simpleMat->emissionStrength = 0.0f;
-		simpleMat->heightScale = 0.0f;
-		RESOURCE.AddResource<Material>("LightMat", std::move(simpleMat));
-	}
-
 	// 쇠공 머티리얼
 	{
 		// TODO : 이후에는 ktx로 한 번 구울 필요가 있음.
@@ -94,6 +84,72 @@ bool PBRScene::LoadNessesaryResources()
 		RESOURCE.AddResource<Material>("hdrCubeMat", std::move(hdrCubeMat));
 	}
 
+	// Equirectangular HDR -> Cubemap 변환
+	// TODO : 이후에 HDR Skybox pass 내에서 수행되어야 할 작업 중 하나.
+	{
+		// (1) 리소스 준비
+		auto cubeMesh = RESOURCE.GetResource<Mesh>("Cube");
+		auto hdrMat = RESOURCE.GetResource<Material>("hdrCubeMat");
+		auto hdrTexture = hdrMat->diffuse; // 위에서 로드한 HDR 텍스쳐
+
+		// (2) 베이킹용 임시 쉐이더 생성
+		auto sphericalProgram = Program::Create
+		(
+			"./Resources/Shaders/Universal/spherical_map.vert",
+			"./Resources/Shaders/Universal/spherical_map.frag"
+		);
+
+		if (sphericalProgram)
+		{
+			// (3) 결과물을 담을 빈 큐브맵 생성 (512x512, RGB16F)
+			// 해상도를 높이고 싶다면 1024, 2048 등으로 높이면 됨
+			CubeTexturePtr envCubemap = CubeTexture::Create(2048, 2048, GL_RGB16F, GL_FLOAT);
+
+			// (4) 캡처용 FBO 생성
+			auto captureFBO = CubeFramebuffer::Create(envCubemap);
+
+			// (5) 캡처 행렬 설정 (90도 FOV, 1.0 Aspect)
+			glm::mat4 captureProjection = glm::perspective(glm::radians(90.0f), 1.0f, 0.1f, 10.0f);
+			std::vector<glm::mat4> captureViews =
+			{
+				glm::lookAt(glm::vec3(0.0f), glm::vec3(1.0f,  0.0f,  0.0f), glm::vec3(0.0f, -1.0f,  0.0f)), // +X
+				glm::lookAt(glm::vec3(0.0f), glm::vec3(-1.0f, 0.0f,  0.0f), glm::vec3(0.0f, -1.0f,  0.0f)), // -X
+				glm::lookAt(glm::vec3(0.0f), glm::vec3(0.0f,  1.0f,  0.0f), glm::vec3(0.0f,  0.0f,  1.0f)), // +Y
+				glm::lookAt(glm::vec3(0.0f), glm::vec3(0.0f, -1.0f,  0.0f), glm::vec3(0.0f,  0.0f, -1.0f)), // -Y
+				glm::lookAt(glm::vec3(0.0f), glm::vec3(0.0f,  0.0f,  1.0f), glm::vec3(0.0f, -1.0f,  0.0f)), // +Z
+				glm::lookAt(glm::vec3(0.0f), glm::vec3(0.0f,  0.0f, -1.0f), glm::vec3(0.0f, -1.0f,  0.0f))  // -Z
+			};
+
+			// (6) 렌더링 설정
+			sphericalProgram->Use();
+			sphericalProgram->SetUniform("tex", 0);
+			glActiveTexture(GL_TEXTURE0);
+			hdrTexture->Bind();
+
+			glViewport(0, 0, 2048, 2048); // [중요] 큐브맵 크기에 맞춤
+			captureFBO->Bind();
+
+			// (7) 6면 렌더링 루프
+			glDisable(GL_CULL_FACE);
+			for (int i = 0; i < 6; ++i)
+			{
+				sphericalProgram->SetUniform("transform", captureProjection * captureViews[i]);
+				captureFBO->Bind(i); // FBO 타겟 변경
+				glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+				cubeMesh->Draw(sphericalProgram.get()); // 큐브 그리기
+			}
+			glEnable(GL_CULL_FACE);
+
+			// (8) 정리 및 등록
+			CubeFramebuffer::BindToDefault();
+			glViewport(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT); // 뷰포트 원상복구
+
+			// 씬의 SkyboxTexture로 등록 (소유권 이동)
+			SetSkyboxTexture(std::move(envCubemap));
+		}
+	}
+
 	return true;
 }
 
@@ -110,6 +166,9 @@ bool PBRScene::CreateNessesaryRenderPasses()
 	}
 
 	// Spherical map을 큐브에 입히는 간단한 렌더 패스
+	// TODO : 이건 이후에 HDR Skybox에서 하나의 추가적인 기능 프로그램으로
+	// 종속되어 들어가야 할 대상이지, 렌더 패스에 렌더링을 위한 프로그램은 아님.
+	// 왜냐하면 spherical을 단지 큐브로 바꿔주는 셰이더일 뿐이기 때문.
 	{
 		auto prog = Program::Create
 		(
@@ -117,6 +176,17 @@ bool PBRScene::CreateNessesaryRenderPasses()
 			"./Resources/Shaders/Universal/spherical_map.frag"
 		); if (!prog) return false;
 		AddCustomRenderPass("SphericalToCube", SphericalToCubePass::Create(std::move(prog)));
+	}
+
+	// HDR Skybox 렌더 패스
+	// TODO : 이는 URP의 정식 렌더 패스가 되어야 한다.
+	{
+		auto prog = Program::Create
+		(
+			"./Resources/Shaders/Universal/skybox_hdr.vert",
+			"./Resources/Shaders/Universal/skybox_hdr.frag"
+		); if (!prog) return false;
+		AddCustomRenderPass("HDRSkyPass", HDRSkyboxPass::Create(std::move(prog)));
 	}
 
 	return true;
@@ -207,7 +277,7 @@ bool PBRScene::CreateSceneContext()
 		);
 
 		// AO는 1.0 (그림자 없음)
-		auto sharedAO = Texture::CreateFromFloat(1.0f);
+		auto sharedAO = Texture::CreateBlack();
 
 		// 7x7 그리드 설정
 		const int rows = 7;

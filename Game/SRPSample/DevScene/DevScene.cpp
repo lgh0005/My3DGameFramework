@@ -127,7 +127,7 @@ bool DevScene::LoadNessesaryResources()
 
 		auto box4Mat = Material::Create();
 		box4Mat->diffuse = std::move(diffuseTexture);
-		box4Mat->shininess = 1024.0f;
+		box4Mat->shininess = 20.0f;
 		box4Mat->emissionStrength = 0.0f;
 		box4Mat->heightScale = 0.0f;
 		RESOURCE.AddResource<Material>("boxMat3", std::move(box4Mat));
@@ -354,7 +354,6 @@ bool DevScene::CreateSceneContext()
 
 		auto meshRenderer = MeshRenderer::Create
 		(RESOURCE.GetResource<Mesh>("Cube"), RESOURCE.GetResource<Material>("boxMat1"));
-		// gPass->AddStaticMeshRenderer(meshRenderer.get());
 		cubeObj->AddComponent(std::move(meshRenderer));
 		AddGameObject(std::move(cubeObj));
 	}
@@ -370,7 +369,6 @@ bool DevScene::CreateSceneContext()
 
 		auto meshRenderer = MeshRenderer::Create
 		(RESOURCE.GetResource<Mesh>("Cube"), RESOURCE.GetResource<Material>("boxMat2"));
-		// gPass->AddStaticMeshRenderer(meshRenderer.get());
 		cubeObj->AddComponent(std::move(meshRenderer));
 
 		// TEMP : BGM 재생
@@ -392,7 +390,6 @@ bool DevScene::CreateSceneContext()
 
 		auto meshRenderer = MeshRenderer::Create
 		(RESOURCE.GetResource<Mesh>("Cube"), RESOURCE.GetResource<Material>("boxMat4"));
-		// gPass->AddStaticMeshRenderer(meshRenderer.get());
 		cubeObj->AddComponent(std::move(meshRenderer));
 		AddGameObject(std::move(cubeObj));
 	}
@@ -466,29 +463,6 @@ bool DevScene::CreateSceneContext()
 
 		// 5. 씬에 GameObject 등록
 		AddGameObject(std::move(modelGo));
-	}
-
-	// 8. 모델 #1
-	{
-		//auto modelGo = GameObject::Create();
-		//modelGo->SetName("Soldier");
-		//modelGo->GetTransform().SetPosition(glm::vec3(2.0f, 0.0f, -2.0f));
-		//modelGo->GetTransform().SetScale(glm::vec3(0.025f));
-
-		//// 3. GameObject에 Animator 컴포넌트 추가
-		//modelGo->AddComponent(Animator::Create(RESOURCE.GetResource<Animation>("hiphopDancing")));
-
-		//// 4. Model 안의 모든 Mesh 조각을 MeshRenderer 컴포넌트로 추가
-		//auto model = RESOURCE.GetResource<Model>("aliensoldier");
-		//for (uint32 i = 0; i < model->GetMeshCount(); ++i)
-		//{
-		//	SkinnedMeshPtr mesh = model->GetMesh(i);
-		//	auto renderer = MeshRenderer::Create(mesh, mesh->GetMaterial());
-		//	modelGo->AddComponent((std::move(renderer)));
-		//}
-
-		//// 5. 씬에 GameObject 등록
-		//AddGameObject(std::move(modelGo));
 	}
 
 	// 가방

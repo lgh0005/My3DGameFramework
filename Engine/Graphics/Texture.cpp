@@ -160,14 +160,14 @@ void Texture::SetTextureFromImage(const Image* image)
 }
 
 void Texture::SetTextureFormat(int32 width, int32 height, 
-    uint32 internalFormal, uint32 format, uint32 type)
+    uint32 internalFormat, uint32 format, uint32 type)
 {
     m_width  = width;
     m_height = height;
     m_format = format;
     m_type   = type;
 
-    glTexImage2D(GL_TEXTURE_2D, 0, internalFormal, m_width, m_height, 0,
+    glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, m_width, m_height, 0,
         format, m_type, nullptr);
 }
 
@@ -223,10 +223,17 @@ TextureUPtr Texture::LoadKtx(const std::string& ktxFilePath)
     return std::move(texture);
 }
 
-TexturePtr Texture::Create1x1Texture(const std::vector<uint8>& colorData)
+TexturePtr Texture::Create4x4Texture(const std::vector<uint8>& colorData)
 {
-    auto texture = Texture::Create(1, 1, GL_RGBA8, GL_RGBA, GL_UNSIGNED_BYTE);
-    texture->SetData(colorData.data(), (uint32)colorData.size());
+    auto texture = Texture::Create(4, 4, GL_RGBA8, GL_RGBA, GL_UNSIGNED_BYTE);
+
+    std::vector<uint8> fullBuffer;
+    fullBuffer.reserve(4 * 4 * 4);
+
+    for (int i = 0; i < 16; ++i)
+        fullBuffer.insert(fullBuffer.end(), colorData.begin(), colorData.end());
+    texture->SetData(fullBuffer.data(), (uint32)fullBuffer.size());
+
     return std::move(texture);
 }
 
@@ -234,7 +241,7 @@ TexturePtr Texture::CreateWhite()
 {
     if (s_whiteTex) return s_whiteTex;
     std::vector<uint8> data = { 255, 255, 255, 255 };
-    s_whiteTex = Create1x1Texture(data);
+    s_whiteTex = Create4x4Texture(data);
     return s_whiteTex;
 }
 
@@ -242,7 +249,7 @@ TexturePtr Texture::CreateGray()
 {
     if (s_grayTex) return s_grayTex;
     std::vector<uint8> data = { 128, 128, 128, 255 };
-    s_grayTex = Create1x1Texture(data);
+    s_grayTex = Create4x4Texture(data);
     return s_grayTex;
 }
 
@@ -250,7 +257,7 @@ TexturePtr Texture::CreateBlack()
 {
     if (s_blackTex) return s_blackTex;
     std::vector<uint8> data = { 0, 0, 0, 255 };
-    s_blackTex = Create1x1Texture(data);
+    s_blackTex = Create4x4Texture(data);
     return s_blackTex;
 }
 
@@ -258,13 +265,13 @@ TexturePtr Texture::CreateBlue()
 {
     if (s_blueTex) return s_blueTex;
     std::vector<uint8> data = { 128, 128, 255, 255 };
-    s_blueTex = Create1x1Texture(data);
+    s_blueTex = Create4x4Texture(data);
     return s_blueTex;
 }
 
-TexturePtr Texture::CreateFromFloat(float value)
-{
-    uint8 val = static_cast<uint8>(glm::clamp(value, 0.0f, 1.0f) * 255.0f);
-    std::vector<uint8> data = { val, val, val, 255 };
-    return Create1x1Texture(data);
-}
+//TexturePtr Texture::CreateFromFloat(float value)
+//{
+//    uint8 val = static_cast<uint8>(glm::clamp(value, 0.0f, 1.0f) * 255.0f);
+//    std::vector<uint8> data = { val, val, val, 255 };
+//    return Create4x4Texture(data);
+//}
