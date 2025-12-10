@@ -39,23 +39,3 @@ Texture* StandardRenderContext::GetShadowMap(int32 index) const
 	}
 	return nullptr;
 }
-
-// TEMP : CullingPass에서 직접적으로 수행할 작업들.
-// 현재는 일단 씬에 있는 것들을 그대로 복사.
-#pragma region TEMP_SCENE_PROPERTY_COPY_METHODS
-void StandardRenderContext::AddStaticMeshRenderer(MeshRenderer* renderer)
-{
-	m_culledStaticMeshRenderers.push_back(renderer);
-}
-
-void StandardRenderContext::AddSkinnedMeshRenderer(MeshRenderer* renderer)
-{
-	m_culledSkinnedMeshRenderers.push_back(renderer);
-}
-
-void StandardRenderContext::AddLight(Light* light)
-{
-	m_culledLights.push_back(light);
-}
-#pragma endregion
-

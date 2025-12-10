@@ -16,9 +16,8 @@ public:
 	StandardRenderContext() = default;
 
 	void SetGBuffer(Framebuffer* gBuffer);
+	Framebuffer* GetGBuffer() const { return m_gBuffer; }\
 
-	Framebuffer* GetGBuffer() const { return m_gBuffer; }
-	
 	Texture* GetGBufferPosition() const { return m_gPosition; }
 	Texture* GetGBufferNormal()   const { return m_gNormal; }
 	Texture* GetGBufferAlbedo() const { return m_gAlbedoSpec; }
@@ -46,10 +45,4 @@ private:
 	Framebuffer* m_targetFramebuffer{ nullptr };
 	Texture* m_shadowMaps[MAX_SHADOW_CASTER] = { nullptr, };
 	CubeTexture* m_skyboxTexture{ nullptr };
-
-// TEMP : CullingPass 구현 전, 그냥 씬에 있는 것을 그대로 복사.
-public:
-	void AddStaticMeshRenderer(MeshRenderer* renderer);
-	void AddSkinnedMeshRenderer(MeshRenderer* renderer);
-	void AddLight(Light* light);
 };

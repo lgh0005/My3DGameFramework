@@ -2,6 +2,7 @@
 #include "UniversalRenderPipeline.h"
 
 #include "Pipelines/Common/CullingPass.h"
+#include "Pipelines/URP/RenderPasses/UniversalSkyboxPass.h"
 #include "Pipelines/URP/UniversalGlobalUniforms.h"
 #include "Pipelines/URP/UniversalRenderContext.h"
 
@@ -38,6 +39,10 @@ bool UniversalRenderPipeline::Init()
 	m_cullingPass = CullingPass::Create();
 	if (!m_cullingPass) return false;
 
+	// Skybox 패스 생성
+	m_skyboxPass = UniversalSkyboxPass::Create();
+	if (!m_skyboxPass) return false;
+
 	return true;
 }
 
@@ -62,6 +67,7 @@ void UniversalRenderPipeline::Render(Scene* scene)
 	// 0. 스택 영역에 StandardRenderContext 생성
 	UniversalRenderContext context;
 	context.Reset(scene, camera);
+	context.SetSkyboxTexture(scene->GetSkyboxTexture());
 
 	// [패스 0] 컬링 패스 : 절두체 범위 안에 있는 대상만 추리기
 	m_cullingPass->Render(&context);
@@ -73,6 +79,9 @@ void UniversalRenderPipeline::Render(Scene* scene)
 	auto& cnt = scene->GetCustomRenderPasses();
 	for (const auto& [name, pass] : scene->GetCustomRenderPasses())
 		pass->Render(scene, camera);
+
+	// [패스 6] 스카이박스 패스
+	m_skyboxPass->Render(&context);
 
 	/*=========================//
 	//   imgui debug context   //

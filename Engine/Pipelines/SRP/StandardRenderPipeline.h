@@ -4,8 +4,8 @@
 #pragma region FORWARD_DECLARATION
 CLASS_PTR(CullingPass)
 CLASS_PTR(ShadowPass)
-CLASS_PTR(SkyboxPass)
 CLASS_PTR(SSAOPass)
+CLASS_PTR(StandardSkyboxPass)
 CLASS_PTR(StandardDeferredLightingPass)
 CLASS_PTR(StandardGeometryPass)
 CLASS_PTR(StandardPostProcessPass)
@@ -33,10 +33,10 @@ private:
 	// 공통 필수 렌더 패스
 	CullingPassUPtr		      m_cullingPass		  { nullptr };
 	ShadowPassUPtr		      m_shadowPass		  { nullptr };
-	SkyboxPassUPtr			  m_skyboxPass		  { nullptr };
 	SSAOPassUPtr			  m_ssaoPass		  { nullptr };
 
 	// SRP 필수 렌더 패스
+	StandardSkyboxPassUPtr			  m_skyboxPass		  { nullptr };
 	StandardPostProcessPassUPtr		  m_postProcessPass	  { nullptr };
 	StandardGeometryPassUPtr		  m_geometryPass	  { nullptr };
 	StandardDeferredLightingPassUPtr  m_deferredLightPass { nullptr };

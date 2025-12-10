@@ -21,3 +21,18 @@ void RenderContext::Reset(Scene* scene, Camera* camera)
 	m_culledSkinnedMeshRenderers.clear();
 	m_culledLights.clear();
 }
+
+void RenderContext::AddStaticMeshRenderer(MeshRenderer* renderer)
+{
+	m_culledStaticMeshRenderers.push_back(renderer);
+}
+
+void RenderContext::AddSkinnedMeshRenderer(MeshRenderer* renderer)
+{
+	m_culledSkinnedMeshRenderers.push_back(renderer);
+}
+
+void RenderContext::AddLight(Light* light)
+{
+	m_culledLights.push_back(light);
+}

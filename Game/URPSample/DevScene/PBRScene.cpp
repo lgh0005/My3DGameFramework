@@ -19,6 +19,8 @@
 #include "Graphics/Geometry.h"
 #include "Audios/AudioClip.h"
 
+#include "Misc/IBLUtils.h"
+
 #include "Components/Camera.h"
 #include "Components/Transform.h"
 #include "Components/MeshRenderer.h"
@@ -33,6 +35,7 @@
 #include "URPSample/RenderPasses/SphericalToCubePass.h"
 #include "URPSample/RenderPasses/HDRSkyboxPass.h"
 #include "SRPSample/Scripts/CameraController.h"
+
 
 PBRScene::~PBRScene() = default;
 
@@ -84,72 +87,14 @@ bool PBRScene::LoadNessesaryResources()
 		RESOURCE.AddResource<Material>("hdrCubeMat", std::move(hdrCubeMat));
 	}
 
-	// Equirectangular HDR -> Cubemap 변환
-	// TODO : 이후에 HDR Skybox pass 내에서 수행되어야 할 작업 중 하나.
+	// HDR Skybox 생성 (IBLUtils 사용)
 	{
-		// (1) 리소스 준비
-		auto cubeMesh = RESOURCE.GetResource<Mesh>("Cube");
-		auto hdrMat = RESOURCE.GetResource<Material>("hdrCubeMat");
-		auto hdrTexture = hdrMat->diffuse; // 위에서 로드한 HDR 텍스쳐
-
-		// (2) 베이킹용 임시 쉐이더 생성
-		auto sphericalProgram = Program::Create
-		(
-			"./Resources/Shaders/Universal/spherical_map.vert",
-			"./Resources/Shaders/Universal/spherical_map.frag"
-		);
-
-		if (sphericalProgram)
-		{
-			// (3) 결과물을 담을 빈 큐브맵 생성 (512x512, RGB16F)
-			// 해상도를 높이고 싶다면 1024, 2048 등으로 높이면 됨
-			CubeTexturePtr envCubemap = CubeTexture::Create(2048, 2048, GL_RGB16F, GL_FLOAT);
-
-			// (4) 캡처용 FBO 생성
-			auto captureFBO = CubeFramebuffer::Create(envCubemap);
-
-			// (5) 캡처 행렬 설정 (90도 FOV, 1.0 Aspect)
-			glm::mat4 captureProjection = glm::perspective(glm::radians(90.0f), 1.0f, 0.1f, 10.0f);
-			std::vector<glm::mat4> captureViews =
-			{
-				glm::lookAt(glm::vec3(0.0f), glm::vec3(1.0f,  0.0f,  0.0f), glm::vec3(0.0f, -1.0f,  0.0f)), // +X
-				glm::lookAt(glm::vec3(0.0f), glm::vec3(-1.0f, 0.0f,  0.0f), glm::vec3(0.0f, -1.0f,  0.0f)), // -X
-				glm::lookAt(glm::vec3(0.0f), glm::vec3(0.0f,  1.0f,  0.0f), glm::vec3(0.0f,  0.0f,  1.0f)), // +Y
-				glm::lookAt(glm::vec3(0.0f), glm::vec3(0.0f, -1.0f,  0.0f), glm::vec3(0.0f,  0.0f, -1.0f)), // -Y
-				glm::lookAt(glm::vec3(0.0f), glm::vec3(0.0f,  0.0f,  1.0f), glm::vec3(0.0f, -1.0f,  0.0f)), // +Z
-				glm::lookAt(glm::vec3(0.0f), glm::vec3(0.0f,  0.0f, -1.0f), glm::vec3(0.0f, -1.0f,  0.0f))  // -Z
-			};
-
-			// (6) 렌더링 설정
-			sphericalProgram->Use();
-			sphericalProgram->SetUniform("tex", 0);
-			glActiveTexture(GL_TEXTURE0);
-			hdrTexture->Bind();
-
-			glViewport(0, 0, 2048, 2048); // [중요] 큐브맵 크기에 맞춤
-			captureFBO->Bind();
-
-			// (7) 6면 렌더링 루프
-			glDisable(GL_CULL_FACE);
-			for (int i = 0; i < 6; ++i)
-			{
-				sphericalProgram->SetUniform("transform", captureProjection * captureViews[i]);
-				captureFBO->Bind(i); // FBO 타겟 변경
-				glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-				cubeMesh->Draw(sphericalProgram.get()); // 큐브 그리기
-			}
-			glEnable(GL_CULL_FACE);
-
-			// (8) 정리 및 등록
-			CubeFramebuffer::BindToDefault();
-			glViewport(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT); // 뷰포트 원상복구
-
-			// 씬의 SkyboxTexture로 등록 (소유권 이동)
-			SetSkyboxTexture(std::move(envCubemap));
-		}
+		auto hdrImage = Image::LoadHDR("./Resources/Images/IBL/mirrored_hall_4k.hdr");
+		auto hdrTex = Texture::CreateFromHDR(hdrImage.get());
+		auto bakedCubemap = IBLUtils::CreateCubemapFromHDR(hdrTex.get());
+		if (bakedCubemap) SetSkyboxTexture(std::move(bakedCubemap));
 	}
-
+	
 	return true;
 }
 

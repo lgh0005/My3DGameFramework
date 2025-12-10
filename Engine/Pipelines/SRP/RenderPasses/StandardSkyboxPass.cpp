@@ -1,5 +1,5 @@
 #include "EnginePch.h"
-#include "SkyboxPass.h"
+#include "StandardSkyboxPass.h"
 
 #include "Core/Scene.h"
 #include "Core/RenderContext.h"
@@ -12,19 +12,19 @@
 
 #include "Pipelines/SRP/StandardRenderContext.h"
 
-SkyboxPassUPtr SkyboxPass::Create()
+StandardSkyboxPassUPtr StandardSkyboxPass::Create()
 {
-	auto pass = SkyboxPassUPtr(new SkyboxPass());
+	auto pass = StandardSkyboxPassUPtr(new StandardSkyboxPass());
 	if (!pass->Init()) return nullptr;
 	return std::move(pass);
 }
 
-bool SkyboxPass::Init()
+bool StandardSkyboxPass::Init()
 {
 	m_skyboxProgram = Program::Create
 	(
-		"./Resources/Shaders/Common/Common_Sky_Skybox.vert",
-		"./Resources/Shaders/Common/Common_Sky_Skybox.frag"
+		"./Resources/Shaders/Standard/Standard_Sky_Skybox.vert",
+		"./Resources/Shaders/Standard/Standard_Sky_Skybox.frag"
 	);
 	if (!m_skyboxProgram) return false;
 
@@ -34,13 +34,11 @@ bool SkyboxPass::Init()
 	return true;
 };
 
-void SkyboxPass::Render(RenderContext* context)
+void StandardSkyboxPass::Render(RenderContext* context)
 {
 	// 0. 자신의 렌더 패스에 활용되고 있는 RenderContext로 캐스팅
 	auto stdCtx = (StandardRenderContext*)context;
-	auto camera = context->GetCamera();
-	auto skybox = nullptr;
-
+	auto camera = stdCtx->GetCamera();
 	auto skyTexture = stdCtx->GetSkyboxTexture();
 	if (!skyTexture) return;
 

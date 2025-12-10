@@ -33,6 +33,8 @@ void CullingPass::Render(RenderContext* context)
     m_frustum->Update(camera->GetViewProjectionMatrix());
 
     // 2. Static Mesh Renderer 컬링
+    // TODO : 최적화가 가능한 요소로 옥트트리와 같은 공간 분할로
+    // 절두체 범위에 들어가는 대상들을 빠르게 탐색 가능 (O(logn))
     for (auto* renderer : scene->GetStaticMeshRenderers())
     {
         // O(N) 선형 검사: CheckBounds가 성공하면 (화면에 보이거나 걸쳐 있으면)

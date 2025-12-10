@@ -3,11 +3,11 @@
 
 #include "Pipelines/Common/CullingPass.h"
 #include "Pipelines/Common/ShadowPass.h"
-#include "Pipelines/Common/SkyboxPass.h"
 #include "Pipelines/Common/SSAOPass.h"
 #include "Pipelines/SRP/RenderPasses/StandardPostProcessPass.h"
 #include "Pipelines/SRP/RenderPasses/StandardGeometryPass.h"
 #include "Pipelines/SRP/RenderPasses/StandardDeferredLightingPass.h"
+#include "Pipelines/SRP/RenderPasses/StandardSkyboxPass.h"
 #include "Pipelines/SRP/StandardGlobalUniforms.h"
 #include "Pipelines/SRP/StandardRenderContext.h"
 
@@ -48,7 +48,7 @@ bool StandardRenderPipeline::Init()
 	if (!m_shadowPass) return false;
 
 	// 스카이박스 패스 생성
-	m_skyboxPass = SkyboxPass::Create();
+	m_skyboxPass = StandardSkyboxPass::Create();
 	if (!m_skyboxPass) return false;
 
 	// SSAO 패스 생성

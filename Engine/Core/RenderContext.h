@@ -25,6 +25,10 @@ public:
 	const std::vector<MeshRenderer*>& GetSkinnedMeshRenderers() const { return m_culledSkinnedMeshRenderers; }
 	const std::vector<Light*>& GetLights() const { return m_culledLights; }
 
+	void AddStaticMeshRenderer(MeshRenderer* renderer);
+	void AddSkinnedMeshRenderer(MeshRenderer* renderer);
+	void AddLight(Light* light);
+
 protected: 
 	Scene*  m_currentScene	   { nullptr };
 	Camera* m_currentCamera	   { nullptr };

@@ -1,8 +1,22 @@
 #pragma once
 #include "Core/RenderContext.h"
 
+#pragma region FORWARD_DECLARATION
+CLASS_PTR(Framebuffer)
+CLASS_PTR(MeshRenderer)
+CLASS_PTR(Light)
+CLASS_PTR(Texture)
+CLASS_PTR(CubeTexture)
+#pragma endregion
+
 class UniversalRenderContext : public RenderContext
 {
-	// TODO : 여기에서는 렌더 패스들을 만들어보면서
-	// 생각을 해봐야 한다.
+public:
+	UniversalRenderContext() = default;
+
+	void SetSkyboxTexture(CubeTexture* texture) { m_skyboxTexture = texture; }
+	CubeTexture* GetSkyboxTexture() const { return m_skyboxTexture; }
+
+private:
+	CubeTexture* m_skyboxTexture{ nullptr };
 };
