@@ -1,4 +1,4 @@
-#include "EnginePch.h"
+ï»¿#include "EnginePch.h"
 #include "Geometry.h"
 #include "Graphics/Vertex.h"
 #include "Graphics/StaticMesh.h"
@@ -72,15 +72,15 @@ RenderBounds RenderBounds::Transform(const glm::mat4& mat) const
 
 RenderBounds RenderBounds::Union(const RenderBounds& other) const
 {
-    // 1. ÇöÀç bounds¸¦ Min/Max ÁÂÇ¥·Î º¯È¯
+    // 1. í˜„ìž¬ boundsë¥¼ Min/Max ì¢Œí‘œë¡œ ë³€í™˜
     glm::vec3 minA = m_center - m_extents;
     glm::vec3 maxA = m_center + m_extents;
 
-    // 2. other bounds¸¦ Min/Max ÁÂÇ¥·Î º¯È¯
+    // 2. other boundsë¥¼ Min/Max ì¢Œí‘œë¡œ ë³€í™˜
     glm::vec3 minB = other.m_center - other.m_extents;
     glm::vec3 maxB = other.m_center + other.m_extents;
 
-    // 3. µÎ Min/Max¸¦ ÇÕÃÄ¼­ »õ·Î¿î ÃÖÁ¾ Min/Max °è»ê (Union)
+    // 3. ë‘ Min/Maxë¥¼ í•©ì³ì„œ ìƒˆë¡œìš´ ìµœì¢… Min/Max ê³„ì‚° (Union)
     glm::vec3 newMin = Utils::Min(minA, minB);
     glm::vec3 newMax = Utils::Max(maxA, maxB);
 
@@ -197,6 +197,7 @@ StaticMeshUPtr GeometryGenerator::CreateNDCQuad()
         maxBound = Utils::Max(maxBound, v.position);
     }
 
+    // TODO : ì´ê±¸ ì»¬ë§ ëŒ€ìƒì— ë„£ëŠ”ê²Œ ë§žëŠ”ê±¸ê¹Œ?
     auto mesh = StaticMesh::Create(vertices, indices, GL_TRIANGLES);
     mesh->SetLocalBounds(RenderBounds::CreateFromMinMax(minBound, maxBound));
     if (!mesh) return nullptr;
@@ -255,7 +256,7 @@ StaticMeshUPtr GeometryGenerator::CreateSphere
         }
     }
 
-    // 3. ¹Ù¿îµù ¹Ú½º(AABB) °è»ê
+    // 3. ë°”ìš´ë”© ë°•ìŠ¤(AABB) ê³„ì‚°
     glm::vec3 minBound(FLT_MAX);
     glm::vec3 maxBound(-FLT_MAX);
     for (const auto& v : vertices)

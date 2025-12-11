@@ -45,7 +45,8 @@ struct Material {
 uniform Material material;
 
 layout(binding = 10) uniform samplerCube irradianceMap;
-layout(binding = 11) uniform sampler2D   brdf;
+layout(binding = 11) uniform samplerCube prefilterMap;
+layout(binding = 12) uniform sampler2D   brdf;
 uniform int useIBL; // 잠시 차이를 비교하기 위한 임시 유니폼
 
 const float PI = 3.14159265359;
@@ -107,6 +108,8 @@ void main()
     vec3 N = normalize(Normal); 
     
     vec3 V = normalize(viewPos - FragPos);
+
+    vec3 R = reflect(-V, N);
 
     // F0 설정
     vec3 F0 = vec3(0.04); 
@@ -187,21 +190,30 @@ void main()
 
     if (useIBL > 0) 
     {
-        // [ON] Diffuse IBL (Irradiance Map) 적용
-        
-        // 1. IBL용 kS (Fresnel) 계산
+        // 1. Fresnel (Roughness 고려)
         vec3 kS = FresnelSchlickRoughness(max(dot(N, V), 0.0), F0, roughness);
-        
-        // 2. kD (Diffuse 비율) 계산
         vec3 kD = 1.0 - kS;
-        kD *= (1.0 - metallic); // 금속은 Diffuse 0
+        kD *= (1.0 - metallic);
         
-        // 3. Irradiance Map 샘플링
+        // 2. Diffuse IBL (Irradiance Map)
         vec3 irradiance = texture(irradianceMap, N).rgb;
         vec3 diffuse    = irradiance * albedo;
         
-        // 4. 최종 Ambient
-        ambient = (kD * diffuse) * ao;
+        // 3. Specular IBL (Prefiltered Map + BRDF LUT)
+        // MAX_REFLECTION_LOD: Prefilter 맵을 만들 때 설정한 Mip Level 단계 수와 맞춰야 함 (보통 4.0 or 5.0)
+        const float MAX_REFLECTION_LOD = 4.0; 
+        
+        // 거칠기(Roughness)에 따라 Mipmap 레벨을 선택해서 흐릿한 환경맵 샘플링
+        vec3 prefilteredColor = textureLod(prefilterMap, R, roughness * MAX_REFLECTION_LOD).rgb;
+        
+        // BRDF LUT에서 Scale(x)과 Bias(y) 값을 가져옴
+        vec2 brdf  = texture(brdf, vec2(max(dot(N, V), 0.0), roughness)).rg;
+        
+        // Split Sum Approximation 결합
+        vec3 specular = prefilteredColor * (kS * brdf.x + brdf.y);
+        
+        // 4. 최종 Ambient 결합 (Diffuse + Specular) * AO
+        ambient = (kD * diffuse + specular) * ao;
     }
     else
     {
@@ -221,6 +233,6 @@ void main()
     FragColor = vec4(color, 1.0);
 
     // [DEBUG]
-    vec2 debugBRDF = texture(brdf, TexCoords).rg;
-    FragColor = vec4(debugBRDF, 0.0, 1.0);
+   //  vec2 debugBRDF = texture(brdf, TexCoords).rg;
+    // FragColor = vec4(debugBRDF, 0.0, 1.0);
 }

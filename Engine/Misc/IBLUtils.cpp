@@ -1,4 +1,4 @@
-#include "EnginePch.h"
+ï»¿#include "EnginePch.h"
 #include "IBLUtils.h"
 #include "Graphics/Program.h"
 #include "Graphics/Mesh.h"
@@ -10,7 +10,7 @@
 
 CubeTexturePtr IBLUtils::CreateCubemapFromHDR(Texture* hdrTexture, int32 resolution)
 {
-	// ÀÏÈ¸¿ë À¯Æ¿¼º ½¦ÀÌ´õ ·Îµå
+	// ì¼íšŒìš© ìœ í‹¸ì„± ì‰ì´ë” ë¡œë“œ
 	auto sphericalToCubeProgram = Program::Create
 	(
 		"./Resources/Shaders/Utils/spherical_map.vert",
@@ -18,15 +18,15 @@ CubeTexturePtr IBLUtils::CreateCubemapFromHDR(Texture* hdrTexture, int32 resolut
 	);
 	if (!sphericalToCubeProgram) return nullptr;
 
-	// ÀÏÈ¸¿ë Å¥ºê ¸Ş½¬ »ı¼º
+	// ì¼íšŒìš© íë¸Œ ë©”ì‰¬ ìƒì„±
 	auto cubeMesh = GeometryGenerator::CreateBox();
 	if (!cubeMesh) return nullptr;
 
-	// °á°ú¹°À» ´ãÀ» Å¥ºê¸Ê »ı¼º
+	// ê²°ê³¼ë¬¼ì„ ë‹´ì„ íë¸Œë§µ ìƒì„±
 	CubeTexturePtr envCubemap = CubeTexture::Create(resolution, resolution, GL_RGB16F, GL_FLOAT);
 	if (!envCubemap) return nullptr;
 
-	// º£ÀÌÅ· ÁØºñ (FBO, Çà·Ä µî)
+	// ë² ì´í‚¹ ì¤€ë¹„ (FBO, í–‰ë ¬ ë“±)
 	auto captureFBO = CubeFramebuffer::Create(envCubemap);
 	glm::mat4 captureProjection = glm::perspective(glm::radians(90.0f), 1.0f, 0.1f, 10.0f);
 	std::vector<glm::mat4> captureViews =
@@ -39,7 +39,7 @@ CubeTexturePtr IBLUtils::CreateCubemapFromHDR(Texture* hdrTexture, int32 resolut
 		glm::lookAt(glm::vec3(0.0f), glm::vec3(0.0f,  0.0f, -1.0f), glm::vec3(0.0f, -1.0f,  0.0f))
 	};
 
-	// ·»´õ¸µ (ÀÏÈ¸¿ë ¸®¼Ò½º »ç¿ë)
+	// ë Œë”ë§ (ì¼íšŒìš© ë¦¬ì†ŒìŠ¤ ì‚¬ìš©)
 	sphericalToCubeProgram->Use();
 	sphericalToCubeProgram->SetUniform("tex", 0);
 	glActiveTexture(GL_TEXTURE0);
@@ -62,7 +62,7 @@ CubeTexturePtr IBLUtils::CreateCubemapFromHDR(Texture* hdrTexture, int32 resolut
 	CubeFramebuffer::BindToDefault();
 	glViewport(prevViewport[0], prevViewport[1], prevViewport[2], prevViewport[3]);
 
-	// 6. ¹Ó¸Ê »ı¼º
+	// 6. ë°‰ë§µ ìƒì„±
 	envCubemap->GenerateMipmap();
 
 	return envCubemap;
@@ -70,7 +70,7 @@ CubeTexturePtr IBLUtils::CreateCubemapFromHDR(Texture* hdrTexture, int32 resolut
 
 CubeTexturePtr IBLUtils::CreateIrradianceMap(CubeTexture* src)
 {
-	// ÀÏÈ¸¿ë À¯Æ¿¼º ½¦ÀÌ´õ ·Îµå
+	// ì¼íšŒìš© ìœ í‹¸ì„± ì‰ì´ë” ë¡œë“œ
 	auto convolutionProgram = Program::Create
 	(
 		"./Resources/Shaders/Utils/spherical_map.vert",
@@ -78,16 +78,16 @@ CubeTexturePtr IBLUtils::CreateIrradianceMap(CubeTexture* src)
 	);
 	if (!convolutionProgram) return nullptr;
 
-	// ÀÏÈ¸¿ë Å¥ºê ¸Ş½¬ »ı¼º
+	// ì¼íšŒìš© íë¸Œ ë©”ì‰¬ ìƒì„±
 	auto cubeMesh = GeometryGenerator::CreateBox();
 	if (!cubeMesh) return nullptr;
 
-	// °á°ú¹°À» ´ãÀ» Å¥ºê¸Ê »ı¼º
+	// ê²°ê³¼ë¬¼ì„ ë‹´ì„ íë¸Œë§µ ìƒì„±
 	int32 resolution = 64;
 	CubeTexturePtr irradianceMap = CubeTexture::Create(resolution, resolution, GL_RGB16F, GL_FLOAT);
 	if (!irradianceMap) return nullptr;
 
-	// º£ÀÌÅ· ÁØºñ (FBO, Çà·Ä)
+	// ë² ì´í‚¹ ì¤€ë¹„ (FBO, í–‰ë ¬)
 	auto captureFBO = CubeFramebuffer::Create(irradianceMap);
 	glm::mat4 captureProjection = glm::perspective(glm::radians(90.0f), 1.0f, 0.1f, 10.0f);
 	std::vector<glm::mat4> captureViews =
@@ -100,7 +100,7 @@ CubeTexturePtr IBLUtils::CreateIrradianceMap(CubeTexture* src)
 		glm::lookAt(glm::vec3(0.0f), glm::vec3(0.0f,  0.0f, -1.0f), glm::vec3(0.0f, -1.0f,  0.0f))
 	};
 
-	// ·»´õ¸µ (ÀÏÈ¸¿ë ¸®¼Ò½º »ç¿ë)
+	// ë Œë”ë§ (ì¼íšŒìš© ë¦¬ì†ŒìŠ¤ ì‚¬ìš©)
 	convolutionProgram->Use();
 	convolutionProgram->SetUniform("cubeMap", 0);
 	glActiveTexture(GL_TEXTURE0);
@@ -133,7 +133,7 @@ CubeTexturePtr IBLUtils::CreatePrefilteredMap(CubeTexture* src)
 	GLint prevViewport[4];
 	glGetIntegerv(GL_VIEWPORT, prevViewport);
 
-	// ÀÏÈ¸¿ë À¯Æ¿¼º ½¦ÀÌ´õ ·Îµå
+	// ì¼íšŒìš© ìœ í‹¸ì„± ì‰ì´ë” ë¡œë“œ
 	auto preFilteredProgram = Program::Create
 	(
 		"./Resources/Shaders/Utils/spherical_map.vert",
@@ -211,27 +211,25 @@ TexturePtr IBLUtils::CreateBRDFLUT()
 
 	lookupFramebuffer->Bind();
 
-	// 1. ³ë¶õ»ö Å¬¸®¾î
-	glClearColor(1.0f, 1.0f, 0.0f, 1.0f);
-	glClear(GL_COLOR_BUFFER_BIT);
-
-	// 2. ¡Ú¸ğµç ¹æÇØ ¿ä¼Ò ²ô±â¡Ú
+	// TEMP : brdfLookUpTextureë¥¼ ë§Œë“¤ê¸° ìœ„í•œ í•˜ë“œì½”ë“œ
+	// TODO : ì´í›„ì— ì´ë¥¼ ë”°ë¡œ ëº„ì§€ ê·¸ëŒ€ë¡œ ë‘˜ ì§€ì— ëŒ€í•œ ê³ ë¯¼ í•„ìš”.
+	// ì›¬ë§Œí•˜ë©´ ìƒˆë¡œìš´ Vertex ë°ì´í„° êµ¬ì¡°ì²´ë¥¼ í•˜ë‚˜ íŒŒê³  GeometryGeneratorì—
+	// ì½”ë“œë¥¼ ì˜®ê¸°ëŠ” ìª½ì„ ê³ ë ¤
 	glDisable(GL_DEPTH_TEST);
 	glDisable(GL_CULL_FACE);
 	glDisable(GL_BLEND);
 	glDepthMask(GL_FALSE);
 
 	brdfProgram->Use();
-	// Çà·Ä Àü¼Û ºÒÇÊ¿ä (È­¸é ÁÂÇ¥¿¡ Á÷Á¢ ±×¸²)
 
-	// 3. ¼öµ¿ Äõµå (ÀÎµ¦½º µå·ÎÀ× Àû¿ë: Á¤Á¡ 4°³ + ÀÎµ¦½º 6°³)
+	// 3. ìˆ˜ë™ ì¿¼ë“œ (ì¸ë±ìŠ¤ ë“œë¡œì‰ ì ìš©: ì •ì  4ê°œ + ì¸ë±ìŠ¤ 6ê°œ)
 	static unsigned int quadVAO = 0;
 	static unsigned int quadVBO = 0;
-	static unsigned int quadEBO = 0; // ÀÎµ¦½º ¹öÆÛ Ãß°¡
+	static unsigned int quadEBO = 0; // ì¸ë±ìŠ¤ ë²„í¼ ì¶”ê°€
 
 	if (quadVAO == 0)
 	{
-		// Áßº¹ Á¦°ÅµÈ 4°³ÀÇ Á¤Á¡ (Pos + UV)
+		// ì¤‘ë³µ ì œê±°ëœ 4ê°œì˜ ì •ì  (Pos + UV)
 		float quadVertices[] = {
 			// Pos(x,y,z)        // UV(u,v)
 			-1.0f,  1.0f, 0.0f,  0.0f, 1.0f, // 0: Top-Left
@@ -240,43 +238,40 @@ TexturePtr IBLUtils::CreateBRDFLUT()
 			 1.0f, -1.0f, 0.0f,  1.0f, 0.0f  // 3: Bottom-Right
 		};
 
-		// ±×¸®´Â ¼ø¼­ (CCW)
+		// ì¸ë±ì‹±
 		unsigned int quadIndices[] = {
-			0, 1, 2, // Ã¹ ¹øÂ° »ï°¢Çü (TL -> BL -> TR)
-			2, 1, 3  // µÎ ¹øÂ° »ï°¢Çü (TR -> BL -> BR)
+			0, 1, 2, // ì²« ë²ˆì§¸ ì‚¼ê°í˜• (TL -> BL -> TR)
+			2, 1, 3  // ë‘ ë²ˆì§¸ ì‚¼ê°í˜• (TR -> BL -> BR)
 		};
 
 		glGenVertexArrays(1, &quadVAO);
 		glGenBuffers(1, &quadVBO);
-		glGenBuffers(1, &quadEBO); // EBO »ı¼º
+		glGenBuffers(1, &quadEBO); // EBO ìƒì„±
 
 		glBindVertexArray(quadVAO);
 
-		// VBO ¼³Á¤
+		// VBO ì„¤ì •
 		glBindBuffer(GL_ARRAY_BUFFER, quadVBO);
 		glBufferData(GL_ARRAY_BUFFER, sizeof(quadVertices), quadVertices, GL_STATIC_DRAW);
 
-		// EBO ¼³Á¤ (VAO°¡ ¹ÙÀÎµùµÈ »óÅÂ¿¡¼­ ÇØ¾ß ÇÔ)
+		// EBO ì„¤ì • (VAOê°€ ë°”ì¸ë”©ëœ ìƒíƒœì—ì„œ í•´ì•¼ í•¨)
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, quadEBO);
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(quadIndices), quadIndices, GL_STATIC_DRAW);
 
-		// Attribute ¼³Á¤
+		// Attribute ì„¤ì •
 		// 0: Position
 		glEnableVertexAttribArray(0);
 		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
 
-		// 2: TexCoord (½¦ÀÌ´õ layout 2¹ø)
+		// 2: TexCoord (ì‰ì´ë” layout 2ë²ˆ)
 		glEnableVertexAttribArray(2);
 		glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
 	}
 
 	glBindVertexArray(quadVAO);
-	// ¡Ú DrawArrays -> DrawElements·Î º¯°æ
-	// (¸ğµå, °³¼ö(ÀÎµ¦½º °³¼ö 6), Å¸ÀÔ, ¿ÀÇÁ¼Â)
 	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-	glBindVertexArray(0);
 
-	// º¹±¸
+	// ë³µêµ¬
 	Framebuffer::BindToDefault();
 	glViewport(prevViewport[0], prevViewport[1], prevViewport[2], prevViewport[3]);
 	glEnable(GL_DEPTH_TEST);
@@ -285,137 +280,3 @@ TexturePtr IBLUtils::CreateBRDFLUT()
 
 	return lookupFramebuffer->GetColorAttachment(0);
 }
-
-//TexturePtr IBLUtils::CreateBRDFLUT() // ÀÏ´Ü ÀÛµ¿ È®ÀÎ
-//{
-//	const uint32 resolution = 512;
-//	GLint prevViewport[4];
-//	glGetIntegerv(GL_VIEWPORT, prevViewport);
-//	glViewport(0, 0, resolution, resolution);
-//
-//	auto brdfProgram = Program::Create(
-//		"./Resources/Shaders/Utils/brdf_lookup.vert",
-//		"./Resources/Shaders/Utils/brdf_lookup.frag"
-//	);
-//	if (!brdfProgram) return nullptr;
-//
-//	auto lookupFramebuffer = Framebuffer::CreateBRDFLUT(resolution, resolution);
-//	if (!lookupFramebuffer) return nullptr;
-//
-//	lookupFramebuffer->Bind();
-//
-//	// 1. ³ë¶õ»ö Å¬¸®¾î
-//	glClearColor(1.0f, 1.0f, 0.0f, 1.0f);
-//	glClear(GL_COLOR_BUFFER_BIT); // Depth´Â ÇÊ¿ä ¾øÀ½
-//
-//	// 2. ¡Ú¸ğµç ¹æÇØ ¿ä¼Ò ²ô±â¡Ú (¸Å¿ì Áß¿ä)
-//	glDisable(GL_DEPTH_TEST);
-//	glDisable(GL_CULL_FACE);  // µŞ¸éÀÌ¶ó¼­ ¾È ±×·ÁÁö´Â ¹®Á¦ ¹æÁö
-//	glDisable(GL_BLEND);      // ºí·»µù ²¿ÀÓ ¹æÁö
-//	glDepthMask(GL_FALSE);    // ±íÀÌ ¾²±â ±İÁö
-//
-//	brdfProgram->Use();
-//	// brdfProgram->SetUniform("transform", ...); // <--- »èÁ¦! ½¦ÀÌ´õ¿¡¼­µµ »°À¸´Ï±î ¾È º¸³¿.
-//
-//	// 3. ¼öµ¿ Äõµå (GL_TRIANGLES »ç¿ë - Stripº¸´Ù ¾ÈÀü)
-//	static unsigned int quadVAO = 0;
-//	static unsigned int quadVBO;
-//
-//	if (quadVAO == 0)
-//	{
-//		// Pos(3) + UV(2)
-//		float quadVertices[] = {
-//			// Triangle 1
-//			-1.0f,  1.0f, 0.0f,   0.0f, 1.0f, // TL
-//			-1.0f, -1.0f, 0.0f,   0.0f, 0.0f, // BL
-//			 1.0f,  1.0f, 0.0f,   1.0f, 1.0f, // TR
-//			 // Triangle 2
-//			  1.0f,  1.0f, 0.0f,   1.0f, 1.0f, // TR
-//			 -1.0f, -1.0f, 0.0f,   0.0f, 0.0f, // BL
-//			  1.0f, -1.0f, 0.0f,   1.0f, 0.0f  // BR
-//		};
-//
-//		glGenVertexArrays(1, &quadVAO);
-//		glGenBuffers(1, &quadVBO);
-//		glBindVertexArray(quadVAO);
-//		glBindBuffer(GL_ARRAY_BUFFER, quadVBO);
-//		glBufferData(GL_ARRAY_BUFFER, sizeof(quadVertices), &quadVertices, GL_STATIC_DRAW);
-//
-//		glEnableVertexAttribArray(0);
-//		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
-//
-//		glEnableVertexAttribArray(2); // Layout 2¹ø È®ÀÎ
-//		glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
-//	}
-//
-//	glBindVertexArray(quadVAO);
-//	glDrawArrays(GL_TRIANGLES, 0, 6); // 6°³ Á¤Á¡ ±×¸®±â
-//	glBindVertexArray(0);
-//
-//	// º¹±¸
-//	Framebuffer::BindToDefault();
-//	glViewport(prevViewport[0], prevViewport[1], prevViewport[2], prevViewport[3]);
-//	glEnable(GL_DEPTH_TEST);
-//	glEnable(GL_CULL_FACE);
-//	glDepthMask(GL_TRUE); // ¸¶½ºÅ© º¹±¸ Áß¿ä
-//
-//	return lookupFramebuffer->GetColorAttachment(0);
-//}
-
-//TexturePtr IBLUtils::CreateBRDFLUT()
-//{
-//	// BRDF LUT´Â Á¤¹Ğµµ°¡ Áß¿äÇÏ¹Ç·Î 512 ÃßÃµ (°­ÀÇ¿Í µ¿ÀÏ)
-//	const uint32 resolution = 512;
-//
-//	GLint prevViewport[4];
-//	glGetIntegerv(GL_VIEWPORT, prevViewport);
-//	glViewport(0, 0, resolution, resolution);
-//
-//	// 1. ½¦ÀÌ´õ ·Îµå
-//	auto brdfProgram = Program::Create
-//	(
-//		"./Resources/Shaders/Utils/brdf_lookup.vert", // uniform mat4 transform; ÀÌ ÀÖ¾î¾ß ÇÔ
-//		"./Resources/Shaders/Utils/brdf_lookup.frag"
-//	);
-//	if (!brdfProgram) return nullptr;
-//
-//	// 2. Æò¸é ¸Ş½¬ »ı¼º (±âº» Å©±â 1x1, Áß¾Ó Á¤·Ä)
-//	auto ndcQuad = GeometryGenerator::CreatePlane();
-//
-//	// 3. FBO »ı¼º
-//	auto lookupFramebuffer = Framebuffer::CreateBRDFLUT(resolution, resolution);
-//	if (!lookupFramebuffer) return nullptr;
-//
-//	lookupFramebuffer->Bind();
-//
-//	// µğ¹ö±×¿ë ¹è°æ»ö (Á¦´ë·Î ±×·ÁÁö¸é ÀÌ »öÀº µ¤¿©¼­ ¾È º¸ÀÓ)
-//	glClearColor(1.0f, 1.0f, 0.0f, 1.0f);
-//	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-//
-//	// 4. »óÅÂ ¼³Á¤ (Áß¿ä)
-//	glDisable(GL_DEPTH_TEST);
-//	glDisable(GL_CULL_FACE);
-//
-//	brdfProgram->Use();
-//
-//	glm::mat4 transform = glm::scale(glm::mat4(1.0f), glm::vec3(2.0f, -2.0f, 2.0f));
-//	brdfProgram->SetUniform("transform", transform);
-//	ndcQuad->Draw(brdfProgram.get());
-//
-//	// 5. ÅØ½ºÃ³ ¼³Á¤
-//	TexturePtr resultTexture = lookupFramebuffer->GetColorAttachment(0);
-//	if (resultTexture)
-//	{
-//		resultTexture->SetWrap(GL_CLAMP_TO_EDGE, GL_CLAMP_TO_EDGE);
-//		resultTexture->SetFilter(GL_LINEAR, GL_LINEAR);
-//	}
-//
-//	// 6. º¹±¸
-//	Framebuffer::BindToDefault();
-//	glViewport(prevViewport[0], prevViewport[1], prevViewport[2], prevViewport[3]);
-//	glEnable(GL_DEPTH_TEST);
-//	glEnable(GL_CULL_FACE);
-//	glClearColor(0.1f, 0.1f, 0.1f, 1.0f); // ¿ø·¡ ¹è°æ»öÀ¸·Î º¹±¸
-//
-//	return resultTexture;
-//}

@@ -40,22 +40,33 @@ void HDRRenderPass::Render(Scene* scene, Camera* camera)
 {
     m_simpleProgram->Use();
 
-    // Irradiance 적용
-    auto* irradianceMap = scene->GetIrradianceTexture();
-    if (irradianceMap)
     {
-        glActiveTexture(GL_TEXTURE10);
-        irradianceMap->Bind();
-        m_simpleProgram->SetUniform("irradianceMap", 10);
-    }
+        // Irradiance 적용
+        auto* irradianceMap = scene->GetIrradianceTexture();
+        if (irradianceMap)
+        {
+            glActiveTexture(GL_TEXTURE10);
+            irradianceMap->Bind();
+            m_simpleProgram->SetUniform("irradianceMap", 10);
+        }
 
-    // BRDF 적용
-    auto* brdf = scene->GetBRDFLookUpTexture();
-    if (brdf)
-    {
-        glActiveTexture(GL_TEXTURE11);
-        brdf->Bind();
-        m_simpleProgram->SetUniform("brdf", 11);
+        // prefilter 적용
+        auto* prefilter = scene->GetPrefilteredTexture();
+        if (prefilter)
+        {
+            glActiveTexture(GL_TEXTURE11);
+            prefilter->Bind();
+            m_simpleProgram->SetUniform("prefilterMap", 11);
+        }
+
+        // BRDF 적용
+        auto* brdf = scene->GetBRDFLookUpTexture();
+        if (brdf)
+        {
+            glActiveTexture(GL_TEXTURE12);
+            brdf->Bind();
+            m_simpleProgram->SetUniform("brdf", 12);
+        } 
     }
 
     // 모델 그리기
