@@ -18,8 +18,8 @@ add_executable(Game
     # Univeral Render Pipeline Sample Scene
     "URPSample/DevScene/PBRScene.h"    "URPSample/DevScene/PBRScene.cpp"
     "URPSample/RenderPasses/HDRRenderPass.h"   "URPSample/RenderPasses/HDRRenderPass.cpp"
-    "URPSample/RenderPasses/SphericalToCubePass.h"   "URPSample/RenderPasses/SphericalToCubePass.cpp"
-    "URPSample/RenderPasses/HDRSkyboxPass.h"    "URPSample/RenderPasses/HDRSkyboxPass.cpp"
+    #"URPSample/RenderPasses/SphericalToCubePass.h"   "URPSample/RenderPasses/SphericalToCubePass.cpp"
+    #"URPSample/RenderPasses/HDRSkyboxPass.h"    "URPSample/RenderPasses/HDRSkyboxPass.cpp"
 
  )
 

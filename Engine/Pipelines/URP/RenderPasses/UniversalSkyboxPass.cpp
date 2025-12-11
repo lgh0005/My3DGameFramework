@@ -50,7 +50,7 @@ void UniversalSkyboxPass::Render(RenderContext* context)
 	auto view = camera->GetViewMatrix();
 
 	glDepthFunc(GL_LEQUAL);  // 깊이가 1.0(초기값)인 곳에도 그려지도록
-	glDepthMask(GL_FALSE);   // 깊이 버퍼 쓰기 금지
+	glCullFace(GL_FRONT);
 
 	m_hdrSkyboxProgram->Use();
 	m_hdrSkyboxProgram->SetUniform("view", view);
@@ -64,7 +64,7 @@ void UniversalSkyboxPass::Render(RenderContext* context)
 	m_cubeMesh->Draw(m_hdrSkyboxProgram.get());
 
 	// 상태 복구
+	glCullFace(GL_BACK);
 	glDepthFunc(GL_LESS);
-	glDepthMask(GL_TRUE);
 }
 

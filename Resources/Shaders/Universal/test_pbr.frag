@@ -36,11 +36,11 @@ layout (std140, binding = 1) uniform LightData
 
 // [Material] 텍스처 슬롯 기반 (C++ SetToProgram과 매칭)
 struct Material {
-    sampler2D albedoMap;    // Slot 0
-    sampler2D normalMap;    // Slot 3
-    sampler2D metallicMap;  // Slot 6
-    sampler2D roughnessMap; // Slot 7
-    sampler2D aoMap;        // Slot 5
+    sampler2D diffuse;    // Slot 0
+    sampler2D normal;    // Slot 3
+    sampler2D metallic;  // Slot 6
+    sampler2D roughness; // Slot 7
+    sampler2D ao;        // Slot 5
 };
 uniform Material material;
 
@@ -91,13 +91,13 @@ void main()
 {
     // 1. Material 속성 읽기 (텍스처에서 샘플링)
     // Albedo는 sRGB -> Linear 변환
-    vec3 albedo     = pow(texture(material.albedoMap, TexCoords).rgb, vec3(2.2));
-    float metallic  = texture(material.metallicMap, TexCoords).r;
-    float roughness = texture(material.roughnessMap, TexCoords).r;
-    float ao        = texture(material.aoMap, TexCoords).r;
+    vec3 albedo     = pow(texture(material.diffuse, TexCoords).rgb, vec3(2.2));
+    float metallic  = texture(material.metallic, TexCoords).r;
+    float roughness = texture(material.roughness, TexCoords).r;
+    float ao        = texture(material.ao, TexCoords).r;
 
     // Normal Map 처리
-    vec3 normValue = texture(material.normalMap, TexCoords).rgb;
+    vec3 normValue = texture(material.normal, TexCoords).rgb;
     normValue = normalize(normValue * 2.0 - 1.0);
     // (간이 TBN: 실제로는 Vertex Shader에서 TBN을 넘겨받는 게 정확함)
     // 여기서는 일단 World Normal을 그대로 사용한다고 가정하거나,

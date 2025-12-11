@@ -26,13 +26,12 @@ bool HDRRenderPass::Init(ProgramUPtr program)
     // 텍스처 슬롯 번호는 변하지 않으므로 한 번만 세팅
     // TODO : SRP도 이렇게 수정하기. 
     m_simpleProgram->Use();
-    m_simpleProgram->SetUniform("material.albedoMap", (int)TextureSlot::SLOT_ALBEDO);
-    m_simpleProgram->SetUniform("material.normalMap", (int)TextureSlot::SLOT_NORMAL);
-    m_simpleProgram->SetUniform("material.metallicMap", (int)TextureSlot::SLOT_METALLIC);
-    m_simpleProgram->SetUniform("material.roughnessMap", (int)TextureSlot::SLOT_ROUGHNESS);
-    m_simpleProgram->SetUniform("material.aoMap", (int)TextureSlot::SLOT_AO);
-    m_simpleProgram->SetUniform("irradianceMap", 10);
-    m_simpleProgram->SetUniform("useIBL", 0);
+    m_simpleProgram->SetUniform("material.diffuse", (int)TextureSlot::SLOT_ALBEDO);
+    m_simpleProgram->SetUniform("material.normal", (int)TextureSlot::SLOT_NORMAL);
+    m_simpleProgram->SetUniform("material.metallic", (int)TextureSlot::SLOT_METALLIC);
+    m_simpleProgram->SetUniform("material.roughness", (int)TextureSlot::SLOT_ROUGHNESS);
+    m_simpleProgram->SetUniform("material.ao", (int)TextureSlot::SLOT_AO);
+    m_simpleProgram->SetUniform("useIBL", 1);
     return true;
 }
 
@@ -46,6 +45,7 @@ void HDRRenderPass::Render(Scene* scene, Camera* camera)
     {
         glActiveTexture(GL_TEXTURE10);
         irradianceMap->Bind();
+        m_simpleProgram->SetUniform("irradianceMap", 10);
     }
 
     // 모델 그리기

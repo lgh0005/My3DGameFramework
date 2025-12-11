@@ -73,7 +73,7 @@ CubeTexturePtr IBLUtils::CreateIrradianceMap(CubeTexture* src)
 	// 일회용 유틸성 쉐이더 로드
 	auto convolutionProgram = Program::Create
 	(
-		"./Resources/Shaders/Utils/diffuse_irradiance.vert", // spherical_map.vert랑 내용 같음
+		"./Resources/Shaders/Utils/spherical_map.vert",
 		"./Resources/Shaders/Utils/diffuse_irradiance.frag"
 	);
 	if (!convolutionProgram) return nullptr;
