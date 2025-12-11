@@ -12,6 +12,7 @@ public:
 	static FramebufferUPtr Create(int32 width, int32 height, int32 samples = 4);
 	static FramebufferUPtr CreateGBuffer(int32 width, int32 height);
 	static FramebufferUPtr CreateSSAO(int32 width, int32 height);
+	static FramebufferUPtr CreateBRDFLUT(int32 width, int32 height);
 	static void BindToDefault();
 	~Framebuffer();
 
@@ -28,6 +29,7 @@ private:
 	bool Init(int32 width, int32 height, int32 samples);
 	bool InitGBuffer(int32 width, int32 height);
 	bool InitSSAO(int32 width, int32 height);
+	bool InitBRDFLUT(int32 width, int32 height);
 
 	int32 m_width						{ 0 };
 	int32 m_height						{ 0 };

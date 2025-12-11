@@ -6,6 +6,7 @@
 #include "Graphics/Mesh.h"
 #include "Graphics/Material.h"
 #include "Graphics/CubeTexture.h"
+#include "Graphics/Texture.h"
 #include "Components/Camera.h"
 #include "Components/MeshRenderer.h"
 #include "Components/Transform.h"
@@ -46,6 +47,15 @@ void HDRRenderPass::Render(Scene* scene, Camera* camera)
         glActiveTexture(GL_TEXTURE10);
         irradianceMap->Bind();
         m_simpleProgram->SetUniform("irradianceMap", 10);
+    }
+
+    // BRDF 적용
+    auto* brdf = scene->GetBRDFLookUpTexture();
+    if (brdf)
+    {
+        glActiveTexture(GL_TEXTURE11);
+        brdf->Bind();
+        m_simpleProgram->SetUniform("brdf", 11);
     }
 
     // 모델 그리기

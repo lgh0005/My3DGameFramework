@@ -105,8 +105,10 @@ bool PBRScene::LoadNessesaryResources()
 		auto bakedCubemap = IBLUtils::CreateCubemapFromHDR(hdrTex.get());
 		auto bakedDiffuse = IBLUtils::CreateIrradianceMap(bakedCubemap.get());
 		auto prefiltered = IBLUtils::CreatePrefilteredMap(bakedCubemap.get());
+		auto brdf = IBLUtils::CreateBRDFLUT();
 		SetSkyboxTexture(std::move(prefiltered));
 		SetIrradianceTexture(std::move(bakedDiffuse));
+		SetBRDFLookUpTexture(std::move(brdf));
 		// SetPrefilteredTexture(std::move(prefiltered));
 	}
 	

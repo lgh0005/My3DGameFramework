@@ -21,5 +21,5 @@ public:
 
     // 4. Specular용 (BRDF LUT) 생성
     // 2D 텍스처 하나 리턴
-    // static TexturePtr CreateBRDFLUT();
+    static TexturePtr CreateBRDFLUT();
 };

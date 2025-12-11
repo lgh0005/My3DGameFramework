@@ -44,7 +44,8 @@ struct Material {
 };
 uniform Material material;
 
-uniform samplerCube irradianceMap;
+layout(binding = 10) uniform samplerCube irradianceMap;
+layout(binding = 11) uniform sampler2D   brdf;
 uniform int useIBL; // 잠시 차이를 비교하기 위한 임시 유니폼
 
 const float PI = 3.14159265359;
@@ -218,4 +219,8 @@ void main()
     color = pow(color, vec3(1.0/2.2)); 
 
     FragColor = vec4(color, 1.0);
+
+    // [DEBUG]
+    vec2 debugBRDF = texture(brdf, TexCoords).rg;
+    FragColor = vec4(debugBRDF, 0.0, 1.0);
 }

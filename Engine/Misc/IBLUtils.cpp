@@ -6,6 +6,7 @@
 #include "Graphics/CubeTexture.h"
 #include "Graphics/CubeFramebuffer.h"
 #include "Graphics/Texture.h"
+#include "Graphics/FrameBuffer.h"
 
 CubeTexturePtr IBLUtils::CreateCubemapFromHDR(Texture* hdrTexture, int32 resolution)
 {
@@ -191,3 +192,230 @@ CubeTexturePtr IBLUtils::CreatePrefilteredMap(CubeTexture* src)
 
 	return preFilteredMap;
 }
+
+TexturePtr IBLUtils::CreateBRDFLUT()
+{
+	const uint32 resolution = 512;
+	GLint prevViewport[4];
+	glGetIntegerv(GL_VIEWPORT, prevViewport);
+	glViewport(0, 0, resolution, resolution);
+
+	auto brdfProgram = Program::Create(
+		"./Resources/Shaders/Utils/brdf_lookup.vert",
+		"./Resources/Shaders/Utils/brdf_lookup.frag"
+	);
+	if (!brdfProgram) return nullptr;
+
+	auto lookupFramebuffer = Framebuffer::CreateBRDFLUT(resolution, resolution);
+	if (!lookupFramebuffer) return nullptr;
+
+	lookupFramebuffer->Bind();
+
+	// 1. 노란색 클리어
+	glClearColor(1.0f, 1.0f, 0.0f, 1.0f);
+	glClear(GL_COLOR_BUFFER_BIT);
+
+	// 2. ★모든 방해 요소 끄기★
+	glDisable(GL_DEPTH_TEST);
+	glDisable(GL_CULL_FACE);
+	glDisable(GL_BLEND);
+	glDepthMask(GL_FALSE);
+
+	brdfProgram->Use();
+	// 행렬 전송 불필요 (화면 좌표에 직접 그림)
+
+	// 3. 수동 쿼드 (인덱스 드로잉 적용: 정점 4개 + 인덱스 6개)
+	static unsigned int quadVAO = 0;
+	static unsigned int quadVBO = 0;
+	static unsigned int quadEBO = 0; // 인덱스 버퍼 추가
+
+	if (quadVAO == 0)
+	{
+		// 중복 제거된 4개의 정점 (Pos + UV)
+		float quadVertices[] = {
+			// Pos(x,y,z)        // UV(u,v)
+			-1.0f,  1.0f, 0.0f,  0.0f, 1.0f, // 0: Top-Left
+			-1.0f, -1.0f, 0.0f,  0.0f, 0.0f, // 1: Bottom-Left
+			 1.0f,  1.0f, 0.0f,  1.0f, 1.0f, // 2: Top-Right
+			 1.0f, -1.0f, 0.0f,  1.0f, 0.0f  // 3: Bottom-Right
+		};
+
+		// 그리는 순서 (CCW)
+		unsigned int quadIndices[] = {
+			0, 1, 2, // 첫 번째 삼각형 (TL -> BL -> TR)
+			2, 1, 3  // 두 번째 삼각형 (TR -> BL -> BR)
+		};
+
+		glGenVertexArrays(1, &quadVAO);
+		glGenBuffers(1, &quadVBO);
+		glGenBuffers(1, &quadEBO); // EBO 생성
+
+		glBindVertexArray(quadVAO);
+
+		// VBO 설정
+		glBindBuffer(GL_ARRAY_BUFFER, quadVBO);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(quadVertices), quadVertices, GL_STATIC_DRAW);
+
+		// EBO 설정 (VAO가 바인딩된 상태에서 해야 함)
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, quadEBO);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(quadIndices), quadIndices, GL_STATIC_DRAW);
+
+		// Attribute 설정
+		// 0: Position
+		glEnableVertexAttribArray(0);
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
+
+		// 2: TexCoord (쉐이더 layout 2번)
+		glEnableVertexAttribArray(2);
+		glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
+	}
+
+	glBindVertexArray(quadVAO);
+	// ★ DrawArrays -> DrawElements로 변경
+	// (모드, 개수(인덱스 개수 6), 타입, 오프셋)
+	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+	glBindVertexArray(0);
+
+	// 복구
+	Framebuffer::BindToDefault();
+	glViewport(prevViewport[0], prevViewport[1], prevViewport[2], prevViewport[3]);
+	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_CULL_FACE);
+	glDepthMask(GL_TRUE);
+
+	return lookupFramebuffer->GetColorAttachment(0);
+}
+
+//TexturePtr IBLUtils::CreateBRDFLUT() // 일단 작동 확인
+//{
+//	const uint32 resolution = 512;
+//	GLint prevViewport[4];
+//	glGetIntegerv(GL_VIEWPORT, prevViewport);
+//	glViewport(0, 0, resolution, resolution);
+//
+//	auto brdfProgram = Program::Create(
+//		"./Resources/Shaders/Utils/brdf_lookup.vert",
+//		"./Resources/Shaders/Utils/brdf_lookup.frag"
+//	);
+//	if (!brdfProgram) return nullptr;
+//
+//	auto lookupFramebuffer = Framebuffer::CreateBRDFLUT(resolution, resolution);
+//	if (!lookupFramebuffer) return nullptr;
+//
+//	lookupFramebuffer->Bind();
+//
+//	// 1. 노란색 클리어
+//	glClearColor(1.0f, 1.0f, 0.0f, 1.0f);
+//	glClear(GL_COLOR_BUFFER_BIT); // Depth는 필요 없음
+//
+//	// 2. ★모든 방해 요소 끄기★ (매우 중요)
+//	glDisable(GL_DEPTH_TEST);
+//	glDisable(GL_CULL_FACE);  // 뒷면이라서 안 그려지는 문제 방지
+//	glDisable(GL_BLEND);      // 블렌딩 꼬임 방지
+//	glDepthMask(GL_FALSE);    // 깊이 쓰기 금지
+//
+//	brdfProgram->Use();
+//	// brdfProgram->SetUniform("transform", ...); // <--- 삭제! 쉐이더에서도 뺐으니까 안 보냄.
+//
+//	// 3. 수동 쿼드 (GL_TRIANGLES 사용 - Strip보다 안전)
+//	static unsigned int quadVAO = 0;
+//	static unsigned int quadVBO;
+//
+//	if (quadVAO == 0)
+//	{
+//		// Pos(3) + UV(2)
+//		float quadVertices[] = {
+//			// Triangle 1
+//			-1.0f,  1.0f, 0.0f,   0.0f, 1.0f, // TL
+//			-1.0f, -1.0f, 0.0f,   0.0f, 0.0f, // BL
+//			 1.0f,  1.0f, 0.0f,   1.0f, 1.0f, // TR
+//			 // Triangle 2
+//			  1.0f,  1.0f, 0.0f,   1.0f, 1.0f, // TR
+//			 -1.0f, -1.0f, 0.0f,   0.0f, 0.0f, // BL
+//			  1.0f, -1.0f, 0.0f,   1.0f, 0.0f  // BR
+//		};
+//
+//		glGenVertexArrays(1, &quadVAO);
+//		glGenBuffers(1, &quadVBO);
+//		glBindVertexArray(quadVAO);
+//		glBindBuffer(GL_ARRAY_BUFFER, quadVBO);
+//		glBufferData(GL_ARRAY_BUFFER, sizeof(quadVertices), &quadVertices, GL_STATIC_DRAW);
+//
+//		glEnableVertexAttribArray(0);
+//		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
+//
+//		glEnableVertexAttribArray(2); // Layout 2번 확인
+//		glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
+//	}
+//
+//	glBindVertexArray(quadVAO);
+//	glDrawArrays(GL_TRIANGLES, 0, 6); // 6개 정점 그리기
+//	glBindVertexArray(0);
+//
+//	// 복구
+//	Framebuffer::BindToDefault();
+//	glViewport(prevViewport[0], prevViewport[1], prevViewport[2], prevViewport[3]);
+//	glEnable(GL_DEPTH_TEST);
+//	glEnable(GL_CULL_FACE);
+//	glDepthMask(GL_TRUE); // 마스크 복구 중요
+//
+//	return lookupFramebuffer->GetColorAttachment(0);
+//}
+
+//TexturePtr IBLUtils::CreateBRDFLUT()
+//{
+//	// BRDF LUT는 정밀도가 중요하므로 512 추천 (강의와 동일)
+//	const uint32 resolution = 512;
+//
+//	GLint prevViewport[4];
+//	glGetIntegerv(GL_VIEWPORT, prevViewport);
+//	glViewport(0, 0, resolution, resolution);
+//
+//	// 1. 쉐이더 로드
+//	auto brdfProgram = Program::Create
+//	(
+//		"./Resources/Shaders/Utils/brdf_lookup.vert", // uniform mat4 transform; 이 있어야 함
+//		"./Resources/Shaders/Utils/brdf_lookup.frag"
+//	);
+//	if (!brdfProgram) return nullptr;
+//
+//	// 2. 평면 메쉬 생성 (기본 크기 1x1, 중앙 정렬)
+//	auto ndcQuad = GeometryGenerator::CreatePlane();
+//
+//	// 3. FBO 생성
+//	auto lookupFramebuffer = Framebuffer::CreateBRDFLUT(resolution, resolution);
+//	if (!lookupFramebuffer) return nullptr;
+//
+//	lookupFramebuffer->Bind();
+//
+//	// 디버그용 배경색 (제대로 그려지면 이 색은 덮여서 안 보임)
+//	glClearColor(1.0f, 1.0f, 0.0f, 1.0f);
+//	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+//
+//	// 4. 상태 설정 (중요)
+//	glDisable(GL_DEPTH_TEST);
+//	glDisable(GL_CULL_FACE);
+//
+//	brdfProgram->Use();
+//
+//	glm::mat4 transform = glm::scale(glm::mat4(1.0f), glm::vec3(2.0f, -2.0f, 2.0f));
+//	brdfProgram->SetUniform("transform", transform);
+//	ndcQuad->Draw(brdfProgram.get());
+//
+//	// 5. 텍스처 설정
+//	TexturePtr resultTexture = lookupFramebuffer->GetColorAttachment(0);
+//	if (resultTexture)
+//	{
+//		resultTexture->SetWrap(GL_CLAMP_TO_EDGE, GL_CLAMP_TO_EDGE);
+//		resultTexture->SetFilter(GL_LINEAR, GL_LINEAR);
+//	}
+//
+//	// 6. 복구
+//	Framebuffer::BindToDefault();
+//	glViewport(prevViewport[0], prevViewport[1], prevViewport[2], prevViewport[3]);
+//	glEnable(GL_DEPTH_TEST);
+//	glEnable(GL_CULL_FACE);
+//	glClearColor(0.1f, 0.1f, 0.1f, 1.0f); // 원래 배경색으로 복구
+//
+//	return resultTexture;
+//}

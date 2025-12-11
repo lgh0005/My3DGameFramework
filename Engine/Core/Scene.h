@@ -53,6 +53,9 @@ public:
 
 	void SetPrefilteredTexture(CubeTexturePtr texture) { m_prefiteredTexture = texture; }
 	CubeTexture* GetPrefilteredTexture() const { return m_prefiteredTexture.get(); }
+
+	void SetBRDFLookUpTexture(TexturePtr texture) { m_brdfLookUpTexture = texture; }
+	Texture* GetBRDFLookUpTexture() const { return m_brdfLookUpTexture.get(); }
 #pragma endregion
 
 /*================================//
@@ -103,6 +106,7 @@ protected:
 	CubeTexturePtr				m_skyboxTexture;
 	CubeTexturePtr			    m_irradianceTexture;
 	CubeTexturePtr				m_prefiteredTexture;
+	TexturePtr					m_brdfLookUpTexture;
 
 	// 커스텀 포워드 렌더 패스
 	std::unordered_map<std::string, GeneralRenderPassUPtr> m_customPasses;

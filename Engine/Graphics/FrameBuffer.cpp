@@ -23,6 +23,13 @@ FramebufferUPtr Framebuffer::CreateSSAO(int32 width, int32 height)
     return std::move(fbo);
 }
 
+FramebufferUPtr Framebuffer::CreateBRDFLUT(int32 width, int32 height)
+{
+    auto fbo = FramebufferUPtr(new Framebuffer());
+    if (!fbo->InitBRDFLUT(width, height)) return nullptr;
+    return std::move(fbo);
+}
+
 void Framebuffer::BindToDefault()
 {
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -270,6 +277,34 @@ bool Framebuffer::InitSSAO(int32 width, int32 height)
 
     if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
         return false;
+
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    return true;
+}
+
+bool Framebuffer::InitBRDFLUT(int32 width, int32 height)
+{
+    m_width = width;
+    m_height = height;
+    m_samples = 1;
+
+    glGenFramebuffers(1, &m_resolveFbo);
+    glBindFramebuffer(GL_FRAMEBUFFER, m_resolveFbo);
+
+    auto texture = Texture::Create(width, height, GL_RG16F, GL_RG, GL_FLOAT);
+    texture->SetFilter(GL_LINEAR, GL_LINEAR);
+    texture->SetWrap(GL_CLAMP_TO_EDGE, GL_CLAMP_TO_EDGE);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, texture->Get(), 0);
+    m_resolveTextures.push_back(std::move(texture));
+
+    uint32 attachments[1] = { GL_COLOR_ATTACHMENT0 };
+    glDrawBuffers(1, attachments);
+
+    if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+    {
+        SPDLOG_ERROR("BRDF LUT Framebuffer Incomplete!");
+        return false;
+    }
 
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     return true;
