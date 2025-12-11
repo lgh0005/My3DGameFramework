@@ -62,8 +62,7 @@ CubeTexturePtr IBLUtils::CreateCubemapFromHDR(Texture* hdrTexture, int32 resolut
 	glViewport(prevViewport[0], prevViewport[1], prevViewport[2], prevViewport[3]);
 
 	// 6. ¹Ó¸Ê »ý¼º
-	envCubemap->Bind();
-	glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
+	envCubemap->GenerateMipmap();
 
 	return envCubemap;
 }
@@ -124,4 +123,71 @@ CubeTexturePtr IBLUtils::CreateIrradianceMap(CubeTexture* src)
 	glViewport(prevViewport[0], prevViewport[1], prevViewport[2], prevViewport[3]);
 
 	return irradianceMap;
+}
+
+CubeTexturePtr IBLUtils::CreatePrefilteredMap(CubeTexture* src)
+{
+	const uint32 maxMipLevels = 5;
+	const uint32 baseResolution = 128;
+	GLint prevViewport[4];
+	glGetIntegerv(GL_VIEWPORT, prevViewport);
+
+	// ÀÏÈ¸¿ë À¯Æ¿¼º ½¦ÀÌ´õ ·Îµå
+	auto preFilteredProgram = Program::Create
+	(
+		"./Resources/Shaders/Utils/spherical_map.vert",
+		"./Resources/Shaders/Utils/prefiltered_light.frag"
+	);
+	if (!preFilteredProgram) return nullptr;
+
+	auto cubeMesh = GeometryGenerator::CreateBox();
+	if (!cubeMesh) return nullptr;
+
+
+	CubeTexturePtr preFilteredMap = CubeTexture::Create(baseResolution, baseResolution, 
+														     GL_RGB16F, GL_FLOAT);
+	if (!preFilteredMap) return nullptr;
+	preFilteredMap->GenerateMipmap();
+
+	glm::mat4 captureProjection = glm::perspective(glm::radians(90.0f), 1.0f, 0.1f, 10.0f);
+	std::vector<glm::mat4> captureViews =
+	{
+		glm::lookAt(glm::vec3(0.0f), glm::vec3(1.0f,  0.0f,  0.0f), glm::vec3(0.0f, -1.0f,  0.0f)),
+		glm::lookAt(glm::vec3(0.0f), glm::vec3(-1.0f, 0.0f,  0.0f), glm::vec3(0.0f, -1.0f,  0.0f)),
+		glm::lookAt(glm::vec3(0.0f), glm::vec3(0.0f,  1.0f,  0.0f), glm::vec3(0.0f,  0.0f,  1.0f)),
+		glm::lookAt(glm::vec3(0.0f), glm::vec3(0.0f, -1.0f,  0.0f), glm::vec3(0.0f,  0.0f, -1.0f)),
+		glm::lookAt(glm::vec3(0.0f), glm::vec3(0.0f,  0.0f,  1.0f), glm::vec3(0.0f, -1.0f,  0.0f)),
+		glm::lookAt(glm::vec3(0.0f), glm::vec3(0.0f,  0.0f, -1.0f), glm::vec3(0.0f, -1.0f,  0.0f))
+	};
+
+	preFilteredProgram->Use();
+	preFilteredProgram->SetUniform("cubeMap", 0);
+	glActiveTexture(GL_TEXTURE0);
+	src->Bind();
+
+	glDepthFunc(GL_LEQUAL);
+	glDisable(GL_CULL_FACE);
+	for (uint32 mip = 0; mip < maxMipLevels; mip++)
+	{
+		uint32 mipWidth = 128 >> mip;
+		uint32 mipHeight = 128 >> mip;
+		auto framebuffer = CubeFramebuffer::Create(preFilteredMap, mip);
+		glViewport(0, 0, mipWidth, mipHeight);
+
+		float roughness = (float)mip / (float)(maxMipLevels - 1);
+		preFilteredProgram->SetUniform("roughness", roughness);
+		for (uint32_t i = 0; i < 6; i++)
+		{
+			preFilteredProgram->SetUniform("transform", captureProjection * captureViews[i]);
+			framebuffer->Bind(i);
+			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+			cubeMesh->Draw(preFilteredProgram.get());
+		}
+	}
+	glEnable(GL_CULL_FACE);
+	glDepthFunc(GL_LESS);
+	CubeFramebuffer::BindToDefault();
+	glViewport(prevViewport[0], prevViewport[1], prevViewport[2], prevViewport[3]);
+
+	return preFilteredMap;
 }

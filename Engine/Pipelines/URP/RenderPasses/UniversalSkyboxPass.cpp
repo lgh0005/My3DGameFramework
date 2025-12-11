@@ -55,6 +55,7 @@ void UniversalSkyboxPass::Render(RenderContext* context)
 	m_hdrSkyboxProgram->Use();
 	m_hdrSkyboxProgram->SetUniform("view", view);
 	m_hdrSkyboxProgram->SetUniform("projection", projection);
+	m_hdrSkyboxProgram->SetUniform("roughness", 0.06f);
 
 	// 3. 텍스처 바인딩
 	m_hdrSkyboxProgram->SetUniform("skybox", 0);

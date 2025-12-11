@@ -50,6 +50,9 @@ public:
 
 	void SetIrradianceTexture(CubeTexturePtr texture) { m_irradianceTexture = texture; }
 	CubeTexture* GetIrradianceTexture() const { return m_irradianceTexture.get(); }
+
+	void SetPrefilteredTexture(CubeTexturePtr texture) { m_prefiteredTexture = texture; }
+	CubeTexture* GetPrefilteredTexture() const { return m_prefiteredTexture.get(); }
 #pragma endregion
 
 /*================================//
@@ -99,6 +102,7 @@ protected:
 	// 각 맵들에 대한 setter와 getter를 달아둔 클래스로 관리하면 편리할 수 있음.
 	CubeTexturePtr				m_skyboxTexture;
 	CubeTexturePtr			    m_irradianceTexture;
+	CubeTexturePtr				m_prefiteredTexture;
 
 	// 커스텀 포워드 렌더 패스
 	std::unordered_map<std::string, GeneralRenderPassUPtr> m_customPasses;

@@ -17,7 +17,7 @@ public:
 
     // 3. Specular용 (Prefiltered Map) 생성
     // 거칠기별로 밉맵이 생성된 큐브맵 리턴
-    // static CubeTexturePtr CreatePrefilteredMap(CubeTexture* source);
+    static CubeTexturePtr CreatePrefilteredMap(CubeTexture* src);
 
     // 4. Specular용 (BRDF LUT) 생성
     // 2D 텍스처 하나 리턴

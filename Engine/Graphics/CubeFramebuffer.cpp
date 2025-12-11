@@ -2,10 +2,10 @@
 #include "CubeFramebuffer.h"
 #include "Graphics/CubeTexture.h"
 
-CubeFramebufferUPtr CubeFramebuffer::Create(const CubeTexturePtr colorAttachment)
+CubeFramebufferUPtr CubeFramebuffer::Create(const CubeTexturePtr colorAttachment, uint32 mipLevel)
 {
     auto framebuffer = CubeFramebufferUPtr(new CubeFramebuffer());
-    if (!framebuffer->InitWithColorAttachment(colorAttachment))
+    if (!framebuffer->InitWithColorAttachment(colorAttachment, mipLevel))
         return nullptr;
     return std::move(framebuffer);
 }
@@ -27,7 +27,7 @@ CubeFramebuffer::~CubeFramebuffer()
     }
 }
 
-void CubeFramebuffer::Bind(int32 cubeIndex, int32 mipLevel) const
+void CubeFramebuffer::Bind(int32 cubeIndex) const
 {
     glBindFramebuffer(GL_FRAMEBUFFER, m_framebuffer);
 
@@ -38,7 +38,7 @@ void CubeFramebuffer::Bind(int32 cubeIndex, int32 mipLevel) const
         GL_COLOR_ATTACHMENT0,
         GL_TEXTURE_CUBE_MAP_POSITIVE_X + cubeIndex,
         m_colorAttachment->Get(),
-        mipLevel
+        m_mipLevel
     );
 
     // TODO : 밉맵 레벨이 바뀌면 Viewport 크기도 그에 맞춰 줄여줘야 합니다.
@@ -62,20 +62,19 @@ void CubeFramebuffer::Bind(int32 cubeIndex, int32 mipLevel) const
     //}
 }
 
-bool CubeFramebuffer::InitWithColorAttachment(const CubeTexturePtr& colorAttachment)
+bool CubeFramebuffer::InitWithColorAttachment(const CubeTexturePtr& colorAttachment, uint32 mipLevel)
 {
     m_colorAttachment = colorAttachment;
-
+    m_mipLevel = mipLevel;
     glGenFramebuffers(1, &m_framebuffer);
     glBindFramebuffer(GL_FRAMEBUFFER, m_framebuffer);
 
-    // 초기화 시에는 MipLevel 0번에 붙여서 테스트
     glFramebufferTexture2D(GL_FRAMEBUFFER,
         GL_COLOR_ATTACHMENT0, GL_TEXTURE_CUBE_MAP_POSITIVE_X,
-        m_colorAttachment->Get(), 0);
+        m_colorAttachment->Get(), m_mipLevel);
 
-    int32 width = m_colorAttachment->GetWidth();
-    int32 height = m_colorAttachment->GetHeight();
+    int32 width = m_colorAttachment->GetWidth() >> m_mipLevel;
+    int32 height = m_colorAttachment->GetHeight() >> m_mipLevel;
 
     // 깊이 버퍼 생성
     glGenRenderbuffers(1, &m_depthStencilBuffer);
