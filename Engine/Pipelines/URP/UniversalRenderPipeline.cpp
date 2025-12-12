@@ -3,6 +3,7 @@
 
 #include "Pipelines/Common/CullingPass.h"
 #include "Pipelines/URP/RenderPasses/UniversalSkyboxPass.h"
+#include "Pipelines/URP/RenderPasses/UniversalPostProcessPass.h"
 #include "Pipelines/URP/UniversalGlobalUniforms.h"
 #include "Pipelines/URP/UniversalRenderContext.h"
 
@@ -43,6 +44,10 @@ bool UniversalRenderPipeline::Init()
 	m_skyboxPass = UniversalSkyboxPass::Create();
 	if (!m_skyboxPass) return false;
 
+	// 포스트-프로세싱 패스 생성
+	m_postProcessPass = UniversalPostProcessPass::Create();
+	if (!m_postProcessPass) return false;
+
 	return true;
 }
 
@@ -75,13 +80,19 @@ void UniversalRenderPipeline::Render(Scene* scene)
 	// 1. ubo 갱신
 	m_globalUniforms->PreRender(&context);
 
+	// TEMP : 포스트 프로세싱 프레임 버퍼 넘기기
+	// 이후 context에서 m_gBuffer에 그림을 그리도록 만들어야 한다
+	m_postProcessPass->BeginDraw();
+
 	// [패스 5] 포워드 셰이딩
-	auto& cnt = scene->GetCustomRenderPasses();
 	for (const auto& [name, pass] : scene->GetCustomRenderPasses())
 		pass->Render(scene, camera);
 
 	// [패스 6] 스카이박스 패스
 	m_skyboxPass->Render(&context);
+
+	// [패스 7] 포스트 프로세싱 패스
+	m_postProcessPass->Render(&context);
 
 	/*=========================//
 	//   imgui debug context   //

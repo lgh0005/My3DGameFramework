@@ -11,7 +11,7 @@ uniform sampler2D tex;
 uniform sampler2D bloomBlur;
 uniform vec2 inverseScreenSize;
 
-// [추가] FXAA 알고리즘 함수
+// FXAA 알고리즘 함수
 vec3 ApplyFXAA(sampler2D tex, vec2 coords, vec2 inverseScreenSize) 
 {
     float FXAA_SPAN_MAX = 8.0;
