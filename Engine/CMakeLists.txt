@@ -24,6 +24,7 @@ add_library(Engine STATIC
    "Pipelines/Common/CullingPass.h" "Pipelines/Common/CullingPass.cpp"
    "Pipelines/Common/SSAOPass.h"    "Pipelines/Common/SSAOPass.cpp"
    "Pipelines/Common/ShadowPass.h"  "Pipelines/Common/ShadowPass.cpp"
+   "Pipelines/Common/SkyboxPass.h"  "Pipelines/Common/SkyboxPass.cpp"
 
    # Standard Render Pipeline
    "Pipelines/SRP/RenderPasses/StandardPostProcessPass.h" "Pipelines/SRP/RenderPasses/StandardPostProcessPass.cpp"
@@ -41,7 +42,6 @@ add_library(Engine STATIC
    "Pipelines/URP/UniversalGlobalUniforms.h"   "Pipelines/URP/UniversalGlobalUniforms.cpp"
    "Pipelines/URP/UniversalRenderContext.h"    "Pipelines/URP/UniversalRenderContext.cpp"
    "Pipelines/URP/UniversalRenderPipeline.h"   "Pipelines/URP/UniversalRenderPipeline.cpp"
-
 
    # Misc
    "Misc/Defines.h"
@@ -75,6 +75,7 @@ add_library(Engine STATIC
    "Graphics/Geometry.h"            "Graphics/Geometry.cpp"
    "Graphics/CubeFramebuffer.h"     "Graphics/CubeFramebuffer.cpp"
    "Graphics/ScreenMesh.h"          "Graphics/ScreenMesh.cpp"
+   "Graphics/SkyLight.h"            "Graphics/SkyLight.cpp"
 
    # Audio
    "Audios/AudioClip.h"             "Audios/AudioClip.cpp"

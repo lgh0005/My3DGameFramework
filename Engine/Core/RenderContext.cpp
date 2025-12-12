@@ -1,5 +1,6 @@
-#include "EnginePch.h"
+ï»¿#include "EnginePch.h"
 #include "RenderContext.h"
+#include "Graphics/SkyLight.h"
 #include "Components/MeshRenderer.h"
 #include "Components/Light.h"
 
@@ -7,16 +8,20 @@ RenderContext::~RenderContext() = default;
 
 void RenderContext::Reset(Scene* scene, Camera* camera)
 {
-	// 1. ±âº» Á¤º¸ °»½Å
-	m_currentScene = scene;
+	// 1. ê¸°ë³¸ ì •ë³´ ê°±ì‹ 
+	m_currentScene  = scene;
 	m_currentCamera = camera;
 
-	// 2. ¾ÀÀÇ ¿øº» µ¥ÀÌÅÍ ¿¬°á
-	m_staticMeshRenderers  = &scene->GetStaticMeshRenderers();
-	m_skinnedMeshRenderers = &scene->GetSkinnedMeshRenderers();
-	m_lights			   = &scene->GetLights();
+	// 2. ì”¬ì˜ ì›ë³¸ ë°ì´í„° ì—°ê²°
+	if (m_currentScene)
+	{
+		m_staticMeshRenderers  = &scene->GetStaticMeshRenderers();
+		m_skinnedMeshRenderers = &scene->GetSkinnedMeshRenderers();
+		m_lights			   = &scene->GetLights();
+		m_skyLight			   = m_currentScene->GetSkyLight();
+	}
 
-	// 3. °á°ú º¤ÅÍ ÃÊ±âÈ­
+	// 3. ê²°ê³¼ ë²¡í„° ì´ˆê¸°í™”
 	m_culledStaticMeshRenderers.clear();
 	m_culledSkinnedMeshRenderers.clear();
 	m_culledLights.clear();

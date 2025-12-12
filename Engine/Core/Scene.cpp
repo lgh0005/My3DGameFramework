@@ -4,10 +4,10 @@
 #include "Core/GameObject.h"
 #include "Core/RenderPass.h"
 #include "Graphics/Mesh.h"
+#include "Graphics/SkyLight.h"
 #include "Components/Component.h"
 #include "Components/Light.h"
 #include "Components/PointLight.h"
-#include "Components/SpotLight.h"
 #include "Components/DirectionalLight.h"
 #include "Components/MeshRenderer.h"
 #include "Components/Camera.h"
@@ -20,6 +20,9 @@
 Scene::Scene() = default;
 Scene::~Scene() = default;
 
+/*===================================================================//
+//   object, component and custom render passes management methods   //
+//===================================================================*/
 void Scene::AddGameObject(GameObjectUPtr gameObject)
 {
 	auto* go = gameObject.get();
@@ -112,6 +115,29 @@ void Scene::OnScreenResize(int32 width, int32 height)
 	if (camera) camera->SetAspectRatio((float)width / (float)height);
 }
 
+void Scene::SetSkyLight(SkyLightUPtr skyLight)
+{
+	m_sky = std::move(skyLight);
+}
+
+GeneralRenderPass* Scene::GetCustomRenderPass(const std::string& name)
+{
+	auto it = m_customPasses.find(name);
+	if (it != m_customPasses.end()) return it->second.get();
+	return nullptr;
+}
+
+void Scene::AddCustomRenderPass(const std::string& name, GeneralRenderPassUPtr pass)
+{
+	if (m_customPasses.find(name) != m_customPasses.end())
+		SPDLOG_WARN("Custom random pass '{}' already exists. Overwriting.", name);
+
+	m_customPasses[name] = std::move(pass);
+}
+
+/*=====================================//
+//   default scene lifecycle methods   //
+//=====================================*/
 bool Scene::Init()
 {
 	if (!LoadNessesaryResources())
@@ -190,19 +216,4 @@ void Scene::Update()
 void Scene::FlushDestroyQueue()
 {
 	// TODO : 씬에 Destroy를 호출한 오브젝트를 정리
-}
-
-GeneralRenderPass* Scene::GetCustomRenderPass(const std::string& name)
-{
-	auto it = m_customPasses.find(name);
-	if (it != m_customPasses.end()) return it->second.get();
-	return nullptr;
-}
-
-void Scene::AddCustomRenderPass(const std::string& name, GeneralRenderPassUPtr pass)
-{
-	if (m_customPasses.find(name) != m_customPasses.end())
-		SPDLOG_WARN("Custom random pass '{}' already exists. Overwriting.", name);
-
-	m_customPasses[name] = std::move(pass);
 }

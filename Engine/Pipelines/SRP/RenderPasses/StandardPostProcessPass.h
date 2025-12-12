@@ -32,6 +32,7 @@ private:
 	ScreenMeshPtr			  m_plane;
 	ProgramUPtr				  m_blurProgram;
 	ProgramUPtr				  m_compositeProgram;
+	ProgramUPtr				  m_thresholdProgram;
 	FramebufferUPtr			  m_frameBuffer;
 	FramebufferUPtr			  m_pingPongFBOs[2];
 	float m_gamma			  { 2.2f };

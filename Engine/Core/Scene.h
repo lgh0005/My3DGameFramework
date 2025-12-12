@@ -12,6 +12,7 @@ CLASS_PTR(Script)
 CLASS_PTR(AudioSource)
 CLASS_PTR(AudioListener)
 CLASS_PTR(GeneralRenderPass)
+CLASS_PTR(SkyLight)
 #pragma endregion
 
 CLASS_PTR(Scene)
@@ -39,24 +40,10 @@ public:
 	Camera* GetMainCamera() const { return m_mainCamera; }
 	void SetMainCamera(Camera* camera) { m_mainCamera = camera; }
 
+	SkyLight* GetSkyLight() const { return m_sky.get(); }
+	void SetSkyLight(SkyLightUPtr skyLight);
+
 	GeneralRenderPass* GetCustomRenderPass(const std::string& name);
-
-	// TODO : 이후에 SceneEnvironment 도입 가능
-#pragma region SCENE_ENVIRONMENT_METHODS
-	// 지금은 SRP, PBR과 관련없이 일단 하늘과 관련된 텍스쳐의 getter/setter를 여기에
-	// 적어두겠음
-	void SetSkyboxTexture(CubeTexturePtr texture) { m_skyboxTexture = texture; }
-	CubeTexture* GetSkyboxTexture() const { return m_skyboxTexture.get(); }
-
-	void SetIrradianceTexture(CubeTexturePtr texture) { m_irradianceTexture = texture; }
-	CubeTexture* GetIrradianceTexture() const { return m_irradianceTexture.get(); }
-
-	void SetPrefilteredTexture(CubeTexturePtr texture) { m_prefiteredTexture = texture; }
-	CubeTexture* GetPrefilteredTexture() const { return m_prefiteredTexture.get(); }
-
-	void SetBRDFLookUpTexture(TexturePtr texture) { m_brdfLookUpTexture = texture; }
-	Texture* GetBRDFLookUpTexture() const { return m_brdfLookUpTexture.get(); }
-#pragma endregion
 
 /*================================//
 //   interface to renderContext   //
@@ -99,14 +86,7 @@ protected:
 	std::vector<MeshRenderer*>  m_skinnedMeshRenderers;
 
 	// 하늘 텍스쳐
-	// TODO : 이후에 SRP와 PBR 모두를 고려하여 여기에 늘어나는
-	// 포인터 멤버들을 하나의 SceneEnvironment과 같은 구조체로
-	// 묶어서 관리할 수도 있음.
-	// 각 맵들에 대한 setter와 getter를 달아둔 클래스로 관리하면 편리할 수 있음.
-	CubeTexturePtr				m_skyboxTexture;
-	CubeTexturePtr			    m_irradianceTexture;
-	CubeTexturePtr				m_prefiteredTexture;
-	TexturePtr					m_brdfLookUpTexture;
+	SkyLightUPtr				m_sky;
 
 	// 커스텀 포워드 렌더 패스
 	std::unordered_map<std::string, GeneralRenderPassUPtr> m_customPasses;

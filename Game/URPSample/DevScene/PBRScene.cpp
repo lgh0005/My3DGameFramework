@@ -17,6 +17,7 @@
 #include "Graphics/Buffer.h"
 #include "Graphics/InstancedMesh.h"
 #include "Graphics/Geometry.h"
+#include "Graphics/SkyLight.h"
 #include "Audios/AudioClip.h"
 
 #include "Misc/IBLUtils.h"
@@ -102,14 +103,18 @@ bool PBRScene::LoadNessesaryResources()
 	{
 		auto hdrImage = Image::LoadHDR("./Resources/Images/IBL/mirrored_hall_4k.hdr");
 		auto hdrTex = Texture::CreateFromHDR(hdrImage.get());
-		auto bakedCubemap = IBLUtils::CreateCubemapFromHDR(hdrTex.get());
-		auto bakedDiffuse = IBLUtils::CreateIrradianceMap(bakedCubemap.get());
-		auto prefiltered = IBLUtils::CreatePrefilteredMap(bakedCubemap.get());
-		auto brdf = IBLUtils::CreateBRDFLUT();
-		SetSkyboxTexture(std::move(bakedCubemap));
-		SetIrradianceTexture(std::move(bakedDiffuse));
-		SetPrefilteredTexture(std::move(prefiltered));
-		SetBRDFLookUpTexture(std::move(brdf));
+
+		CubeTexturePtr bakedCubemap = IBLUtils::CreateCubemapFromHDR(hdrTex.get());
+		CubeTexturePtr bakedDiffuse = IBLUtils::CreateIrradianceMap(bakedCubemap.get());
+		CubeTexturePtr prefiltered  = IBLUtils::CreatePrefilteredMap(bakedCubemap.get());
+		TexturePtr	   brdf			= IBLUtils::CreateBRDFLUT();
+
+		auto sky = SkyLight::CreateUniversalSky
+		(
+			std::move(bakedCubemap), std::move(bakedDiffuse), 
+			std::move(prefiltered),  std::move(brdf)
+		);
+		SetSkyLight(std::move(sky));
 	}
 	
 	return true;

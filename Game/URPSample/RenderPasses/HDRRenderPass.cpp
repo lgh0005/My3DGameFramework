@@ -7,6 +7,7 @@
 #include "Graphics/Material.h"
 #include "Graphics/CubeTexture.h"
 #include "Graphics/Texture.h"
+#include "Graphics/SkyLight.h"
 #include "Components/Camera.h"
 #include "Components/MeshRenderer.h"
 #include "Components/Transform.h"
@@ -40,9 +41,10 @@ void HDRRenderPass::Render(Scene* scene, Camera* camera)
 {
     m_simpleProgram->Use();
 
+    auto sky = scene->GetSkyLight();
     {
         // Irradiance 적용
-        auto* irradianceMap = scene->GetIrradianceTexture();
+        auto* irradianceMap = sky->GetIrradianceMap();
         if (irradianceMap)
         {
             glActiveTexture(GL_TEXTURE10);
@@ -51,7 +53,7 @@ void HDRRenderPass::Render(Scene* scene, Camera* camera)
         }
 
         // prefilter 적용
-        auto* prefilter = scene->GetPrefilteredTexture();
+        auto* prefilter = sky->GetPrefilterMap();
         if (prefilter)
         {
             glActiveTexture(GL_TEXTURE11);
@@ -60,7 +62,7 @@ void HDRRenderPass::Render(Scene* scene, Camera* camera)
         }
 
         // BRDF 적용
-        auto* brdf = scene->GetBRDFLookUpTexture();
+        auto* brdf = sky->GetBRDFLookUp();
         if (brdf)
         {
             glActiveTexture(GL_TEXTURE12);

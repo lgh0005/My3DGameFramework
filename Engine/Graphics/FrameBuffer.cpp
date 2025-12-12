@@ -116,6 +116,7 @@ bool Framebuffer::Init(int32 width, int32 height, int32 samples)
             // 필터링은 FXAA 등을 위해 선형(Linear)이 좋을 수 있으나,
             // 픽셀 정확도를 위해 Nearest를 쓰기도 합니다. 취향껏 선택하세요.
             texture->SetFilter(GL_LINEAR, GL_LINEAR);
+            texture->SetWrap(GL_CLAMP_TO_EDGE, GL_CLAMP_TO_EDGE);
 
             glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i,
                 GL_TEXTURE_2D, texture->Get(), 0);

@@ -16,6 +16,7 @@
 #include "Graphics/Buffer.h"
 #include "Graphics/InstancedMesh.h"
 #include "Graphics/Geometry.h"
+#include "Graphics/SkyLight.h"
 #include "Audios/AudioClip.h"
 
 #include "Components/Camera.h"
@@ -260,7 +261,8 @@ bool DevScene::CreateNessesaryRenderPasses()
 bool DevScene::CreateSceneContext()
 {
 	// 0. 하늘 설정
-	SetSkyboxTexture(RESOURCE.GetResource<CubeTexture>("SkyboxTexture"));
+	auto sky = SkyLight::CreateStandardSky(RESOURCE.GetResource<CubeTexture>("SkyboxTexture"));
+	SetSkyLight(std::move(sky));
 
 	SimpleRenderPass* lightPass = (SimpleRenderPass*)GetCustomRenderPass("LightGizmo");
 	InstancedRenderPass* grassPass = (InstancedRenderPass*)GetCustomRenderPass("Instanced");

@@ -114,6 +114,6 @@ void main()
     // TODO : emission 파라미터 설정 필요
     vec3 emissionTex = texture(material.emission, texCoord).rgb;
     emissionTex = pow(emissionTex, vec3(2.2)); // 감마 보정
-    emissionTex = emissionTex * 5.0;           // 강도 뻥튀기
+    emissionTex = emissionTex * 10.0;           // 강도 뻥튀기
     gEmission = vec4(emissionTex * material.emissionStrength, 1.0);
 }

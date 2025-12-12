@@ -72,7 +72,6 @@ void UniversalRenderPipeline::Render(Scene* scene)
 	// 0. 스택 영역에 StandardRenderContext 생성
 	UniversalRenderContext context;
 	context.Reset(scene, camera);
-	context.SetSkyboxTexture(scene->GetSkyboxTexture());
 
 	// [패스 0] 컬링 패스 : 절두체 범위 안에 있는 대상만 추리기
 	m_cullingPass->Render(&context);

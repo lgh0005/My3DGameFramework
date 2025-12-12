@@ -12,6 +12,9 @@
 #include "Graphics/StaticMesh.h"
 #include "Graphics/Geometry.h"
 
+// TODO : 공통 RenderContext에 대해서 캐스팅할 때,
+// RenderContext를 적절히 캐스팅할 수 있도록 하는 수단 마련해야함.
+// 지금은 SRP에만 적용되고 있음.
 #include "Pipelines/SRP/StandardRenderPipeline.h"
 #include "Pipelines/SRP/StandardRenderContext.h"
 
