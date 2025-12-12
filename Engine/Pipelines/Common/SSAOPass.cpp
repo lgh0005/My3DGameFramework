@@ -8,6 +8,7 @@
 #include "Graphics/Texture.h"
 #include "Graphics/FrameBuffer.h"
 #include "Graphics/Program.h"
+#include "Graphics/ScreenMesh.h"
 #include "Graphics/StaticMesh.h"
 #include "Graphics/Geometry.h"
 
@@ -41,7 +42,7 @@ bool SSAOPass::Init(int32 width, int32 height)
     if (!m_ssaoFBO || !m_ssaoBlurFBO) return false;
 
     // 화면 전체를 덮는 Quad 생성
-    m_screenQuad = GeometryGenerator::CreateNDCQuad();
+    m_screenQuad = ScreenMesh::Create();
     if (!m_screenQuad) return false;
 
     GenerateKernel();
@@ -157,7 +158,7 @@ void SSAOPass::Render(RenderContext* context)
     m_ssaoFBO->GetColorAttachment(0)->Bind();
     m_ssaoBlurProgram->SetUniform("ssaoInput", 0);
 
-    m_screenQuad->Draw(m_ssaoBlurProgram.get());
+    m_screenQuad->Draw();
 
     Framebuffer::BindToDefault();
 }

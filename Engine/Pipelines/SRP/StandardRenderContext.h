@@ -16,7 +16,7 @@ public:
 	StandardRenderContext() = default;
 
 	void SetGBuffer(Framebuffer* gBuffer);
-	Framebuffer* GetGBuffer() const { return m_gBuffer; }\
+	Framebuffer* GetGBuffer() const { return m_gBuffer; }
 
 	Texture* GetGBufferPosition() const { return m_gPosition; }
 	Texture* GetGBufferNormal()   const { return m_gNormal; }
@@ -43,6 +43,6 @@ private:
 	Texture* m_gEmission{ nullptr };
 	Texture* m_ssaoTexture{ nullptr };
 	Framebuffer* m_targetFramebuffer{ nullptr };
-	Texture* m_shadowMaps[MAX_SHADOW_CASTER] = { nullptr, };
+	Texture* m_shadowMaps[MAX_SHADOW_CASTER] = { nullptr };
 	CubeTexture* m_skyboxTexture{ nullptr };
 };

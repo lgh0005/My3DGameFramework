@@ -4,7 +4,7 @@
 #pragma region FORWARD_DECLARATION
 CLASS_PTR(Scene)
 CLASS_PTR(Camera)
-CLASS_PTR(Mesh)
+CLASS_PTR(ScreenMesh)
 CLASS_PTR(Texture)
 CLASS_PTR(Program)
 CLASS_PTR(RenderContext)
@@ -22,7 +22,7 @@ private:
 	StandardDeferredLightingPass() = default;
 	bool Init();
 
-	MeshPtr m_plane;
+	ScreenMeshPtr m_plane;
 	ProgramUPtr m_deferredLightProgram;
 	Texture* m_ssaoTexture{ nullptr };
 };

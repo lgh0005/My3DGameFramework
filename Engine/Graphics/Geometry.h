@@ -60,7 +60,6 @@ class GeometryGenerator
 public:
 	static StaticMeshUPtr CreateBox();
 	static StaticMeshUPtr CreatePlane();
-	static StaticMeshUPtr CreateNDCQuad();
 	static StaticMeshUPtr CreateSphere
 	(
 		uint32 latiSegmentCount = 16,

@@ -56,8 +56,8 @@ bool DevScene::LoadNessesaryResources()
 	RESOURCE.AddResource<Mesh>("Plane", std::move(planeMesh));
 
 	// 0-2. NDC 평면 메쉬
-	auto ndcPlaneMesh = GeometryGenerator::CreateNDCQuad();
-	RESOURCE.AddResource<Mesh>("NDC", std::move(ndcPlaneMesh));
+	/*auto ndcPlaneMesh = GeometryGenerator::CreateNDCQuad();
+	RESOURCE.AddResource<Mesh>("NDC", std::move(ndcPlaneMesh));*/
 
 	// 0-2. 모델과 애니메이션 #1
 	{
@@ -73,7 +73,7 @@ bool DevScene::LoadNessesaryResources()
 
 	// 0-3. 머티리얼 1
 	{
-		auto lightMat = Material::Create();
+		auto lightMat = StandardMaterial::Create();
 		lightMat->shininess = 16.0f;
 		lightMat->emissionStrength = 0.0f;
 		lightMat->heightScale = 0.0f;
@@ -89,7 +89,7 @@ bool DevScene::LoadNessesaryResources()
 		(Image::Load("./Resources/Images/matrix.jpg").get());*/
 		TextureUPtr emissionTexture = Texture::CreateFromKtxImage("./Resources/Images/baked/matrix.ktx");
 
-		auto box1Mat = Material::Create();
+		auto box1Mat = StandardMaterial::Create();
 		box1Mat->diffuse = std::move(diffuseTexture);
 		box1Mat->emission = std::move(emissionTexture);
 		box1Mat->shininess = 16.0f;
@@ -110,7 +110,7 @@ bool DevScene::LoadNessesaryResources()
 		(Image::Load("./Resources/Images/matrix.jpg").get());*/
 		TextureUPtr emissionTexture = Texture::CreateFromKtxImage("./Resources/Images/baked/matrix.ktx");
 
-		auto box2Mat = Material::Create();
+		auto box2Mat = StandardMaterial::Create();
 		box2Mat->diffuse = std::move(diffuseTexture);
 		box2Mat->specular = std::move(specularTexture);
 		box2Mat->emission = std::move(emissionTexture);
@@ -125,7 +125,7 @@ bool DevScene::LoadNessesaryResources()
 		/*TextureUPtr diffuseTexture = Texture::CreateFromImage(Image::Load("./Resources/Images/marble.jpg").get());*/
 		TextureUPtr diffuseTexture = Texture::CreateFromKtxImage("./Resources/Images/baked/marble.ktx");
 
-		auto box4Mat = Material::Create();
+		auto box4Mat = StandardMaterial::Create();
 		box4Mat->diffuse = std::move(diffuseTexture);
 		box4Mat->shininess = 20.0f;
 		box4Mat->emissionStrength = 0.0f;
@@ -140,7 +140,7 @@ bool DevScene::LoadNessesaryResources()
 		TextureUPtr normalTexture = Texture::CreateFromImage
 		(Image::Load("./Resources/Images/brickwall_normal.jpg").get());
 
-		auto box5Mat = Material::Create();
+		auto box5Mat = StandardMaterial::Create();
 		box5Mat->diffuse = std::move(diffuseTexture);
 		box5Mat->normal = std::move(normalTexture);
 		box5Mat->shininess = 64.0f;
@@ -158,7 +158,7 @@ bool DevScene::LoadNessesaryResources()
 		TextureUPtr heightTexture = Texture::CreateFromImage
 		(Image::Load("./Resources/Images/toy_box_disp.png").get());
 
-		auto box6Mat = Material::Create();
+		auto box6Mat = StandardMaterial::Create();
 		box6Mat->diffuse = std::move(diffuseTexture);
 		box6Mat->normal = std::move(normalTexture);
 		box6Mat->height = std::move(heightTexture);
@@ -174,7 +174,7 @@ bool DevScene::LoadNessesaryResources()
 		(Image::Load("./Resources/Images/grass.png").get());
 		if (!grassTexture) return false;
 
-		auto grassMat = Material::Create();
+		auto grassMat = StandardMaterial::Create();
 		grassMat->diffuse = std::move(grassTexture);
 		grassMat->emission = nullptr;
 		grassMat->emissionStrength = 0.0f;

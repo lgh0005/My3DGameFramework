@@ -7,6 +7,7 @@ CLASS_PTR(Camera)
 CLASS_PTR(Texture)
 CLASS_PTR(Framebuffer)
 CLASS_PTR(Program)
+CLASS_PTR(ScreenMesh)
 CLASS_PTR(StaticMesh)
 CLASS_PTR(RenderContext)
 #pragma endregion
@@ -31,7 +32,7 @@ private:
 	void GenerateKernel();
 	void GenerateNoiseTexture();
 
-	StaticMeshUPtr m_screenQuad{ nullptr };
+	ScreenMeshUPtr		   m_screenQuad{ nullptr };
 
 	std::vector<glm::vec3> m_ssaoKernel;
 	TextureUPtr            m_noiseTexture{ nullptr };

@@ -4,7 +4,7 @@
 #include "Core/Scene.h"
 #include "Core/RenderContext.h"
 #include "Graphics/Program.h"
-#include "Graphics/Mesh.h"
+#include "Graphics/ScreenMesh.h"
 #include "Graphics/StaticMesh.h" 
 #include "Graphics/FrameBuffer.h"
 #include "Graphics/Texture.h"
@@ -34,8 +34,7 @@ bool StandardPostProcessPass::Init(int32 width, int32 height)
 	);
 	if (!m_compositeProgram || !m_blurProgram) return false;
 
-	// m_plane = StaticMesh::CreateNDCQuad();
-	m_plane = GeometryGenerator::CreateNDCQuad();
+	m_plane = ScreenMesh::Create();
 	if (!m_plane) return false;
 
 	m_frameBuffer = Framebuffer::Create(width, height, 1);
@@ -109,7 +108,7 @@ void StandardPostProcessPass::Render(RenderContext* context)
 	finalBloomTexture->Bind();
 	m_compositeProgram->SetUniform("bloomBlur", 1);
 
-	m_plane->Draw(m_compositeProgram.get());
+	m_plane->Draw();
 }
 
 void StandardPostProcessPass::Resize(int32 width, int32 height)
@@ -130,8 +129,6 @@ void StandardPostProcessPass::BeginDraw()
 {
 	m_frameBuffer->Bind();
 	glViewport(0, 0, m_frameBuffer->GetWidth(), m_frameBuffer->GetHeight());
-	/*glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);*/
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);
 	glCullFace(GL_BACK);

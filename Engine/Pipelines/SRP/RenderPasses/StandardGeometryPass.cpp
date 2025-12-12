@@ -45,7 +45,6 @@ bool StandardGeometryPass::Init(int32 width, int32 height)
 	return true;
 }
 
-
 // TEST : Context에 있는 내용물을 잘 렌더링 하는 지 테스트
 void StandardGeometryPass::Render(RenderContext* context)
 {

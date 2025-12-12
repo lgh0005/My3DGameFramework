@@ -12,9 +12,9 @@ uniform sampler2D gNormal;
 uniform sampler2D gAlbedoSpec;
 uniform sampler2D gEmission;
 
-// [Shadow] - 배열로 변경!
+// [Shadow]
 uniform sampler2D shadowMaps[8]; 
-uniform mat4 lightSpaceMatrices[8]; // 행렬도 배열로!
+uniform mat4 lightSpaceMatrices[8];
 
 // [SSAO sampler]
 uniform sampler2D ssaoTexture;

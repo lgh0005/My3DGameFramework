@@ -1,6 +1,12 @@
 #pragma once
 #define MAX_BONE_INFLUENCE 4
 
+struct ScreenVertex
+{
+    glm::vec3 position;
+    glm::vec2 texCoord;
+};
+
 struct StaticVertex
 {
     glm::vec3 position;

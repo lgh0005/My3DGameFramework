@@ -72,6 +72,7 @@ add_library(Engine STATIC
    "Graphics/Frustum.h"             "Graphics/Frustum.cpp"
    "Graphics/Geometry.h"            "Graphics/Geometry.cpp"
    "Graphics/CubeFramebuffer.h"     "Graphics/CubeFramebuffer.cpp"
+   "Graphics/ScreenMesh.h"          "Graphics/ScreenMesh.cpp"
 
    # Audio
    "Audios/AudioClip.h"             "Audios/AudioClip.cpp"
@@ -99,6 +100,7 @@ add_library(Engine STATIC
    "Managers/SceneManager.h"        "Managers/SceneManager.cpp"
    "Managers/RenderManager.h"       "Managers/RenderManager.cpp"
    "Managers/AudioManager.h"        "Managers/AudioManager.cpp"
+
 )
 
 # 2. [PCH 설정] EnginePCH.h를 PCH로 사용합니다.

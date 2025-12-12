@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 #include <filesystem>
 #include <fstream>
 #include <assimp/Importer.hpp>
@@ -6,11 +6,6 @@
 #include <assimp/postprocess.h>
 #include "Graphics/Vertex.h"
 #include "Graphics/Bone.h"
-
-// TODO :
-// IMPORTANT : Áö±Ý ÀÌ Model Å¬·¡½º´Â ¿òÁ÷ÀÌ´Â ¸ðµ¨ ÇÑÁ¤¿¡¼­¸¸
-// ·Îµå¸¦ Áö¿øÇÏ°í ÀÖ´Ù. Á¤Àû ¹°Ã¼¿¡ ´ëÇÑ ·Îµåµµ Áö¿øÇÒ ¼ö ÀÖµµ·Ï
-// ¼öÁ¤ÀÌ ÇÊ¿äÇÏ´Ù.
 
 #pragma region FORWARD_DECLARATION
 CLASS_PTR(Mesh)
@@ -20,6 +15,9 @@ CLASS_PTR(Material)
 CLASS_PTR(Program)
 #pragma endregion
 
+// TODO : ë¨¸í‹°ë¦¬ì–¼ ì¡°ê¸ˆ ë‚˜ëˆ„ë©´ ì´ì œ ëª¨ë¸ì„ ë¡œë“œí•  ë•Œ,
+// ë¨¸í‹°ë¦¬ì–¼ ë¡œë“œë¥¼ SRPë¡œ í•  ê²ƒì¸ì§€ URPë¡œ í•  ê²ƒì¸ì§€ êµ¬ë¶„í•˜ëŠ”
+// ë¡œì§ì„ ì¶”ê°€í•´ì¤˜ì•¼ í•œë‹¤.
 CLASS_PTR(Model)
 class Model
 {

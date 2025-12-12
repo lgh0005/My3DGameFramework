@@ -152,7 +152,6 @@ bool Model::LoadByBinary(const std::string& filename)
 
     // 2. 머티리얼 로드
     // TODO : PBR 관련 텍스쳐도 로드해야 함.
-    // TODO : 만일 이들이 없을 경우에 대한 조치도 필요. (기본값으로 들어가도록 수정 필요)
     m_materials.resize(materialCount);
     for (uint32 i = 0; i < materialCount; ++i)
     {

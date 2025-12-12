@@ -10,7 +10,7 @@
 #include "Core/Scene.h"
 #include "Graphics/Geometry.h"
 #include "Graphics/Program.h"
-#include "Graphics/Mesh.h"
+#include "Graphics/ScreenMesh.h"
 #include "Graphics/StaticMesh.h" 
 #include "Graphics/FrameBuffer.h"
 #include "Graphics/Texture.h"   
@@ -37,7 +37,7 @@ bool StandardDeferredLightingPass::Init()
 	);
 	if (!m_deferredLightProgram) return false;
 
-	m_plane = GeometryGenerator::CreateNDCQuad();
+	m_plane = ScreenMesh::Create();
 	if (!m_plane) return false;
 
 	return true;
@@ -130,6 +130,6 @@ void StandardDeferredLightingPass::Render(RenderContext* context)
 	}
 
 	// 7. 그리기
-	m_plane->Draw(m_deferredLightProgram.get());
+	m_plane->Draw();
 	glEnable(GL_DEPTH_TEST);
 }

@@ -5,6 +5,7 @@
 CLASS_PTR(Scene)
 CLASS_PTR(Camera)
 CLASS_PTR(Framebuffer)
+CLASS_PTR(ScreenMesh)
 CLASS_PTR(RenderContext)
 #pragma endregion
 
@@ -28,11 +29,11 @@ private:
 	StandardPostProcessPass() = default;
 	bool Init(int32 width, int32 height);
 
-	MeshPtr			m_plane;
-	ProgramUPtr		m_blurProgram;
-	ProgramUPtr		m_compositeProgram;
-	FramebufferUPtr m_frameBuffer;
-	FramebufferUPtr m_pingPongFBOs[2];
-	float m_gamma			 { 2.2f };
-	float m_exposure		 { 1.0f };
+	ScreenMeshPtr			  m_plane;
+	ProgramUPtr				  m_blurProgram;
+	ProgramUPtr				  m_compositeProgram;
+	FramebufferUPtr			  m_frameBuffer;
+	FramebufferUPtr			  m_pingPongFBOs[2];
+	float m_gamma			  { 2.2f };
+	float m_exposure		  { 1.0f };
 };

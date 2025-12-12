@@ -13,7 +13,8 @@ enum class MeshType
 {
     Static,
     Skinned,
-    Instanced
+    Instanced,
+    Screen
 };
 
 CLASS_PTR(Mesh)

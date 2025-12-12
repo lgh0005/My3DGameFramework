@@ -177,34 +177,6 @@ StaticMeshUPtr GeometryGenerator::CreatePlane()
     return std::move(mesh);
 }
 
-StaticMeshUPtr GeometryGenerator::CreateNDCQuad()
-{
-    std::vector<StaticVertex> vertices =
-    {
-            StaticVertex { glm::vec3(-1.0f, -1.0f, 0.0f), glm::vec3(0.0f,  0.0f, 1.0f), glm::vec2(0.0f, 0.0f), glm::vec3(1.0f, 0.0f, 0.0f) },
-            StaticVertex { glm::vec3(1.0f, -1.0f, 0.0f), glm::vec3(0.0f,  0.0f, 1.0f), glm::vec2(1.0f, 0.0f), glm::vec3(1.0f, 0.0f, 0.0f) },
-            StaticVertex { glm::vec3(1.0f,  1.0f, 0.0f), glm::vec3(0.0f,  0.0f, 1.0f), glm::vec2(1.0f, 1.0f), glm::vec3(1.0f, 0.0f, 0.0f) },
-            StaticVertex { glm::vec3(-1.0f,  1.0f, 0.0f), glm::vec3(0.0f,  0.0f, 1.0f), glm::vec2(0.0f, 1.0f), glm::vec3(1.0f, 0.0f, 0.0f) },
-    };
-
-    std::vector<uint32> indices = { 0, 1, 2, 2, 3, 0 };
-
-    glm::vec3 minBound(FLT_MAX);
-    glm::vec3 maxBound(-FLT_MAX);
-    for (const auto& v : vertices)
-    {
-        minBound = Utils::Min(minBound, v.position);
-        maxBound = Utils::Max(maxBound, v.position);
-    }
-
-    // TODO : 이걸 컬링 대상에 넣는게 맞는걸까?
-    auto mesh = StaticMesh::Create(vertices, indices, GL_TRIANGLES);
-    mesh->SetLocalBounds(RenderBounds::CreateFromMinMax(minBound, maxBound));
-    if (!mesh) return nullptr;
-
-    return std::move(mesh);
-}
-
 StaticMeshUPtr GeometryGenerator::CreateSphere
 (
     uint32 latiSegmentCount,

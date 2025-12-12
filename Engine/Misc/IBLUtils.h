@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 
 #pragma region FORWARD_DECLARATION
 CLASS_PTR(Program)
@@ -8,18 +8,19 @@ CLASS_PTR(Mesh)
 class IBLUtils
 {
 public:
+
+    // 1. Spherical Mapì„ íë¸Œë§µìœ¼ë¡œ ë³€í™˜
 	static CubeTexturePtr CreateCubemapFromHDR(Texture* hdrTexture, int32 resolution = 2048);
 
-    // TODO
-    // 2. Diffuse¿ë (Irradiance Map) »ı¼º
-    // Å¥ºê¸ÊÀ» ³ÖÀ¸¸é, Èå¸´ÇÏ°Ô ¹¶°³Áø »õ Å¥ºê¸ÊÀ» ¸®ÅÏ
+    // 2. IBL Diffuseìš© (Irradiance Map) ìƒì„±
+    // íë¸Œë§µì„ ë„£ìœ¼ë©´, íë¦¿í•˜ê²Œ ë­‰ê°œì§„ ìƒˆ íë¸Œë§µì„ ë¦¬í„´
     static CubeTexturePtr CreateIrradianceMap(CubeTexture* src);
 
-    // 3. Specular¿ë (Prefiltered Map) »ı¼º
-    // °ÅÄ¥±âº°·Î ¹Ó¸ÊÀÌ »ı¼ºµÈ Å¥ºê¸Ê ¸®ÅÏ
+    // 3. IBL Specularìš© (Prefiltered Map) ìƒì„±
+    // ê±°ì¹ ê¸°ë³„ë¡œ ë°‰ë§µì´ ìƒì„±ëœ íë¸Œë§µ ë¦¬í„´
     static CubeTexturePtr CreatePrefilteredMap(CubeTexture* src);
 
-    // 4. Specular¿ë (BRDF LUT) »ı¼º
-    // 2D ÅØ½ºÃ³ ÇÏ³ª ¸®ÅÏ
+    // 4. IBL Specularìš© (BRDF LUT) ìƒì„±
+    // 2D í…ìŠ¤ì²˜ í•˜ë‚˜ ë¦¬í„´
     static TexturePtr CreateBRDFLUT();
 };

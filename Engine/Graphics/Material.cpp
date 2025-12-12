@@ -1,8 +1,11 @@
-#include "EnginePch.h"
+ï»¿#include "EnginePch.h"
 #include "Material.h"
 #include "Graphics/Program.h"
 #include "Graphics/Texture.h"
 
+/*===========================//
+//  material common methods  //
+//===========================*/
 MaterialUPtr Material::Create()
 {
     return MaterialUPtr(new Material());
@@ -11,56 +14,56 @@ MaterialUPtr Material::Create()
 void Material::SetToProgram(const Program* program) const 
 {
     // 1. Albedo (Diffuse) - [Slot 0]
-    // ±âº»°ª: White (»ö»ó °ö¼À¿¡ ¿µÇâ ¾øÀ½)
+    // ê¸°ë³¸ê°’: White (ìƒ‰ìƒ ê³±ì…ˆì— ì˜í–¥ ì—†ìŒ)
     glActiveTexture(GL_TEXTURE0 + (int)TextureSlot::SLOT_ALBEDO);
     program->SetUniform("material.diffuse", (int)TextureSlot::SLOT_ALBEDO);
     if (diffuse) diffuse->Bind();
     else Texture::CreateWhite()->Bind();
 
-    // 2. Specular - [Slot 1]
-    // ±âº»°ª: Black (¹İ»ç±¤ ¾øÀ½)
+    //// 2. Specular - [Slot 1]
+    // ê¸°ë³¸ê°’: Black (ë°˜ì‚¬ê´‘ ì—†ìŒ)
     glActiveTexture(GL_TEXTURE0 + (int)TextureSlot::SLOT_SPECULAR);
     program->SetUniform("material.specular", (int)TextureSlot::SLOT_SPECULAR);
     if (specular) specular->Bind();
     else Texture::CreateBlack()->Bind();
 
     // 3. Emission - [Slot 2]
-    // ±âº»°ª: Black (¹ß±¤ ¾øÀ½)
+    // ê¸°ë³¸ê°’: Black (ë°œê´‘ ì—†ìŒ)
     glActiveTexture(GL_TEXTURE0 + (int)TextureSlot::SLOT_EMISSION);
     program->SetUniform("material.emission", (int)TextureSlot::SLOT_EMISSION);
     if (emission) emission->Bind();
     else Texture::CreateBlack()->Bind();
 
     // 4. Normal - [Slot 3]
-    // ±âº»°ª: Blue (RGB: 128, 128, 255 -> Vector: 0, 0, 1)
+    // ê¸°ë³¸ê°’: Blue (RGB: 128, 128, 255 -> Vector: 0, 0, 1)
     glActiveTexture(GL_TEXTURE0 + (int)TextureSlot::SLOT_NORMAL);
     program->SetUniform("material.normal", (int)TextureSlot::SLOT_NORMAL);
     if (normal) normal->Bind();
     else Texture::CreateBlue()->Bind();
 
     // 5. Height (Displacement) - [Slot 4]
-    // ±âº»°ª: Black (³ôÀÌ º¯È­ ¾øÀ½)
+    // ê¸°ë³¸ê°’: Black (ë†’ì´ ë³€í™” ì—†ìŒ)
     glActiveTexture(GL_TEXTURE0 + (int)TextureSlot::SLOT_HEIGHT);
     program->SetUniform("material.height", (int)TextureSlot::SLOT_HEIGHT);
     if (height) height->Bind();
     else Texture::CreateBlack()->Bind();
 
     // 6. Ambient Occlusion (AO) - [Slot 5]
-    // ±âº»°ª: White (Â÷Æó ¾øÀ½, ¸ğµç ºûÀ» ´Ù ¹ŞÀ½)
+    // ê¸°ë³¸ê°’: White (ì°¨í ì—†ìŒ, ëª¨ë“  ë¹›ì„ ë‹¤ ë°›ìŒ)
     glActiveTexture(GL_TEXTURE0 + (int)TextureSlot::SLOT_AO);
     program->SetUniform("material.ao", (int)TextureSlot::SLOT_AO);
     if (ao) ao->Bind();
     else Texture::CreateWhite()->Bind();
 
     // 7. Metallic - [Slot 6]
-    // ±âº»°ª: Black (ºñ±İ¼Ó)
+    // ê¸°ë³¸ê°’: Black (ë¹„ê¸ˆì†)
     glActiveTexture(GL_TEXTURE0 + (int)TextureSlot::SLOT_METALLIC);
     program->SetUniform("material.metallic", (int)TextureSlot::SLOT_METALLIC);
     if (metallic) metallic->Bind();
     else Texture::CreateBlack()->Bind();
 
     // 8. Roughness - [Slot 7]
-    // ±âº»°ª: Gray (0.5 - Àû´çÇÑ °ÅÄ¥±â) È¤Àº White (¿ÏÀü °ÅÄ§)
+    // ê¸°ë³¸ê°’: Gray (0.5 - ì ë‹¹í•œ ê±°ì¹ ê¸°) í˜¹ì€ White (ì™„ì „ ê±°ì¹¨)
     glActiveTexture(GL_TEXTURE0 + (int)TextureSlot::SLOT_ROUGHNESS);
     program->SetUniform("material.roughness", (int)TextureSlot::SLOT_ROUGHNESS);
     if (roughness) roughness->Bind();
@@ -72,3 +75,60 @@ void Material::SetToProgram(const Program* program) const
     program->SetUniform("material.heightScale", heightScale);
 }
 
+#pragma region MATERIALS_NOW_WORKING
+/*=============================//
+//  standard material methods  //
+//=============================*/
+StandardMaterialUPtr StandardMaterial::Create()
+{
+    return StandardMaterialUPtr(new StandardMaterial());
+}
+
+void StandardMaterial::SetToProgram(const Program* program) const
+{
+    // ê³µí†µ ì†ì„± í…ìŠ¤ì³ ë°”ì¸ë”©
+    Super::SetToProgram(program);
+
+    // Specular - [Slot 1]
+    // ê¸°ë³¸ê°’: Black (ë°˜ì‚¬ê´‘ ì—†ìŒ)
+    glActiveTexture(GL_TEXTURE0 + (int)TextureSlot::SLOT_SPECULAR);
+    program->SetUniform("material.specular", (int)TextureSlot::SLOT_SPECULAR);
+    if (specular) specular->Bind();
+    else Texture::CreateBlack()->Bind();
+
+    // í…ìŠ¤ì³ ìŠ¬ë¡¯ ì´ˆê¸°í™” ë° í…ìŠ¤ì³ ìœ ë‹ˆí¼ ë³€ìˆ˜ ì„¤ì •
+    glActiveTexture(GL_TEXTURE0);
+    program->SetUniform("material.shininess", shininess);
+}
+
+/*==============================//
+//  universal material methods  //
+//==============================*/
+UniversalMaterialUPtr UniversalMaterial::Create()
+{
+    return UniversalMaterialUPtr(new UniversalMaterial());
+}
+
+void UniversalMaterial::SetToProgram(const Program* program) const
+{
+    // ê³µí†µ ì†ì„± í…ìŠ¤ì³ ë°”ì¸ë”©
+    Super::SetToProgram(program);
+
+    // Metallic - [Slot 6]
+    // ê¸°ë³¸ê°’: Black (ë¹„ê¸ˆì†)
+    glActiveTexture(GL_TEXTURE0 + (int)TextureSlot::SLOT_METALLIC);
+    program->SetUniform("material.metallic", (int)TextureSlot::SLOT_METALLIC);
+    if (metallic) metallic->Bind();
+    else Texture::CreateBlack()->Bind();
+
+    // Roughness - [Slot 7]
+    // ê¸°ë³¸ê°’: Gray (0.5 - ì ë‹¹í•œ ê±°ì¹ ê¸°)
+    glActiveTexture(GL_TEXTURE0 + (int)TextureSlot::SLOT_ROUGHNESS);
+    program->SetUniform("material.roughness", (int)TextureSlot::SLOT_ROUGHNESS);
+    if (roughness) roughness->Bind();
+    else Texture::CreateGray()->Bind();
+
+    // í…ìŠ¤ì³ ìŠ¬ë¡¯ ì´ˆê¸°í™” ë° í…ìŠ¤ì³ ìœ ë‹ˆí¼ ë³€ìˆ˜ ì„¤ì •
+    glActiveTexture(GL_TEXTURE0);
+}
+#pragma endregion
