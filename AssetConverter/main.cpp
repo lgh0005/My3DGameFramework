@@ -32,101 +32,112 @@ void PrintUsage()
 
 int main(int argc, char* argv[])
 {
+    // 0. verify 로직
+    if (argc >= 2 && std::string(argv[1]) == "--check")
+    {
+        std::cout << "AssetConverter verified\n";
+        return 0;
+    }
+
     // 1. Logger 초기화
     // spdlog::set_level(spdlog::level::info);
     LOGGER.Init();
 
-    if (argc < 2) // Check if at least an option is provided
-    {
-        SPDLOG_ERROR("Not enough arguments.");
-        PrintUsage();
-        return -1;
-    }
+    // TODO : Python GUI와의 통신을 위해서 로직 수정이 필요
+    // 추가로, 보다 안정된 로드를 위해 AssetConverter의 Converter들의 로직을
+    // 보강할 필요가 있음.
 
-    std::string option = argv[1];
-    bool success = false;
+    //if (argc < 2) // Check if at least an option is provided
+    //{
+    //    SPDLOG_ERROR("Not enough arguments.");
+    //    PrintUsage();
+    //    return -1;
+    //}
 
-    try
-    {
-        if (option == "-m" || option == "--model")
-        {
-            // Model conversion: needs 4 arguments (exe, option, input, output)
-            if (argc < 4)
-            {
-                SPDLOG_ERROR("Model conversion requires input and output file paths.");
-                PrintUsage();
-                return -1;
-            }
-            std::string inputPath = argv[2];
-            std::string outputPath = argv[3];
+    //std::string option = argv[1];
+    //bool success = false;
 
-            SPDLOG_INFO("=== Model Conversion Mode ===");
-            success = ModelConverter::Convert(inputPath, outputPath);
-        }
-        else if (option == "-a" || option == "--anim")
-        {
-            // Animation conversion: needs 5 arguments (exe, option, animInput, modelInput, output)
-            if (argc < 5)
-            {
-                SPDLOG_ERROR("Animation conversion requires animation file, base model file, and output file paths.");
-                PrintUsage();
-                return -1;
-            }
-            std::string animInputPath = argv[2];
-            std::string modelInputPath = argv[3];
-            std::string outputPath = argv[4];
+    //try
+    //{
+    //    if (option == "-m" || option == "--model")
+    //    {
+    //        // Model conversion: needs 4 arguments (exe, option, input, output)
+    //        if (argc < 4)
+    //        {
+    //            SPDLOG_ERROR("Model conversion requires input and output file paths.");
+    //            PrintUsage();
+    //            return -1;
+    //        }
+    //        std::string inputPath = argv[2];
+    //        std::string outputPath = argv[3];
 
-            // Check if input files exist
-            if (!std::filesystem::exists(animInputPath))
-            {
-                SPDLOG_ERROR("Cannot find animation file: {}", animInputPath);
-                return -1;
-            }
-            if (!std::filesystem::exists(modelInputPath))
-            {
-                SPDLOG_ERROR("Cannot find base model file: {}", modelInputPath);
-                return -1;
-            }
+    //        SPDLOG_INFO("=== Model Conversion Mode ===");
+    //        success = ModelConverter::Convert(inputPath, outputPath);
+    //    }
+    //    else if (option == "-a" || option == "--anim")
+    //    {
+    //        // Animation conversion: needs 5 arguments (exe, option, animInput, modelInput, output)
+    //        if (argc < 5)
+    //        {
+    //            SPDLOG_ERROR("Animation conversion requires animation file, base model file, and output file paths.");
+    //            PrintUsage();
+    //            return -1;
+    //        }
+    //        std::string animInputPath = argv[2];
+    //        std::string modelInputPath = argv[3];
+    //        std::string outputPath = argv[4];
 
-            SPDLOG_INFO("=== Animation Conversion Mode ===");
-            success = AnimConverter::Convert(animInputPath, modelInputPath, outputPath);
-        }
-        else if (option == "-t" || option == "--texture")
-        {
-            if (argc < 4)
-            {
-                SPDLOG_ERROR("Texture conversion requires input and output file paths.");
-                PrintUsage();
-                return -1;
-            }
+    //        // Check if input files exist
+    //        if (!std::filesystem::exists(animInputPath))
+    //        {
+    //            SPDLOG_ERROR("Cannot find animation file: {}", animInputPath);
+    //            return -1;
+    //        }
+    //        if (!std::filesystem::exists(modelInputPath))
+    //        {
+    //            SPDLOG_ERROR("Cannot find base model file: {}", modelInputPath);
+    //            return -1;
+    //        }
 
-            std::string inputPath = argv[2];
-            std::string outputPath = argv[3];
+    //        SPDLOG_INFO("=== Animation Conversion Mode ===");
+    //        success = AnimConverter::Convert(animInputPath, modelInputPath, outputPath);
+    //    }
+    //    else if (option == "-t" || option == "--texture")
+    //    {
+    //        if (argc < 4)
+    //        {
+    //            SPDLOG_ERROR("Texture conversion requires input and output file paths.");
+    //            PrintUsage();
+    //            return -1;
+    //        }
 
-            std::string oetfMode = "linear";
+    //        std::string inputPath = argv[2];
+    //        std::string outputPath = argv[3];
 
-        }
-        else
-        {
-            SPDLOG_ERROR("Unknown option: {}", option);
-            PrintUsage();
-            return -1;
-        }
-    }
-    catch (const std::exception& e)
-    {
-        SPDLOG_ERROR("Exception occurred: {}", e.what());
-        return -1;
-    }
+    //        std::string oetfMode = "linear";
 
-    if (success)
-    {
-        SPDLOG_INFO(">>> Conversion Complete! <<<");
-        return 0;
-    }
-    else
-    {
-        SPDLOG_ERROR(">>> Conversion Failed! <<<");
-        return -1;
-    }
+    //    }
+    //    else
+    //    {
+    //        SPDLOG_ERROR("Unknown option: {}", option);
+    //        PrintUsage();
+    //        return -1;
+    //    }
+    //}
+    //catch (const std::exception& e)
+    //{
+    //    SPDLOG_ERROR("Exception occurred: {}", e.what());
+    //    return -1;
+    //}
+
+    //if (success)
+    //{
+    //    SPDLOG_INFO(">>> Conversion Complete! <<<");
+    //    return 0;
+    //}
+    //else
+    //{
+    //    SPDLOG_ERROR(">>> Conversion Failed! <<<");
+    //    return -1;
+    //}
 }

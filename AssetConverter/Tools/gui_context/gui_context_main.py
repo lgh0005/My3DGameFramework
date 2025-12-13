@@ -1,4 +1,6 @@
+import os, subprocess
 import tkinter as tk
+from tkinter import filedialog, messagebox
 from gui_context.gui_context_base import GUIContextBase
 
 class GuiContextConvertMain(GUIContextBase):
@@ -23,6 +25,15 @@ class GuiContextConvertMain(GUIContextBase):
                                                 self._clicked_convert_orm]):
             btn = tk.Button(self, text=text, command=command, width=max_button_width)
             btn.pack(pady=10, ipadx=10, ipady=5)
+
+    def _browse_exe_file(self):
+        path = filedialog.askopenfilename(
+            title="Select AssetConverter.exe",
+            filetypes=[("Executable Files", "*.exe"), ("All Files", "*.*")]
+        )
+        if path:
+            self._exe_path.delete(0, tk.END)
+            self._exe_path.insert(0, path)
 
     def _clicked_convert_animation(self):
         self._window.set_context_by_name("animation")

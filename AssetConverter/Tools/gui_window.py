@@ -1,5 +1,6 @@
 import tkinter as tk
 
+from gui_context.gui_context_exe_verify import GuiContextVerifyAssetConverter
 from gui_context.gui_context_main import GuiContextConvertMain
 from gui_context.gui_context_convert_animation import GuiContextConvertAnimation
 from gui_context.gui_context_convert_model import GuiContextConvertModel
@@ -21,11 +22,13 @@ class Window:
         self._root.maxsize(Window.width, Window.height)
         self._current_context = None
         self._context_classes = {
+            "verify": GuiContextVerifyAssetConverter,
             "main": GuiContextConvertMain,
             "animation": GuiContextConvertAnimation,
             "model": GuiContextConvertModel,
             "orm": GuiContextConvertORMTexture
         }
+        self._asset_converter_executable_path = ""
 
     def _set_context(self, context_cls):
         if self._current_context:
@@ -38,6 +41,9 @@ class Window:
         context_cls = self._context_classes[name]
         self._set_context(context_cls)
 
-    def run(self, context_cls=GuiContextConvertMain):
+    def destroy(self):
+        self._root.destroy()
+
+    def run(self, context_cls=GuiContextVerifyAssetConverter):
         self._set_context(context_cls)
         self._root.mainloop()
