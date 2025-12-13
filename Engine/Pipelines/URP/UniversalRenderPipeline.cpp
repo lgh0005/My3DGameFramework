@@ -2,7 +2,7 @@
 #include "UniversalRenderPipeline.h"
 
 #include "Pipelines/Common/CullingPass.h"
-#include "Pipelines/URP/RenderPasses/UniversalSkyboxPass.h"
+#include "Pipelines/Common/SkyboxPass.h"
 #include "Pipelines/URP/RenderPasses/UniversalPostProcessPass.h"
 #include "Pipelines/URP/UniversalGlobalUniforms.h"
 #include "Pipelines/URP/UniversalRenderContext.h"
@@ -41,7 +41,7 @@ bool UniversalRenderPipeline::Init()
 	if (!m_cullingPass) return false;
 
 	// Skybox 패스 생성
-	m_skyboxPass = UniversalSkyboxPass::Create();
+	m_skyboxPass = SkyboxPass::Create();
 	if (!m_skyboxPass) return false;
 
 	// 포스트-프로세싱 패스 생성

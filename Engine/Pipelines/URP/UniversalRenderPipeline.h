@@ -3,7 +3,8 @@
 
 #pragma region FORWARD_DECLARATION
 CLASS_PTR(CullingPass)
-CLASS_PTR(UniversalSkyboxPass) // TODO : 이제 왜 공통인지 이해해버렸다
+CLASS_PTR(SkyboxPass)
+// CLASS_PTR(UniversalSkyboxPass) // TODO : 이제 왜 공통인지 이해해버렸다
 CLASS_PTR(UniversalPostProcessPass)
 CLASS_PTR(UniversalGlobalUniforms)
 #pragma endregion
@@ -26,9 +27,9 @@ private:
 
 	// 공통 필수 렌더 패스
 	CullingPassUPtr		         m_cullingPass      { nullptr };
+	SkyboxPassUPtr               m_skyboxPass       { nullptr };
 
 	// URP 필수 렌더 패스
-	UniversalSkyboxPassUPtr      m_skyboxPass		{ nullptr };
 	UniversalPostProcessPassUPtr m_postProcessPass	{ nullptr };
 
 	// URP 공통 유니폼 변수 버퍼

@@ -8,9 +8,8 @@
 #include "Graphics/Mesh.h"
 #include "Graphics/StaticMesh.h"
 #include "Graphics/Geometry.h"
+#include "Graphics/SkyLight.h"
 #include "Components/Camera.h"
-
-#include "Pipelines/SRP/StandardRenderContext.h"
 
 SkyboxPassUPtr SkyboxPass::Create()
 {
@@ -37,9 +36,8 @@ bool SkyboxPass::Init()
 void SkyboxPass::Render(RenderContext* context)
 {
 	// 0. 자신의 렌더 패스에 활용되고 있는 RenderContext로 캐스팅
-	auto stdCtx = (StandardRenderContext*)context;
-	auto camera = stdCtx->GetCamera();
-	auto skyTexture = stdCtx->GetSkyboxTexture();
+	auto camera = context->GetCamera();
+	auto skyTexture = context->GetSkyLight()->GetSkybox();
 	if (!skyTexture) return;
 
 	auto projection = camera->GetProjectionMatrix();

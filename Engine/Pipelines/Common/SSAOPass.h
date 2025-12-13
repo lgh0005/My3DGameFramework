@@ -24,8 +24,6 @@ public:
 	virtual void Render(RenderContext* context) override;
 	void Resize(int32 width, int32 height);
 
-	Texture* GetSSAOResultTexture() const;
-
 private:
 	SSAOPass() = default;
 	bool Init(int32 width, int32 height);

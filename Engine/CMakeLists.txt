@@ -31,13 +31,13 @@ add_library(Engine STATIC
    "Pipelines/SRP/RenderPasses/StandardGeometryPass.h"  "Pipelines/SRP/RenderPasses/StandardGeometryPass.cpp"
    "Pipelines/SRP/RenderPasses/StandardDeferredLightingPass.h"  "Pipelines/SRP/RenderPasses/StandardDeferredLightingPass.cpp"
    "Pipelines/SRP/RenderPasses/StandardPostProcessPass.h"  "Pipelines/SRP/RenderPasses/StandardPostProcessPass.cpp"
-   "Pipelines/SRP/RenderPasses/StandardSkyboxPass.h"        "Pipelines/SRP/RenderPasses/StandardSkyboxPass.cpp"
+   #"Pipelines/SRP/RenderPasses/StandardSkyboxPass.h"        "Pipelines/SRP/RenderPasses/StandardSkyboxPass.cpp"
    "Pipelines/SRP/StandardGlobalUniforms.h"    "Pipelines/SRP/StandardGlobalUniforms.cpp"
    "Pipelines/SRP/StandardRenderContext.h"     "Pipelines/SRP/StandardRenderContext.cpp"
    "Pipelines/SRP/StandardRenderPipeline.h"    "Pipelines/SRP/StandardRenderPipeline.cpp"
 
    # Universal Render Pipeline
-   "Pipelines/URP/RenderPasses/UniversalSkyboxPass.h" "Pipelines/URP/RenderPasses/UniversalSkyboxPass.cpp"
+   #"Pipelines/URP/RenderPasses/UniversalSkyboxPass.h" "Pipelines/URP/RenderPasses/UniversalSkyboxPass.cpp"
    "Pipelines/URP/RenderPasses/UniversalPostProcessPass.h"  "Pipelines/URP/RenderPasses/UniversalPostProcessPass.cpp"
    "Pipelines/URP/UniversalGlobalUniforms.h"   "Pipelines/URP/UniversalGlobalUniforms.cpp"
    "Pipelines/URP/UniversalRenderContext.h"    "Pipelines/URP/UniversalRenderContext.cpp"

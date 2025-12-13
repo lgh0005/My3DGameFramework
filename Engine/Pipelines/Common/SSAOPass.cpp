@@ -66,12 +66,6 @@ void SSAOPass::Resize(int32 width, int32 height)
     m_ssaoBlurFBO = Framebuffer::CreateSSAO(width, height);
 }
 
-Texture* SSAOPass::GetSSAOResultTexture() const
-{
-    // Framebuffer 클래스에 GetColorAttachment가 있으므로 이를 활용
-    return m_ssaoBlurFBO->GetColorAttachment(0).get();
-}
-
 void SSAOPass::GenerateKernel()
 {
     std::uniform_real_distribution<float> randomFloats(0.0, 1.0);
@@ -162,6 +156,9 @@ void SSAOPass::Render(RenderContext* context)
     m_ssaoBlurProgram->SetUniform("ssaoInput", 0);
 
     m_screenQuad->Draw();
+
+    // context에 ssao 결과 캐싱
+    stdCtx->SetSSAOTexture(m_ssaoBlurFBO->GetColorAttachment(0).get());
 
     Framebuffer::BindToDefault();
 }
