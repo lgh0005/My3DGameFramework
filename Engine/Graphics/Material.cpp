@@ -3,9 +3,6 @@
 #include "Graphics/Program.h"
 #include "Graphics/Texture.h"
 
-/*===========================//
-//  material common methods  //
-//===========================*/
 MaterialUPtr Material::Create()
 {
     return MaterialUPtr(new Material());
@@ -48,6 +45,8 @@ void Material::SetToProgram(const Program* program) const
     if (height) height->Bind();
     else Texture::CreateBlack()->Bind();
 
+#pragma region ORM_TEXTURE_PROPERTIES
+
     // 6. Ambient Occlusion (AO) - [Slot 5]
     // 기본값: White (차폐 없음, 모든 빛을 다 받음)
     glActiveTexture(GL_TEXTURE0 + (int)TextureSlot::SLOT_AO);
@@ -69,66 +68,14 @@ void Material::SetToProgram(const Program* program) const
     if (roughness) roughness->Bind();
     else Texture::CreateGray()->Bind();
 
+#pragma endregion
+
     glActiveTexture(GL_TEXTURE0);
     program->SetUniform("material.shininess", shininess);
     program->SetUniform("material.emissionStrength", emissionStrength);
     program->SetUniform("material.heightScale", heightScale);
+
+   /* program->SetUniform("material.albedoFactor", albedoFactor);
+    program->SetUniform("material.metallicFactor", metallicFactor);
+    program->SetUniform("material.roughnessFactor", roughnessFactor);*/
 }
-
-#pragma region MATERIALS_NOW_WORKING
-/*=============================//
-//  standard material methods  //
-//=============================*/
-StandardMaterialUPtr StandardMaterial::Create()
-{
-    return StandardMaterialUPtr(new StandardMaterial());
-}
-
-void StandardMaterial::SetToProgram(const Program* program) const
-{
-    // 공통 속성 텍스쳐 바인딩
-    Super::SetToProgram(program);
-
-    // Specular - [Slot 1]
-    // 기본값: Black (반사광 없음)
-    glActiveTexture(GL_TEXTURE0 + (int)TextureSlot::SLOT_SPECULAR);
-    program->SetUniform("material.specular", (int)TextureSlot::SLOT_SPECULAR);
-    if (specular) specular->Bind();
-    else Texture::CreateBlack()->Bind();
-
-    // 텍스쳐 슬롯 초기화 및 텍스쳐 유니폼 변수 설정
-    glActiveTexture(GL_TEXTURE0);
-    program->SetUniform("material.shininess", shininess);
-}
-
-/*==============================//
-//  universal material methods  //
-//==============================*/
-UniversalMaterialUPtr UniversalMaterial::Create()
-{
-    return UniversalMaterialUPtr(new UniversalMaterial());
-}
-
-void UniversalMaterial::SetToProgram(const Program* program) const
-{
-    // 공통 속성 텍스쳐 바인딩
-    Super::SetToProgram(program);
-
-    // Metallic - [Slot 6]
-    // 기본값: Black (비금속)
-    glActiveTexture(GL_TEXTURE0 + (int)TextureSlot::SLOT_METALLIC);
-    program->SetUniform("material.metallic", (int)TextureSlot::SLOT_METALLIC);
-    if (metallic) metallic->Bind();
-    else Texture::CreateBlack()->Bind();
-
-    // Roughness - [Slot 7]
-    // 기본값: Gray (0.5 - 적당한 거칠기)
-    glActiveTexture(GL_TEXTURE0 + (int)TextureSlot::SLOT_ROUGHNESS);
-    program->SetUniform("material.roughness", (int)TextureSlot::SLOT_ROUGHNESS);
-    if (roughness) roughness->Bind();
-    else Texture::CreateGray()->Bind();
-
-    // 텍스쳐 슬롯 초기화 및 텍스쳐 유니폼 변수 설정
-    glActiveTexture(GL_TEXTURE0);
-}
-#pragma endregion

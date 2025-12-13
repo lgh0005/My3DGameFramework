@@ -1,65 +1,38 @@
 #pragma once
-#include "Graphics/Vertex.h"
-
-#pragma region FORWARD_DECLARATION
-struct aiScene;
-struct aiNode;
-struct aiMesh;
-struct aiMaterial;
-enum aiTextureType : int32;
-#pragma endregion
-
-#pragma region CONVERT_STRUCTS
-struct TempMesh
-{
-    uint32_t materialIndex;
-    std::vector<SkinnedVertex> vertices;
-    std::vector<uint32_t> indices;
-};
-
-struct TempMaterial
-{
-    std::string diffuseMapPath;
-    std::string specularMapPath;
-    std::string emissionMapPath;
-    std::string normalMapPath;
-    std::string heightMapPath;
-    // ... (나중에 shininess 등 PBR 데이터 추가) ...
-};
-#pragma endregion
+#include "AssetTypes/RawModel.h"
 
 class ModelConverter
 {
+	DECLARE_SINGLE(ModelConverter)
+
 public:
-    static bool Convert(const std::string& inputPath, 
-                        const std::string& outputPath);
+	bool Convert(const std::string& inputPath, const std::string& outputPath);
 
 private:
-    ModelConverter() = default;
-    bool RunConversion(const std::string& inputPath, const std::string& outputPath);
+	bool RunConversion(const std::string& inputPath, const std::string& outputPath);
 
-    // assimp 데이터 추출 메서드
-    void ProcessNode(aiNode* node, const aiScene* scene);
-    void ProcessMesh(aiMesh* mesh, const aiScene* scene);
-    TempMaterial ProcessMaterial(aiMaterial* material);
-    std::string GetTexturePath(aiMaterial* material, aiTextureType type);
-    void ExtractBoneWeightForVertices(std::vector<SkinnedVertex>& vertices, aiMesh* mesh);
+	// Assimp 처리 메서드
+	void ProcessNode(aiNode* node, const aiScene* scene);
+	void ProcessMesh(aiMesh* mesh, const aiScene* scene);
+	RawMaterial ProcessMaterial(aiMaterial* material);
 
-    // 커스텀 바이너리 파일 작성 메서드
-    bool WriteCustomModelFile(const std::string& outputPath);
+	// 뼈 가중치 추출 (SkinnedVertex일 때만 사용)
+	void ExtractBoneWeights(std::vector<RawSkinnedVertex>& vertices, aiMesh* mesh);
 
-    // 뼈 헬퍼 메서드
-    void SetVertexBoneDataToDefault(SkinnedVertex& vertex);
-    void SetVertexBoneData(SkinnedVertex& vertex, int boneID, float weight);
+	// 텍스쳐 경로 및 파일 쓰기
+	std::string GetTexturePath(aiMaterial* material, aiTextureType type);
+	bool WriteCustomModelFile(const std::string& outputPath);
 
 private:
-    std::vector<TempMesh>     m_meshes;     // 추출된 메쉬 데이터
-    std::vector<TempMaterial> m_materials;  // 추출된 머티리얼 데이터
+	// 기존의 잡다한 벡터들을 이거 하나로 통합!
+	RawModel m_rawModel;
 
-    std::unordered_map<std::string, BoneInfo> m_boneInfoMap;
-    int32 m_boneCounter = 0;
-    bool  m_hasSkeleton = false;
+	// 경로 계산용 임시 변수
+	std::string m_modelDirectory;
 
-    // 텍스처 경로를 찾기 위한 원본 모델 파일의 디렉터리
-    std::string m_modelDirectory;
+	// 뼈 ID 할당용 카운터 (RawModel.boneOffsetInfos의 인덱스와 동일)
+	int32 m_boneCounter = 0;
+
+	// 뼈 이름 중복 등록 방지 및 ID 검색용 맵
+	std::unordered_map<std::string, int32> m_boneNameToIdMap;
 };

@@ -15,75 +15,45 @@ enum class TextureSlot : int8
     SLOT_EMISSION = 2,
     SLOT_NORMAL = 3,
     SLOT_HEIGHT = 4,
+
+    // TODO : 이후에 ORM 텍스쳐 하나로 합쳐야 한다.
     SLOT_AO = 5,
     SLOT_METALLIC = 6,
     SLOT_ROUGHNESS = 7
 };
 
-enum class DefaultMaterialType { SRP, URP };
-
-/*==============================//
-//  material common properties  //
-//==============================*/
+/*==================//
+//  material class  //
+//==================*/
 CLASS_PTR(Material);
 class Material 
 {
 public:
-    static MaterialUPtr Create(); // TODO : 이후에 추상 클래스로 둬야함.
+    static MaterialUPtr Create();
 
     TexturePtr  diffuse;  // [공통]
     TexturePtr  specular; // [SRP]
     TexturePtr  emission; // [공통]
     TexturePtr  normal;   // [공통]
     TexturePtr  height;   // [공통]
+
+    // TODO : 이후에 ORM 텍스쳐 하나로 합쳐야 한다.
     TexturePtr  ao;       // [공통]
     TexturePtr  metallic; // [URP]
-    TexturePtr  roughness;// [URP]
+    TexturePtr  roughness;
+
     float       shininess           { 32.0f }; // [SRP]
     float       emissionStrength    { 1.0f };  // [공통]
     float       heightScale         { 1.0f };  // [공통]
 
-    virtual void SetToProgram(const Program* program) const;
-    // virtual DefaultMaterialType GetType() const = 0;
+    // TODO : 머티리얼에 albedoFactor, metallicFactor,
+    // roughnessFactor를 추가할 필요가 있음
+    /*float       albedoFactor;
+    float       metallicFactor;
+    float       roughnessFactor*/;
+
+    void SetToProgram(const Program* program) const;
 
 protected:
     Material() = default;
 };
-
-#pragma region MATERIALS_NOW_WORKING
-/*===============================//
-//  material properties for SRP  //
-//===============================*/
-CLASS_PTR(StandardMaterial)
-class StandardMaterial : public Material
-{
-    using Super = Material;
-
-public:
-    static StandardMaterialUPtr Create();
-    TexturePtr  specular; // [SRP]
-    float       shininess{ 32.0f }; // [SRP]
-    virtual void SetToProgram(const Program* program) const override;
-
-private:
-    StandardMaterial() = default;
-};
-
-/*===============================//
-//  material properties for URP  //
-//===============================*/
-CLASS_PTR(UniversalMaterial)
-class UniversalMaterial : public Material
-{
-    using Super = Material;
-
-public:
-    static UniversalMaterialUPtr Create();
-    TexturePtr  metallic; // [URP]
-    TexturePtr  roughness;// [URP]
-    virtual void SetToProgram(const Program* program) const override;
-
-private:
-    UniversalMaterial() = default;
-};
-#pragma endregion

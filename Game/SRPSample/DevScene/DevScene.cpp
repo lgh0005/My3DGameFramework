@@ -74,7 +74,7 @@ bool DevScene::LoadNessesaryResources()
 
 	// 0-3. 머티리얼 1
 	{
-		auto lightMat = StandardMaterial::Create();
+		auto lightMat = Material::Create();
 		lightMat->shininess = 16.0f;
 		lightMat->emissionStrength = 0.0f;
 		lightMat->heightScale = 0.0f;
@@ -90,7 +90,7 @@ bool DevScene::LoadNessesaryResources()
 		(Image::Load("./Resources/Images/matrix.jpg").get());*/
 		TextureUPtr emissionTexture = Texture::CreateFromKtxImage("./Resources/Images/baked/matrix.ktx");
 
-		auto box1Mat = StandardMaterial::Create();
+		auto box1Mat = Material::Create();
 		box1Mat->diffuse = std::move(diffuseTexture);
 		box1Mat->emission = std::move(emissionTexture);
 		box1Mat->shininess = 16.0f;
@@ -111,7 +111,7 @@ bool DevScene::LoadNessesaryResources()
 		(Image::Load("./Resources/Images/matrix.jpg").get());*/
 		TextureUPtr emissionTexture = Texture::CreateFromKtxImage("./Resources/Images/baked/matrix.ktx");
 
-		auto box2Mat = StandardMaterial::Create();
+		auto box2Mat = Material::Create();
 		box2Mat->diffuse = std::move(diffuseTexture);
 		box2Mat->specular = std::move(specularTexture);
 		box2Mat->emission = std::move(emissionTexture);
@@ -126,7 +126,7 @@ bool DevScene::LoadNessesaryResources()
 		/*TextureUPtr diffuseTexture = Texture::CreateFromImage(Image::Load("./Resources/Images/marble.jpg").get());*/
 		TextureUPtr diffuseTexture = Texture::CreateFromKtxImage("./Resources/Images/baked/marble.ktx");
 
-		auto box4Mat = StandardMaterial::Create();
+		auto box4Mat = Material::Create();
 		box4Mat->diffuse = std::move(diffuseTexture);
 		box4Mat->shininess = 20.0f;
 		box4Mat->emissionStrength = 0.0f;
@@ -141,7 +141,7 @@ bool DevScene::LoadNessesaryResources()
 		TextureUPtr normalTexture = Texture::CreateFromImage
 		(Image::Load("./Resources/Images/brickwall_normal.jpg").get());
 
-		auto box5Mat = StandardMaterial::Create();
+		auto box5Mat = Material::Create();
 		box5Mat->diffuse = std::move(diffuseTexture);
 		box5Mat->normal = std::move(normalTexture);
 		box5Mat->shininess = 64.0f;
@@ -159,7 +159,7 @@ bool DevScene::LoadNessesaryResources()
 		TextureUPtr heightTexture = Texture::CreateFromImage
 		(Image::Load("./Resources/Images/toy_box_disp.png").get());
 
-		auto box6Mat = StandardMaterial::Create();
+		auto box6Mat = Material::Create();
 		box6Mat->diffuse = std::move(diffuseTexture);
 		box6Mat->normal = std::move(normalTexture);
 		box6Mat->height = std::move(heightTexture);
@@ -175,7 +175,7 @@ bool DevScene::LoadNessesaryResources()
 		(Image::Load("./Resources/Images/grass.png").get());
 		if (!grassTexture) return false;
 
-		auto grassMat = StandardMaterial::Create();
+		auto grassMat = Material::Create();
 		grassMat->diffuse = std::move(grassTexture);
 		grassMat->emission = nullptr;
 		grassMat->emissionStrength = 0.0f;

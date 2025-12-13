@@ -334,6 +334,154 @@ void Model::Draw(const Program* program) const
     for (auto& mesh : m_meshes) mesh->Draw(program);
 }
 
+#pragma region TEST_FOR_ASSET_CONVERTER
+
+bool Model::LoadByBinaryV2(const std::string& filename)
+{
+    std::ifstream inFile(filename, std::ios::binary);
+    if (!inFile)
+    {
+        SPDLOG_ERROR("Failed to open binary model file: {}", filename);
+        return false;
+    }
+
+    std::filesystem::path modelDir = std::filesystem::path(filename).parent_path();
+
+    // 헬퍼: 바이너리 문자열 읽기
+    // TODO : Utils 함수로 따로 뺄 필요가 있음
+    auto ReadString = [&](std::ifstream& file) -> std::string 
+    {
+        uint32 len = 0;
+        file.read((char*)&len, sizeof(len));
+        if (len == 0) return "";
+        std::string str(len, '\0');
+        file.read(&str[0], len);
+        return str;
+    };
+
+    // TODO : 이 일련의 과정들을 조금 씩 함수로 빼서 이 함수의 부피를 줄일 필요가 
+    // 있어 보인다.
+
+    // 1. 헤더 읽기 (Header)
+    uint32 magic, version, materialCount, meshCount;
+    bool hasSkeleton;
+    glm::vec3 globalMin, globalMax;
+
+    inFile.read((char*)&magic, sizeof(magic));
+    if (magic != 0x4D594D44) { SPDLOG_ERROR("Invalid Magic Number"); return false; }
+    
+    inFile.read((char*)&version, sizeof(version));
+    if (version != 2) { SPDLOG_WARN("Version mismatch! Expected 2, Got {}", version); }
+
+    inFile.read((char*)&materialCount, sizeof(materialCount));
+    inFile.read((char*)&meshCount, sizeof(meshCount));
+    inFile.read((char*)&hasSkeleton, sizeof(hasSkeleton));
+
+    inFile.read((char*)&globalMin, sizeof(glm::vec3));
+    inFile.read((char*)&globalMax, sizeof(glm::vec3));
+
+    // 2. 스켈레톤 로드 (Skeleton Info)
+    if (hasSkeleton)
+    {
+        uint32 boneCount;
+        inFile.read((char*)&boneCount, sizeof(boneCount));
+        for (uint32 i = 0; i < boneCount; ++i)
+        {
+            std::string boneName = ReadString(inFile);
+            BoneInfo info;
+            inFile.read((char*)&info, sizeof(BoneInfo));
+            m_boneInfoMap[boneName] = info;
+        }
+        m_BoneCounter = (int32)boneCount;
+    }
+
+    // 3. 머티리얼 로드 (Materials)
+    m_materials.resize(materialCount);
+    for (uint32 i = 0; i < materialCount; ++i) 
+    {
+        auto material = Material::Create();
+
+        // [순서 엄수] 텍스처 경로 8개 읽기
+        std::string pathAlbedo    = ReadString(inFile);
+        std::string pathNormal    = ReadString(inFile);
+        std::string pathEmissive  = ReadString(inFile);
+#pragma region NEED_TO_BE_ORM
+        std::string pathORM       = ReadString(inFile); // V2
+        std::string pathRoughness = ReadString(inFile); // V2
+        std::string pathMetallic  = ReadString(inFile); // V2
+#pragma endregion
+        std::string pathSpecular  = ReadString(inFile); // Legacy
+        std::string pathHeight    = ReadString(inFile); // Legacy
+
+        // PBR Factors 읽기 (사용 안 하더라도 읽어서 스킵해야 함)
+        glm::vec4 albedoFactor;
+        float metallicFactor, roughnessFactor;
+        inFile.read((char*)&albedoFactor, sizeof(glm::vec4));
+        inFile.read((char*)&metallicFactor, sizeof(float));
+        inFile.read((char*)&roughnessFactor, sizeof(float));
+
+        // 실제 텍스처 로드
+        material->diffuse = LoadTextureFromFile(pathAlbedo, modelDir);
+        material->normal = LoadTextureFromFile(pathNormal, modelDir);
+        material->emission = LoadTextureFromFile(pathEmissive, modelDir);
+        // material->orm    = LoadTextureFromFile(pathORM, modelDir); ...
+        // TODO : 더 채워야함.
+
+        m_materials[i] = std::move(material);
+    }
+
+    // 4. 메쉬 로드 (Meshes)
+    m_meshes.reserve(meshCount);
+    for (uint32 i = 0; i < meshCount; ++i)
+    {
+        uint32 materialIndex;
+        bool isSkinned;
+        glm::vec3 aabbMin, aabbMax;
+
+        // 메쉬 헤더 읽기
+        inFile.read((char*)&materialIndex, sizeof(materialIndex));
+        inFile.read((char*)&isSkinned, sizeof(isSkinned));
+        inFile.read((char*)&aabbMin, sizeof(aabbMin));
+        inFile.read((char*)&aabbMax, sizeof(aabbMax));
+
+        uint32 vCount, iCount;
+        inFile.read((char*)&vCount, sizeof(vCount));
+        inFile.read((char*)&iCount, sizeof(iCount));
+
+        std::vector<uint32> indices(iCount);
+
+        if (isSkinned)
+        {
+            // [SkinnedMesh 생성]
+            std::vector<SkinnedVertex> vertices(vCount);
+            inFile.read((char*)vertices.data(), sizeof(SkinnedVertex) * vCount);
+            inFile.read((char*)indices.data(), sizeof(uint32) * iCount);
+
+            auto mesh = SkinnedMesh::Create(vertices, indices, GL_TRIANGLES);
+            mesh->SetLocalBounds(RenderBounds::CreateFromMinMax(aabbMin, aabbMax));
+            if (materialIndex < m_materials.size()) mesh->SetMaterial(m_materials[materialIndex]);
+            m_meshes.push_back(std::move(mesh));
+        }
+        else
+        {
+            // [StaticMesh 생성]
+            std::vector<StaticVertex> vertices(vCount);
+            inFile.read((char*)vertices.data(), sizeof(StaticVertex) * vCount);
+            inFile.read((char*)indices.data(), sizeof(uint32) * iCount);
+
+            auto mesh = StaticMesh::Create(vertices, indices, GL_TRIANGLES);
+            mesh->SetLocalBounds(RenderBounds::CreateFromMinMax(aabbMin, aabbMax));
+            if (materialIndex < m_materials.size()) mesh->SetMaterial(m_materials[materialIndex]);
+            m_meshes.push_back(std::move(mesh));
+        }
+    }
+
+    inFile.close();
+    return true;
+}
+
+#pragma endregion
+
 /*===================//
 //  Bone properties  //
 //===================*/

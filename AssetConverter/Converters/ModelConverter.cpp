@@ -1,275 +1,436 @@
-#include "../pch.h"
+#include "pch.h"
 #include "ModelConverter.h"
 
-/*=========================//
-//  converter entry point  //
-//=========================*/
-bool ModelConverter::Convert(const std::string& inputPath, 
-							 const std::string& outputPath)
+/*==========================================//
+//  [Public Entry] 변환 시작 및 상태 초기화   //
+//==========================================*/
+bool ModelConverter::Convert(const std::string& inputPath, const std::string& outputPath)
 {
-	ModelConverter converter;
-	SPDLOG_INFO("Creating ModelConverter instance and starting conversion...");
-	return converter.RunConversion(inputPath, outputPath);
+    // [중요] 상태 초기화 (State Clear)
+    // 싱글톤은 데이터가 유지되므로 매번 실행 시 리셋해야 합니다.
+    m_rawModel = RawModel(); // 새 객체로 덮어씌워 초기화
+    m_boneNameToIdMap.clear();
+    m_boneCounter = 0;
+    m_modelDirectory.clear();
+    
+    // 로그 출력
+    LOG_INFO(" [ModelConverter] Start Conversion");
+    LOG_INFO(" - Input:  {}", inputPath);
+    LOG_INFO(" - Output: {}", outputPath);
+
+    // 실제 로직 실행
+    bool result = RunConversion(inputPath, outputPath);
+
+    if (result) LOG_INFO(" [Success] Conversion Completed.");
+    else LOG_ERROR(" [Failed] Conversion Aborted.");
+
+    return result;
 }
 
-/*===========================//
-//  main conversion methods  //
-//===========================*/
+/*==================//
+//  Internal Logic  //
+//==================*/
+// INFO : Assimp 로드 -> 변환(Materials/Nodes) -> 저장
 bool ModelConverter::RunConversion(const std::string& inputPath, const std::string& outputPath)
 {
-	Assimp::Importer importer;
-	const aiScene* scene = importer.ReadFile(inputPath, aiProcess_Triangulate | aiProcess_CalcTangentSpace);
-	if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
-	{
-		SPDLOG_ERROR("Assimp load failed: {}", importer.GetErrorString());
-		return false;
-	}
+    // 0. 초기화
+    m_rawModel = RawModel(); // 모델 데이터 초기화
+    m_boneNameToIdMap.clear();
+    m_boneCounter = 0;
+    m_modelDirectory = std::filesystem::path(inputPath).parent_path().string();
 
-	m_modelDirectory = std::filesystem::path(inputPath).parent_path().string();
+    // 1. Assimp 임포터 실행
+    // [옵션 설명]
+    // - Triangulate: 모든 면을 삼각형으로
+    // - CalcTangentSpace: 노멀 매핑을 위해 탄젠트 계산 (필수!)
+    // - GenSmoothNormals: 노멀이 없으면 부드럽게 생성
+    // - LimitBoneWeights: 하나의 정점에 최대 4개의 뼈만 영향 (우리 엔진 규격)
+    // - ConvertToLeftHanded: DirectX 등을 쓸 때 필요하지만, OpenGL은 보통 생략 가능 (상황에 따라)
+    Assimp::Importer importer;
+    const aiScene* scene = importer.ReadFile
+    (
+        inputPath,
+        aiProcess_Triangulate      |
+        aiProcess_CalcTangentSpace |
+        aiProcess_GenSmoothNormals |
+        aiProcess_LimitBoneWeights
+    );
+    if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
+        return false;
 
-	// 1-1. 머티리얼 처리
-	SPDLOG_INFO("Processing materials... Total: {}", scene->mNumMaterials);
-	for (uint32 i = 0; i < scene->mNumMaterials; ++i)
-		m_materials.push_back(ProcessMaterial(scene->mMaterials[i]));
+    // 2. 머티리얼 처리
+    LOG_INFO("Processing materials... Total: {}", scene->mNumMaterials);
+    m_rawModel.materials.reserve(scene->mNumMaterials);
+    for (uint32 i = 0; i < scene->mNumMaterials; ++i)
+    {
+        m_rawModel.materials.push_back(ProcessMaterial(scene->mMaterials[i]));
+    }
 
-	// 1-2. 노드/메쉬 처리
-	SPDLOG_INFO("Starting node and mesh processing...");
-	ProcessNode(scene->mRootNode, scene);
-	SPDLOG_INFO("Total {} meshes processed.", m_meshes.size());
-	if (m_hasSkeleton)
-		SPDLOG_INFO("Skeleton found. Total {} bones.", m_boneInfoMap.size());
+    // 3. 노드/메쉬 처리 (재귀 호출 시작)
+    LOG_INFO("Processing meshes...");
+    ProcessNode(scene->mRootNode, scene);
 
-	// 2. 커스텀 바이너리 파일 쓰기
-	SPDLOG_INFO("Starting to write custom model file: {}", outputPath);
-	if (!WriteCustomModelFile(outputPath))
-	{
-		SPDLOG_ERROR("Failed to write custom model file: {}", outputPath);
-		return false;
-	}
+    // 4. 스켈레톤 존재 여부 최종 확정
+    m_rawModel.hasSkeleton = (m_boneCounter > 0);
+    if (m_rawModel.hasSkeleton) LOG_INFO(" - Skeleton Detected (Total Bones: {})", m_boneCounter);
+    else LOG_INFO(" - Static Mesh Detected (No Skeleton)");
 
-	SPDLOG_INFO("Model conversion successful!");
-	return true;
+    // 5. 파일 저장 (직렬화)
+    LOG_INFO("Writing Binary File...");
+    if (!WriteCustomModelFile(outputPath))
+    {
+        LOG_ERROR("Failed to write output file: {}", outputPath);
+        return false;
+    }
+
+    return true;
 }
 
-/*=========================//
-//   extract assimp data   //
-//=========================*/
-void ModelConverter::ProcessNode(aiNode* node, const aiScene* scene)
+// INFO : Header -> Skeleton -> Materials -> Meshes 순서
+bool ModelConverter::WriteCustomModelFile(const std::string& outputPath)
 {
-	for (uint32 i = 0; i < node->mNumMeshes; i++)
-	{
-		auto meshIndex = node->mMeshes[i];
-		auto mesh = scene->mMeshes[meshIndex];
-		ProcessMesh(mesh, scene);
-	}
+    std::ofstream outFile(outputPath, std::ios::binary);
+    if (!outFile) return false;
 
-	for (uint32 i = 0; i < node->mNumChildren; i++)
-		ProcessNode(node->mChildren[i], scene);
+    // 1. 헤더 (Header)
+    uint32 magic = 0x4D594D44; // 'MYMD'
+    uint32 version = 2;        // 버전 2로 업데이트
+    uint32 matCount = (uint32)m_rawModel.materials.size();
+    uint32 meshCount = (uint32)m_rawModel.meshes.size();
+    bool hasSkeleton = m_rawModel.hasSkeleton;
+
+    Utils::WriteData(outFile, magic);
+    Utils::WriteData(outFile, version);
+    Utils::WriteData(outFile, matCount);
+    Utils::WriteData(outFile, meshCount);
+    Utils::WriteData(outFile, hasSkeleton);
+
+    // 전역 AABB (엔진의 초기 컬링을 위해 헤더에 포함)
+    Utils::WriteData(outFile, m_rawModel.globalAABBMin);
+    Utils::WriteData(outFile, m_rawModel.globalAABBMax);
+
+    // 2. 스켈레톤 정보 (Skeleton Info)
+    // 엔진은 (뼈이름 -> 뼈정보) 순서로 읽어서 맵핑함
+    if (hasSkeleton)
+    {
+        uint32 boneCount = (uint32)m_rawModel.boneOffsetInfos.size();
+        Utils::WriteData(outFile, boneCount);
+
+        // 맵을 순회하며 저장 (이름과 ID를 매칭시키기 위해)
+        for (const auto& [name, id] : m_boneNameToIdMap)
+        {
+            // 1. 뼈 이름 쓰기
+            Utils::WriteString(outFile, name);
+
+            // 2. 뼈 정보(ID, Offset) 쓰기
+            // ID로 벡터에서 정보 가져오기
+            const RawBoneInfo& info = m_rawModel.boneOffsetInfos[id];
+            Utils::WriteData(outFile, info);
+        }
+    }
+
+    // 3. 머티리얼 (Materials)
+    for (const auto& mat : m_rawModel.materials)
+    {
+        // 텍스처 경로들 쓰기 (엔진 로더와 일치시켜야 함!)
+        Utils::WriteString(outFile, mat.GetTexturePath(RawTextureType::Albedo));
+        Utils::WriteString(outFile, mat.GetTexturePath(RawTextureType::Normal));
+        Utils::WriteString(outFile, mat.GetTexturePath(RawTextureType::Emissive));
+
+        // [PBR / ORM]
+        Utils::WriteString(outFile, mat.GetTexturePath(RawTextureType::ORM));
+        Utils::WriteString(outFile, mat.GetTexturePath(RawTextureType::Roughness));
+        Utils::WriteString(outFile, mat.GetTexturePath(RawTextureType::Metallic));
+
+        // [Legacy]
+        Utils::WriteString(outFile, mat.GetTexturePath(RawTextureType::Specular));
+        Utils::WriteString(outFile, mat.GetTexturePath(RawTextureType::Height));
+
+        // [New] PBR Factors (텍스처 없을 때를 대비한 수치값)
+        Utils::WriteData(outFile, mat.albedoFactor);
+        Utils::WriteData(outFile, mat.metallicFactor);
+        Utils::WriteData(outFile, mat.roughnessFactor);
+    }
+
+    // 4. 메쉬 (Meshes)
+    for (const auto& mesh : m_rawModel.meshes)
+    {
+        // 메쉬 헤더
+        Utils::WriteData(outFile, mesh.materialIndex);
+        Utils::WriteData(outFile, mesh.isSkinned); // [V2 추가] 스킨드 여부 플래그
+
+        // AABB (로컬)
+        Utils::WriteData(outFile, mesh.aabbMin);
+        Utils::WriteData(outFile, mesh.aabbMax);
+
+        // 버텍스/인덱스 개수
+        uint32 vCount = mesh.isSkinned ? (uint32)mesh.skinnedVertices.size() : (uint32)mesh.staticVertices.size();
+        uint32 iCount = (uint32)mesh.indices.size();
+        Utils::WriteData(outFile, vCount);
+        Utils::WriteData(outFile, iCount);
+
+        // 버텍스 데이터 (분기 처리)
+        if (mesh.isSkinned)
+        {
+            // RawSkinnedVertex 저장
+            outFile.write(reinterpret_cast<const char*>(mesh.skinnedVertices.data()), sizeof(RawSkinnedVertex) * vCount);
+        }
+        else
+        {
+            // RawStaticVertex 저장
+            outFile.write(reinterpret_cast<const char*>(mesh.staticVertices.data()), sizeof(RawStaticVertex) * vCount);
+        }
+
+        // 인덱스 데이터
+        outFile.write(reinterpret_cast<const char*>(mesh.indices.data()), sizeof(uint32) * iCount);
+    }
+
+    outFile.close();
+    return true;
 }
 
+/*==================================//
+//  [Processing] 모델의 데이터 추출  //
+//==================================*/
 void ModelConverter::ProcessMesh(aiMesh* mesh, const aiScene* scene)
 {
-	TempMesh tempMesh;
-	std::vector<SkinnedVertex> vertices;
+    RawMesh rawMesh;
+    rawMesh.name = mesh->mName.C_Str();
+    rawMesh.materialIndex = mesh->mMaterialIndex;
 
-	// 1. 정점 데이터 채우기
-	vertices.resize(mesh->mNumVertices);
-	for (uint32 i = 0; i < mesh->mNumVertices; i++)
-	{
-		auto& v = vertices[i];
-		SetVertexBoneDataToDefault(v);
-		v.position = { mesh->mVertices[i].x, mesh->mVertices[i].y, mesh->mVertices[i].z };
-		v.normal = { mesh->mNormals[i].x, mesh->mNormals[i].y, mesh->mNormals[i].z };
-		if (mesh->mTextureCoords[0])
-			v.texCoord = { mesh->mTextureCoords[0][i].x, mesh->mTextureCoords[0][i].y };
-		else
-			v.texCoord = { 0.0f, 0.0f };
+    // 1. 스킨드(애니메이션) 메쉬인지 판단
+    rawMesh.isSkinned = (mesh->mNumBones > 0);
 
-		if (mesh->mTangents)
-		{
-			v.tangent = { mesh->mTangents[i].x, mesh->mTangents[i].y, mesh->mTangents[i].z };
-		}
-		else
-		{
-			v.tangent = { 0.0f, 0.0f, 0.0f };
-		}
-	}
+    // 2. 바운딩 박스 초기화 (최대값으로 뒤집어서 시작)
+    rawMesh.aabbMin = glm::vec3(FLT_MAX);
+    rawMesh.aabbMax = glm::vec3(-FLT_MAX);
 
-	// 2. 인덱스 데이터 채우기
-	std::vector<uint32> indices;
-	indices.resize(mesh->mNumFaces * 3);
-	for (uint32 i = 0; i < mesh->mNumFaces; i++)
-	{
-		indices[3 * i] = mesh->mFaces[i].mIndices[0];
-		indices[3 * i + 1] = mesh->mFaces[i].mIndices[1];
-		indices[3 * i + 2] = mesh->mFaces[i].mIndices[2];
-	}
+    /*================================================//
+    //  스킨드 메쉬 (뼈 있음) -> RawSkinnedVertex 사용  //
+    //================================================*/
+    if (rawMesh.isSkinned)
+    {
+        // 3-1. 정점 데이터 채우기
+        rawMesh.skinnedVertices.resize(mesh->mNumVertices);
+        for (uint32 i = 0; i < mesh->mNumVertices; i++)
+        {
+            auto& v = rawMesh.skinnedVertices[i];
 
-	// 3. 뼈 가중치 추출
-	if (mesh->mNumBones > 0)
-	{
-		m_hasSkeleton = true; // 스켈레톤이 있다고 표시
-		ExtractBoneWeightForVertices(vertices, mesh);
-	}
+            // 위치, 노멀, UV, 탄젠트 복사
+            v.position = { mesh->mVertices[i].x, mesh->mVertices[i].y, mesh->mVertices[i].z };
+            v.normal = { mesh->mNormals[i].x, mesh->mNormals[i].y, mesh->mNormals[i].z };
 
-	// 4. TempMesh에 데이터 저장
-	tempMesh.vertices = std::move(vertices);
-	tempMesh.indices = std::move(indices);
-	tempMesh.materialIndex = mesh->mMaterialIndex;
+            // assimp에서 uv좌표와 tangent를 로드
+            if (mesh->mTextureCoords[0]) v.texCoord = { mesh->mTextureCoords[0][i].x, mesh->mTextureCoords[0][i].y };
+            else v.texCoord = { 0.0f, 0.0f };
+            if (mesh->mTangents) v.tangent = { mesh->mTangents[i].x, mesh->mTangents[i].y, mesh->mTangents[i].z };
+            else  v.tangent = { 0.0f, 0.0f, 0.0f };
 
-	// 5. 멤버 변수 m_meshes에 추가
-	m_meshes.push_back(std::move(tempMesh));
+            // AABB 갱신 (Global & Local 동시 갱신)
+            rawMesh.aabbMin = Utils::Min(rawMesh.aabbMin, v.position);
+            rawMesh.aabbMax = Utils::Max(rawMesh.aabbMax, v.position);
+            m_rawModel.globalAABBMin = Utils::Min(m_rawModel.globalAABBMin, v.position);
+            m_rawModel.globalAABBMax = Utils::Max(m_rawModel.globalAABBMax, v.position);
+        }
+
+        // 3-2. 뼈 가중치 추출 (별도 함수로 분리)
+        ExtractBoneWeights(rawMesh.skinnedVertices, mesh);
+    }
+    /*================================================//
+    //  스태틱 메쉬 (뼈 없음) -> RawStaticVertex 사용   //
+    //================================================*/
+    else
+    {
+        rawMesh.staticVertices.resize(mesh->mNumVertices);
+        for (uint32 i = 0; i < mesh->mNumVertices; i++)
+        {
+            auto& v = rawMesh.staticVertices[i];
+
+            // (BoneID, Weight 제외하고 똑같이 복사)
+            v.position = { mesh->mVertices[i].x, mesh->mVertices[i].y, mesh->mVertices[i].z };
+            v.normal = { mesh->mNormals[i].x, mesh->mNormals[i].y, mesh->mNormals[i].z };
+
+            // assimp에서 uv좌표와 tangent를 로드
+            if (mesh->mTextureCoords[0]) v.texCoord = { mesh->mTextureCoords[0][i].x, mesh->mTextureCoords[0][i].y };
+            else v.texCoord = { 0.0f, 0.0f };
+            if (mesh->mTangents) v.tangent = { mesh->mTangents[i].x, mesh->mTangents[i].y, mesh->mTangents[i].z };
+            else v.tangent = { 0.0f, 0.0f, 0.0f };
+
+            // AABB 갱신 (Global & Local 동시 갱신)
+            rawMesh.aabbMin = Utils::Min(rawMesh.aabbMin, v.position);
+            rawMesh.aabbMax = Utils::Max(rawMesh.aabbMax, v.position);
+            m_rawModel.globalAABBMin = Utils::Min(m_rawModel.globalAABBMin, v.position);
+            m_rawModel.globalAABBMax = Utils::Max(m_rawModel.globalAABBMax, v.position);
+        }
+    }
+
+    // 4. 인덱스 복사 (공통)
+    rawMesh.indices.reserve(mesh->mNumFaces * 3);
+    for (uint32 i = 0; i < mesh->mNumFaces; i++)
+    {
+        rawMesh.indices.push_back(mesh->mFaces[i].mIndices[0]);
+        rawMesh.indices.push_back(mesh->mFaces[i].mIndices[1]);
+        rawMesh.indices.push_back(mesh->mFaces[i].mIndices[2]);
+    }
+
+    // 5. 최종 결과 모델에 추가
+    m_rawModel.meshes.push_back(std::move(rawMesh));
 }
 
-TempMaterial ModelConverter::ProcessMaterial(aiMaterial* material)
+void ModelConverter::ProcessNode(aiNode* node, const aiScene* scene)
 {
-	TempMaterial tempMat;
-	tempMat.diffuseMapPath = GetTexturePath(material, aiTextureType_DIFFUSE);
-	tempMat.specularMapPath = GetTexturePath(material, aiTextureType_SPECULAR);
-	tempMat.emissionMapPath = GetTexturePath(material, aiTextureType_EMISSIVE);
-	tempMat.normalMapPath = GetTexturePath(material, aiTextureType_NORMALS);
-	tempMat.heightMapPath = GetTexturePath(material, aiTextureType_HEIGHT);
-	return tempMat;
+    for (uint32 i = 0; i < node->mNumMeshes; i++)
+    {
+        aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
+        ProcessMesh(mesh, scene);
+    }
+
+    for (uint32 i = 0; i < node->mNumChildren; i++)
+    {
+        ProcessNode(node->mChildren[i], scene);
+    }
+}
+
+RawMaterial ModelConverter::ProcessMaterial(aiMaterial* material)
+{
+    RawMaterial rawMat;
+    aiString name;
+    if (material->Get(AI_MATKEY_NAME, name) == AI_SUCCESS) rawMat.name = name.C_Str();
+    else rawMat.name = "DefaultMaterial";
+
+    // 1. 머티리얼 속성 추출
+    aiColor4D color;
+    float value;
+
+    // 1-1. Albedo (Base Color)
+    // GLTF 같은 PBR 포맷은 AI_MATKEY_BASE_COLOR를 쓰고, 레거시는 COLOR_DIFFUSE를 씀. 우선순위 체크.
+    if (material->Get(AI_MATKEY_BASE_COLOR, color) == AI_SUCCESS)
+    {
+        rawMat.albedoFactor = { color.r, color.g, color.b, color.a };
+    }
+    else if (material->Get(AI_MATKEY_COLOR_DIFFUSE, color) == AI_SUCCESS)
+    {
+        rawMat.albedoFactor = { color.r, color.g, color.b, 1.0f }; // Diffuse는 보통 Alpha가 없으므로 1.0
+    }
+
+    // 1-2. Emissive
+    if (material->Get(AI_MATKEY_COLOR_EMISSIVE, color) == AI_SUCCESS)
+    {
+        rawMat.emissiveFactor = { color.r, color.g, color.b };
+    }
+
+    // 1-3. Metallic & Roughness
+    // GLTF 표준 PBR 속성 확인
+    if (material->Get(AI_MATKEY_METALLIC_FACTOR, value) == AI_SUCCESS)
+        rawMat.metallicFactor = value;
+
+    if (material->Get(AI_MATKEY_ROUGHNESS_FACTOR, value) == AI_SUCCESS)
+        rawMat.roughnessFactor = value;
+
+    // 2. 텍스처 추출 (Helper Lambda 활용)
+    auto AddTexture = [&](aiTextureType aiType, RawTextureType rawType)
+        {
+            std::string path = GetTexturePath(material, aiType);
+            if (!path.empty())
+            {
+                RawTexture tex;
+                tex.relativePath = path;
+                tex.type = rawType;
+                rawMat.textures.push_back(tex);
+            }
+        };
+
+    // Assimp 타입 <-> 우리 타입 매핑
+    // PBR Albedo는 BASE_COLOR 혹은 DIFFUSE
+    std::string baseColorPath = GetTexturePath(material, aiTextureType_BASE_COLOR);
+    if (!baseColorPath.empty()) rawMat.textures.push_back({ baseColorPath, RawTextureType::Albedo });
+    else AddTexture(aiTextureType_DIFFUSE, RawTextureType::Albedo);
+
+    AddTexture(aiTextureType_NORMALS, RawTextureType::Normal);
+    AddTexture(aiTextureType_EMISSIVE, RawTextureType::Emissive);
+    AddTexture(aiTextureType_HEIGHT, RawTextureType::Height); // Displacement
+
+    // [ORM 준비]
+    // TODO : 개별 텍스처로 일단 로드 -> 나중에 TextureConverter에서 합칠 예정
+    AddTexture(aiTextureType_AMBIENT_OCCLUSION, RawTextureType::AmbientOcclusion);
+    AddTexture(aiTextureType_DIFFUSE_ROUGHNESS, RawTextureType::Roughness);
+    AddTexture(aiTextureType_METALNESS, RawTextureType::Metallic);
+
+    return rawMat;
+}
+
+void ModelConverter::ExtractBoneWeights(std::vector<RawSkinnedVertex>& vertices, aiMesh* mesh)
+{
+    // 메쉬가 가진 모든 뼈를 순회
+    for (uint32 i = 0; i < mesh->mNumBones; ++i)
+    {
+        aiBone* bone = mesh->mBones[i];
+        int32 boneID = -1;
+        std::string boneName = bone->mName.C_Str();
+
+        // 1. 뼈 등록 단계 (Global Bone Registry)
+        if (m_boneNameToIdMap.find(boneName) == m_boneNameToIdMap.end())
+        {
+            RawBoneInfo newBoneInfo;
+            newBoneInfo.id = m_boneCounter;
+            newBoneInfo.offset = Utils::ConvertToGLMMat4(bone->mOffsetMatrix);
+
+            m_rawModel.boneOffsetInfos.push_back(newBoneInfo);
+
+            // 맵에 등록하고 카운터 증가
+            boneID = m_boneCounter;
+            m_boneNameToIdMap[boneName] = boneID;
+            m_boneCounter++;
+        }
+        else
+        {
+            // [이미 등록된 뼈] ID만 가져옴
+            boneID = m_boneNameToIdMap[boneName];
+        }
+
+        // 2. 가중치 주입 단계 (Vertex Weight Assignment)
+        // 이 뼈가 영향을 주는 모든 정점을 순회
+        for (uint32 j = 0; j < bone->mNumWeights; ++j)
+        {
+            const auto& weightData = bone->mWeights[j];
+            uint32 vertexId = weightData.mVertexId;
+            float weight = weightData.mWeight;
+
+            // 안전 장치: 정점 인덱스가 범위 밖이면 무시
+            if (vertexId >= vertices.size()) continue;
+
+            // 해당 정점의 빈 슬롯(-1)을 찾아서 채움 (최대 4개)
+            auto& v = vertices[vertexId];
+            for (int k = 0; k < MAX_BONE_INFLUENCE; ++k)
+            {
+                if (v.boneIDs[k] < 0) // -1이면 비어있다는 뜻
+                {
+                    v.boneIDs[k] = boneID;
+                    v.weights[k] = weight;
+                    break; // 채웠으면 다음 정점으로
+                }
+            }
+        }
+    }
 }
 
 std::string ModelConverter::GetTexturePath(aiMaterial* material, aiTextureType type)
 {
-	if (material->GetTextureCount(type) <= 0) return "";
+    if (material->GetTextureCount(type) <= 0) return "";
 
-	aiString filepath;
-	if (material->GetTexture(type, 0, &filepath) != AI_SUCCESS) return "";
+    aiString filepath;
+    if (material->GetTexture(type, 0, &filepath) != AI_SUCCESS) return "";
 
-	// 텍스처 파일 이름만 추출
-	std::string filenameOnly = std::filesystem::path(filepath.C_Str()).filename().string();
-	if (filenameOnly.empty()) return "";
+    // 파일 이름만 추출 (경로 정규화)
+    std::filesystem::path fullPath(filepath.C_Str());
+    std::string filename = fullPath.filename().string();
+    if (filename.empty()) return "";
 
-	// 원본 모델 디렉터리와 파일 이름을 조합 (상대 경로 유지)
-	return (std::filesystem::path(m_modelDirectory) / filenameOnly).string();
+    // [설계 결정] 리턴값은 "파일 이름"만? 아니면 "상대 경로"?
+    // 일단 텍스처 파일이 모델과 같은 폴더(혹은 하위)에 있다고 가정하고
+    // 나중에 로딩할 때 조합할 수 있도록 파일 이름(혹은 상대경로)을 반환.
+    // 여기서는 원본 파일명을 그대로 반환하고, 
+    // 실제 파일 복사/변환은 나중에 RunConversion의 후처리 단계에서 진행.
+    return filename;
 }
 
-void ModelConverter::ExtractBoneWeightForVertices(std::vector<SkinnedVertex>& vertices, aiMesh* mesh)
-{
-	for (uint32 boneIndex = 0; boneIndex < mesh->mNumBones; ++boneIndex)
-	{
-		int boneID = -1;
-		std::string boneName = mesh->mBones[boneIndex]->mName.C_Str();
-
-		if (m_boneInfoMap.find(boneName) == m_boneInfoMap.end())
-		{
-			BoneInfo newBoneInfo;
-			newBoneInfo.id = m_boneCounter;
-			newBoneInfo.offset = Utils::ConvertMatrixToGLMFormat(mesh->mBones[boneIndex]->mOffsetMatrix);
-			m_boneInfoMap[boneName] = newBoneInfo;
-			boneID = m_boneCounter;
-			m_boneCounter++;
-		}
-		else
-		{
-			boneID = m_boneInfoMap[boneName].id;
-		}
-
-		auto weights = mesh->mBones[boneIndex]->mWeights;
-		int numWeights = mesh->mBones[boneIndex]->mNumWeights;
-
-		for (int weightIndex = 0; weightIndex < numWeights; ++weightIndex)
-		{
-			int vertexId = weights[weightIndex].mVertexId;
-			float weight = weights[weightIndex].mWeight;
-			SetVertexBoneData(vertices[vertexId], boneID, weight);
-		}
-	}
-}
-
-/*===========================//
-//   wirte custom binaries   //
-//===========================*/
-bool ModelConverter::WriteCustomModelFile(const std::string& outputPath)
-{
-	std::ofstream outFile(outputPath, std::ios::binary);
-	if (!outFile)
-	{
-		SPDLOG_ERROR("Failed to open output file: {}", outputPath);
-		return false;
-	}
-
-	// --- 1. 파일 헤더 쓰기 ---
-	uint32 magic = 0x4D594D44; // 'MYMD' (My Model)
-	uint32 version = 1;
-	uint32 materialCount = (uint32)m_materials.size();
-	uint32 meshCount = (uint32)m_meshes.size();
-
-	ConverterUtils::WriteData(outFile, magic);
-	ConverterUtils::WriteData(outFile, version);
-	ConverterUtils::WriteData(outFile, materialCount);
-	ConverterUtils::WriteData(outFile, meshCount);
-	ConverterUtils::WriteData(outFile, m_hasSkeleton);
-
-	// --- 2. 스켈레톤 블록 쓰기 ---
-	if (m_hasSkeleton)
-	{
-		uint32 boneCount = (uint32)m_boneInfoMap.size();
-		ConverterUtils::WriteData(outFile, boneCount);
-
-		for (auto const& [name, boneInfo] : m_boneInfoMap)
-		{
-			ConverterUtils::WriteString(outFile, name); // 뼈 이름
-			ConverterUtils::WriteData(outFile, boneInfo); // BoneInfo struct (id, offset)
-		}
-	}
-
-	// --- 3. 머티리얼 블록 쓰기 ---
-	for (const auto& material : m_materials)
-	{
-		ConverterUtils::WriteString(outFile, material.diffuseMapPath);
-		ConverterUtils::WriteString(outFile, material.specularMapPath);
-		ConverterUtils::WriteString(outFile, material.emissionMapPath);
-		ConverterUtils::WriteString(outFile, material.normalMapPath);
-		ConverterUtils::WriteString(outFile, material.heightMapPath);
-	}
-
-	// --- 4. 메쉬 블록 쓰기 ---
-	for (const auto& mesh : m_meshes)
-	{
-		// 메쉬 헤더
-		ConverterUtils::WriteData(outFile, mesh.materialIndex);
-		uint32 vertexCount = (uint32)mesh.vertices.size();
-		uint32 indexCount = (uint32)mesh.indices.size();
-		ConverterUtils::WriteData(outFile, vertexCount);
-		ConverterUtils::WriteData(outFile, indexCount);
-
-		// 메쉬 데이터 (데이터 덩어리 통째로 쓰기)
-		outFile.write(reinterpret_cast<const char*>(mesh.vertices.data()),
-			sizeof(SkinnedVertex) * vertexCount);
-		outFile.write(reinterpret_cast<const char*>(mesh.indices.data()),
-			sizeof(uint32) * indexCount);
-	}
-
-	outFile.close();
-	SPDLOG_INFO("Binary file write complete.");
-	return true;
-}
-
-/*==================//
-//   bone helpers   //
-//==================*/
-void ModelConverter::SetVertexBoneDataToDefault(SkinnedVertex& vertex)
-{
-	for (int i = 0; i < MAX_BONE_INFLUENCE; i++)
-	{
-		vertex.boneIDs[i] = -1;
-		vertex.weights[i] = 0.0f;
-	}
-}
-
-void ModelConverter::SetVertexBoneData(SkinnedVertex& vertex, int boneID, float weight)
-{
-	for (int i = 0; i < MAX_BONE_INFLUENCE; ++i)
-	{
-		if (vertex.boneIDs[i] < 0)
-		{
-			vertex.weights[i] = weight;
-			vertex.boneIDs[i] = boneID;
-			break;
-		}
-	}
-}

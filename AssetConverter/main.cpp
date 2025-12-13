@@ -1,6 +1,6 @@
 #include "pch.h"
-#include "Converters/ModelConverter.h"
-#include "Converters/AnimConverter.h"
+// #include "Converters/ModelConverter.h"
+// #include "Converters/AnimConverter.h"
 
 void PrintUsage()
 {
@@ -25,9 +25,16 @@ void PrintUsage()
     std::cout << "      Example: AssetConverter.exe -t color.png color.ktx2 srgb\n";
 }
 
+// TODO : 백엔드 프로세스로 전환
+// 즉, PrintUsage와 같은 로그 작성이 더 이상 필요가 없음.
+// 다만, 로그 작성이 필요하다면 Logger를 이용해야 함.
+// 인자 처리가 필요하다면 따로 클래스를 파서 만들 것.
+
 int main(int argc, char* argv[])
 {
-    spdlog::set_level(spdlog::level::info);
+    // 1. Logger 초기화
+    // spdlog::set_level(spdlog::level::info);
+    LOGGER.Init();
 
     if (argc < 2) // Check if at least an option is provided
     {

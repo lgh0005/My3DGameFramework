@@ -15,9 +15,7 @@ CLASS_PTR(Material)
 CLASS_PTR(Program)
 #pragma endregion
 
-// TODO : 머티리얼 조금 나누면 이제 모델을 로드할 때,
-// 머티리얼 로드를 SRP로 할 것인지 URP로 할 것인지 구분하는
-// 로직을 추가해줘야 한다.
+// TODO : 머티리얼 조금 나누면 이제 모델을 로드할 때 
 CLASS_PTR(Model)
 class Model
 {
@@ -49,6 +47,13 @@ private:
 	Model() = default;
 	bool LoadByAssimp(const std::string& filename);
 	bool LoadByBinary(const std::string& filename);
+
+	// TEST
+#pragma region TEST_FOR_ASSET_CONVERTER
+	bool LoadByAssimpV2(const std::string& filename);
+	bool LoadByBinaryV2(const std::string& filename);
+#pragma endregion
+
 	void ProcessMesh(aiMesh* mesh, const aiScene* scene);
 	void ProcessNode(aiNode* node, const aiScene* scene);
 	TexturePtr LoadTextureFromFile
