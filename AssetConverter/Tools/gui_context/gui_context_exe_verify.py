@@ -48,12 +48,13 @@ class GuiContextVerifyAssetConverter(GUIContextBase):
 
         try:
             result = subprocess.run(
-                [exe_path, "--check"],  # 확인용 인자
+                [exe_path, "--check"],
                 capture_output=True,
                 text=True,
                 timeout=1
             )
             if "AssetConverter" in result.stdout:
+                self._window.set_data("exe_path", exe_path)
                 messagebox.showinfo("Success", "AssetConverter.exe verified successfully!")
                 self._window.set_context_by_name("main")
             else:

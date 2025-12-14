@@ -70,6 +70,8 @@ vec2 ParallaxMapping(vec2 texCoords, vec3 viewDir)
 void main()
 {
     vec2 texCoord = TexCoords;
+    // texCoord.y = 1.0 - texCoord.y; // [DEBUG] 
+
 
     // 1. TBN 재정렬 및 패럴랙스 매핑
     vec3 T = normalize(TBN[0]);

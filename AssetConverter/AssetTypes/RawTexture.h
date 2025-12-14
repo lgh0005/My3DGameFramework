@@ -1,6 +1,6 @@
 #pragma once
 
-enum class RawTextureType : int32
+enum class RawTextureType : int8
 {
     None = 0,
     Albedo,     // Diffuse Color
@@ -19,6 +19,7 @@ enum class RawTextureType : int32
     // [레거시 / 기타]
     Specular,
     Height,     // Displacement
+    Shininess,  // [New] Glossiness / Specular Power
 
     MAX
 };

@@ -26,9 +26,11 @@ add_executable(AssetConverter
     # Utils
     "Utils/Utils.h"                 "Utils/Utils.cpp"
     "Utils/Logger.h"                "Utils/Logger.cpp"
+    "Utils/ArgumentParser.h"        "Utils/ArgumentParser.cpp"
     "Utils/Types.h"
+    "Utils/Defines.h"
 
-  "Utils/Defines.h")
+  )
 
 # 2. [PCH 설정] AssetConverter/pch.h를 AsssetConverter 타겟 전용(PRIVATE) PCH로 사용합니다.
 target_precompile_headers(AssetConverter PRIVATE pch.h)

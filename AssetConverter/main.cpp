@@ -1,143 +1,85 @@
 #include "pch.h"
-// #include "Converters/ModelConverter.h"
+#include "Utils/ArgumentParser.h"
+#include "Converters/ModelConverter.h"
+
+// [TODO] 추후 구현 시 주석 해제
 // #include "Converters/AnimConverter.h"
-
-void PrintUsage()
-{
-    std::cout << "\n[ Usage ]\n";
-    std::cout << "  AssetConverter.exe <option> <arguments...>\n\n";
-    std::cout << "[ Options ]\n";
-    std::cout << "  -m, --model <input model> <output file>\n";
-    std::cout << "      Converts a model file (.fbx, .obj) to .mymodel format.\n";
-    std::cout << "      Example: AssetConverter.exe -m backpack.obj backpack.mymodel\n\n";
-
-    std::cout << "  -a, --anim <input animation> <base model> <output file>\n";
-    std::cout << "      Converts an animation file (.fbx) to .myanim format.\n";
-    std::cout << "      (Requires a base .mymodel file as reference!)\n";
-    std::cout << "      Example: AssetConverter.exe -a run.fbx character.mymodel run.myanim\n";
-
-    std::cout << "  -t, --texture <input texture> <output file> [oetf]\n";
-    std::cout << "      Converts an image (.png, .jpg) to .ktx2 format using toktx.exe.\n";
-    std::cout << "      [oetf] mode: 'linear' (default) or 'srgb'.\n";
-    std::cout << "      - linear: For Normal, Roughness, Metallic, HDR maps.\n";
-    std::cout << "      - srgb:   For Albedo (Base Color) maps.\n";
-    std::cout << "      Example: AssetConverter.exe -t normal.png normal.ktx2 linear\n";
-    std::cout << "      Example: AssetConverter.exe -t color.png color.ktx2 srgb\n";
-}
-
-// TODO : 백엔드 프로세스로 전환
-// 즉, PrintUsage와 같은 로그 작성이 더 이상 필요가 없음.
-// 다만, 로그 작성이 필요하다면 Logger를 이용해야 함.
-// 인자 처리가 필요하다면 따로 클래스를 파서 만들 것.
+// #include "Converters/TextureConverter.h"
 
 int main(int argc, char* argv[])
 {
-    // 0. verify 로직
-    if (argc >= 2 && std::string(argv[1]) == "--check")
+    // Logger 초기화
+    LOGGER.Init(argc);
+
+    // 2. 인자 파싱 (ArgumentParser 이용)
+    ParseResult args = ArgumentParser::Parse(argc, argv);
+
+    // 3. 파싱 실패 시
+    if (!args.IsValid())
     {
-        std::cout << "AssetConverter verified\n";
-        return 0;
+        // ArgumentParser 내부에서 이미 에러 로그나 Usage를 출력했을 것임
+        // Python 측에 실패(-1)를 알림
+        return -1;
     }
 
-    // 1. Logger 초기화
-    // spdlog::set_level(spdlog::level::info);
-    LOGGER.Init();
+    bool success = false;
 
-    // TODO : Python GUI와의 통신을 위해서 로직 수정이 필요
-    // 추가로, 보다 안정된 로드를 위해 AssetConverter의 Converter들의 로직을
-    // 보강할 필요가 있음.
+    // 4. 모드별 분기 실행
+    switch (args.mode)
+    {
+    case ConversionMode::Verify:
+        // [Verify Mode]
+        // Python GUI가 "--check"를 보냈을 때 "AssetConverter verified" 문자열을 기다림
+        // 로그(LOG_INFO)는 포맷팅이 붙을 수 있으므로, 순수한 std::cout 사용 권장
+        std::cout << "AssetConverter verified" << std::endl;
+        return 0; // 즉시 성공 종료
 
-    //if (argc < 2) // Check if at least an option is provided
-    //{
-    //    SPDLOG_ERROR("Not enough arguments.");
-    //    PrintUsage();
-    //    return -1;
-    //}
+    case ConversionMode::Model:
+        // [Model Mode]
+        // ModelConverter 싱글톤 호출
+        LOG_INFO(">>> [Mode] Model Conversion Selected");
+        success = CONV_MODEL.Convert(args.inputPath, args.outputPath);
+        break;
 
-    //std::string option = argv[1];
-    //bool success = false;
+    case ConversionMode::Animation:
+        // [Animation Mode]
+        LOG_INFO(">>> [Mode] Animation Conversion Selected");
 
-    //try
-    //{
-    //    if (option == "-m" || option == "--model")
-    //    {
-    //        // Model conversion: needs 4 arguments (exe, option, input, output)
-    //        if (argc < 4)
-    //        {
-    //            SPDLOG_ERROR("Model conversion requires input and output file paths.");
-    //            PrintUsage();
-    //            return -1;
-    //        }
-    //        std::string inputPath = argv[2];
-    //        std::string outputPath = argv[3];
+        // TODO: AnimConverter 구현 후 연결
+        // success = AnimConverter::Instance().Convert(args.inputPath, args.refModelPath, args.outputPath);
 
-    //        SPDLOG_INFO("=== Model Conversion Mode ===");
-    //        success = ModelConverter::Convert(inputPath, outputPath);
-    //    }
-    //    else if (option == "-a" || option == "--anim")
-    //    {
-    //        // Animation conversion: needs 5 arguments (exe, option, animInput, modelInput, output)
-    //        if (argc < 5)
-    //        {
-    //            SPDLOG_ERROR("Animation conversion requires animation file, base model file, and output file paths.");
-    //            PrintUsage();
-    //            return -1;
-    //        }
-    //        std::string animInputPath = argv[2];
-    //        std::string modelInputPath = argv[3];
-    //        std::string outputPath = argv[4];
+        LOG_WARN("Animation converter is under construction.");
+        success = false; // 아직 구현 안 됐으므로 실패 처리
+        break;
 
-    //        // Check if input files exist
-    //        if (!std::filesystem::exists(animInputPath))
-    //        {
-    //            SPDLOG_ERROR("Cannot find animation file: {}", animInputPath);
-    //            return -1;
-    //        }
-    //        if (!std::filesystem::exists(modelInputPath))
-    //        {
-    //            SPDLOG_ERROR("Cannot find base model file: {}", modelInputPath);
-    //            return -1;
-    //        }
+    case ConversionMode::ORM:
+        // [ORM Texture Mode]
+        LOG_INFO(">>> [Mode] ORM Texture Packing Selected");
 
-    //        SPDLOG_INFO("=== Animation Conversion Mode ===");
-    //        success = AnimConverter::Convert(animInputPath, modelInputPath, outputPath);
-    //    }
-    //    else if (option == "-t" || option == "--texture")
-    //    {
-    //        if (argc < 4)
-    //        {
-    //            SPDLOG_ERROR("Texture conversion requires input and output file paths.");
-    //            PrintUsage();
-    //            return -1;
-    //        }
+        // TODO: TextureConverter 구현 후 연결
+        // success = TextureConverter::Instance().ConvertORM(args.aoMapPath, args.roughnessMapPath, args.metallicMapPath, args.outputPath);
 
-    //        std::string inputPath = argv[2];
-    //        std::string outputPath = argv[3];
+        LOG_WARN("ORM converter is under construction.");
+        success = false; // 아직 구현 안 됐으므로 실패 처리
+        break;
 
-    //        std::string oetfMode = "linear";
+    default:
+        LOG_ERROR("Unknown conversion mode.");
+        success = false;
+        break;
+    }
 
-    //    }
-    //    else
-    //    {
-    //        SPDLOG_ERROR("Unknown option: {}", option);
-    //        PrintUsage();
-    //        return -1;
-    //    }
-    //}
-    //catch (const std::exception& e)
-    //{
-    //    SPDLOG_ERROR("Exception occurred: {}", e.what());
-    //    return -1;
-    //}
-
-    //if (success)
-    //{
-    //    SPDLOG_INFO(">>> Conversion Complete! <<<");
-    //    return 0;
-    //}
-    //else
-    //{
-    //    SPDLOG_ERROR(">>> Conversion Failed! <<<");
-    //    return -1;
-    //}
+    // 5. 결과 리턴
+    // 0 : 성공 (subprocess.returncode == 0)
+    // 1 : 실패 (subprocess.returncode != 0)
+    if (success)
+    {
+        LOG_INFO(">>> [SUCCESS] Processing finished.");
+        return 0;
+    }
+    else
+    {
+        LOG_ERROR(">>> [FAILED] Processing failed or not implemented.");
+        return 1;
+    }
 }

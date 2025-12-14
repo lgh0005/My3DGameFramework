@@ -28,7 +28,8 @@ ModelUPtr Model::Load(const std::string& filename)
     std::transform(ext.begin(), ext.end(), ext.begin(), ::tolower);
     if (ext == ".mymodel")
     {
-        if (!model->LoadByBinary(filename)) return nullptr;
+        if (!model->LoadByBinaryV2(filename)) return nullptr;
+        // if (!model->LoadByBinary(filename)) return nullptr;
     }
     else
     {
@@ -405,11 +406,9 @@ bool Model::LoadByBinaryV2(const std::string& filename)
         std::string pathAlbedo    = ReadString(inFile);
         std::string pathNormal    = ReadString(inFile);
         std::string pathEmissive  = ReadString(inFile);
-#pragma region NEED_TO_BE_ORM
         std::string pathORM       = ReadString(inFile); // V2
         std::string pathRoughness = ReadString(inFile); // V2
         std::string pathMetallic  = ReadString(inFile); // V2
-#pragma endregion
         std::string pathSpecular  = ReadString(inFile); // Legacy
         std::string pathHeight    = ReadString(inFile); // Legacy
 
@@ -423,9 +422,13 @@ bool Model::LoadByBinaryV2(const std::string& filename)
         // 실제 텍스처 로드
         material->diffuse = LoadTextureFromFile(pathAlbedo, modelDir);
         material->normal = LoadTextureFromFile(pathNormal, modelDir);
+        material->specular = LoadTextureFromFile(pathSpecular, modelDir); // Legacy
         material->emission = LoadTextureFromFile(pathEmissive, modelDir);
-        // material->orm    = LoadTextureFromFile(pathORM, modelDir); ...
-        // TODO : 더 채워야함.
+        material->metallic = LoadTextureFromFile(pathMetallic, modelDir);
+        material->roughness = LoadTextureFromFile(pathRoughness, modelDir);
+        if (!pathORM.empty()) material->ao = LoadTextureFromFile(pathORM, modelDir);
+        else material->ao = nullptr; // 혹은 별도 AO 경로가 있다면 그것 사용
+        material->height = LoadTextureFromFile(pathHeight, modelDir);
 
         m_materials[i] = std::move(material);
     }

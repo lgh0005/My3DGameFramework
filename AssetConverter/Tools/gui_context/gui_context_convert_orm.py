@@ -1,4 +1,4 @@
-import os
+import os, subprocess
 import tkinter as tk
 from tkinter import filedialog, messagebox
 from gui_context.gui_context_base import GUIContextBase
@@ -43,6 +43,16 @@ class GuiContextConvertORMTexture(GUIContextBase):
         metal_browse = tk.Button(metal_frame, text="Browse...", command=self._browse_metallic_map_file)
         metal_browse.pack(side="left", padx=5)
 
+        # 4. [추가됨] Output Folder context
+        output_frame = tk.Frame(self)
+        output_frame.pack(pady=10, padx=20, fill="x")
+        output_label = tk.Label(output_frame, text="Output Folder:")
+        output_label.pack(side="left", padx=(0,5))
+        self._output_path = tk.Entry(output_frame)
+        self._output_path.pack(side="left", fill="x", expand=True, ipady=4)
+        browse_output = tk.Button(output_frame, text="Browse...", command=self._browse_output_folder)
+        browse_output.pack(side="left", padx=5)
+
          # back and convert Button context 
         action_frame = tk.Frame(self)
         action_frame.pack(pady=20)
@@ -78,24 +88,62 @@ class GuiContextConvertORMTexture(GUIContextBase):
             self._metal_path.delete(0, tk.END)
             self._metal_path.insert(0, path)
 
+    def _browse_output_folder(self):
+        path = filedialog.askdirectory(title="Select Output Folder")
+        if path:
+            self._output_path.delete(0, tk.END)
+            self._output_path.insert(0, path)
+
     def _clicked_convert(self):
         ao_path = self._ao_path.get().strip()
         rough_path = self._rough_path.get().strip()
         metal_path = self._metal_path.get().strip()
+        output_folder = self._output_path.get().strip()
 
-        # 유효성 검사
-        if not ao_path or not os.path.isfile(ao_path):
-            messagebox.showerror("Error", "Please select a valid AO map file.")
-            return
-        if not rough_path or not os.path.isfile(rough_path):
-            messagebox.showerror("Error", "Please select a valid Roughness map file.")
-            return
-        if not metal_path or not os.path.isfile(metal_path):
-            messagebox.showerror("Error", "Please select a valid Metallic map file.")
+        # 1. 입력 파일 유효성 검사
+        if not all(os.path.isfile(p) for p in [ao_path, rough_path, metal_path]):
+            messagebox.showerror("Error", "Please select valid files for all texture inputs.")
             return
 
-        print(f"Converting to ORM Texture:\n  AO: {ao_path}\n  Roughness: {rough_path}\n  Metallic: {metal_path}")
-        # TODO : AssetConverter.exe를 실행하여 변환 로직 수행
+        # 2. 출력 폴더 유효성 검사
+        if not output_folder or not os.path.isdir(output_folder):
+            messagebox.showerror("Error", "Please select a valid output folder.")
+            return
+
+        # 3. EXE 경로 확인
+        exe_path = self._window.get_data("exe_path")
+        if not exe_path:
+            messagebox.showerror("Error", "AssetConverter path lost! Please verify again.")
+            self._window.set_context_by_name("verify")
+            return
+
+        # 4. 출력 파일명 생성 (BaseName_ORM.png)
+        # 예: Wood_AO.png -> Wood_ORM.png
+        # 파일명에서 _AO, _Roughness 등을 제거하고 싶다면 추가 로직이 필요하지만,
+        # 일단은 Base Name 뒤에 붙입니다.
+        base_name = os.path.splitext(os.path.basename(ao_path))[0]
+        final_output_path = os.path.join(output_folder, f"{base_name}_ORM.png")
+
+        # 5. 명령 인자 조립
+        # C++ ArgumentParser: exe --orm <ao> <rough> <metal> <out>
+        cmd = [exe_path, "--orm", ao_path, rough_path, metal_path, final_output_path]
+        try:
+            # 6. 실행
+            result = subprocess.run(
+                cmd, 
+                capture_output=True, 
+                text=True
+            )
+            
+            # 7. 결과 처리
+            if result.returncode == 0:
+                messagebox.showinfo("Success", f"ORM Texture Created Successfully!\n\nSaved to:\n{final_output_path}")
+            else:
+                err_msg = result.stderr if result.stderr else result.stdout
+                messagebox.showerror("Conversion Failed", f"Error Code: {result.returncode}\n\nLog:\n{err_msg}")
+
+        except Exception as e:
+            messagebox.showerror("Critical Error", f"Failed to run executable.\n{e}")
 
     def _clicked_back(self):
         self._window.set_context_by_name("main")

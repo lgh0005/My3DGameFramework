@@ -2,13 +2,14 @@
 #include <spdlog/spdlog.h>
 #include <spdlog/fmt/ostr.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
+#include <spdlog/sinks/basic_file_sink.h>
 
 class Logger
 {
 	DECLARE_SINGLE(Logger)
 
 public:
-	void Init();
+	void Init(int argc);
 	std::shared_ptr<spdlog::logger>& GetLogger() { return m_logger; }
 
 private:

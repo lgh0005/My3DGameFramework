@@ -42,8 +42,16 @@ void Material::SetToProgram(const Program* program) const
     // 기본값: Black (높이 변화 없음)
     glActiveTexture(GL_TEXTURE0 + (int)TextureSlot::SLOT_HEIGHT);
     program->SetUniform("material.height", (int)TextureSlot::SLOT_HEIGHT);
-    if (height) height->Bind();
-    else Texture::CreateBlack()->Bind();
+    if (height)
+    {
+        height->Bind();
+        program->SetUniform("material.heightScale", heightScale);
+    }
+    else
+    {
+        Texture::CreateBlack()->Bind();
+        program->SetUniform("material.heightScale", 0.0f);
+    }
 
 #pragma region ORM_TEXTURE_PROPERTIES
 
@@ -73,7 +81,7 @@ void Material::SetToProgram(const Program* program) const
     glActiveTexture(GL_TEXTURE0);
     program->SetUniform("material.shininess", shininess);
     program->SetUniform("material.emissionStrength", emissionStrength);
-    program->SetUniform("material.heightScale", heightScale);
+    // program->SetUniform("material.heightScale", heightScale);
 
    /* program->SetUniform("material.albedoFactor", albedoFactor);
     program->SetUniform("material.metallicFactor", metallicFactor);
