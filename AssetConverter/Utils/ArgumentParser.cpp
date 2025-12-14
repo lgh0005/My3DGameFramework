@@ -39,15 +39,32 @@ ParseResult ArgumentParser::Parse(int argc, char* argv[])
 		result.outputPath = argv[4];   // 출력 파일
 	}
 
-	// 4. [ORM] --t <ao> <rough> <metal> <out>
+	// 4. [ORM] exe --orm <ao_or_none> <rough_or_none> <metal_or_none> <out_png>
 	else if (command == "--orm")
 	{
 		if (argc < 6) return result;
+
+		auto norm = [](const char* arg) -> std::string 
+		{
+			if (!arg) return {}; 
+			std::string s = arg;
+			if (s == "none" || s == "-") return {};
+			return s;
+		};
+
 		result.mode = ConversionMode::ORM;
-		result.aoMapPath = argv[2];
-		result.roughnessMapPath = argv[3];
-		result.metallicMapPath = argv[4];
+		result.aoMapPath = norm(argv[2]);
+		result.roughnessMapPath = norm(argv[3]);
+		result.metallicMapPath = norm(argv[4]);
 		result.outputPath = argv[5];
+
+		// out 인자 유무 점검
+		if (result.outputPath.empty()) return ParseResult{};
+
+		// 최소 1개 입력은 있는지 점검
+		if (result.aoMapPath.empty() && 
+			result.roughnessMapPath.empty() && 
+			result.metallicMapPath.empty()) return ParseResult{};
 	}
 
 	return result;
@@ -57,17 +74,22 @@ void ArgumentParser::PrintUsage()
 {
 	std::cout << "\n[ Usage ]\n";
 	std::cout << "  1. Verify:\n";
-	std::cout << "     AssetConverter.exe --check\n";
+	std::cout << "     AssetConverter.exe --check\n\n";
 
 	std::cout << "  2. Model Conversion:\n";
-	std::cout << "     AssetConverter.exe -m <input.fbx> <output.mymodel>\n";
+	std::cout << "     AssetConverter.exe -m <input.fbx> <output.mymodel>\n\n";
 
 	std::cout << "  3. Animation Conversion:\n";
-	std::cout << "     AssetConverter.exe -a <anim.fbx> <ref_model.mymodel> <out.myanim>\n";
+	std::cout << "     AssetConverter.exe -a <anim.fbx> <ref_model.mymodel> <out.myanim>\n\n";
 
 	std::cout << "  4. ORM Texture Packing:\n";
-	std::cout << "     AssetConverter.exe --orm <ao> <rough> <metal> <out.png>\n";
+	std::cout << "     AssetConverter.exe --orm <ao_or_none> <rough_or_none> <metal_or_none> <out.png>\n";
+	std::cout << "       - Use 'none' (or '-') for missing maps.\n";
+	std::cout << "       - At least one of AO/Rough/Metal must be provided.\n";
+	std::cout << "       - Defaults when missing: AO=1.0 (white), Rough=1.0 (white), Metal=0.0 (black)\n";
+
 	std::cout << "\n";
 }
+
 
 

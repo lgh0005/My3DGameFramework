@@ -1,6 +1,5 @@
-import os, subprocess
 import tkinter as tk
-from tkinter import filedialog, messagebox
+from tkinter import filedialog
 from gui_context.gui_context_base import GUIContextBase
 
 class GuiContextConvertMain(GUIContextBase):

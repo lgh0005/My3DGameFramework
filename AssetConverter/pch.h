@@ -11,8 +11,6 @@
 #include <memory>
 
 // assimp
-// TODO : Model, Animation 로드 컨버터 클래스에만 포함되도록 빼둘
-// 필요가 있음
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
@@ -33,5 +31,9 @@
 
 // Converters
 #include "Converters/ModelConverter.h"
+#include "Converters/AnimationConverter.h"
+#include "Converters/ORMTexturePacker.h"
 
 #define CONV_MODEL ModelConverter::Instance()
+#define CONV_ANIM  AnimationConverter::Instance()
+#define CONV_ORM   ORMTexturePacker::Instance()

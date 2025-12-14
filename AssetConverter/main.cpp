@@ -1,10 +1,5 @@
 #include "pch.h"
 #include "Utils/ArgumentParser.h"
-#include "Converters/ModelConverter.h"
-
-// [TODO] 추후 구현 시 주석 해제
-// #include "Converters/AnimConverter.h"
-// #include "Converters/TextureConverter.h"
 
 int main(int argc, char* argv[])
 {
@@ -27,22 +22,21 @@ int main(int argc, char* argv[])
     // 4. 모드별 분기 실행
     switch (args.mode)
     {
+    // [Verify Mode]
     case ConversionMode::Verify:
-        // [Verify Mode]
-        // Python GUI가 "--check"를 보냈을 때 "AssetConverter verified" 문자열을 기다림
-        // 로그(LOG_INFO)는 포맷팅이 붙을 수 있으므로, 순수한 std::cout 사용 권장
-        std::cout << "AssetConverter verified" << std::endl;
-        return 0; // 즉시 성공 종료
 
+        // Python GUI가 "--check"를 보냈을 때 "AssetConverter verified" 문자열을 기다림
+        std::cout << "AssetConverter verified" << std::endl;
+        return 0;
+    
+    // [Model Mode]
     case ConversionMode::Model:
-        // [Model Mode]
-        // ModelConverter 싱글톤 호출
         LOG_INFO(">>> [Mode] Model Conversion Selected");
         success = CONV_MODEL.Convert(args.inputPath, args.outputPath);
         break;
 
+    // [Animation Mode]
     case ConversionMode::Animation:
-        // [Animation Mode]
         LOG_INFO(">>> [Mode] Animation Conversion Selected");
 
         // TODO: AnimConverter 구현 후 연결
@@ -52,15 +46,10 @@ int main(int argc, char* argv[])
         success = false; // 아직 구현 안 됐으므로 실패 처리
         break;
 
+    // [ORM Texture Mode]
     case ConversionMode::ORM:
-        // [ORM Texture Mode]
         LOG_INFO(">>> [Mode] ORM Texture Packing Selected");
-
-        // TODO: TextureConverter 구현 후 연결
-        // success = TextureConverter::Instance().ConvertORM(args.aoMapPath, args.roughnessMapPath, args.metallicMapPath, args.outputPath);
-
-        LOG_WARN("ORM converter is under construction.");
-        success = false; // 아직 구현 안 됐으므로 실패 처리
+        success = CONV_ORM.Convert(args.aoMapPath, args.roughnessMapPath, args.metallicMapPath, args.outputPath);
         break;
 
     default:
@@ -70,8 +59,6 @@ int main(int argc, char* argv[])
     }
 
     // 5. 결과 리턴
-    // 0 : 성공 (subprocess.returncode == 0)
-    // 1 : 실패 (subprocess.returncode != 0)
     if (success)
     {
         LOG_INFO(">>> [SUCCESS] Processing finished.");
