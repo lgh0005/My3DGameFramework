@@ -9,7 +9,7 @@ public:
 	bool Convert(const std::string& inputPath, const std::string& outputPath);
 
 private:
-	bool RunConversion(const std::string& inputPath, const std::string& outputPath);
+	bool RunConversion();
 
 	// Assimp 처리 메서드
 	void ProcessNode(aiNode* node, const aiScene* scene);
@@ -21,13 +21,15 @@ private:
 
 	// 텍스쳐 경로 및 파일 쓰기
 	std::string GetTexturePath(aiMaterial* material, aiTextureType type);
-	bool WriteCustomModelFile(const std::string& outputPath);
+	bool WriteCustomModelFile();
 
 private:
 	// 기존의 잡다한 벡터들을 이거 하나로 통합!
 	RawModel m_rawModel;
 
 	// 경로 계산용 임시 변수
+	std::string m_inputPath;
+	std::string m_outputPath;
 	std::string m_modelDirectory;
 
 	// 뼈 ID 할당용 카운터 (RawModel.boneOffsetInfos의 인덱스와 동일)

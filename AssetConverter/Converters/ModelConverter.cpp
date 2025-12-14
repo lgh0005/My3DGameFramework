@@ -11,15 +11,19 @@ bool ModelConverter::Convert(const std::string& inputPath, const std::string& ou
     m_rawModel = RawModel(); // 새 객체로 덮어씌워 초기화
     m_boneNameToIdMap.clear();
     m_boneCounter = 0;
+    m_inputPath.clear();
+    m_outputPath.clear();
     m_modelDirectory.clear();
     
-    // 로그 출력
+    // 로그 출력 및 입출력 경로 캐싱
     LOG_INFO(" [ModelConverter] Start Conversion");
     LOG_INFO(" - Input:  {}", inputPath);
     LOG_INFO(" - Output: {}", outputPath);
+    m_inputPath = inputPath;
+    m_outputPath = outputPath;
 
     // 실제 로직 실행
-    bool result = RunConversion(inputPath, outputPath);
+    bool result = RunConversion();
 
     if (result) LOG_INFO(" [Success] Conversion Completed.");
     else LOG_ERROR(" [Failed] Conversion Aborted.");
@@ -31,13 +35,13 @@ bool ModelConverter::Convert(const std::string& inputPath, const std::string& ou
 //  Internal Logic  //
 //==================*/
 // INFO : Assimp 로드 -> 변환(Materials/Nodes) -> 저장
-bool ModelConverter::RunConversion(const std::string& inputPath, const std::string& outputPath)
+bool ModelConverter::RunConversion()
 {
     // 0. 초기화
     m_rawModel = RawModel(); // 모델 데이터 초기화
     m_boneNameToIdMap.clear();
     m_boneCounter = 0;
-    m_modelDirectory = std::filesystem::path(inputPath).parent_path().string();
+    m_modelDirectory = std::filesystem::path(m_inputPath).parent_path().string();
 
     // 1. Assimp 임포터 실행
     // [옵션 설명]
@@ -49,7 +53,7 @@ bool ModelConverter::RunConversion(const std::string& inputPath, const std::stri
     Assimp::Importer importer;
     const aiScene* scene = importer.ReadFile
     (
-        inputPath,
+        m_inputPath,
         aiProcess_Triangulate      |
         aiProcess_CalcTangentSpace |
         aiProcess_GenSmoothNormals |
@@ -78,9 +82,9 @@ bool ModelConverter::RunConversion(const std::string& inputPath, const std::stri
 
     // 5. 파일 저장 (직렬화)
     LOG_INFO("Writing Binary File...");
-    if (!WriteCustomModelFile(outputPath))
+    if (!WriteCustomModelFile())
     {
-        LOG_ERROR("Failed to write output file: {}", outputPath);
+        LOG_ERROR("Failed to write output file: {}", m_outputPath);
         return false;
     }
 
@@ -88,11 +92,11 @@ bool ModelConverter::RunConversion(const std::string& inputPath, const std::stri
 }
 
 // INFO : Header -> Skeleton -> Materials -> Meshes 순서
-bool ModelConverter::WriteCustomModelFile(const std::string& outputPath)
+bool ModelConverter::WriteCustomModelFile()
 {
-    LOG_INFO("Attempting to write file to: {}", outputPath);
+    LOG_INFO("Attempting to write file to: {}", m_outputPath);
 
-    std::ofstream outFile(outputPath, std::ios::binary);
+    std::ofstream outFile(m_outputPath, std::ios::binary);
     if (!outFile)
     {
         // errno를 통해 구체적인 시스템 에러 메시지 확인
@@ -390,7 +394,7 @@ RawMaterial ModelConverter::ProcessMaterial(aiMaterial* material)
             if (!path.empty())
             {
                 RawTexture tex;
-                tex.relativePath = path;
+                tex.fileName = path;
                 tex.type = rawType;
                 rawMat.textures.push_back(tex);
             }
@@ -430,7 +434,7 @@ RawMaterial ModelConverter::ProcessMaterial(aiMaterial* material)
         default: typeStr = "Unknown"; break;
         }
         // 정렬을 맞춰서 보기 편하게 출력
-        LOG_INFO("   - {:<12} : {}", typeStr, tex.relativePath);
+        LOG_INFO("   - {:<12} : {}", typeStr, tex.fileName);
     }
 
     // 파일 포맷마다 매핑되는 키가 제각각이라, 문제가 생기면 이 로그를 보고 추적합니다.
@@ -536,6 +540,6 @@ std::string ModelConverter::GetTexturePath(aiMaterial* material, aiTextureType t
     // 나중에 로딩할 때 조합할 수 있도록 파일 이름(혹은 상대경로)을 반환.
     // 여기서는 원본 파일명을 그대로 반환하고, 
     // 실제 파일 복사/변환은 나중에 RunConversion의 후처리 단계에서 진행.
+    // INFO : 반드시 .mymodel과 이를 이루는 모든 텍스쳐는 같은 경로에 있게 된다.
     return filename;
 }
-

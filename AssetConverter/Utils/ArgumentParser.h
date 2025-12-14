@@ -26,6 +26,7 @@ struct ParseResult
     std::string aoMapPath;
     std::string roughnessMapPath;
     std::string metallicMapPath;
+    bool invertRoughness = false;
 
     bool IsValid() const { return mode != ConversionMode::None; }
 };

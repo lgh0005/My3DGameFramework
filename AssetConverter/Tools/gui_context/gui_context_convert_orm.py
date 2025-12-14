@@ -26,6 +26,7 @@ class GuiContextConvertORMTexture(GUIContextBase):
         ao_clear.pack(side="left", padx=5)
 
         # roughness map path context
+        # TODO : glosiness인지 roughness인지 boolean 같은 걸로 선택하게 해야함.
         rough_frame = tk.Frame(self)
         rough_frame.pack(pady=10, padx=20, fill="x")
         rough_label = tk.Label(rough_frame, text="Open Roughness Map:")
@@ -58,6 +59,19 @@ class GuiContextConvertORMTexture(GUIContextBase):
         self._output_path.pack(side="left", fill="x", expand=True, ipady=4)
         browse_output = tk.Button(output_frame, text="Browse...", command=self._browse_output_folder)
         browse_output.pack(side="left", padx=5)
+
+        # =========================
+        # [NEW] invert option checkbox
+        # =========================
+        opt_frame = tk.Frame(self)
+        opt_frame.pack(pady=(5, 0), padx=20, fill="x")
+        self._invert_rough = tk.BooleanVar(value=False)
+        invert_cb = tk.Checkbutton(
+            opt_frame,
+            text="Input is Glossiness (invert to Roughness)",
+            variable=self._invert_rough
+        )
+        invert_cb.pack(side="left")
 
         # back and convert Button context 
         action_frame = tk.Frame(self)
@@ -143,11 +157,12 @@ class GuiContextConvertORMTexture(GUIContextBase):
         # 6. 명령 인자 조립
         # TODO : 사실 이들이 반드시 전부 잇어야 하는 것은 아님. 그러나, 적어도 하나의 입력 맵이 있는 지는 검사해야함.
         # 백엔드에서의 파싱 편리성을 위해서 명령어를 조금 수정 필요.
-        # C++ ArgumentParser: exe --orm <ao_or_none> <rough_or_none> <metal_or_none> <out_png>
+        # C++ ArgumentParser: exe --orm <ao_or_none> <rough_or_none> <metal_or_none> <out_png> [--invert-roughness]
         ao_arg = ao_path if ao_path else "none"
         rough_arg = rough_path if rough_path else "none"
         metal_arg = metal_path if metal_path else "none"
         cmd = [exe_path, "--orm", ao_arg, rough_arg, metal_arg, final_output_path]
+        if self._invert_rough.get(): cmd.append("--invert-roughness")
 
         try:
             # 6. 실행

@@ -27,6 +27,7 @@ enum class RawTextureType : int8
 struct RawTexture
 {
     // 한 폴더 안에 모델과 텍스쳐를 같이 둔 채로 읽는 것을 가정
-    std::string relativePath; // .asset 파일 기준 상대 경로 (예: "Textures/Sword_ORM.png")
+    //  // 규격: mymodel 파일과 같은 폴더에 있어야 함. (파일명만 저장)
+    std::string fileName; // 예: "Sword_ORM.png"
     RawTextureType type;
 };

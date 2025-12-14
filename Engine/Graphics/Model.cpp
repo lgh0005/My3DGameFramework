@@ -560,7 +560,7 @@ void Model::ExtractBoneWeightForVertices(std::vector<SkinnedVertex>& vertices,
 //========================*/
 TexturePtr Model::LoadTextureFromFile
 (
-    const std::string& relativePath, 
+    const std::string& relativePath, // TODO : 이는 상대 경로가 아닌 순수 모델 파일명이 될 것임.
     const std::filesystem::path& parentDir
 )
 {

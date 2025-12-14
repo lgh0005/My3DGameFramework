@@ -39,7 +39,7 @@ ParseResult ArgumentParser::Parse(int argc, char* argv[])
 		result.outputPath = argv[4];   // 출력 파일
 	}
 
-	// 4. [ORM] exe --orm <ao_or_none> <rough_or_none> <metal_or_none> <out_png>
+	// 4. [ORM] exe --orm <ao_or_none> <rough_or_none> <metal_or_none> <out_png> [--invert-roughness]
 	else if (command == "--orm")
 	{
 		if (argc < 6) return result;
@@ -57,6 +57,12 @@ ParseResult ArgumentParser::Parse(int argc, char* argv[])
 		result.roughnessMapPath = norm(argv[3]);
 		result.metallicMapPath = norm(argv[4]);
 		result.outputPath = argv[5];
+		result.invertRoughness = false;
+		for (int i = 6; i < argc; ++i)
+		{
+			std::string opt = argv[i];
+			if (opt == "--invert-roughness") result.invertRoughness = true;
+		}
 
 		// out 인자 유무 점검
 		if (result.outputPath.empty()) return ParseResult{};

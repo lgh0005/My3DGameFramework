@@ -9,6 +9,7 @@
 #include <filesystem>
 #include <fstream>
 #include <memory>
+namespace fs = std::filesystem;
 
 // assimp
 #include <assimp/Importer.hpp>

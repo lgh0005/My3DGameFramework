@@ -49,7 +49,12 @@ int main(int argc, char* argv[])
     // [ORM Texture Mode]
     case ConversionMode::ORM:
         LOG_INFO(">>> [Mode] ORM Texture Packing Selected");
-        success = CONV_ORM.Convert(args.aoMapPath, args.roughnessMapPath, args.metallicMapPath, args.outputPath);
+        success = CONV_ORM.Convert
+        (
+            args.aoMapPath, args.roughnessMapPath, 
+            args.metallicMapPath, args.outputPath,
+            args.invertRoughness
+        );
         break;
 
     default:
