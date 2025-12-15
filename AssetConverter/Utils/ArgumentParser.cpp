@@ -16,13 +16,19 @@ ParseResult ArgumentParser::Parse(int argc, char* argv[])
 		return result;
 	}
 
-	// 2. [Model] -m <in> <out>
+	// 2. [Model] -m <in> <out> [--extract-orm]
 	else if (command == "-m" || command == "--model")
 	{
 		if (argc < 4) return result;
 		result.mode = ConversionMode::Model;
 		result.inputPath = argv[2];
 		result.outputPath = argv[3];
+		result.extractOrm = false;
+		for (int i = 4; i < argc; ++i)
+		{
+			std::string opt = argv[i];
+			if (opt == "--extract-orm") result.extractOrm = true;
+		}
 	}
 
 	// 3. [Animation] -a <anim_in> <ref_model> <out>

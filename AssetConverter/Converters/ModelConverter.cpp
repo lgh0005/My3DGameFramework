@@ -4,13 +4,15 @@
 /*==========================================//
 //  [Public Entry] 변환 시작 및 상태 초기화   //
 //==========================================*/
-bool ModelConverter::Convert(const std::string& inputPath, const std::string& outputPath)
+bool ModelConverter::Convert(const std::string& inputPath, 
+                             const std::string& outputPath, bool extractORM)
 {
     // [중요] 상태 초기화 (State Clear)
     // 싱글톤은 데이터가 유지되므로 매번 실행 시 리셋해야 합니다.
     m_rawModel = RawModel(); // 새 객체로 덮어씌워 초기화
     m_boneNameToIdMap.clear();
     m_boneCounter = 0;
+    m_extractORM = extractORM;
     m_inputPath.clear();
     m_outputPath.clear();
     m_modelDirectory.clear();
@@ -41,7 +43,12 @@ bool ModelConverter::RunConversion()
     m_rawModel = RawModel(); // 모델 데이터 초기화
     m_boneNameToIdMap.clear();
     m_boneCounter = 0;
-    m_modelDirectory = std::filesystem::path(m_inputPath).parent_path().string();
+
+    // 0-1. 모델 이름과 상위 경로를 추출
+    const fs::path outPath(m_outputPath);
+    m_modelDirectory = outPath.parent_path().string();
+    m_modelName = outPath.stem().string();
+    if (m_modelName.empty()) m_modelName = "unnamed_model";
 
     // 1. Assimp 임포터 실행
     // [옵션 설명]
@@ -68,7 +75,7 @@ bool ModelConverter::RunConversion()
     m_rawModel.materials.reserve(scene->mNumMaterials);
     for (uint32 i = 0; i < scene->mNumMaterials; ++i)
     {
-        m_rawModel.materials.push_back(ProcessMaterial(scene->mMaterials[i]));
+        m_rawModel.materials.push_back(ProcessMaterial(scene->mMaterials[i], i));
     }
 
     // 3. 노드/메쉬 처리 (재귀 호출 시작)
@@ -133,6 +140,8 @@ bool ModelConverter::WriteCustomModelFile()
 
     // 2. 스켈레톤 정보 (Skeleton Info)
     // 엔진은 (뼈이름 -> 뼈정보) 순서로 읽어서 맵핑함
+    // TODO : 이후에 이 부분은 Avatar나 Skeleton과 같은 곳에서 읽을 수 있는
+    // 데이터로 뺄 수 있어야 함
     if (hasSkeleton)
     {
         uint32 boneCount = (uint32)m_rawModel.boneOffsetInfos.size();
@@ -346,7 +355,7 @@ void ModelConverter::ProcessNode(aiNode* node, const aiScene* scene)
     }
 }
 
-RawMaterial ModelConverter::ProcessMaterial(aiMaterial* material)
+RawMaterial ModelConverter::ProcessMaterial(aiMaterial* material, int32 index)
 {
     RawMaterial rawMat;
     aiString name;
@@ -389,16 +398,16 @@ RawMaterial ModelConverter::ProcessMaterial(aiMaterial* material)
 
     // 2. 텍스처 추출 (Helper Lambda 활용)
     auto AddTexture = [&](aiTextureType aiType, RawTextureType rawType)
+    {
+        std::string path = GetTexturePath(material, aiType);
+        if (!path.empty())
         {
-            std::string path = GetTexturePath(material, aiType);
-            if (!path.empty())
-            {
-                RawTexture tex;
-                tex.fileName = path;
-                tex.type = rawType;
-                rawMat.textures.push_back(tex);
-            }
-        };
+            RawTexture tex;
+            tex.fileName = path;
+            tex.type = rawType;
+            rawMat.textures.push_back(tex);
+        }
+    };
 
     // Assimp 타입 <-> 우리 타입 매핑
     // PBR Albedo는 BASE_COLOR 혹은 DIFFUSE
@@ -409,10 +418,14 @@ RawMaterial ModelConverter::ProcessMaterial(aiMaterial* material)
     AddTexture(aiTextureType_HEIGHT, RawTextureType::Height);
     AddTexture(aiTextureType_SPECULAR, RawTextureType::Specular);
     AddTexture(aiTextureType_EMISSIVE, RawTextureType::Emissive);
+
     AddTexture(aiTextureType_AMBIENT_OCCLUSION, RawTextureType::AmbientOcclusion);
     AddTexture(aiTextureType_DIFFUSE_ROUGHNESS, RawTextureType::Roughness);
     AddTexture(aiTextureType_METALNESS, RawTextureType::Metallic);
     AddTexture(aiTextureType_SHININESS, RawTextureType::Shininess);
+
+    // 3. 자동 ORM 텍스쳐 생성
+    CreateORMTextureFromAssimp(material, rawMat, index);
 
     // [LOG] 최종 매핑된 텍스처 리스트 확인
     LOG_INFO("  [Textures] Count: {}", rawMat.textures.size());
@@ -424,13 +437,13 @@ RawMaterial ModelConverter::ProcessMaterial(aiMaterial* material)
         case RawTextureType::Albedo: typeStr = "Albedo"; break;
         case RawTextureType::Normal: typeStr = "Normal"; break;
         case RawTextureType::Emissive: typeStr = "Emissive"; break;
-        case RawTextureType::ORM: typeStr = "ORM (Packed)"; break;
+        case RawTextureType::Specular: typeStr = "Specular"; break;
+        case RawTextureType::Height:   typeStr = "Height"; break;
+        case RawTextureType::Shininess: typeStr = "Shininess"; break;
         case RawTextureType::Roughness: typeStr = "Roughness"; break;
         case RawTextureType::Metallic: typeStr = "Metallic"; break;
         case RawTextureType::AmbientOcclusion: typeStr = "AO"; break;
-        case RawTextureType::Specular:         typeStr = "Specular"; break;
-        case RawTextureType::Height:           typeStr = "Height"; break;
-        case RawTextureType::Shininess:        typeStr = "Shininess"; break;
+        case RawTextureType::ORM: typeStr = "ORM (Packed)"; break;
         default: typeStr = "Unknown"; break;
         }
         // 정렬을 맞춰서 보기 편하게 출력
@@ -447,12 +460,12 @@ RawMaterial ModelConverter::ProcessMaterial(aiMaterial* material)
         { aiTextureType_NORMALS, "NORMALS" },
         { aiTextureType_HEIGHT, "HEIGHT (Bump)" },
         { aiTextureType_SPECULAR, "SPECULAR" },
-        { aiTextureType_SHININESS, "SHININESS" },
         { aiTextureType_EMISSIVE, "EMISSIVE" },
+        { aiTextureType_UNKNOWN, "UNKNOWN" },
+        { aiTextureType_SHININESS, "SHININESS" },
         { aiTextureType_METALNESS, "METALNESS" },
         { aiTextureType_DIFFUSE_ROUGHNESS, "ROUGHNESS" },
         { aiTextureType_AMBIENT_OCCLUSION, "AO" },
-        { aiTextureType_UNKNOWN, "UNKNOWN (Might be ORM)" }
     };
 
     aiString debugPath;
@@ -543,3 +556,65 @@ std::string ModelConverter::GetTexturePath(aiMaterial* material, aiTextureType t
     // INFO : 반드시 .mymodel과 이를 이루는 모든 텍스쳐는 같은 경로에 있게 된다.
     return filename;
 }
+
+void ModelConverter::CreateORMTextureFromAssimp(aiMaterial* material, RawMaterial& rawMat, int32 index)
+{
+    // 0. 옵션이 꺼져있으면 즉시 리턴
+    if (!m_extractORM) return;
+
+    // 0. 입력 텍스처 파일명 얻어오기
+    std::string aoFile = GetTexturePath(material, aiTextureType_AMBIENT_OCCLUSION);
+    std::string roughFile = GetTexturePath(material, aiTextureType_DIFFUSE_ROUGHNESS);
+    std::string metalFile = GetTexturePath(material, aiTextureType_METALNESS);
+    std::string glossyFile = GetTexturePath(material, aiTextureType_SHININESS);
+    if (aoFile.empty() && roughFile.empty() && 
+        metalFile.empty() && glossyFile.empty()) return;
+
+    // 1. 절대 경로 조립 
+    // INFO : 입력 모델 폴더 기준으로 ao, roughness, metallic 텍스쳐가 같이 있다고 가정
+    fs::path inputDir = fs::path(m_inputPath).parent_path();
+    auto ToAbsInput = [&](const std::string& fileName) -> std::string
+    {
+        if (fileName.empty()) return {};
+        fs::path p(fileName);
+
+        // 절대 경로거나, 상대 경로로 찾았거나, 파일명만으로 찾았거나 (Fallback 로직 포함)
+        if (p.is_absolute() && fs::exists(p)) return p.string();
+        if (fs::exists(inputDir / p)) return (inputDir / p).string();
+        if (fs::exists(inputDir / p.filename())) return (inputDir / p.filename()).string();
+        return ""; // 파일 없음
+    };
+    std::string aoAbs    = ToAbsInput(aoFile);
+    std::string roughAbs = ToAbsInput(roughFile);
+    std::string metalAbs = ToAbsInput(metalFile);
+    std::string glossAbs = ToAbsInput(glossyFile);
+
+    // 3. Roughness vs Glossiness 결정 로직
+    std::string finalRoughPath = roughAbs;
+    bool invertRoughness = false;
+    if (finalRoughPath.empty() && !glossAbs.empty())
+    {
+        finalRoughPath = glossAbs;
+        invertRoughness = true; // ORM Packer에게 "이거 뒤집어서 써라"라고 지시
+        LOG_INFO("  - Roughness map missing. Using Glossiness map instead (Inverted).");
+    }
+
+    // 4. ORM 출력 파일명 결정 및 저장 절대 경로 조립
+    // INFO : 출력 파일 포멧은 {ModelName}_{Index}_ORM.png
+    // INFO : 출력 경로는 .mymodel이 출력되는 경로와 동일
+    fs::path outPath(m_outputPath);
+    std::string ormFileName = fmt::format("{}_{}_ORM.png", m_modelName, index);
+    fs::path savePath = outPath.parent_path() / ormFileName;
+    LOG_INFO("[ORM Packer] Baking to: {}", savePath.string());
+
+    // 5. 변환 실행 (마지막 인자로 반전 여부 전달)
+    if (!CONV_ORM.Convert(aoAbs, finalRoughPath, metalAbs, savePath.string(), invertRoughness))
+    {
+        LOG_ERROR("[ORM Packer] Failed to pack ORM texture.");
+        return;
+    }
+
+    // 4) RawMaterial에는 "파일명만" 저장 (엔진 로더 정책과 일치)
+    rawMat.textures.push_back({ ormFileName, RawTextureType::ORM });
+}
+

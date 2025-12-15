@@ -45,8 +45,11 @@ private:
 
 private:
 	Model() = default;
+
+#pragma region LEGACY_ASSET_CONVERTER_METHODS
 	bool LoadByAssimp(const std::string& filename);
 	bool LoadByBinary(const std::string& filename);
+#pragma endregion
 
 	// TEST
 #pragma region TEST_FOR_ASSET_CONVERTER

@@ -39,11 +39,17 @@ ModelUPtr Model::Load(const std::string& filename)
     return std::move(model);
 }
 
+#pragma region LEGACY_ASSET_CONVERTER_METHODS
+// TODO : 이후에 LoadByAssimpV2로 좀 다시 작성해볼 필요가 있음.
+// 새로워진 ModelConverter의 내용을 반영할 필요가 있다.
 bool Model::LoadByAssimp(const std::string& filename)
 {
     Assimp::Importer importer;
+
     // INFO : 어떤 모델은 UV 좌표가 올바르고 어떤 모델은 뒤집히는 것이 있는 모양이다.
     // 텍스쳐가 이상하게 뒤집한다면 파일 단에서 수정을 한 후 적용한다.
+    // INFO : 간혹 Diffuse맵만 상하를 반전시켜야 올바르게 로드가 될 수 있음.
+    // 텍스쳐에 대한 것은 이미지를 적절히 뒤집에서 UV를 맞춰줄 필요가 있음.
     auto scene = importer.ReadFile(filename, aiProcess_Triangulate | aiProcess_CalcTangentSpace);
     if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode) 
     {
@@ -53,6 +59,8 @@ bool Model::LoadByAssimp(const std::string& filename)
 
     std::filesystem::path modelDir = std::filesystem::path(filename).parent_path();
 
+    // INFO : LoadByAssimp를 통한 임포팅은 ORM 텍스쳐를 지원하지 못한다
+    // TODO : Glossiness에 대한 조치가 필요
     m_materials.clear();
     for (uint32 i = 0; i < scene->mNumMaterials; i++) 
     {
@@ -66,10 +74,8 @@ bool Model::LoadByAssimp(const std::string& filename)
         glMaterial->roughness = LoadTextureFromAssimp(material, aiTextureType_DIFFUSE_ROUGHNESS, modelDir);
         glMaterial->ao = LoadTextureFromAssimp(material, aiTextureType_AMBIENT_OCCLUSION, modelDir);
 
-        // IFNO : obj를 로드할 때 normal을 height에 넣어야 작동되는 경우가 있음.
-        // 그에 대한 방어 코드를 작성
-        // TODO : 간혹 Diffuse맵만 상하를 반전시켜야 올바르게 로드가 될 수 있음.
-        // 텍스쳐에 대한 것은 이미지를 적절히 뒤집에서 UV를 맞춰줄 필요가 있음.
+        // TODO : 머티리얼 단에서 height 스케일을 초기화를 안해서 발생한 버그였음이 드러났으니
+        // 해당 부분은 적절히 수정할 필요가 있다.
 #pragma region OBJ_EXTENSION_COMPATIBLE
         // Normal을 aiTextureType_HEIGHT로 우선 로드
         if (!glMaterial->normal)
@@ -94,6 +100,8 @@ bool Model::LoadByAssimp(const std::string& filename)
 
         if (!glMaterial->height) glMaterial->heightScale = 0.0f;
         else glMaterial->heightScale = 0.05f;
+
+        // TODO : albedoFactor, metallicFactor, roughnessFactor도 추가로 기록해야 함.
 
         m_materials.push_back(std::move(glMaterial));
     }
@@ -220,6 +228,7 @@ bool Model::LoadByBinary(const std::string& filename)
     inFile.close();
     return true;
 }
+#pragma endregion
 
 void Model::ProcessMesh(aiMesh* mesh, const aiScene* scene)
 {
@@ -336,6 +345,11 @@ void Model::Draw(const Program* program) const
 }
 
 #pragma region TEST_FOR_ASSET_CONVERTER
+bool Model::LoadByAssimpV2(const std::string& filename)
+{
+
+    return true;
+}
 
 bool Model::LoadByBinaryV2(const std::string& filename)
 {
@@ -482,7 +496,6 @@ bool Model::LoadByBinaryV2(const std::string& filename)
     inFile.close();
     return true;
 }
-
 #pragma endregion
 
 /*===================//

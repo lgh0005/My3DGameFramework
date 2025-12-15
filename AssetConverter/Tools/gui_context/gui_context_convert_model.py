@@ -33,6 +33,17 @@ class GuiContextConvertModel(GUIContextBase):
         browse_output = tk.Button(output_frame, text="Browse...", command=self._browse_output_folder)
         browse_output.pack(side="left", padx=5)
 
+        # extract orm texture context
+        opt_frame = tk.Frame(self)
+        opt_frame.pack(pady=(5, 0), padx=20, fill="x")
+        self._extract_orm = tk.BooleanVar(value=False)
+        invert_cb = tk.Checkbutton(
+            opt_frame,
+            text="Extract ORM texture from model (from AO, Roughness, Metallic)",
+            variable=self._extract_orm
+        )
+        invert_cb.pack(side="left")
+
         # back and convert Button context 
         action_frame = tk.Frame(self)
         action_frame.pack(pady=20)
@@ -84,6 +95,7 @@ class GuiContextConvertModel(GUIContextBase):
         file_name_no_ext = os.path.splitext(os.path.basename(input_path))[0]
         final_output_path = os.path.join(output_folder, f"{file_name_no_ext}.mymodel")
         cmd = [exe_path, "-m", input_path, final_output_path]
+        if self._extract_orm.get(): cmd.append("--extract-orm")
         try:
             result = subprocess.run(
                 cmd,
@@ -99,7 +111,6 @@ class GuiContextConvertModel(GUIContextBase):
                 messagebox.showerror("Conversion Failed", f"Error Code: {result.returncode}\n\nLog:\n{err_msg}")
         except Exception as e:
             messagebox.showerror("Error", f"Failed to run executable.\n{e}")
-
 
     def _clicked_back(self):
         self._window.set_context_by_name("main")

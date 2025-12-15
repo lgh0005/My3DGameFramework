@@ -16,13 +16,14 @@ struct ParseResult
     // [공통] 출력 경로 (파일 전체 경로)
     std::string outputPath;
 
-    // [Model / Animation / ORM Texture]
+    // [Model]
     std::string inputPath;
+    bool extractOrm = false;
 
-    // [Animation Only] 애니메이션의 기준이 되는 모델 파일
+    // [Animation] 애니메이션의 기준이 되는 모델 파일
     std::string refModelPath;
 
-    // [ORM Texture] (PBR 텍스처 패킹용)
+    // [ORM Texture] 개별 PBR 텍스처 패킹용
     std::string aoMapPath;
     std::string roughnessMapPath;
     std::string metallicMapPath;

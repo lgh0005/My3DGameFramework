@@ -32,7 +32,7 @@ int main(int argc, char* argv[])
     // [Model Mode]
     case ConversionMode::Model:
         LOG_INFO(">>> [Mode] Model Conversion Selected");
-        success = CONV_MODEL.Convert(args.inputPath, args.outputPath);
+        success = CONV_MODEL.Convert(args.inputPath, args.outputPath, args.extractOrm);
         break;
 
     // [Animation Mode]

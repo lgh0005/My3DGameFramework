@@ -22,11 +22,8 @@ class GuiContextConvertORMTexture(GUIContextBase):
         self._ao_path.pack(side="left", fill="x", expand=True, ipady=4)
         ao_browse = tk.Button(ao_frame, text="Browse...", command=self._browse_ao_map_file)
         ao_browse.pack(side="left", padx=5)
-        ao_clear = tk.Button(ao_frame, text="Clear", command=self._clear_ao_map_file)
-        ao_clear.pack(side="left", padx=5)
 
         # roughness map path context
-        # TODO : glosiness인지 roughness인지 boolean 같은 걸로 선택하게 해야함.
         rough_frame = tk.Frame(self)
         rough_frame.pack(pady=10, padx=20, fill="x")
         rough_label = tk.Label(rough_frame, text="Open Roughness Map:")
@@ -35,8 +32,6 @@ class GuiContextConvertORMTexture(GUIContextBase):
         self._rough_path.pack(side="left", fill="x", expand=True, ipady=4)
         rough_browse = tk.Button(rough_frame, text="Browse...", command=self._browse_roughness_map_file)
         rough_browse.pack(side="left", padx=5)
-        rough_clear = tk.Button(rough_frame, text="Clear", command=self._clear_roughness_map_file)
-        rough_clear.pack(side="left", padx=5)
 
         # metallic map path context
         metal_frame = tk.Frame(self)
@@ -47,8 +42,6 @@ class GuiContextConvertORMTexture(GUIContextBase):
         self._metal_path.pack(side="left", fill="x", expand=True, ipady=4)
         metal_browse = tk.Button(metal_frame, text="Browse...", command=self._browse_metallic_map_file)
         metal_browse.pack(side="left", padx=5)
-        metal_clear = tk.Button(metal_frame, text="Clear", command=self._clear_metallic_map_file)
-        metal_clear.pack(side="left", padx=5)
 
         # output folder context
         output_frame = tk.Frame(self)
@@ -60,9 +53,7 @@ class GuiContextConvertORMTexture(GUIContextBase):
         browse_output = tk.Button(output_frame, text="Browse...", command=self._browse_output_folder)
         browse_output.pack(side="left", padx=5)
 
-        # =========================
-        # [NEW] invert option checkbox
-        # =========================
+        # invert option checkbox
         opt_frame = tk.Frame(self)
         opt_frame.pack(pady=(5, 0), padx=20, fill="x")
         self._invert_rough = tk.BooleanVar(value=False)
@@ -113,10 +104,6 @@ class GuiContextConvertORMTexture(GUIContextBase):
         if path:
             self._output_path.delete(0, tk.END)
             self._output_path.insert(0, path)
-
-    def _clear_ao_map_file(self): self._ao_path.delete(0, tk.END)
-    def _clear_roughness_map_file(self): self._rough_path.delete(0, tk.END)
-    def _clear_metallic_map_file(self): self._metal_path.delete(0, tk.END)
 
     def _clicked_convert(self):
         ao_path = self._ao_path.get().strip()
