@@ -13,6 +13,7 @@ layout (std140, binding = 0) uniform CameraData
     vec3 viewPos;
 };
 
+// TODO : Light은 이후에 UBO로 빼야 함
 // [UBO] Light Data (Binding 1) - 구조체 패딩 일치 필수!
 struct LightInfo
 {
@@ -35,7 +36,8 @@ layout (std140, binding = 1) uniform LightData
 };
 
 // [Material] 텍스처 슬롯 기반 (C++ SetToProgram과 매칭)
-struct Material {
+struct Material 
+{
     sampler2D diffuse;    // Slot 0
     sampler2D normal;    // Slot 3
     sampler2D metallic;  // Slot 6

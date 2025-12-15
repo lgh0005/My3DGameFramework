@@ -8,49 +8,51 @@ CLASS_PTR(Program)
 /*==================//
 //  material enums  //
 //==================*/
-enum class TextureSlot : int8
+enum class TextureSlot : uint8
 {
     SLOT_ALBEDO = 0,
     SLOT_SPECULAR = 1,
     SLOT_EMISSION = 2,
     SLOT_NORMAL = 3,
     SLOT_HEIGHT = 4,
-
-    // TODO : 이후에 ORM 텍스쳐 하나로 합쳐야 한다.
     SLOT_AO = 5,
     SLOT_METALLIC = 6,
-    SLOT_ROUGHNESS = 7
+    SLOT_ROUGHNESS = 7,
+    SLOT_ORM = 8,
+    SLOT_GLOSSINESS = 9
 };
 
-/*==================//
-//  material class  //
-//==================*/
 CLASS_PTR(Material);
 class Material 
 {
 public:
     static MaterialUPtr Create();
 
-    TexturePtr  diffuse;  // [공통]
-    TexturePtr  specular; // [SRP]
-    TexturePtr  emission; // [공통]
-    TexturePtr  normal;   // [공통]
-    TexturePtr  height;   // [공통]
+    /*=====================//
+    //  material textures  //
+    //=====================*/
+    TexturePtr  diffuse;   // [Common]
+    TexturePtr  specular;  // [SRP]
+    TexturePtr  emission;  // [Common]
+    TexturePtr  normal;    // [Common]
+    TexturePtr  height;    // [Common]
+    TexturePtr  ao;        // [Common]
+    TexturePtr  metallic;  // [URP]
+    TexturePtr  roughness; // [URP]
+    TexturePtr  orm;       // [URP]
 
-    // TODO : 이후에 ORM 텍스쳐 하나로 합쳐야 한다.
-    TexturePtr  ao;       // [공통]
-    TexturePtr  metallic; // [URP]
-    TexturePtr  roughness;
-
+    /*====================//
+    //  material factors  //
+    //====================*/
     float       shininess           { 32.0f }; // [SRP]
-    float       emissionStrength    { 1.0f };  // [공통]
-    float       heightScale         { 1.0f };  // [공통]
+    float       emissionStrength    { 1.0f };  // [Common]
+    float       heightScale         { 1.0f };  // [Common]
 
-    // TODO : 머티리얼에 albedoFactor, metallicFactor,
-    // roughnessFactor를 추가할 필요가 있음
-    /*float       albedoFactor;
-    float       metallicFactor;
-    float       roughnessFactor*/;
+    glm::vec4   albedoFactor        { 1.0f, 1.0f, 1.0f, 1.0f };  // [URP]
+    float       metallicFactor      { 1.0f };  // [URP]
+    float       roughnessFactor     { 1.0f };  // [URP]
+
+    bool useGlossinessAsRoughness   { false }; // [URP]
 
     void SetToProgram(const Program* program) const;
 

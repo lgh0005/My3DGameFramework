@@ -171,14 +171,6 @@ void Texture::SetTextureFormat(int32 width, int32 height,
         format, m_type, nullptr);
 }
 
-/*===================//
-//   texture utils   //
-//===================*/
-TexturePtr Texture::s_whiteTex = nullptr;
-TexturePtr Texture::s_grayTex = nullptr;
-TexturePtr Texture::s_blackTex = nullptr;
-TexturePtr Texture::s_blueTex = nullptr;
-
 TextureUPtr Texture::LoadKtx(const std::string& ktxFilePath)
 {
     ktxTexture* kTexture;
@@ -222,6 +214,14 @@ TextureUPtr Texture::LoadKtx(const std::string& ktxFilePath)
     ktxTexture_Destroy(kTexture);
     return std::move(texture);
 }
+
+/*===================//
+//   texture utils   //
+//===================*/
+TexturePtr Texture::s_whiteTex = nullptr;
+TexturePtr Texture::s_grayTex = nullptr;
+TexturePtr Texture::s_blackTex = nullptr;
+TexturePtr Texture::s_blueTex = nullptr;
 
 TexturePtr Texture::Create4x4Texture(const std::vector<uint8>& colorData)
 {
@@ -268,10 +268,3 @@ TexturePtr Texture::CreateBlue()
     s_blueTex = Create4x4Texture(data);
     return s_blueTex;
 }
-
-//TexturePtr Texture::CreateFromFloat(float value)
-//{
-//    uint8 val = static_cast<uint8>(glm::clamp(value, 0.0f, 1.0f) * 255.0f);
-//    std::vector<uint8> data = { val, val, val, 255 };
-//    return Create4x4Texture(data);
-//}

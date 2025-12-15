@@ -1,26 +1,18 @@
 #pragma once
 
-enum class RawTextureType : int8
+enum class RawTextureType : uint8
 {
     None = 0,
-    Albedo,     // Diffuse Color
-    Normal,     // Normal Map
-    
-    Emissive,   // Emission
-
-    // [최종] 패킹된 텍스처 (Occlusion + Roughness + Metallic)
-    ORM,        // Occlusion(R) + Roughness(G) + Metallic(B)
-
-    // [입력] Assimp에서 읽어올 때 필요한 개별 채널 (나중에 ORM으로 합쳐짐)
+    Albedo,
+    Normal,
+    Emissive, 
+    ORM,
     AmbientOcclusion,
     Metallic,
     Roughness,
-
-    // [레거시 / 기타]
     Specular,
-    Height,     // Displacement
-    Shininess,  // [New] Glossiness / Specular Power
-
+    Height,
+    Glossiness,
     MAX
 };
 

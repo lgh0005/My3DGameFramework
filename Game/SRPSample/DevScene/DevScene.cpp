@@ -56,10 +56,6 @@ bool DevScene::LoadNessesaryResources()
 	auto planeMesh = GeometryGenerator::CreatePlane();
 	RESOURCE.AddResource<Mesh>("Plane", std::move(planeMesh));
 
-	// 0-2. NDC 평면 메쉬
-	/*auto ndcPlaneMesh = GeometryGenerator::CreateNDCQuad();
-	RESOURCE.AddResource<Mesh>("NDC", std::move(ndcPlaneMesh));*/
-
 	// 0-2. 모델과 애니메이션 #1
 	{
 		auto model = Model::Load("./Resources/Models/spacesoldier/aliensoldier.mymodel");

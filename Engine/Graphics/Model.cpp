@@ -33,6 +33,7 @@ ModelUPtr Model::Load(const std::string& filename)
     }
     else
     {
+        // if (!model->LoadByAssimpV2(filename)) return nullptr;
         if (!model->LoadByAssimp(filename)) return nullptr;
     }
 
@@ -76,6 +77,10 @@ bool Model::LoadByAssimp(const std::string& filename)
 
         // TODO : 머티리얼 단에서 height 스케일을 초기화를 안해서 발생한 버그였음이 드러났으니
         // 해당 부분은 적절히 수정할 필요가 있다.
+        // INFO : 보니까 이게 모델마다 이상하게 매핑이 되어있는게 있는 모양이다. 지금 샘플로 
+        // 주어진 가방 모델은 assimp가 왜인지 모르겠지만 normal을 height으로 읽고 있다.
+        // 이건 지금 V2에서도 동일하게 나타나는 것이 코드의 문제보다는 모델의 문제에 더 가까운 것 같다.
+        // 그래서 웬만해서는 fbx로 인코딩하고 맵 바인딩을 모델 단에서 좀 똑바로 해둘 필요가 있음.
 #pragma region OBJ_EXTENSION_COMPATIBLE
         // Normal을 aiTextureType_HEIGHT로 우선 로드
         if (!glMaterial->normal)
@@ -347,6 +352,97 @@ void Model::Draw(const Program* program) const
 #pragma region TEST_FOR_ASSET_CONVERTER
 bool Model::LoadByAssimpV2(const std::string& filename)
 {
+    Assimp::Importer importer;
+
+    // 1. Import Flags 설정 (ModelConverter와 동일하게 맞춤)
+    // 노멀/탄젠트 계산, UV 플립, 뼈 가중치 제한 등 필수 옵션 적용
+    const uint32 flags =
+        aiProcess_Triangulate |
+        aiProcess_CalcTangentSpace |
+        aiProcess_GenSmoothNormals |
+        aiProcess_LimitBoneWeights |
+        aiProcess_FlipUVs;
+
+    const aiScene* scene = importer.ReadFile(filename, flags);
+    if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
+    {
+        SPDLOG_ERROR("Failed to load model (Assimp): {}", filename);
+        return false;
+    }
+
+    // 2. 초기화 (기존 데이터 클리어)
+    m_meshes.clear();
+    m_materials.clear();
+    m_boneInfoMap.clear();
+    m_BoneCounter = 0;
+
+    // 텍스처 로드를 위한 디렉토리 경로 계산
+    std::filesystem::path modelDir = std::filesystem::path(filename).parent_path();
+
+    // TODO : 인자 형식에 맞게 Material 수정 필요
+    // 3. 머티리얼 로드 (PBR 지원 버전)
+    m_materials.resize(scene->mNumMaterials);
+    for (uint32 i = 0; i < scene->mNumMaterials; i++)
+    {
+        aiMaterial* aiMat = scene->mMaterials[i];
+        auto material = Material::Create();
+
+        // 3-1. PBR Factors
+        {
+            aiColor4D color;
+            float value;
+
+            // Albedo Factor
+            if (aiMat->Get(AI_MATKEY_BASE_COLOR, color) == AI_SUCCESS)
+                material->albedoFactor = { color.r, color.g, color.b, color.a };
+            else if (aiMat->Get(AI_MATKEY_COLOR_DIFFUSE, color) == AI_SUCCESS)
+                material->albedoFactor = { color.r, color.g, color.b, 1.0f };
+
+            // Metallic Factor
+            if (aiMat->Get(AI_MATKEY_METALLIC_FACTOR, value) == AI_SUCCESS)
+                material->metallicFactor = value;
+
+            // Roughness Factor
+            if (aiMat->Get(AI_MATKEY_ROUGHNESS_FACTOR, value) == AI_SUCCESS)
+                material->roughnessFactor = value;
+
+            // Emission Strength (변수명이 엔진마다 다를 수 있으니 확인 필요)
+            if (aiMat->Get(AI_MATKEY_EMISSIVE_INTENSITY, value) == AI_SUCCESS)
+                material->emissionStrength = value;
+            else
+                material->emissionStrength = 1.0f;
+        }
+    
+        // 3-2. 텍스처 로드 (PBR 슬롯 매핑)
+        {
+            auto LoadTex = [&](aiTextureType type) -> TexturePtr 
+            {
+                return LoadTextureFromAssimp(aiMat, type, modelDir);
+            };
+
+            // 실제 텍스처 로드 및 glossiness 처리
+            material->diffuse = LoadTex(aiTextureType_BASE_COLOR);
+            if (!material->diffuse) material->diffuse = LoadTex(aiTextureType_DIFFUSE);
+            material->normal = LoadTex(aiTextureType_NORMALS);
+            material->emission = LoadTex(aiTextureType_EMISSIVE);
+            material->metallic = LoadTex(aiTextureType_METALNESS);
+            material->roughness = LoadTex(aiTextureType_DIFFUSE_ROUGHNESS);
+            material->ao = LoadTex(aiTextureType_AMBIENT_OCCLUSION);
+            material->specular = LoadTex(aiTextureType_SPECULAR);
+            material->height = LoadTex(aiTextureType_HEIGHT);
+            auto glossTex = LoadTex(aiTextureType_SHININESS);
+            if (!material->roughness && glossTex)
+            {
+                material->roughness = glossTex;
+                material->useGlossinessAsRoughness = true;
+            }
+            material->orm = nullptr;
+            m_materials[i] = std::move(material);
+        }
+    }
+
+    // 4. 노드 및 메쉬 처리
+    ProcessNode(scene->mRootNode, scene);
 
     return true;
 }
@@ -417,14 +513,17 @@ bool Model::LoadByBinaryV2(const std::string& filename)
         auto material = Material::Create();
 
         // [순서 엄수] 텍스처 경로 8개 읽기
-        std::string pathAlbedo    = ReadString(inFile);
-        std::string pathNormal    = ReadString(inFile);
-        std::string pathEmissive  = ReadString(inFile);
-        std::string pathORM       = ReadString(inFile); // V2
-        std::string pathRoughness = ReadString(inFile); // V2
-        std::string pathMetallic  = ReadString(inFile); // V2
-        std::string pathSpecular  = ReadString(inFile); // Legacy
-        std::string pathHeight    = ReadString(inFile); // Legacy
+        // IMPORTANT : ModelConverter에서 지정한 순서와 동일해야함
+        std::string pathAlbedo      = ReadString(inFile);
+        std::string pathNormal      = ReadString(inFile);
+        std::string pathEmissive    = ReadString(inFile);
+        std::string pathORM         = ReadString(inFile);
+        std::string pathAO          = ReadString(inFile); 
+        std::string pathRoughness   = ReadString(inFile);
+        std::string pathMetallic    = ReadString(inFile);
+        std::string pathGlossiness  = ReadString(inFile); 
+        std::string pathSpecular    = ReadString(inFile);
+        std::string pathHeight      = ReadString(inFile);
 
         // PBR Factors 읽기 (사용 안 하더라도 읽어서 스킵해야 함)
         glm::vec4 albedoFactor;
@@ -433,16 +532,20 @@ bool Model::LoadByBinaryV2(const std::string& filename)
         inFile.read((char*)&metallicFactor, sizeof(float));
         inFile.read((char*)&roughnessFactor, sizeof(float));
 
-        // 실제 텍스처 로드
+        // 실제 텍스처 로드 및 glossiness 처리
         material->diffuse = LoadTextureFromFile(pathAlbedo, modelDir);
         material->normal = LoadTextureFromFile(pathNormal, modelDir);
-        material->specular = LoadTextureFromFile(pathSpecular, modelDir); // Legacy
+        material->specular = LoadTextureFromFile(pathSpecular, modelDir);
         material->emission = LoadTextureFromFile(pathEmissive, modelDir);
-        material->metallic = LoadTextureFromFile(pathMetallic, modelDir);
+        material->orm = LoadTextureFromFile(pathORM, modelDir);
+        material->ao = LoadTextureFromFile(pathAO, modelDir);
         material->roughness = LoadTextureFromFile(pathRoughness, modelDir);
-        if (!pathORM.empty()) material->ao = LoadTextureFromFile(pathORM, modelDir);
-        else material->ao = nullptr; // 혹은 별도 AO 경로가 있다면 그것 사용
-        material->height = LoadTextureFromFile(pathHeight, modelDir);
+        material->metallic = LoadTextureFromFile(pathMetallic, modelDir);
+        if (!material->roughness && !pathGlossiness.empty())
+        {
+            material->roughness = LoadTextureFromFile(pathGlossiness, modelDir);
+            material->useGlossinessAsRoughness = true;
+        }
 
         m_materials[i] = std::move(material);
     }

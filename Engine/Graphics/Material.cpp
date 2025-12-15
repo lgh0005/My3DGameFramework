@@ -39,7 +39,7 @@ void Material::SetToProgram(const Program* program) const
     else Texture::CreateBlue()->Bind();
 
     // 5. Height (Displacement) - [Slot 4]
-    // 기본값: Black (높이 변화 없음)
+    // 기본값: Black (높이 변화 없음), 높이 스케일은 0
     glActiveTexture(GL_TEXTURE0 + (int)TextureSlot::SLOT_HEIGHT);
     program->SetUniform("material.height", (int)TextureSlot::SLOT_HEIGHT);
     if (height)
@@ -49,41 +49,52 @@ void Material::SetToProgram(const Program* program) const
     }
     else
     {
-        Texture::CreateBlack()->Bind();
+        Texture::CreateWhite()->Bind();
         program->SetUniform("material.heightScale", 0.0f);
     }
 
-#pragma region ORM_TEXTURE_PROPERTIES
+    // 6. ORM vs. AO, Matellic, Roughness
+    if (orm)
+    {
+        // 6. Occulsion Roughness Metallic Map (ORM) - [Slot 8]
+        // 기본값: Yello (차폐 없음, 완전 거침, 비금속)
+        glActiveTexture(GL_TEXTURE0 + (int)TextureSlot::SLOT_ORM);
+        program->SetUniform("material.orm", (int)TextureSlot::SLOT_ORM);
+        orm->Bind();
+        program->SetUniform("material.hasORM", true);
+    }
+    else
+    {
+        // 6. Ambient Occlusion (AO) - [Slot 5]
+        // 기본값: White (차폐 없음, 모든 빛을 다 받음)
+        glActiveTexture(GL_TEXTURE0 + (int)TextureSlot::SLOT_AO);
+        program->SetUniform("material.ao", (int)TextureSlot::SLOT_AO);
+        if (ao) ao->Bind();
+        else Texture::CreateWhite()->Bind();
 
-    // 6. Ambient Occlusion (AO) - [Slot 5]
-    // 기본값: White (차폐 없음, 모든 빛을 다 받음)
-    glActiveTexture(GL_TEXTURE0 + (int)TextureSlot::SLOT_AO);
-    program->SetUniform("material.ao", (int)TextureSlot::SLOT_AO);
-    if (ao) ao->Bind();
-    else Texture::CreateWhite()->Bind();
+        // 7. Metallic - [Slot 6]
+        // 기본값: Black (비금속)
+        glActiveTexture(GL_TEXTURE0 + (int)TextureSlot::SLOT_METALLIC);
+        program->SetUniform("material.metallic", (int)TextureSlot::SLOT_METALLIC);
+        if (metallic) metallic->Bind();
+        else Texture::CreateBlack()->Bind();
 
-    // 7. Metallic - [Slot 6]
-    // 기본값: Black (비금속)
-    glActiveTexture(GL_TEXTURE0 + (int)TextureSlot::SLOT_METALLIC);
-    program->SetUniform("material.metallic", (int)TextureSlot::SLOT_METALLIC);
-    if (metallic) metallic->Bind();
-    else Texture::CreateBlack()->Bind();
+        // 8. Roughness - [Slot 7]
+        // 기본값: Gray (0.5 - 적당한 거칠기) 혹은 White (완전 거침)
+        glActiveTexture(GL_TEXTURE0 + (int)TextureSlot::SLOT_ROUGHNESS);
+        program->SetUniform("material.roughness", (int)TextureSlot::SLOT_ROUGHNESS);
+        if (roughness) roughness->Bind();
+        else Texture::CreateGray()->Bind();
 
-    // 8. Roughness - [Slot 7]
-    // 기본값: Gray (0.5 - 적당한 거칠기) 혹은 White (완전 거침)
-    glActiveTexture(GL_TEXTURE0 + (int)TextureSlot::SLOT_ROUGHNESS);
-    program->SetUniform("material.roughness", (int)TextureSlot::SLOT_ROUGHNESS);
-    if (roughness) roughness->Bind();
-    else Texture::CreateGray()->Bind();
-
-#pragma endregion
+        program->SetUniform("material.hasORM", false);
+    }
 
     glActiveTexture(GL_TEXTURE0);
     program->SetUniform("material.shininess", shininess);
     program->SetUniform("material.emissionStrength", emissionStrength);
-    // program->SetUniform("material.heightScale", heightScale);
-
-   /* program->SetUniform("material.albedoFactor", albedoFactor);
+    program->SetUniform("material.heightScale", heightScale);
+    program->SetUniform("material.albedoFactor", albedoFactor);
     program->SetUniform("material.metallicFactor", metallicFactor);
-    program->SetUniform("material.roughnessFactor", roughnessFactor);*/
+    program->SetUniform("material.roughnessFactor", roughnessFactor);
+    program->SetUniform("material.useGlossiness", useGlossinessAsRoughness);
 }

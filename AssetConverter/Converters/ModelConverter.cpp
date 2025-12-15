@@ -177,8 +177,10 @@ bool ModelConverter::WriteCustomModelFile()
 
         // [PBR / ORM]
         Utils::WriteString(outFile, mat.GetTexturePath(RawTextureType::ORM));
+        Utils::WriteString(outFile, mat.GetTexturePath(RawTextureType::AmbientOcclusion));
         Utils::WriteString(outFile, mat.GetTexturePath(RawTextureType::Roughness));
         Utils::WriteString(outFile, mat.GetTexturePath(RawTextureType::Metallic));
+        Utils::WriteString(outFile, mat.GetTexturePath(RawTextureType::Glossiness));
 
         // [Legacy]
         Utils::WriteString(outFile, mat.GetTexturePath(RawTextureType::Specular));
@@ -418,11 +420,10 @@ RawMaterial ModelConverter::ProcessMaterial(aiMaterial* material, int32 index)
     AddTexture(aiTextureType_HEIGHT, RawTextureType::Height);
     AddTexture(aiTextureType_SPECULAR, RawTextureType::Specular);
     AddTexture(aiTextureType_EMISSIVE, RawTextureType::Emissive);
-
     AddTexture(aiTextureType_AMBIENT_OCCLUSION, RawTextureType::AmbientOcclusion);
     AddTexture(aiTextureType_DIFFUSE_ROUGHNESS, RawTextureType::Roughness);
     AddTexture(aiTextureType_METALNESS, RawTextureType::Metallic);
-    AddTexture(aiTextureType_SHININESS, RawTextureType::Shininess);
+    AddTexture(aiTextureType_SHININESS, RawTextureType::Glossiness);
 
     // 3. 자동 ORM 텍스쳐 생성
     CreateORMTextureFromAssimp(material, rawMat, index);
@@ -439,7 +440,7 @@ RawMaterial ModelConverter::ProcessMaterial(aiMaterial* material, int32 index)
         case RawTextureType::Emissive: typeStr = "Emissive"; break;
         case RawTextureType::Specular: typeStr = "Specular"; break;
         case RawTextureType::Height:   typeStr = "Height"; break;
-        case RawTextureType::Shininess: typeStr = "Shininess"; break;
+        case RawTextureType::Glossiness: typeStr = "Glossiness"; break;
         case RawTextureType::Roughness: typeStr = "Roughness"; break;
         case RawTextureType::Metallic: typeStr = "Metallic"; break;
         case RawTextureType::AmbientOcclusion: typeStr = "AO"; break;
@@ -462,7 +463,7 @@ RawMaterial ModelConverter::ProcessMaterial(aiMaterial* material, int32 index)
         { aiTextureType_SPECULAR, "SPECULAR" },
         { aiTextureType_EMISSIVE, "EMISSIVE" },
         { aiTextureType_UNKNOWN, "UNKNOWN" },
-        { aiTextureType_SHININESS, "SHININESS" },
+        { aiTextureType_SHININESS, "GLOSSINESS" },
         { aiTextureType_METALNESS, "METALNESS" },
         { aiTextureType_DIFFUSE_ROUGHNESS, "ROUGHNESS" },
         { aiTextureType_AMBIENT_OCCLUSION, "AO" },

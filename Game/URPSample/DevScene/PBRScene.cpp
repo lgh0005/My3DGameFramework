@@ -74,7 +74,7 @@ bool PBRScene::LoadNessesaryResources()
 		RESOURCE.AddResource<Material>("solidColor", std::move(solidColorMat));
 	}
 
-	// 쇠공 머티리얼
+	// 쇠공 머티리얼 #1
 	{
 		// TODO : 이후에는 ktx로 한 번 구울 필요가 있음.
 		auto rustedIronMat = Material::Create();
@@ -88,6 +88,20 @@ bool PBRScene::LoadNessesaryResources()
 		rustedIronMat->normal = Texture::CreateFromImage
 		(Image::Load("./Resources/Images/rustediron/rustediron2_normal.png").get());
 		RESOURCE.AddResource<Material>("Rusted_Iron", std::move(rustedIronMat));
+	}
+
+	// 쇠공 머티리얼 #2
+	{
+		// TODO : 이후에는 ktx로 한 번 구울 필요가 있음.
+		auto rustedIronMat = Material::Create();
+		if (!rustedIronMat) return false;
+		rustedIronMat->diffuse = Texture::CreateFromImage
+		(Image::Load("./Resources/Images/rustediron/rustediron2_basecolor.png").get());
+		rustedIronMat->normal = Texture::CreateFromImage
+		(Image::Load("./Resources/Images/rustediron/rustediron2_normal.png").get());
+		rustedIronMat->orm = Texture::CreateFromImage
+		(Image::Load("./Resources/Images/rustediron/rustediron2_ORM.png").get());
+		RESOURCE.AddResource<Material>("Rusted_Iron_orm", std::move(rustedIronMat));
 	}
 
 	// HDR 큐브맵 머티리얼
@@ -126,8 +140,8 @@ bool PBRScene::CreateNessesaryRenderPasses()
 	{
 		auto prog = Program::Create
 		(
-			"./Resources/Shaders/Universal/test_pbr.vert",
-			"./Resources/Shaders/Universal/test_pbr.frag"
+			"./Resources/Shaders/Universal/test_pbr_testing.vert",
+			"./Resources/Shaders/Universal/test_pbr_testing.frag"
 		); if (!prog) return false;
 		AddCustomRenderPass("simpleHDR", HDRRenderPass::Create(std::move(prog)));
 	}
@@ -206,69 +220,115 @@ bool PBRScene::CreateSceneContext()
 			AddGameObject(std::move(lightGo));
 		}
 	}
-
-	// 3. 구 49개 (PBR Chart)
+	
+	// 3. 구 49개 (ORM 텍스쳐 테스트)
 	{
-		// 리소스 가져오기
 		auto sphereMesh = RESOURCE.GetResource<Mesh>("Sphere");
 
-		// [공유 리소스] 모든 구가 공유할 기본 알베도 (빨간색)
-		TexturePtr sharedAlbedo = Texture::CreateFromImage(
-			Image::CreateSingleColorImage(4, 4, glm::vec4(1.0f, 1.0f, 1.0f, 1.0f)).get()
-		);
+		// [핵심] 미리 로드해둔 'Rusted_Iron_orm' 머티리얼을 가져옵니다.
+		// 이 머티리얼 안에는 이미 Diffuse, Normal, ORM 텍스처가 들어있습니다.
+		auto baseMat = RESOURCE.GetResource<Material>("Rusted_Iron_orm");
 
-		// 7x7 그리드 설정
 		const int rows = 7;
 		const int cols = 7;
 		const float spacing = 1.4f;
 
 		for (int row = 0; row < rows; ++row)
 		{
-			// Row를 기준으로 메탈릭 계산 (0: 아래쪽 ~ 6: 위쪽)
-			// 위쪽(Top)일수록 메탈릭이 1.0이 되어야 하므로 row 비례
+			// Metallic Factor (0.0 ~ 1.0)
 			float metallicFactor = (float)row / (float)(rows - 1);
-
 			float y = ((float)row - (float)(rows - 1) * 0.5f) * spacing;
 
 			for (int col = 0; col < cols; ++col)
 			{
-				// Col을 기준으로 거칠기 계산 (0: 왼쪽 ~ 6: 오른쪽)
-				// 왼쪽(Left)일수록 거칠기가 0.0이어야 하므로 col 비례
+				// Roughness Factor (0.05 ~ 1.0)
 				float roughnessFactor = (float)col / (float)(cols - 1);
-				// 거칠기가 완전 0이면 렌더링 시 아티팩트가 생길 수 있으니 최소값 보정 (0.05f ~ 1.0f)
 				roughnessFactor = glm::clamp(roughnessFactor, 0.05f, 1.0f);
 
-				// X 좌표 계산
 				float x = ((float)col - (float)(cols - 1) * 0.5f) * spacing;
 
-				// 1. GameObject 생성
 				auto sphereObj = GameObject::Create();
 				sphereObj->GetTransform().SetPosition(glm::vec3(x, y, 0.0f));
 
-				// 2. 머티리얼 인스턴스 생성 (각 구마다 속성이 다르므로 개별 생성)
+				// [중요] 각 구체마다 개별적인 파라미터를 가져야 하므로 새 머티리얼 생성
 				MaterialPtr pbrMat = Material::Create();
 
-				// 알베도와 AO는 공유
-				pbrMat->diffuse = sharedAlbedo;
+				// 1. 텍스처 공유 (Texture Pointer Copy)
+				// 이미지를 새로 로드하는게 아니라, baseMat이 들고 있는 텍스처 포인터만 복사합니다.
+				// 따라서 메모리 낭비 없이 텍스처를 재사용합니다.
+				if (baseMat)
+				{
+					pbrMat->diffuse = baseMat->diffuse;
+					pbrMat->normal = baseMat->normal;
+					pbrMat->orm = baseMat->orm; // ORM 텍스처 연결
+				}
 
-				// 메탈릭 텍스처 생성 (단색 4x4)
-				pbrMat->metallic = Texture::CreateFromImage(
-					Image::CreateSingleColorImage(4, 4, glm::vec4(metallicFactor, metallicFactor, metallicFactor, 1.0f)).get()
-				);
+				// 2. Factor 값 설정 (Grid Logic)
+				// 셰이더 연산: FinalValue = TextureValue * FactorValue
+				pbrMat->albedoFactor = glm::vec4(1.0f); // 원본 텍스처 색상 그대로 (Tint 없음)
+				pbrMat->metallicFactor = metallicFactor;  // 행에 따라 금속성 조절
+				pbrMat->roughnessFactor = roughnessFactor; // 열에 따라 거칠기 조절
 
-				// 러프니스 텍스처 생성 (단색 4x4)
-				pbrMat->roughness = Texture::CreateFromImage(
-					Image::CreateSingleColorImage(4, 4, glm::vec4(roughnessFactor, roughnessFactor, roughnessFactor, 1.0f)).get()
-				);
-
-				// 3. MeshRenderer 생성 및 연결
+				// 렌더러 등록
 				auto mr = MeshRenderer::Create(sphereMesh, pbrMat);
-				hdrPass->AddRenderer(mr.get()); // 렌더 패스에 등록
-
+				hdrPass->AddRenderer(mr.get());
 				sphereObj->AddComponent(std::move(mr));
 				AddGameObject(std::move(sphereObj));
 			}
 		}
+	}
+
+	// 3. 구 49개 (PBR Chart)
+	{
+		//auto sphereMesh = RESOURCE.GetResource<Mesh>("Sphere");
+
+		//// [최적화] 모든 구가 공유할 기본 텍스처들 (White)
+		//// 텍스처 값(1.0) * 팩터 값(설정값) = 최종 값
+		//TexturePtr sharedWhite = Texture::CreateWhite();
+
+		//const int rows = 7;
+		//const int cols = 7;
+		//const float spacing = 1.4f;
+
+		//for (int row = 0; row < rows; ++row)
+		//{
+		//	// Metallic (0.0 ~ 1.0)
+		//	float metallicValue = (float)row / (float)(rows - 1);
+		//	float y = ((float)row - (float)(rows - 1) * 0.5f) * spacing;
+
+		//	for (int col = 0; col < cols; ++col)
+		//	{
+		//		// Roughness (0.05 ~ 1.0)
+		//		float roughnessValue = (float)col / (float)(cols - 1);
+		//		roughnessValue = glm::clamp(roughnessValue, 0.05f, 1.0f);
+
+		//		float x = ((float)col - (float)(cols - 1) * 0.5f) * spacing;
+
+		//		auto sphereObj = GameObject::Create();
+		//		sphereObj->GetTransform().SetPosition(glm::vec3(x, y, 0.0f));
+
+		//		// 머티리얼 생성
+		//		MaterialPtr pbrMat = Material::Create();
+
+		//		// 1. 텍스처는 모두 White로 통일 (공유)
+		//		pbrMat->diffuse = sharedWhite;
+		//		pbrMat->metallic = sharedWhite;
+		//		pbrMat->roughness = sharedWhite;
+		//		pbrMat->ao = sharedWhite;
+		//		// Normal이 없으면 SetToProgram에서 자동으로 Blue(Flat)가 바인딩되므로 생략 가능
+
+		//		// 2. Factor에 값을 설정 [핵심!]
+		//		pbrMat->albedoFactor = glm::vec4(0.2f, 0.4f, 0.5f, 1.0f); // 빨간공
+		//		pbrMat->metallicFactor = metallicValue;   // 팩터로 조절
+		//		pbrMat->roughnessFactor = roughnessValue; // 팩터로 조절
+
+		//		// 렌더러 등록
+		//		auto mr = MeshRenderer::Create(sphereMesh, pbrMat);
+		//		hdrPass->AddRenderer(mr.get());
+		//		sphereObj->AddComponent(std::move(mr));
+		//		AddGameObject(std::move(sphereObj));
+		//	}
+		//}
 	}
 
 	//// 3. 구 49개 (PBR Chart)
@@ -276,14 +336,10 @@ bool PBRScene::CreateSceneContext()
 	//	// 리소스 가져오기
 	//	auto sphereMesh = RESOURCE.GetResource<Mesh>("Sphere");
 
-	//	// [최적화] 모든 구가 공유할 기본 텍스처는 미리 만들어둡니다.
-	//	// 빨간색 알베도 (R=1.0, G=0.0, B=0.0)
+	//	// [공유 리소스] 모든 구가 공유할 기본 알베도 (빨간색)
 	//	TexturePtr sharedAlbedo = Texture::CreateFromImage(
-	//		Image::CreateSingleColorImage(1, 1, glm::vec4(1.0f, 0.0f, 0.0f, 1.0f)).get()
+	//		Image::CreateSingleColorImage(4, 4, glm::vec4(0.1f, 0.4f, 0.5f, 1.0f)).get()
 	//	);
-
-	//	// AO는 1.0 (그림자 없음)
-	//	auto sharedAO = Texture::CreateBlack();
 
 	//	// 7x7 그리드 설정
 	//	const int rows = 7;
@@ -292,10 +348,20 @@ bool PBRScene::CreateSceneContext()
 
 	//	for (int row = 0; row < rows; ++row)
 	//	{
+	//		// Row를 기준으로 메탈릭 계산 (0: 아래쪽 ~ 6: 위쪽)
+	//		// 위쪽(Top)일수록 메탈릭이 1.0이 되어야 하므로 row 비례
+	//		float metallicFactor = (float)row / (float)(rows - 1);
+
 	//		float y = ((float)row - (float)(rows - 1) * 0.5f) * spacing;
 
 	//		for (int col = 0; col < cols; ++col)
 	//		{
+	//			// Col을 기준으로 거칠기 계산 (0: 왼쪽 ~ 6: 오른쪽)
+	//			// 왼쪽(Left)일수록 거칠기가 0.0이어야 하므로 col 비례
+	//			float roughnessFactor = (float)col / (float)(cols - 1);
+	//			// 거칠기가 완전 0이면 렌더링 시 아티팩트가 생길 수 있으니 최소값 보정 (0.05f ~ 1.0f)
+	//			roughnessFactor = glm::clamp(roughnessFactor, 0.05f, 1.0f);
+
 	//			// X 좌표 계산
 	//			float x = ((float)col - (float)(cols - 1) * 0.5f) * spacing;
 
@@ -303,8 +369,24 @@ bool PBRScene::CreateSceneContext()
 	//			auto sphereObj = GameObject::Create();
 	//			sphereObj->GetTransform().SetPosition(glm::vec3(x, y, 0.0f));
 
-	//			// 2. MeshRendere 생성
-	//			auto mr = MeshRenderer::Create(sphereMesh, RESOURCE.GetResource<Material>("solidColor"));
+	//			// 2. 머티리얼 인스턴스 생성 (각 구마다 속성이 다르므로 개별 생성)
+	//			MaterialPtr pbrMat = Material::Create();
+
+	//			// 알베도와 AO는 공유
+	//			pbrMat->diffuse = sharedAlbedo;
+
+	//			// 메탈릭 텍스처 생성 (단색 4x4)
+	//			pbrMat->metallic = Texture::CreateFromImage(
+	//				Image::CreateSingleColorImage(4, 4, glm::vec4(metallicFactor, metallicFactor, metallicFactor, 1.0f)).get()
+	//			);
+
+	//			// 러프니스 텍스처 생성 (단색 4x4)
+	//			pbrMat->roughness = Texture::CreateFromImage(
+	//				Image::CreateSingleColorImage(4, 4, glm::vec4(roughnessFactor, roughnessFactor, roughnessFactor, 1.0f)).get()
+	//			);
+
+	//			// 3. MeshRenderer 생성 및 연결
+	//			auto mr = MeshRenderer::Create(sphereMesh, pbrMat);
 	//			hdrPass->AddRenderer(mr.get()); // 렌더 패스에 등록
 
 	//			sphereObj->AddComponent(std::move(mr));

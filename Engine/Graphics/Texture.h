@@ -50,11 +50,6 @@ private:
 	uint32	m_format		{ GL_RGBA };
 	GLenum  m_target		{ GL_TEXTURE_2D };
 
-	static TexturePtr s_whiteTex;
-	static TexturePtr s_grayTex;
-	static TexturePtr s_blackTex;
-	static TexturePtr s_blueTex;
-
 /*===================//
 //   texture utils   //
 //===================*/
@@ -64,8 +59,9 @@ public:
 	static TexturePtr CreateBlack();
 	static TexturePtr CreateBlue();
 
-	//// TODO : CreateFromImage에서
-	//// 단색 이미지를 바탕으로 만들 수 있기에 이 함수는
-	//// 테스트 용으로 두도록 하겠음.
-	//static TexturePtr CreateFromFloat(float value);
+private:
+	static TexturePtr s_whiteTex;
+	static TexturePtr s_grayTex;
+	static TexturePtr s_blackTex;
+	static TexturePtr s_blueTex;
 };
