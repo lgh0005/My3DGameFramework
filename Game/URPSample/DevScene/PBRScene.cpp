@@ -278,7 +278,7 @@ bool PBRScene::CreateSceneContext()
 		}
 	}
 
-	// 3. 구 49개 (PBR Chart)
+	// 4. 구 49개 (PBR Chart)
 	{
 		//auto sphereMesh = RESOURCE.GetResource<Mesh>("Sphere");
 
@@ -330,70 +330,6 @@ bool PBRScene::CreateSceneContext()
 		//	}
 		//}
 	}
-
-	//// 3. 구 49개 (PBR Chart)
-	//{
-	//	// 리소스 가져오기
-	//	auto sphereMesh = RESOURCE.GetResource<Mesh>("Sphere");
-
-	//	// [공유 리소스] 모든 구가 공유할 기본 알베도 (빨간색)
-	//	TexturePtr sharedAlbedo = Texture::CreateFromImage(
-	//		Image::CreateSingleColorImage(4, 4, glm::vec4(0.1f, 0.4f, 0.5f, 1.0f)).get()
-	//	);
-
-	//	// 7x7 그리드 설정
-	//	const int rows = 7;
-	//	const int cols = 7;
-	//	const float spacing = 1.4f;
-
-	//	for (int row = 0; row < rows; ++row)
-	//	{
-	//		// Row를 기준으로 메탈릭 계산 (0: 아래쪽 ~ 6: 위쪽)
-	//		// 위쪽(Top)일수록 메탈릭이 1.0이 되어야 하므로 row 비례
-	//		float metallicFactor = (float)row / (float)(rows - 1);
-
-	//		float y = ((float)row - (float)(rows - 1) * 0.5f) * spacing;
-
-	//		for (int col = 0; col < cols; ++col)
-	//		{
-	//			// Col을 기준으로 거칠기 계산 (0: 왼쪽 ~ 6: 오른쪽)
-	//			// 왼쪽(Left)일수록 거칠기가 0.0이어야 하므로 col 비례
-	//			float roughnessFactor = (float)col / (float)(cols - 1);
-	//			// 거칠기가 완전 0이면 렌더링 시 아티팩트가 생길 수 있으니 최소값 보정 (0.05f ~ 1.0f)
-	//			roughnessFactor = glm::clamp(roughnessFactor, 0.05f, 1.0f);
-
-	//			// X 좌표 계산
-	//			float x = ((float)col - (float)(cols - 1) * 0.5f) * spacing;
-
-	//			// 1. GameObject 생성
-	//			auto sphereObj = GameObject::Create();
-	//			sphereObj->GetTransform().SetPosition(glm::vec3(x, y, 0.0f));
-
-	//			// 2. 머티리얼 인스턴스 생성 (각 구마다 속성이 다르므로 개별 생성)
-	//			MaterialPtr pbrMat = Material::Create();
-
-	//			// 알베도와 AO는 공유
-	//			pbrMat->diffuse = sharedAlbedo;
-
-	//			// 메탈릭 텍스처 생성 (단색 4x4)
-	//			pbrMat->metallic = Texture::CreateFromImage(
-	//				Image::CreateSingleColorImage(4, 4, glm::vec4(metallicFactor, metallicFactor, metallicFactor, 1.0f)).get()
-	//			);
-
-	//			// 러프니스 텍스처 생성 (단색 4x4)
-	//			pbrMat->roughness = Texture::CreateFromImage(
-	//				Image::CreateSingleColorImage(4, 4, glm::vec4(roughnessFactor, roughnessFactor, roughnessFactor, 1.0f)).get()
-	//			);
-
-	//			// 3. MeshRenderer 생성 및 연결
-	//			auto mr = MeshRenderer::Create(sphereMesh, pbrMat);
-	//			hdrPass->AddRenderer(mr.get()); // 렌더 패스에 등록
-
-	//			sphereObj->AddComponent(std::move(mr));
-	//			AddGameObject(std::move(sphereObj));
-	//		}
-	//	}
-	//}
 
 	return true;
 }

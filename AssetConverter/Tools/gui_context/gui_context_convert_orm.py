@@ -1,23 +1,28 @@
-import os, subprocess
+import os
 import tkinter as tk
 from tkinter import filedialog, messagebox
 from gui_context.gui_context_base import GUIContextBase
+from gui_process.gui_process_runner import ProcessRunner
+from gui_process.gui_log_window import LogWindow
+
 
 class GuiContextConvertORMTexture(GUIContextBase):
     def __init__(self, app_context, window):
+        self._log_win = None
+        self._runner = None
+        self._convert_button = None
         super().__init__(app_context, window)
 
     def _build_ui(self):
-        
         # main label
         title_label = tk.Label(self, text="Convert AO, Roughness, Metallic to ORM Texture", font=("System", 20))
-        title_label.pack(pady=(20,40))
+        title_label.pack(pady=(20, 40))
 
         # AO map path context
         ao_frame = tk.Frame(self)
         ao_frame.pack(pady=10, padx=20, fill="x")
         ao_label = tk.Label(ao_frame, text="Open AO Map:")
-        ao_label.pack(side="left", padx=(0,5))
+        ao_label.pack(side="left", padx=(0, 5))
         self._ao_path = tk.Entry(ao_frame)
         self._ao_path.pack(side="left", fill="x", expand=True, ipady=4)
         ao_browse = tk.Button(ao_frame, text="Browse...", command=self._browse_ao_map_file)
@@ -27,7 +32,7 @@ class GuiContextConvertORMTexture(GUIContextBase):
         rough_frame = tk.Frame(self)
         rough_frame.pack(pady=10, padx=20, fill="x")
         rough_label = tk.Label(rough_frame, text="Open Roughness Map:")
-        rough_label.pack(side="left", padx=(0,5))
+        rough_label.pack(side="left", padx=(0, 5))
         self._rough_path = tk.Entry(rough_frame)
         self._rough_path.pack(side="left", fill="x", expand=True, ipady=4)
         rough_browse = tk.Button(rough_frame, text="Browse...", command=self._browse_roughness_map_file)
@@ -37,7 +42,7 @@ class GuiContextConvertORMTexture(GUIContextBase):
         metal_frame = tk.Frame(self)
         metal_frame.pack(pady=10, padx=20, fill="x")
         metal_label = tk.Label(metal_frame, text="Open Metallic Map:")
-        metal_label.pack(side="left", padx=(0,5))
+        metal_label.pack(side="left", padx=(0, 5))
         self._metal_path = tk.Entry(metal_frame)
         self._metal_path.pack(side="left", fill="x", expand=True, ipady=4)
         metal_browse = tk.Button(metal_frame, text="Browse...", command=self._browse_metallic_map_file)
@@ -47,7 +52,7 @@ class GuiContextConvertORMTexture(GUIContextBase):
         output_frame = tk.Frame(self)
         output_frame.pack(pady=10, padx=20, fill="x")
         output_label = tk.Label(output_frame, text="Output Folder:")
-        output_label.pack(side="left", padx=(0,5))
+        output_label.pack(side="left", padx=(0, 5))
         self._output_path = tk.Entry(output_frame)
         self._output_path.pack(side="left", fill="x", expand=True, ipady=4)
         browse_output = tk.Button(output_frame, text="Browse...", command=self._browse_output_folder)
@@ -64,13 +69,17 @@ class GuiContextConvertORMTexture(GUIContextBase):
         )
         invert_cb.pack(side="left")
 
-        # back and convert Button context 
+        # back and convert Button context
         action_frame = tk.Frame(self)
         action_frame.pack(pady=20)
         back_button = tk.Button(action_frame, text="Back", command=self._clicked_back)
-        back_button.pack(side="left", ipadx=10, ipady=5, padx=(0,10))
-        convert_button = tk.Button(action_frame, text="Convert!", command=self._clicked_convert)
-        convert_button.pack(side="left", ipadx=10, ipady=5)
+        back_button.pack(side="left", ipadx=10, ipady=5, padx=(0, 10))
+
+        self._convert_button = tk.Button(action_frame, text="Convert!", command=self._clicked_convert)
+        self._convert_button.pack(side="left", ipadx=10, ipady=5)
+
+        # Process runner
+        self._runner = ProcessRunner(self)
 
     def _browse_ao_map_file(self):
         path = filedialog.askopenfilename(
@@ -129,45 +138,94 @@ class GuiContextConvertORMTexture(GUIContextBase):
             messagebox.showerror("Error", "AssetConverter path lost! Please verify again.")
             self._window.set_context_by_name("verify")
             return
-        
-        # 4. 최소 1개는 있어야 한다(원하시면 이 체크는 빼도 됩니다)
+
+        # 4. 최소 1개는 있어야 한다
         if not any([ao_path, rough_path, metal_path]):
             messagebox.showerror("Error", "Please select at least one texture (AO/Roughness/Metallic).")
             return
 
         # 5. 출력 파일명 생성 (BaseName_ORM.png)
-        # 입력된 맵들 중 하나를 이름의 참조로 사용
         ref_path = ao_path or rough_path or metal_path
         base_name = os.path.splitext(os.path.basename(ref_path))[0]
         final_output_path = os.path.join(output_folder, f"{base_name}_ORM.png")
 
         # 6. 명령 인자 조립
-        # TODO : 사실 이들이 반드시 전부 잇어야 하는 것은 아님. 그러나, 적어도 하나의 입력 맵이 있는 지는 검사해야함.
-        # 백엔드에서의 파싱 편리성을 위해서 명령어를 조금 수정 필요.
-        # C++ ArgumentParser: exe --orm <ao_or_none> <rough_or_none> <metal_or_none> <out_png> [--invert-roughness]
         ao_arg = ao_path if ao_path else "none"
         rough_arg = rough_path if rough_path else "none"
         metal_arg = metal_path if metal_path else "none"
+
         cmd = [exe_path, "--orm", ao_arg, rough_arg, metal_arg, final_output_path]
-        if self._invert_rough.get(): cmd.append("--invert-roughness")
+        if self._invert_rough.get():
+            cmd.append("--invert-roughness")
 
-        try:
-            # 6. 실행
-            result = subprocess.run(
-                cmd, 
-                capture_output=True, 
-                text=True
-            )
-            
-            # 7. 결과 처리
-            if result.returncode == 0:
-                messagebox.showinfo("Success", f"ORM Texture Created Successfully!\n\nSaved to:\n{final_output_path}")
+        # --- LogWindow 띄우기 (Convert 누를 때마다 새로) ---
+        if self._log_win is not None and self._log_win.winfo_exists():
+            self._log_win.destroy()
+
+        parent = self.winfo_toplevel()
+        self._log_win = LogWindow(parent, title="Converting ORM...")
+        self._log_win.set_busy(True, "Converting...")
+        self._log_win.append("[UI] Starting process...")
+
+        # --- 비동기 실행 ---
+        self._convert_button.config(state="disabled")
+        self._runner.run(cmd)
+        self._log_win.append("[UI] runner.run() called")
+        self._log_win.append("[UI] polling...")
+        self._poll_runner(final_output_path)
+
+    def _poll_runner(self, final_output_path: str):
+        done_code = None
+
+        for kind, payload in self._runner.poll():
+            if kind == "log":
+                if self._log_win is not None and self._log_win.winfo_exists():
+                    self._log_win.append(payload)
+            elif kind == "done":
+                done_code = payload
+
+        if done_code is None:
+            self.after(50, lambda: self._poll_runner(final_output_path))
+            return
+
+        # done 처리
+        self._convert_button.config(state="normal")
+
+        if self._log_win is not None and self._log_win.winfo_exists():
+            self._log_win.set_busy(False, f"Done (code={done_code})")
+
+            if done_code == 0:
+                self._log_win.show_modal_result(
+                    "Success",
+                    f"ORM Texture Created Successfully!\n\nSaved to:\n{final_output_path}",
+                    ok_text="OK"
+                )
+                # OK 누르면 로그창도 같이 닫기
+                if self._log_win.winfo_exists():
+                    self._log_win.destroy()
+                self._log_win = None
+
             else:
-                err_msg = result.stderr if result.stderr else result.stdout
-                messagebox.showerror("Conversion Failed", f"Error Code: {result.returncode}\n\nLog:\n{err_msg}")
+                self._log_win.show_modal_result(
+                    "Conversion Failed",
+                    f"Exit Code: {done_code}\n\n(See log above)",
+                    ok_text="OK"
+                )
 
-        except Exception as e:
-            messagebox.showerror("Critical Error", f"Failed to run executable.\n{e}")
+        # done 처리
+        # self._convert_button.config(state="normal")
+
+        # if self._log_win is not None and self._log_win.winfo_exists():
+        #     self._log_win.set_busy(False, f"Done (code={done_code})")
+
+        # if done_code == 0:
+        #     messagebox.showinfo("Success", f"ORM Texture Created Successfully!\n\nSaved to:\n{final_output_path}")
+        # else:
+        #     messagebox.showerror("Conversion Failed", f"Exit Code: {done_code}\n\nCheck log window.")
+
+        # if self._log_win is not None and self._log_win.winfo_exists():
+        #     self._log_win.destroy()
+        #     self._log_win = None
 
     def _clicked_back(self):
         self._window.set_context_by_name("main")
