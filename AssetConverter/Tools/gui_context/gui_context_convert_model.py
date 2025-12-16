@@ -2,9 +2,15 @@ import os, subprocess
 import tkinter as tk
 from tkinter import filedialog, messagebox
 from gui_context.gui_context_base import GUIContextBase
+from gui_process.gui_process_runner import ProcessRunner
+from gui_process.gui_log_window import LogWindow
+
 
 class GuiContextConvertModel(GUIContextBase):
     def __init__(self, app_context, window):
+        self._log_win = None
+        self._runner = None
+        self._convert_button = None
         super().__init__(app_context, window)
 
     def _build_ui(self):
@@ -49,8 +55,11 @@ class GuiContextConvertModel(GUIContextBase):
         action_frame.pack(pady=20)
         back_button = tk.Button(action_frame, text="Back", command=self._clicked_back)
         back_button.pack(side="left", ipadx=10, ipady=5, padx=(0,10))
-        convert_button = tk.Button(action_frame, text="Convert!", command=self._clicked_convert)
-        convert_button.pack(side="left", ipadx=10, ipady=5)
+        self._convert_button = tk.Button(action_frame, text="Convert!", command=self._clicked_convert)
+        self._convert_button.pack(side="left", ipadx=10, ipady=5)
+
+        # Process runner
+        self._runner = ProcessRunner(self)
 
     def _browse_input_file(self):
         path = filedialog.askopenfilename(
@@ -96,21 +105,64 @@ class GuiContextConvertModel(GUIContextBase):
         final_output_path = os.path.join(output_folder, f"{file_name_no_ext}.mymodel")
         cmd = [exe_path, "-m", input_path, final_output_path]
         if self._extract_orm.get(): cmd.append("--extract-orm")
-        try:
-            result = subprocess.run(
-                cmd,
-                capture_output=True,
-                text=True,
-            )
 
-            if result.returncode == 0:
-                messagebox.showinfo("Conversion Success", f"Conversion Completed!\n\nSaved to:\n{output_folder}")
-                self._window.set_context_by_name("main")
+        # --- LogWindow 띄우기 (Convert 누를 때마다 새로) ---
+        if self._log_win is not None and self._log_win.winfo_exists():
+            self._log_win.destroy()
+
+        parent = self.winfo_toplevel()
+        self._log_win = LogWindow(parent, title="Converting Model...")
+        self._log_win.set_busy(True, "Converting...")
+        self._log_win.append("[UI] Starting process...")
+
+        # --- 비동기 실행 ---
+        self._convert_button.config(state="disabled")
+        self._runner.run(cmd)
+        self._log_win.append("[UI] runner.run() called")
+        self._log_win.append("[UI] polling...")
+        self._poll_runner(final_output_path)
+
+    def _poll_runner(self, final_output_path: str):
+        done_code = None
+
+        for kind, payload in self._runner.poll():
+            if kind == "log":
+                if self._log_win is not None and self._log_win.winfo_exists():
+                    self._log_win.append(payload)
+            elif kind == "done":
+                done_code = payload
+
+        if done_code is None:
+            self.after(50, lambda: self._poll_runner(final_output_path))
+            return
+
+        # done 처리
+        self._convert_button.config(state="normal")
+
+        if self._log_win is not None and self._log_win.winfo_exists():
+            self._log_win.set_busy(False, f"Done (code={done_code})")
+
+            # 작업 완료 알림음
+            self.winfo_toplevel().bell()
+
+            if done_code == 0:
+                self._log_win.show_modal_result(
+                    "Success",
+                    f"Model Converted Successfully!\n\nSaved to:\n{final_output_path}",
+                    ok_text="OK"
+                )
+                # OK 누르면 로그창도 같이 닫기
+                if self._log_win.winfo_exists():
+                    self._log_win.destroy()
+                self._log_win = None
+
             else:
-                err_msg = result.stderr if result.stderr else result.stdout
-                messagebox.showerror("Conversion Failed", f"Error Code: {result.returncode}\n\nLog:\n{err_msg}")
-        except Exception as e:
-            messagebox.showerror("Error", f"Failed to run executable.\n{e}")
+                self._log_win.show_modal_result(
+                    "Conversion Failed",
+                    f"Exit Code: {done_code}\n\n(See log above)",
+                    ok_text="OK"
+                )
 
     def _clicked_back(self):
         self._window.set_context_by_name("main")
+        

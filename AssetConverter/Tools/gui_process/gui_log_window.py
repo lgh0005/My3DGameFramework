@@ -24,9 +24,6 @@ class LogWindow(tk.Toplevel):
         sb.pack(side="right", fill="y")
         self._text.config(yscrollcommand=sb.set)
 
-        self._close_btn = tk.Button(self, text="Close", state="disabled", command=self.destroy)
-        self._close_btn.pack(pady=(0, 10))
-
         # 작업 중 임의로 닫지 못하게(원하면 제거)
         self.protocol("WM_DELETE_WINDOW", lambda: None)
 
@@ -34,11 +31,8 @@ class LogWindow(tk.Toplevel):
         self._status.config(text=msg)
         if busy:
             self._bar.start(10)
-            self._close_btn.config(state="disabled")
         else:
             self._bar.stop()
-            self._close_btn.config(state="normal")
-            self.protocol("WM_DELETE_WINDOW", self.destroy)
 
     def append(self, line: str):
         self._text.configure(state="normal")

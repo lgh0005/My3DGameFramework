@@ -194,6 +194,9 @@ class GuiContextConvertORMTexture(GUIContextBase):
         if self._log_win is not None and self._log_win.winfo_exists():
             self._log_win.set_busy(False, f"Done (code={done_code})")
 
+             # 작업 완료 알림음
+            self.winfo_toplevel().bell()
+
             if done_code == 0:
                 self._log_win.show_modal_result(
                     "Success",
@@ -211,21 +214,6 @@ class GuiContextConvertORMTexture(GUIContextBase):
                     f"Exit Code: {done_code}\n\n(See log above)",
                     ok_text="OK"
                 )
-
-        # done 처리
-        # self._convert_button.config(state="normal")
-
-        # if self._log_win is not None and self._log_win.winfo_exists():
-        #     self._log_win.set_busy(False, f"Done (code={done_code})")
-
-        # if done_code == 0:
-        #     messagebox.showinfo("Success", f"ORM Texture Created Successfully!\n\nSaved to:\n{final_output_path}")
-        # else:
-        #     messagebox.showerror("Conversion Failed", f"Exit Code: {done_code}\n\nCheck log window.")
-
-        # if self._log_win is not None and self._log_win.winfo_exists():
-        #     self._log_win.destroy()
-        #     self._log_win = None
 
     def _clicked_back(self):
         self._window.set_context_by_name("main")
