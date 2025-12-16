@@ -4,10 +4,10 @@
 #include "Core/Scene.h"
 #include "Core/RenderContext.h"
 #include "Graphics/Program.h"
-#include "Graphics/ScreenMesh.h"
-#include "Graphics/StaticMesh.h" 
+#include "Resources/ScreenMesh.h"
+#include "Resources/StaticMesh.h"
+#include "Resources/Texture.h"
 #include "Graphics/FrameBuffer.h"
-#include "Graphics/Texture.h"
 #include "Graphics/Geometry.h"
 #include "Components/Camera.h"
 

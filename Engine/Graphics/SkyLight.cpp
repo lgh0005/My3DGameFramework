@@ -1,7 +1,7 @@
 #include "EnginePch.h"
 #include "SkyLight.h"
-#include "Graphics/Texture.h"
-#include "Graphics/CubeTexture.h"
+#include "Resources/Texture.h"
+#include "Resources/CubeTexture.h"
 
 SkyLight::~SkyLight() = default;
 SkyLight::SkyLight() = default;

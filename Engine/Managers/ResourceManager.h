@@ -4,7 +4,6 @@
 CLASS_PTR(StaticMesh)
 CLASS_PTR(Mesh)
 CLASS_PTR(Material)
-CLASS_PTR(Program)
 CLASS_PTR(Texture)
 CLASS_PTR(CubeTexture)
 CLASS_PTR(Model)

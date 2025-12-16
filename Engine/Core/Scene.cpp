@@ -3,7 +3,7 @@
 
 #include "Core/GameObject.h"
 #include "Core/RenderPass.h"
-#include "Graphics/Mesh.h"
+#include "Resources/Mesh.h"
 #include "Graphics/SkyLight.h"
 #include "Components/Component.h"
 #include "Components/Light.h"

@@ -1,5 +1,5 @@
 #pragma once
-#include "Graphics/Mesh.h"
+#include "Resources/Mesh.h"
 
 #pragma region FORWARD_DECLARATION
 CLASS_PTR(Buffer)

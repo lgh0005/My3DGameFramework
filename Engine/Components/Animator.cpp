@@ -1,6 +1,6 @@
 ﻿#include "EnginePch.h"
 #include "Animator.h"
-#include "Graphics/Bone.h"
+#include "Resources/Bone.h"
 
 AnimatorUPtr Animator::Create(AnimationPtr animation)
 {

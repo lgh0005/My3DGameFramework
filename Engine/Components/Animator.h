@@ -1,6 +1,6 @@
 #pragma once
 #include "Component.h"
-#include "Graphics/Animation.h"
+#include "Resources/Animation.h"
 #include "Graphics/Geometry.h"
 
 CLASS_PTR(Animator)

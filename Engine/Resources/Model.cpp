@@ -1,12 +1,12 @@
 #include "EnginePch.h"
 #include "Model.h"
-#include "Graphics/Mesh.h"
-#include "Graphics/StaticMesh.h"
-#include "Graphics/SkinnedMesh.h"
+#include "Resources/Mesh.h"
+#include "Resources/StaticMesh.h"
+#include "Resources/SkinnedMesh.h"
+#include "Resources/Material.h"
+#include "Resources/Image.h"
+#include "Resources/Texture.h"
 #include "Graphics/VertexLayout.h"
-#include "Graphics/Material.h"
-#include "Graphics/Image.h"
-#include "Graphics/Texture.h"
 #include "Graphics/Program.h"
 
 SkinnedMeshPtr Model::GetSkinnedMesh(int index) const

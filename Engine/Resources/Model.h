@@ -5,7 +5,7 @@
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
 #include "Graphics/Vertex.h"
-#include "Graphics/Bone.h"
+#include "Resources/Bone.h"
 
 #pragma region FORWARD_DECLARATION
 CLASS_PTR(Mesh)

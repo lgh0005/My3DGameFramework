@@ -1,6 +1,6 @@
 #include "EnginePch.h"
 #include "ShadowMap.h"
-#include "Graphics/Texture.h"
+#include "Resources/Texture.h"
 
 ShadowMapUPtr ShadowMap::Create(int32 width, int32 height)
 {

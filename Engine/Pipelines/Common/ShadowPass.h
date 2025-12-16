@@ -4,6 +4,7 @@
 #pragma region FORWARD_DECLARATION
 CLASS_PTR(Scene)
 CLASS_PTR(Camera)
+CLASS_PTR(Program)
 CLASS_PTR(ShadowMap)
 CLASS_PTR(RenderContext)
 #pragma endregion
@@ -23,7 +24,7 @@ private:
 	ShadowPass() = default;
 	bool Init(int32 resolution);
 
-	int32	      m_resolution;
+	int32	    m_resolution;
 	std::vector<ShadowMapUPtr> m_shadowMaps;
 	ProgramUPtr m_staticDepthProgram;
 	ProgramUPtr m_skinnedDepthProgram;

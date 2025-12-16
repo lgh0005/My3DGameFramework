@@ -3,21 +3,20 @@
 
 #include "Core/Scene.h"
 #include "Core/GameObject.h"
-#include "Pipelines/SRP/StandardRenderPipeline.h"
-#include "Pipelines/SRP/RenderPasses/StandardGeometryPass.h"
 #include "Graphics/Program.h"
-#include "Graphics/Mesh.h"
-#include "Graphics/StaticMesh.h" 
-#include "Graphics/FrameBuffer.h"
-#include "Graphics/Texture.h"     
+#include "Graphics/FrameBuffer.h"    
 #include "Graphics/ShadowMap.h"
+#include "Resources/Mesh.h"
+#include "Resources/StaticMesh.h"
+#include "Resources/Texture.h" 
 #include "Components/Light.h"
 #include "Components/SpotLight.h"
 #include "Components/Transform.h"
 #include "Components/MeshRenderer.h"
 #include "Components/Animator.h"
-
 #include "Pipelines/SRP/StandardRenderContext.h"
+#include "Pipelines/SRP/StandardRenderPipeline.h"
+#include "Pipelines/SRP/RenderPasses/StandardGeometryPass.h"
 
 ShadowPassUPtr ShadowPass::Create(int32 resolution)
 {

@@ -1,7 +1,7 @@
 ﻿#include "EnginePch.h"
 #include "Material.h"
 #include "Graphics/Program.h"
-#include "Graphics/Texture.h"
+#include "Resources/Texture.h"
 
 MaterialUPtr Material::Create()
 {

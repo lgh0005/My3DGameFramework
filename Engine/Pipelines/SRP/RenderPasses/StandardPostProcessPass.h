@@ -4,6 +4,7 @@
 #pragma region FORWARD_DECLARATION
 CLASS_PTR(Scene)
 CLASS_PTR(Camera)
+CLASS_PTR(Program)
 CLASS_PTR(Framebuffer)
 CLASS_PTR(ScreenMesh)
 CLASS_PTR(RenderContext)

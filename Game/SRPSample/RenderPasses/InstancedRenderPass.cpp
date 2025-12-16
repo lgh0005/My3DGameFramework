@@ -3,8 +3,8 @@
 
 #include "Core/Scene.h"
 #include "Graphics/Program.h"
-#include "Graphics/Mesh.h"
-#include "Graphics/Material.h"
+#include "Resources/Mesh.h"
+#include "Resources/Material.h"
 #include "Components/Camera.h"
 #include "Components/MeshRenderer.h"
 #include "Components/Transform.h"

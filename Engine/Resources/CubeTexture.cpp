@@ -1,6 +1,6 @@
 ﻿#include "EnginePch.h"
 #include "CubeTexture.h"
-#include "Graphics/Image.h"
+#include "Resources/Image.h"
 
 /*=========================================//
 //   default cube texture create methods   //

@@ -4,10 +4,10 @@
 #include "Core/GameObject.h"
 #include "Components/Animator.h"
 #include "Components/Transform.h"
-#include "Graphics/Mesh.h"
-#include "Graphics/StaticMesh.h"
-#include "Graphics/SkinnedMesh.h"
-#include "Graphics/Material.h"
+#include "Resources/Mesh.h"
+#include "Resources/StaticMesh.h"
+#include "Resources/SkinnedMesh.h"
+#include "Resources/Material.h"
 
 MeshRendererUPtr MeshRenderer::Create(MeshPtr mesh, MaterialPtr material)
 {

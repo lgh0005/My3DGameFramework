@@ -1,8 +1,8 @@
 #include "EnginePch.h"
 #include "StandardRenderContext.h"
-#include "Graphics/Texture.h"
 #include "Graphics/FrameBuffer.h"
-#include "Graphics/CubeTexture.h"
+#include "Resources/Texture.h"
+#include "Resources/CubeTexture.h"
 
 void StandardRenderContext::SetGBuffer(Framebuffer* gBuffer)
 {

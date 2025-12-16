@@ -1,6 +1,6 @@
 #include "EnginePch.h"
 #include "Texture.h"
-#include "Graphics/Image.h"
+#include "Resources/Image.h"
 
 /*====================================//
 //   default texture create methods   //

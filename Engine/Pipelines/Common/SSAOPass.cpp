@@ -5,12 +5,12 @@
 #include "Core/Scene.h"
 #include "Core/RenderContext.h"
 #include "Components/Camera.h"
-#include "Graphics/Texture.h"
+#include "Resources/Texture.h"
+#include "Resources/ScreenMesh.h"
+#include "Resources/StaticMesh.h"
+#include "Graphics/Geometry.h"
 #include "Graphics/FrameBuffer.h"
 #include "Graphics/Program.h"
-#include "Graphics/ScreenMesh.h"
-#include "Graphics/StaticMesh.h"
-#include "Graphics/Geometry.h"
 
 // TODO : 공통 RenderContext에 대해서 캐스팅할 때,
 // RenderContext를 적절히 캐스팅할 수 있도록 하는 수단 마련해야함.

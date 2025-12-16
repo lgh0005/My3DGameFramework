@@ -1,5 +1,5 @@
 #pragma once
-#include "Graphics/Bone.h"
+#include "Resources/Bone.h"
 
 #pragma region FORWARD_DECLARATION
 CLASS_PTR(Model)

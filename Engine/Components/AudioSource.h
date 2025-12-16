@@ -1,6 +1,6 @@
 #pragma once
 #include "Components/Component.h"
-#include "Audios/AudioClip.h"
+#include "Resources/AudioClip.h"
 
 #pragma region FORWARD_DECLARATION
 CLASS_PTR(AudioClip)

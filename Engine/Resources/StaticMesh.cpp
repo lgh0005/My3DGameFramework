@@ -1,8 +1,8 @@
 #include "EnginePch.h"
 #include "StaticMesh.h"
+#include "Resources/Material.h"
 #include "Graphics/Buffer.h"
 #include "Graphics/VertexLayout.h"
-#include "Graphics/Material.h"
 #include "Graphics/Program.h"
 
 StaticMesh::~StaticMesh() = default;

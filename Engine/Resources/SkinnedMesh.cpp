@@ -1,8 +1,8 @@
 #include "EnginePch.h"
 #include "SkinnedMesh.h"
+#include "Resources/Material.h"
 #include "Graphics/Buffer.h"
 #include "Graphics/VertexLayout.h"
-#include "Graphics/Material.h"
 #include "Graphics/Program.h"
 
 SkinnedMesh::~SkinnedMesh() = default;

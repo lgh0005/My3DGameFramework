@@ -1,6 +1,6 @@
 ﻿#include "EnginePch.h"
 #include "CubeFramebuffer.h"
-#include "Graphics/CubeTexture.h"
+#include "Resources/CubeTexture.h"
 
 CubeFramebufferUPtr CubeFramebuffer::Create(const CubeTexturePtr colorAttachment, uint32 mipLevel)
 {

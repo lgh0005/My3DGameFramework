@@ -1,14 +1,13 @@
 #include "EnginePch.h"
 #include "ResourceManager.h"
-#include "Graphics/StaticMesh.h"
-#include "Graphics/Mesh.h"
-#include "Graphics/Material.h"
-#include "Graphics/Program.h"
-#include "Graphics/Texture.h"
-#include "Graphics/CubeTexture.h"
-#include "Graphics/Model.h"
-#include "Graphics/Animation.h"
-#include "Audios/AudioClip.h"
+#include "Resources/StaticMesh.h"
+#include "Resources/Mesh.h"
+#include "Resources/Material.h"
+#include "Resources/Texture.h"
+#include "Resources/CubeTexture.h"
+#include "Resources/Model.h"
+#include "Resources/Animation.h"
+#include "Resources/AudioClip.h"
 
 // TODO : 이후에 음원과 관련된 리소스들도 추가 필요
 void ResourceManager::Clear()

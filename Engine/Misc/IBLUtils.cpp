@@ -1,13 +1,13 @@
 ﻿#include "EnginePch.h"
 #include "IBLUtils.h"
 #include "Graphics/Program.h"
-#include "Graphics/Mesh.h"
-#include "Graphics/StaticMesh.h"
-#include "Graphics/CubeTexture.h"
+#include "Resources/Mesh.h"
+#include "Resources/StaticMesh.h"
+#include "Resources/CubeTexture.h"
+#include "Resources/Texture.h"
+#include "Resources/ScreenMesh.h"
 #include "Graphics/CubeFramebuffer.h"
-#include "Graphics/Texture.h"
 #include "Graphics/FrameBuffer.h"
-#include "Graphics/ScreenMesh.h"
 
 CubeTexturePtr IBLUtils::CreateCubemapFromHDR(Texture* hdrTexture, int32 resolution)
 {

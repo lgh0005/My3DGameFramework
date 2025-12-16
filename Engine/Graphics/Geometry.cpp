@@ -1,7 +1,7 @@
 ﻿#include "EnginePch.h"
 #include "Geometry.h"
 #include "Graphics/Vertex.h"
-#include "Graphics/StaticMesh.h"
+#include "Resources/StaticMesh.h"
 
 /*===================//
 //   Plane methods   //

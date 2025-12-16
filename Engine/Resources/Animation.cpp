@@ -1,6 +1,6 @@
 #include "Animation.h"
-#include "Graphics/Model.h"
-#include "Graphics//Bone.h"
+#include "Resources/Model.h"
+#include "Resources//Bone.h"
 
 AnimationUPtr Animation::Load(const std::string& filePath, Model* model)
 {

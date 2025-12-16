@@ -1,6 +1,6 @@
 #include "EnginePch.h"
 #include "FrameBuffer.h"
-#include "Graphics/Texture.h"
+#include "Resources/Texture.h"
 
 FramebufferUPtr Framebuffer::Create(int32 width, int32 height, int32 samples)
 {

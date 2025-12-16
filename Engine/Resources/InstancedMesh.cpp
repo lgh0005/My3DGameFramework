@@ -1,8 +1,8 @@
 #include "EnginePch.h"
 #include "InstancedMesh.h"
 #include "Graphics/VertexLayout.h"
-#include "Graphics/Material.h"
-#include "Graphics/StaticMesh.h"
+#include "Resources/Material.h"
+#include "Resources/StaticMesh.h"
 #include "Graphics/Buffer.h"
 
 InstancedMeshUPtr InstancedMesh::Create(StaticMeshPtr baseMesh, BufferPtr instanceBuffer, 
