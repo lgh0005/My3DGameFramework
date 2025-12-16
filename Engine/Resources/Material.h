@@ -1,4 +1,5 @@
 ﻿#pragma once
+#include "Resources/Resource.h"
 
 #pragma region FORWARD_DECLARATION
 CLASS_PTR(Texture)
@@ -23,9 +24,11 @@ enum class TextureSlot : uint8
 };
 
 CLASS_PTR(Material);
-class Material 
+class Material : public Resource
 {
 public:
+    static const ResourceType s_ResourceType = ResourceType::Material;
+    virtual ResourceType GetResourceType() const override { return ResourceType::Material; }
     static MaterialUPtr Create();
 
     /*=====================//

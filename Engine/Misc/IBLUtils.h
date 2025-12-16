@@ -3,6 +3,8 @@
 #pragma region FORWARD_DECLARATION
 CLASS_PTR(Program)
 CLASS_PTR(Mesh)
+CLASS_PTR(Texture)
+CLASS_PTR(CubeTexture)
 #pragma endregion
 
 class IBLUtils

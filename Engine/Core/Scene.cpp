@@ -37,14 +37,16 @@ void Scene::RegisterComponent(Component* component)
 	if (!component) return;
 
 	// TODO : 이후에 다른 게임 컴포넌트들도 나열해야함
-	switch (component->GetType())
+	switch (component->GetComponentType())
 	{
 		case ComponentType::Camera:
 		{
 			m_cameras.push_back(static_cast<Camera*>(component));
 			break;
 		}
-		case ComponentType::Light:
+		case ComponentType::DirectionalLight:
+		case ComponentType::PointLight:
+		case ComponentType::SpotLight:
 		{
 			m_lights.push_back(static_cast<Light*>(component));
 			break;
@@ -71,28 +73,31 @@ void Scene::RegisterComponent(Component* component)
 		}
 		// TODO : 중첩 switch-case문은 좋은 방식은 아니므로 
 		// 가독성을 위해 따로 함수로 뺄 필요 있음
+		// TODO : 이후에 MeshRenderer를 상위 클래스로 StaticMeshRenderer, SkinnedMeshRenderer 등이
+		// 생겨날 수도 있음. 그럴 경우에는 위의 Light처럼 처리를 해야 할 수도 있다.
+		// InstancedMesh에 대한 분화는 좀 더 생각을 해봐야 함.
 		case ComponentType::MeshRenderer:
 		{
 			auto meshRenderer = static_cast<MeshRenderer*>(component);
-			MeshType meshType = meshRenderer->GetMesh()->GetMeshType();
+			ResourceType meshType = meshRenderer->GetMesh()->GetResourceType();
 			RenderStage stage = meshRenderer->GetRenderStage();
 
 			if (stage == RenderStage::Forward) return;
 
 			switch (meshType)
 			{
-				case MeshType::Static:
+				case ResourceType::StaticMesh:
 				{
 					m_staticMeshRenderers.push_back(meshRenderer);
 					break;
 				}
 
-				case MeshType::Skinned:
+				case ResourceType::SkinnedMesh:
 				{
 					m_skinnedMeshRenderers.push_back(meshRenderer);
 					break;
 				}
-				case MeshType::Instanced:
+				case ResourceType::InstancedMesh:
 				{
 					// TODO : 메쉬의 어떤 속성을 다르게 하여 인스턴싱을
 					// 할 지는 모르기 때문에 이는 따로 처리할 필요가 있음

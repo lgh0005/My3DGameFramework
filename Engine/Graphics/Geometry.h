@@ -4,6 +4,10 @@
 #include <glm/gtc/matrix_access.hpp>
 #include <glm/gtc/constants.hpp>
 
+#pragma region FORWARD_DECLARATION
+CLASS_PTR(StaticMesh)
+#pragma endregion
+
 /*===========//
 //   Plane   //
 //===========*/

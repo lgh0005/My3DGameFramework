@@ -9,7 +9,7 @@ class Animator : public Component
 public:
 	static AnimatorUPtr Create(AnimationPtr animation);
 	static const ComponentType s_ComponentType = ComponentType::Animator;
-	virtual ComponentType GetType() const override { return ComponentType::Animator; }
+	virtual ComponentType GetComponentType() const override { return ComponentType::Animator; }
 
 	void Update();
 	void PlayAnimation(AnimationPtr animation);

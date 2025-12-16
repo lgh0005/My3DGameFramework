@@ -165,13 +165,13 @@ glm::mat4 ShadowPass::CalculateLightSpaceMatrix(Light* light)
 	float size = 20.0f;
 	float nearPlane = 0.1f;
 	float farPlane = 100.0f;
-	switch (light->GetLightType())
+	switch (light->GetComponentType())
 	{
-	case LightType::Directional:
+	case ComponentType::DirectionalLight:
 		lightProjection = glm::ortho(-size, size, -size, size, nearPlane, farPlane);
 		break;
 
-	case LightType::Spot:
+	case ComponentType::SpotLight:
 		glm::vec2 cutoff = static_cast<SpotLight*>(light)->GetCutoff();
 		lightProjection = glm::perspective(glm::radians((cutoff[0] + cutoff[1]) * 2.0f),
 			1.0f, 1.0f, 100.0f);

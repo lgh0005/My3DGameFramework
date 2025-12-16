@@ -1,4 +1,5 @@
 #pragma once
+#include "Resources/Resource.h"
 #include <ktx.h>
 
 #pragma region FORWARD_DECLARATION
@@ -6,9 +7,11 @@ CLASS_PTR(Image)
 #pragma endregion
 
 CLASS_PTR(CubeTexture)
-class CubeTexture
+class CubeTexture : public Resource
 {
 public:
+    static const ResourceType s_ResourceType = ResourceType::CubeTexture;
+    virtual ResourceType GetResourceType() const override { return ResourceType::CubeTexture; }
     static CubeTextureUPtr CreateFromImages(const std::vector<Image*> images);
     static CubeTextureUPtr CreateFromKtxImage(const std::string& ktxFilePath);
     static CubeTextureUPtr CreateFromKtxHDR(const std::string& ktxFilePath);

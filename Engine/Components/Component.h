@@ -9,7 +9,9 @@ enum class ComponentType
 {
     Animator,
 	Camera,
-	Light,
+	DirectionalLight,
+	SpotLight,
+	PointLight,
 	Transform,
 	MeshRenderer,
 	Script,
@@ -22,7 +24,8 @@ class Component
 {
 public:
 	virtual ~Component() = default;
-	virtual ComponentType GetType() const = 0;
+	virtual ComponentType GetComponentType() const = 0;
+	bool MatchesType(ComponentType type) const;
 
 	void SetOwner(GameObject* gameObject);
 	GameObject* GetOwner() const;

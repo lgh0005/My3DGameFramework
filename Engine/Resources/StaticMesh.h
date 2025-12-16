@@ -13,6 +13,8 @@ CLASS_PTR(StaticMesh)
 class StaticMesh : public Mesh
 {
 public:
+    static const ResourceType s_ResourceType = ResourceType::StaticMesh;
+    virtual ResourceType GetResourceType() const override { return ResourceType::StaticMesh; }
     static StaticMeshUPtr Create
     (
         const std::vector<StaticVertex>& vertices,
@@ -20,7 +22,6 @@ public:
         uint32 primitiveType = GL_TRIANGLES
     );
     virtual ~StaticMesh() override;
-    virtual MeshType GetMeshType() const override { return MeshType::Static; }
     void ComputeTangents
     (
         std::vector<StaticVertex>& vertices,

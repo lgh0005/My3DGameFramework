@@ -64,6 +64,7 @@ add_library(Engine STATIC
    "Graphics/ShadowMap.h"           "Graphics/ShadowMap.cpp"
 
    # Resources
+   "Resources/Resource.h"           "Resources/Resource.cpp"
    "Resources/AudioClip.h"          "Resources/AudioClip.cpp"
    "Resources/Image.h"              "Resources/Image.cpp"
    "Resources/Model.h"              "Resources/Model.cpp"
@@ -82,7 +83,6 @@ add_library(Engine STATIC
    "Resources/ScreenMesh.h"         "Resources/ScreenMesh.cpp"
    "Resources/Material.h"           "Resources/Material.cpp"
    "Resources/CubeTexture.h"        "Resources/CubeTexture.cpp"
-
 
    # Components
    "Components/Component.h"         "Components/Component.cpp"
@@ -108,7 +108,7 @@ add_library(Engine STATIC
    "Managers/RenderManager.h"       "Managers/RenderManager.cpp"
    "Managers/AudioManager.h"        "Managers/AudioManager.cpp"
 
- )
+  "Resources/Resource.h")
 
 # 2. [PCH 설정] EnginePCH.h를 PCH로 사용합니다.
 target_precompile_headers(Engine  PUBLIC EnginePCH.h)

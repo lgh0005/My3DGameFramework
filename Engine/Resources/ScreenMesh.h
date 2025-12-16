@@ -14,8 +14,8 @@ class ScreenMesh : public Mesh
 public:
 	static ScreenMeshUPtr Create();
 	virtual ~ScreenMesh() override;
-	virtual MeshType GetMeshType() const override { return MeshType::Screen; }
-
+	static const ResourceType s_ResourceType = ResourceType::ScreenMesh;
+	virtual ResourceType GetResourceType() const override { return ResourceType::ScreenMesh; }
 	virtual void Draw(const Program* program = nullptr) const override;
 
 private:

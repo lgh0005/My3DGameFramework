@@ -13,6 +13,8 @@ CLASS_PTR(SkinnedMesh)
 class SkinnedMesh : public Mesh
 {
 public:
+    static const ResourceType s_ResourceType = ResourceType::SkinnedMesh;
+    virtual ResourceType GetResourceType() const override { return ResourceType::SkinnedMesh; }
     static SkinnedMeshUPtr Create
     (
         const std::vector<SkinnedVertex>& vertices,
@@ -20,7 +22,6 @@ public:
         uint32 primitiveType = GL_TRIANGLES
     );
     virtual ~SkinnedMesh() override;
-    virtual MeshType GetMeshType() const override { return MeshType::Skinned; }
     virtual void Draw(const Program* program) const override;
 
 private:

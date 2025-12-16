@@ -9,7 +9,7 @@ class Transform : public Component
 public:
 	static TransformUPtr Create();
 	static const ComponentType s_ComponentType = ComponentType::Transform;
-	virtual ComponentType GetType() const override { return ComponentType::Transform; }
+	virtual ComponentType GetComponentType() const override { return ComponentType::Transform; }
 	void Update();
 
 	// À§Ä¡

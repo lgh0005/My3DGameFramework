@@ -704,7 +704,7 @@ TexturePtr Model::LoadTextureFromFile
         auto texture = Texture::CreateFromKtxImage(ktxFullPath);
         if (texture)
         {
-            RESOURCE.AddResource<Texture>(ktxFullPath, std::move(texture));
+            RESOURCE.AddResource<Texture>(std::move(texture), ktxFullPath);
             return RESOURCE.GetResource<Texture>(ktxFullPath);
         }
     }
@@ -728,7 +728,7 @@ TexturePtr Model::LoadTextureFromFile
     }
 
     auto texture = Texture::CreateFromImage(image.get());
-    RESOURCE.AddResource<Texture>(originalFullPath, std::move(texture));
+    RESOURCE.AddResource<Texture>(std::move(texture), originalFullPath);
     return RESOURCE.GetResource<Texture>(originalFullPath);
 }
 

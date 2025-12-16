@@ -50,23 +50,23 @@ bool DevScene::LoadNessesaryResources()
 
 	// 0-1. 큐브 메쉬
 	auto boxMesh = GeometryGenerator::CreateBox();
-	RESOURCE.AddResource<Mesh>("Cube", std::move(boxMesh));
+	RESOURCE.AddResource<StaticMesh>(std::move(boxMesh), "Cube");
 
 	// 0-1. 평면 메쉬
 	auto planeMesh = GeometryGenerator::CreatePlane();
-	RESOURCE.AddResource<Mesh>("Plane", std::move(planeMesh));
+	RESOURCE.AddResource<StaticMesh>(std::move(planeMesh), "Plane");
 
 	// 0-2. 모델과 애니메이션 #1
 	{
 		auto model = Model::Load("./Resources/Models/spacesoldier/aliensoldier.mymodel");
 		auto anim = Animation::Load("./Resources/Models/spacesoldier/Running.fbx", model.get());
-		RESOURCE.AddResource<Model>("aliensoldier", std::move(model));
-		RESOURCE.AddResource<Animation>("hiphopDancing", std::move(anim));
+		RESOURCE.AddResource<Model>(std::move(model), "aliensoldier");
+		RESOURCE.AddResource<Animation>(std::move(anim), "hiphopDancing");
 	}
 
 	//// 가방 모델
 	auto backpack = Model::Load("./Resources/Models/backpack/backpack.obj");
-	RESOURCE.AddResource<Model>("backpack", std::move(backpack));
+	RESOURCE.AddResource<Model>(std::move(backpack), "backpack");
 
 	// 0-3. 머티리얼 1
 	{
@@ -74,7 +74,7 @@ bool DevScene::LoadNessesaryResources()
 		lightMat->shininess = 16.0f;
 		lightMat->emissionStrength = 0.0f;
 		lightMat->heightScale = 0.0f;
-		RESOURCE.AddResource<Material>("LightMat", std::move(lightMat));
+		RESOURCE.AddResource<Material>(std::move(lightMat), "LightMat");
 	}
 
 	// 0-4. 머티리얼 2
@@ -92,7 +92,7 @@ bool DevScene::LoadNessesaryResources()
 		box1Mat->shininess = 16.0f;
 		box1Mat->emissionStrength = 5.0f;
 		box1Mat->heightScale = 0.0f;
-		RESOURCE.AddResource<Material>("boxMat1", std::move(box1Mat));
+		RESOURCE.AddResource<Material>(std::move(box1Mat), "boxMat1");
 	}
 
 	// 0-5. 머티리얼 3
@@ -114,7 +114,7 @@ bool DevScene::LoadNessesaryResources()
 		box2Mat->shininess = 16.0f;
 		box2Mat->emissionStrength = 2.0f;
 		box2Mat->heightScale = 0.0f;
-		RESOURCE.AddResource<Material>("boxMat2", std::move(box2Mat));
+		RESOURCE.AddResource<Material>(std::move(box2Mat), "boxMat2");
 	}
 
 	// 0-6. 머티리얼 4
@@ -127,7 +127,7 @@ bool DevScene::LoadNessesaryResources()
 		box4Mat->shininess = 20.0f;
 		box4Mat->emissionStrength = 0.0f;
 		box4Mat->heightScale = 0.0f;
-		RESOURCE.AddResource<Material>("boxMat3", std::move(box4Mat));
+		RESOURCE.AddResource<Material>(std::move(box4Mat), "boxMat3");
 	}
 
 	// 머티리얼 5
@@ -143,7 +143,7 @@ bool DevScene::LoadNessesaryResources()
 		box5Mat->shininess = 64.0f;
 		box5Mat->emissionStrength = 0.0f;
 		box5Mat->heightScale = 0.0f;
-		RESOURCE.AddResource<Material>("boxMat4", std::move(box5Mat));
+		RESOURCE.AddResource<Material>(std::move(box5Mat), "boxMat4");
 	}
 
 	// 머티리얼 6
@@ -162,7 +162,7 @@ bool DevScene::LoadNessesaryResources()
 		box6Mat->shininess = 14.0f;
 		box6Mat->emissionStrength = 0.0f;
 		box6Mat->heightScale = 0.065f;
-		RESOURCE.AddResource<Material>("boxMat5", std::move(box6Mat));
+		RESOURCE.AddResource<Material>(std::move(box6Mat), "boxMat5");
 	}
 
 	// 0-7. 풀떼기
@@ -175,10 +175,10 @@ bool DevScene::LoadNessesaryResources()
 		grassMat->diffuse = std::move(grassTexture);
 		grassMat->emission = nullptr;
 		grassMat->emissionStrength = 0.0f;
-		RESOURCE.AddResource<Material>("grassMat", std::move(grassMat));
+		RESOURCE.AddResource<Material>(std::move(grassMat), "grassMat");
 
 		auto bladeMesh = GeometryGenerator::CreatePlane();
-		RESOURCE.AddResource<Mesh>("grassBlade", std::move(bladeMesh));
+		RESOURCE.AddResource<StaticMesh>(std::move(bladeMesh), "grassBlade");
 	}
 
 	// 8. 하늘 큐브맵
@@ -198,19 +198,19 @@ bool DevScene::LoadNessesaryResources()
 		  cubeFront.get(), cubeBack.get() });
 		if (!cubeTexture) return false;*/
 
-		RESOURCE.AddResource<CubeTexture>("SkyboxTexture", std::move(cubeSky));
+		RESOURCE.AddResource<CubeTexture>(std::move(cubeSky), "SkyboxTexture");
 	}
 
 	// 9. sfx
 	{
 		auto sfx = AudioClip::LoadSFX("./Resources/Audios/gunshot.mp3");
-		RESOURCE.AddResource<AudioClip>("MySFX", std::move(sfx));
+		RESOURCE.AddResource<AudioClip>(std::move(sfx), "MySFX");
 	}
 
 	// 10. bgm
 	{
 		auto bgm = AudioClip::LoadBGM("./Resources/Audios/anubis.wav");
-		RESOURCE.AddResource<AudioClip>("MyBGM", std::move(bgm));
+		RESOURCE.AddResource<AudioClip>(std::move(bgm), "MyBGM");
 	}
 
 	return true;
@@ -301,7 +301,7 @@ bool DevScene::CreateSceneContext()
 		lightComp->SetDistance(128.0f);
 		lightGo->AddComponent(std::move(lightComp));
 		auto renderer = MeshRenderer::Create
-		(RESOURCE.GetResource<Mesh>("Cube"), RESOURCE.GetResource<Material>("LightMat"));
+		(RESOURCE.GetResource<StaticMesh>("Cube"), RESOURCE.GetResource<Material>("LightMat"));
 		renderer->SetRenderStage(RenderStage::Forward);
 		lightPass->AddRenderer(renderer.get());
 		lightGo->AddComponent(std::move(renderer));
@@ -334,7 +334,7 @@ bool DevScene::CreateSceneContext()
 		lightGo->GetTransform().SetScale(glm::vec3(0.2f));
 		lightGo->AddComponent(std::move(lightComp));
 		auto renderer = MeshRenderer::Create
-		(RESOURCE.GetResource<Mesh>("Cube"), RESOURCE.GetResource<Material>("LightMat"));
+		(RESOURCE.GetResource<StaticMesh>("Cube"), RESOURCE.GetResource<Material>("LightMat"));
 		renderer->SetRenderStage(RenderStage::Forward);
 		lightPass->AddRenderer(renderer.get());
 		lightGo->AddComponent(std::move(renderer));
@@ -351,7 +351,7 @@ bool DevScene::CreateSceneContext()
 		cubeTransform.SetScale(glm::vec3(1.5f, 1.5f, 1.5f));
 
 		auto meshRenderer = MeshRenderer::Create
-		(RESOURCE.GetResource<Mesh>("Cube"), RESOURCE.GetResource<Material>("boxMat1"));
+		(RESOURCE.GetResource<StaticMesh>("Cube"), RESOURCE.GetResource<Material>("boxMat1"));
 		cubeObj->AddComponent(std::move(meshRenderer));
 		AddGameObject(std::move(cubeObj));
 	}
@@ -366,7 +366,7 @@ bool DevScene::CreateSceneContext()
 		cubeTransform.SetScale(glm::vec3(1.5f, 1.5f, 1.5f));
 
 		auto meshRenderer = MeshRenderer::Create
-		(RESOURCE.GetResource<Mesh>("Cube"), RESOURCE.GetResource<Material>("boxMat2"));
+		(RESOURCE.GetResource<StaticMesh>("Cube"), RESOURCE.GetResource<Material>("boxMat2"));
 		cubeObj->AddComponent(std::move(meshRenderer));
 
 		// TEMP : BGM 재생
@@ -387,7 +387,7 @@ bool DevScene::CreateSceneContext()
 		cubeTransform.SetScale(glm::vec3(1.5f, 1.5f, 1.5f));
 
 		auto meshRenderer = MeshRenderer::Create
-		(RESOURCE.GetResource<Mesh>("Cube"), RESOURCE.GetResource<Material>("boxMat4"));
+		(RESOURCE.GetResource<StaticMesh>("Cube"), RESOURCE.GetResource<Material>("boxMat4"));
 		cubeObj->AddComponent(std::move(meshRenderer));
 		AddGameObject(std::move(cubeObj));
 	}
@@ -402,7 +402,7 @@ bool DevScene::CreateSceneContext()
 		cubeTransform.SetScale(glm::vec3(3.0f, 3.0f, 3.0f));
 
 		auto meshRenderer = MeshRenderer::Create
-		(RESOURCE.GetResource<Mesh>("Cube"), RESOURCE.GetResource<Material>("boxMat5"));
+		(RESOURCE.GetResource<StaticMesh>("Cube"), RESOURCE.GetResource<Material>("boxMat5"));
 		cubeObj->AddComponent(std::move(meshRenderer));
 		AddGameObject(std::move(cubeObj));
 	}
@@ -416,7 +416,7 @@ bool DevScene::CreateSceneContext()
 		cubeTransform.SetScale(glm::vec3(100.0f, 1.0f, 100.0f));
 
 		auto meshRenderer = MeshRenderer::Create
-		(RESOURCE.GetResource<Mesh>("Cube"), RESOURCE.GetResource<Material>("boxMat3"));
+		(RESOURCE.GetResource<StaticMesh>("Cube"), RESOURCE.GetResource<Material>("boxMat3"));
 		cubeObj->AddComponent(std::move(meshRenderer));
 		AddGameObject(std::move(cubeObj));
 	}
@@ -431,7 +431,7 @@ bool DevScene::CreateSceneContext()
 
 		auto meshRenderer = MeshRenderer::Create
 		(
-			RESOURCE.GetResource<Mesh>("Cube"),
+			RESOURCE.GetResource<StaticMesh>("Cube"),
 			RESOURCE.GetResource<Material>("boxMat1") // 임시 재질
 		);
 		meshRenderer->SetRenderStage(RenderStage::Forward);

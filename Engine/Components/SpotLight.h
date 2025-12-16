@@ -13,8 +13,8 @@ class SpotLight : public Light
 {
 public:
 	static SpotLightUPtr Create();
-	static const ComponentType s_ComponentType = ComponentType::Light;
-	virtual LightType GetLightType() const override { return LightType::Spot; }
+	static const ComponentType s_ComponentType = ComponentType::SpotLight;
+	virtual ComponentType GetComponentType() const override { return ComponentType::SpotLight; }
 
 	const glm::vec2 GetCutoff()				const { return m_cutoff; }
 	const float GetDistance()				const { return m_distance; }

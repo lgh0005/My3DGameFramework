@@ -1,5 +1,5 @@
 #include "EnginePch.h"
-#include "Bone.h"
+#include "Resources/Bone.h"
 
 BoneUPtr Bone::Create(const std::string& name, int id, const aiNodeAnim* channel)
 {

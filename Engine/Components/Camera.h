@@ -7,7 +7,7 @@ class Camera : public Component
 public:
 	static CameraUPtr Create();
 	static const ComponentType s_ComponentType = ComponentType::Camera;
-	virtual ComponentType GetType() const override { return ComponentType::Camera; }
+	virtual ComponentType GetComponentType() const override { return ComponentType::Camera; }
 
 	void SetProjection(float fovDegrees, float aspectRatio, 
 					   float nearPlane, float farPlane);

@@ -1,5 +1,5 @@
 #pragma once
-#include "Graphics/Vertex.h"
+#include "Resources/Resource.h"
 #include "Graphics/Geometry.h"
 
 #pragma region FORWARD_DECLARATION
@@ -9,20 +9,13 @@ CLASS_PTR(Material)
 CLASS_PTR(Program)
 #pragma endregion
 
-enum class MeshType
-{
-    Static,
-    Skinned,
-    Instanced,
-    Screen
-};
-
 CLASS_PTR(Mesh)
-class Mesh
+class Mesh : public Resource
 {
+    using Super = Resource;
+
 public:
     virtual ~Mesh();
-    virtual MeshType GetMeshType() const = 0;
     virtual void Draw(const Program* program) const = 0;
 
     usize GetIndexCount() const { return m_indexCount; }

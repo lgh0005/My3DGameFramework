@@ -51,14 +51,14 @@ bool PBRScene::LoadNessesaryResources()
 	{
 		auto cubeMesh = GeometryGenerator::CreateBox();
 		if (!cubeMesh) return false;
-		RESOURCE.AddResource<Mesh>("Cube", std::move(cubeMesh));
+		RESOURCE.AddResource<StaticMesh>(std::move(cubeMesh), "Cube");
 	}
 
 	// 구 메쉬
 	{
 		auto sphereMesh = GeometryGenerator::CreateSphere();
 		if (!sphereMesh) return false;
-		RESOURCE.AddResource<Mesh>("Sphere", std::move(sphereMesh));
+		RESOURCE.AddResource<StaticMesh>(std::move(sphereMesh), "Sphere");
 	}
 
 	// 단색 머티리얼
@@ -71,7 +71,7 @@ bool PBRScene::LoadNessesaryResources()
 		(4, 4, glm::vec4(0.85f, 0.85f, 0.85f, 1.0f)).get());
 		solidColorMat->roughness = Texture::CreateFromImage(Image::CreateSingleColorImage
 		(4, 4, glm::vec4(0.25f, 0.35f, 0.25f, 1.0f)).get());
-		RESOURCE.AddResource<Material>("solidColor", std::move(solidColorMat));
+		RESOURCE.AddResource<Material>(std::move(solidColorMat), "solidColor");
 	}
 
 	// 쇠공 머티리얼 #1
@@ -87,7 +87,7 @@ bool PBRScene::LoadNessesaryResources()
 		(Image::Load("./Resources/Images/rustediron/rustediron2_metallic.png").get());
 		rustedIronMat->normal = Texture::CreateFromImage
 		(Image::Load("./Resources/Images/rustediron/rustediron2_normal.png").get());
-		RESOURCE.AddResource<Material>("Rusted_Iron", std::move(rustedIronMat));
+		RESOURCE.AddResource<Material>(std::move(rustedIronMat), "Rusted_Iron");
 	}
 
 	// 쇠공 머티리얼 #2
@@ -101,7 +101,7 @@ bool PBRScene::LoadNessesaryResources()
 		(Image::Load("./Resources/Images/rustediron/rustediron2_normal.png").get());
 		rustedIronMat->orm = Texture::CreateFromImage
 		(Image::Load("./Resources/Images/rustediron/rustediron2_ORM.png").get());
-		RESOURCE.AddResource<Material>("Rusted_Iron_orm", std::move(rustedIronMat));
+		RESOURCE.AddResource<Material>(std::move(rustedIronMat), "Rusted_Iron_orm");
 	}
 
 	// HDR 큐브맵 머티리얼
@@ -110,7 +110,7 @@ bool PBRScene::LoadNessesaryResources()
 		if (!hdrCubeMat) return false;
 		hdrCubeMat->diffuse = Texture::CreateFromHDR
 		(Image::LoadHDR("./Resources/Images/IBL/mirrored_hall_4k.hdr").get());
-		RESOURCE.AddResource<Material>("hdrCubeMat", std::move(hdrCubeMat));
+		RESOURCE.AddResource<Material>(std::move(hdrCubeMat), "hdrCubeMat");
 	}
 
 	// HDR Skybox 생성 (IBLUtils 사용)
@@ -223,7 +223,7 @@ bool PBRScene::CreateSceneContext()
 	
 	// 3. 구 49개 (ORM 텍스쳐 테스트)
 	{
-		auto sphereMesh = RESOURCE.GetResource<Mesh>("Sphere");
+		auto sphereMesh = RESOURCE.GetResource<StaticMesh>("Sphere");
 
 		// [핵심] 미리 로드해둔 'Rusted_Iron_orm' 머티리얼을 가져옵니다.
 		// 이 머티리얼 안에는 이미 Diffuse, Normal, ORM 텍스처가 들어있습니다.

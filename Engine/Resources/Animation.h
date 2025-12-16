@@ -1,4 +1,5 @@
 #pragma once
+#include "Resources/Resource.h"
 #include "Resources/Bone.h"
 
 #pragma region FORWARD_DECLARATION
@@ -15,9 +16,11 @@ struct AssimpNodeData
 };
 
 CLASS_PTR(Animation)
-class Animation
+class Animation : public Resource
 {
 public:
+    static const ResourceType s_ResourceType = ResourceType::Animation;
+    virtual ResourceType GetResourceType() const override { return ResourceType::Animation; }
 	static AnimationUPtr Load(const std::string& filePath, Model* model);
 
     Bone* FindBone(const std::string& name);

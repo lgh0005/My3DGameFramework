@@ -12,10 +12,6 @@ CLASS_PTR(Light)
 class Light : public Component
 {
 public:
-    static const ComponentType s_ComponentType = ComponentType::Light;
-    virtual ComponentType GetType() const override { return ComponentType::Light; }
-    virtual LightType GetLightType() const = 0;
-
     const glm::vec3& GetAmbient() const { return m_ambient; }
     const glm::vec3& GetDiffuse() const { return m_diffuse; }
     const glm::vec3& GetSpecular() const { return m_specular; }

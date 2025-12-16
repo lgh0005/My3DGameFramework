@@ -1,4 +1,5 @@
 #pragma once
+#include "Resources/Resource.h"
 
 #pragma region BONE_STRUCTS
 struct BoneInfo
@@ -26,10 +27,14 @@ struct KeyScale
 };
 #pragma endregion
 
+// TODO : 이후 Legacy 클래스가 될 수 있음
+// Skeleton의 컨테이너 역할 클래스로 역할이 대폭 축소 예정
 CLASS_PTR(Bone)
-class Bone
+class Bone : public Resource
 {
 public:
+    static const ResourceType s_ResourceType = ResourceType::Bone;
+    virtual ResourceType GetResourceType() const override { return ResourceType::Bone; }
 	static BoneUPtr Create(const std::string& name, int id, const aiNodeAnim* channel);
     static BoneUPtr Create(uint32 id, std::vector<KeyPosition>&& positions,
                                       std::vector<KeyRotation>&& rotations,

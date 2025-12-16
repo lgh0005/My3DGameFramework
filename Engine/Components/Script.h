@@ -6,7 +6,7 @@ class Script : public Component
 {
 public:
 	static const ComponentType s_ComponentType = ComponentType::Script;
-	virtual ComponentType GetType() const override { return ComponentType::Script; }
+	virtual ComponentType GetComponentType() const override { return ComponentType::Script; }
 
 	// TODO : Awake, FixedUpdate, LateUpdate 등의 분기 필요할 수 있음
 	virtual void Start()   {}

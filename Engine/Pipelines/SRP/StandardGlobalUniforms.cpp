@@ -80,9 +80,9 @@ void StandardGlobalUniforms::PreRender(RenderContext* context)
 			}
 
 			// [타입별 속성]
-			switch (light->GetLightType())
+			switch (light->GetComponentType())
 			{
-				case LightType::Directional:
+				case ComponentType::DirectionalLight:
 				{
 					info.type = 0;
 					info.attenuation = glm::vec3(1.0f, 0.0f, 0.0f);
@@ -90,7 +90,7 @@ void StandardGlobalUniforms::PreRender(RenderContext* context)
 					break;
 				}
 
-				case LightType::Point:
+				case ComponentType::PointLight:
 				{
 					info.type = 1;
 					auto point = static_cast<PointLight*>(light);
@@ -99,7 +99,7 @@ void StandardGlobalUniforms::PreRender(RenderContext* context)
 					break;
 				}
 
-				case LightType::Spot:
+				case ComponentType::SpotLight:
 				{
 					info.type = 2;
 					auto spot = static_cast<SpotLight*>(light);

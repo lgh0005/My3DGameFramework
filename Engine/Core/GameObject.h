@@ -56,9 +56,10 @@ private:
 template<typename T>
 inline T* GameObject::GetComponent() const
 {
+	ComponentType type = T::s_ComponentType;
 	for (const auto& comp : m_components)
 	{
-		if (comp->GetType() == T::s_ComponentType)
+		if (comp->MatchesType(type))
 			return static_cast<T*>(comp.get());
 	}
 	return nullptr;

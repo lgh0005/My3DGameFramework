@@ -1,4 +1,5 @@
 ﻿#pragma once
+#include "Resources/Resource.h"
 #include <ktx.h>
 
 #pragma region FORWARD_DECLARATION
@@ -6,9 +7,11 @@ CLASS_PTR(Image)
 #pragma endregion
 
 CLASS_PTR(Texture)
-class Texture
+class Texture : public Resource
 {
 public:
+	static const ResourceType s_ResourceType = ResourceType::Texture;
+	virtual ResourceType GetResourceType() const override { return ResourceType::Texture; }
 	static TextureUPtr Create(int32 width, int32 height, 
 							  uint32 format, uint32 type = GL_UNSIGNED_BYTE);
 	static TextureUPtr Create(int32 width, int32 height,

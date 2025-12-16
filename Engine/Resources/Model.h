@@ -1,4 +1,5 @@
 ﻿#pragma once
+#include "Resources/Resource.h"
 #include <filesystem>
 #include <fstream>
 #include <assimp/Importer.hpp>
@@ -13,13 +14,15 @@ CLASS_PTR(SkinnedMesh)
 CLASS_PTR(StaticMesh)
 CLASS_PTR(Material)
 CLASS_PTR(Program)
+CLASS_PTR(Texture)
 #pragma endregion
 
-// TODO : 머티리얼 조금 나누면 이제 모델을 로드할 때 
 CLASS_PTR(Model)
-class Model
+class Model : public Resource
 {
 public:
+	static const ResourceType s_ResourceType = ResourceType::Model;
+	virtual ResourceType GetResourceType() const override { return ResourceType::Model; }
 	static ModelUPtr Load(const std::string& filename);
 	uint32 GetMeshCount() const { return (uint32)m_meshes.size(); }
 	SkinnedMeshPtr GetSkinnedMesh(int index) const;
@@ -51,7 +54,6 @@ private:
 	bool LoadByBinary(const std::string& filename);
 #pragma endregion
 
-	// TEST
 #pragma region TEST_FOR_ASSET_CONVERTER
 	bool LoadByAssimpV2(const std::string& filename);
 	bool LoadByBinaryV2(const std::string& filename);

@@ -8,7 +8,7 @@ public:
 	virtual ~AudioListener() = default;
 	static AudioListenerUPtr Create();
 	static const ComponentType s_ComponentType = ComponentType::AudioListener;
-	virtual ComponentType GetType() const override { return ComponentType::AudioListener; }
+	virtual ComponentType GetComponentType() const override { return ComponentType::AudioListener; }
 	void Update();
 
 private:

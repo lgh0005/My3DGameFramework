@@ -3,6 +3,11 @@
 #include "Core/GameObject.h"
 #include "Components/Transform.h"
 
+bool Component::MatchesType(ComponentType type) const
+{
+	return GetComponentType() == type;
+}
+
 void Component::SetOwner(GameObject* gameObject)
 {
 	m_owner = gameObject;

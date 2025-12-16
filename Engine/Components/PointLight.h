@@ -13,8 +13,8 @@ class PointLight : public Light
 {
 public:
 	static PointLightUPtr Create();
-	static const ComponentType s_ComponentType = ComponentType::Light;
-	virtual LightType GetLightType() const override { return LightType::Point; }
+	static const ComponentType s_ComponentType = ComponentType::PointLight;
+	virtual ComponentType GetComponentType() const override { return ComponentType::PointLight; }
 
 	const float GetDistance() const { return m_distance; }
 	const glm::vec3 GetAttenuation() const      { return Utils::GetAttenuationCoeff(m_distance); }
