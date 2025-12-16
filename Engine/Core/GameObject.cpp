@@ -21,8 +21,38 @@ bool GameObject::Init()
 	return true;
 }
 
+/*==========================//
+//  hierarchical structure  //
+//==========================*/
 void GameObject::AddComponent(ComponentUPtr component)
 {
 	component->SetOwner(this);
 	m_components.push_back(std::move(component));
+}
+
+void GameObject::SetParent(GameObject* parent)
+{
+	// parent가 nullptr이면 부모를 없앤다(Root로 만든다)는 의미
+	Transform* parentTransform = (parent != nullptr) ? &parent->GetTransform() : nullptr;
+	
+	// Transform에게 실제 로직 위임
+	m_transform->SetParent(parentTransform);
+}
+
+void GameObject::AddChild(GameObject* child)
+{
+	if (child == nullptr) return;
+
+	// "너 내 자식이 돼라" == "너의 부모는 나다"
+	child->SetParent(this);
+}
+
+GameObject* GameObject::GetChildByIndex(usize index)
+{
+	return m_transform->GetChildGameObjectByIndex(index);
+}
+
+GameObject* GameObject::GetChildByName(const std::string& name)
+{
+	return m_transform->GetChildGameObjectByName(name);
 }

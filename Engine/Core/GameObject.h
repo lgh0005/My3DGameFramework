@@ -24,6 +24,12 @@ public:
 	const std::vector<ComponentUPtr>& GetAllComponents() 
 								 const		 { return m_components; }
 
+	// 계층 구조 메서드들
+	void SetParent(GameObject* parent);
+	void AddChild(GameObject* child);
+	GameObject* GetChildByIndex(usize index);
+	GameObject* GetChildByName(const std::string& name);
+
 	// 게임 오브젝트가 가져야 할 기본 메서드들
 	// TODO : 추가해야 할 메서드
 	// 0. Find

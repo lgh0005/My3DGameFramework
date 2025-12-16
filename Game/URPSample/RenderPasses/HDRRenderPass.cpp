@@ -81,7 +81,7 @@ void HDRRenderPass::Render(Scene* scene, Camera* camera)
         material->SetToProgram(m_simpleProgram.get());
 
         // 2. 모델 행렬 전송
-        auto modelMatrix = transform.GetModelMatrix();
+        auto modelMatrix = transform.GetWorldMatrix();
         m_simpleProgram->SetUniform("model", modelMatrix);
 
         mesh->Draw(m_simpleProgram.get());

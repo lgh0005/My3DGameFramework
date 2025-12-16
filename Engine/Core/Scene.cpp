@@ -175,45 +175,70 @@ void Scene::Start()
 
 void Scene::Update()
 {
-	// TODO : 
-	// 0. 나중에 추가할 Destroy/SetActive 로직을 고려
+	// [Phase 1] Behaviors (Input)
+	UpdateBehaviours();
 
-	// 1. m_animators 목록을 순회하며 애니메이션 업데이트
-	for (auto* animator : m_animators)
-	{
-		// (나중에 추가) if (animator->GetOwner()->IsActiveInHierarchy())
+	// [Phase 2] Transforms (Calculation)
+	UpdateTransforms();
 
-		// 기존 Context::Render()에 있던 애니메이션 업데이트 로직을
-		// Scene::Update()로 이동
-		animator->Update();
-	}
+	// [Phase 3] Systems (Output)
+	UpdateSceneSystems();
 
-	// 전체적으로 컴포넌트가 계층적 위치에 따라 적용되도록 만들 필요가 있음
-	
-	// 2. 스크립트 컴포넌트 업데이트
-	for (auto* script : m_scripts)
-	{
-	     script->Update();
-	}
-
-	// 3. 오디오 소스 위치 갱신
-	for (auto* audioSource : m_audioSources)
-	{
-		audioSource->Update();
-	}
-
-	// 3. 오디오 리스너 위치 갱신
-	// TODO : 리스너는 단 하나만 있도록 유도 필요
-	for (auto* audioListener : m_audioListeners)
-	{
-		audioListener->Update();
-	}
-
-	// 3. 파괴가 예약된 오브젝트들 일괄 삭제
+	// [Phase 4] Cleanup (Destroy)
 	FlushDestroyQueue();
+}
+
+/*================================//
+//   scene update cycle methods   //
+//================================*/
+void Scene::UpdateBehaviours()
+{
+	// 1. 스크립트 Update
+	for (auto* script : m_scripts) script->Update();
+
+	// 2. 애니메이터 Update
+	for (auto* animator : m_animators) animator->Update();
+}
+
+void Scene::UpdateTransforms()
+{
+	// 1. 루트 오브젝트만 찾아서 계층 순회 시작
+	for (auto& go : m_gameObjects)
+	{
+		if (go->GetTransform().GetParent() == nullptr)
+			UpdateTransformRecursive(go.get());
+	}
+}
+
+void Scene::UpdateTransformRecursive(GameObject* go)
+{
+	if (!go) return;
+
+	// [SetActive 로직] 
+	// Unity/Unreal 방식: 부모가 비활성되면 자식도 로직상 비활성 취급
+	// 따라서 여기서 IsActive 체크를 해서, 꺼져있으면 자식들 순회도 안 하고 리턴
+	// if (!go->IsActive()) return;
+
+	// 1. 내 월드 행렬 갱신
+	go->GetTransform().Update();
+
+	// 2. 자식들 재귀 호출
+	for (Transform* childTransform : go->GetTransform().GetChildren())
+	{
+		GameObject* childGO = childTransform->GetOwner();
+		if (childGO) UpdateTransformRecursive(childGO);
+	}
+}
+
+void Scene::UpdateSceneSystems()
+{
+	// 오디오
+	for (auto* source : m_audioSources) source->Update();
+	for (auto* listener : m_audioListeners) listener->Update();
 }
 
 void Scene::FlushDestroyQueue()
 {
 	// TODO : 씬에 Destroy를 호출한 오브젝트를 정리
 }
+

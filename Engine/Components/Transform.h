@@ -2,10 +2,7 @@
 #include "Component.h"
 
 // TODO:
-// 1. 이후에 부모와 자식의 관계는 transform을 통해서 찾을 수 있도록
-// 만들 필요가 있음.
-// 2. 부모에 따라 자기 자신의 transform도 변경이 되어야 한다.
-// 3. 부모-자식의 컴포넌트들의 Active 순회는 Transform을 통해서.
+// 1. 부모-자식의 컴포넌트들의 Active 순회는 Transform을 통해서.
 CLASS_PTR(Transform)
 class Transform : public Component
 {
@@ -13,35 +10,55 @@ public:
 	static TransformUPtr Create();
 	static const ComponentType s_ComponentType = ComponentType::Transform;
 	virtual ComponentType GetType() const override { return ComponentType::Transform; }
+	void Update();
 
 	// 위치
-	void SetPosition(const glm::vec3& position) { m_position = position; }
-	const glm::vec3& GetPosition() const		{ return m_position; }
-	void Translate(const glm::vec3& delta)		{ m_position += delta; }
+	void SetPosition(const glm::vec3& position);
+	const glm::vec3& GetPosition() const;
+	void Translate(const glm::vec3& delta);
 
 	// 회전
 	void SetRotation(const glm::vec3& eulerAnglesDegrees);
-	void SetRotation(const glm::quat& rotation) { m_rotation = rotation; }
-	void Rotate(const glm::vec3& eulerAnglesDegrees);
-	glm::vec3 GetRotationEuler() const;
+	void SetRotation(const glm::quat& rotation);
 	void SetRotation(const glm::vec3& axis, float angleRadians);
-	const glm::quat& GetRotationQuat() const { return m_rotation; }
+	glm::vec3 GetRotationEuler() const;
+	const glm::quat& GetRotationQuat() const;
+	void Rotate(const glm::vec3& eulerAnglesDegrees);
 
 	// 스케일
-	void SetScale(const glm::vec3& scale) { m_scale = scale; }
-	const glm::vec3& GetScale() const { return m_scale; }
+	void SetScale(const glm::vec3& scale);
+	const glm::vec3& GetScale() const;
 
 	// 방향 벡터
 	glm::vec3 GetForwardVector() const; // 앞쪽   (-Z)
 	glm::vec3 GetUpVector() const;      // 위쪽   (+Y)
 	glm::vec3 GetRightVector() const;   // 오른쪽 (+X)
 
-	// 모델 행렬
-	glm::mat4 GetModelMatrix() const;
+	// 월드 또는 로컬 모델 행렬
+	glm::mat4 GetLocalMatrix() const;
+	glm::mat4 GetWorldMatrix() const;
+
+	// 계층 구조
+	void SetParent(Transform* parent);
+	Transform* GetParent() const { return m_parent; }
+	const std::vector<Transform*>& GetChildren() const { return m_children; }
+	GameObject* GetChildGameObjectByIndex(usize index) const;
+	GameObject* GetChildGameObjectByName(const std::string& name) const;
+
+private:
+	void AddChild(Transform* child);
+	void RemoveChild(Transform* child);
+	void SetTransformDirty();
+
+	glm::mat4 m_worldMatrix { 1.0f };
+	bool m_isTransformDirty	{ true };
 
 private:
 	Transform() = default;
 	glm::vec3 m_position	{ 0.0f, 0.0f, 0.0f };
 	glm::quat m_rotation	{ 1.0f, 0.0f, 0.0f, 0.0f };
 	glm::vec3 m_scale		{ 1.0f, 1.0f, 1.0f };
+
+	Transform* m_parent		{ nullptr };
+	std::vector<Transform*> m_children;
 };

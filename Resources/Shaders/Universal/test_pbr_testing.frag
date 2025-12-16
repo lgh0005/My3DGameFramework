@@ -139,9 +139,7 @@ void main()
     // 3. Normal Map 처리
     vec3 normValue = texture(material.normal, TexCoords).rgb;
     normValue = normalize(normValue * 2.0 - 1.0);
-    // vec3 N = normalize(TBN * normValue);
-    // [DEBUG]
-    vec3 N = normalize(Normal);
+    vec3 N = normalize(TBN * normValue);
 
     // 4. PBR 조명 계산
     vec3 V = normalize(viewPos - FragPos);

@@ -39,7 +39,6 @@ public:
 
 	Camera* GetMainCamera() const { return m_mainCamera; }
 	void SetMainCamera(Camera* camera) { m_mainCamera = camera; }
-
 	SkyLight* GetSkyLight() const { return m_sky.get(); }
 	void SetSkyLight(SkyLightUPtr skyLight);
 
@@ -51,9 +50,22 @@ public:
 public:
 	void AddCustomRenderPass(const std::string& name, GeneralRenderPassUPtr pass);
 	auto& GetCustomRenderPasses() { return m_customPasses; }
-
 	auto& GetStaticMeshRenderers() { return m_staticMeshRenderers; }
 	auto& GetSkinnedMeshRenderers() { return m_skinnedMeshRenderers; }
+
+/*================================//
+//   scene update cycle methods   //
+//================================*/
+protected:
+	// TODO : 이후 Destroy와 같은 것을 구현할 때,
+	// 자신이 파괴될 지 말지를 큐에 넣는 메서드가 필요.
+	// TODO : 메서드 이름 좀 더 고려 필요. 일단 임시로 이렇게 적겠음.
+	void UpdateBehaviours();
+	void UpdateTransforms();
+	void UpdateTransformRecursive(GameObject* go);
+	void UpdateSceneSystems();
+	void FlushDestroyQueue();
+	std::vector<GameObjectUPtr> m_destroyQueue;
 
 protected:
 	Scene();
@@ -67,12 +79,9 @@ protected:
 	// 게임 오브젝트 소유권
 	std::vector<GameObjectUPtr> m_gameObjects;
 
-	// 삭제 대기열
-	// TODO : GameObject 파괴를 위한 FlushDestroyQueue 구현 진행 필요
-	void FlushDestroyQueue();
-	std::vector<GameObjectUPtr> m_destroyQueue;
-
 	// 주요 참조 (캐싱)
+	// TOOD : 이후에는 Main Camera를 딱히 이렇게 하나의 변수로 다믄 것이 아니라
+	// m_cameras에서 렌더링할 카메라를 가져오는 방식으로 만들어야 한다.
 	Camera* m_mainCamera		{ nullptr };
 
 	// 컴포넌트 업데이트를 위한 참조 포인터 벡터

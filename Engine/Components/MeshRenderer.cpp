@@ -41,5 +41,5 @@ RenderBounds MeshRenderer::GetWorldBounds() const
     }
 
     // 3. Transform의 최신 행렬 적용
-    return bounds.Transform(GetTransform().GetModelMatrix());
+    return bounds.Transform(GetTransform().GetWorldMatrix());
 }

@@ -42,7 +42,7 @@ void SimpleRenderPass::Render(Scene* scene, Camera* camera)
 
         material->SetToProgram(m_simpleProgram.get());
 
-        auto lightModel = transform.GetModelMatrix();
+        auto lightModel = transform.GetWorldMatrix();
         auto lightMvp = projection * view * lightModel;
         m_simpleProgram->SetUniform("transform", lightMvp);
 

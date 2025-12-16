@@ -45,7 +45,6 @@ bool StandardGeometryPass::Init(int32 width, int32 height)
 	return true;
 }
 
-// TEST : Context에 있는 내용물을 잘 렌더링 하는 지 테스트
 void StandardGeometryPass::Render(RenderContext* context)
 {
 	// 0. 자신의 렌더 패스에 활용되고 있는 RenderContext로 캐스팅
@@ -68,7 +67,7 @@ void StandardGeometryPass::Render(RenderContext* context)
 		for (const auto* renderer : stdCtx->GetStaticMeshRenderers())
 		{
 			MeshPtr mesh = renderer->GetMesh();
-			auto model = renderer->GetTransform().GetModelMatrix();
+			auto model = renderer->GetTransform().GetWorldMatrix();
 			auto material = renderer->GetMaterial();
 
 			material->SetToProgram(m_staticGeometryProgram.get());
@@ -95,7 +94,7 @@ void StandardGeometryPass::Render(RenderContext* context)
 			auto finalMatrices = animator->GetFinalBoneMatrices();
 			for (int i = 0; i < finalMatrices.size(); ++i)
 				m_skinnedGeometryProgram->SetUniform("finalBoneMatrices[" + std::to_string(i) + "]", finalMatrices[i]);
-			m_skinnedGeometryProgram->SetUniform("model", transform.GetModelMatrix());
+			m_skinnedGeometryProgram->SetUniform("model", transform.GetWorldMatrix());
 
 			mesh->Draw(m_skinnedGeometryProgram.get());
 		}

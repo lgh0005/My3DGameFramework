@@ -31,13 +31,11 @@ add_library(Engine STATIC
    "Pipelines/SRP/RenderPasses/StandardGeometryPass.h"  "Pipelines/SRP/RenderPasses/StandardGeometryPass.cpp"
    "Pipelines/SRP/RenderPasses/StandardDeferredLightingPass.h"  "Pipelines/SRP/RenderPasses/StandardDeferredLightingPass.cpp"
    "Pipelines/SRP/RenderPasses/StandardPostProcessPass.h"  "Pipelines/SRP/RenderPasses/StandardPostProcessPass.cpp"
-   #"Pipelines/SRP/RenderPasses/StandardSkyboxPass.h"        "Pipelines/SRP/RenderPasses/StandardSkyboxPass.cpp"
    "Pipelines/SRP/StandardGlobalUniforms.h"    "Pipelines/SRP/StandardGlobalUniforms.cpp"
    "Pipelines/SRP/StandardRenderContext.h"     "Pipelines/SRP/StandardRenderContext.cpp"
    "Pipelines/SRP/StandardRenderPipeline.h"    "Pipelines/SRP/StandardRenderPipeline.cpp"
 
    # Universal Render Pipeline
-   #"Pipelines/URP/RenderPasses/UniversalSkyboxPass.h" "Pipelines/URP/RenderPasses/UniversalSkyboxPass.cpp"
    "Pipelines/URP/RenderPasses/UniversalPostProcessPass.h"  "Pipelines/URP/RenderPasses/UniversalPostProcessPass.cpp"
    "Pipelines/URP/UniversalGlobalUniforms.h"   "Pipelines/URP/UniversalGlobalUniforms.cpp"
    "Pipelines/URP/UniversalRenderContext.h"    "Pipelines/URP/UniversalRenderContext.cpp"
@@ -64,7 +62,6 @@ add_library(Engine STATIC
    "Graphics/Vertex.h"              "Graphics/Vertex.cpp"
    "Graphics/Model.h"               "Graphics/Model.cpp"
    "Graphics/Material.h"            "Graphics/Material.cpp"
-   "Graphics/Bone.h"                "Graphics/Bone.cpp"
    "Graphics/Animation.h"           "Graphics/Animation.cpp"
    "Graphics/FrameBuffer.h"         "Graphics/FrameBuffer.cpp"
    "Graphics/CubeTexture.h"         "Graphics/CubeTexture.cpp"
@@ -76,6 +73,13 @@ add_library(Engine STATIC
    "Graphics/CubeFramebuffer.h"     "Graphics/CubeFramebuffer.cpp"
    "Graphics/ScreenMesh.h"          "Graphics/ScreenMesh.cpp"
    "Graphics/SkyLight.h"            "Graphics/SkyLight.cpp"
+
+   "Graphics/Bone.h"                "Graphics/Bone.cpp"
+   "Graphics/Skeleton.h"            "Graphics/Skeleton.cpp"
+   "Graphics/AnimationChannel.h"    "Graphics/AnimationChannel.cpp"
+   "Graphics/AnimationClip.h"       "Graphics/AnimationClip.cpp"
+   "Graphics/Pose.h"                "Graphics/Pose.cpp"
+   "Graphics/Avatar.h"              "Graphics/Avatar.cpp"
 
    # Audio
    "Audios/AudioClip.h"             "Audios/AudioClip.cpp"
@@ -104,7 +108,7 @@ add_library(Engine STATIC
    "Managers/RenderManager.h"       "Managers/RenderManager.cpp"
    "Managers/AudioManager.h"        "Managers/AudioManager.cpp"
 
-)
+ )
 
 # 2. [PCH 설정] EnginePCH.h를 PCH로 사용합니다.
 target_precompile_headers(Engine  PUBLIC EnginePCH.h)

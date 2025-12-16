@@ -99,7 +99,7 @@ void ShadowPass::Render(RenderContext* context)
 
 			for (const auto* renderer : staticMeshes)
 			{
-				auto model = renderer->GetTransform().GetModelMatrix();
+				auto model = renderer->GetTransform().GetWorldMatrix();
 				m_staticDepthProgram->SetUniform("model", model);
 				renderer->GetMesh()->Draw(m_staticDepthProgram.get());
 			}
@@ -115,7 +115,7 @@ void ShadowPass::Render(RenderContext* context)
 			for (const auto* renderer : skinnedMeshes)
 			{
 				GameObject* go = renderer->GetOwner();
-				auto model = renderer->GetTransform().GetModelMatrix();
+				auto model = renderer->GetTransform().GetWorldMatrix();
 				m_skinnedDepthProgram->SetUniform("model", model);
 
 				Animator* animator = go->GetComponent<Animator>();
