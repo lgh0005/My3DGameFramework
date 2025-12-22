@@ -38,6 +38,7 @@ public:
 private:
 	bool LoadByAssimp(const std::string& filename);
 	void ProcessAssimpNode(aiNode* node, const aiScene* scene);
+	void ProcessAssimpHierarchy(aiNode* node, int32 parentIndex, int32& currentIndex);
 	void ProcessAssimpMaterials(const aiScene* scene, const std::filesystem::path& modelDir);
 	void ProcessAssimpMesh(aiMesh* mesh, const aiScene* scene);
 	void ProcessAssimpSkinnedMesh(aiMesh* mesh, const aiScene* scene);
@@ -49,6 +50,7 @@ private:
 private:
 	bool LoadByBinary(const std::string& filename);
 	bool ReadBinaryModelHeader(std::ifstream& inFile, uint32& outMatCount, uint32& outMeshCount, bool& outHasSkeleton);
+	void ReadBinaryNodes(std::ifstream& inFile);
 	void ReadBinarySkeleton(std::ifstream& inFile);
 	void ReadBinaryMaterials(std::ifstream& inFile, uint32 matCount, const std::filesystem::path& modelDir);
 	void ReadBinaryMeshes(std::ifstream& inFile, uint32 meshCount);
@@ -59,6 +61,7 @@ private:
 	Model() = default;
 	std::vector<MeshPtr> m_meshes;
 	std::vector<MaterialPtr> m_materials;
+	std::vector<AssetFmt::RawNode> m_nodes;
 
 #pragma region SKELETON_SECTION
 	/*===================//

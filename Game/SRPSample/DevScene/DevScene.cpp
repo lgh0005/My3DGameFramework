@@ -65,7 +65,7 @@ bool DevScene::LoadNessesaryResources()
 	}
 
 	// 가방 모델
-	auto backpack = Model::Load("./Resources/Models/backpack/backpack.fbx");
+	auto backpack = Model::Load("./Resources/Models/backpack/backpack.mymodel");
 	RESOURCE.AddResource<Model>(std::move(backpack), "backpack");
 
 	// 0-3. 머티리얼 1

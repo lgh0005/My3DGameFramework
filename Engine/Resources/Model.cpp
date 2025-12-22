@@ -83,7 +83,39 @@ bool Model::LoadByAssimp(const std::string& filename)
     // 4. 노드 및 메쉬 처리 (함수 분리)
     ProcessAssimpNode(scene->mRootNode, scene);
 
+    // 5. 계층 구조 추출 (런타임 생성)
+    int32 currentIndex = 0;
+    ProcessAssimpHierarchy(scene->mRootNode, -1, currentIndex);
+
     return true;
+}
+
+void Model::ProcessAssimpNode(aiNode* node, const aiScene* scene)
+{
+    for (uint32 i = 0; i < node->mNumMeshes; i++)
+    {
+        auto meshIndex = node->mMeshes[i];
+        auto mesh = scene->mMeshes[meshIndex];
+        ProcessAssimpMesh(mesh, scene);
+    }
+
+    for (uint32 i = 0; i < node->mNumChildren; i++)
+        ProcessAssimpNode(node->mChildren[i], scene);
+}
+
+void Model::ProcessAssimpHierarchy(aiNode* node, int32 parentIndex, int32& currentIndex)
+{
+    AssetFmt::RawNode rawNode;
+    rawNode.name = node->mName.C_Str();
+    rawNode.parentIndex = parentIndex;
+    rawNode.localTransform = Utils::ConvertToGLMMat4(node->mTransformation);
+
+    int32 myIndex = currentIndex;
+    m_nodes.push_back(rawNode);
+    currentIndex++;
+
+    for (uint32 i = 0; i < node->mNumChildren; i++)
+        ProcessAssimpHierarchy(node->mChildren[i], myIndex, currentIndex);
 }
 
 void Model::ProcessAssimpMaterials(const aiScene* scene, const std::filesystem::path& modelDir)
@@ -144,19 +176,6 @@ void Model::ProcessAssimpMaterials(const aiScene* scene, const std::filesystem::
 
         m_materials[i] = std::move(material);
     }
-}
-
-void Model::ProcessAssimpNode(aiNode* node, const aiScene* scene)
-{
-    for (uint32 i = 0; i < node->mNumMeshes; i++)
-    {
-        auto meshIndex = node->mMeshes[i];
-        auto mesh = scene->mMeshes[meshIndex];
-        ProcessAssimpMesh(mesh, scene);
-    }
-
-    for (uint32 i = 0; i < node->mNumChildren; i++)
-        ProcessAssimpNode(node->mChildren[i], scene);
 }
 
 void Model::ProcessAssimpMesh(aiMesh* mesh, const aiScene* scene)
@@ -280,13 +299,16 @@ bool Model::LoadByBinary(const std::string& filename)
     if (!ReadBinaryModelHeader(inFile, matCount, meshCount, hasSkeleton)) 
         return false;
 
-    // 2. Skeleton Read
+    // 2. Nodes Hierarchy Read
+    ReadBinaryNodes(inFile);
+
+    // 3. Skeleton Read
     if (hasSkeleton) ReadBinarySkeleton(inFile);
 
-    // 3. Materials Read
+    // 4. Materials Read
     ReadBinaryMaterials(inFile, matCount, modelDir);
 
-    // 4. Meshes Read
+    // 5. Meshes Read
     ReadBinaryMeshes(inFile, meshCount);
 
     SPDLOG_INFO("Model loaded successfully (Binary): {}", filename);
@@ -296,22 +318,22 @@ bool Model::LoadByBinary(const std::string& filename)
 
 bool Model::ReadBinaryModelHeader(std::ifstream& inFile, uint32& outMatCount, uint32& outMeshCount, bool& outHasSkeleton)
 {
-    auto magic = AssetUtils::ReadData<uint32_t>(inFile);
+    auto magic = AssetUtils::ReadData<uint32>(inFile);
     if (magic != 0x4D594D44)
     {
         SPDLOG_ERROR("Invalid Magic Number");
         return false;
     }
 
-    auto version = AssetUtils::ReadData<uint32_t>(inFile);
+    auto version = AssetUtils::ReadData<uint32>(inFile);
     if (version != 2)
     {
         SPDLOG_WARN("Version mismatch! Expected 2, Got {}", version);
     }
 
     // 값들을 읽어서 참조 인자에 할당
-    outMatCount = AssetUtils::ReadData<uint32_t>(inFile);
-    outMeshCount = AssetUtils::ReadData<uint32_t>(inFile);
+    outMatCount = AssetUtils::ReadData<uint32>(inFile);
+    outMeshCount = AssetUtils::ReadData<uint32>(inFile);
     outHasSkeleton = AssetUtils::ReadData<bool>(inFile);
 
     // 전역 AABB는 현재 Model 클래스 멤버가 아니면 여기서 읽고 버리거나, 멤버에 저장합니다.
@@ -321,23 +343,25 @@ bool Model::ReadBinaryModelHeader(std::ifstream& inFile, uint32& outMatCount, ui
     return true;
 }
 
+void Model::ReadBinaryNodes(std::ifstream& inFile) { m_nodes = AssetUtils::ReadRawNodes(inFile); }
+
 void Model::ReadBinarySkeleton(std::ifstream& inFile)
 {
     // 1. 뼈 정보 벡터 읽기 (Loop Read 필수!)
-    uint32_t bCount = AssetUtils::ReadData<uint32_t>(inFile);
+    uint32 bCount = AssetUtils::ReadData<uint32>(inFile);
     std::vector<AssetFmt::RawBoneInfo> rawBoneInfos(bCount);
 
-    for (uint32_t i = 0; i < bCount; ++i)
+    for (uint32 i = 0; i < bCount; ++i)
     {
-        rawBoneInfos[i].id = AssetUtils::ReadData<uint32_t>(inFile);
+        rawBoneInfos[i].id = AssetUtils::ReadData<uint32>(inFile);
         rawBoneInfos[i].offset = AssetUtils::ReadData<glm::mat4>(inFile);
     }
 
     m_BoneCounter = (int32_t)rawBoneInfos.size();
 
     // 2. 이름 매핑 읽기
-    uint32_t mapCount = AssetUtils::ReadData<uint32_t>(inFile);
-    for (uint32_t i = 0; i < mapCount; ++i)
+    uint32 mapCount = AssetUtils::ReadData<uint32>(inFile);
+    for (uint32 i = 0; i < mapCount; ++i)
     {
         std::string name = AssetUtils::ReadString(inFile);
         int32_t id = AssetUtils::ReadData<int32_t>(inFile);
@@ -355,7 +379,7 @@ void Model::ReadBinarySkeleton(std::ifstream& inFile)
 void Model::ReadBinaryMaterials(std::ifstream& inFile, uint32 matCount, const std::filesystem::path& modelDir)
 {
     m_materials.resize(matCount);
-    for (uint32_t i = 0; i < matCount; ++i)
+    for (uint32 i = 0; i < matCount; ++i)
     {
         // Raw Data 읽기
         auto rawMat = AssetUtils::ReadRawMaterial(inFile);
@@ -407,7 +431,7 @@ void Model::ReadBinaryMeshes(std::ifstream& inFile, uint32 meshCount)
     m_meshes.clear();
     m_meshes.reserve(meshCount);
 
-    for (uint32_t i = 0; i < meshCount; ++i)
+    for (uint32 i = 0; i < meshCount; ++i)
     {
         // 1. 파일에서 Raw 데이터 덩어리 읽기
         auto rawMesh = AssetUtils::ReadRawMesh(inFile);
@@ -640,3 +664,4 @@ TexturePtr Model::LoadTextureFromAssimp
 }
 
 #pragma endregion
+

@@ -26,6 +26,7 @@ public:
 public:
 	static AssetFmt::RawMaterial ReadRawMaterial(std::ifstream& file);
 	static AssetFmt::RawMesh ReadRawMesh(std::ifstream& file);
+	static std::vector<AssetFmt::RawNode> AssetUtils::ReadRawNodes(std::ifstream& file);
 };
 
 /*================================//

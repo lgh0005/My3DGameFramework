@@ -77,12 +77,18 @@ bool ModelConverter::RunConversion()
     LOG_INFO("Processing meshes...");
     ProcessNode(scene->mRootNode, scene);
 
-    // 4. 스켈레톤 존재 여부 최종 확정
+    // 4. 계층 구조 완성 (Hierarchy Extraction)
+    LOG_INFO("Processing node hierarchy...");
+    int32 startIndex = 0;
+    ProcessHierarchy(scene->mRootNode, -1, startIndex);
+    LOG_INFO(" - Total Nodes extracted: {}", m_rawModel.nodes.size());
+
+    // 5. 스켈레톤 존재 여부 최종 확정
     m_rawModel.hasSkeleton = (m_boneCounter > 0);
     if (m_rawModel.hasSkeleton) LOG_INFO(" - Skeleton Detected (Total Bones: {})", m_boneCounter);
     else LOG_INFO(" - Static Mesh Detected (No Skeleton)");
 
-    // 5. 파일 저장 (직렬화)
+    // 6. 파일 저장 (직렬화)
     LOG_INFO("Writing Binary File...");
     if (!WriteCustomModelFile())
     {
@@ -117,6 +123,10 @@ bool ModelConverter::WriteCustomModelFile()
     AssetUtils::WriteData(outFile, m_rawModel.globalAABBMin);
     AssetUtils::WriteData(outFile, m_rawModel.globalAABBMax);
     LOG_WARN(">>> [WRITER] Header: {}", (long)outFile.tellp());
+
+    // 2. Hierarchy
+    LOG_WARN(">>> [WRITER] Node Hierarchy: {}", (long)outFile.tellp());
+    AssetUtils::WriteRawNodes(outFile, m_rawModel.nodes);
 
     // 2. Skeleton
     if (hasSkeleton)
@@ -217,6 +227,29 @@ void ModelConverter::ProcessNode(aiNode* node, const aiScene* scene)
     {
         ProcessNode(node->mChildren[i], scene);
     }
+}
+
+void ModelConverter::ProcessHierarchy(aiNode* node, int32 parentIndex, int32& currentIndex)
+{
+    AssetFmt::RawNode rawNode;
+
+    // 1. 기본 정보 복사
+    rawNode.name = node->mName.C_Str();
+    rawNode.parentIndex = parentIndex;
+
+    // 2. 행렬 변환 (Assimp -> GLM)
+    rawNode.localTransform = Utils::ConvertToGLMMat4(node->mTransformation);
+
+    // 3. 리스트에 추가 (현재 인덱스 = currentIndex)
+    int32 myIndex = currentIndex;
+    m_rawModel.nodes.push_back(rawNode);
+
+    // 4. 인덱스 증가
+    currentIndex++;
+
+    // 5. 자식 노드 순회 (재귀 호출)
+    for (uint32 i = 0; i < node->mNumChildren; i++)
+        ProcessHierarchy(node->mChildren[i], myIndex, currentIndex);
 }
 
 void ModelConverter::ProcessMesh(aiMesh* mesh, const aiScene* scene)

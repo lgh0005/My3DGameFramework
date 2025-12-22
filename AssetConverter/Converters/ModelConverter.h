@@ -31,6 +31,7 @@ private:
 //====================================*/
 private:
 	void ProcessNode(aiNode* node, const aiScene* scene);
+	void ProcessHierarchy(aiNode* node, int32 parentIndex, int32& currentIndex);
 	void ProcessMesh(aiMesh* mesh, const aiScene* scene);
 	void ProcessSkinnedMesh(aiMesh* mesh, AssetFmt::RawMesh& rawMesh);
 	void ProcessStaticMesh(aiMesh* mesh, AssetFmt::RawMesh& rawMesh);

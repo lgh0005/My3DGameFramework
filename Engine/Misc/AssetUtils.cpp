@@ -75,3 +75,22 @@ AssetFmt::RawMesh AssetUtils::ReadRawMesh(std::ifstream& file)
     return mesh;
 }
 
+std::vector<AssetFmt::RawNode> AssetUtils::ReadRawNodes(std::ifstream& file)
+{
+    std::vector<AssetFmt::RawNode> nodes;
+
+    // 1. 노드 개수 읽기
+    uint32 count = ReadData<uint32>(file);
+    nodes.resize(count);
+
+    // 2. 각 노드 정보 읽기
+    for (uint32_t i = 0; i < count; ++i)
+    {
+        nodes[i].name = ReadString(file);
+        nodes[i].parentIndex = ReadData<int32>(file);
+        nodes[i].localTransform = ReadData<glm::mat4>(file);
+    }
+
+    return nodes;
+}
+

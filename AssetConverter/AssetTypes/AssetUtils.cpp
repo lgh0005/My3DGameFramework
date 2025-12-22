@@ -57,3 +57,23 @@ void AssetUtils::WriteRawMesh(std::ofstream& file, const AssetFmt::RawMesh& mesh
     AssetUtils::WriteVector(file, mesh.indices);
 }
 
+void AssetUtils::WriteRawNodes(std::ofstream& file, const std::vector<AssetFmt::RawNode>& nodes)
+{
+    // 1. 노드 개수 저장 (vector size)
+    uint32 count = (uint32)nodes.size();
+    WriteData(file, count);
+
+    // 2. 각 노드 정보 순회 저장
+    for (const auto& node : nodes)
+    {
+        // 이름 (가변 길이 문자열)
+        WriteString(file, node.name);
+
+        // 부모 인덱스 (int32)
+        WriteData(file, node.parentIndex);
+
+        // 로컬 변환 행렬 (glm::mat4)
+        WriteData(file, node.localTransform);
+    }
+}
+

@@ -25,6 +25,7 @@ public:
 public:
 	static void WriteRawMaterial(std::ofstream& file, const AssetFmt::RawMaterial& mat);
 	static void WriteRawMesh(std::ofstream& file, const AssetFmt::RawMesh& mesh);
+	static void WriteRawNodes(std::ofstream& file, const std::vector<AssetFmt::RawNode>& nodes);
 };
 
 /*================================//

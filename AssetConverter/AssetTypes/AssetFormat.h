@@ -116,6 +116,34 @@ namespace AssetFmt
         glm::vec3 aabbMax = glm::vec3(-FLT_MAX);
     };
 
+    // RawNode
+    struct RawNode
+    {
+        std::string name;
+        int32_t parentIndex = -1; // -1이면 루트
+        glm::mat4 localTransform; // 초기 변환 (T-Pose)
+    };
+
+    // RawAnimChannel
+    struct RawAnimChannel
+    {
+        std::string nodeName; // 움직일 노드의 이름 (RawNode의 name과 매칭)
+        std::vector<RawKeyPosition> positions;
+        std::vector<RawKeyRotation> rotations;
+        std::vector<RawKeyScale>    scales;
+    };
+
+    // RawAnimation
+    struct RawAnimation
+    {
+        uint32_t magic = 0x414E494D; // 'ANIM'
+        uint32_t version = 1;
+        std::string name;
+        float duration;
+        float ticksPerSecond;
+        std::vector<RawAnimChannel> channels;
+    };
+
     // RawModel
     struct RawModel
     {
@@ -125,7 +153,7 @@ namespace AssetFmt
         std::vector<AssetFmt::RawMesh> meshes;
         std::vector<AssetFmt::RawBoneInfo> boneOffsetInfos;
         bool hasSkeleton = false;
-        std::vector<RawBone> flatSkeleton;
+        std::vector<AssetFmt::RawNode> nodes;
         glm::vec3 globalAABBMin = glm::vec3(FLT_MAX);
         glm::vec3 globalAABBMax = glm::vec3(-FLT_MAX);
     };
