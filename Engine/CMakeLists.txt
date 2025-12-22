@@ -115,7 +115,10 @@ target_precompile_headers(Engine  PUBLIC EnginePCH.h)
 
 # 3. [헤더 경로] 다른 프로젝트(Game)가 Engine의 헤더 파일을
 #    찾을 수 있도록 현재 폴더를 PUBLIC include 경로로 지정합니다.
-target_include_directories(Engine PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+target_include_directories(Engine PUBLIC 
+    ${CMAKE_CURRENT_SOURCE_DIR}
+    ${CMAKE_CURRENT_SOURCE_DIR}/ThirdParty
+)
 
 # 4. 외부 라이브러리를 여기에 링크
 target_link_libraries(Engine PUBLIC

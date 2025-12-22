@@ -1,6 +1,6 @@
 #include "EnginePch.h"
 #define MINIAUDIO_IMPLEMENTATION
-#include <Misc/miniaudio.h>
+#include "miniaudio/miniaudio.h"
 #include "AudioManager.h"
 
 bool AudioManager::Init()

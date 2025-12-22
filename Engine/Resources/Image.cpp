@@ -1,7 +1,7 @@
 #include "EnginePch.h"
 #include "Image.h"
 #define STB_IMAGE_IMPLEMENTATION
-#include "Misc/stb_image.h"
+#include "stb_image/stb_image.h"
 
 /*==================================//
 //  default image creation methods  //
