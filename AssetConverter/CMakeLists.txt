@@ -15,14 +15,8 @@ add_executable(AssetConverter
     "Converters/ORMTexturePacker.h"   "Converters/ORMTexturePacker.cpp"
 
     # AssetTypes
-    "AssetTypes/RawBone.h"          "AssetTypes/RawBone.cpp" 
-    "AssetTypes/RawVertex.h"        "AssetTypes/RawVertex.cpp" 
-    "AssetTypes/RawMaterial.h"      "AssetTypes/RawMaterial.cpp" 
-    "AssetTypes/RawMesh.h"          "AssetTypes/RawMesh.cpp" 
-    "AssetTypes/RawTexture.h"       "AssetTypes/RawTexture.cpp" 
-    "AssetTypes/RawImage.h"         "AssetTypes/RawImage.cpp" 
-    "AssetTypes/RawModel.h"         "AssetTypes/RawModel.cpp" 
-    "AssetTypes/RawAnimData.h"      "AssetTypes/RawAnimData.cpp"
+    "AssetTypes/AssetUtils.h"       "AssetTypes/AssetUtils.cpp"
+    "AssetTypes/AssetFormat.h"      "AssetTypes/AssetFormat.cpp"
 
     # Utils
     "Utils/Utils.h"                 "Utils/Utils.cpp"
@@ -30,7 +24,8 @@ add_executable(AssetConverter
     "Utils/ArgumentParser.h"        "Utils/ArgumentParser.cpp"
     "Utils/Types.h"
     "Utils/Defines.h"
-)
+
+ )
 
 # 2. [PCH 설정] AssetConverter/pch.h를 AsssetConverter 타겟 전용(PRIVATE) PCH로 사용합니다.
 target_precompile_headers(AssetConverter PRIVATE pch.h)

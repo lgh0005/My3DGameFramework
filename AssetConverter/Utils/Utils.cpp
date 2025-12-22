@@ -48,13 +48,3 @@ glm::quat Utils::ConvertToGLMQuat(const aiQuaternion& pOrientation)
 {
 	return glm::quat(pOrientation.w, pOrientation.x, pOrientation.y, pOrientation.z);
 }
-
-/*========================================//
-//   ModelConverter의 파일 기록 유틸 함수   //
-//========================================*/
-void Utils::WriteString(std::ofstream& file, const std::string& str)
-{
-	uint32 len = (uint32)str.length();
-	WriteData(file, len);
-	file.write(str.c_str(), len);
-}

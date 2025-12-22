@@ -16,7 +16,7 @@
 bool ORMTexturePacker::Convert(const std::string& aoPath, const std::string& roughPath, 
 	const std::string& metalPath, const std::string& outPngPath, bool invertRoughness)
 {
-	RawImage ao, roughness, metallic;
+	AssetFmt::RawImage ao, roughness, metallic;
 
 	// 1. 이미지 로드 (각각의 로드 실패가 전체 실패로 이어지지 않게 수정)
 	LoadImageToRaw(aoPath, ao);
@@ -49,17 +49,17 @@ bool ORMTexturePacker::Convert(const std::string& aoPath, const std::string& rou
 	}
 
 	// 3. 최종 ORM 이미지 생성
-	RawImage ormImage;
+	AssetFmt::RawImage ormImage;
 	ormImage.width = finalWidth;
 	ormImage.height = finalHeight;
 	ormImage.channels = 3;
-	ormImage.pixels.resize((size_t)finalWidth * finalHeight * 3);
+	ormImage.pixels.resize((usize)finalWidth * finalHeight * 3);
 
 	for (int32 y = 0; y < finalHeight; ++y)
 	{
 		for (int32 x = 0; x < finalWidth; ++x)
 		{
-			size_t idx = (size_t)(y * finalWidth + x) * 3;
+			usize idx = (usize)(y * finalWidth + x) * 3;
 
 			// 해상도 보정 (Scaling)
 			// 현재 픽셀 위치(x, y)를 원본 이미지의 비율에 맞춰 변환합니다.
@@ -123,7 +123,7 @@ bool ORMTexturePacker::Convert(const std::string& aoPath, const std::string& rou
 	}
 }
 
-bool ORMTexturePacker::LoadImageToRaw(const std::string& filepath, RawImage& outImage)
+bool ORMTexturePacker::LoadImageToRaw(const std::string& filepath, AssetFmt::RawImage& outImage)
 {
 	if (filepath.empty()) return false;
 
@@ -148,7 +148,7 @@ bool ORMTexturePacker::LoadImageToRaw(const std::string& filepath, RawImage& out
 	return outImage.IsValid();
 }
 
-uint8 ORMTexturePacker::GetPixelChannel(const RawImage& img, int32 px, int32 py)
+uint8 ORMTexturePacker::GetPixelChannel(const AssetFmt::RawImage& img, int32 px, int32 py)
 {
 	// 유효하지 않거나 범위 밖이면 0 (검은색) 반환
 	if (!img.IsValid() || px >= img.width || py >= img.height) return 0;

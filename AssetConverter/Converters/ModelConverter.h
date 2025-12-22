@@ -1,5 +1,5 @@
 #pragma once
-#include "AssetTypes/RawModel.h"
+#include "AssetTypes/AssetFormat.h"
 
 class ModelConverter
 {
@@ -15,20 +15,27 @@ private:
 	// Assimp 처리 메서드
 	void ProcessNode(aiNode* node, const aiScene* scene);
 	void ProcessMesh(aiMesh* mesh, const aiScene* scene);
-	RawMaterial ProcessMaterial(aiMaterial* material, int32 index);
+	AssetFmt::RawMaterial ProcessMaterial(aiMaterial* material, int32 index);
 
 	// 뼈 가중치 추출 (SkinnedVertex일 때만 사용)
-	void ExtractBoneWeights(std::vector<RawSkinnedVertex>& vertices, aiMesh* mesh);
+	void ExtractBoneWeights
+	(
+		std::vector<AssetFmt::RawSkinnedVertex>& vertices, 
+		aiMesh* mesh
+	);
 
 	// 텍스쳐 경로 및 파일 쓰기
 	std::string GetTexturePath(aiMaterial* material, aiTextureType type);
-	void CreateORMTextureFromAssimp(aiMaterial* material, 
-									RawMaterial& rawMat, int32 index);
+	void CreateORMTextureFromAssimp
+	(
+		aiMaterial* material, 
+		AssetFmt::RawMaterial& rawMat, int32 index
+	);
 	bool WriteCustomModelFile();
 
 private:
 	// 모델 데이터 구조체
-	RawModel m_rawModel;
+	AssetFmt::RawModel m_rawModel;
 
 	// 경로 문자열 멤버
 	std::string m_inputPath;
@@ -39,9 +46,6 @@ private:
 	// 옵션 캐싱
 	bool m_extractORM		{ false };
 
-	// TODO : 이후에 이거 Avatar 또는 Skeleton과 같은 클래스에서
-	// 읽을 수 있는 메타 데이터 생성용으로 따로 분리해야 할 수도 있음
-	// 
 	// 뼈 ID 할당용 카운터 (RawModel.boneOffsetInfos의 인덱스와 동일)
 	int32 m_boneCounter		{ 0 };
 

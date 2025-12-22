@@ -1,5 +1,5 @@
 #pragma once
-#include "AssetTypes/RawImage.h"
+#include "AssetTypes/AssetFormat.h"
 
 class ORMTexturePacker
 {
@@ -14,6 +14,15 @@ public:
 
 private:
 
-    bool LoadImageToRaw(const std::string& filepath, RawImage& outImage);
-    uint8 GetPixelChannel(const RawImage& img, int32 px, int32 py);
+    bool LoadImageToRaw
+    (
+        const std::string& filepath, 
+        AssetFmt::RawImage& outImage
+    );
+
+    uint8 GetPixelChannel
+    (
+        const AssetFmt::RawImage& img, 
+        int32 px, int32 py
+    );
 };

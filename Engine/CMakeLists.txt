@@ -47,6 +47,8 @@ add_library(Engine STATIC
    "Misc/ImguiManager.h"            "Misc/ImguiManager.cpp"
    "Misc/Utils.h"                   "Misc/Utils.cpp"       
    "Misc/IBLUtils.h"                "Misc/IBLUtils.cpp"
+   "Misc/AssetFormat.h"                "Misc/AssetFormat.cpp"
+   "Misc/AssetUtils.h"                "Misc/AssetUtils.cpp"
 
    # Graphics
    "Graphics/Shader.h"              "Graphics/Shader.cpp"
@@ -108,7 +110,7 @@ add_library(Engine STATIC
    "Managers/RenderManager.h"       "Managers/RenderManager.cpp"
    "Managers/AudioManager.h"        "Managers/AudioManager.cpp"
 
-  "Resources/Resource.h")
+)
 
 # 2. [PCH 설정] EnginePCH.h를 PCH로 사용합니다.
 target_precompile_headers(Engine  PUBLIC EnginePCH.h)

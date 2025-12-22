@@ -8,6 +8,8 @@
 #include "Resources/Texture.h"
 #include "Graphics/VertexLayout.h"
 #include "Graphics/Program.h"
+#include "Misc/AssetFormat.h"
+#include "Misc/AssetUtils.h"
 
 SkinnedMeshPtr Model::GetSkinnedMesh(int index) const
 {
@@ -28,8 +30,9 @@ ModelUPtr Model::Load(const std::string& filename)
     std::transform(ext.begin(), ext.end(), ext.begin(), ::tolower);
     if (ext == ".mymodel")
     {
-        if (!model->LoadByBinaryV2(filename)) return nullptr;
+        //if (!model->LoadByBinaryV2(filename)) return nullptr;
         // if (!model->LoadByBinary(filename)) return nullptr;
+         if (!model->LoadByBinaryV3(filename)) return nullptr;
     }
     else
     {
@@ -599,6 +602,188 @@ bool Model::LoadByBinaryV2(const std::string& filename)
     inFile.close();
     return true;
 }
+#pragma endregion
+
+#pragma region TEST_FOR_ASSET_CONVERTER_2
+
+bool Model::LoadByBinaryV3(const std::string& filename)
+{
+    std::ifstream inFile(filename, std::ios::binary);
+    if (!inFile)
+    {
+        SPDLOG_ERROR("Failed to open binary model file (V3): {}", filename);
+        return false;
+    }
+
+    std::filesystem::path modelDir = std::filesystem::path(filename).parent_path();
+
+    // =========================================================
+    // 1. Header Read
+    // =========================================================
+    auto magic = AssetUtils::ReadData<uint32_t>(inFile);
+    if (magic != 0x4D594D44) { return false; }
+    auto version = AssetUtils::ReadData<uint32_t>(inFile);
+    auto matCount = AssetUtils::ReadData<uint32_t>(inFile);
+    auto meshCount = AssetUtils::ReadData<uint32_t>(inFile);
+    auto hasSkeleton = AssetUtils::ReadData<bool>(inFile);
+    auto globalMin = AssetUtils::ReadData<glm::vec3>(inFile);
+    auto globalMax = AssetUtils::ReadData<glm::vec3>(inFile);
+
+    SPDLOG_INFO("Header Read OK. Mats: {}, Meshes: {}", matCount, meshCount);
+
+    // =========================================================
+    // 2. Skeleton Read
+    // =========================================================
+    if (hasSkeleton)
+    {
+        uint32_t bCount = AssetUtils::ReadData<uint32_t>(inFile);
+        std::vector<AssetFmt::RawBoneInfo> rawBoneInfos(bCount);
+
+        // Loop Read (안전)
+        for (uint32_t i = 0; i < bCount; ++i)
+        {
+            rawBoneInfos[i].id = AssetUtils::ReadData<uint32_t>(inFile);
+            rawBoneInfos[i].offset = AssetUtils::ReadData<glm::mat4>(inFile);
+        }
+        m_BoneCounter = (int32_t)rawBoneInfos.size();
+
+        uint32_t mapCount = AssetUtils::ReadData<uint32_t>(inFile);
+        for (uint32_t i = 0; i < mapCount; ++i)
+        {
+            std::string name = AssetUtils::ReadString(inFile);
+            int32_t id = AssetUtils::ReadData<int32_t>(inFile);
+
+            BoneInfo info;
+            info.id = id;
+            if (id >= 0 && id < (int32)rawBoneInfos.size())
+                info.offset = rawBoneInfos[id].offset;
+
+            m_boneInfoMap[name] = info;
+        }
+    }
+
+    // =========================================================
+    // 3. Materials Read
+    // =========================================================
+    m_materials.resize(matCount);
+    for (uint32_t i = 0; i < matCount; ++i)
+    {
+        // 파일 읽기
+        auto rawMat = AssetUtils::ReadRawMaterial(inFile);
+
+        // 엔진 객체 생성
+        auto material = Material::Create();
+        material->albedoFactor = rawMat.albedoFactor;
+        material->metallicFactor = rawMat.metallicFactor;
+        material->roughnessFactor = rawMat.roughnessFactor;
+        material->emissionStrength = (rawMat.emissiveFactor.r + rawMat.emissiveFactor.g + rawMat.emissiveFactor.b) / 3.0f;
+
+        TexturePtr glossinessTex = nullptr;
+        for (const auto& rawTex : rawMat.textures)
+        {
+            // 경로가 비어있으면 스킵
+            if (rawTex.fileName.empty()) continue;
+
+            auto texPtr = LoadTextureFromFile(rawTex.fileName, modelDir);
+            if (!texPtr) continue;
+
+            switch (rawTex.type)
+            {
+            case AssetFmt::RawTextureType::Albedo:            material->diffuse = texPtr; break;
+            case AssetFmt::RawTextureType::Normal:            material->normal = texPtr; break;
+            case AssetFmt::RawTextureType::ORM:               material->orm = texPtr; break;
+            case AssetFmt::RawTextureType::Emissive:          material->emission = texPtr; break;
+            case AssetFmt::RawTextureType::AmbientOcclusion:  material->ao = texPtr; break;
+            case AssetFmt::RawTextureType::Roughness:         material->roughness = texPtr; break;
+            case AssetFmt::RawTextureType::Metallic:          material->metallic = texPtr; break;
+            case AssetFmt::RawTextureType::Specular:          material->specular = texPtr; break;
+            case AssetFmt::RawTextureType::Height:            material->height = texPtr; break;
+            case AssetFmt::RawTextureType::Glossiness:        glossinessTex = texPtr; break;
+            }
+        }
+        if (!material->roughness && glossinessTex)
+        {
+            material->roughness = glossinessTex;
+            material->useGlossinessAsRoughness = true;
+        }
+
+        m_materials[i] = std::move(material);
+    }
+
+    // =========================================================
+    // 4. Meshes Read
+    // =========================================================
+    m_meshes.clear();
+    m_meshes.reserve(meshCount);
+
+    for (uint32_t i = 0; i < meshCount; ++i)
+    {
+        auto rawMesh = AssetUtils::ReadRawMesh(inFile);
+
+        if (rawMesh.isSkinned)
+        {
+            // [Skinned Mesh]
+            std::vector<SkinnedVertex> engineVerts;
+            engineVerts.resize(rawMesh.skinnedVertices.size());
+
+            // [중요 수정] memcpy 대신 루프 복사 사용 (메모리 오염 원천 차단)
+            // RawSkinnedVertex와 SkinnedVertex 구조체가 미세하게 다르면 memcpy는 힙을 파괴합니다.
+            for (size_t v = 0; v < rawMesh.skinnedVertices.size(); ++v)
+            {
+                const auto& src = rawMesh.skinnedVertices[v];
+                auto& dst = engineVerts[v];
+
+                dst.position = src.position;
+                dst.normal = src.normal;
+                dst.texCoord = src.texCoord;
+                dst.tangent = src.tangent;
+
+                // 배열 복사
+                for (int j = 0; j < 4; ++j) {
+                    dst.weights[j] = src.weights[j];
+                    dst.boneIDs[j] = src.boneIDs[j];
+                }
+            }
+
+            auto mesh = SkinnedMesh::Create(engineVerts, rawMesh.indices, GL_TRIANGLES);
+            mesh->SetLocalBounds(RenderBounds::CreateFromMinMax(rawMesh.aabbMin, rawMesh.aabbMax));
+            if (rawMesh.materialIndex < m_materials.size())
+                mesh->SetMaterial(m_materials[rawMesh.materialIndex]);
+
+            m_meshes.push_back(std::move(mesh));
+        }
+        else
+        {
+            // [Static Mesh]
+            std::vector<StaticVertex> engineVerts;
+            engineVerts.resize(rawMesh.staticVertices.size());
+
+            // [중요 수정] memcpy 대신 루프 복사
+            for (size_t v = 0; v < rawMesh.staticVertices.size(); ++v)
+            {
+                const auto& src = rawMesh.staticVertices[v];
+                auto& dst = engineVerts[v];
+
+                dst.position = src.position;
+                dst.normal = src.normal;
+                dst.texCoord = src.texCoord;
+                dst.tangent = src.tangent;
+            }
+
+            auto mesh = StaticMesh::Create(engineVerts, rawMesh.indices, GL_TRIANGLES);
+            mesh->SetLocalBounds(RenderBounds::CreateFromMinMax(rawMesh.aabbMin, rawMesh.aabbMax));
+            if (rawMesh.materialIndex < m_materials.size())
+                mesh->SetMaterial(m_materials[rawMesh.materialIndex]);
+
+            m_meshes.push_back(std::move(mesh));
+        }
+    }
+
+    SPDLOG_INFO("Model loaded successfully (V3): {}", filename);
+    inFile.close();
+    return true;
+}
+
 #pragma endregion
 
 /*===================//

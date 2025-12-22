@@ -59,6 +59,10 @@ private:
 	bool LoadByBinaryV2(const std::string& filename);
 #pragma endregion
 
+#pragma region TEST_FOR_ASSET_CONVERTER_2
+	bool LoadByBinaryV3(const std::string& filename);
+#pragma endregion
+
 	void ProcessMesh(aiMesh* mesh, const aiScene* scene);
 	void ProcessNode(aiNode* node, const aiScene* scene);
 	TexturePtr LoadTextureFromFile

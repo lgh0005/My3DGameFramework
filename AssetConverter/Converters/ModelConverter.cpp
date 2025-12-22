@@ -8,8 +8,7 @@ bool ModelConverter::Convert(const std::string& inputPath,
                              const std::string& outputPath, bool extractORM)
 {
     // [중요] 상태 초기화 (State Clear)
-    // 싱글톤은 데이터가 유지되므로 매번 실행 시 리셋해야 합니다.
-    m_rawModel = RawModel(); // 새 객체로 덮어씌워 초기화
+    m_rawModel = AssetFmt::RawModel();
     m_boneNameToIdMap.clear();
     m_boneCounter = 0;
     m_extractORM = extractORM;
@@ -40,7 +39,7 @@ bool ModelConverter::Convert(const std::string& inputPath,
 bool ModelConverter::RunConversion()
 {
     // 0. 초기화
-    m_rawModel = RawModel(); // 모델 데이터 초기화
+    m_rawModel = AssetFmt::RawModel(); // 모델 데이터 초기화
     m_boneNameToIdMap.clear();
     m_boneCounter = 0;
 
@@ -51,12 +50,6 @@ bool ModelConverter::RunConversion()
     if (m_modelName.empty()) m_modelName = "unnamed_model";
 
     // 1. Assimp 임포터 실행
-    // [옵션 설명]
-    // - Triangulate: 모든 면을 삼각형으로
-    // - CalcTangentSpace: 노멀 매핑을 위해 탄젠트 계산
-    // - GenSmoothNormals: 노멀이 없으면 부드럽게 생성
-    // - LimitBoneWeights: 하나의 정점에 최대 4개의 뼈만 영향 (우리 엔진 규격)
-    // - ConvertToLeftHanded: DirectX 등을 쓸 때 필요하지만, OpenGL은 보통 생략 가능 (상황에 따라)
     Assimp::Importer importer;
     const aiScene* scene = importer.ReadFile
     (
@@ -68,7 +61,10 @@ bool ModelConverter::RunConversion()
         aiProcess_FlipUVs
     );
     if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
+    {
+        LOG_ERROR("Assimp ReadFile failed: {}", importer.GetErrorString());
         return false;
+    }
 
     // 2. 머티리얼 처리
     LOG_INFO("Processing materials... Total: {}", scene->mNumMaterials);
@@ -98,155 +94,183 @@ bool ModelConverter::RunConversion()
     return true;
 }
 
-// INFO : Header -> Skeleton -> Materials -> Meshes 순서
 bool ModelConverter::WriteCustomModelFile()
 {
     LOG_INFO("Attempting to write file to: {}", m_outputPath);
-
     std::ofstream outFile(m_outputPath, std::ios::binary);
-    if (!outFile)
-    {
-        // errno를 통해 구체적인 시스템 에러 메시지 확인
-        LOG_ERROR("Failed to open std::ofstream!");
-        LOG_ERROR("Error Code (errno): {}", errno);
-        LOG_ERROR("Error Message: {}", std::strerror(errno));
-        return false;
-    }
-    LOG_INFO("File opened successfully.");
+    if (!outFile) return false;
 
-    // 1. 헤더 (Header)
-    uint32 magic = 0x4D594D44; // 'MYMD'
-    uint32 version = 2;        // 버전 2로 업데이트
+    // [DEBUG] 시작 위치
+    long pos = (long)outFile.tellp();
+    LOG_WARN(">>> [WRITER] Start Offset: {}", pos);
+
+    // 1. Header
+    uint32 magic = 0x4D594D44; uint32 version = 2;
     uint32 matCount = (uint32)m_rawModel.materials.size();
     uint32 meshCount = (uint32)m_rawModel.meshes.size();
     bool hasSkeleton = m_rawModel.hasSkeleton;
-    LOG_INFO("Writing Header - Mats: {}, Meshes: {}, Skel: {}", matCount, meshCount, hasSkeleton);
 
-    Utils::WriteData(outFile, magic);
-    Utils::WriteData(outFile, version);
-    Utils::WriteData(outFile, matCount);
-    Utils::WriteData(outFile, meshCount);
-    Utils::WriteData(outFile, hasSkeleton);
+    AssetUtils::WriteData(outFile, magic);
+    AssetUtils::WriteData(outFile, version);
+    AssetUtils::WriteData(outFile, matCount);
+    AssetUtils::WriteData(outFile, meshCount);
+    AssetUtils::WriteData(outFile, hasSkeleton);
+    AssetUtils::WriteData(outFile, m_rawModel.globalAABBMin);
+    AssetUtils::WriteData(outFile, m_rawModel.globalAABBMax);
 
-    // 전역 AABB (엔진의 초기 컬링을 위해 헤더에 포함)
-    Utils::WriteData(outFile, m_rawModel.globalAABBMin);
-    Utils::WriteData(outFile, m_rawModel.globalAABBMax);
+    // [DEBUG] 헤더 직후 위치
+    LOG_WARN(">>> [WRITER] After Header: {}", (long)outFile.tellp());
 
-    if (outFile.fail())
-    {
-        LOG_ERROR("File write failed after Header.");
-        return false;
-    }
-
-    // 2. 스켈레톤 정보 (Skeleton Info)
-    // 엔진은 (뼈이름 -> 뼈정보) 순서로 읽어서 맵핑함
-    // TODO : 이후에 이 부분은 Avatar나 Skeleton과 같은 곳에서 읽을 수 있는
-    // 데이터로 뺄 수 있어야 함
+    // 2. Skeleton
     if (hasSkeleton)
     {
         uint32 boneCount = (uint32)m_rawModel.boneOffsetInfos.size();
-        LOG_INFO("Writing Skeleton Info ({} bones)", boneCount);
-        Utils::WriteData(outFile, boneCount);
+        AssetUtils::WriteData(outFile, boneCount); // 개수
 
-        // 맵을 순회하며 저장 (이름과 ID를 매칭시키기 위해)
+        for (const auto& info : m_rawModel.boneOffsetInfos)
+        {
+            AssetUtils::WriteData(outFile, info.id);     // 4 bytes
+            AssetUtils::WriteData(outFile, info.offset); // 64 bytes
+        }
+
+        uint32 mapCount = (uint32)m_boneNameToIdMap.size();
+        AssetUtils::WriteData(outFile, mapCount);
+
         for (const auto& [name, id] : m_boneNameToIdMap)
         {
-            // 1. 뼈 이름 쓰기
-            Utils::WriteString(outFile, name);
-
-            // 2. 뼈 정보(ID, Offset) 쓰기
-            // ID로 벡터에서 정보 가져오기
-            const RawBoneInfo& info = m_rawModel.boneOffsetInfos[id];
-            Utils::WriteData(outFile, info);
+            AssetUtils::WriteString(outFile, name);
+            AssetUtils::WriteData(outFile, id);
         }
     }
-    if (outFile.fail())
-    {
-        LOG_ERROR("File write failed after Skeleton.");
-        return false;
-    }
 
-    // 3. 머티리얼 (Materials)
-    LOG_INFO("Writing Materials...");
+    // [DEBUG] 스켈레톤 직후 (머티리얼 시작 전) 위치 -> 여기가 핵심!
+    LOG_WARN(">>> [WRITER] Before Materials: {}", (long)outFile.tellp());
+
+    // 3. Materials
     for (const auto& mat : m_rawModel.materials)
     {
-        // 텍스처 경로들 쓰기 (엔진 로더와 일치시켜야 함!)
-        Utils::WriteString(outFile, mat.GetTexturePath(RawTextureType::Albedo));
-        Utils::WriteString(outFile, mat.GetTexturePath(RawTextureType::Normal));
-        Utils::WriteString(outFile, mat.GetTexturePath(RawTextureType::Emissive));
-
-        // [PBR / ORM]
-        Utils::WriteString(outFile, mat.GetTexturePath(RawTextureType::ORM));
-        Utils::WriteString(outFile, mat.GetTexturePath(RawTextureType::AmbientOcclusion));
-        Utils::WriteString(outFile, mat.GetTexturePath(RawTextureType::Roughness));
-        Utils::WriteString(outFile, mat.GetTexturePath(RawTextureType::Metallic));
-        Utils::WriteString(outFile, mat.GetTexturePath(RawTextureType::Glossiness));
-
-        // [Legacy]
-        Utils::WriteString(outFile, mat.GetTexturePath(RawTextureType::Specular));
-        Utils::WriteString(outFile, mat.GetTexturePath(RawTextureType::Height));
-
-        // [New] PBR Factors (텍스처 없을 때를 대비한 수치값)
-        Utils::WriteData(outFile, mat.albedoFactor);
-        Utils::WriteData(outFile, mat.metallicFactor);
-        Utils::WriteData(outFile, mat.roughnessFactor);
-    }
-    if (outFile.fail())
-    {
-        LOG_ERROR("File write failed after Materials.");
-        return false;
+        AssetUtils::WriteRawMaterial(outFile, mat);
     }
 
-    // 4. 메쉬 (Meshes)
-    LOG_INFO("Writing Meshes...");
+    // [DEBUG] 머티리얼 직후
+    LOG_WARN(">>> [WRITER] Before Meshes: {}", (long)outFile.tellp());
+
+    // 4. Meshes
     for (const auto& mesh : m_rawModel.meshes)
     {
-        // 메쉬 헤더
-        Utils::WriteData(outFile, mesh.materialIndex);
-        Utils::WriteData(outFile, mesh.isSkinned); // [V2 추가] 스킨드 여부 플래그
-
-        // AABB (로컬)
-        Utils::WriteData(outFile, mesh.aabbMin);
-        Utils::WriteData(outFile, mesh.aabbMax);
-
-        // 버텍스/인덱스 개수
-        uint32 vCount = mesh.isSkinned ? (uint32)mesh.skinnedVertices.size() : (uint32)mesh.staticVertices.size();
-        uint32 iCount = (uint32)mesh.indices.size();
-        Utils::WriteData(outFile, vCount);
-        Utils::WriteData(outFile, iCount);
-
-        // 버텍스 데이터 (분기 처리)
-        if (mesh.isSkinned)
-        {
-            // RawSkinnedVertex 저장
-            outFile.write(reinterpret_cast<const char*>(mesh.skinnedVertices.data()), sizeof(RawSkinnedVertex) * vCount);
-        }
-        else
-        {
-            // RawStaticVertex 저장
-            outFile.write(reinterpret_cast<const char*>(mesh.staticVertices.data()), sizeof(RawStaticVertex) * vCount);
-        }
-
-        // 인덱스 데이터
-        outFile.write(reinterpret_cast<const char*>(mesh.indices.data()), sizeof(uint32) * iCount);
-    }
-    if (outFile.fail())
-    {
-        LOG_ERROR("File write failed after Meshes.");
-        return false;
+        AssetUtils::WriteRawMesh(outFile, mesh);
     }
 
-    LOG_INFO("File write completed successfully.");
+    LOG_WARN(">>> [WRITER] Final Size: {}", (long)outFile.tellp());
     outFile.close();
     return true;
 }
+
+// INFO : Header -> Skeleton -> Materials -> Meshes 순서
+//bool ModelConverter::WriteCustomModelFile()
+//{
+//    LOG_INFO("Attempting to write file to: {}", m_outputPath);
+//
+//    std::ofstream outFile(m_outputPath, std::ios::binary);
+//    if (!outFile)
+//    {
+//        // errno를 통해 구체적인 시스템 에러 메시지 확인
+//        LOG_ERROR("Failed to open std::ofstream!");
+//        LOG_ERROR("Error Code (errno): {}", errno);
+//        LOG_ERROR("Error Message: {}", std::strerror(errno));
+//        return false;
+//    }
+//    LOG_INFO("File opened successfully.");
+//
+//    // 1. 헤더 (Header)
+//    uint32 magic = 0x4D594D44; // 'MYMD'
+//    uint32 version = 2;        // 버전 2로 업데이트
+//    uint32 matCount = (uint32)m_rawModel.materials.size();
+//    uint32 meshCount = (uint32)m_rawModel.meshes.size();
+//    bool hasSkeleton = m_rawModel.hasSkeleton;
+//    LOG_INFO("Writing Header - Mats: {}, Meshes: {}, Skel: {}", matCount, meshCount, hasSkeleton);
+//
+//    AssetUtils::WriteData(outFile, magic);
+//    AssetUtils::WriteData(outFile, version);
+//    AssetUtils::WriteData(outFile, matCount);
+//    AssetUtils::WriteData(outFile, meshCount);
+//    AssetUtils::WriteData(outFile, hasSkeleton);
+//    AssetUtils::WriteData(outFile, m_rawModel.globalAABBMin);
+//    AssetUtils::WriteData(outFile, m_rawModel.globalAABBMax);
+//    if (outFile.fail())
+//    {
+//        LOG_ERROR("File write failed after Header.");
+//        return false;
+//    }
+//
+//    // 2. 스켈레톤 정보 (Skeleton Info)
+//    // 엔진은 (뼈이름 -> 뼈정보) 순서로 읽어서 맵핑함
+//    // TODO : 이후에 이 부분은 Avatar나 Skeleton과 같은 곳에서 읽을 수 있는
+//    // 데이터로 뺄 수 있어야 함
+//    if (hasSkeleton)
+//    {
+//        uint32 boneCount = (uint32)m_rawModel.boneOffsetInfos.size();
+//        LOG_INFO("Writing Skeleton Info ({} bones)", boneCount);
+//
+//        // 안전하게 하나씩 풀어서 씁니다.
+//        AssetUtils::WriteData(outFile, boneCount); // 개수 먼저 기록
+//        for (const auto& info : m_rawModel.boneOffsetInfos)
+//        {
+//            AssetUtils::WriteData(outFile, info.id);     // ID (4 bytes)
+//            AssetUtils::WriteData(outFile, info.offset); // Matrix (64 bytes)
+//        }
+//
+//        // 2-2. Bone Name Mapping 저장
+//        uint32 mapCount = (uint32)m_boneNameToIdMap.size();
+//        AssetUtils::WriteData(outFile, mapCount);
+//
+//        for (const auto& [name, id] : m_boneNameToIdMap)
+//        {
+//            AssetUtils::WriteString(outFile, name);
+//            AssetUtils::WriteData(outFile, id);
+//        }
+//    }
+//    if (outFile.fail())
+//    {
+//        LOG_ERROR("File write failed after Skeleton.");
+//        return false;
+//    }
+//
+//    // 3. 머티리얼 (Materials)
+//    LOG_INFO("Writing Materials...");
+//    for (const auto& mat : m_rawModel.materials)
+//    {
+//        AssetUtils::WriteRawMaterial(outFile, mat);
+//    }
+//    if (outFile.fail())
+//    {
+//        LOG_ERROR("File write failed after Materials.");
+//        return false;
+//    }
+//
+//    // 4. 메쉬 (Meshes)
+//    LOG_INFO("Writing Meshes...");
+//    for (const auto& mesh : m_rawModel.meshes)
+//    {
+//        AssetUtils::WriteRawMesh(outFile, mesh);
+//    }
+//    if (outFile.fail())
+//    {
+//        LOG_ERROR("File write failed after Meshes.");
+//        return false;
+//    }
+//
+//    LOG_INFO("File write completed successfully.");
+//    outFile.close();
+//    return true;
+//}
 
 /*==================================//
 //  [Processing] 모델의 데이터 추출  //
 //==================================*/
 void ModelConverter::ProcessMesh(aiMesh* mesh, const aiScene* scene)
 {
-    RawMesh rawMesh;
+    AssetFmt::RawMesh rawMesh;
     rawMesh.name = mesh->mName.C_Str();
     rawMesh.materialIndex = mesh->mMaterialIndex;
 
@@ -357,9 +381,9 @@ void ModelConverter::ProcessNode(aiNode* node, const aiScene* scene)
     }
 }
 
-RawMaterial ModelConverter::ProcessMaterial(aiMaterial* material, int32 index)
+AssetFmt::RawMaterial ModelConverter::ProcessMaterial(aiMaterial* material, int32 index)
 {
-    RawMaterial rawMat;
+    AssetFmt::RawMaterial rawMat;
     aiString name;
     if (material->Get(AI_MATKEY_NAME, name) == AI_SUCCESS) rawMat.name = name.C_Str();
     else rawMat.name = "DefaultMaterial";
@@ -370,28 +394,16 @@ RawMaterial ModelConverter::ProcessMaterial(aiMaterial* material, int32 index)
 
     // 1-1. Albedo (Base Color)
     // GLTF 같은 PBR 포맷은 AI_MATKEY_BASE_COLOR를 쓰고, 레거시는 COLOR_DIFFUSE를 씀. 우선순위 체크.
-    if (material->Get(AI_MATKEY_BASE_COLOR, color) == AI_SUCCESS)
-    {
-        rawMat.albedoFactor = { color.r, color.g, color.b, color.a };
-    }
-    else if (material->Get(AI_MATKEY_COLOR_DIFFUSE, color) == AI_SUCCESS)
-    {
-        rawMat.albedoFactor = { color.r, color.g, color.b, 1.0f }; // Diffuse는 보통 Alpha가 없으므로 1.0
-    }
+    if (material->Get(AI_MATKEY_BASE_COLOR, color) == AI_SUCCESS) rawMat.albedoFactor = { color.r, color.g, color.b, color.a };
+    else if (material->Get(AI_MATKEY_COLOR_DIFFUSE, color) == AI_SUCCESS) rawMat.albedoFactor = { color.r, color.g, color.b, 1.0f };
 
     // 1-2. Emissive
-    if (material->Get(AI_MATKEY_COLOR_EMISSIVE, color) == AI_SUCCESS)
-    {
-        rawMat.emissiveFactor = { color.r, color.g, color.b };
-    }
+    // TODO : 여기서 EmissiveFactor값을 읽을 수 있다고 앎.
+    if (material->Get(AI_MATKEY_COLOR_EMISSIVE, color) == AI_SUCCESS) rawMat.emissiveFactor = { color.r, color.g, color.b };
 
     // 1-3. Metallic & Roughness
-    // GLTF 표준 PBR 속성 확인
-    if (material->Get(AI_MATKEY_METALLIC_FACTOR, value) == AI_SUCCESS)
-        rawMat.metallicFactor = value;
-
-    if (material->Get(AI_MATKEY_ROUGHNESS_FACTOR, value) == AI_SUCCESS)
-        rawMat.roughnessFactor = value;
+    if (material->Get(AI_MATKEY_METALLIC_FACTOR, value) == AI_SUCCESS) rawMat.metallicFactor = value;
+    if (material->Get(AI_MATKEY_ROUGHNESS_FACTOR, value) == AI_SUCCESS) rawMat.roughnessFactor = value;
 
     // [LOG] 추출된 Factor 값 확인
     LOG_INFO("  [Factors]");
@@ -399,90 +411,96 @@ RawMaterial ModelConverter::ProcessMaterial(aiMaterial* material, int32 index)
     LOG_INFO("   - Metallic: {:.2f}, Roughness: {:.2f}", rawMat.metallicFactor, rawMat.roughnessFactor);
 
     // 2. 텍스처 추출 (Helper Lambda 활용)
-    auto AddTexture = [&](aiTextureType aiType, RawTextureType rawType)
+    // TODO : 이 부분도 이후에는 따로 Util과 같은 곳에 뺄 필요 있음
+    auto AddTexture = [&](aiTextureType aiType, AssetFmt::RawTextureType rawType)
     {
         std::string path = GetTexturePath(material, aiType);
         if (!path.empty())
         {
-            RawTexture tex;
+            AssetFmt::RawTexture tex;
             tex.fileName = path;
             tex.type = rawType;
             rawMat.textures.push_back(tex);
         }
     };
 
-    // Assimp 타입 <-> 우리 타입 매핑
-    // PBR Albedo는 BASE_COLOR 혹은 DIFFUSE
+    // 텍스처 매핑
     std::string baseColorPath = GetTexturePath(material, aiTextureType_BASE_COLOR);
-    if (!baseColorPath.empty()) rawMat.textures.push_back({ baseColorPath, RawTextureType::Albedo });
-    else AddTexture(aiTextureType_DIFFUSE, RawTextureType::Albedo);
-    AddTexture(aiTextureType_NORMALS, RawTextureType::Normal);
-    AddTexture(aiTextureType_HEIGHT, RawTextureType::Height);
-    AddTexture(aiTextureType_SPECULAR, RawTextureType::Specular);
-    AddTexture(aiTextureType_EMISSIVE, RawTextureType::Emissive);
-    AddTexture(aiTextureType_AMBIENT_OCCLUSION, RawTextureType::AmbientOcclusion);
-    AddTexture(aiTextureType_DIFFUSE_ROUGHNESS, RawTextureType::Roughness);
-    AddTexture(aiTextureType_METALNESS, RawTextureType::Metallic);
-    AddTexture(aiTextureType_SHININESS, RawTextureType::Glossiness);
+    if (!baseColorPath.empty()) rawMat.textures.push_back({ baseColorPath, AssetFmt::RawTextureType::Albedo });
+    else AddTexture(aiTextureType_DIFFUSE, AssetFmt::RawTextureType::Albedo);
+    AddTexture(aiTextureType_NORMALS, AssetFmt::RawTextureType::Normal);
+    AddTexture(aiTextureType_HEIGHT, AssetFmt::RawTextureType::Height);
+    AddTexture(aiTextureType_SPECULAR, AssetFmt::RawTextureType::Specular);
+    AddTexture(aiTextureType_EMISSIVE, AssetFmt::RawTextureType::Emissive);
+    AddTexture(aiTextureType_AMBIENT_OCCLUSION, AssetFmt::RawTextureType::AmbientOcclusion);
+    AddTexture(aiTextureType_DIFFUSE_ROUGHNESS, AssetFmt::RawTextureType::Roughness);
+    AddTexture(aiTextureType_METALNESS, AssetFmt::RawTextureType::Metallic);
+    AddTexture(aiTextureType_SHININESS, AssetFmt::RawTextureType::Glossiness);
 
     // 3. 자동 ORM 텍스쳐 생성
     CreateORMTextureFromAssimp(material, rawMat, index);
 
     // [LOG] 최종 매핑된 텍스처 리스트 확인
-    LOG_INFO("  [Textures] Count: {}", rawMat.textures.size());
-    for (const auto& tex : rawMat.textures)
     {
-        std::string typeStr;
-        switch (tex.type)
+        LOG_INFO("  [Textures] Count: {}", rawMat.textures.size());
+        for (const auto& tex : rawMat.textures)
         {
-        case RawTextureType::Albedo: typeStr = "Albedo"; break;
-        case RawTextureType::Normal: typeStr = "Normal"; break;
-        case RawTextureType::Emissive: typeStr = "Emissive"; break;
-        case RawTextureType::Specular: typeStr = "Specular"; break;
-        case RawTextureType::Height:   typeStr = "Height"; break;
-        case RawTextureType::Glossiness: typeStr = "Glossiness"; break;
-        case RawTextureType::Roughness: typeStr = "Roughness"; break;
-        case RawTextureType::Metallic: typeStr = "Metallic"; break;
-        case RawTextureType::AmbientOcclusion: typeStr = "AO"; break;
-        case RawTextureType::ORM: typeStr = "ORM (Packed)"; break;
-        default: typeStr = "Unknown"; break;
+            std::string typeStr;
+            switch (tex.type)
+            {
+            case AssetFmt::RawTextureType::Albedo: typeStr = "Albedo"; break;
+            case AssetFmt::RawTextureType::Normal: typeStr = "Normal"; break;
+            case AssetFmt::RawTextureType::Emissive: typeStr = "Emissive"; break;
+            case AssetFmt::RawTextureType::Specular: typeStr = "Specular"; break;
+            case AssetFmt::RawTextureType::Height:   typeStr = "Height"; break;
+            case AssetFmt::RawTextureType::Glossiness: typeStr = "Glossiness"; break;
+            case AssetFmt::RawTextureType::Roughness: typeStr = "Roughness"; break;
+            case AssetFmt::RawTextureType::Metallic: typeStr = "Metallic"; break;
+            case AssetFmt::RawTextureType::AmbientOcclusion: typeStr = "AO"; break;
+            case AssetFmt::RawTextureType::ORM: typeStr = "ORM (Packed)"; break;
+            default: typeStr = "Unknown"; break;
+            }
+            // 정렬을 맞춰서 보기 편하게 출력
+            LOG_INFO("   - {:<12} : {}", typeStr, tex.fileName);
         }
-        // 정렬을 맞춰서 보기 편하게 출력
-        LOG_INFO("   - {:<12} : {}", typeStr, tex.fileName);
-    }
 
-    // 파일 포맷마다 매핑되는 키가 제각각이라, 문제가 생기면 이 로그를 보고 추적합니다.
-    LOG_TRACE("  [Assimp Raw Debug] Checking all texture slots...");
+        // 파일 포맷마다 매핑되는 키가 제각각이라, 문제가 생기면 이 로그를 보고 추적합니다.
+        LOG_TRACE("  [Assimp Raw Debug] Checking all texture slots...");
 
-    // 검사할 텍스처 타입과 이름을 매핑
-    const struct { aiTextureType type; const char* name; } checkList[] = {
-        { aiTextureType_DIFFUSE, "DIFFUSE (Legacy)" },
-        { aiTextureType_BASE_COLOR, "BASE_COLOR (PBR)" },
-        { aiTextureType_NORMALS, "NORMALS" },
-        { aiTextureType_HEIGHT, "HEIGHT (Bump)" },
-        { aiTextureType_SPECULAR, "SPECULAR" },
-        { aiTextureType_EMISSIVE, "EMISSIVE" },
-        { aiTextureType_UNKNOWN, "UNKNOWN" },
-        { aiTextureType_SHININESS, "GLOSSINESS" },
-        { aiTextureType_METALNESS, "METALNESS" },
-        { aiTextureType_DIFFUSE_ROUGHNESS, "ROUGHNESS" },
-        { aiTextureType_AMBIENT_OCCLUSION, "AO" },
-    };
+        // 검사할 텍스처 타입과 이름을 매핑
+        const struct { aiTextureType type; const char* name; } checkList[] = {
+            { aiTextureType_DIFFUSE, "DIFFUSE (Legacy)" },
+            { aiTextureType_BASE_COLOR, "BASE_COLOR (PBR)" },
+            { aiTextureType_NORMALS, "NORMALS" },
+            { aiTextureType_HEIGHT, "HEIGHT (Bump)" },
+            { aiTextureType_SPECULAR, "SPECULAR" },
+            { aiTextureType_EMISSIVE, "EMISSIVE" },
+            { aiTextureType_UNKNOWN, "UNKNOWN" },
+            { aiTextureType_SHININESS, "GLOSSINESS" },
+            { aiTextureType_METALNESS, "METALNESS" },
+            { aiTextureType_DIFFUSE_ROUGHNESS, "ROUGHNESS" },
+            { aiTextureType_AMBIENT_OCCLUSION, "AO" },
+        };
 
-    aiString debugPath;
-    for (const auto& check : checkList)
-    {
-        // 각 타입의 0번 인덱스(첫 번째 텍스처)만 확인
-        if (material->GetTexture(check.type, 0, &debugPath) == AI_SUCCESS)
+        aiString debugPath;
+        for (const auto& check : checkList)
         {
-            LOG_TRACE("   [Assimp Debug] Found {:<15} : {}", check.name, debugPath.C_Str());
+            // 각 타입의 0번 인덱스(첫 번째 텍스처)만 확인
+            if (material->GetTexture(check.type, 0, &debugPath) == AI_SUCCESS)
+            {
+                LOG_TRACE("   [Assimp Debug] Found {:<15} : {}", check.name, debugPath.C_Str());
+            }
         }
     }
 
     return rawMat;
 }
 
-void ModelConverter::ExtractBoneWeights(std::vector<RawSkinnedVertex>& vertices, aiMesh* mesh)
+void ModelConverter::ExtractBoneWeights
+(
+    std::vector<AssetFmt::RawSkinnedVertex>& vertices, 
+    aiMesh* mesh
+)
 {
     // 메쉬가 가진 모든 뼈를 순회
     for (uint32 i = 0; i < mesh->mNumBones; ++i)
@@ -494,7 +512,7 @@ void ModelConverter::ExtractBoneWeights(std::vector<RawSkinnedVertex>& vertices,
         // 1. 뼈 등록 단계 (Global Bone Registry)
         if (m_boneNameToIdMap.find(boneName) == m_boneNameToIdMap.end())
         {
-            RawBoneInfo newBoneInfo;
+            AssetFmt::RawBoneInfo newBoneInfo;
             newBoneInfo.id = m_boneCounter;
             newBoneInfo.offset = Utils::ConvertToGLMMat4(bone->mOffsetMatrix);
 
@@ -558,7 +576,7 @@ std::string ModelConverter::GetTexturePath(aiMaterial* material, aiTextureType t
     return filename;
 }
 
-void ModelConverter::CreateORMTextureFromAssimp(aiMaterial* material, RawMaterial& rawMat, int32 index)
+void ModelConverter::CreateORMTextureFromAssimp(aiMaterial* material, AssetFmt::RawMaterial& rawMat, int32 index)
 {
     // 0. 옵션이 꺼져있으면 즉시 리턴
     if (!m_extractORM) return;
@@ -616,6 +634,6 @@ void ModelConverter::CreateORMTextureFromAssimp(aiMaterial* material, RawMateria
     }
 
     // 4) RawMaterial에는 "파일명만" 저장 (엔진 로더 정책과 일치)
-    rawMat.textures.push_back({ ormFileName, RawTextureType::ORM });
+    rawMat.textures.push_back({ ormFileName, AssetFmt::RawTextureType::ORM });
 }
 

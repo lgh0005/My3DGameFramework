@@ -30,6 +30,10 @@ namespace fs = std::filesystem;
 #include "Utils/Defines.h"
 #include "Utils/Logger.h"
 
+// AssetUtils
+#include "AssetTypes/AssetFormat.h"
+#include "AssetTypes/AssetUtils.h"
+
 // Converters
 #include "Converters/ModelConverter.h"
 #include "Converters/AnimationConverter.h"
