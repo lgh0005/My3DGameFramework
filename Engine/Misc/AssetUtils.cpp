@@ -38,6 +38,7 @@ AssetFmt::RawMaterial AssetUtils::ReadRawMaterial(std::ifstream& file)
     // 2. Factors
     mat.albedoFactor = AssetUtils::ReadData<glm::vec4>(file);
     mat.emissiveFactor = AssetUtils::ReadData<glm::vec3>(file);
+    mat.emissiveStrength = AssetUtils::ReadData<float>(file);
     mat.metallicFactor = AssetUtils::ReadData<float>(file);
     mat.roughnessFactor = AssetUtils::ReadData<float>(file);
 

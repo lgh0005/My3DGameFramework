@@ -17,7 +17,6 @@ public:
 public:
 	template<typename T> static void ReadData(std::ifstream& file, T& data);
 	template<typename T> static T ReadData(std::ifstream& file);
-	template<typename T> static void ReadVector(std::ifstream& file, std::vector<T>& vec);
 	static std::string ReadString(std::ifstream& file);
 
 /*===================================//
@@ -61,19 +60,6 @@ inline T AssetUtils::ReadData(std::ifstream& file)
 	T data;
 	file.read(reinterpret_cast<char*>(&data), sizeof(T));
 	return data;
-}
-
-template<typename T>
-inline void AssetUtils::ReadVector(std::ifstream& file, std::vector<T>& vec)
-{
-	uint32_t count = 0;
-	file.read(reinterpret_cast<char*>(&count), sizeof(uint32_t));
-
-	vec.resize(count);
-	if (count > 0)
-	{
-		file.read(reinterpret_cast<char*>(vec.data()), sizeof(T) * count);
-	}
 }
 
 #pragma endregion

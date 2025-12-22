@@ -94,9 +94,9 @@ namespace AssetFmt
     struct RawMaterial
     {
         std::string name;
-
         glm::vec4 albedoFactor = { 1.0f, 1.0f, 1.0f, 1.0f };
         glm::vec3 emissiveFactor = { 0.0f, 0.0f, 0.0f };
+        float emissiveStrength = 0.0f;
         float metallicFactor = 0.0f;
         float roughnessFactor = 1.0f;
         std::vector<RawTexture> textures;

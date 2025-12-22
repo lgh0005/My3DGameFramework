@@ -25,335 +25,31 @@ ModelUPtr Model::Load(const std::string& filename)
 {
     auto model = ModelUPtr(new Model());
 
-    // 파일 확장명 비교 후 로드 : .mymodel로 로드하는 것을 추천
+    // 파일 확장명 비교 후 로드
     std::string ext = std::filesystem::path(filename).extension().string();
     std::transform(ext.begin(), ext.end(), ext.begin(), ::tolower);
     if (ext == ".mymodel")
     {
-        //if (!model->LoadByBinaryV2(filename)) return nullptr;
-        // if (!model->LoadByBinary(filename)) return nullptr;
-         if (!model->LoadByBinaryV3(filename)) return nullptr;
+         if (!model->LoadByBinary(filename)) return nullptr;
     }
     else
     {
-        // if (!model->LoadByAssimpV2(filename)) return nullptr;
         if (!model->LoadByAssimp(filename)) return nullptr;
     }
 
     return std::move(model);
 }
 
-#pragma region LEGACY_ASSET_CONVERTER_METHODS
-// TODO : 이후에 LoadByAssimpV2로 좀 다시 작성해볼 필요가 있음.
-// 새로워진 ModelConverter의 내용을 반영할 필요가 있다.
-bool Model::LoadByAssimp(const std::string& filename)
-{
-    Assimp::Importer importer;
-
-    // INFO : 어떤 모델은 UV 좌표가 올바르고 어떤 모델은 뒤집히는 것이 있는 모양이다.
-    // 텍스쳐가 이상하게 뒤집한다면 파일 단에서 수정을 한 후 적용한다.
-    // INFO : 간혹 Diffuse맵만 상하를 반전시켜야 올바르게 로드가 될 수 있음.
-    // 텍스쳐에 대한 것은 이미지를 적절히 뒤집에서 UV를 맞춰줄 필요가 있음.
-    auto scene = importer.ReadFile(filename, aiProcess_Triangulate | aiProcess_CalcTangentSpace);
-    if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode) 
-    {
-        SPDLOG_ERROR("failed to load model: {}", filename);
-        return false;
-    }
-
-    std::filesystem::path modelDir = std::filesystem::path(filename).parent_path();
-
-    // INFO : LoadByAssimp를 통한 임포팅은 ORM 텍스쳐를 지원하지 못한다
-    // TODO : Glossiness에 대한 조치가 필요
-    m_materials.clear();
-    for (uint32 i = 0; i < scene->mNumMaterials; i++) 
-    {
-        auto material = scene->mMaterials[i];
-        auto glMaterial = Material::Create();
-        glMaterial->diffuse = LoadTextureFromAssimp(material, aiTextureType_DIFFUSE, modelDir);
-        glMaterial->specular = LoadTextureFromAssimp(material, aiTextureType_SPECULAR, modelDir);
-        glMaterial->emission = LoadTextureFromAssimp(material, aiTextureType_EMISSIVE, modelDir);
-        glMaterial->normal = LoadTextureFromAssimp(material, aiTextureType_NORMALS, modelDir);
-        glMaterial->metallic = LoadTextureFromAssimp(material, aiTextureType_METALNESS, modelDir);
-        glMaterial->roughness = LoadTextureFromAssimp(material, aiTextureType_DIFFUSE_ROUGHNESS, modelDir);
-        glMaterial->ao = LoadTextureFromAssimp(material, aiTextureType_AMBIENT_OCCLUSION, modelDir);
-
-        // TODO : 머티리얼 단에서 height 스케일을 초기화를 안해서 발생한 버그였음이 드러났으니
-        // 해당 부분은 적절히 수정할 필요가 있다.
-        // INFO : 보니까 이게 모델마다 이상하게 매핑이 되어있는게 있는 모양이다. 지금 샘플로 
-        // 주어진 가방 모델은 assimp가 왜인지 모르겠지만 normal을 height으로 읽고 있다.
-        // 이건 지금 V2에서도 동일하게 나타나는 것이 코드의 문제보다는 모델의 문제에 더 가까운 것 같다.
-        // 그래서 웬만해서는 fbx로 인코딩하고 맵 바인딩을 모델 단에서 좀 똑바로 해둘 필요가 있음.
-#pragma region OBJ_EXTENSION_COMPATIBLE
-        // Normal을 aiTextureType_HEIGHT로 우선 로드
-        if (!glMaterial->normal)
-        {
-            glMaterial->normal = LoadTextureFromAssimp(material, aiTextureType_HEIGHT, modelDir);
-        }
-
-        // 그 후, Height 로드
-        TexturePtr tempHeight = LoadTextureFromAssimp(material, aiTextureType_HEIGHT, modelDir);
-        if (tempHeight != glMaterial->normal)
-        {
-            glMaterial->height = tempHeight;
-        }
-        else
-        {
-            glMaterial->height = nullptr; // 납치됐으면 Height 슬롯은 비워줌
-        }
-#pragma endregion
-
-        if (glMaterial->emission) glMaterial->emissionStrength = 1.0f;
-        else glMaterial->emissionStrength = 0.0f;
-
-        if (!glMaterial->height) glMaterial->heightScale = 0.0f;
-        else glMaterial->heightScale = 0.05f;
-
-        // TODO : albedoFactor, metallicFactor, roughnessFactor도 추가로 기록해야 함.
-
-        m_materials.push_back(std::move(glMaterial));
-    }
-
-    ProcessNode(scene->mRootNode, scene);
-    return true;
-}
-
-bool Model::LoadByBinary(const std::string& filename)
-{
-    std::ifstream inFile(filename, std::ios::binary);
-    if (!inFile) 
-    { 
-        SPDLOG_ERROR("Failed to open model file: {}", filename); 
-        return false; 
-    }
-    
-    // [핵심] 현재 로드하는 .mymodel 파일의 디렉터리 경로를 구합니다.
-    // 예: "./Resources/Models/backpack/"
-    std::filesystem::path modelDir = std::filesystem::path(filename).parent_path();
-
-    // [약속된 순서대로 읽기]
-    uint32 magic, version, materialCount, meshCount;
-    bool hasSkeleton;
-    inFile.read((char*)&magic, sizeof(magic));
-    inFile.read((char*)&version, sizeof(version));
-    inFile.read((char*)&materialCount, sizeof(materialCount));
-    inFile.read((char*)&meshCount, sizeof(meshCount));
-    inFile.read((char*)&hasSkeleton, sizeof(hasSkeleton));
-
-    // 1. 스켈레톤 로드
-    if (hasSkeleton)
-    {
-        uint32 boneCount;
-        inFile.read((char*)&boneCount, sizeof(boneCount));
-        for (uint32 i = 0; i < boneCount; ++i)
-        {
-            uint32 nameLen;
-            inFile.read((char*)&nameLen, sizeof(nameLen));
-            std::string boneName(nameLen, '\0');
-            inFile.read(&boneName[0], nameLen);
-
-            BoneInfo info;
-            inFile.read((char*)&info, sizeof(BoneInfo));
-            m_boneInfoMap[boneName] = info;
-        }
-        m_BoneCounter = (int32)boneCount; // 카운터 갱신
-    }
-
-    // 헬퍼: 바이너리 문자열 읽기
-    auto ReadPath = [&](std::ifstream& file) -> std::string {
-        uint32 len; file.read((char*)&len, sizeof(len));
-        if (len == 0) return "";
-        std::string path(len, '\0'); file.read(&path[0], len);
-        return path;
-        };
-
-    // 2. 머티리얼 로드
-    // TODO : PBR 관련 텍스쳐도 로드해야 함.
-    m_materials.resize(materialCount);
-    for (uint32 i = 0; i < materialCount; ++i)
-    {
-        auto material = Material::Create();
-
-        // 파일에서 경로 문자열 읽기
-        std::string storedDiffuse = ReadPath(inFile);
-        std::string storedSpecular = ReadPath(inFile);
-        std::string storedEmission = ReadPath(inFile);
-        std::string storedNormal = ReadPath(inFile);
-        std::string storedHeight = ReadPath(inFile);
-
-        // 위에서 만든 헬퍼 함수로 깔끔하게 로드
-        material->diffuse = LoadTextureFromFile(storedDiffuse, modelDir);
-        material->specular = LoadTextureFromFile(storedSpecular, modelDir);
-        material->emission = LoadTextureFromFile(storedEmission, modelDir);
-        material->normal = LoadTextureFromFile(storedNormal, modelDir);
-        material->height = LoadTextureFromFile(storedHeight, modelDir);
-
-        // 파라미터 설정 (기존 로직 유지)
-        if (material->emission) material->emissionStrength = 1.0f;
-        else material->emissionStrength = 0.0f;
-
-        if (material->height) material->heightScale = 0.05f;
-        else material->heightScale = 0.0f;
-
-        m_materials[i] = std::move(material);
-    }
-
-    // 3. 메쉬 로드
-    m_meshes.reserve(meshCount);
-    for (uint32 i = 0; i < meshCount; ++i)
-    {
-        uint32 materialIndex, vertexCount, indexCount;
-        inFile.read((char*)&materialIndex, sizeof(materialIndex));
-        inFile.read((char*)&vertexCount, sizeof(vertexCount));
-        inFile.read((char*)&indexCount, sizeof(indexCount));
-
-        std::vector<uint32> indices(indexCount);
-
-        if (hasSkeleton)
-        {
-            // 뼈가 있어서 애니메이션이 가능한 모델
-            std::vector<SkinnedVertex> vertices(vertexCount);
-            inFile.read((char*)vertices.data(), sizeof(SkinnedVertex) * vertexCount);
-            inFile.read((char*)indices.data(), sizeof(uint32) * indexCount);
-
-            auto mesh = SkinnedMesh::Create(vertices, indices, GL_TRIANGLES);
-            if (materialIndex < m_materials.size()) mesh->SetMaterial(m_materials[materialIndex]);
-            m_meshes.push_back(std::move(mesh));
-        }
-        else
-        {
-            // 뼈가 없어서 움직이지 않는 정적 모델
-            std::vector<StaticVertex> vertices(vertexCount);
-            inFile.read((char*)vertices.data(), sizeof(StaticVertex)* vertexCount);
-            inFile.read((char*)indices.data(), sizeof(uint32)* indexCount);
-
-            auto mesh = StaticMesh::Create(vertices, indices, GL_TRIANGLES);
-            if (materialIndex < m_materials.size()) mesh->SetMaterial(m_materials[materialIndex]);
-            m_meshes.push_back(std::move(mesh));
-        }
-    }
-
-    inFile.close();
-    return true;
-}
-#pragma endregion
-
-void Model::ProcessMesh(aiMesh* mesh, const aiScene* scene)
-{
-    glm::vec3 minBound(FLT_MAX);
-    glm::vec3 maxBound(-FLT_MAX);
-
-    // 인덱스 추출
-    std::vector<uint32> indices;
-    indices.resize(mesh->mNumFaces * 3);
-    for (uint32 i = 0; i < mesh->mNumFaces; i++)
-    {
-        indices[3 * i] = mesh->mFaces[i].mIndices[0];
-        indices[3 * i + 1] = mesh->mFaces[i].mIndices[1];
-        indices[3 * i + 2] = mesh->mFaces[i].mIndices[2];
-    }
-
-    if (mesh->mNumBones > 0)
-    {
-        // 뼈가 있어서 애니메이션이 가능한 모델
-        std::vector<SkinnedVertex> vertices;
-        vertices.resize(mesh->mNumVertices);
-
-        for (uint32 i = 0; i < mesh->mNumVertices; i++)
-        {
-            auto& v = vertices[i];
-            SetVertexBoneDataToDefault(v);
-
-            v.position = glm::vec3(mesh->mVertices[i].x, mesh->mVertices[i].y, mesh->mVertices[i].z);
-            v.normal = glm::vec3(mesh->mNormals[i].x, mesh->mNormals[i].y, mesh->mNormals[i].z);
-            if (mesh->mTextureCoords[0])
-            {
-                v.texCoord = glm::vec2(mesh->mTextureCoords[0][i].x, mesh->mTextureCoords[0][i].y);
-            }
-            else
-            {
-                v.texCoord = glm::vec2(0.0f);
-            }
-
-            if (mesh->mTangents)
-            {
-                v.tangent = glm::vec3(mesh->mTangents[i].x, mesh->mTangents[i].y, mesh->mTangents[i].z);
-            }
-            else
-            {
-                v.tangent = glm::vec3(0.0f);
-            }
-
-            minBound = Utils::Min(minBound, v.position);
-            maxBound = Utils::Max(maxBound, v.position);
-        }
-
-        // 뼈 가중치 추출 (정적 메쉬엔 없음)
-        ExtractBoneWeightForVertices(vertices, mesh, scene);
-
-        auto glMesh = SkinnedMesh::Create(vertices, indices, GL_TRIANGLES);
-        glMesh->SetLocalBounds(RenderBounds::CreateFromMinMax(minBound, maxBound));
-        if (mesh->mMaterialIndex >= 0) glMesh->SetMaterial(m_materials[mesh->mMaterialIndex]);
-
-        m_meshes.push_back(std::move(glMesh));
-    }
-    else
-    {
-        // 뼈가 없어서 움직이지 않는 정적 모델
-        std::vector<StaticVertex> vertices;
-        vertices.resize(mesh->mNumVertices);
-
-        for (uint32 i = 0; i < mesh->mNumVertices; i++)
-        {
-            auto& v = vertices[i];
-            v.position = glm::vec3(mesh->mVertices[i].x, mesh->mVertices[i].y, mesh->mVertices[i].z);
-            v.normal = glm::vec3(mesh->mNormals[i].x, mesh->mNormals[i].y, mesh->mNormals[i].z);
-            if (mesh->mTextureCoords[0])
-                v.texCoord = glm::vec2(mesh->mTextureCoords[0][i].x, mesh->mTextureCoords[0][i].y);
-            else
-                v.texCoord = glm::vec2(0.0f);
-
-            if (mesh->mTangents)
-            {
-                v.tangent = glm::vec3(mesh->mTangents[i].x, mesh->mTangents[i].y, mesh->mTangents[i].z);
-            }
-            else
-            {
-                v.tangent = glm::vec3(0.0f);
-            }
-
-            minBound = Utils::Min(minBound, v.position);
-            maxBound = Utils::Max(maxBound, v.position);
-        }
-
-        auto glMesh = StaticMesh::Create(vertices, indices, GL_TRIANGLES);
-        glMesh->SetLocalBounds(RenderBounds::CreateFromMinMax(minBound, maxBound));
-        if (mesh->mMaterialIndex >= 0) glMesh->SetMaterial(m_materials[mesh->mMaterialIndex]);
-
-        m_meshes.push_back(std::move(glMesh));
-    }
-}
-
-void Model::ProcessNode(aiNode* node, const aiScene* scene)
-{
-    for (uint32 i = 0; i < node->mNumMeshes; i++) 
-    {
-        auto meshIndex = node->mMeshes[i];
-        auto mesh = scene->mMeshes[meshIndex];
-        ProcessMesh(mesh, scene);
-    }
-
-    for (uint32 i = 0; i < node->mNumChildren; i++)
-        ProcessNode(node->mChildren[i], scene);
-}
-
 void Model::Draw(const Program* program) const
 {
-    for (auto& mesh : m_meshes) mesh->Draw(program);
+    for (auto& mesh : m_meshes)
+        mesh->Draw(program);
 }
 
-#pragma region TEST_FOR_ASSET_CONVERTER
-bool Model::LoadByAssimpV2(const std::string& filename)
+/*=================================================================//
+//   3d model load process methods : assimp (raw 3d model files)   //
+//=================================================================*/
+bool Model::LoadByAssimp(const std::string& filename)
 {
     Assimp::Importer importer;
 
@@ -363,8 +59,7 @@ bool Model::LoadByAssimpV2(const std::string& filename)
         aiProcess_Triangulate |
         aiProcess_CalcTangentSpace |
         aiProcess_GenSmoothNormals |
-        aiProcess_LimitBoneWeights |
-        aiProcess_FlipUVs;
+        aiProcess_LimitBoneWeights;
 
     const aiScene* scene = importer.ReadFile(filename, flags);
     if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
@@ -382,231 +77,192 @@ bool Model::LoadByAssimpV2(const std::string& filename)
     // 텍스처 로드를 위한 디렉토리 경로 계산
     std::filesystem::path modelDir = std::filesystem::path(filename).parent_path();
 
-    // TODO : 인자 형식에 맞게 Material 수정 필요
-    // 3. 머티리얼 로드 (PBR 지원 버전)
+    // 3. 머티리얼 처리 (함수 분리)
+    ProcessAssimpMaterials(scene, modelDir);
+
+    // 4. 노드 및 메쉬 처리 (함수 분리)
+    ProcessAssimpNode(scene->mRootNode, scene);
+
+    return true;
+}
+
+void Model::ProcessAssimpMaterials(const aiScene* scene, const std::filesystem::path& modelDir)
+{
     m_materials.resize(scene->mNumMaterials);
     for (uint32 i = 0; i < scene->mNumMaterials; i++)
     {
         aiMaterial* aiMat = scene->mMaterials[i];
         auto material = Material::Create();
 
-        // 3-1. PBR Factors
+        aiColor4D color;
+        float value;
+
+        // 1. PBR Factors
+        if (aiMat->Get(AI_MATKEY_BASE_COLOR, color) == AI_SUCCESS)
+            material->albedoFactor = { color.r, color.g, color.b, color.a };
+        else if (aiMat->Get(AI_MATKEY_COLOR_DIFFUSE, color) == AI_SUCCESS)
+            material->albedoFactor = { color.r, color.g, color.b, 1.0f };
+
+        // [New] Emissive Color
+        if (aiMat->Get(AI_MATKEY_COLOR_EMISSIVE, color) == AI_SUCCESS)
+            material->emissiveFactor = { color.r, color.g, color.b };
+
+        // [New] Emissive Strength
+        if (aiMat->Get(AI_MATKEY_EMISSIVE_INTENSITY, value) == AI_SUCCESS)
+            material->emissionStrength = value;
+        else
+            material->emissionStrength = 1.0f;
+
+        if (aiMat->Get(AI_MATKEY_METALLIC_FACTOR, value) == AI_SUCCESS)
+            material->metallicFactor = value;
+
+        if (aiMat->Get(AI_MATKEY_ROUGHNESS_FACTOR, value) == AI_SUCCESS)
+            material->roughnessFactor = value;
+
+        // 2. Textures
+        auto LoadTex = [&](aiTextureType type) -> TexturePtr 
         {
-            aiColor4D color;
-            float value;
+            return LoadTextureFromAssimp(aiMat, type, modelDir);
+        };
 
-            // Albedo Factor
-            if (aiMat->Get(AI_MATKEY_BASE_COLOR, color) == AI_SUCCESS)
-                material->albedoFactor = { color.r, color.g, color.b, color.a };
-            else if (aiMat->Get(AI_MATKEY_COLOR_DIFFUSE, color) == AI_SUCCESS)
-                material->albedoFactor = { color.r, color.g, color.b, 1.0f };
-
-            // Metallic Factor
-            if (aiMat->Get(AI_MATKEY_METALLIC_FACTOR, value) == AI_SUCCESS)
-                material->metallicFactor = value;
-
-            // Roughness Factor
-            if (aiMat->Get(AI_MATKEY_ROUGHNESS_FACTOR, value) == AI_SUCCESS)
-                material->roughnessFactor = value;
-
-            // Emission Strength (변수명이 엔진마다 다를 수 있으니 확인 필요)
-            if (aiMat->Get(AI_MATKEY_EMISSIVE_INTENSITY, value) == AI_SUCCESS)
-                material->emissionStrength = value;
-            else
-                material->emissionStrength = 1.0f;
-        }
-    
-        // 3-2. 텍스처 로드 (PBR 슬롯 매핑)
+        material->diffuse = LoadTex(aiTextureType_BASE_COLOR);
+        if (!material->diffuse) material->diffuse = LoadTex(aiTextureType_DIFFUSE);
+        material->normal = LoadTex(aiTextureType_NORMALS);
+        material->emission = LoadTex(aiTextureType_EMISSIVE);
+        material->metallic = LoadTex(aiTextureType_METALNESS);
+        material->roughness = LoadTex(aiTextureType_DIFFUSE_ROUGHNESS);
+        material->ao = LoadTex(aiTextureType_AMBIENT_OCCLUSION);
+        material->specular = LoadTex(aiTextureType_SPECULAR);
+        material->height = LoadTex(aiTextureType_HEIGHT);
+        // [Glossiness Fallback]
+        auto glossTex = LoadTex(aiTextureType_SHININESS);
+        if (!material->roughness && glossTex)
         {
-            auto LoadTex = [&](aiTextureType type) -> TexturePtr 
-            {
-                return LoadTextureFromAssimp(aiMat, type, modelDir);
-            };
-
-            // 실제 텍스처 로드 및 glossiness 처리
-            material->diffuse = LoadTex(aiTextureType_BASE_COLOR);
-            if (!material->diffuse) material->diffuse = LoadTex(aiTextureType_DIFFUSE);
-            material->normal = LoadTex(aiTextureType_NORMALS);
-            material->emission = LoadTex(aiTextureType_EMISSIVE);
-            material->metallic = LoadTex(aiTextureType_METALNESS);
-            material->roughness = LoadTex(aiTextureType_DIFFUSE_ROUGHNESS);
-            material->ao = LoadTex(aiTextureType_AMBIENT_OCCLUSION);
-            material->specular = LoadTex(aiTextureType_SPECULAR);
-            material->height = LoadTex(aiTextureType_HEIGHT);
-            auto glossTex = LoadTex(aiTextureType_SHININESS);
-            if (!material->roughness && glossTex)
-            {
-                material->roughness = glossTex;
-                material->useGlossinessAsRoughness = true;
-            }
-            material->orm = nullptr;
-            m_materials[i] = std::move(material);
-        }
-    }
-
-    // 4. 노드 및 메쉬 처리
-    ProcessNode(scene->mRootNode, scene);
-
-    return true;
-}
-
-bool Model::LoadByBinaryV2(const std::string& filename)
-{
-    std::ifstream inFile(filename, std::ios::binary);
-    if (!inFile)
-    {
-        SPDLOG_ERROR("Failed to open binary model file: {}", filename);
-        return false;
-    }
-
-    std::filesystem::path modelDir = std::filesystem::path(filename).parent_path();
-
-    // 헬퍼: 바이너리 문자열 읽기
-    // TODO : Utils 함수로 따로 뺄 필요가 있음
-    auto ReadString = [&](std::ifstream& file) -> std::string 
-    {
-        uint32 len = 0;
-        file.read((char*)&len, sizeof(len));
-        if (len == 0) return "";
-        std::string str(len, '\0');
-        file.read(&str[0], len);
-        return str;
-    };
-
-    // TODO : 이 일련의 과정들을 조금 씩 함수로 빼서 이 함수의 부피를 줄일 필요가 
-    // 있어 보인다.
-
-    // 1. 헤더 읽기 (Header)
-    uint32 magic, version, materialCount, meshCount;
-    bool hasSkeleton;
-    glm::vec3 globalMin, globalMax;
-
-    inFile.read((char*)&magic, sizeof(magic));
-    if (magic != 0x4D594D44) { SPDLOG_ERROR("Invalid Magic Number"); return false; }
-    
-    inFile.read((char*)&version, sizeof(version));
-    if (version != 2) { SPDLOG_WARN("Version mismatch! Expected 2, Got {}", version); }
-
-    inFile.read((char*)&materialCount, sizeof(materialCount));
-    inFile.read((char*)&meshCount, sizeof(meshCount));
-    inFile.read((char*)&hasSkeleton, sizeof(hasSkeleton));
-
-    inFile.read((char*)&globalMin, sizeof(glm::vec3));
-    inFile.read((char*)&globalMax, sizeof(glm::vec3));
-
-    // 2. 스켈레톤 로드 (Skeleton Info)
-    if (hasSkeleton)
-    {
-        uint32 boneCount;
-        inFile.read((char*)&boneCount, sizeof(boneCount));
-        for (uint32 i = 0; i < boneCount; ++i)
-        {
-            std::string boneName = ReadString(inFile);
-            BoneInfo info;
-            inFile.read((char*)&info, sizeof(BoneInfo));
-            m_boneInfoMap[boneName] = info;
-        }
-        m_BoneCounter = (int32)boneCount;
-    }
-
-    // 3. 머티리얼 로드 (Materials)
-    m_materials.resize(materialCount);
-    for (uint32 i = 0; i < materialCount; ++i) 
-    {
-        auto material = Material::Create();
-
-        // [순서 엄수] 텍스처 경로 8개 읽기
-        // IMPORTANT : ModelConverter에서 지정한 순서와 동일해야함
-        std::string pathAlbedo      = ReadString(inFile);
-        std::string pathNormal      = ReadString(inFile);
-        std::string pathEmissive    = ReadString(inFile);
-        std::string pathORM         = ReadString(inFile);
-        std::string pathAO          = ReadString(inFile); 
-        std::string pathRoughness   = ReadString(inFile);
-        std::string pathMetallic    = ReadString(inFile);
-        std::string pathGlossiness  = ReadString(inFile); 
-        std::string pathSpecular    = ReadString(inFile);
-        std::string pathHeight      = ReadString(inFile);
-
-        // PBR Factors 읽기 (사용 안 하더라도 읽어서 스킵해야 함)
-        glm::vec4 albedoFactor;
-        float metallicFactor, roughnessFactor;
-        inFile.read((char*)&albedoFactor, sizeof(glm::vec4));
-        inFile.read((char*)&metallicFactor, sizeof(float));
-        inFile.read((char*)&roughnessFactor, sizeof(float));
-
-        // 실제 텍스처 로드 및 glossiness 처리
-        material->diffuse = LoadTextureFromFile(pathAlbedo, modelDir);
-        material->normal = LoadTextureFromFile(pathNormal, modelDir);
-        material->specular = LoadTextureFromFile(pathSpecular, modelDir);
-        material->emission = LoadTextureFromFile(pathEmissive, modelDir);
-        material->orm = LoadTextureFromFile(pathORM, modelDir);
-        material->ao = LoadTextureFromFile(pathAO, modelDir);
-        material->roughness = LoadTextureFromFile(pathRoughness, modelDir);
-        material->metallic = LoadTextureFromFile(pathMetallic, modelDir);
-        if (!material->roughness && !pathGlossiness.empty())
-        {
-            material->roughness = LoadTextureFromFile(pathGlossiness, modelDir);
+            material->roughness = glossTex;
             material->useGlossinessAsRoughness = true;
         }
 
         m_materials[i] = std::move(material);
     }
+}
 
-    // 4. 메쉬 로드 (Meshes)
-    m_meshes.reserve(meshCount);
-    for (uint32 i = 0; i < meshCount; ++i)
+void Model::ProcessAssimpNode(aiNode* node, const aiScene* scene)
+{
+    for (uint32 i = 0; i < node->mNumMeshes; i++)
     {
-        uint32 materialIndex;
-        bool isSkinned;
-        glm::vec3 aabbMin, aabbMax;
-
-        // 메쉬 헤더 읽기
-        inFile.read((char*)&materialIndex, sizeof(materialIndex));
-        inFile.read((char*)&isSkinned, sizeof(isSkinned));
-        inFile.read((char*)&aabbMin, sizeof(aabbMin));
-        inFile.read((char*)&aabbMax, sizeof(aabbMax));
-
-        uint32 vCount, iCount;
-        inFile.read((char*)&vCount, sizeof(vCount));
-        inFile.read((char*)&iCount, sizeof(iCount));
-
-        std::vector<uint32> indices(iCount);
-
-        if (isSkinned)
-        {
-            // [SkinnedMesh 생성]
-            std::vector<SkinnedVertex> vertices(vCount);
-            inFile.read((char*)vertices.data(), sizeof(SkinnedVertex) * vCount);
-            inFile.read((char*)indices.data(), sizeof(uint32) * iCount);
-
-            auto mesh = SkinnedMesh::Create(vertices, indices, GL_TRIANGLES);
-            mesh->SetLocalBounds(RenderBounds::CreateFromMinMax(aabbMin, aabbMax));
-            if (materialIndex < m_materials.size()) mesh->SetMaterial(m_materials[materialIndex]);
-            m_meshes.push_back(std::move(mesh));
-        }
-        else
-        {
-            // [StaticMesh 생성]
-            std::vector<StaticVertex> vertices(vCount);
-            inFile.read((char*)vertices.data(), sizeof(StaticVertex) * vCount);
-            inFile.read((char*)indices.data(), sizeof(uint32) * iCount);
-
-            auto mesh = StaticMesh::Create(vertices, indices, GL_TRIANGLES);
-            mesh->SetLocalBounds(RenderBounds::CreateFromMinMax(aabbMin, aabbMax));
-            if (materialIndex < m_materials.size()) mesh->SetMaterial(m_materials[materialIndex]);
-            m_meshes.push_back(std::move(mesh));
-        }
+        auto meshIndex = node->mMeshes[i];
+        auto mesh = scene->mMeshes[meshIndex];
+        ProcessAssimpMesh(mesh, scene);
     }
 
-    inFile.close();
-    return true;
+    for (uint32 i = 0; i < node->mNumChildren; i++)
+        ProcessAssimpNode(node->mChildren[i], scene);
 }
-#pragma endregion
 
-#pragma region TEST_FOR_ASSET_CONVERTER_2
+void Model::ProcessAssimpMesh(aiMesh* mesh, const aiScene* scene)
+{
+    bool hasSkeleton = mesh->mNumBones > 0;
+    if (hasSkeleton) ProcessAssimpSkinnedMesh(mesh, scene);
+    else ProcessAssimpStaticMesh(mesh, scene);
+}
 
-bool Model::LoadByBinaryV3(const std::string& filename)
+void Model::ProcessAssimpSkinnedMesh(aiMesh* mesh, const aiScene* scene)
+{
+    std::vector<SkinnedVertex> vertices(mesh->mNumVertices);
+    std::vector<uint32> indices;
+    glm::vec3 minBound(FLT_MAX);
+    glm::vec3 maxBound(-FLT_MAX);
+
+    // 1. Vertices
+    for (uint32 i = 0; i < mesh->mNumVertices; i++)
+    {
+        auto& v = vertices[i];
+        SetVertexBoneDataToDefault(v);
+
+        v.position = { mesh->mVertices[i].x, mesh->mVertices[i].y, mesh->mVertices[i].z };
+        v.normal = { mesh->mNormals[i].x, mesh->mNormals[i].y, mesh->mNormals[i].z };
+
+        if (mesh->mTextureCoords[0])  v.texCoord = { mesh->mTextureCoords[0][i].x, mesh->mTextureCoords[0][i].y };
+        else v.texCoord = { 0.0f, 0.0f };
+
+        if (mesh->mTangents) v.tangent = { mesh->mTangents[i].x, mesh->mTangents[i].y, mesh->mTangents[i].z };
+        else v.tangent = { 0.0f, 0.0f, 0.0f };
+
+        minBound = Utils::Min(minBound, v.position);
+        maxBound = Utils::Max(maxBound, v.position);
+    }
+
+    // 2. Bone Weights (Assimp only)
+    ExtractBoneWeightForVertices(vertices, mesh, scene);
+
+    // 3. Indices
+    indices.reserve(mesh->mNumFaces * 3);
+    for (uint32 i = 0; i < mesh->mNumFaces; i++)
+    {
+        indices.push_back(mesh->mFaces[i].mIndices[0]);
+        indices.push_back(mesh->mFaces[i].mIndices[1]);
+        indices.push_back(mesh->mFaces[i].mIndices[2]);
+    }
+
+    // 4. Create Mesh
+    auto glMesh = SkinnedMesh::Create(vertices, indices, GL_TRIANGLES);
+    glMesh->SetLocalBounds(RenderBounds::CreateFromMinMax(minBound, maxBound));
+
+    if (mesh->mMaterialIndex >= 0 && mesh->mMaterialIndex < m_materials.size())
+        glMesh->SetMaterial(m_materials[mesh->mMaterialIndex]);
+
+    m_meshes.push_back(std::move(glMesh));
+}
+
+void Model::ProcessAssimpStaticMesh(aiMesh* mesh, const aiScene* scene)
+{
+    std::vector<StaticVertex> vertices(mesh->mNumVertices);
+    std::vector<uint32> indices;
+
+    glm::vec3 minBound(FLT_MAX);
+    glm::vec3 maxBound(-FLT_MAX);
+
+    // 1. Vertices
+    for (uint32 i = 0; i < mesh->mNumVertices; i++)
+    {
+        auto& v = vertices[i];
+
+        v.position = { mesh->mVertices[i].x, mesh->mVertices[i].y, mesh->mVertices[i].z };
+        v.normal = { mesh->mNormals[i].x, mesh->mNormals[i].y, mesh->mNormals[i].z };
+
+        if (mesh->mTextureCoords[0]) v.texCoord = { mesh->mTextureCoords[0][i].x, mesh->mTextureCoords[0][i].y };
+        else v.texCoord = { 0.0f, 0.0f };
+
+        if (mesh->mTangents) v.tangent = { mesh->mTangents[i].x, mesh->mTangents[i].y, mesh->mTangents[i].z };
+        else v.tangent = { 0.0f, 0.0f, 0.0f };
+
+        minBound = Utils::Min(minBound, v.position);
+        maxBound = Utils::Max(maxBound, v.position);
+    }
+
+    // 2. Indices
+    indices.reserve(mesh->mNumFaces * 3);
+    for (uint32 i = 0; i < mesh->mNumFaces; i++)
+    {
+        indices.push_back(mesh->mFaces[i].mIndices[0]);
+        indices.push_back(mesh->mFaces[i].mIndices[1]);
+        indices.push_back(mesh->mFaces[i].mIndices[2]);
+    }
+
+    // 3. Create Mesh
+    auto glMesh = StaticMesh::Create(vertices, indices, GL_TRIANGLES);
+    glMesh->SetLocalBounds(RenderBounds::CreateFromMinMax(minBound, maxBound));
+
+    if (mesh->mMaterialIndex >= 0 && mesh->mMaterialIndex < m_materials.size())
+        glMesh->SetMaterial(m_materials[mesh->mMaterialIndex]);
+
+    m_meshes.push_back(std::move(glMesh));
+}
+
+/*========================================================//
+//   .mymodel file load process methods : .mymodel file   //
+//========================================================*/
+bool Model::LoadByBinary(const std::string& filename)
 {
     std::ifstream inFile(filename, std::ios::binary);
     if (!inFile)
@@ -617,71 +273,104 @@ bool Model::LoadByBinaryV3(const std::string& filename)
 
     std::filesystem::path modelDir = std::filesystem::path(filename).parent_path();
 
-    // =========================================================
-    // 1. Header Read
-    // =========================================================
+    // 데이터를 받아올 지역 변수 (참조로 넘겨서 채움)
+    uint32 matCount = 0;
+    uint32 meshCount = 0;
+    bool hasSkeleton = false;
+    if (!ReadBinaryModelHeader(inFile, matCount, meshCount, hasSkeleton)) 
+        return false;
+
+    // 2. Skeleton Read
+    if (hasSkeleton) ReadBinarySkeleton(inFile);
+
+    // 3. Materials Read
+    ReadBinaryMaterials(inFile, matCount, modelDir);
+
+    // 4. Meshes Read
+    ReadBinaryMeshes(inFile, meshCount);
+
+    SPDLOG_INFO("Model loaded successfully (Binary): {}", filename);
+    inFile.close();
+    return true;
+}
+
+bool Model::ReadBinaryModelHeader(std::ifstream& inFile, uint32& outMatCount, uint32& outMeshCount, bool& outHasSkeleton)
+{
     auto magic = AssetUtils::ReadData<uint32_t>(inFile);
-    if (magic != 0x4D594D44) { return false; }
+    if (magic != 0x4D594D44)
+    {
+        SPDLOG_ERROR("Invalid Magic Number");
+        return false;
+    }
+
     auto version = AssetUtils::ReadData<uint32_t>(inFile);
-    auto matCount = AssetUtils::ReadData<uint32_t>(inFile);
-    auto meshCount = AssetUtils::ReadData<uint32_t>(inFile);
-    auto hasSkeleton = AssetUtils::ReadData<bool>(inFile);
+    if (version != 2)
+    {
+        SPDLOG_WARN("Version mismatch! Expected 2, Got {}", version);
+    }
+
+    // 값들을 읽어서 참조 인자에 할당
+    outMatCount = AssetUtils::ReadData<uint32_t>(inFile);
+    outMeshCount = AssetUtils::ReadData<uint32_t>(inFile);
+    outHasSkeleton = AssetUtils::ReadData<bool>(inFile);
+
+    // 전역 AABB는 현재 Model 클래스 멤버가 아니면 여기서 읽고 버리거나, 멤버에 저장합니다.
     auto globalMin = AssetUtils::ReadData<glm::vec3>(inFile);
     auto globalMax = AssetUtils::ReadData<glm::vec3>(inFile);
 
-    SPDLOG_INFO("Header Read OK. Mats: {}, Meshes: {}", matCount, meshCount);
+    return true;
+}
 
-    // =========================================================
-    // 2. Skeleton Read
-    // =========================================================
-    if (hasSkeleton)
+void Model::ReadBinarySkeleton(std::ifstream& inFile)
+{
+    // 1. 뼈 정보 벡터 읽기 (Loop Read 필수!)
+    uint32_t bCount = AssetUtils::ReadData<uint32_t>(inFile);
+    std::vector<AssetFmt::RawBoneInfo> rawBoneInfos(bCount);
+
+    for (uint32_t i = 0; i < bCount; ++i)
     {
-        uint32_t bCount = AssetUtils::ReadData<uint32_t>(inFile);
-        std::vector<AssetFmt::RawBoneInfo> rawBoneInfos(bCount);
-
-        // Loop Read (안전)
-        for (uint32_t i = 0; i < bCount; ++i)
-        {
-            rawBoneInfos[i].id = AssetUtils::ReadData<uint32_t>(inFile);
-            rawBoneInfos[i].offset = AssetUtils::ReadData<glm::mat4>(inFile);
-        }
-        m_BoneCounter = (int32_t)rawBoneInfos.size();
-
-        uint32_t mapCount = AssetUtils::ReadData<uint32_t>(inFile);
-        for (uint32_t i = 0; i < mapCount; ++i)
-        {
-            std::string name = AssetUtils::ReadString(inFile);
-            int32_t id = AssetUtils::ReadData<int32_t>(inFile);
-
-            BoneInfo info;
-            info.id = id;
-            if (id >= 0 && id < (int32)rawBoneInfos.size())
-                info.offset = rawBoneInfos[id].offset;
-
-            m_boneInfoMap[name] = info;
-        }
+        rawBoneInfos[i].id = AssetUtils::ReadData<uint32_t>(inFile);
+        rawBoneInfos[i].offset = AssetUtils::ReadData<glm::mat4>(inFile);
     }
 
-    // =========================================================
-    // 3. Materials Read
-    // =========================================================
+    m_BoneCounter = (int32_t)rawBoneInfos.size();
+
+    // 2. 이름 매핑 읽기
+    uint32_t mapCount = AssetUtils::ReadData<uint32_t>(inFile);
+    for (uint32_t i = 0; i < mapCount; ++i)
+    {
+        std::string name = AssetUtils::ReadString(inFile);
+        int32_t id = AssetUtils::ReadData<int32_t>(inFile);
+
+        BoneInfo info;
+        info.id = id;
+        if (id >= 0 && id < (int32)rawBoneInfos.size())
+        {
+            info.offset = rawBoneInfos[id].offset;
+        }
+        m_boneInfoMap[name] = info;
+    }
+}
+
+void Model::ReadBinaryMaterials(std::ifstream& inFile, uint32 matCount, const std::filesystem::path& modelDir)
+{
     m_materials.resize(matCount);
     for (uint32_t i = 0; i < matCount; ++i)
     {
-        // 파일 읽기
+        // Raw Data 읽기
         auto rawMat = AssetUtils::ReadRawMaterial(inFile);
 
-        // 엔진 객체 생성
+        // Engine Material 생성
         auto material = Material::Create();
         material->albedoFactor = rawMat.albedoFactor;
         material->metallicFactor = rawMat.metallicFactor;
         material->roughnessFactor = rawMat.roughnessFactor;
-        material->emissionStrength = (rawMat.emissiveFactor.r + rawMat.emissiveFactor.g + rawMat.emissiveFactor.b) / 3.0f;
+        material->emissiveFactor = rawMat.emissiveFactor;
+        material->emissionStrength = rawMat.emissiveStrength;
 
         TexturePtr glossinessTex = nullptr;
         for (const auto& rawTex : rawMat.textures)
         {
-            // 경로가 비어있으면 스킵
             if (rawTex.fileName.empty()) continue;
 
             auto texPtr = LoadTextureFromFile(rawTex.fileName, modelDir);
@@ -701,6 +390,8 @@ bool Model::LoadByBinaryV3(const std::string& filename)
             case AssetFmt::RawTextureType::Glossiness:        glossinessTex = texPtr; break;
             }
         }
+
+        // [Glossiness Fallback]
         if (!material->roughness && glossinessTex)
         {
             material->roughness = glossinessTex;
@@ -709,83 +400,96 @@ bool Model::LoadByBinaryV3(const std::string& filename)
 
         m_materials[i] = std::move(material);
     }
+}
 
-    // =========================================================
-    // 4. Meshes Read
-    // =========================================================
+void Model::ReadBinaryMeshes(std::ifstream& inFile, uint32 meshCount)
+{
     m_meshes.clear();
     m_meshes.reserve(meshCount);
 
     for (uint32_t i = 0; i < meshCount; ++i)
     {
+        // 1. 파일에서 Raw 데이터 덩어리 읽기
         auto rawMesh = AssetUtils::ReadRawMesh(inFile);
 
+        // 2. 타입에 따라 적절한 함수 호출 (분기 처리)
         if (rawMesh.isSkinned)
         {
-            // [Skinned Mesh]
-            std::vector<SkinnedVertex> engineVerts;
-            engineVerts.resize(rawMesh.skinnedVertices.size());
-
-            // [중요 수정] memcpy 대신 루프 복사 사용 (메모리 오염 원천 차단)
-            // RawSkinnedVertex와 SkinnedVertex 구조체가 미세하게 다르면 memcpy는 힙을 파괴합니다.
-            for (size_t v = 0; v < rawMesh.skinnedVertices.size(); ++v)
-            {
-                const auto& src = rawMesh.skinnedVertices[v];
-                auto& dst = engineVerts[v];
-
-                dst.position = src.position;
-                dst.normal = src.normal;
-                dst.texCoord = src.texCoord;
-                dst.tangent = src.tangent;
-
-                // 배열 복사
-                for (int j = 0; j < 4; ++j) {
-                    dst.weights[j] = src.weights[j];
-                    dst.boneIDs[j] = src.boneIDs[j];
-                }
-            }
-
-            auto mesh = SkinnedMesh::Create(engineVerts, rawMesh.indices, GL_TRIANGLES);
-            mesh->SetLocalBounds(RenderBounds::CreateFromMinMax(rawMesh.aabbMin, rawMesh.aabbMax));
-            if (rawMesh.materialIndex < m_materials.size())
-                mesh->SetMaterial(m_materials[rawMesh.materialIndex]);
-
-            m_meshes.push_back(std::move(mesh));
+            CreateBinarySkinnedMesh(rawMesh);
         }
         else
         {
-            // [Static Mesh]
-            std::vector<StaticVertex> engineVerts;
-            engineVerts.resize(rawMesh.staticVertices.size());
+            CreateBinaryStaticMesh(rawMesh);
+        }
+    }
+}
 
-            // [중요 수정] memcpy 대신 루프 복사
-            for (size_t v = 0; v < rawMesh.staticVertices.size(); ++v)
-            {
-                const auto& src = rawMesh.staticVertices[v];
-                auto& dst = engineVerts[v];
+void Model::CreateBinarySkinnedMesh(const AssetFmt::RawMesh& rawMesh)
+{
+    std::vector<SkinnedVertex> engineVerts(rawMesh.skinnedVertices.size());
+    for (size_t v = 0; v < rawMesh.skinnedVertices.size(); ++v)
+    {
+        const auto& src = rawMesh.skinnedVertices[v];
+        auto& dst = engineVerts[v];
 
-                dst.position = src.position;
-                dst.normal = src.normal;
-                dst.texCoord = src.texCoord;
-                dst.tangent = src.tangent;
-            }
+        dst.position = src.position;
+        dst.normal = src.normal;
+        dst.texCoord = src.texCoord;
+        dst.tangent = src.tangent;
 
-            auto mesh = StaticMesh::Create(engineVerts, rawMesh.indices, GL_TRIANGLES);
-            mesh->SetLocalBounds(RenderBounds::CreateFromMinMax(rawMesh.aabbMin, rawMesh.aabbMax));
-            if (rawMesh.materialIndex < m_materials.size())
-                mesh->SetMaterial(m_materials[rawMesh.materialIndex]);
-
-            m_meshes.push_back(std::move(mesh));
+        for (int j = 0; j < 4; ++j) {
+            dst.weights[j] = src.weights[j];
+            dst.boneIDs[j] = src.boneIDs[j];
         }
     }
 
-    SPDLOG_INFO("Model loaded successfully (V3): {}", filename);
-    inFile.close();
-    return true;
+    // 2. 엔진 메쉬 객체 생성
+    auto mesh = SkinnedMesh::Create(engineVerts, rawMesh.indices, GL_TRIANGLES);
+
+    // 3. 바운딩 박스 설정
+    mesh->SetLocalBounds(RenderBounds::CreateFromMinMax(rawMesh.aabbMin, rawMesh.aabbMax));
+    
+    // 4. 머티리얼 연결
+    if (rawMesh.materialIndex < m_materials.size())
+        mesh->SetMaterial(m_materials[rawMesh.materialIndex]);
+
+    // 5. 등록
+    m_meshes.push_back(std::move(mesh));
 }
 
-#pragma endregion
+void Model::CreateBinaryStaticMesh(const AssetFmt::RawMesh& rawMesh)
+{
+    // 1. 정점 변환 (Raw -> Engine)
+    std::vector<StaticVertex> engineVerts(rawMesh.staticVertices.size());
+    for (size_t v = 0; v < rawMesh.staticVertices.size(); ++v)
+    {
+        const auto& src = rawMesh.staticVertices[v];
+        auto& dst = engineVerts[v];
 
+        dst.position = src.position;
+        dst.normal = src.normal;
+        dst.texCoord = src.texCoord;
+        dst.tangent = src.tangent;
+    }
+
+    // 2. 엔진 메쉬 객체 생성
+    auto mesh = StaticMesh::Create(engineVerts, rawMesh.indices, GL_TRIANGLES);
+
+    // 3. 바운딩 박스 설정
+    mesh->SetLocalBounds(RenderBounds::CreateFromMinMax(rawMesh.aabbMin, rawMesh.aabbMax));
+
+    // 4. 머티리얼 연결
+    if (rawMesh.materialIndex < m_materials.size())
+        mesh->SetMaterial(m_materials[rawMesh.materialIndex]);
+
+    // 5. 등록
+    m_meshes.push_back(std::move(mesh));
+}
+
+/*=================//
+//   TODOs later   //
+//=================*/
+#pragma region SKELETON_SECTION
 /*===================//
 //  Bone properties  //
 //===================*/
@@ -855,6 +559,9 @@ void Model::ExtractBoneWeightForVertices(std::vector<SkinnedVertex>& vertices,
         }
     }
 }
+#pragma endregion
+
+#pragma region TEXTURE_LOAD_SECTION
 
 /*========================//
 //  texture load methods  //
@@ -931,3 +638,5 @@ TexturePtr Model::LoadTextureFromAssimp
 
     return LoadTextureFromFile(filepath.C_Str(), parentDir);
 }
+
+#pragma endregion

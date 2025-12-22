@@ -33,6 +33,7 @@ void AssetUtils::WriteRawMaterial(std::ofstream& file, const AssetFmt::RawMateri
     AssetUtils::WriteString(file, mat.name);
     AssetUtils::WriteData(file, mat.albedoFactor);
     AssetUtils::WriteData(file, mat.emissiveFactor);
+    AssetUtils::WriteData(file, mat.emissiveStrength);
     AssetUtils::WriteData(file, mat.metallicFactor);
     AssetUtils::WriteData(file, mat.roughnessFactor);
     uint32 texCount = (uint32)mat.textures.size();

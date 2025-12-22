@@ -64,8 +64,8 @@ bool DevScene::LoadNessesaryResources()
 		RESOURCE.AddResource<Animation>(std::move(anim), "hiphopDancing");
 	}
 
-	//// 가방 모델
-	auto backpack = Model::Load("./Resources/Models/backpack/backpack.obj");
+	// 가방 모델
+	auto backpack = Model::Load("./Resources/Models/backpack/backpack.fbx");
 	RESOURCE.AddResource<Model>(std::move(backpack), "backpack");
 
 	// 0-3. 머티리얼 1
@@ -467,8 +467,8 @@ bool DevScene::CreateSceneContext()
 	{
 		auto modelGo = GameObject::Create();
 		modelGo->SetName("Backpack");
-		modelGo->GetTransform().SetPosition(glm::vec3(7.0f, 1.0f, -6.0f));
-		modelGo->GetTransform().SetScale(glm::vec3(0.5f));
+		modelGo->GetTransform().SetPosition(glm::vec3(6.0f, 1.0f, -6.0f));
+		modelGo->GetTransform().SetScale(glm::vec3(1.5f));
 
 		auto model = RESOURCE.GetResource<Model>("backpack");
 		for (uint32 i = 0; i < model->GetMeshCount(); ++i)

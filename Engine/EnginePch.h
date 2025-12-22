@@ -6,6 +6,8 @@
 #include <unordered_map>
 #include <filesystem>
 #include <fstream>
+#include <sstream>
+#include <optional>
 
 // Logger
 #include <spdlog/spdlog.h>

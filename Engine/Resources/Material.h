@@ -52,6 +52,7 @@ public:
     float       heightScale         { 1.0f };  // [Common]
 
     glm::vec4   albedoFactor        { 1.0f, 1.0f, 1.0f, 1.0f };  // [URP]
+    glm::vec3   emissiveFactor      { 0.0f, 0.0f, 0.0f };
     float       metallicFactor      { 1.0f };  // [URP]
     float       roughnessFactor     { 1.0f };  // [URP]
 

@@ -1,7 +1,4 @@
 #pragma once
-#include <fstream>
-#include <sstream>
-#include <optional>
 
 CLASS_PTR(Shader)
 class Shader
