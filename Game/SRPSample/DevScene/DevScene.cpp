@@ -59,7 +59,7 @@ bool DevScene::LoadNessesaryResources()
 	// 0-2. 모델과 애니메이션 #1
 	{
 		auto model = Model::Load("./Resources/Models/spacesoldier/aliensoldier.mymodel");
-		auto anim = Animation::Load("./Resources/Models/spacesoldier/Idle.fbx", model.get());
+		auto anim = Animation::Load("./Resources/Models/spacesoldier/Idle.myanim");
 		RESOURCE.AddResource<Model>(std::move(model), "aliensoldier");
 		RESOURCE.AddResource<Animation>(std::move(anim), "hiphopDancing");
 	}
@@ -441,28 +441,6 @@ bool DevScene::CreateSceneContext()
 	}
 
 	// 7. 모델
-	//{
-	//	auto modelGo = GameObject::Create();
-	//	modelGo->SetName("Soldier");
-	//	modelGo->GetTransform().SetPosition(glm::vec3(2.0f, 0.0f, -2.0f));
-	//	modelGo->GetTransform().SetScale(glm::vec3(0.025f));
-
-	//	// 3. GameObject에 Animator 컴포넌트 추가 
-	//	modelGo->AddComponent(Animator::Create(RESOURCE.GetResource<Animation>("hiphopDancing")));
-
-	//	// 4. Model 안의 모든 Mesh 조각을 MeshRenderer 컴포넌트로 추가
-	//	auto model = RESOURCE.GetResource<Model>("aliensoldier");
-	//	for (uint32 i = 0; i < model->GetMeshCount(); ++i)
-	//	{
-	//		SkinnedMeshPtr mesh = model->GetSkinnedMesh(i);
-	//		auto renderer = MeshRenderer::Create(mesh, mesh->GetMaterial());
-	//		modelGo->AddComponent((std::move(renderer)));
-	//	}
-
-	//	// 5. 씬에 GameObject 등록
-	//	AddGameObject(std::move(modelGo));
-	//}
-	// 7. 모델
 	{
 		// 1. 리소스 먼저 확보 (Model과 Animation)
 		auto model = RESOURCE.GetResource<Model>("aliensoldier");
@@ -474,23 +452,17 @@ bool DevScene::CreateSceneContext()
 		modelGo->GetTransform().SetPosition(glm::vec3(2.0f, 0.0f, -2.0f));
 		modelGo->GetTransform().SetScale(glm::vec3(0.025f));
 
-		// [변경 핵심 1] Animator 생성 시 'model'을 넘겨줘야 함!
-		// (Animator가 뼈대 구조와 개수를 알아야 하기 때문)
+		// 3. 애니메이터 생성
 		auto animator = Animator::Create(model);
-
-		// [변경 핵심 2] 애니메이션 재생은 별도로 호출
 		if (animator)
 		{
 			animator->PlayAnimation(animation);
 			modelGo->AddComponent(std::move(animator));
 		}
 
-		// 4. Model 안의 모든 Mesh 조각을 MeshRenderer 컴포넌트로 추가 (기존 로직 유지)
-		// (Model 클래스 인터페이스가 유지되었다면 이 부분은 동일합니다)
+		// 4. Model 안의 모든 Mesh 조각을 MeshRenderer 컴포넌트로 추가
 		for (uint32 i = 0; i < model->GetMeshCount(); ++i)
 		{
-			// MeshRenderer는 Animator와 같은 GameObject에 붙어 있으므로,
-			// 렌더링 파이프라인에서 자동으로 Animator의 행렬을 가져다가 그릴 것입니다.
 			SkinnedMeshPtr mesh = model->GetSkinnedMesh(i);
 			auto renderer = MeshRenderer::Create(mesh, mesh->GetMaterial());
 			modelGo->AddComponent(std::move(renderer));
@@ -499,7 +471,6 @@ bool DevScene::CreateSceneContext()
 		// 5. 씬에 GameObject 등록
 		AddGameObject(std::move(modelGo));
 	}
-
 
 	// 가방
 	{

@@ -10,6 +10,7 @@ AnimChannelUPtr AnimChannel::Create(const std::string& name, int32 id, const aiN
 
 AnimChannelUPtr AnimChannel::Create
 (
+    const std::string& name,
     uint32 id, 
     std::vector<AssetFmt::RawKeyPosition>&& positions,
     std::vector<AssetFmt::RawKeyRotation>&& rotations,
@@ -17,7 +18,11 @@ AnimChannelUPtr AnimChannel::Create
 )
 {
     auto animChannel = AnimChannelUPtr(new AnimChannel());
-    animChannel->Init(id, std::move(positions), std::move(rotations), std::move(scales));
+    animChannel->Init
+    (
+        name, id, 
+        std::move(positions), std::move(rotations), std::move(scales)
+    );
     return std::move(animChannel);
 }
 
@@ -69,12 +74,14 @@ bool AnimChannel::Init(const std::string& name, int id, const aiNodeAnim* channe
 
 void AnimChannel::Init
 (
+    const std::string& name,
     uint32 id, 
     std::vector<AssetFmt::RawKeyPosition>&& positions,
     std::vector<AssetFmt::RawKeyRotation>&& rotations,
     std::vector<AssetFmt::RawKeyScale>&& scales
 )
 {
+    m_name = name;
     m_id = id;
 
     m_positions = std::move(positions);
@@ -86,14 +93,9 @@ void AnimChannel::Init
     m_numScalings = (uint32)m_scales.size();
 }
 
-//void AnimChannel::Update(float animationTime)
-//{
-//    glm::mat4 translation = InterpolatePosition(animationTime);
-//    glm::mat4 rotation = InterpolateRotation(animationTime);
-//    glm::mat4 scale = InterpolateScaling(animationTime);
-//    m_localTransform = translation * rotation * scale;
-//}
-
+/*==============================================//
+//   animation channel default getter methods   //
+//==============================================*/
 uint32 AnimChannel::GetBoneID() const { return m_id; }
 
 std::string AnimChannel::GetBoneName() const { return m_name; }
@@ -139,13 +141,15 @@ uint32 AnimChannel::GetScaleIndex(float animationTime) const
     return m_numScalings - 2;
 }
 
+/*===========================//
+//   interpolation methods   //
+//===========================*/
 float AnimChannel::GetScaleFactor(float lastTimeStamp, float nextTimeStamp, float animationTime) const 
 {
-    float scaleFactor = 0.0f;
-    float midWayLength = animationTime - lastTimeStamp;
     float framesDiff = nextTimeStamp - lastTimeStamp;
-    scaleFactor = midWayLength / framesDiff;
-    return scaleFactor;
+    if (framesDiff <= 0.0001f) return 0.0f;
+    float midWayLength = animationTime - lastTimeStamp;
+    return midWayLength / framesDiff;
 }
 
 glm::mat4 AnimChannel::InterpolatePosition(float animationTime) const

@@ -21,41 +21,61 @@ bool Animator::Init(ModelPtr model)
 	m_currentModel = model;
 	m_currentTime = 0.0f;
 
+    // 1. Bone Count에 맞게 스키닝 행렬 버퍼 초기화
 	usize boneCount = m_currentModel->GetBoneCount();
 	m_finalBoneMatrices.resize(boneCount, glm::mat4(1.0f));
 	m_globalJointPositions.resize(boneCount, glm::vec3(0.0f));
 
+    // 2. 전체 노드 개수에 맞게 글로벌 행렬 버퍼 미리 확보
+    usize nodeCount = m_currentModel->GetNodes().size();
+    m_globalTransforms.resize(nodeCount, glm::mat4(1.0f));
+
 	return true;
 }
 
+void Animator::PlayAnimation(AnimationPtr animation)
+{
+    m_currentAnimation = std::move(animation);
+    m_currentTime = 0.0f;
+}
+
+/*====================================//
+//   animation update logic methods   //
+//====================================*/
 void Animator::Update()
 {
-    // 모델이 없으면 애니메이션 재생 불가
     if (!m_currentModel) return;
 
-    // 1. 시간 업데이트 (애니메이션 리소스가 있을 때만 진행)
+    // 1. 시간 업데이트
+    UpdateAnimationTime();
+
+    // 2. 뼈대 변환 행렬 계산 (순회 + 스키닝)
+    UpdateBoneTransforms();
+
+    // 3. 바운딩 박스 업데이트
+    UpdateCurrentPoseLocalBounds();
+}
+
+void Animator::UpdateAnimationTime()
+{
     if (m_currentAnimation)
     {
-        float dt = TIME.GetDeltaTime(); // 싱글톤 접근
-        m_currentTime += m_currentAnimation->GetTicksPerSecond() * dt;
-
+        m_currentTime += m_currentAnimation->GetTicksPerSecond() * TIME.GetDeltaTime();
         float duration = m_currentAnimation->GetDuration();
-        // 0으로 나누기 방지 및 루프 처리
-        if (duration > 0.0f)
-        {
-            m_currentTime = fmod(m_currentTime, duration);
-        }
+        if (duration > 0.0f) m_currentTime = fmod(m_currentTime, duration);
     }
+}
 
-    // 2. [핵심] 계층 구조 순회 (선형 반복)
-    // ModelConverter에서 이미 "부모가 항상 자식보다 앞 인덱스에 오도록" 정렬해둠.
+void Animator::UpdateBoneTransforms()
+{
     const auto& nodes = m_currentModel->GetNodes();
+    
+    // 만약 런타임에 모델이 바뀌거나 해서 사이즈가 다르면 재조정
+    if (m_globalTransforms.size() != nodes.size())
+        m_globalTransforms.resize(nodes.size());
 
-    // 현재 프레임의 글로벌 변환 행렬들을 담을 임시 버퍼
-    // (매 프레임 할당이 부담된다면 멤버 변수 m_globalTransforms로 빼도 됨)
-    std::vector<glm::mat4> globalTransforms(nodes.size());
-
-    for (size_t i = 0; i < nodes.size(); ++i)
+    // 노드 선형 순회
+    for (usize i = 0; i < nodes.size(); ++i)
     {
         const auto& node = nodes[i];
 
@@ -66,27 +86,15 @@ void Animator::Update()
         if (m_currentAnimation)
         {
             // 이름으로 채널 검색 (FindBone -> FindChannel 권장)
-            const AnimChannel* channel = m_currentAnimation->FindBone(node.name);
-
-            if (channel)
-            {
-                // [Stateless] 현재 시간을 인자로 넘겨서 행렬을 받아옴
-                localTransform = channel->GetLocalTransform(m_currentTime);
-            }
+            const AnimChannel* channel = m_currentAnimation->FindChannel(node.name);
+            if (channel) localTransform = channel->GetLocalTransform(m_currentTime);
         }
 
         // C. 부모 행렬과 결합 (Global Transform 계산)
+        // TODO: 추후 GameObject Transform 계층 구조와 통합 고려 필요
         int32 parentIndex = node.parentIndex;
-
-        if (parentIndex == -1) // 루트 노드
-        {
-            globalTransforms[i] = localTransform;
-        }
-        else
-        {
-            // 부모는 무조건 나보다 인덱스가 작으므로, 이미 globalTransforms에 계산되어 있음
-            globalTransforms[i] = globalTransforms[parentIndex] * localTransform;
-        }
+        if (parentIndex == -1) m_globalTransforms[i] = localTransform;
+        else m_globalTransforms[i] = m_globalTransforms[parentIndex] * localTransform;
 
         // D. 스키닝 행렬(FinalBoneMatrix) 계산
         // 현재 노드가 실제 뼈(Bone)로 등록되어 있는지 확인
@@ -102,111 +110,16 @@ void Animator::Update()
             if (boneID < m_finalBoneMatrices.size())
             {
                 // Final = Global * Offset (Shader로 보낼 행렬)
-                m_finalBoneMatrices[boneID] = globalTransforms[i] * offsetMat;
+                m_finalBoneMatrices[boneID] = m_globalTransforms[i] * offsetMat;
 
                 // 바운딩 박스 계산 등을 위해 관절 위치 저장
-                m_globalJointPositions[boneID] = glm::vec3(globalTransforms[i][3]);
+                m_globalJointPositions[boneID] = glm::vec3(m_globalTransforms[i][3]);
             }
         }
     }
-
-    // 3. 바운딩 박스 업데이트
-    CalculateCurrentPoseLocalBounds();
 }
 
-//void Animator::Update()
-//{
-//    if (!m_currentModel) return;
-//
-//    // 1. 시간 업데이트 (애니메이션이 있을 때만)
-//    if (m_currentAnimation)
-//    {
-//        float dt = TIME.GetDeltaTime();
-//        m_currentTime += m_currentAnimation->GetTicksPerSecond() * dt;
-//        m_currentTime = fmod(m_currentTime, m_currentAnimation->GetDuration());
-//    }
-//
-//    // 2. [핵심] 선형 반복문으로 계층 구조 계산
-//    // ModelConverter에서 부모가 항상 자식보다 앞 인덱스에 오도록 정렬했으므로 
-//    // 0번부터 순서대로 계산하면 됨.
-//    const auto& nodes = m_currentModel->GetNodes(); // vector<RawNode>
-//
-//    // 현재 프레임의 글로벌 변환 행렬들을 담을 임시 버퍼
-//    // (최적화를 위해 멤버 변수로 빼서 재사용 가능)
-//    std::vector<glm::mat4> globalTransforms(nodes.size());
-//
-//    for (size_t i = 0; i < nodes.size(); ++i)
-//    {
-//        const auto& node = nodes[i];
-//
-//        // A. 기본 로컬 변환 (T-Pose)
-//        glm::mat4 localTransform = node.localTransform;
-//
-//        // B. 애니메이션 적용 (있으면)
-//        if (m_currentAnimation)
-//        {
-//            // Animation에서 해당 노드 이름의 채널 찾기
-//            const AnimChannel* channel = m_currentAnimation->FindBone(node.name);
-//            if (channel)
-//            {
-//                // [변경] Stateless: 시간만 주면 행렬 리턴 (const 호환)
-//                localTransform = channel->GetLocalTransform();
-//            }
-//        }
-//
-//        // C. 부모 행렬과 결합 (Global Transform 계산)
-//        // parentIndex가 -1이면 루트
-//        if (node.parentIndex == -1)
-//        {
-//            globalTransforms[i] = localTransform;
-//        }
-//        else
-//        {
-//            // 부모는 무조건 나보다 인덱스가 작으므로 이미 계산됨 (정렬 보장)
-//            globalTransforms[i] = globalTransforms[node.parentIndex] * localTransform;
-//        }
-//
-//        // D. 스키닝 행렬(FinalBoneMatrix) 계산
-//        // 이 노드가 실제 뼈(Bone)인지 확인
-//        const auto& boneInfoMap = m_currentModel->GetBoneInfoMap();
-//        auto it = boneInfoMap.find(node.name);
-//
-//        if (it != boneInfoMap.end())
-//        {
-//            uint32 boneID = it->second.id;
-//            const glm::mat4& offsetMat = it->second.offset;
-//
-//            // 범위 체크 후 적용
-//            if (boneID < m_finalBoneMatrices.size())
-//            {
-//                // Final = Global * Offset
-//                m_finalBoneMatrices[boneID] = globalTransforms[i] * offsetMat;
-//
-//                // 디버그용 위치 저장
-//                m_globalJointPositions[boneID] = glm::vec3(globalTransforms[i][3]);
-//            }
-//        }
-//    }
-//
-//    // 3. 바운딩 박스 업데이트
-//    CalculateCurrentPoseLocalBounds();
-//
-//	/*if (m_currentAnimation)
-//	{
-//		m_currentTime += m_currentAnimation->GetTicksPerSecond() * TIME.GetDeltaTime();
-//		m_currentTime = fmod(m_currentTime, m_currentAnimation->GetDuration());
-//		CalculateBoneTransform(&m_currentAnimation->GetRootNode(), glm::mat4(1.0f));
-//		CalculateCurrentPoseLocalBounds();
-//	}*/
-//}
-
-void Animator::PlayAnimation(AnimationPtr animation)
-{
-	m_currentAnimation = std::move(animation);
-	m_currentTime = 0.0f;
-}
-
-void Animator::CalculateCurrentPoseLocalBounds()
+void Animator::UpdateCurrentPoseLocalBounds()
 {
 	glm::vec3 minPos(FLT_MAX);
 	glm::vec3 maxPos(-FLT_MAX);

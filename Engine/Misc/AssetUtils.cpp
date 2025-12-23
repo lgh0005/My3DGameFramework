@@ -94,3 +94,64 @@ std::vector<AssetFmt::RawNode> AssetUtils::ReadRawNodes(std::ifstream& file)
     return nodes;
 }
 
+AssetFmt::RawKeyPosition AssetUtils::ReadKeyVector3(std::ifstream& file)
+{
+    AssetFmt::RawKeyPosition key;
+    key.time = ReadData<float>(file);
+    key.vec3 = ReadData<glm::vec3>(file);
+    return key;
+}
+
+AssetFmt::RawKeyRotation AssetUtils::ReadKeyQuaternion(std::ifstream& file)
+{
+    AssetFmt::RawKeyRotation key;
+    key.time = ReadData<float>(file);
+    key.quat = ReadData<glm::quat>(file);
+    return key;
+}
+
+AssetFmt::RawAnimation AssetUtils::ReadRawAnimation(std::ifstream& file)
+{
+    AssetFmt::RawAnimation anim;
+
+    // 1. Header
+    anim.magic = ReadData<uint32>(file);
+    anim.version = ReadData<uint32>(file);
+    anim.name = ReadString(file);
+    anim.duration = ReadData<float>(file);
+    anim.ticksPerSecond = ReadData<float>(file);
+
+    // 2. Channels
+    uint32 channelCount = ReadData<uint32>(file);
+    anim.channels.resize(channelCount);
+
+    for (uint32 i = 0; i < channelCount; ++i)
+    {
+        auto& ch = anim.channels[i];
+
+        // Node Name
+        ch.nodeName = ReadString(file);
+
+        // Positions
+        uint32 pCount = ReadData<uint32>(file);
+        ch.positions.reserve(pCount);
+        for (uint32 k = 0; k < pCount; ++k)
+            ch.positions.push_back(ReadKeyVector3(file));
+
+        // Rotations
+        uint32 rCount = ReadData<uint32>(file);
+        ch.rotations.reserve(rCount);
+        for (uint32 k = 0; k < rCount; ++k)
+            ch.rotations.push_back(ReadKeyQuaternion(file));
+
+        // Scales
+        uint32 sCount = ReadData<uint32>(file);
+        ch.scales.reserve(sCount);
+        for (uint32 k = 0; k < sCount; ++k)
+            ch.scales.push_back(ReadKeyVector3(file));
+    }
+
+    return anim;
+}
+
+
