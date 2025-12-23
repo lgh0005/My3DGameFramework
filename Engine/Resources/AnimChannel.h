@@ -1,5 +1,6 @@
 #pragma once
 #include "Misc/AssetFormat.h"
+#include "Resources/Pose.h"
 
 CLASS_PTR(AnimChannel)
 class AnimChannel
@@ -14,6 +15,8 @@ public:
         std::vector<AssetFmt::RawKeyRotation>&& rotations,
         std::vector<AssetFmt::RawKeyScale>&&    scales
     );
+
+    Pose GetPose(float time) const;
 
 /*==============================================//
 //   animation channel default getter methods   //
@@ -31,9 +34,9 @@ public:
 //===========================*/
 private:
     float GetScaleFactor(float lastTimeStamp, float nextTimeStamp, float animationTime) const;
-    glm::mat4 InterpolatePosition(float animationTime) const;
-    glm::mat4 InterpolateRotation(float animationTime) const;
-    glm::mat4 InterpolateScaling(float animationTime) const;
+    glm::vec3 InterpolatePosition(float animationTime) const;
+    glm::quat InterpolateRotation(float animationTime) const;
+    glm::vec3 InterpolateScaling(float animationTime) const;
 
 private:
     AnimChannel() = default;

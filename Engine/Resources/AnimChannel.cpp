@@ -1,5 +1,6 @@
 #include "EnginePch.h"
 #include "Resources/AnimChannel.h"
+#include "Resources/Pose.h"
 
 AnimChannelUPtr AnimChannel::Create(const std::string& name, int32 id, const aiNodeAnim* channel)
 {
@@ -24,6 +25,14 @@ AnimChannelUPtr AnimChannel::Create
         std::move(positions), std::move(rotations), std::move(scales)
     );
     return std::move(animChannel);
+}
+
+Pose AnimChannel::GetPose(float time) const
+{
+    glm::vec3 translation = InterpolatePosition(time);
+    glm::quat rotation = InterpolateRotation(time);
+    glm::vec3 scale = InterpolateScaling(time);
+    return Pose(translation, rotation, scale);
 }
 
 bool AnimChannel::Init(const std::string& name, int id, const aiNodeAnim* channel)
@@ -102,10 +111,7 @@ std::string AnimChannel::GetBoneName() const { return m_name; }
 
 glm::mat4 AnimChannel::GetLocalTransform(float animationTime) const
 {
-    glm::mat4 translation = InterpolatePosition(animationTime);
-    glm::mat4 rotation = InterpolateRotation(animationTime);
-    glm::mat4 scale = InterpolateScaling(animationTime);
-    return translation * rotation * scale;
+    return GetPose(animationTime).ToMat4();
 }
 
 uint32 AnimChannel::GetPositionIndex(float animationTime) const 
@@ -152,52 +158,42 @@ float AnimChannel::GetScaleFactor(float lastTimeStamp, float nextTimeStamp, floa
     return midWayLength / framesDiff;
 }
 
-glm::mat4 AnimChannel::InterpolatePosition(float animationTime) const
+glm::vec3 AnimChannel::InterpolatePosition(float animationTime) const
 {
-    if (m_numPositions == 1)
-        return glm::translate(glm::mat4(1.0f), m_positions[0].vec3);
+    if (m_numPositions == 1) return m_positions[0].vec3;
 
     int p0Index = GetPositionIndex(animationTime);
     int p1Index = p0Index + 1;
     float scaleFactor = GetScaleFactor(m_positions[p0Index].time,
         m_positions[p1Index].time, animationTime);
-    glm::vec3 finalPosition = glm::mix(m_positions[p0Index].vec3,
-        m_positions[p1Index].vec3, scaleFactor);
 
-    return glm::translate(glm::mat4(1.0f), finalPosition);
+    return glm::mix(m_positions[p0Index].vec3, m_positions[p1Index].vec3, scaleFactor);
 }
 
-glm::mat4 AnimChannel::InterpolateRotation(float animationTime) const
+glm::quat AnimChannel::InterpolateRotation(float animationTime) const
 {
-    if (m_numRotations == 1)
-    {
-        auto rotation = glm::normalize(m_rotations[0].quat);
-        return glm::toMat4(rotation);
-    }
+    if (m_numRotations == 1) return glm::normalize(m_rotations[0].quat);
 
     int p0Index = GetRotationIndex(animationTime);
     int p1Index = p0Index + 1;
     float scaleFactor = GetScaleFactor(m_rotations[p0Index].time,
         m_rotations[p1Index].time, animationTime);
+
     glm::quat finalRotation = glm::slerp(m_rotations[p0Index].quat,
         m_rotations[p1Index].quat, scaleFactor);
-    finalRotation = glm::normalize(finalRotation);
 
-    return glm::toMat4(finalRotation);
+    return glm::normalize(finalRotation);
 }
 
-glm::mat4 AnimChannel::InterpolateScaling(float animationTime) const
+glm::vec3 AnimChannel::InterpolateScaling(float animationTime) const
 {
-    if (m_numScalings == 1)
-        return glm::scale(glm::mat4(1.0f), m_scales[0].vec3);
+    if (m_numScalings == 1) return m_scales[0].vec3;
 
     int p0Index = GetScaleIndex(animationTime);
     int p1Index = p0Index + 1;
     float scaleFactor = GetScaleFactor(m_scales[p0Index].time,
         m_scales[p1Index].time, animationTime);
-    glm::vec3 finalScale = glm::mix(m_scales[p0Index].vec3, m_scales[p1Index].vec3
-        , scaleFactor);
 
-    return glm::scale(glm::mat4(1.0f), finalScale);
+    return glm::mix(m_scales[p0Index].vec3, m_scales[p1Index].vec3, scaleFactor);
 }
 

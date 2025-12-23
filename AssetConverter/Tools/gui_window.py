@@ -1,5 +1,4 @@
 import tkinter as tk
-
 from gui_context.gui_context_exe_verify import GuiContextVerifyAssetConverter
 from gui_context.gui_context_main import GuiContextConvertMain
 from gui_context.gui_context_convert_animation import GuiContextConvertAnimation
