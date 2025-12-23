@@ -1,6 +1,7 @@
 #include "Animation.h"
 #include "Resources/Model.h"
 #include "Resources/AnimChannel.h"
+#include "Resources/Skeleton.h"
 #include "Misc/AssetUtils.h"
 
 AnimationUPtr Animation::Load(const std::string& filePath, Model* model)
@@ -65,25 +66,21 @@ bool Animation::LoadByAssimp(const std::string& animationPath, Model* model)
 void Animation::ReadMissingBones(const aiAnimation* animation, Model& model)
 {
 	uint32 size = animation->mNumChannels;
-	auto& boneInfoMap = model.GetBoneInfoMap();
-	int32& boneCount = model.GetBoneCount();
+	
+	auto skeleton = model.GetSkeleton();
+	if (!skeleton)
+	{
+		SPDLOG_WARN("Animation loaded for a model without skeleton!");
+		return;
+	}
 
 	for (int i = 0; i < size; i++)
 	{
 		auto channel = animation->mChannels[i];
 		std::string boneName = channel->mNodeName.C_Str();
 
-		if (boneInfoMap.find(boneName) == boneInfoMap.end())
-		{
-			boneInfoMap[boneName].id = boneCount;
-			boneInfoMap[boneName].offset = glm::mat4(1.0f);
-			boneCount++;
-		}
-		m_channels.push_back(AnimChannel::Create
-		(
-			boneName,
-			boneInfoMap[boneName].id, channel)
-		);
+		int32 boneID = skeleton->AddBone(boneName, glm::mat4(1.0f));
+		m_channels.push_back(AnimChannel::Create(boneName, boneID, channel));
 	}
 }
 

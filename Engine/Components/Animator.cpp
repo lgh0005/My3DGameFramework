@@ -2,6 +2,7 @@
 #include "Animator.h"
 #include "Resources/AnimChannel.h"
 #include "Resources/Model.h"
+#include "Resources/Skeleton.h"
 
 AnimatorUPtr Animator::Create(ModelPtr model)
 {
@@ -21,8 +22,16 @@ bool Animator::Init(ModelPtr model)
 	m_currentModel = model;
 	m_currentTime = 0.0f;
 
+    // 0. 모델로부터 스켈레톤을 얻어옴
+    auto skeleton = m_currentModel->GetSkeleton();
+    if (!skeleton)
+    {
+        SPDLOG_WARN("Animator initialized with a model having no skeleton.");
+        return false;
+    }
+
     // 1. Bone Count에 맞게 스키닝 행렬 버퍼 초기화
-	usize boneCount = m_currentModel->GetBoneCount();
+	usize boneCount = skeleton->GetBoneCount();
 	m_finalBoneMatrices.resize(boneCount, glm::mat4(1.0f));
 	m_globalJointPositions.resize(boneCount, glm::vec3(0.0f));
 
@@ -69,7 +78,8 @@ void Animator::UpdateAnimationTime()
 void Animator::UpdateBoneTransforms()
 {
     const auto& nodes = m_currentModel->GetNodes();
-    
+    auto skeleton = m_currentModel->GetSkeleton();
+
     // 만약 런타임에 모델이 바뀌거나 해서 사이즈가 다르면 재조정
     if (m_globalTransforms.size() != nodes.size())
         m_globalTransforms.resize(nodes.size());
@@ -98,7 +108,7 @@ void Animator::UpdateBoneTransforms()
 
         // D. 스키닝 행렬(FinalBoneMatrix) 계산
         // 현재 노드가 실제 뼈(Bone)로 등록되어 있는지 확인
-        const auto& boneInfoMap = m_currentModel->GetBoneInfoMap();
+        const auto& boneInfoMap = skeleton->GetBoneInfoMap();
         auto it = boneInfoMap.find(node.name);
 
         if (it != boneInfoMap.end())

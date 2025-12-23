@@ -59,7 +59,7 @@ bool DevScene::LoadNessesaryResources()
 	// 0-2. 모델과 애니메이션 #1
 	{
 		auto model = Model::Load("./Resources/Models/spacesoldier/aliensoldier.mymodel");
-		auto anim = Animation::Load("./Resources/Models/spacesoldier/Idle.myanim");
+		auto anim = Animation::Load("./Resources/Models/spacesoldier/Walking.fbx", model.get());
 		RESOURCE.AddResource<Model>(std::move(model), "aliensoldier");
 		RESOURCE.AddResource<Animation>(std::move(anim), "hiphopDancing");
 	}

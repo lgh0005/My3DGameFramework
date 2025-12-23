@@ -1,5 +1,6 @@
 #include "EnginePch.h"
 #include "Utils.h"
+#include <glm/gtx/matrix_decompose.hpp>
 
 /*============================//
 //   조명 연산 전용 유틸 함수   //
@@ -81,4 +82,34 @@ glm::vec3 Utils::Max(const glm::vec3& a, const glm::vec3& b)
 		std::max<float>(a.y, b.y),
 		std::max<float>(a.z, b.z)
 	);
+}
+
+// TODO : 이후에는 Pose 클래스에 따라 바로바로 보간 작업을 수행할 예정
+// decompose는 너무 무거움.
+glm::mat4 Utils::Interpolate(const glm::mat4& matA, const glm::mat4& matB, float blendFactor)
+{
+	// 0. 필요 없는 인자
+	glm::vec3 skew; glm::vec4 perspective;
+
+	// 1. A 분해
+	glm::vec3 scaleA, posA;
+	glm::quat rotA;
+	glm::decompose(matA, scaleA, rotA, posA, skew, perspective);
+
+	// 2. B 분해
+	glm::vec3 scaleB, posB;
+	glm::quat rotB;
+	glm::decompose(matB, scaleB, rotB, posB, skew, perspective);
+
+	// 3. 보간 (위치/크기는 선형, 회전은 구면 선형), blendFactor: 0.0(A) ~ 1.0(B)
+	glm::vec3 finalPos = glm::mix(posA, posB, blendFactor);
+	glm::vec3 finalScale = glm::mix(scaleA, scaleB, blendFactor);
+	glm::quat finalRot = glm::slerp(rotA, rotB, blendFactor);
+
+	// 4. 재조립
+	glm::mat4 T = glm::translate(glm::mat4(1.0f), finalPos);
+	glm::mat4 R = glm::toMat4(finalRot);
+	glm::mat4 S = glm::scale(glm::mat4(1.0f), finalScale);
+
+	return T * R * S;
 }

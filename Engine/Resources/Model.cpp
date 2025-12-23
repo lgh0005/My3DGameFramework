@@ -6,6 +6,7 @@
 #include "Resources/Material.h"
 #include "Resources/Image.h"
 #include "Resources/Texture.h"
+#include "Resources/Skeleton.h"
 #include "Graphics/VertexLayout.h"
 #include "Graphics/Program.h"
 #include "Misc/AssetFormat.h"
@@ -71,8 +72,9 @@ bool Model::LoadByAssimp(const std::string& filename)
     // 2. 초기화 (기존 데이터 클리어)
     m_meshes.clear();
     m_materials.clear();
-    m_boneInfoMap.clear();
-    m_BoneCounter = 0;
+    /*m_boneInfoMap.clear();
+    m_BoneCounter = 0;*/
+    m_skeleton = Skeleton::Create();
 
     // 텍스처 로드를 위한 디렉토리 경로 계산
     std::filesystem::path modelDir = std::filesystem::path(filename).parent_path();
@@ -154,7 +156,7 @@ void Model::ProcessAssimpMaterials(const aiScene* scene, const std::filesystem::
         // 2. Textures
         auto LoadTex = [&](aiTextureType type) -> TexturePtr 
         {
-            return LoadTextureFromAssimp(aiMat, type, modelDir);
+            return LoadMaterialTexture(aiMat, type, modelDir);
         };
 
         material->diffuse = LoadTex(aiTextureType_BASE_COLOR);
@@ -196,7 +198,7 @@ void Model::ProcessAssimpSkinnedMesh(aiMesh* mesh, const aiScene* scene)
     for (uint32 i = 0; i < mesh->mNumVertices; i++)
     {
         auto& v = vertices[i];
-        SetVertexBoneDataToDefault(v);
+        Skeleton::InitializeVertexBoneData(v);
 
         v.position = { mesh->mVertices[i].x, mesh->mVertices[i].y, mesh->mVertices[i].z };
         v.normal = { mesh->mNormals[i].x, mesh->mNormals[i].y, mesh->mNormals[i].z };
@@ -303,7 +305,12 @@ bool Model::LoadByBinary(const std::string& filename)
     ReadBinaryNodes(inFile);
 
     // 3. Skeleton Read
-    if (hasSkeleton) ReadBinarySkeleton(inFile);
+    if (hasSkeleton)
+    {
+        m_skeleton = Skeleton::Create();
+        ReadBinarySkeleton(inFile);
+    }
+    else m_skeleton = nullptr;
 
     // 4. Materials Read
     ReadBinaryMaterials(inFile, matCount, modelDir);
@@ -347,6 +354,10 @@ void Model::ReadBinaryNodes(std::ifstream& inFile) { m_nodes = AssetUtils::ReadR
 
 void Model::ReadBinarySkeleton(std::ifstream& inFile)
 {
+    // 로컬 변수에 먼저 읽어들임
+    Skeleton::BoneMap boneMap;
+    int32 maxId = 0;
+
     // 1. 뼈 정보 벡터 읽기 (Loop Read 필수!)
     uint32 bCount = AssetUtils::ReadData<uint32>(inFile);
     std::vector<AssetFmt::RawBoneInfo> rawBoneInfos(bCount);
@@ -356,15 +367,14 @@ void Model::ReadBinarySkeleton(std::ifstream& inFile)
         rawBoneInfos[i].id = AssetUtils::ReadData<uint32>(inFile);
         rawBoneInfos[i].offset = AssetUtils::ReadData<glm::mat4>(inFile);
     }
-
-    m_BoneCounter = (int32_t)rawBoneInfos.size();
+    maxId = (int32_t)rawBoneInfos.size();
 
     // 2. 이름 매핑 읽기
     uint32 mapCount = AssetUtils::ReadData<uint32>(inFile);
     for (uint32 i = 0; i < mapCount; ++i)
     {
         std::string name = AssetUtils::ReadString(inFile);
-        int32_t id = AssetUtils::ReadData<int32_t>(inFile);
+        int32 id = AssetUtils::ReadData<int32>(inFile);
 
         AssetFmt::RawBoneInfo info;
         info.id = id;
@@ -372,8 +382,11 @@ void Model::ReadBinarySkeleton(std::ifstream& inFile)
         {
             info.offset = rawBoneInfos[id].offset;
         }
-        m_boneInfoMap[name] = info;
+        boneMap[name] = info;
     }
+
+    // 3. 다 읽은 데이터를 Skeleton에 주입
+    if (m_skeleton) m_skeleton->SetData(boneMap, maxId);
 }
 
 void Model::ReadBinaryMaterials(std::ifstream& inFile, uint32 matCount, const std::filesystem::path& modelDir)
@@ -397,7 +410,7 @@ void Model::ReadBinaryMaterials(std::ifstream& inFile, uint32 matCount, const st
         {
             if (rawTex.fileName.empty()) continue;
 
-            auto texPtr = LoadTextureFromFile(rawTex.fileName, modelDir);
+            auto texPtr = LoadTexture(rawTex.fileName, modelDir);
             if (!texPtr) continue;
 
             switch (rawTex.type)
@@ -510,111 +523,53 @@ void Model::CreateBinaryStaticMesh(const AssetFmt::RawMesh& rawMesh)
     m_meshes.push_back(std::move(mesh));
 }
 
-/*=================//
-//   TODOs later   //
-//=================*/
-#pragma region SKELETON_SECTION
-/*===================//
-//  Bone properties  //
-//===================*/
-void Model::SetVertexBoneDataToDefault(SkinnedVertex& vertex)
+/*==========================================//
+//   model texture loading helper methods   //
+//==========================================*/
+
+TexturePtr Model::LoadMaterialTexture(aiMaterial* material, aiTextureType type, const std::filesystem::path& parentDir)
 {
-    for (int i = 0; i < MAX_BONE_INFLUENCE; i++)
-    {
-        vertex.boneIDs[i] = -1; // -1로 초기화
-        vertex.weights[i] = 0.0f;
-    }
+    if (material->GetTextureCount(type) <= 0) return nullptr;
+
+    aiString filepath;
+    if (material->GetTexture(type, 0, &filepath) != AI_SUCCESS) return nullptr;
+
+    return LoadTexture(filepath.C_Str(), parentDir);
 }
 
-void Model::SetVertexBoneData(SkinnedVertex& vertex, int boneID, float weight)
+TexturePtr Model::LoadTexture(const std::string& path, const std::filesystem::path& parentDir)
 {
-    // -1로 초기화된 첫 번째 빈 슬롯을 찾음
-    for (int i = 0; i < MAX_BONE_INFLUENCE; ++i)
-    {
-        if (vertex.boneIDs[i] < 0) // -1인 슬롯 발견
-        {
-            vertex.weights[i] = weight;
-            vertex.boneIDs[i] = boneID;
-            break; // 찾았으면 루프 중단
-        }
-    }
-}
+    if (path.empty()) return nullptr;
 
-void Model::ExtractBoneWeightForVertices(std::vector<SkinnedVertex>& vertices,
-                                    aiMesh* mesh, const aiScene* scene)
-{
-    // 1. 이 메쉬의 모든 뼈를 순회
-    for (int boneIndex = 0; boneIndex < mesh->mNumBones; ++boneIndex)
-    {
-        int boneID = -1;
-        std::string boneName = mesh->mBones[boneIndex]->mName.C_Str();
-
-        // 2. 이 뼈가 맵에 등록된 뼈인지 확인 (unordered_map 사용)
-        if (m_boneInfoMap.find(boneName) == m_boneInfoMap.end())
-        {
-            // 3. 새 뼈라면, 새 ID와 오프셋을 맵에 등록
-            AssetFmt::RawBoneInfo newBoneInfo;
-            newBoneInfo.id = m_BoneCounter;
-            newBoneInfo.offset = Utils::ConvertToGLMMat4(mesh->mBones[boneIndex]->mOffsetMatrix);
-            m_boneInfoMap[boneName] = newBoneInfo;
-
-            boneID = m_BoneCounter;
-            m_BoneCounter++;
-        }
-        else
-        {
-            // 4. 이미 등록된 뼈라면 ID만 가져옴
-            boneID = m_boneInfoMap[boneName].id;
-        }
-        // assert(boneID != -1);
-
-        // 5. 이 뼈가 영향을 주는 모든 정점(Weight)을 순회
-        auto weights = mesh->mBones[boneIndex]->mWeights;
-        int numWeights = mesh->mBones[boneIndex]->mNumWeights;
-
-        for (int weightIndex = 0; weightIndex < numWeights; ++weightIndex)
-        {
-            int vertexId = weights[weightIndex].mVertexId;
-            float weight = weights[weightIndex].mWeight;
-            // assert(vertexId < vertices.size()); // (등호 포함X)
-
-            // 6. 'vertices' 벡터에 있는 실제 정점에 뼈 데이터 주입
-            SetVertexBoneData(vertices[vertexId], boneID, weight);
-        }
-    }
-}
-#pragma endregion
-
-#pragma region TEXTURE_LOAD_SECTION
-
-/*========================//
-//  texture load methods  //
-//========================*/
-TexturePtr Model::LoadTextureFromFile
-(
-    const std::string& relativePath, // TODO : 이는 상대 경로가 아닌 순수 모델 파일명이 될 것임.
-    const std::filesystem::path& parentDir
-)
-{
-    if (relativePath.empty()) return nullptr;
-    
-    // 파일 이름만 추출
-    std::string filenameOnly = std::filesystem::path(relativePath).filename().string();
+    // 1. 파일 이름만 추출 (예: "texture/diffuse.jpg" -> "diffuse.jpg")
+    std::string filenameOnly = std::filesystem::path(path).filename().string();
     if (filenameOnly.empty()) return nullptr;
 
-    /*=======================//
-    //  ktx file extraction  //
-    //=======================*/
-    // 1. KTX 경로 구성 (예: .../wood.ktx)
-    std::filesystem::path ktxPath = parentDir / filenameOnly;
+    TexturePtr tex;
+
+    // 2. [최적화] KTX 포맷 로드 시도
+    tex = LoadTextureFromKTX(filenameOnly, parentDir);
+    if (tex) return tex;
+
+    // 3. [기본] 원본 이미지(png, jpg 등) 로드
+    tex = LoadTextureFromImage(filenameOnly, parentDir);
+    if (tex) return tex;
+
+    return nullptr;
+}
+
+TexturePtr Model::LoadTextureFromKTX(const std::string& filename, const std::filesystem::path& parentDir)
+{
+    // 1. KTX 경로 구성
+    std::filesystem::path ktxPath = parentDir / filename;
     ktxPath.replace_extension(".ktx");
     std::string ktxFullPath = ktxPath.string();
 
-    // 2. KTX 캐시 확인
+    // 2. 리소스 매니저 캐시 확인
     auto cachedTex = RESOURCE.GetResource<Texture>(ktxFullPath);
     if (cachedTex) return cachedTex;
 
-    // 3. KTX 파일 존재 여부 확인 및 로드
+    // 3. 파일이 실제로 존재하는지 확인 후 로드
     if (std::filesystem::exists(ktxPath))
     {
         auto texture = Texture::CreateFromKtxImage(ktxFullPath);
@@ -625,43 +580,64 @@ TexturePtr Model::LoadTextureFromFile
         }
     }
 
-    /*===========================//
-    //  png/jpg file extraction  //
-    //===========================*/
-    std::filesystem::path originalPath = parentDir / filenameOnly;
+    return nullptr;
+}
+
+TexturePtr Model::LoadTextureFromImage(const std::string& filename, const std::filesystem::path& parentDir)
+{
+    // 1. 원본 경로 구성
+    std::filesystem::path originalPath = parentDir / filename;
     std::string originalFullPath = originalPath.string();
 
-    // 원래 경로로도 캐시 확인
-    cachedTex = RESOURCE.GetResource<Texture>(originalFullPath);
+    // 2. 리소스 매니저 캐시 확인
+    auto cachedTex = RESOURCE.GetResource<Texture>(originalFullPath);
     if (cachedTex) return cachedTex;
 
-    // 이미지 로드 시도
+    // 3. 이미지 로드 시도 (Image 클래스 사용)
     auto image = Image::Load(originalFullPath);
     if (!image)
     {
+        // 원본조차 없으면 에러 로그 출력
         SPDLOG_ERROR("Failed to load texture image: {}", originalFullPath);
         return nullptr;
     }
 
+    // 4. 텍스처 생성 및 등록
     auto texture = Texture::CreateFromImage(image.get());
     RESOURCE.AddResource<Texture>(std::move(texture), originalFullPath);
+
     return RESOURCE.GetResource<Texture>(originalFullPath);
 }
 
-TexturePtr Model::LoadTextureFromAssimp
-(
-    aiMaterial* material, 
-    aiTextureType type, 
-    const std::filesystem::path& parentDir
-)
+/*============================//
+//   skeleton helper method   //
+//============================*/
+void Model::ExtractBoneWeightForVertices(std::vector<SkinnedVertex>& vertices, aiMesh* mesh, const aiScene* scene)
 {
-    if (material->GetTextureCount(type) <= 0) return nullptr;
+    // Skeleton이 생성되어 있어야 함
+    if (!m_skeleton) return;
 
-    aiString filepath;
-    if (material->GetTexture(type, 0, &filepath) != AI_SUCCESS) return nullptr;
+    for (uint32 i = 0; i < mesh->mNumBones; ++i)
+    {
+        aiBone* bone = mesh->mBones[i];
+        std::string boneName = bone->mName.C_Str();
 
-    return LoadTextureFromFile(filepath.C_Str(), parentDir);
+        // [위임] Skeleton에게 등록 및 ID 발급 요청
+        int32 boneID = m_skeleton->AddBone
+        (
+            boneName,
+            Utils::ConvertToGLMMat4(bone->mOffsetMatrix)
+        );
+
+        // 웨이트 정보 주입
+        for (uint32 w = 0; w < bone->mNumWeights; ++w)
+        {
+            const auto& weightData = bone->mWeights[w];
+            int vertexId = weightData.mVertexId;
+            float weight = weightData.mWeight;
+
+            if (vertexId < vertices.size())
+                Skeleton::AddBoneWeightToVertex(vertices[vertexId], boneID, weight);
+        }
+    }
 }
-
-#pragma endregion
-

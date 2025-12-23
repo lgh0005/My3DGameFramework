@@ -1,7 +1,5 @@
 ﻿#pragma once
 #include "Resources/Resource.h"
-#include <filesystem>
-#include <fstream>
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
@@ -16,6 +14,7 @@ CLASS_PTR(StaticMesh)
 CLASS_PTR(Material)
 CLASS_PTR(Program)
 CLASS_PTR(Texture)
+CLASS_PTR(Skeleton)
 #pragma endregion
 
 CLASS_PTR(Model)
@@ -29,6 +28,7 @@ public:
 	uint32 GetMeshCount() const { return (uint32)m_meshes.size(); }
 	SkinnedMeshPtr GetSkinnedMesh(int index) const;
 	StaticMeshPtr GetStaticMesh(int index) const;
+	SkeletonPtr GetSkeleton() const { return m_skeleton; }
 	auto& GetNodes() { return m_nodes; }
 
 	void Draw(const Program* program) const;
@@ -58,48 +58,25 @@ private:
 	void CreateBinarySkinnedMesh(const AssetFmt::RawMesh& rawMesh);
 	void CreateBinaryStaticMesh(const AssetFmt::RawMesh& rawMesh);
 
+/*==========================================//
+//   model texture loading helper methods   //
+//==========================================*/
+private:
+	TexturePtr LoadMaterialTexture(aiMaterial* material, aiTextureType type, const std::filesystem::path& parentDir);
+	TexturePtr LoadTexture(const std::string& path, const std::filesystem::path& parentDir);
+	TexturePtr LoadTextureFromKTX(const std::string& filename, const std::filesystem::path& parentDir);
+	TexturePtr LoadTextureFromImage(const std::string& filename, const std::filesystem::path& parentDir);
+
+/*============================//
+//   skeleton helper method   //
+//============================*/
+private:
+	void ExtractBoneWeightForVertices(std::vector<SkinnedVertex>& vertices, aiMesh* mesh, const aiScene* scene);
+	SkeletonPtr m_skeleton;
+
 private:
 	Model() = default;
 	std::vector<MeshPtr> m_meshes;
 	std::vector<MaterialPtr> m_materials;
 	std::vector<AssetFmt::RawNode> m_nodes;
-
-#pragma region SKELETON_SECTION
-	/*===================//
-	//  Bone properties  //
-	//===================*/
-
-public:
-	auto& GetBoneInfoMap() { return m_boneInfoMap; }
-	int32& GetBoneCount() { return m_BoneCounter; }
-
-private:
-	void SetVertexBoneDataToDefault(SkinnedVertex& vertex);
-	void SetVertexBoneData(SkinnedVertex& vertex, int boneID, float weight);
-	void ExtractBoneWeightForVertices(std::vector<SkinnedVertex>& vertices,
-		aiMesh* mesh, const aiScene* scene);
-
-private:
-	std::unordered_map<std::string, AssetFmt::RawBoneInfo> m_boneInfoMap;
-	int32 m_BoneCounter = 0;
-
-#pragma endregion
-
-#pragma region TEXTURE_LOAD_SECTION
-	/*======================//
-	//  Texture properties  //
-	//======================*/
-private:
-	TexturePtr LoadTextureFromFile
-	(
-		const std::string& relativePath,
-		const std::filesystem::path& parentDir
-	);
-	TexturePtr LoadTextureFromAssimp
-	(
-		aiMaterial* material,
-		aiTextureType type,
-		const std::filesystem::path& parentDir
-	);
-#pragma endregion
 };

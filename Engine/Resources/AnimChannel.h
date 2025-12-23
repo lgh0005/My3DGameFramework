@@ -1,13 +1,10 @@
 #pragma once
-#include "Resources/Resource.h"
 #include "Misc/AssetFormat.h"
 
 CLASS_PTR(AnimChannel)
-class AnimChannel : public Resource
+class AnimChannel
 {
 public:
-    static const ResourceType s_ResourceType = ResourceType::AnimChannel;
-    virtual ResourceType GetResourceType() const override { return ResourceType::AnimChannel; }
 	static AnimChannelUPtr Create(const std::string& name, int32 id, const aiNodeAnim* channel);
     static AnimChannelUPtr Create
     (
@@ -15,7 +12,7 @@ public:
         uint32 id, 
         std::vector<AssetFmt::RawKeyPosition>&& positions,
         std::vector<AssetFmt::RawKeyRotation>&& rotations,
-        std::vector<AssetFmt::RawKeyScale>&& scales
+        std::vector<AssetFmt::RawKeyScale>&&    scales
     );
 
 /*==============================================//

@@ -3,9 +3,8 @@
 enum class ResourceType
 {
 	Animation,
-	AnimChannel,
+	// AnimChannel,
 	// AnimationChannel,
-	AnimationClip,
 	AudilClip,
 	// Avatar,
 	CubeTexture,
@@ -13,7 +12,7 @@ enum class ResourceType
 	Material,
 	Model,
 	// Pose,
-	Skeleton,
+	// Skeleton,
 	Texture,
 	StaticMesh,
 	SkinnedMesh,

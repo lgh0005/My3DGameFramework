@@ -24,6 +24,6 @@ public:
 	static glm::vec3 Min(const glm::vec3& a, const glm::vec3& b);
 	static glm::vec3 Max(const glm::vec3& a, const glm::vec3& b);
 
-	// TODO : Scene 스크립팅 API 추가 고려 필요
-	// Utils보다는 다른 class를 추가하는 것을 고려해볼 필요가 있다.
+	// TEMP : 애니메이션 블렌딩을 위한 트랜스폼 보간 유틸 함수
+	static glm::mat4 Interpolate(const glm::mat4& matA, const glm::mat4& matB, float blendFactor);
 };
