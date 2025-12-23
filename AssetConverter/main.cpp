@@ -38,12 +38,7 @@ int main(int argc, char* argv[])
     // [Animation Mode]
     case ConversionMode::Animation:
         LOG_INFO(">>> [Mode] Animation Conversion Selected");
-
-        // TODO: AnimConverter 구현 후 연결
-        // success = AnimConverter::Instance().Convert(args.inputPath, args.refModelPath, args.outputPath);
-
-        LOG_WARN("Animation converter is under construction.");
-        success = false; // 아직 구현 안 됐으므로 실패 처리
+        success = CONV_ANIM.Convert(args.inputPath, args.refModelPath, args.outputPath);
         break;
 
     // [ORM Texture Mode]

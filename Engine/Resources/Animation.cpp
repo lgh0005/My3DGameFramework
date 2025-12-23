@@ -1,6 +1,6 @@
 #include "Animation.h"
 #include "Resources/Model.h"
-#include "Resources//Bone.h"
+#include "Resources/AnimChannel.h"
 
 AnimationUPtr Animation::Load(const std::string& filePath, Model* model)
 {
@@ -30,18 +30,18 @@ AnimationUPtr Animation::Load(const std::string& filePath, Model* model)
 bool Animation::LoadByAssimp(const std::string& animationPath, Model* model)
 {
 	Assimp::Importer importer;
-	const aiScene* scene = importer.ReadFile(animationPath, aiProcess_Triangulate);
-	
+	const aiScene* scene = importer.ReadFile(animationPath, aiProcess_LimitBoneWeights);
 	if (!scene || !scene->mRootNode)
 	{
 		SPDLOG_ERROR("Failed to load animation file: {}", animationPath);
 		return false;
 	}
 
-	auto animation = scene->mAnimations[0];
-	m_duration = animation->mDuration;
-	m_ticksPerSecond = animation->mTicksPerSecond;
-	ReadHeirarchyData(m_rootNode, scene->mRootNode);
+	aiAnimation* animation = scene->mAnimations[0];
+	m_name = animation->mName.C_Str();
+	m_duration = (float)animation->mDuration;
+	m_ticksPerSecond = (float)animation->mTicksPerSecond;
+
 	ReadMissingBones(animation, *model);
 
 	return true;
@@ -87,18 +87,18 @@ bool Animation::LoadByBinary(const std::string& filePath)
 		inFile.read((char*)&rotCount, sizeof(rotCount));
 		inFile.read((char*)&sclCount, sizeof(sclCount));
 
-		std::vector<KeyPosition> positions(posCount);
-		std::vector<KeyRotation> rotations(rotCount);
-		std::vector<KeyScale> scales(sclCount);
+		std::vector<AssetFmt::RawKeyPosition> positions(posCount);
+		std::vector<AssetFmt::RawKeyRotation> rotations(rotCount);
+		std::vector<AssetFmt::RawKeyScale> scales(sclCount);
 
-		if (posCount > 0) inFile.read((char*)positions.data(), sizeof(KeyPosition) * posCount);
-		if (rotCount > 0) inFile.read((char*)rotations.data(), sizeof(KeyRotation) * rotCount);
-		if (sclCount > 0) inFile.read((char*)scales.data(), sizeof(KeyScale) * sclCount);
+		if (posCount > 0) inFile.read((char*)positions.data(), sizeof(AssetFmt::RawKeyPosition) * posCount);
+		if (rotCount > 0) inFile.read((char*)rotations.data(), sizeof(AssetFmt::RawKeyRotation) * rotCount);
+		if (sclCount > 0) inFile.read((char*)scales.data(), sizeof(AssetFmt::RawKeyScale) * sclCount);
 
 		// Bone::Create가 이제 vector를 직접 받도록 수정되었다고 가정
 		// m_bones가 std::vector<BoneUPtr>라면 ID에 맞춰 resize 필요할 수도 있음.
 		// 여기서는 m_bones에 단순히 push_back 한다고 가정 (Bone 클래스가 ID를 가지고 있으므로)
-		m_bones.push_back(Bone::Create(boneID, std::move(positions), std::move(rotations), std::move(scales)));
+		m_bones.push_back(AnimChannel::Create(boneID, std::move(positions), std::move(rotations), std::move(scales)));
 	}
 
 	inFile.close();
@@ -107,12 +107,12 @@ bool Animation::LoadByBinary(const std::string& filePath)
 }
 
 
-Bone* Animation::FindBone(const std::string& name)
+AnimChannel* Animation::FindBone(const std::string& name)
 {
 	auto it = std::find_if
 	(
 		m_bones.begin(), m_bones.end(),
-		[&](const BoneUPtr& bonePtr) { return bonePtr->GetBoneName() == name; }
+		[&](const AnimChannelUPtr& bonePtr) { return bonePtr->GetBoneName() == name; }
 	);
 	if (it == m_bones.end()) return nullptr;
 	else return it->get();
@@ -127,32 +127,20 @@ void Animation::ReadMissingBones(const aiAnimation* animation, Model& model)
 	for (int i = 0; i < size; i++)
 	{
 		auto channel = animation->mChannels[i];
-		std::string boneName = channel->mNodeName.data;
+		std::string boneName = channel->mNodeName.C_Str();
 
 		if (boneInfoMap.find(boneName) == boneInfoMap.end())
 		{
 			boneInfoMap[boneName].id = boneCount;
+			boneInfoMap[boneName].offset = glm::mat4(1.0f);
 			boneCount++;
 		}
-		m_bones.push_back(Bone::Create(channel->mNodeName.data,
-			boneInfoMap[channel->mNodeName.data].id, channel));
+		m_bones.push_back(AnimChannel::Create
+		(
+			boneName,
+			boneInfoMap[boneName].id, channel)
+		);
 	}
 
 	m_boneInfoMap = boneInfoMap;
-}
-
-void Animation::ReadHeirarchyData(AssimpNodeData& dest, const aiNode* src)
-{
-	if (!src) return;
-
-	dest.name = src->mName.data;
-	dest.transformation = Utils::ConvertToGLMMat4(src->mTransformation);
-	dest.childrenCount = src->mNumChildren;
-
-	for (int32 i = 0; i < src->mNumChildren; i++)
-	{
-		AssimpNodeData newData;
-		ReadHeirarchyData(newData, src->mChildren[i]);
-		dest.children.push_back(newData);
-	}
 }

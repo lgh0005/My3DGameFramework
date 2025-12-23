@@ -114,6 +114,8 @@ class GuiContextConvertAnimation(GUIContextBase):
 
         # 4. 명령 인자 조립 및 변환 로직 실행
         cmd = [exe_path, "-a", input_path, ref_path, final_output_path]
+
+        # TODO : 이것도 이후에 비동기로 돌아가도록 만들어야 함
         try:
             # 5. 실행
             result = subprocess.run(

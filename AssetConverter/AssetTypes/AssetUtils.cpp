@@ -77,3 +77,67 @@ void AssetUtils::WriteRawNodes(std::ofstream& file, const std::vector<AssetFmt::
     }
 }
 
+std::vector<AssetFmt::RawNode> AssetUtils::ReadRawNodes(std::ifstream& file)
+{
+    std::vector<AssetFmt::RawNode> nodes;
+
+    // 1. 노드 개수 읽기
+    uint32 count = ReadData<uint32>(file);
+    nodes.resize(count);
+
+    // 2. 각 노드 정보 읽기
+    for (uint32 i = 0; i < count; ++i)
+    {
+        nodes[i].name = ReadString(file);
+        nodes[i].parentIndex = ReadData<int32>(file);
+        nodes[i].localTransform = ReadData<glm::mat4>(file);
+    }
+
+    return nodes;
+}
+
+void AssetUtils::WriteKeyVector3(std::ofstream& file, const AssetFmt::RawKeyPosition& key)
+{
+    WriteData(file, key.time);
+    WriteData(file, key.vec3);
+}
+
+void AssetUtils::WriteKeyQuaternion(std::ofstream& file, const AssetFmt::RawKeyRotation& key)
+{
+    WriteData(file, key.time);
+    WriteData(file, key.quat);
+}
+
+void AssetUtils::WriteRawAnimation(std::ofstream& file, const AssetFmt::RawAnimation& anim)
+{
+    // 1. Header
+    WriteData(file, anim.magic);
+    WriteData(file, anim.version);
+    WriteString(file, anim.name);
+    WriteData(file, anim.duration);
+    WriteData(file, anim.ticksPerSecond);
+
+    // 2. Channels
+    uint32 channelCount = (uint32)anim.channels.size();
+    WriteData(file, channelCount);
+
+    for (const auto& ch : anim.channels)
+    {
+        WriteString(file, ch.nodeName);
+
+        // Positions
+        uint32 pCount = (uint32)ch.positions.size();
+        WriteData(file, pCount);
+        for (const auto& key : ch.positions) WriteKeyVector3(file, key);
+
+        // Rotations
+        uint32 rCount = (uint32)ch.rotations.size();
+        WriteData(file, rCount);
+        for (const auto& key : ch.rotations) WriteKeyQuaternion(file, key);
+
+        // Scales
+        uint32 sCount = (uint32)ch.scales.size();
+        WriteData(file, sCount);
+        for (const auto& key : ch.scales) WriteKeyVector3(file, key);
+    }
+}

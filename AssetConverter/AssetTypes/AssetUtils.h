@@ -26,6 +26,14 @@ public:
 	static void WriteRawMaterial(std::ofstream& file, const AssetFmt::RawMaterial& mat);
 	static void WriteRawMesh(std::ofstream& file, const AssetFmt::RawMesh& mesh);
 	static void WriteRawNodes(std::ofstream& file, const std::vector<AssetFmt::RawNode>& nodes);
+	static void WriteKeyVector3(std::ofstream& file, const AssetFmt::RawKeyPosition& key);
+	static void WriteKeyQuaternion(std::ofstream& file, const AssetFmt::RawKeyRotation& key);
+	static void WriteRawAnimation(std::ofstream& file, const AssetFmt::RawAnimation& anim);
+
+/*==================================//
+//  asset format read util methods  //
+//==================================*/
+	static std::vector<AssetFmt::RawNode> AssetUtils::ReadRawNodes(std::ifstream& file);
 };
 
 /*================================//

@@ -6,7 +6,7 @@
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
 #include "Graphics/Vertex.h"
-#include "Resources/Bone.h"
+#include "Resources/AnimChannel.h"
 #include "Misc/AssetFormat.h"
 
 #pragma region FORWARD_DECLARATION
@@ -29,6 +29,7 @@ public:
 	uint32 GetMeshCount() const { return (uint32)m_meshes.size(); }
 	SkinnedMeshPtr GetSkinnedMesh(int index) const;
 	StaticMeshPtr GetStaticMesh(int index) const;
+	auto& GetNodes() { return m_nodes; }
 
 	void Draw(const Program* program) const;
 
@@ -79,7 +80,7 @@ private:
 		aiMesh* mesh, const aiScene* scene);
 
 private:
-	std::unordered_map<std::string, BoneInfo> m_boneInfoMap;
+	std::unordered_map<std::string, AssetFmt::RawBoneInfo> m_boneInfoMap;
 	int32 m_BoneCounter = 0;
 
 #pragma endregion

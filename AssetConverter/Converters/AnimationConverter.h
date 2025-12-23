@@ -5,6 +5,21 @@ class AnimationConverter
 	DECLARE_SINGLE(AnimationConverter)
 
 public:
-	// TODO : 이후에 Pose, Pose, Skeleton 등의 클래스를 확실히 
-	// 구현을 해 둔 다음에 생각을 해볼 필요가 있다.
+	bool Convert
+	(
+		const std::string& animPath,
+		const std::string& refModelPath,
+		const std::string& outputPath
+	);
+
+private:
+	void ProcessChannel(aiNodeAnim* srcChannel, AssetFmt::RawAnimChannel& dstChannel);
+	bool LoadReferenceSkeleton(const std::string& path);
+    bool ProcessSingleClip(aiAnimation* srcAnim, AssetFmt::RawAnimation& outAnim);
+	std::string MakeSafeName(const std::string& rawName);
+    bool WriteAnimationFile(const std::string& finalPath, const AssetFmt::RawAnimation& anim);
+
+private:
+    // m_rawAnim 멤버 변수 제거 (지역 변수 사용)
+    std::unordered_set<std::string> m_validNodeNames;
 };

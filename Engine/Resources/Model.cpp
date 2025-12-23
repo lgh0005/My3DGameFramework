@@ -366,7 +366,7 @@ void Model::ReadBinarySkeleton(std::ifstream& inFile)
         std::string name = AssetUtils::ReadString(inFile);
         int32_t id = AssetUtils::ReadData<int32_t>(inFile);
 
-        BoneInfo info;
+        AssetFmt::RawBoneInfo info;
         info.id = id;
         if (id >= 0 && id < (int32)rawBoneInfos.size())
         {
@@ -553,7 +553,7 @@ void Model::ExtractBoneWeightForVertices(std::vector<SkinnedVertex>& vertices,
         if (m_boneInfoMap.find(boneName) == m_boneInfoMap.end())
         {
             // 3. 새 뼈라면, 새 ID와 오프셋을 맵에 등록
-            BoneInfo newBoneInfo;
+            AssetFmt::RawBoneInfo newBoneInfo;
             newBoneInfo.id = m_BoneCounter;
             newBoneInfo.offset = Utils::ConvertToGLMMat4(mesh->mBones[boneIndex]->mOffsetMatrix);
             m_boneInfoMap[boneName] = newBoneInfo;

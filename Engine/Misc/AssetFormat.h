@@ -39,22 +39,6 @@ namespace AssetFmt
         RawSkinnedVertex();
     };
 
-    // RawAnimData
-    struct AnimHeader
-    {
-        char     name[64];       // 애니메이션 이름
-        float    duration;       // 전체 재생 시간 (Ticks)
-        float    ticksPerSecond; // FPS
-        uint32   channelCount;   // 트랙 개수
-    };
-
-    struct AnimChannelInfo
-    {
-        uint32   positionCount;
-        uint32   rotationCount;
-        uint32   scaleCount;
-    };
-
     struct KeyVector3 { glm::vec3 vec3; float time; };
     struct KeyQuaternion { glm::quat quat; float time; };
 
@@ -67,17 +51,6 @@ namespace AssetFmt
     {
         uint32 id;
         glm::mat4 offset;
-    };
-
-    struct RawBone
-    {
-        std::string name;
-        int32 id;
-        glm::mat4 localTransform;
-        std::vector<AssetFmt::RawKeyPosition> positions;
-        std::vector<AssetFmt::RawKeyRotation> rotations;
-        std::vector<AssetFmt::RawKeyScale>    scales;
-        std::vector<std::string> childrenNames;
     };
 
     // RawImage
@@ -136,8 +109,8 @@ namespace AssetFmt
     // RawAnimation
     struct RawAnimation
     {
-        uint32_t magic = 0x414E494D; // 'ANIM'
-        uint32_t version = 1;
+        uint32 magic = 0x414E494D; // 'ANIM'
+        uint32 version = 1;
         std::string name;
         float duration;
         float ticksPerSecond;
@@ -147,7 +120,7 @@ namespace AssetFmt
     // RawModel
     struct RawModel
     {
-        uint32 magicNumber = 0x4D594D44;
+        uint32 magicNumber = 0x4D594D44; // 'MYMD'
         uint32 version = 2;
         std::vector<AssetFmt::RawMaterial> materials;
         std::vector<AssetFmt::RawMesh> meshes;
