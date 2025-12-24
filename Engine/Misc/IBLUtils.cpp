@@ -14,8 +14,8 @@ CubeTexturePtr IBLUtils::CreateCubemapFromHDR(Texture* hdrTexture, int32 resolut
 	// 일회용 유틸성 쉐이더 로드
 	auto sphericalToCubeProgram = Program::Create
 	(
-		"./Resources/Shaders/IBLUtils/spherical_map.vert",
-		"./Resources/Shaders/IBLUtils/spherical_map.frag"
+		"./Resources/Shaders/IBLUtils/IBLUtils_Common.vert",
+		"./Resources/Shaders/IBLUtils/IBLUtils_Spherical_Map.frag"
 	);
 	if (!sphericalToCubeProgram) return nullptr;
 
@@ -74,8 +74,8 @@ CubeTexturePtr IBLUtils::CreateIrradianceMap(CubeTexture* src)
 	// 일회용 유틸성 쉐이더 로드
 	auto convolutionProgram = Program::Create
 	(
-		"./Resources/Shaders/IBLUtils/spherical_map.vert",
-		"./Resources/Shaders/IBLUtils/diffuse_irradiance.frag"
+		"./Resources/Shaders/IBLUtils/IBLUtils_Common.vert",
+		"./Resources/Shaders/IBLUtils/IBLUtils_Diffuse_Irradiance.frag"
 	);
 	if (!convolutionProgram) return nullptr;
 
@@ -137,8 +137,8 @@ CubeTexturePtr IBLUtils::CreatePrefilteredMap(CubeTexture* src)
 	// 일회용 유틸성 쉐이더 로드
 	auto preFilteredProgram = Program::Create
 	(
-		"./Resources/Shaders/IBLUtils/spherical_map.vert",
-		"./Resources/Shaders/IBLUtils/prefiltered_light.frag"
+		"./Resources/Shaders/IBLUtils/IBLUtils_Common.vert",
+		"./Resources/Shaders/IBLUtils/IBLUtils_Prefiltered_Light.frag"
 	);
 	if (!preFilteredProgram) return nullptr;
 
@@ -202,8 +202,8 @@ TexturePtr IBLUtils::CreateBRDFLUT()
 	glViewport(0, 0, resolution, resolution);
 
 	auto brdfProgram = Program::Create(
-		"./Resources/Shaders/IBLUtils/brdf_lookup.vert",
-		"./Resources/Shaders/IBLUtils/brdf_lookup.frag"
+		"./Resources/Shaders/IBLUtils/IBLUtils_BRDF_Lookup.vert",
+		"./Resources/Shaders/IBLUtils/IBLUtils_BRDF_Lookup.frag"
 	);
 	if (!brdfProgram) return nullptr;
 

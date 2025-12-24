@@ -56,15 +56,13 @@ bool ShadowPass::Init(int32 resolution)
 	return true;
 }
 
-// TEST : Context에 있는 내용물을 잘 렌더링 하는 지 테스트
 void ShadowPass::Render(RenderContext* context)
 {
-	// 0. Context 캐스팅 및 유효성 검사
-	auto stdCtx = (StandardRenderContext*)context;
-	auto lights = stdCtx->GetLights();
-	auto staticMeshes = stdCtx->GetStaticMeshRenderers();
-	auto skinnedMeshes = stdCtx->GetSkinnedMeshRenderers();
-	if (!stdCtx) return;
+	// 0. Context 유효성 검사 및 필요 정보 가져오기
+	if (!context) return;
+	auto lights = context->GetLights();
+	auto staticMeshes = context->GetStaticMeshRenderers();
+	auto skinnedMeshes = context->GetSkinnedMeshRenderers();
 
 	// 1. 공통 설정
 	glEnable(GL_DEPTH_TEST);
@@ -140,11 +138,11 @@ void ShadowPass::Render(RenderContext* context)
 		{
 			// ShadowMap 클래스 내부의 Texture를 가져옵니다.
 			Texture* tex = m_shadowMaps[i]->GetShadowMap().get();
-			stdCtx->SetShadowMap(i, tex);
+			context->SetShadowMap(i, tex);
 		}
 		else
 		{
-			stdCtx->SetShadowMap(i, nullptr);
+			context->SetShadowMap(i, nullptr);
 		}
 	}
 }

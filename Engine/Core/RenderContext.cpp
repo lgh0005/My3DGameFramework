@@ -3,9 +3,14 @@
 #include "Graphics/SkyLight.h"
 #include "Components/MeshRenderer.h"
 #include "Components/Light.h"
+#include "Resources/CubeTexture.h"
+#include "Resources/Texture.h"
 
 RenderContext::~RenderContext() = default;
 
+/*====================================//
+//   default render context methods   //
+//====================================*/
 void RenderContext::Reset(Scene* scene, Camera* camera)
 {
 	// 1. 기본 정보 갱신
@@ -40,4 +45,61 @@ void RenderContext::AddSkinnedMeshRenderer(MeshRenderer* renderer)
 void RenderContext::AddLight(Light* light)
 {
 	m_culledLights.push_back(light);
+}
+
+/*====================================//
+//   default render context getters   //
+//====================================*/
+Scene* RenderContext::GetScene() const
+{
+	return m_currentScene;
+}
+
+Camera* RenderContext::GetCamera() const
+{
+	return m_currentCamera;
+}
+
+SkyLight* RenderContext::GetSkyLight() const
+{
+	return m_skyLight;
+}
+
+const std::vector<MeshRenderer*>& RenderContext::GetStaticMeshRenderers() const
+{
+	return m_culledStaticMeshRenderers;
+}
+
+const std::vector<MeshRenderer*>& RenderContext::GetSkinnedMeshRenderers() const
+{
+	return m_culledSkinnedMeshRenderers;
+}
+
+const std::vector<Light*>& RenderContext::GetLights() const
+{
+	return m_culledLights;
+}
+
+/*======================================================//
+//   common resource methods for common render passes   //
+//======================================================*/
+void RenderContext::SetShadowMap(int32 index, Texture* texture)
+{
+	if (index >= 0 && index < MAX_SHADOW_CASTER) m_shadowMaps[index] = texture;
+}
+
+Texture* RenderContext::GetShadowMap(int32 index) const
+{
+	if (index >= 0 && index < MAX_SHADOW_CASTER) return m_shadowMaps[index];
+	return nullptr;
+}
+
+void RenderContext::SetSkyboxTexture(CubeTexture* texture)
+{
+	m_skyboxTexture = texture;
+}
+
+CubeTexture* RenderContext::GetSkyboxTexture() const
+{
+	return m_skyboxTexture;
 }

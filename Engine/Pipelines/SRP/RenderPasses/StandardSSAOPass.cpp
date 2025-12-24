@@ -1,5 +1,5 @@
 #include "EnginePch.h"
-#include "SSAOPass.h"
+#include "StandardSSAOPass.h"
 
 #include <random>
 #include "Core/Scene.h"
@@ -12,30 +12,27 @@
 #include "Graphics/FrameBuffer.h"
 #include "Graphics/Program.h"
 
-// TODO : 공통 RenderContext에 대해서 캐스팅할 때,
-// RenderContext를 적절히 캐스팅할 수 있도록 하는 수단 마련해야함.
-// 지금은 SRP에만 적용되고 있음.
 #include "Pipelines/SRP/StandardRenderPipeline.h"
 #include "Pipelines/SRP/StandardRenderContext.h"
 
-SSAOPassUPtr SSAOPass::Create(int32 width, int32 height)
+StandardSSAOPassUPtr StandardSSAOPass::Create(int32 width, int32 height)
 {
-    auto pass = SSAOPassUPtr(new SSAOPass());
+    auto pass = StandardSSAOPassUPtr(new StandardSSAOPass());
     if (!pass->Init(width, height)) return nullptr;
     return std::move(pass);
 }
 
-bool SSAOPass::Init(int32 width, int32 height)
+bool StandardSSAOPass::Init(int32 width, int32 height)
 {
     m_ssaoProgram = Program::Create
     (
-        "./Resources/Shaders/Common/Common_SSAO.vert",
-        "./Resources/Shaders/Common/Common_SSAO_pass.frag"
+        "./Resources/Shaders/Standard/Standard_SSAO.vert",
+        "./Resources/Shaders/Standard/Standard_SSAO_pass.frag"
     );
     m_ssaoBlurProgram = Program::Create
     (
-        "./Resources/Shaders/Common/Common_SSAO.vert",
-        "./Resources/Shaders/Common/Common_SSAO_blur.frag"
+        "./Resources/Shaders/Standard/Standard_SSAO.vert",
+        "./Resources/Shaders/Standard/Standard_SSAO_blur.frag"
     );
     if (!m_ssaoProgram || !m_ssaoBlurProgram) return false;
 
@@ -59,14 +56,14 @@ bool SSAOPass::Init(int32 width, int32 height)
     return true;
 }
 
-void SSAOPass::Resize(int32 width, int32 height)
+void StandardSSAOPass::Resize(int32 width, int32 height)
 {
     // FBO 재생성 (단순하게 새로 만듦)
     m_ssaoFBO = Framebuffer::CreateSSAO(width, height);
     m_ssaoBlurFBO = Framebuffer::CreateSSAO(width, height);
 }
 
-void SSAOPass::GenerateKernel()
+void StandardSSAOPass::GenerateKernel()
 {
     std::uniform_real_distribution<float> randomFloats(0.0, 1.0);
     std::default_random_engine generator;
@@ -90,7 +87,7 @@ void SSAOPass::GenerateKernel()
     }
 }
 
-void SSAOPass::GenerateNoiseTexture()
+void StandardSSAOPass::GenerateNoiseTexture()
 {
     std::uniform_real_distribution<float> randomFloats(0.0, 1.0);
     std::default_random_engine generator;
@@ -116,7 +113,7 @@ void SSAOPass::GenerateNoiseTexture()
     m_noiseTexture->SetData(ssaoNoise.data());
 }
 
-void SSAOPass::Render(RenderContext* context)
+void StandardSSAOPass::Render(RenderContext* context)
 {
     // 0. 자신의 렌더 패스에 활용되고 있는 RenderContext로 캐스팅
     auto stdCtx = (StandardRenderContext*)context;

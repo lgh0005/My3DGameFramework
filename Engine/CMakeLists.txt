@@ -22,7 +22,6 @@ add_library(Engine STATIC
 
    # Common Render Passes
    "Pipelines/Common/CullingPass.h" "Pipelines/Common/CullingPass.cpp"
-   "Pipelines/Common/SSAOPass.h"    "Pipelines/Common/SSAOPass.cpp"
    "Pipelines/Common/ShadowPass.h"  "Pipelines/Common/ShadowPass.cpp"
    "Pipelines/Common/SkyboxPass.h"  "Pipelines/Common/SkyboxPass.cpp"
 
@@ -30,6 +29,7 @@ add_library(Engine STATIC
    "Pipelines/SRP/RenderPasses/StandardPostProcessPass.h" "Pipelines/SRP/RenderPasses/StandardPostProcessPass.cpp"
    "Pipelines/SRP/RenderPasses/StandardGeometryPass.h"  "Pipelines/SRP/RenderPasses/StandardGeometryPass.cpp"
    "Pipelines/SRP/RenderPasses/StandardDeferredLightingPass.h"  "Pipelines/SRP/RenderPasses/StandardDeferredLightingPass.cpp"
+   "Pipelines/SRP/RenderPasses/StandardSSAOPass.h"    "Pipelines/SRP/RenderPasses/StandardSSAOPass.cpp"
    "Pipelines/SRP/RenderPasses/StandardPostProcessPass.h"  "Pipelines/SRP/RenderPasses/StandardPostProcessPass.cpp"
    "Pipelines/SRP/StandardGlobalUniforms.h"    "Pipelines/SRP/StandardGlobalUniforms.cpp"
    "Pipelines/SRP/StandardRenderContext.h"     "Pipelines/SRP/StandardRenderContext.cpp"

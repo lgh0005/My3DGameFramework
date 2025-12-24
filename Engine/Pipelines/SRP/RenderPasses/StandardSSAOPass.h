@@ -12,11 +12,11 @@ CLASS_PTR(StaticMesh)
 CLASS_PTR(RenderContext)
 #pragma endregion
 
-CLASS_PTR(SSAOPass)
-class SSAOPass : public ContextRenderPass
+CLASS_PTR(StandardSSAOPass)
+class StandardSSAOPass : public ContextRenderPass
 {
 public:
-	static SSAOPassUPtr Create
+	static StandardSSAOPassUPtr Create
 	(
 		int32 width = WINDOW_WIDTH, 
 		int32 height = WINDOW_HEIGHT
@@ -25,7 +25,7 @@ public:
 	void Resize(int32 width, int32 height);
 
 private:
-	SSAOPass() = default;
+	StandardSSAOPass() = default;
 	bool Init(int32 width, int32 height);
 	void GenerateKernel();
 	void GenerateNoiseTexture();

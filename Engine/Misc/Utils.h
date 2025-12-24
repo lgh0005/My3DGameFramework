@@ -23,7 +23,4 @@ public:
 	// AABB 좌표를 얻어오는 유틸 함수
 	static glm::vec3 Min(const glm::vec3& a, const glm::vec3& b);
 	static glm::vec3 Max(const glm::vec3& a, const glm::vec3& b);
-
-	// TEMP : 애니메이션 블렌딩을 위한 트랜스폼 보간 유틸 함수
-	static glm::mat4 Interpolate(const glm::mat4& matA, const glm::mat4& matB, float blendFactor);
 };
