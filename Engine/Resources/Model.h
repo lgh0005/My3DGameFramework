@@ -30,6 +30,9 @@ public:
 	StaticMeshPtr GetStaticMesh(int index) const;
 	SkeletonPtr GetSkeleton() const { return m_skeleton; }
 	auto& GetNodes() { return m_nodes; }
+	
+	// TODO : GenerateGameObjectHierarchy와 같은 함수가
+	// 추가될 수 있음.
 
 	void Draw(const Program* program) const;
 

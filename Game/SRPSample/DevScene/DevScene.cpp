@@ -18,6 +18,7 @@
 #include "Graphics/Geometry.h"
 #include "Graphics/SkyLight.h"
 #include "Resources/AudioClip.h"
+#include "Resources/AnimController.h"
 
 #include "Components/Camera.h"
 #include "Components/Transform.h"
@@ -34,6 +35,7 @@
 #include "SRPSample/RenderPasses/EnvironmentRenderPass.h"
 
 #include "SRPSample/Scripts/CameraController.h"
+#include "SRPSample/Scripts/PlayerController.h"
 
 DevScene::~DevScene() = default;
 
@@ -59,9 +61,11 @@ bool DevScene::LoadNessesaryResources()
 	// 0-2. 모델과 애니메이션 #1
 	{
 		auto model = Model::Load("./Resources/Models/spacesoldier/aliensoldier.mymodel");
-		auto anim = Animation::Load("./Resources/Models/spacesoldier/Idle.myanim", model.get());
+		auto anim1 = Animation::Load("./Resources/Models/spacesoldier/Idle.myanim");
+		auto anim2 = Animation::Load("./Resources/Models/spacesoldier/Walking.myanim");
 		RESOURCE.AddResource<Model>(std::move(model), "aliensoldier");
-		RESOURCE.AddResource<Animation>(std::move(anim), "hiphopDancing");
+		RESOURCE.AddResource<Animation>(std::move(anim1), "Idle");
+		RESOURCE.AddResource<Animation>(std::move(anim2), "Walk");
 	}
 
 	// 가방 모델
@@ -444,7 +448,14 @@ bool DevScene::CreateSceneContext()
 	{
 		// 1. 리소스 먼저 확보 (Model과 Animation)
 		auto model = RESOURCE.GetResource<Model>("aliensoldier");
-		auto animation = RESOURCE.GetResource<Animation>("hiphopDancing");
+		auto anim1 = RESOURCE.GetResource<Animation>("Idle");
+		auto anim2 = RESOURCE.GetResource<Animation>("Walk");
+		auto animCtrl = AnimController::Create();
+		animCtrl->AddState("Idle", anim1);
+		animCtrl->AddState("Walk", anim2);
+		animCtrl->SetTransitionDuration("Idle", "Walk", 0.2f);
+		animCtrl->SetTransitionDuration("Walk", "Idle", 0.2f);
+		animCtrl->SetStartState("Idle");
 
 		// 2. GameObject 생성
 		auto modelGo = GameObject::Create();
@@ -453,12 +464,8 @@ bool DevScene::CreateSceneContext()
 		modelGo->GetTransform().SetScale(glm::vec3(0.025f));
 
 		// 3. 애니메이터 생성
-		auto animator = Animator::Create(model);
-		if (animator)
-		{
-			animator->PlayAnimation(animation);
-			modelGo->AddComponent(std::move(animator));
-		}
+		auto animator = Animator::Create(model, std::move(animCtrl));
+		if (animator) modelGo->AddComponent(std::move(animator));
 
 		// 4. Model 안의 모든 Mesh 조각을 MeshRenderer 컴포넌트로 추가
 		for (uint32 i = 0; i < model->GetMeshCount(); ++i)
@@ -467,6 +474,10 @@ bool DevScene::CreateSceneContext()
 			auto renderer = MeshRenderer::Create(mesh, mesh->GetMaterial());
 			modelGo->AddComponent(std::move(renderer));
 		}
+
+		// 5. PlayerController
+		auto script = PlayerController::Create();
+		modelGo->AddComponent(std::move(script));
 
 		// 5. 씬에 GameObject 등록
 		AddGameObject(std::move(modelGo));

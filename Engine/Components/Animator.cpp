@@ -3,15 +3,17 @@
 #include "Resources/AnimChannel.h"
 #include "Resources/Model.h"
 #include "Resources/Skeleton.h"
+#include "Resources/AnimController.h"
+#include "Resources/Pose.h"
 
-AnimatorUPtr Animator::Create(ModelPtr model)
+AnimatorUPtr Animator::Create(ModelPtr model, AnimControllerUPtr controller)
 {
 	auto animator = AnimatorUPtr(new Animator());
-	if (!animator->Init(std::move(model))) return nullptr;
+	if (!animator->Init(std::move(model), std::move(controller))) return nullptr;
 	return animator;
 }
 
-bool Animator::Init(ModelPtr model)
+bool Animator::Init(ModelPtr model, AnimControllerUPtr controller)
 {
 	if (!model)
 	{
@@ -20,9 +22,16 @@ bool Animator::Init(ModelPtr model)
 	}
 
 	m_currentModel = model;
-	m_currentTime = 0.0f;
 
-    // 0. 모델로부터 스켈레톤을 얻어옴
+    // 0. 애니메이션 컨트롤러를 move
+    m_controller = std::move(controller);
+    if (!m_controller)
+    {
+        SPDLOG_ERROR("Animator initialized without AnimController!");
+        return false;
+    }
+
+    // 1. 모델로부터 스켈레톤을 얻어옴
     auto skeleton = m_currentModel->GetSkeleton();
     if (!skeleton)
     {
@@ -30,22 +39,20 @@ bool Animator::Init(ModelPtr model)
         return false;
     }
 
-    // 1. Bone Count에 맞게 스키닝 행렬 버퍼 초기화
+    // 2. Bone Count에 맞게 스키닝 행렬 버퍼 초기화
 	usize boneCount = skeleton->GetBoneCount();
 	m_finalBoneMatrices.resize(boneCount, glm::mat4(1.0f));
 	m_globalJointPositions.resize(boneCount, glm::vec3(0.0f));
 
-    // 2. 전체 노드 개수에 맞게 글로벌 행렬 버퍼 미리 확보
+    // 글로벌 행렬 버퍼 빛 포즈 벡터 초기화
+    const auto& nodes = m_currentModel->GetNodes();
     usize nodeCount = m_currentModel->GetNodes().size();
     m_globalTransforms.resize(nodeCount, glm::mat4(1.0f));
+    m_poses.resize(nodeCount);
+    for (usize i = 0; i < nodeCount; ++i)
+        m_poses[i] = Pose::FromMat4(nodes[i].localTransform);
 
 	return true;
-}
-
-void Animator::PlayAnimation(AnimationPtr animation)
-{
-    m_currentAnimation = std::move(animation);
-    m_currentTime = 0.0f;
 }
 
 /*====================================//
@@ -56,7 +63,7 @@ void Animator::Update()
     if (!m_currentModel) return;
 
     // 1. 시간 업데이트
-    UpdateAnimationTime();
+    UpdateAnimationController();
 
     // 2. 뼈대 변환 행렬 계산 (순회 + 스키닝)
     UpdateBoneTransforms();
@@ -65,14 +72,9 @@ void Animator::Update()
     UpdateCurrentPoseLocalBounds();
 }
 
-void Animator::UpdateAnimationTime()
+void Animator::UpdateAnimationController() 
 {
-    if (m_currentAnimation)
-    {
-        m_currentTime += m_currentAnimation->GetTicksPerSecond() * TIME.GetDeltaTime();
-        float duration = m_currentAnimation->GetDuration();
-        if (duration > 0.0f) m_currentTime = fmod(m_currentTime, duration);
-    }
+    m_controller->Update(TIME.GetDeltaTime()); 
 }
 
 void Animator::UpdateBoneTransforms()
@@ -89,41 +91,40 @@ void Animator::UpdateBoneTransforms()
     {
         const auto& node = nodes[i];
 
-        // A. 기본 로컬 변환 (T-Pose 상태)
-        glm::mat4 localTransform = node.localTransform;
+        // A. 기본 포즈 가져오기 (Init에서 미리 계산해둔 캐시 사용)
+        // [수정] 매 프레임 Decompose 하던 것을 m_poses[i]로 대체
+        Pose defaultPose = m_poses[i];
 
-        // B. 애니메이션 적용 (채널이 존재하면 덮어쓰기)
-        if (m_currentAnimation)
-        {
-            // 이름으로 채널 검색 (FindBone -> FindChannel 권장)
-            const AnimChannel* channel = m_currentAnimation->FindChannel(node.name);
-            if (channel) localTransform = channel->GetLocalTransform(m_currentTime);
-        }
+        // B. 컨트롤러에게 최종 포즈 요청
+        // [수정] m_currentAnimation 직접 접근 삭제 -> Controller가 알아서 블렌딩해서 줌
+        Pose finalPose = m_controller->GetPose(node.name, defaultPose);
 
-        // C. 부모 행렬과 결합 (Global Transform 계산)
-        // TODO: 추후 GameObject Transform 계층 구조와 통합 고려 필요
+        // C. Pose -> Matrix 변환
+        glm::mat4 localTransform = finalPose.ToMat4();
+
+        // D. 부모 행렬과 결합 (Global Transform)
         int32 parentIndex = node.parentIndex;
         if (parentIndex == -1) m_globalTransforms[i] = localTransform;
         else m_globalTransforms[i] = m_globalTransforms[parentIndex] * localTransform;
 
-        // D. 스키닝 행렬(FinalBoneMatrix) 계산
-        // 현재 노드가 실제 뼈(Bone)로 등록되어 있는지 확인
-        const auto& boneInfoMap = skeleton->GetBoneInfoMap();
-        auto it = boneInfoMap.find(node.name);
-
-        if (it != boneInfoMap.end())
+        // E. 스키닝 행렬(FinalBoneMatrix) 계산
+        if (skeleton)
         {
-            uint32 boneID = it->second.id;
-            const glm::mat4& offsetMat = it->second.offset;
+            // (최적화 팁: 매번 Find하지 말고, Init에서 NodeIndex -> BoneID 매핑 테이블을 만들어두면 더 빠름)
+            // 일단 현재 구조 유지
+            const auto& boneInfoMap = skeleton->GetBoneInfoMap();
+            auto it = boneInfoMap.find(node.name);
 
-            // 유효한 ID 범위인지 체크
-            if (boneID < m_finalBoneMatrices.size())
+            if (it != boneInfoMap.end())
             {
-                // Final = Global * Offset (Shader로 보낼 행렬)
-                m_finalBoneMatrices[boneID] = m_globalTransforms[i] * offsetMat;
+                uint32 boneID = it->second.id;
+                const glm::mat4& offsetMat = it->second.offset;
 
-                // 바운딩 박스 계산 등을 위해 관절 위치 저장
-                m_globalJointPositions[boneID] = glm::vec3(m_globalTransforms[i][3]);
+                if (boneID < m_finalBoneMatrices.size())
+                {
+                    m_finalBoneMatrices[boneID] = m_globalTransforms[i] * offsetMat;
+                    m_globalJointPositions[boneID] = glm::vec3(m_globalTransforms[i][3]);
+                }
             }
         }
     }

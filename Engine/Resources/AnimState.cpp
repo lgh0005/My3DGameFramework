@@ -2,6 +2,8 @@
 #include "AnimState.h"
 #include "Resources/Animation.h"
 
+AnimState::AnimState() = default;
+
 AnimStateUPtr AnimState::Create(const std::string& name, AnimationPtr clip)
 {
 	auto state = AnimStateUPtr(new AnimState());

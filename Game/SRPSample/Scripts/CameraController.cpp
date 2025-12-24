@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "CameraController.h"
 #include "Components/Transform.h"
+#include "PlayerController.h"
 
 CameraControllerUPtr CameraController::Create()
 {

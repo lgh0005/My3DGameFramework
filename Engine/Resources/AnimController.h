@@ -12,16 +12,16 @@ class AnimController
 public:
 	static AnimControllerUPtr Create();
 	using AnimStateMap = std::unordered_map<std::string, AnimStatePtr>;
-	void Update(float deltaTime);
-
 	void AddState(const std::string& name, AnimationPtr clip, bool isLoop = true, float speed = 1.0f);
+	void CrossFade(const std::string& stateName, float duration = -1.0f);
+	void Update(float deltaTime);
+	void Play(const std::string& stateName);
+
 	void SetTransitionDuration(const std::string& from, const std::string& to, float duration);
 	void SetStartState(const std::string& name);
-
-	void Play(const std::string& stateName);
-	void CrossFade(const std::string& stateName, float duration = -1.0f);
-
 	Pose GetPose(const std::string& nodeName, const Pose& defaultPose) const;
+
+private:
 
 private:
 	AnimController() = default;
