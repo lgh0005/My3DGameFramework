@@ -3,10 +3,7 @@
 
 #pragma region FORWARD_DECLARATION
 CLASS_PTR(Framebuffer)
-//CLASS_PTR(MeshRenderer)
-//CLASS_PTR(Light)
 CLASS_PTR(Texture)
-//CLASS_PTR(CubeTexture)
 #pragma endregion
 
 CLASS_PTR(StandardRenderContext)
@@ -15,9 +12,11 @@ class StandardRenderContext : public RenderContext
 public:
 	StandardRenderContext() = default;
 
+	// For DeferredLightingPass : Target Framebuffer
 	void SetTargetFramebuffer(Framebuffer* fbo) { m_targetFramebuffer = fbo; }
 	Framebuffer* GetTargetFramebuffer() const { return m_targetFramebuffer; }
 
+	// For StandardGeometryPass
 	void SetGBuffer(Framebuffer* gBuffer);
 	Framebuffer* GetGBuffer() const { return m_gBuffer; }
 	Texture* GetGBufferPosition() const { return m_gPosition; }
@@ -25,17 +24,22 @@ public:
 	Texture* GetGBufferAlbedo() const { return m_gAlbedoSpec; }
 	Texture* GetGBufferEmission() const { return m_gEmission; }
 
+	// For StandardSSAOPass
 	void SetSSAOTexture(Texture* texture) { m_ssaoTexture = texture; }
 	Texture* GetSSAOTexture() const { return m_ssaoTexture; }
 
 private:
-	Framebuffer* m_targetFramebuffer{ nullptr };
-	Framebuffer* m_gBuffer{ nullptr };
 
+	// For DeferredLightingPass : Target Framebuffer
+	Framebuffer* m_targetFramebuffer{ nullptr };
+
+	// For StandardGeometryPass 
+	Framebuffer* m_gBuffer{ nullptr };
 	Texture* m_gPosition{ nullptr };
 	Texture* m_gNormal{ nullptr };
 	Texture* m_gAlbedoSpec{ nullptr };
 	Texture* m_gEmission{ nullptr };
 
+	// For StandardSSAOPass
 	Texture* m_ssaoTexture{ nullptr };
 };

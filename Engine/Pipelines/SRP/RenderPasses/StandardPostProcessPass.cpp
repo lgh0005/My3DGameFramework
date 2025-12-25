@@ -148,16 +148,10 @@ void StandardPostProcessPass::Resize(int32 width, int32 height)
 	if (m_compositeProgram)
 	{
 		m_compositeProgram->Use();
-		m_compositeProgram->SetUniform("inverseScreenSize",
-			glm::vec2(1.0f / (float)width, 1.0f / (float)height));
+		m_compositeProgram->SetUniform
+		(
+			"inverseScreenSize",
+			glm::vec2(1.0f / (float)width, 1.0f / (float)height)
+		);
 	}
-}
-
-void StandardPostProcessPass::BeginDraw()
-{
-	m_frameBuffer->Bind();
-	glViewport(0, 0, m_frameBuffer->GetWidth(), m_frameBuffer->GetHeight());
-	glEnable(GL_DEPTH_TEST);
-	glEnable(GL_CULL_FACE);
-	glCullFace(GL_BACK);
 }

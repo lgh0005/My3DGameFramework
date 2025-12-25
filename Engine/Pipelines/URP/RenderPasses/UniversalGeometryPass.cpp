@@ -1,5 +1,5 @@
-ï»¿#include "EnginePch.h"
-#include "StandardGeometryPass.h"
+#include "EnginePch.h"
+#include "UniversalGeometryPass.h"
 
 #include "Core/Scene.h"
 #include "Core/GameObject.h"
@@ -9,32 +9,38 @@
 #include "Resources/Mesh.h"
 #include "Resources/Material.h"
 #include "Resources/Texture.h"
+#include "Components/Camera.h"
 #include "Components/MeshRenderer.h"
 #include "Components/Transform.h"
 #include "Components/SpotLight.h"
 #include "Components/Animator.h"
 
-#include "Pipelines/SRP/StandardRenderPipeline.h"
-#include "Pipelines/SRP/StandardRenderContext.h"
+#include "Pipelines/URP/UniversalRenderPipeline.h"
+#include "Pipelines/URP/UniversalRenderContext.h"
 
-StandardGeometryPassUPtr StandardGeometryPass::Create(int32 width, int32 height)
+UniversalGeometryPass::~UniversalGeometryPass() = default;
+UniversalGeometryPass::UniversalGeometryPass() = default;
+
+UniversalGeometryPassUPtr UniversalGeometryPass::Create(int32 width, int32 height)
 {
-	auto pass = StandardGeometryPassUPtr(new StandardGeometryPass());
+	auto pass = UniversalGeometryPassUPtr(new UniversalGeometryPass());
 	if (!pass->Init(width, height)) return nullptr;
 	return std::move(pass);
 }
 
-bool StandardGeometryPass::Init(int32 width, int32 height)
+bool UniversalGeometryPass::Init(int32 width, int32 height)
 {
+	// TODO : UniversalRenderPipeline¿¡´Â ´õ ¸¹Àº ¸ÓÆ¼¸®¾ó ÀÎÀÚµéÀÌ µé¾î°¡´Ï±î
+	// °ü·ÃÇØ¼­ ¼ÎÀÌ´õ¿¡ ÆĞÅ·À» ¾î¶»°Ô ÇØ¾ß ÇÒ Áöµµ »ı°¢À» ÇØº¸±ä ÇØ¾ßÇÔ.
 	m_staticGeometryProgram = Program::Create
 	(
-		"./Resources/Shaders/Standard/Standard_Deferred_GeometryPass_Static.vert",
-		"./Resources/Shaders/Standard/Standard_Deferred_GeometryPass.frag"
+		"./Resources/Shaders/Universal/Universal_Deferred_GeometryPass_Static.vert",
+		"./Resources/Shaders/Universal/Universal_Deferred_GeometryPass.frag"
 	);
 	m_skinnedGeometryProgram = Program::Create
 	(
-		"./Resources/Shaders/Standard/Standard_Deferred_GeometryPass_Skinned.vert",
-		"./Resources/Shaders/Standard/Standard_Deferred_GeometryPass.frag"
+		"./Resources/Shaders/Universal/Universal_Deferred_GeometryPass_Skinned.vert",
+		"./Resources/Shaders/Universal/Universal_Deferred_GeometryPass.frag"
 	);
 	if (!m_staticGeometryProgram || !m_skinnedGeometryProgram) return false;
 
@@ -44,22 +50,22 @@ bool StandardGeometryPass::Init(int32 width, int32 height)
 	return true;
 }
 
-void StandardGeometryPass::Render(RenderContext* context)
+void UniversalGeometryPass::Render(RenderContext* context)
 {
-	// 0. ìì‹ ì˜ ë Œë” íŒ¨ìŠ¤ì— í™œìš©ë˜ê³  ìˆëŠ” RenderContextë¡œ ìºìŠ¤íŒ…
-	auto stdCtx = (StandardRenderContext*)context;
+	// 0. ÀÚ½ÅÀÇ ·»´õ ÆĞ½º¿¡ È°¿ëµÇ°í ÀÖ´Â RenderContext·Î Ä³½ºÆÃ
+	auto stdCtx = (UniversalRenderContext*)context;
 
-	// 1. G-Buffer FBO ë°”ì¸ë”©
+	// 1. G-Buffer FBO ¹ÙÀÎµù
 	m_gBuffer->Bind();
 
-	// 2. í™”ë©´ í´ë¦¬ì–´
+	// 2. È­¸é Å¬¸®¾î
 	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 	glViewport(0, 0, m_gBuffer->GetWidth(), m_gBuffer->GetHeight());
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glEnable(GL_DEPTH_TEST);
 	glDisable(GL_BLEND);
 
-	// 3. Static Mesh ê·¸ë¦¬ê¸° (ì •ì  ì˜¤ë¸Œì íŠ¸)
+	// 3. Static Mesh ±×¸®±â (Á¤Àû ¿ÀºêÁ§Æ®)
 	if (m_staticGeometryProgram)
 	{
 		m_staticGeometryProgram->Use();
@@ -76,7 +82,7 @@ void StandardGeometryPass::Render(RenderContext* context)
 		}
 	}
 
-	// 4. Skinned Mesh ê·¸ë¦¬ê¸° (ì• ë‹ˆë©”ì´ì…˜ ì˜¤ë¸Œì íŠ¸)
+	// 4. Skinned Mesh ±×¸®±â (¾Ö´Ï¸ŞÀÌ¼Ç ¿ÀºêÁ§Æ®)
 	if (m_skinnedGeometryProgram)
 	{
 		m_skinnedGeometryProgram->Use();
@@ -99,38 +105,37 @@ void StandardGeometryPass::Render(RenderContext* context)
 		}
 	}
 
-	// 4. contextì— gBuffer ìºì‹±
+	// 4. context¿¡ gBuffer Ä³½Ì
 	stdCtx->SetGBuffer(m_gBuffer.get());
 
-	// 5. ê·¸ë¦¬ê¸° ì™„ë£Œ í›„ ê¸°ë³¸ í”„ë ˆì„ë²„í¼ë¡œ ë³µê·€
+	// 5. ±×¸®±â ¿Ï·á ÈÄ ±âº» ÇÁ·¹ÀÓ¹öÆÛ·Î º¹±Í
 	Framebuffer::BindToDefault();
 }
 
-
-void StandardGeometryPass::Resize(int32 width, int32 height)
+void UniversalGeometryPass::Resize(int32 width, int32 height)
 {
 	m_gBuffer = Framebuffer::CreateGBuffer(width, height);
 }
 
-/*================================================//
-//   standard geometry pass getters and setters   //
-//================================================*/
-void StandardGeometryPass::AddStaticMeshRenderer(MeshRenderer* staticMeshRenderer)
+/*=================================================//
+//   universal geometry pass getters and setters   //
+//=================================================*/
+void UniversalGeometryPass::AddStaticMeshRenderer(MeshRenderer* staticMeshRenderer)
 {
 	m_staticMeshRenderers.push_back(staticMeshRenderer);
 }
 
-void StandardGeometryPass::AddSkinnedMeshRenderer(MeshRenderer* skinnedMeshRenderer)
+void UniversalGeometryPass::AddSkinnedMeshRenderer(MeshRenderer* skinnedMeshRenderer)
 {
 	m_skinnedMeshRenderers.push_back(skinnedMeshRenderer);
 }
 
-const std::vector<MeshRenderer*>& StandardGeometryPass::GetSkinnedMeshRenderers() const
+const std::vector<MeshRenderer*>& UniversalGeometryPass::GetSkinnedMeshRenderers() const
 {
 	return m_skinnedMeshRenderers;
 }
 
-const std::vector<MeshRenderer*>& StandardGeometryPass::GetStaticMeshRenderers() const
+const std::vector<MeshRenderer*>& UniversalGeometryPass::GetStaticMeshRenderers() const
 {
 	return m_staticMeshRenderers;
 }

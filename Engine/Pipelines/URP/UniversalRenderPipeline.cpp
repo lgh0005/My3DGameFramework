@@ -2,8 +2,12 @@
 #include "UniversalRenderPipeline.h"
 
 #include "Pipelines/Common/CullingPass.h"
+#include "Pipelines/Common/ShadowPass.h"
 #include "Pipelines/Common/SkyboxPass.h"
+#include "Pipelines/URP/RenderPasses/UniversalGeometryPass.h"
+#include "Pipelines/URP/RenderPasses/UniversalSSAOPass.h"
 #include "Pipelines/URP/RenderPasses/UniversalPostProcessPass.h"
+#include "Pipelines/URP/RenderPasses/UniversalDeferredLightingPass.h"
 #include "Pipelines/URP/UniversalGlobalUniforms.h"
 #include "Pipelines/URP/UniversalRenderContext.h"
 
@@ -40,13 +44,29 @@ bool UniversalRenderPipeline::Init()
 	m_cullingPass = CullingPass::Create();
 	if (!m_cullingPass) return false;
 
+	// 셰도우 패스 생성
+	m_shadowPass = ShadowPass::Create();
+	if (!m_shadowPass) return false;
+
 	// Skybox 패스 생성
 	m_skyboxPass = SkyboxPass::Create();
 	if (!m_skyboxPass) return false;
 
+	// SSAO 패스 생성
+	m_ssaoPass = UniversalSSAOPass::Create();
+	if (!m_ssaoPass) return false;
+
 	// 포스트-프로세싱 패스 생성
 	m_postProcessPass = UniversalPostProcessPass::Create();
 	if (!m_postProcessPass) return false;
+
+	// G-buffer 패스 생성
+	m_geometryPass = UniversalGeometryPass::Create();
+	if (!m_geometryPass) return false;
+
+	// Light 패스 생성
+	m_deferredLightPass = UniversalDeferredLightingPass::Create();
+	if (!m_deferredLightPass) return false;
 
 	return true;
 }
@@ -79,9 +99,27 @@ void UniversalRenderPipeline::Render(Scene* scene)
 	// 1. ubo 갱신
 	m_globalUniforms->PreRender(&context);
 
-	// TEMP : 포스트 프로세싱 프레임 버퍼 넘기기
-	// 이후 context에서 m_gBuffer에 그림을 그리도록 만들어야 한다
-	m_postProcessPass->BeginDraw();
+	/*================================//
+	//   main scene rendergin logic   //
+	//================================*/
+	// [패스 1] 그림자 패스: m_shadowMap에 깊이 정보 기록
+	m_shadowPass->Render(&context);
+
+	// [패스 2] 디퍼드 셰이딩 : G-buffer 채우기
+	m_geometryPass->Render(&context);
+
+	// [패스 3] SSAO
+	m_ssaoPass->Render(&context);
+
+	// [패스 4] Deferred Lighting 패스: G-buffer를 기반으로 라이팅 연산 시작
+	// 포스트 프로세싱을 위해 포스트 프로세스 프레임 버퍼게 그림을 그림
+	context.SetTargetFramebuffer(m_postProcessPass->GetFramebuffer());
+	m_deferredLightPass->Render(&context);
+
+	// 포스트 프로세스 프레임 버퍼에 깊이 복사
+	auto gBuffer = m_geometryPass->GetGBuffer();
+	auto postFBO = m_postProcessPass->GetFramebuffer();
+	BlitCopyDepth(gBuffer, postFBO, gBuffer->GetWidth(), gBuffer->GetHeight());
 
 	// [패스 5] 포워드 셰이딩
 	for (const auto& [name, pass] : scene->GetCustomRenderPasses())
@@ -123,3 +161,19 @@ void UniversalRenderPipeline::RenderIMGUIContext()
 }
 
 #pragma endregion
+
+void UniversalRenderPipeline::BlitCopyDepth(Framebuffer* src, Framebuffer* dst, int32 width, int32 height)
+{
+	if (!src || !dst) return;
+
+	glBindFramebuffer(GL_READ_FRAMEBUFFER, src->Get());
+	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, dst->Get());
+
+	glBlitFramebuffer
+	(
+		0, 0, width, height,
+		0, 0, width, height,
+		GL_DEPTH_BUFFER_BIT,
+		GL_NEAREST
+	);
+}

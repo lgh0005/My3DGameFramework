@@ -3,9 +3,12 @@
 
 #pragma region FORWARD_DECLARATION
 CLASS_PTR(CullingPass)
+CLASS_PTR(ShadowPass)
 CLASS_PTR(SkyboxPass)
-// CLASS_PTR(UniversalSkyboxPass) // TODO : 이제 왜 공통인지 이해해버렸다
 CLASS_PTR(UniversalPostProcessPass)
+CLASS_PTR(UniversalGeometryPass)
+CLASS_PTR(UniversalSSAOPass)
+CLASS_PTR(UniversalDeferredLightingPass)
 CLASS_PTR(UniversalGlobalUniforms)
 #pragma endregion
 
@@ -20,6 +23,12 @@ public:
 private:
 	UniversalRenderPipeline() = default;
 	bool Init();
+	void BlitCopyDepth
+	(
+		Framebuffer* src, Framebuffer* dst,
+		int32 width = WINDOW_WIDTH,
+		int32 height = WINDOW_HEIGHT
+	);
 
 	// TODO : PBR 기반 렌더링 파이프라인
 	// SRP에 쓰였던 일부 렌더링 파이프라인을 재사용하거나 조금 수정
@@ -27,10 +36,14 @@ private:
 
 	// 공통 필수 렌더 패스
 	CullingPassUPtr		         m_cullingPass      { nullptr };
+	ShadowPassUPtr				 m_shadowPass		{ nullptr };
 	SkyboxPassUPtr               m_skyboxPass       { nullptr };
 
 	// URP 필수 렌더 패스
 	UniversalPostProcessPassUPtr m_postProcessPass	{ nullptr };
+	UniversalGeometryPassUPtr    m_geometryPass     { nullptr };
+	UniversalSSAOPassUPtr		 m_ssaoPass			{ nullptr };
+	UniversalDeferredLightingPassUPtr  m_deferredLightPass  { nullptr };
 
 	// URP 공통 유니폼 변수 버퍼
 	UniversalGlobalUniformsUPtr  m_globalUniforms	{ nullptr }; 

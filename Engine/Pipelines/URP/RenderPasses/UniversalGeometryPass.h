@@ -1,24 +1,24 @@
 #pragma once
 #include "Core/RenderPass.h"
-#include "Graphics/Program.h"
 
 #pragma region FORWARD_DECLARATION
 CLASS_PTR(Program)
 CLASS_PTR(Scene)
+CLASS_PTR(Camera)
 CLASS_PTR(Framebuffer)
 CLASS_PTR(RenderContext)
 #pragma endregion
 
-CLASS_PTR(StandardGeometryPass)
-class StandardGeometryPass : public ContextRenderPass
+CLASS_PTR(UniversalGeometryPass)
+class UniversalGeometryPass : public ContextRenderPass
 {
 public:
-	static StandardGeometryPassUPtr Create
+	virtual ~UniversalGeometryPass();
+	static UniversalGeometryPassUPtr Create
 	(
 		int32 width = WINDOW_WIDTH,
 		int32 heigh = WINDOW_HEIGHT
 	);
-
 	void AddStaticMeshRenderer(MeshRenderer* staticMeshRenderer);
 	void AddSkinnedMeshRenderer(MeshRenderer* skinnedMeshRenderer);
 	const std::vector<MeshRenderer*>& GetSkinnedMeshRenderers() const;
@@ -30,7 +30,7 @@ public:
 	void Resize(int32 width, int32 height);
 
 private:
-	StandardGeometryPass() = default;
+	UniversalGeometryPass();
 	bool Init(int32 width, int32 height);
 
 	FramebufferUPtr m_gBuffer;

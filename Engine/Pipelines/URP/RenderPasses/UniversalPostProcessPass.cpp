@@ -30,7 +30,8 @@ bool UniversalPostProcessPass::Init(int32 width, int32 height)
 	// 2. URP Post-processing 셰이더 프로그램
 
 	// 1. 셰이더 로드
-	m_toneMappingProgram = Program::Create(
+	m_toneMappingProgram = Program::Create
+	(
 		"./Resources/Shaders/Universal/Universal_Post_PostProcess.vert",
 		"./Resources/Shaders/Universal/Universal_Post_PostProcess.frag"
 	);
@@ -83,17 +84,6 @@ void UniversalPostProcessPass::Render(RenderContext* context)
 
 	// 상태 복구 (선택 사항)
 	glEnable(GL_DEPTH_TEST);
-}
-
-void UniversalPostProcessPass::BeginDraw()
-{
-	m_frameBuffer->Bind();
-	glViewport(0, 0, m_frameBuffer->GetWidth(), m_frameBuffer->GetHeight());
-	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	glEnable(GL_DEPTH_TEST);
-	glEnable(GL_CULL_FACE);
-	glCullFace(GL_BACK);
 }
 
 void UniversalPostProcessPass::Resize(int32 width, int32 height)

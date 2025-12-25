@@ -1,5 +1,5 @@
 #include "EnginePch.h"
-#include "StandardSSAOPass.h"
+#include "UniversalSSAOPass.h"
 
 #include "Core/Scene.h"
 #include "Core/RenderContext.h"
@@ -11,27 +11,30 @@
 #include "Graphics/FrameBuffer.h"
 #include "Graphics/Program.h"
 
-#include "Pipelines/SRP/StandardRenderPipeline.h"
-#include "Pipelines/SRP/StandardRenderContext.h"
+#include "Pipelines/URP/UniversalRenderPipeline.h"
+#include "Pipelines/URP/UniversalRenderContext.h"
 
-StandardSSAOPassUPtr StandardSSAOPass::Create(int32 width, int32 height)
+UniversalSSAOPass::~UniversalSSAOPass() = default;
+UniversalSSAOPass::UniversalSSAOPass() = default;
+
+UniversalSSAOPassUPtr UniversalSSAOPass::Create(int32 width, int32 height)
 {
-    auto pass = StandardSSAOPassUPtr(new StandardSSAOPass());
+    auto pass = UniversalSSAOPassUPtr(new UniversalSSAOPass());
     if (!pass->Init(width, height)) return nullptr;
     return std::move(pass);
 }
 
-bool StandardSSAOPass::Init(int32 width, int32 height)
+bool UniversalSSAOPass::Init(int32 width, int32 height)
 {
     m_ssaoProgram = Program::Create
     (
-        "./Resources/Shaders/Standard/Standard_SSAO.vert",
-        "./Resources/Shaders/Standard/Standard_SSAO_pass.frag"
+        "./Resources/Shaders/Universal/Universal_SSAO.vert",
+        "./Resources/Shaders/Universal/Universal_SSAO_pass.frag"
     );
     m_ssaoBlurProgram = Program::Create
     (
-        "./Resources/Shaders/Standard/Standard_SSAO.vert",
-        "./Resources/Shaders/Standard/Standard_SSAO_blur.frag"
+        "./Resources/Shaders/Universal/Universal_SSAO.vert",
+        "./Resources/Shaders/Universal/Universal_SSAO_blur.frag"
     );
     if (!m_ssaoProgram || !m_ssaoBlurProgram) return false;
 
@@ -55,14 +58,14 @@ bool StandardSSAOPass::Init(int32 width, int32 height)
     return true;
 }
 
-void StandardSSAOPass::Resize(int32 width, int32 height)
+void UniversalSSAOPass::Resize(int32 width, int32 height)
 {
     // FBO 재생성 (단순하게 새로 만듦)
     m_ssaoFBO = Framebuffer::CreateSSAO(width, height);
     m_ssaoBlurFBO = Framebuffer::CreateSSAO(width, height);
 }
 
-void StandardSSAOPass::GenerateKernel()
+void UniversalSSAOPass::GenerateKernel()
 {
     std::uniform_real_distribution<float> randomFloats(0.0, 1.0);
     std::default_random_engine generator;
@@ -86,7 +89,7 @@ void StandardSSAOPass::GenerateKernel()
     }
 }
 
-void StandardSSAOPass::GenerateNoiseTexture()
+void UniversalSSAOPass::GenerateNoiseTexture()
 {
     std::uniform_real_distribution<float> randomFloats(0.0, 1.0);
     std::default_random_engine generator;
@@ -102,7 +105,7 @@ void StandardSSAOPass::GenerateNoiseTexture()
         ssaoNoise.push_back(noise);
     }
 
-    // Texture::Create를 사용하여 포맷 지정 (GL_RGB16F or GL_RGB32F)
+    // Texture::Create를 사용하여 포맷 지정 (GL_RGB16F)
     // 4x4 크기, 노이즈는 반복되어야 하므로 GL_REPEAT 필수
     m_noiseTexture = Texture::Create(4, 4, GL_RGB16F, GL_RGB, GL_FLOAT);
     m_noiseTexture->SetFilter(GL_NEAREST, GL_NEAREST);
@@ -112,10 +115,10 @@ void StandardSSAOPass::GenerateNoiseTexture()
     m_noiseTexture->SetData(ssaoNoise.data());
 }
 
-void StandardSSAOPass::Render(RenderContext* context)
+void UniversalSSAOPass::Render(RenderContext* context)
 {
     // 0. 자신의 렌더 패스에 활용되고 있는 RenderContext로 캐스팅
-    auto stdCtx = (StandardRenderContext*)context;
+    auto stdCtx = (UniversalRenderContext*)context;
     Camera* camera = stdCtx->GetCamera();
     Texture* gPos = stdCtx->GetGBufferPosition();
     Texture* gNormal = stdCtx->GetGBufferNormal();

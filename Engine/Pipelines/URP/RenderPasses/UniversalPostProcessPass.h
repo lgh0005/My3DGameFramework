@@ -20,8 +20,6 @@ public:
 		int32 heigh = WINDOW_HEIGHT
 	);
 	virtual void Render(RenderContext* context) override;
-
-	void BeginDraw();
 	void Resize(int32 width, int32 height);
 
 	Framebuffer* GetFramebuffer() const { return m_frameBuffer.get(); }

@@ -14,9 +14,34 @@ class UniversalRenderContext : public RenderContext
 public:
 	UniversalRenderContext() = default;
 
-	void SetSkyboxTexture(CubeTexture* texture) { m_skyboxTexture = texture; }
-	CubeTexture* GetSkyboxTexture() const { return m_skyboxTexture; }
+	// For DeferredLightingPass : Target Framebuffer
+	void SetTargetFramebuffer(Framebuffer* fbo) { m_targetFramebuffer = fbo; }
+	Framebuffer* GetTargetFramebuffer() const { return m_targetFramebuffer; }
+
+	// For GeometryPass
+	void SetGBuffer(Framebuffer* gBuffer);
+	Framebuffer* GetGBuffer() const { return m_gBuffer; }
+	Texture* GetGBufferPosition() const { return m_gPosition; }
+	Texture* GetGBufferNormal()   const { return m_gNormal; }
+	Texture* GetGBufferAlbedo() const { return m_gAlbedoSpec; }
+	Texture* GetGBufferEmission() const { return m_gEmission; }
+
+	// For UniversalSSAOPass
+	void SetSSAOTexture(Texture* texture) { m_ssaoTexture = texture; }
+	Texture* GetSSAOTexture() const { return m_ssaoTexture; }
 
 private:
-	CubeTexture* m_skyboxTexture{ nullptr };
+
+	// For DeferredLightingPass : Target Framebuffer
+	Framebuffer* m_targetFramebuffer{ nullptr };
+
+	// For GeometryPass 
+	Framebuffer* m_gBuffer{ nullptr };
+	Texture* m_gPosition{ nullptr };
+	Texture* m_gNormal{ nullptr };
+	Texture* m_gAlbedoSpec{ nullptr };
+	Texture* m_gEmission{ nullptr };
+
+	// For UniversalSSAOPass
+	Texture* m_ssaoTexture{ nullptr };
 };

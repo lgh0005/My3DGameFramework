@@ -29,6 +29,11 @@ public:
 	void SetScale(const glm::vec3& scale);
 	const glm::vec3& GetScale() const;
 
+	// 월드 좌표계
+	glm::vec3 Transform::GetWorldPosition() const { return m_worldPosition; }
+	glm::vec3 Transform::GetWorldScale() const { return m_worldScale; }
+	glm::quat Transform::GetWorldRotation() const { return m_worldRotation; }
+
 	// 방향 벡터
 	glm::vec3 GetForwardVector() const; // 앞쪽   (-Z)
 	glm::vec3 GetUpVector() const;      // 위쪽   (+Y)
@@ -48,6 +53,7 @@ public:
 private:
 	void AddChild(Transform* child);
 	void RemoveChild(Transform* child);
+	void UpdateWorldTransform();
 	void SetTransformDirty();
 
 	glm::mat4 m_worldMatrix { 1.0f };
@@ -55,9 +61,13 @@ private:
 
 private:
 	Transform() = default;
-	glm::vec3 m_position	{ 0.0f, 0.0f, 0.0f };
-	glm::quat m_rotation	{ 1.0f, 0.0f, 0.0f, 0.0f };
-	glm::vec3 m_scale		{ 1.0f, 1.0f, 1.0f };
+	glm::vec3 m_position		{ 0.0f, 0.0f, 0.0f };
+	glm::quat m_rotation		{ 1.0f, 0.0f, 0.0f, 0.0f };
+	glm::vec3 m_scale			{ 1.0f, 1.0f, 1.0f };
+
+	glm::vec3 m_worldPosition	{ 0.0f, 0.0f, 0.0f };
+	glm::quat m_worldRotation	{ 1.0f, 0.0f, 0.0f, 0.0f };
+	glm::vec3 m_worldScale		{ 1.0f, 1.0f, 1.0f };
 
 	Transform* m_parent		{ nullptr };
 	std::vector<Transform*> m_children;

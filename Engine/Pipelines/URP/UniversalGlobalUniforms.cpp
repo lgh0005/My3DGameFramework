@@ -38,7 +38,7 @@ void UniversalGlobalUniforms::PreRender(RenderContext* context)
 		CameraData camData;
 		camData.view = camera->GetViewMatrix();
 		camData.projection = camera->GetProjectionMatrix();
-		camData.viewPos = camera->GetTransform().GetPosition();
+		camData.viewPos = camera->GetTransform().GetWorldPosition();
 		m_cameraUBO->SetData(&camData, sizeof(CameraData));
 	}
 
@@ -46,7 +46,7 @@ void UniversalGlobalUniforms::PreRender(RenderContext* context)
 	if (m_lightUBO)
 	{
 		LightData lightData = {};
-		lightData.viewPos = camera->GetTransform().GetPosition();
+		lightData.viewPos = camera->GetTransform().GetWorldPosition();
 		int32 lightCount = 0;
 		int32 shadowCasterCount = 0;
 
@@ -59,7 +59,7 @@ void UniversalGlobalUniforms::PreRender(RenderContext* context)
 			auto& transform = light->GetTransform();
 
 			// [공통 속성]
-			info.position = transform.GetPosition();
+			info.position = transform.GetWorldPosition();
 			info.direction = transform.GetForwardVector();
 			info.ambient = light->GetAmbient();
 			info.diffuse = light->GetDiffuse();

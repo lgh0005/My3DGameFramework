@@ -32,15 +32,15 @@ private:
 	);
 
 	// 공통 필수 렌더 패스
-	CullingPassUPtr		      m_cullingPass				  { nullptr };
-	ShadowPassUPtr		      m_shadowPass				  { nullptr };
-	StandardSSAOPassUPtr	  m_ssaoPass				  { nullptr };
-	SkyboxPassUPtr            m_skyboxPass				  { nullptr };
+	CullingPassUPtr					  m_cullingPass		  { nullptr };
+	ShadowPassUPtr					  m_shadowPass		  { nullptr };
+	SkyboxPassUPtr                    m_skyboxPass		  { nullptr };
 
 	// SRP 필수 렌더 패스
 	StandardPostProcessPassUPtr		  m_postProcessPass	  { nullptr };
 	StandardGeometryPassUPtr		  m_geometryPass	  { nullptr };
 	StandardDeferredLightingPassUPtr  m_deferredLightPass { nullptr };
+	StandardSSAOPassUPtr			  m_ssaoPass		  { nullptr };
 
 	// SRP 공통 유니폼 변수 버퍼
 	StandardGlobalUniformsUPtr        m_globalUniforms	  { nullptr };

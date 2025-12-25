@@ -19,12 +19,9 @@ public:
 		int32 width = WINDOW_WIDTH,
 		int32 heigh = WINDOW_HEIGHT
 	);
-	virtual void Render(RenderContext* context) override;
-	
-	void BeginDraw();
-	void Resize(int32 width, int32 height);
-
 	Framebuffer* GetFramebuffer() const { return m_frameBuffer.get(); }
+	virtual void Render(RenderContext* context) override;
+	void Resize(int32 width, int32 height);
 
 private:
 	StandardPostProcessPass() = default;

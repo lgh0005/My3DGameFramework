@@ -4,7 +4,6 @@
 #include "Core/GameObject.h"
 #include "Core/Renderer.h"
 #include "Graphics/Program.h"
-#include "Graphics/CubeFramebuffer.h"
 #include "Resources/Mesh.h"
 #include "Resources/StaticMesh.h"
 #include "Resources/SkinnedMesh.h"
@@ -14,11 +13,12 @@
 #include "Resources/Image.h"
 #include "Resources/Animation.h"
 #include "Resources/Model.h"
-#include "Resources/InstancedMesh.h"
-#include "Resources/AudioClip.h"
 #include "Graphics/Buffer.h"
+#include "Resources/InstancedMesh.h"
 #include "Graphics/Geometry.h"
 #include "Graphics/SkyLight.h"
+#include "Resources/AudioClip.h"
+#include "Resources/AnimController.h"
 
 #include "Misc/IBLUtils.h"
 
@@ -34,7 +34,7 @@
 
 #include "URPSample/RenderPasses/HDRRenderPass.h"
 #include "SRPSample/Scripts/CameraController.h"
-
+#include "SRPSample/Scripts/PlayerController.h"
 
 PBRScene::~PBRScene() = default;
 
@@ -130,7 +130,23 @@ bool PBRScene::LoadNessesaryResources()
 		);
 		SetSkyLight(std::move(sky));
 	}
+
+	// 0-4. 머티리얼 2
+	{
+		auto box1Mat = Material::Create();
+		RESOURCE.AddResource<Material>(std::move(box1Mat), "GroundMat");
+	}
 	
+	// 0-2. 모델과 애니메이션 #1
+	{
+		auto model = Model::Load("./Resources/Models/spacesoldier/aliensoldier.mymodel");
+		auto anim1 = Animation::Load("./Resources/Models/spacesoldier/Idle.myanim");
+		auto anim2 = Animation::Load("./Resources/Models/spacesoldier/Walking.myanim");
+		RESOURCE.AddResource<Model>(std::move(model), "aliensoldier");
+		RESOURCE.AddResource<Animation>(std::move(anim1), "Idle");
+		RESOURCE.AddResource<Animation>(std::move(anim2), "Walk");
+	}
+
 	return true;
 }
 
@@ -140,8 +156,8 @@ bool PBRScene::CreateNessesaryRenderPasses()
 	{
 		auto prog = Program::Create
 		(
-			"./Resources/Shaders/Universal/test_pbr_testing.vert",
-			"./Resources/Shaders/Universal/test_pbr_testing.frag"
+			"./Resources/Shaders/test_pbr_testing.vert",
+			"./Resources/Shaders/test_pbr_testing.frag"
 		); if (!prog) return false;
 		AddCustomRenderPass("simpleHDR", HDRRenderPass::Create(std::move(prog)));
 	}
@@ -176,160 +192,299 @@ bool PBRScene::CreateSceneContext()
 
 	// 2. 조명 추가
 	{
-		// 2. 조명 추가 1
-		{
-			auto lightGo = GameObject::Create();
-			lightGo->SetName("PointLight1");
-			auto lightComp = PointLight::Create();
-			lightGo->GetTransform().SetPosition(glm::vec3(5.0f, 5.0f, 4.0f));
-			lightGo->GetTransform().SetScale(glm::vec3(0.2f));
-			lightGo->AddComponent(std::move(lightComp));
-			AddGameObject(std::move(lightGo));
-		}
-
-		// 2. 조명 추가 2
-		{
-			auto lightGo = GameObject::Create();
-			lightGo->SetName("PointLight2");
-			auto lightComp = PointLight::Create();
-			lightGo->GetTransform().SetPosition(glm::vec3(-4.0f, 5.0f, 5.0f));
-			lightGo->GetTransform().SetScale(glm::vec3(0.2f));
-			lightGo->AddComponent(std::move(lightComp));
-			AddGameObject(std::move(lightGo));
-		}
-
-		// 2. 조명 추가 3
-		{
-			auto lightGo = GameObject::Create();
-			lightGo->SetName("PointLight3");
-			auto lightComp = PointLight::Create();
-			lightGo->GetTransform().SetPosition(glm::vec3(-4.0f, -6.0f, 6.0f));
-			lightGo->GetTransform().SetScale(glm::vec3(0.2f));
-			lightGo->AddComponent(std::move(lightComp));
-			AddGameObject(std::move(lightGo));
-		}
-
-		// 2. 조명 추가 4
-		{
-			auto lightGo = GameObject::Create();
-			lightGo->SetName("PointLight4");
-			auto lightComp = PointLight::Create();
-			lightGo->GetTransform().SetPosition(glm::vec3(5.0f, -6.0f, 7.0f));
-			lightGo->GetTransform().SetScale(glm::vec3(0.2f));
-			lightGo->AddComponent(std::move(lightComp));
-			AddGameObject(std::move(lightGo));
-		}
-	}
-	
-	// 3. 구 49개 (ORM 텍스쳐 테스트)
-	{
-		auto sphereMesh = RESOURCE.GetResource<StaticMesh>("Sphere");
-
-		// [핵심] 미리 로드해둔 'Rusted_Iron_orm' 머티리얼을 가져옵니다.
-		// 이 머티리얼 안에는 이미 Diffuse, Normal, ORM 텍스처가 들어있습니다.
-		auto baseMat = RESOURCE.GetResource<Material>("Rusted_Iron_orm");
-
-		const int rows = 7;
-		const int cols = 7;
-		const float spacing = 1.4f;
-
-		for (int row = 0; row < rows; ++row)
-		{
-			// Metallic Factor (0.0 ~ 1.0)
-			float metallicFactor = (float)row / (float)(rows - 1);
-			float y = ((float)row - (float)(rows - 1) * 0.5f) * spacing;
-
-			for (int col = 0; col < cols; ++col)
-			{
-				// Roughness Factor (0.05 ~ 1.0)
-				float roughnessFactor = (float)col / (float)(cols - 1);
-				roughnessFactor = glm::clamp(roughnessFactor, 0.05f, 1.0f);
-
-				float x = ((float)col - (float)(cols - 1) * 0.5f) * spacing;
-
-				auto sphereObj = GameObject::Create();
-				sphereObj->GetTransform().SetPosition(glm::vec3(x, y, 0.0f));
-
-				// [중요] 각 구체마다 개별적인 파라미터를 가져야 하므로 새 머티리얼 생성
-				MaterialPtr pbrMat = Material::Create();
-
-				// 1. 텍스처 공유 (Texture Pointer Copy)
-				// 이미지를 새로 로드하는게 아니라, baseMat이 들고 있는 텍스처 포인터만 복사합니다.
-				// 따라서 메모리 낭비 없이 텍스처를 재사용합니다.
-				if (baseMat)
-				{
-					pbrMat->diffuse = baseMat->diffuse;
-					pbrMat->normal = baseMat->normal;
-					pbrMat->orm = baseMat->orm; // ORM 텍스처 연결
-				}
-
-				// 2. Factor 값 설정 (Grid Logic)
-				// 셰이더 연산: FinalValue = TextureValue * FactorValue
-				pbrMat->albedoFactor = glm::vec4(1.0f); // 원본 텍스처 색상 그대로 (Tint 없음)
-				pbrMat->metallicFactor = metallicFactor;  // 행에 따라 금속성 조절
-				pbrMat->roughnessFactor = roughnessFactor; // 열에 따라 거칠기 조절
-
-				// 렌더러 등록
-				auto mr = MeshRenderer::Create(sphereMesh, pbrMat);
-				hdrPass->AddRenderer(mr.get());
-				sphereObj->AddComponent(std::move(mr));
-				AddGameObject(std::move(sphereObj));
-			}
-		}
-	}
-
-	// 4. 구 49개 (PBR Chart)
-	{
-		//auto sphereMesh = RESOURCE.GetResource<Mesh>("Sphere");
-
-		//// [최적화] 모든 구가 공유할 기본 텍스처들 (White)
-		//// 텍스처 값(1.0) * 팩터 값(설정값) = 최종 값
-		//TexturePtr sharedWhite = Texture::CreateWhite();
-
-		//const int rows = 7;
-		//const int cols = 7;
-		//const float spacing = 1.4f;
-
-		//for (int row = 0; row < rows; ++row)
+		//// 2. 조명 추가 1
 		//{
-		//	// Metallic (0.0 ~ 1.0)
-		//	float metallicValue = (float)row / (float)(rows - 1);
-		//	float y = ((float)row - (float)(rows - 1) * 0.5f) * spacing;
+		//	auto lightGo = GameObject::Create();
+		//	lightGo->SetName("PointLight1");
+		//	auto lightComp = PointLight::Create();
+		//	lightGo->GetTransform().SetPosition(glm::vec3(5.0f, 5.0f, 4.0f));
+		//	lightGo->GetTransform().SetScale(glm::vec3(0.2f));
+		//	lightGo->AddComponent(std::move(lightComp));
 
-		//	for (int col = 0; col < cols; ++col)
-		//	{
-		//		// Roughness (0.05 ~ 1.0)
-		//		float roughnessValue = (float)col / (float)(cols - 1);
-		//		roughnessValue = glm::clamp(roughnessValue, 0.05f, 1.0f);
+		//	//auto mr = MeshRenderer::Create
+		//	//(RESOURCE.GetResource<StaticMesh>("Cube"), RESOURCE.GetResource<Material>("solidColor"));
+		//	//lightGo->AddComponent(std::move(mr));
+		//	AddGameObject(std::move(lightGo));
+		//}
 
-		//		float x = ((float)col - (float)(cols - 1) * 0.5f) * spacing;
+		//// 2. 조명 추가 2
+		//{
+		//	auto lightGo = GameObject::Create();
+		//	lightGo->SetName("PointLight2");
+		//	auto lightComp = PointLight::Create();
+		//	lightGo->GetTransform().SetPosition(glm::vec3(-4.0f, 5.0f, 5.0f));
+		//	lightGo->GetTransform().SetScale(glm::vec3(0.2f));
+		//	lightGo->AddComponent(std::move(lightComp));
+		//	AddGameObject(std::move(lightGo));
+		//}
 
-		//		auto sphereObj = GameObject::Create();
-		//		sphereObj->GetTransform().SetPosition(glm::vec3(x, y, 0.0f));
+		//// 2. 조명 추가 3
+		//{
+		//	auto lightGo = GameObject::Create();
+		//	lightGo->SetName("PointLight3");
+		//	auto lightComp = PointLight::Create();
+		//	lightGo->GetTransform().SetPosition(glm::vec3(-4.0f, -6.0f, 6.0f));
+		//	lightGo->GetTransform().SetScale(glm::vec3(0.2f));
+		//	lightGo->AddComponent(std::move(lightComp));
+		//	AddGameObject(std::move(lightGo));
+		//}
 
-		//		// 머티리얼 생성
-		//		MaterialPtr pbrMat = Material::Create();
-
-		//		// 1. 텍스처는 모두 White로 통일 (공유)
-		//		pbrMat->diffuse = sharedWhite;
-		//		pbrMat->metallic = sharedWhite;
-		//		pbrMat->roughness = sharedWhite;
-		//		pbrMat->ao = sharedWhite;
-		//		// Normal이 없으면 SetToProgram에서 자동으로 Blue(Flat)가 바인딩되므로 생략 가능
-
-		//		// 2. Factor에 값을 설정 [핵심!]
-		//		pbrMat->albedoFactor = glm::vec4(0.2f, 0.4f, 0.5f, 1.0f); // 빨간공
-		//		pbrMat->metallicFactor = metallicValue;   // 팩터로 조절
-		//		pbrMat->roughnessFactor = roughnessValue; // 팩터로 조절
-
-		//		// 렌더러 등록
-		//		auto mr = MeshRenderer::Create(sphereMesh, pbrMat);
-		//		hdrPass->AddRenderer(mr.get());
-		//		sphereObj->AddComponent(std::move(mr));
-		//		AddGameObject(std::move(sphereObj));
-		//	}
+		//// 2. 조명 추가 4
+		//{
+		//	auto lightGo = GameObject::Create();
+		//	lightGo->SetName("PointLight4");
+		//	auto lightComp = PointLight::Create();
+		//	lightGo->GetTransform().SetPosition(glm::vec3(5.0f, -6.0f, 7.0f));
+		//	lightGo->GetTransform().SetScale(glm::vec3(0.2f));
+		//	lightGo->AddComponent(std::move(lightComp));
+		//	AddGameObject(std::move(lightGo));
 		//}
 	}
+	
+	// 3. 그림자가 있는 조명 추가
+	{
+		auto lightGo = GameObject::Create();
+		lightGo->SetName("SpotLight");
+		auto lightComp = SpotLight::Create();
+		lightComp->SetCastShadow(true);
+		lightComp->SetIntensity(10.0f);
+		lightGo->GetTransform().SetPosition(glm::vec3(1.0f, 4.0f, 4.0f));
+		lightGo->GetTransform().SetScale(glm::vec3(0.2f));
+		lightComp->SetCutoff(glm::vec2(60.0, 5.0f));
+		lightComp->SetDistance(128.0f);
+		lightGo->AddComponent(std::move(lightComp));
+		
+		auto renderer = MeshRenderer::Create
+		(RESOURCE.GetResource<StaticMesh>("Cube"), RESOURCE.GetResource<Material>("solidColor"));
+		lightGo->AddComponent(std::move(renderer));
+
+		AddGameObject(std::move(lightGo));
+	}
+
+	// 6. 큐브 생성 #3
+	{
+		auto cubeObj = GameObject::Create();
+		cubeObj->SetName("Ground");
+		auto& cubeTransform = cubeObj->GetTransform();
+		cubeTransform.SetPosition(glm::vec3(0.0f, -0.5f, 0.0f));
+		cubeTransform.SetScale(glm::vec3(40.0f, 1.0f, 40.0f));
+
+		auto meshRenderer = MeshRenderer::Create
+		(RESOURCE.GetResource<StaticMesh>("Cube"), RESOURCE.GetResource<Material>("GroundMat"));
+		cubeObj->AddComponent(std::move(meshRenderer));
+		AddGameObject(std::move(cubeObj));
+	}
+
+	// 7. 모델
+	{
+		// 1. 리소스 먼저 확보 (Model과 Animation)
+		auto model = RESOURCE.GetResource<Model>("aliensoldier");
+		auto anim1 = RESOURCE.GetResource<Animation>("Idle");
+		auto anim2 = RESOURCE.GetResource<Animation>("Walk");
+		auto animCtrl = AnimController::Create();
+		animCtrl->AddState("Idle", anim1);
+		animCtrl->AddState("Walk", anim2);
+		animCtrl->SetTransitionDuration("Idle", "Walk", 0.2f);
+		animCtrl->SetTransitionDuration("Walk", "Idle", 0.2f);
+		animCtrl->SetStartState("Idle");
+
+		// 2. GameObject 생성
+		auto modelGo = GameObject::Create();
+		modelGo->SetName("Soldier");
+		modelGo->GetTransform().SetPosition(glm::vec3(2.0f, 0.0f, -2.0f));
+		modelGo->GetTransform().SetScale(glm::vec3(0.025f));
+
+		// 3. 애니메이터 생성
+		auto animator = Animator::Create(model, std::move(animCtrl));
+		if (animator) modelGo->AddComponent(std::move(animator));
+
+		// 4. Model 안의 모든 Mesh 조각을 MeshRenderer 컴포넌트로 추가
+		for (uint32 i = 0; i < model->GetMeshCount(); ++i)
+		{
+			SkinnedMeshPtr mesh = model->GetSkinnedMesh(i);
+			auto renderer = MeshRenderer::Create(mesh, mesh->GetMaterial());
+			modelGo->AddComponent(std::move(renderer));
+		}
+
+		// 5. PlayerController
+		auto script = PlayerController::Create();
+		modelGo->AddComponent(std::move(script));
+
+		// 5. 씬에 GameObject 등록
+		AddGameObject(std::move(modelGo));
+	}
+
+	// 3. 구 49개 (ORM 텍스쳐 테스트)
+
+	// TestSpheresForORMTexture(hdrPass);
+	// TestSpheresForPBRChart(hdrPass);
+	TestSpheresForPBRChartDeferred();
 
 	return true;
+}
+
+/*==============//
+//   for test   //
+//==============*/
+void PBRScene::TestSpheresForORMTexture(HDRRenderPass* hdrPass)
+{
+	auto sphereMesh = RESOURCE.GetResource<StaticMesh>("Sphere");
+
+	// [핵심] 미리 로드해둔 'Rusted_Iron_orm' 머티리얼을 가져옵니다.
+	// 이 머티리얼 안에는 이미 Diffuse, Normal, ORM 텍스처가 들어있습니다.
+	auto baseMat = RESOURCE.GetResource<Material>("Rusted_Iron_orm");
+
+	const int rows = 7;
+	const int cols = 7;
+	const float spacing = 1.4f;
+
+	for (int row = 0; row < rows; ++row)
+	{
+		// Metallic Factor (0.0 ~ 1.0)
+		float metallicFactor = (float)row / (float)(rows - 1);
+		float y = ((float)row - (float)(rows - 1) * 0.5f) * spacing;
+
+		for (int col = 0; col < cols; ++col)
+		{
+			// Roughness Factor (0.05 ~ 1.0)
+			float roughnessFactor = (float)col / (float)(cols - 1);
+			roughnessFactor = glm::clamp(roughnessFactor, 0.05f, 1.0f);
+
+			float x = ((float)col - (float)(cols - 1) * 0.5f) * spacing;
+
+			auto sphereObj = GameObject::Create();
+			sphereObj->GetTransform().SetPosition(glm::vec3(x, y, 0.0f));
+
+			// [중요] 각 구체마다 개별적인 파라미터를 가져야 하므로 새 머티리얼 생성
+			MaterialPtr pbrMat = Material::Create();
+
+			// 1. 텍스처 공유 (Texture Pointer Copy)
+			// 이미지를 새로 로드하는게 아니라, baseMat이 들고 있는 텍스처 포인터만 복사합니다.
+			// 따라서 메모리 낭비 없이 텍스처를 재사용합니다.
+			if (baseMat)
+			{
+				pbrMat->diffuse = baseMat->diffuse;
+				pbrMat->normal = baseMat->normal;
+				pbrMat->orm = baseMat->orm; // ORM 텍스처 연결
+			}
+
+			// 2. Factor 값 설정 (Grid Logic)
+			// 셰이더 연산: FinalValue = TextureValue * FactorValue
+			pbrMat->albedoFactor = glm::vec4(1.0f); // 원본 텍스처 색상 그대로 (Tint 없음)
+			pbrMat->metallicFactor = metallicFactor;  // 행에 따라 금속성 조절
+			pbrMat->roughnessFactor = roughnessFactor; // 열에 따라 거칠기 조절
+
+			// 렌더러 등록
+			auto mr = MeshRenderer::Create(sphereMesh, pbrMat);
+			hdrPass->AddRenderer(mr.get());
+			sphereObj->AddComponent(std::move(mr));
+			AddGameObject(std::move(sphereObj));
+		}
+	}
+}
+
+void PBRScene::TestSpheresForPBRChart(HDRRenderPass* hdrPass)
+{
+	auto sphereMesh = RESOURCE.GetResource<StaticMesh>("Sphere");
+
+	// [최적화] 모든 구가 공유할 기본 텍스처들 (White)
+	// 텍스처 값(1.0) * 팩터 값(설정값) = 최종 값
+	TexturePtr sharedWhite = Texture::CreateWhite();
+
+	const int rows = 7;
+	const int cols = 7;
+	const float spacing = 1.4f;
+
+	for (int row = 0; row < rows; ++row)
+	{
+		// Metallic (0.0 ~ 1.0)
+		float metallicValue = (float)row / (float)(rows - 1);
+		float y = ((float)row - (float)(rows - 1) * 0.5f) * spacing;
+
+		for (int col = 0; col < cols; ++col)
+		{
+			// Roughness (0.05 ~ 1.0)
+			float roughnessValue = (float)col / (float)(cols - 1);
+			roughnessValue = glm::clamp(roughnessValue, 0.05f, 1.0f);
+
+			float x = ((float)col - (float)(cols - 1) * 0.5f) * spacing;
+
+			auto sphereObj = GameObject::Create();
+			sphereObj->GetTransform().SetPosition(glm::vec3(x, y, 0.0f));
+
+			// 머티리얼 생성
+			MaterialPtr pbrMat = Material::Create();
+
+			// 1. 텍스처는 모두 White로 통일 (공유)
+			pbrMat->diffuse = sharedWhite;
+			pbrMat->metallic = sharedWhite;
+			pbrMat->roughness = sharedWhite;
+			pbrMat->ao = sharedWhite;
+			// Normal이 없으면 SetToProgram에서 자동으로 Blue(Flat)가 바인딩되므로 생략 가능
+
+			// 2. Factor에 값을 설정 [핵심!]
+			pbrMat->albedoFactor = glm::vec4(0.6f, 0.3f, 0.2f, 1.0f); // 빨간공
+			pbrMat->metallicFactor = metallicValue;   // 팩터로 조절
+			pbrMat->roughnessFactor = roughnessValue; // 팩터로 조절
+
+			// 렌더러 등록
+			auto mr = MeshRenderer::Create(sphereMesh, pbrMat);
+			mr->SetRenderStage(RenderStage::Forward);
+			hdrPass->AddRenderer(mr.get());
+			sphereObj->AddComponent(std::move(mr));
+			AddGameObject(std::move(sphereObj));
+		}
+	}
+}
+
+void PBRScene::TestSpheresForPBRChartDeferred()
+{
+	auto sphereMesh = RESOURCE.GetResource<StaticMesh>("Sphere");
+
+	// [최적화] 모든 구가 공유할 기본 텍스처들 (White)
+	// 텍스처 값(1.0) * 팩터 값(설정값) = 최종 값
+	TexturePtr sharedWhite = Texture::CreateWhite();
+
+	const int rows = 7;
+	const int cols = 7;
+	const float spacing = 1.4f;
+
+	for (int row = 0; row < rows; ++row)
+	{
+		// Metallic (0.0 ~ 1.0)
+		float metallicValue = (float)row / (float)(rows - 1);
+		float y = ((float)row - (float)(rows - 1) * 0.5f) * spacing;
+
+		for (int col = 0; col < cols; ++col)
+		{
+			// Roughness (0.05 ~ 1.0)
+			float roughnessValue = (float)col / (float)(cols - 1);
+			roughnessValue = glm::clamp(roughnessValue, 0.05f, 1.0f);
+
+			float x = ((float)col - (float)(cols - 1) * 0.5f) * spacing;
+
+			auto sphereObj = GameObject::Create();
+			sphereObj->GetTransform().SetPosition(glm::vec3(x, y, 0.0f));
+
+			// 머티리얼 생성
+			MaterialPtr pbrMat = Material::Create();
+
+			// 1. 텍스처는 모두 White로 통일 (공유)
+			pbrMat->diffuse = sharedWhite;
+			pbrMat->metallic = sharedWhite;
+			pbrMat->roughness = sharedWhite;
+			pbrMat->ao = sharedWhite;
+			// Normal이 없으면 SetToProgram에서 자동으로 Blue(Flat)가 바인딩되므로 생략 가능
+
+			// 2. Factor에 값을 설정 [핵심!]
+			pbrMat->albedoFactor = glm::vec4(0.6f, 0.3f, 0.2f, 1.0f); // 빨간공
+			pbrMat->metallicFactor = metallicValue;   // 팩터로 조절
+			pbrMat->roughnessFactor = roughnessValue; // 팩터로 조절
+
+			// 렌더러 등록
+			auto mr = MeshRenderer::Create(sphereMesh, pbrMat);
+			sphereObj->AddComponent(std::move(mr));
+			AddGameObject(std::move(sphereObj));
+		}
+	}
 }

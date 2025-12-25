@@ -36,7 +36,10 @@ add_library(Engine STATIC
    "Pipelines/SRP/StandardRenderPipeline.h"    "Pipelines/SRP/StandardRenderPipeline.cpp"
 
    # Universal Render Pipeline
+   "Pipelines/URP/RenderPasses/UniversalGeometryPass.h" "Pipelines/URP/RenderPasses/UniversalGeometryPass.cpp"
    "Pipelines/URP/RenderPasses/UniversalPostProcessPass.h"  "Pipelines/URP/RenderPasses/UniversalPostProcessPass.cpp"
+   "Pipelines/URP/RenderPasses/UniversalSSAOPass.h"  "Pipelines/URP/RenderPasses/UniversalSSAOPass.cpp"
+   "Pipelines/URP/RenderPasses/UniversalDeferredLightingPass.h" "Pipelines/URP/RenderPasses/UniversalDeferredLightingPass.cpp"
    "Pipelines/URP/UniversalGlobalUniforms.h"   "Pipelines/URP/UniversalGlobalUniforms.cpp"
    "Pipelines/URP/UniversalRenderContext.h"    "Pipelines/URP/UniversalRenderContext.cpp"
    "Pipelines/URP/UniversalRenderPipeline.h"   "Pipelines/URP/UniversalRenderPipeline.cpp"
@@ -108,8 +111,7 @@ add_library(Engine STATIC
    "Managers/SceneManager.h"        "Managers/SceneManager.cpp"
    "Managers/RenderManager.h"       "Managers/RenderManager.cpp"
    "Managers/AudioManager.h"        "Managers/AudioManager.cpp"
-
-  )
+ )
 
 # 2. [PCH 설정] EnginePCH.h를 PCH로 사용합니다.
 target_precompile_headers(Engine  PUBLIC EnginePCH.h)

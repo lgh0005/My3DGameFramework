@@ -19,6 +19,9 @@ void Transform::Update()
 	if (m_parent) m_worldMatrix = m_parent->GetWorldMatrix() * localMat;
 	else m_worldMatrix = localMat;
 
+	// 3. 월드 좌표계 상의 데이터 갱신
+	UpdateWorldTransform();
+
 	// 3. 갱신을 했으므로 더 이상 dirty하지 않음.
 	m_isTransformDirty = false;
 }
@@ -104,17 +107,17 @@ const glm::vec3& Transform::GetScale() const
 //============================*/
 glm::vec3 Transform::GetForwardVector() const
 {
-	return m_rotation * glm::vec3(0.0f, 0.0f, -1.0f);
+	return glm::normalize(glm::vec3(m_worldMatrix[2])) * -1.0f;
 }
 
 glm::vec3 Transform::GetUpVector() const
 {
-	return m_rotation * glm::vec3(0.0f, 1.0f, 0.0f);
+	return glm::normalize(glm::vec3(m_worldMatrix[1]));
 }
 
 glm::vec3 Transform::GetRightVector() const
 {
-	return m_rotation * glm::vec3(1.0f, 0.0f, 0.0f);
+	return glm::normalize(glm::vec3(m_worldMatrix[0]));
 }
 
 /*==========================//
@@ -182,6 +185,29 @@ void Transform::RemoveChild(Transform* child)
 {
 	auto it = std::find(m_children.begin(), m_children.end(), child);
 	if (it != m_children.end()) m_children.erase(it);
+}
+
+void Transform::UpdateWorldTransform()
+{
+	// 1. 위치 갱신
+	m_worldPosition = glm::vec3(m_worldMatrix[3]);
+
+	// 2. 스케일 갱신
+	m_worldScale.x = glm::length(glm::vec3(m_worldMatrix[0]));
+	m_worldScale.y = glm::length(glm::vec3(m_worldMatrix[1]));
+	m_worldScale.z = glm::length(glm::vec3(m_worldMatrix[2]));
+
+	// 3. 회전 갱신
+	if (m_worldScale.x <= 0.0001f || m_worldScale.y <= 0.0001f || m_worldScale.z <= 0.0001f)
+		m_worldRotation = glm::quat(1.0f, 0.0f, 0.0f, 0.0f);
+	else
+	{
+		glm::mat3 rotationMat;
+		rotationMat[0] = glm::vec3(m_worldMatrix[0]) / m_worldScale.x;
+		rotationMat[1] = glm::vec3(m_worldMatrix[1]) / m_worldScale.y;
+		rotationMat[2] = glm::vec3(m_worldMatrix[2]) / m_worldScale.z;
+		m_worldRotation = glm::quat_cast(rotationMat);
+	}
 }
 
 void Transform::SetTransformDirty()

@@ -1,5 +1,5 @@
-ï»¿#include "EnginePch.h"
-#include "StandardDeferredLightingPass.h"
+#include "EnginePch.h"
+#include "UniversalDeferredLightingPass.h"
 
 #include "Pipelines/Common/ShadowPass.h"
 #include "Pipelines/SRP/StandardRenderPipeline.h"
@@ -11,27 +11,30 @@
 #include "Graphics/Program.h"
 #include "Resources/ScreenMesh.h"
 #include "Resources/StaticMesh.h" 
-#include "Resources/Texture.h" 
+#include "Resources/Texture.h"
+#include "Resources/CubeTexture.h"
 #include "Graphics/FrameBuffer.h"  
 #include "Graphics/ShadowMap.h"
+#include "Graphics/SkyLight.h"
+#include "Components/Camera.h"
 #include "Components/SpotLight.h"
 #include "Components/Transform.h"
 
-#include "Pipelines/SRP/StandardRenderContext.h"
+#include "Pipelines/URP/UniversalRenderContext.h"
 
-StandardDeferredLightingPassUPtr StandardDeferredLightingPass::Create()
+UniversalDeferredLightingPassUPtr UniversalDeferredLightingPass::Create()
 {
-	auto pass = StandardDeferredLightingPassUPtr(new StandardDeferredLightingPass());
+	auto pass = UniversalDeferredLightingPassUPtr(new UniversalDeferredLightingPass());
 	if (!pass->Init()) return nullptr;
 	return std::move(pass);
 }
 
-bool StandardDeferredLightingPass::Init()
+bool UniversalDeferredLightingPass::Init()
 {
 	m_deferredLightProgram = Program::Create
 	(
-		"./Resources/Shaders/Standard/Standard_Deferred_LightPass.vert",
-		"./Resources/Shaders/Standard/Standard_Deferred_LightPass.frag"
+		"./Resources/Shaders/Universal/Universal_Deferred_LightPass.vert",
+		"./Resources/Shaders/Universal/Universal_Deferred_LightPass.frag"
 	);
 	if (!m_deferredLightProgram) return false;
 
@@ -41,32 +44,34 @@ bool StandardDeferredLightingPass::Init()
 	return true;
 }
 
-void StandardDeferredLightingPass::Render(RenderContext* context)
+// TODO : IBL ±¤¿ø È¿°ú À¯´ÏÆû º¯¼öµéµµ ³Ö¾îÁà¾ßÇÔ
+// HDRRenderPass ³»¿ëÀ» Âü°í
+void UniversalDeferredLightingPass::Render(RenderContext* context)
 {
-	// 0. Context ìºìŠ¤íŒ… ë° ìœ íš¨ì„± ê²€ì‚¬
-	auto stdCtx = (StandardRenderContext*)context;
+	// 0. Context Ä³½ºÆÃ ¹× À¯È¿¼º °Ë»ç
+	auto stdCtx = (UniversalRenderContext*)context;
 	if (!stdCtx) return;
 
-	// 1. Contextì—ì„œ G-Buffer í…ìŠ¤ì²˜ ê°€ì ¸ì˜¤ê¸°
+	// 1. Context¿¡¼­ G-Buffer ÅØ½ºÃ³ °¡Á®¿À±â
 	Texture* tPos = stdCtx->GetGBufferPosition();
 	Texture* tNormal = stdCtx->GetGBufferNormal();
 	Texture* tAlbedo = stdCtx->GetGBufferAlbedo();
 	Texture* tEmission = stdCtx->GetGBufferEmission();
 	if (!tPos || !tNormal || !tAlbedo || !tEmission) return;
 
-	// 2. ê·¸ë¦¬ê¸° ì¤€ë¹„ (Output FBO ì„¤ì •)
+	// 2. ±×¸®±â ÁØºñ (Output FBO ¼³Á¤)
+	// INFO : m_postProcessPassÀÇ BeginDraw ¿ªÇÒÀ» ¿©±â¼­ ¼öÇàÇÑ´Ù°í º¸¸é µÊ
 	Framebuffer* targetFBO = stdCtx->GetTargetFramebuffer();
 	if (targetFBO)
 	{
 		targetFBO->Bind();
 		glViewport(0, 0, targetFBO->GetWidth(), targetFBO->GetHeight());
-		glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT);
 	}
 	else
 	{
 		Framebuffer::BindToDefault();
-		// í…ìŠ¤ì²˜ í¬ê¸°ë¥¼ ê¸°ì¤€ìœ¼ë¡œ ë·°í¬íŠ¸ ì„¤ì •
 		glViewport(0, 0, tPos->GetWidth(), tPos->GetHeight());
 		glDisable(GL_DEPTH_TEST);
 		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
@@ -75,7 +80,7 @@ void StandardDeferredLightingPass::Render(RenderContext* context)
 
 	m_deferredLightProgram->Use();
 
-	// 3. G-Buffer í…ìŠ¤ì²˜ ë°”ì¸ë”© (Context ë°ì´í„° ì‚¬ìš©)
+	// 3. G-Buffer ÅØ½ºÃ³ ¹ÙÀÎµù (Context µ¥ÀÌÅÍ »ç¿ë)
 	glActiveTexture(GL_TEXTURE0); tPos->Bind();
 	m_deferredLightProgram->SetUniform("gPosition", 0);
 
@@ -88,7 +93,20 @@ void StandardDeferredLightingPass::Render(RenderContext* context)
 	glActiveTexture(GL_TEXTURE3); tEmission->Bind();
 	m_deferredLightProgram->SetUniform("gEmission", 3);
 
-	// 4. SSAO í…ìŠ¤ì²˜ ë°”ì¸ë”© (Context ë°ì´í„° ì‚¬ìš©)
+	// 4. Shadow Maps ¹ÙÀÎµù (Pipeline µ¥ÀÌÅÍ »ç¿ë - ±âÁ¸ À¯Áö)
+	const int shadowStartSlot = 4;
+	for (int i = 0; i < MAX_SHADOW_CASTER; ++i)
+	{
+		glActiveTexture(GL_TEXTURE4 + i);
+
+		Texture* shadowMap = stdCtx->GetShadowMap(i);
+		if (shadowMap) shadowMap->Bind();
+
+		std::string uniformName = "shadowMaps[" + std::to_string(i) + "]";
+		m_deferredLightProgram->SetUniform(uniformName, shadowStartSlot + i);
+	}
+
+	// 5. SSAO ÅØ½ºÃ³ ¹ÙÀÎµù (Context µ¥ÀÌÅÍ »ç¿ë)
 	Texture* tSSAO = stdCtx->GetSSAOTexture();
 	if (tSSAO)
 	{
@@ -102,21 +120,42 @@ void StandardDeferredLightingPass::Render(RenderContext* context)
 		m_deferredLightProgram->SetUniform("useSSAO", false);
 	}
 
-	// 5. Shadow Maps ë°”ì¸ë”© (Pipeline ë°ì´í„° ì‚¬ìš© - ê¸°ì¡´ ìœ ì§€)
-	for (int i = 0; i < MAX_SHADOW_CASTER; ++i)
+	// 6. IBL (SkyLight) Binding [Slot 13-15]
+	SkyLight* skyLight = stdCtx->GetSkyLight();
+	m_deferredLightProgram->SetUniform("useIBL", true);
+	if (skyLight)
 	{
-		glActiveTexture(GL_TEXTURE4 + i);
+		// 13. Irradiance
+		auto* irradiance = skyLight->GetIrradianceMap();
+		if (irradiance)
+		{
+			glActiveTexture(GL_TEXTURE13);
+			irradiance->Bind();
+			m_deferredLightProgram->SetUniform("irradianceMap", 13);
+		}
 
-		Texture* shadowMap = stdCtx->GetShadowMap(i);
-		if (shadowMap) shadowMap->Bind();
+		// 14. Prefilter
+		auto* prefilter = skyLight->GetPrefilterMap();
+		if (prefilter)
+		{
+			glActiveTexture(GL_TEXTURE14);
+			prefilter->Bind();
+			m_deferredLightProgram->SetUniform("prefilterMap", 14);
+		}
 
-		std::string uniformName = "shadowMaps[" + std::to_string(i) + "]";
-		m_deferredLightProgram->SetUniform(uniformName, 4 + i);
+		// 15. BRDF LUT
+		auto* brdf = skyLight->GetBRDFLookUp();
+		if (brdf)
+		{
+			glActiveTexture(GL_TEXTURE15);
+			brdf->Bind();
+			m_deferredLightProgram->SetUniform("brdfLUT", 15);
+		}
 	}
 
-	// 6. Light Matrices ì „ì†¡(Contextì˜ Culled List ì‚¬ìš©)
-	// Scene ì „ì²´ ì¡°ëª…ì´ ì•„ë‹ˆë¼, Contextì— ë‹´ê¸´ ì¡°ëª…ë§Œ ì²˜ë¦¬
-	const auto& lights = stdCtx->GetScene()->GetLights();
+	// 7. Light Matrices Àü¼Û(ContextÀÇ Culled List »ç¿ë)
+	// Scene ÀüÃ¼ Á¶¸íÀÌ ¾Æ´Ï¶ó, Context¿¡ ´ã±ä Á¶¸í¸¸ Ã³¸®
+	const auto& lights = stdCtx->GetLights();
 	for (auto* light : lights)
 	{
 		int32 idx = light->GetShadowMapIndex();
@@ -127,7 +166,7 @@ void StandardDeferredLightingPass::Render(RenderContext* context)
 		}
 	}
 
-	// 7. ê·¸ë¦¬ê¸°
+	// 7. ±×¸®±â
 	m_plane->Draw();
 	glEnable(GL_DEPTH_TEST);
 }

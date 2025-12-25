@@ -2,7 +2,6 @@
 #include "StandardRenderContext.h"
 #include "Graphics/FrameBuffer.h"
 #include "Resources/Texture.h"
-//#include "Resources/CubeTexture.h"
 
 void StandardRenderContext::SetGBuffer(Framebuffer* gBuffer)
 {
@@ -22,20 +21,3 @@ void StandardRenderContext::SetGBuffer(Framebuffer* gBuffer)
 		m_gEmission = nullptr;
 	}
 }
-
-//void StandardRenderContext::SetShadowMap(int32 index, Texture* texture)
-//{
-//	if (index >= 0 && index < MAX_SHADOW_CASTER)
-//	{
-//		m_shadowMaps[index] = texture;
-//	}
-//}
-//
-//Texture* StandardRenderContext::GetShadowMap(int32 index) const
-//{
-//	if (index >= 0 && index < MAX_SHADOW_CASTER)
-//	{
-//		return m_shadowMaps[index];
-//	}
-//	return nullptr;
-//}
