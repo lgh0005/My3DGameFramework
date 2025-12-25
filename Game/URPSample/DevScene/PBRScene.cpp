@@ -192,53 +192,53 @@ bool PBRScene::CreateSceneContext()
 
 	// 2. 조명 추가
 	{
-		//// 2. 조명 추가 1
-		//{
-		//	auto lightGo = GameObject::Create();
-		//	lightGo->SetName("PointLight1");
-		//	auto lightComp = PointLight::Create();
-		//	lightGo->GetTransform().SetPosition(glm::vec3(5.0f, 5.0f, 4.0f));
-		//	lightGo->GetTransform().SetScale(glm::vec3(0.2f));
-		//	lightGo->AddComponent(std::move(lightComp));
+		// 2. 조명 추가 1
+		{
+			auto lightGo = GameObject::Create();
+			lightGo->SetName("PointLight1");
+			auto lightComp = PointLight::Create();
+			lightGo->GetTransform().SetPosition(glm::vec3(5.0f, 5.0f, 4.0f));
+			lightGo->GetTransform().SetScale(glm::vec3(0.2f));
+			lightGo->AddComponent(std::move(lightComp));
 
-		//	//auto mr = MeshRenderer::Create
-		//	//(RESOURCE.GetResource<StaticMesh>("Cube"), RESOURCE.GetResource<Material>("solidColor"));
-		//	//lightGo->AddComponent(std::move(mr));
-		//	AddGameObject(std::move(lightGo));
-		//}
+			//auto mr = MeshRenderer::Create
+			//(RESOURCE.GetResource<StaticMesh>("Cube"), RESOURCE.GetResource<Material>("solidColor"));
+			//lightGo->AddComponent(std::move(mr));
+			AddGameObject(std::move(lightGo));
+		}
 
-		//// 2. 조명 추가 2
-		//{
-		//	auto lightGo = GameObject::Create();
-		//	lightGo->SetName("PointLight2");
-		//	auto lightComp = PointLight::Create();
-		//	lightGo->GetTransform().SetPosition(glm::vec3(-4.0f, 5.0f, 5.0f));
-		//	lightGo->GetTransform().SetScale(glm::vec3(0.2f));
-		//	lightGo->AddComponent(std::move(lightComp));
-		//	AddGameObject(std::move(lightGo));
-		//}
+		// 2. 조명 추가 2
+		{
+			auto lightGo = GameObject::Create();
+			lightGo->SetName("PointLight2");
+			auto lightComp = PointLight::Create();
+			lightGo->GetTransform().SetPosition(glm::vec3(-4.0f, 5.0f, 5.0f));
+			lightGo->GetTransform().SetScale(glm::vec3(0.2f));
+			lightGo->AddComponent(std::move(lightComp));
+			AddGameObject(std::move(lightGo));
+		}
 
-		//// 2. 조명 추가 3
-		//{
-		//	auto lightGo = GameObject::Create();
-		//	lightGo->SetName("PointLight3");
-		//	auto lightComp = PointLight::Create();
-		//	lightGo->GetTransform().SetPosition(glm::vec3(-4.0f, -6.0f, 6.0f));
-		//	lightGo->GetTransform().SetScale(glm::vec3(0.2f));
-		//	lightGo->AddComponent(std::move(lightComp));
-		//	AddGameObject(std::move(lightGo));
-		//}
+		// 2. 조명 추가 3
+		{
+			auto lightGo = GameObject::Create();
+			lightGo->SetName("PointLight3");
+			auto lightComp = PointLight::Create();
+			lightGo->GetTransform().SetPosition(glm::vec3(-4.0f, -6.0f, 6.0f));
+			lightGo->GetTransform().SetScale(glm::vec3(0.2f));
+			lightGo->AddComponent(std::move(lightComp));
+			AddGameObject(std::move(lightGo));
+		}
 
-		//// 2. 조명 추가 4
-		//{
-		//	auto lightGo = GameObject::Create();
-		//	lightGo->SetName("PointLight4");
-		//	auto lightComp = PointLight::Create();
-		//	lightGo->GetTransform().SetPosition(glm::vec3(5.0f, -6.0f, 7.0f));
-		//	lightGo->GetTransform().SetScale(glm::vec3(0.2f));
-		//	lightGo->AddComponent(std::move(lightComp));
-		//	AddGameObject(std::move(lightGo));
-		//}
+		// 2. 조명 추가 4
+		{
+			auto lightGo = GameObject::Create();
+			lightGo->SetName("PointLight4");
+			auto lightComp = PointLight::Create();
+			lightGo->GetTransform().SetPosition(glm::vec3(5.0f, -6.0f, 7.0f));
+			lightGo->GetTransform().SetScale(glm::vec3(0.2f));
+			lightGo->AddComponent(std::move(lightComp));
+			AddGameObject(std::move(lightGo));
+		}
 	}
 	
 	// 3. 그림자가 있는 조명 추가
@@ -317,8 +317,8 @@ bool PBRScene::CreateSceneContext()
 	// 3. 구 49개 (ORM 텍스쳐 테스트)
 
 	// TestSpheresForORMTexture(hdrPass);
-	// TestSpheresForPBRChart(hdrPass);
-	TestSpheresForPBRChartDeferred();
+	TestSpheresForPBRChart(hdrPass);
+	// TestSpheresForPBRChartDeferred();
 
 	return true;
 }

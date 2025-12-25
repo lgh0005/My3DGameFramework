@@ -1,5 +1,7 @@
 #version 460 core
 
+// TODO : 이후에 spv로 미리 컴파일 시키려면 보다 엄격히 적어야 할 필요가 있다.
+
 // TODO : 인풋과 아웃풋은 슬슬 하나의 묶음으로 처리
 // 할 필요가 있다. vs_in, vs_out, fs_in, fs_out 등과 같이.
 
@@ -148,7 +150,7 @@ void main()
     vec3 normalMapValue = textureGrad(material.normal, texCoord, ddx, ddy).rgb;
     normalMapValue = normalize(normalMapValue * 2.0 - 1.0);
     gNormal.rgb = normalize(orthoTBN * normalMapValue);
-    gNormal.a = roughness; // <-- Shininess 대신 Roughness 저장
+    gNormal.a = roughness;
 
     // [Attachment 2] Albedo(RGB) + Metallic(A)
     vec4 albedoSample = textureGrad(material.diffuse, texCoord, ddx, ddy);
@@ -158,7 +160,7 @@ void main()
     if (albedoSample.a * material.albedoFactor.a < 0.1) discard;
 
     gAlbedoSpec.rgb = finalAlbedo;
-    gAlbedoSpec.a = metallic; // <-- Specular Intensity 대신 Metallic 저장
+    gAlbedoSpec.a = metallic;
 
     // [Attachment 3] Emission
     // Emission Texture * Strength + Emission Factor

@@ -225,7 +225,7 @@ TexturePtr Texture::s_blueTex = nullptr;
 
 TexturePtr Texture::Create4x4Texture(const std::vector<uint8>& colorData)
 {
-    auto texture = Texture::Create(4, 4, GL_RGBA8, GL_RGBA, GL_UNSIGNED_BYTE);
+    auto texture = Texture::Create(4, 4, GL_RGBA16F, GL_RGBA, GL_UNSIGNED_BYTE);
 
     std::vector<uint8> fullBuffer;
     fullBuffer.reserve(4 * 4 * 4);

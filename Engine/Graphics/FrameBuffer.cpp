@@ -217,7 +217,7 @@ bool Framebuffer::InitGBuffer(int32 width, int32 height)
     m_resolveTextures.push_back(std::move(normTexture));
 
     // Attachment 2: Albedo + Specular (RGBA)
-    auto colorTexture = Texture::Create(width, height, GL_RGBA, GL_RGBA, GL_UNSIGNED_BYTE);
+    auto colorTexture = Texture::Create(width, height, GL_RGBA16F, GL_RGBA, GL_UNSIGNED_BYTE);
     colorTexture->SetFilter(GL_NEAREST, GL_NEAREST);
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT2, GL_TEXTURE_2D, colorTexture->Get(), 0);
     m_resolveTextures.push_back(std::move(colorTexture));

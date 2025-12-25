@@ -247,4 +247,7 @@ void main()
     vec3 color = ambient + Lo + Emission;
 
     FragColor = vec4(color, 1.0);
+
+    // [디버그 모드] AO만 시각화 (0.0: 어두움/차폐, 1.0: 밝음)
+    // FragColor = vec4(vec3(FinalAO), 1.0);
 }
