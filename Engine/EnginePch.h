@@ -38,6 +38,7 @@
 #include "Managers/SceneManager.h"
 #include "Managers/RenderManager.h"
 #include "Managers/AudioManager.h"
+#include "Managers/PhysicsManager.h"
 
 // TODO : 일부 외부 헤더 때문에 네이밍 컨벤션이
 // 충돌하는 모양. 이름을 조금 수정해볼 필요가 있음.
@@ -48,3 +49,4 @@
 #define SCENE	  SceneManager::Instance()
 #define RENDER    RenderManager::Instance()
 #define AUDIO     AudioManager::Instance()
+#define PHYSICS   PhysicsManager::Instance()

@@ -5,6 +5,8 @@ find_package(imgui CONFIG REQUIRED)
 find_package(spdlog CONFIG REQUIRED)
 find_package(assimp CONFIG REQUIRED)
 find_package(KTX CONFIG REQUIRED)
+find_package(freetype REQUIRED)
+find_package(Jolt CONFIG REQUIRED)
 
 add_library(Engine STATIC
 
@@ -52,6 +54,7 @@ add_library(Engine STATIC
    "Misc/IBLUtils.h"                "Misc/IBLUtils.cpp"
    "Misc/AssetFormat.h"             "Misc/AssetFormat.cpp"
    "Misc/AssetUtils.h"              "Misc/AssetUtils.cpp"
+   "Misc/PhysicsHelper.h"           "Misc/PhysicsHelper.cpp"
 
    # Graphics
    "Graphics/Shader.h"              "Graphics/Shader.cpp"
@@ -92,6 +95,7 @@ add_library(Engine STATIC
    "Components/Component.h"         "Components/Component.cpp"
    "Components/Light.h"             "Components/Light.cpp"
    "Components/Script.h"            "Components/Script.cpp"
+   "Components/PhysicsComponent.h"  "Components/PhysicsComponent.cpp"
 
    "Components/Camera.h"            "Components/Camera.cpp"
    "Components/Transform.h"         "Components/Transform.cpp"
@@ -111,7 +115,9 @@ add_library(Engine STATIC
    "Managers/SceneManager.h"        "Managers/SceneManager.cpp"
    "Managers/RenderManager.h"       "Managers/RenderManager.cpp"
    "Managers/AudioManager.h"        "Managers/AudioManager.cpp"
- )
+   "Managers/PhysicsManager.h"      "Managers/PhysicsManager.cpp"
+
+)
 
 # 2. [PCH 설정] EnginePCH.h를 PCH로 사용합니다.
 target_precompile_headers(Engine  PUBLIC EnginePCH.h)
@@ -132,6 +138,8 @@ target_link_libraries(Engine PUBLIC
     spdlog::spdlog
     assimp::assimp
     KTX::ktx
+    freetype  
+    Jolt::Jolt
 )
 
 # 5. [컴파일 정의] Engine 타겟에 C++ 매크로를 정의합니다.

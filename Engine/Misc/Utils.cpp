@@ -51,6 +51,32 @@ glm::quat Utils::ConvertToGLMQuat(const aiQuaternion& pOrientation)
 	return glm::quat(pOrientation.w, pOrientation.x, pOrientation.y, pOrientation.z);
 }
 
+/*==========================//
+//   Jolt to glm 유틸 함수   //
+//==========================*/
+glm::vec3 Utils::ToGlmVec3(const JPH::Vec3& v)
+{
+	return glm::vec3(v.GetX(), v.GetY(), v.GetZ());
+}
+
+glm::quat Utils::ToGlmQuat(const JPH::Quat& q)
+{
+	return glm::quat(q.GetW(), q.GetX(), q.GetY(), q.GetZ());
+}
+
+/*==========================//
+//   glm to Jolt 유틸 함수   //
+//==========================*/
+JPH::Vec3 Utils::ToJoltVec3(const glm::vec3& v)
+{
+	return JPH::Vec3(v.x, v.y, v.z);
+}
+
+JPH::Quat Utils::ToJoltQuat(const glm::quat& q)
+{
+	return JPH::Quat(q.x, q.y, q.z, q.w);
+}
+
 /*===============================//
 //   SSAO 연산을 위한 Lerp 함수   //
 //===============================*/

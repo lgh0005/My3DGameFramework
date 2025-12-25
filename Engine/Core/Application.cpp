@@ -21,6 +21,7 @@ bool Application::Init(int32 width, int32 height, const std::string& title)
 	if (!RENDER.Init()) return false;    // OpenGL 컨텍스트 등 로드
 	INPUT_MGR.Init();					 // 입력 시스템
 	TIME.Init();						 // 타이머
+	PHYSICS.Init();						 // 물리
 	AUDIO.Init();						 // 오디오 시스템
 	IMGUI.Init(true);					 // 디버그 UI (Window가 있어야 가능)
 
@@ -57,6 +58,9 @@ void Application::Run(const std::string& startLevelName)
 
 		// 타이머 업데이트
 		TIME.Update();
+
+		// 물리 시뮬레이션 (고정 시간 업데이트)
+		while (TIME.CheckFixedUpdate()) PHYSICS.Update();
 
 		// 컨텍스트 업데이트
 		if (auto scene = SCENE.GetActiveScene())
@@ -117,6 +121,7 @@ void Application::Shutdown()
 
 	// 역순 정리
 	SCENE.Clear();      // 씬/게임 오브젝트 정리
+	PHYSICS.Clear();    // 물리 엔진 정리
 	RENDER.Clear();     // 렌더 리소스/셰이더 정리
 
 	IMGUI.ShutDown();

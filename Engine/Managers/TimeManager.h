@@ -12,6 +12,10 @@ public:
 	float GetFPS() const	   { return m_fps; }
 	double GetTime() const	   { return m_currentTime; }
 
+	float GetFixedDeltaTime() const { return m_fixedDeltaTime; }
+	void SetFixedDeltaTime(float fixedDt) { m_fixedDeltaTime = fixedDt; }
+	bool CheckFixedUpdate();
+
 private:
 	void CalculateFPS();
 
@@ -22,4 +26,7 @@ private:
 	double m_fpsLastTime = 0.0;
 	int32 m_frameCount = 0;
 	float m_fps = 0.0f;
+
+	float m_fixedDeltaTime = 1.0f / 60.0f; // 기본값 60hz (0.01666...)
+	double m_accumulator = 0.0;            // 시간이 쌓이는 누적기
 };

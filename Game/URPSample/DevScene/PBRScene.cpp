@@ -317,8 +317,8 @@ bool PBRScene::CreateSceneContext()
 	// 3. 구 49개 (ORM 텍스쳐 테스트)
 
 	// TestSpheresForORMTexture(hdrPass);
-	TestSpheresForPBRChart(hdrPass);
-	// TestSpheresForPBRChartDeferred();
+	// TestSpheresForPBRChart(hdrPass);
+	TestSpheresForPBRChartDeferred();
 
 	return true;
 }
@@ -477,7 +477,7 @@ void PBRScene::TestSpheresForPBRChartDeferred()
 			// Normal이 없으면 SetToProgram에서 자동으로 Blue(Flat)가 바인딩되므로 생략 가능
 
 			// 2. Factor에 값을 설정 [핵심!]
-			pbrMat->albedoFactor = glm::vec4(0.6f, 0.3f, 0.2f, 1.0f); // 빨간공
+			pbrMat->albedoFactor = glm::vec4(0.025f, 0.025f, 0.025f, 1.0f); // 색상
 			pbrMat->metallicFactor = metallicValue;   // 팩터로 조절
 			pbrMat->roughnessFactor = roughnessValue; // 팩터로 조절
 

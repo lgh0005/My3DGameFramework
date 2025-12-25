@@ -66,6 +66,8 @@ void UniversalDeferredLightingPass::Render(RenderContext* context)
 	{
 		targetFBO->Bind();
 		glViewport(0, 0, targetFBO->GetWidth(), targetFBO->GetHeight());
+		glDisable(GL_DEPTH_TEST);
+		glDepthMask(GL_FALSE);
 		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT);
 	}
@@ -168,5 +170,7 @@ void UniversalDeferredLightingPass::Render(RenderContext* context)
 
 	// 7. ±×¸®±â
 	m_plane->Draw();
+
+	glDepthMask(GL_TRUE);
 	glEnable(GL_DEPTH_TEST);
 }

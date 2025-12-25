@@ -1,9 +1,5 @@
 ﻿#pragma once
 
-#pragma region FORWARD_DECLARATION
-CLASS_PTR(Context)
-#pragma endregion
-
 class WindowManager
 {
 	DECLARE_SINGLE(WindowManager)

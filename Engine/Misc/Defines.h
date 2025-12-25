@@ -39,3 +39,9 @@ using className ## WPtr = std::weak_ptr<className>;
 // max light and shadow caster count per scene
 #define MAX_LIGHTS 32
 #define MAX_SHADOW_CASTER 8
+
+/*===============================//
+//   Jolt physics const macros   //
+//===============================*/
+// max memory allocation value
+#define MAX_PHYSICS_MEMORY_ALLOC_VALUE 10 * 1024 * 1024 // 10MB
