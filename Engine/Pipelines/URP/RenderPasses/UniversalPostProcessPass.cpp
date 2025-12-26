@@ -188,6 +188,13 @@ void UniversalPostProcessPass::Render(RenderContext* context)
 		m_compositeProgram->SetUniform("bloomTexture", 1);
 	}
 
+	// FXAA를 위한 화면 크기 역수 전송
+	glm::vec2 invSize = { 1.0f / (float)hdrTexture->GetWidth(), 1.0f / (float)hdrTexture->GetHeight() };
+	m_compositeProgram->SetUniform("inverseScreenSize", invSize);
+
+	// FXAA 사용 여부 (쉐이더에서 useFXAA를 쓰고 있다면 필수)
+	m_compositeProgram->SetUniform("useFXAA", true);
+
 	m_plane->Draw();
 
 	// 상태 복구 (선택 사항)
