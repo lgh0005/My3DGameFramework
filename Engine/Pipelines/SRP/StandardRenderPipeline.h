@@ -11,6 +11,8 @@ CLASS_PTR(StandardGeometryPass)
 CLASS_PTR(StandardSSAOPass)
 CLASS_PTR(StandardPostProcessPass)
 CLASS_PTR(StandardGlobalUniforms)
+CLASS_PTR(GBufferFramebuffer)
+CLASS_PTR(PostProcessFramebuffer)
 #pragma endregion
 
 CLASS_PTR(StandardRenderPipeline)
@@ -26,7 +28,7 @@ private:
 	bool Init();
 	void BlitCopyDepth
 	(
-		Framebuffer* src, Framebuffer* dst,
+		GBufferFramebuffer* src, PostProcessFramebuffer* dst,
 		int32 width = WINDOW_WIDTH,
 		int32 height = WINDOW_HEIGHT
 	);

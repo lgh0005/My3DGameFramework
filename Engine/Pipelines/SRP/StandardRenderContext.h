@@ -3,6 +3,8 @@
 
 #pragma region FORWARD_DECLARATION
 CLASS_PTR(Framebuffer)
+CLASS_PTR(PostProcessFramebuffer)
+CLASS_PTR(GBufferFramebuffer)
 CLASS_PTR(Texture)
 #pragma endregion
 
@@ -12,13 +14,13 @@ class StandardRenderContext : public RenderContext
 public:
 	StandardRenderContext() = default;
 
-	// For DeferredLightingPass : Target Framebuffer
-	void SetTargetFramebuffer(Framebuffer* fbo) { m_targetFramebuffer = fbo; }
-	Framebuffer* GetTargetFramebuffer() const { return m_targetFramebuffer; }
+	// For DeferredLightingPass : draw on Post-processing framebuffer
+	void SetTargetFramebuffer(PostProcessFramebuffer* fbo) { m_targetFramebuffer = fbo; }
+	PostProcessFramebuffer* GetTargetFramebuffer() const { return m_targetFramebuffer; }
 
 	// For StandardGeometryPass
-	void SetGBuffer(Framebuffer* gBuffer);
-	Framebuffer* GetGBuffer() const { return m_gBuffer; }
+	void SetGBuffer(GBufferFramebuffer* gBuffer);
+	GBufferFramebuffer* GetGBuffer() const { return m_gBuffer; }
 	Texture* GetGBufferPosition() const { return m_gPosition; }
 	Texture* GetGBufferNormal()   const { return m_gNormal; }
 	Texture* GetGBufferAlbedo() const { return m_gAlbedoSpec; }
@@ -30,11 +32,11 @@ public:
 
 private:
 
-	// For DeferredLightingPass : Target Framebuffer
-	Framebuffer* m_targetFramebuffer{ nullptr };
+	// For DeferredLightingPass : draw on Post-processing framebuffer
+	PostProcessFramebuffer* m_targetFramebuffer{ nullptr };
 
 	// For StandardGeometryPass 
-	Framebuffer* m_gBuffer{ nullptr };
+	GBufferFramebuffer* m_gBuffer{ nullptr };
 	Texture* m_gPosition{ nullptr };
 	Texture* m_gNormal{ nullptr };
 	Texture* m_gAlbedoSpec{ nullptr };

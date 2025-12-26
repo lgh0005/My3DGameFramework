@@ -1,4 +1,4 @@
-#include "EnginePch.h"
+ï»¿#include "EnginePch.h"
 #include "FrameBuffer.h"
 #include "Resources/Texture.h"
 
@@ -42,7 +42,7 @@ void Framebuffer::BindToDefault()
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
-Framebuffer::~Framebuffer() 
+Framebuffer::~Framebuffer()
 {
     if (m_msaaDepthStencilBuffer)
         glDeleteRenderbuffers(1, &m_msaaDepthStencilBuffer);
@@ -60,7 +60,7 @@ const uint32 Framebuffer::Get() const
     else return m_resolveFbo;
 }
 
-void Framebuffer::Bind() const 
+void Framebuffer::Bind() const
 {
     if (m_samples > 1)
     {
@@ -86,7 +86,7 @@ void Framebuffer::Resolve() const
             GL_COLOR_BUFFER_BIT, GL_NEAREST);
     }
 
-    // »óÅÂ º¹±¸
+    // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
@@ -112,25 +112,25 @@ bool Framebuffer::Init(int32 width, int32 height, int32 samples)
     m_samples = samples;
 
     /*========================================//
-    //   »ùÇÃ ¼ö 1 ÀÌÇÏ :  ÀÏ¹Ý ÅØ½ºÃ³ FBO »ý¼º //
+    //   ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ 1 ï¿½ï¿½ï¿½ï¿½ :  ï¿½Ï¹ï¿½ ï¿½Ø½ï¿½Ã³ FBO ï¿½ï¿½ï¿½ï¿½ //
     //========================================*/
     if (m_samples <= 1)
     {
-        // 1. ÀÏ¹Ý FBO »ý¼º (Resolve FBO º¯¼ö ÀçÈ°¿ë)
+        // 1. ï¿½Ï¹ï¿½ FBO ï¿½ï¿½ï¿½ï¿½ (Resolve FBO ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½È°ï¿½ï¿½)
         glGenFramebuffers(1, &m_resolveFbo);
         glBindFramebuffer(GL_FRAMEBUFFER, m_resolveFbo);
 
-        // 2. ÄÃ·¯ ÅØ½ºÃ³ »ý¼º ¹× ºÎÂø (¿©±â¼­ ¹Ù·Î ÅØ½ºÃ³¿¡ ±×¸³´Ï´Ù)
+        // 2. ï¿½Ã·ï¿½ ï¿½Ø½ï¿½Ã³ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ (ï¿½ï¿½ï¿½â¼­ ï¿½Ù·ï¿½ ï¿½Ø½ï¿½Ã³ï¿½ï¿½ ï¿½×¸ï¿½ï¿½Ï´ï¿½)
         const int32 attachmentCount = 2;
         std::vector<uint32> attachments;
 
         for (int i = 0; i < attachmentCount; ++i)
         {
-            // HDR À¯Áö¸¦ À§ÇØ GL_RGBA16F »ç¿ë
+            // HDR ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ GL_RGBA16F ï¿½ï¿½ï¿½
             auto texture = Texture::Create(width, height, GL_RGBA16F, GL_RGBA, GL_FLOAT);
 
-            // ÇÊÅÍ¸µÀº FXAA µîÀ» À§ÇØ ¼±Çü(Linear)ÀÌ ÁÁÀ» ¼ö ÀÖÀ¸³ª,
-            // ÇÈ¼¿ Á¤È®µµ¸¦ À§ÇØ Nearest¸¦ ¾²±âµµ ÇÕ´Ï´Ù. ÃëÇâ²¯ ¼±ÅÃÇÏ¼¼¿ä.
+            // ï¿½ï¿½ï¿½Í¸ï¿½ï¿½ï¿½ FXAA ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½(Linear)ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½,
+            // ï¿½È¼ï¿½ ï¿½ï¿½È®ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ Nearestï¿½ï¿½ ï¿½ï¿½ï¿½âµµ ï¿½Õ´Ï´ï¿½. ï¿½ï¿½ï¿½â²¯ ï¿½ï¿½ï¿½ï¿½ï¿½Ï¼ï¿½ï¿½ï¿½.
             texture->SetFilter(GL_LINEAR, GL_LINEAR);
             texture->SetWrap(GL_CLAMP_TO_EDGE, GL_CLAMP_TO_EDGE);
 
@@ -141,13 +141,13 @@ bool Framebuffer::Init(int32 width, int32 height, int32 samples)
             attachments.push_back(GL_COLOR_ATTACHMENT0 + i);
         }
 
-        // 3. ±íÀÌ/½ºÅÙ½Ç ·»´õ¹öÆÛ (ÀÏ¹Ý)
-        glGenRenderbuffers(1, &m_msaaDepthStencilBuffer); // º¯¼ö ÀçÈ°¿ë
+        // 3. ï¿½ï¿½ï¿½ï¿½/ï¿½ï¿½ï¿½Ù½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ (ï¿½Ï¹ï¿½)
+        glGenRenderbuffers(1, &m_msaaDepthStencilBuffer); // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½È°ï¿½ï¿½
         glBindRenderbuffer(GL_RENDERBUFFER, m_msaaDepthStencilBuffer);
         glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, width, height);
         glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, m_msaaDepthStencilBuffer);
 
-        // 4. µå·Î¿ì ¹öÆÛ ¼³Á¤ ¹× È®ÀÎ
+        // 4. ï¿½ï¿½Î¿ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ È®ï¿½ï¿½
         glDrawBuffers(attachmentCount, attachments.data());
 
         if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
@@ -156,12 +156,12 @@ bool Framebuffer::Init(int32 width, int32 height, int32 samples)
             return false;
         }
 
-        // m_msaaFbo´Â »ç¿ë ¾È ÇÔ : 0À¸·Î ÃÊ±âÈ­
+        // m_msaaFboï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ : 0ï¿½ï¿½ï¿½ï¿½ ï¿½Ê±ï¿½È­
         m_msaaFbo = 0;
     }
 
     /*================================//
-    //   »ùÇÃ ¼ö 2 ÀÌ»ó :  MSAA ¼öÇà   //
+    //   ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ 2 ï¿½Ì»ï¿½ :  MSAA ï¿½ï¿½ï¿½ï¿½   //
     //================================*/
     else
     {
@@ -190,13 +190,13 @@ bool Framebuffer::Init(int32 width, int32 height, int32 samples)
         if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
             return false;
 
-        // Resolve FBO »ý¼º ºÎºÐ
+        // Resolve FBO ï¿½ï¿½ï¿½ï¿½ ï¿½Îºï¿½
         glGenFramebuffers(1, &m_resolveFbo);
         glBindFramebuffer(GL_FRAMEBUFFER, m_resolveFbo);
 
         for (int i = 0; i < attachmentCount; ++i)
         {
-            // ¿©±âµµ MSAA °á°ú¸¦ ¹ÞÀ» ¶§ GL_RGBA16F·Î ¹Þ¾Æ¾ß HDRÀÌ À¯ÁöµË´Ï´Ù.
+            // ï¿½ï¿½ï¿½âµµ MSAA ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ GL_RGBA16Fï¿½ï¿½ ï¿½Þ¾Æ¾ï¿½ HDRï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ë´Ï´ï¿½.
             auto texture = Texture::Create(width, height, GL_RGBA16F, GL_RGBA, GL_FLOAT);
             glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i, GL_TEXTURE_2D, texture->Get(), 0);
             m_resolveTextures.push_back(std::move(texture));
@@ -216,7 +216,7 @@ bool Framebuffer::InitGBuffer(int32 width, int32 height)
     m_width = width;
     m_height = height;
     m_samples = 1;
-    
+
     glGenFramebuffers(1, &m_resolveFbo);
     glBindFramebuffer(GL_FRAMEBUFFER, m_resolveFbo);
 
@@ -244,8 +244,8 @@ bool Framebuffer::InitGBuffer(int32 width, int32 height)
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT3, GL_TEXTURE_2D, emissionTexture->Get(), 0);
     m_resolveTextures.push_back(std::move(emissionTexture));
 
-    // Draw Buffers ¼³Á¤
-    uint32 attachments[4] = 
+    // Draw Buffers ï¿½ï¿½ï¿½ï¿½
+    uint32 attachments[4] =
     {
         GL_COLOR_ATTACHMENT0,
         GL_COLOR_ATTACHMENT1,
@@ -255,16 +255,16 @@ bool Framebuffer::InitGBuffer(int32 width, int32 height)
     glDrawBuffers(4, attachments);
 
     // Depth Attachment
-    glGenRenderbuffers(1, &m_msaaDepthStencilBuffer); // º¯¼ö ÀçÈ°¿ë
+    glGenRenderbuffers(1, &m_msaaDepthStencilBuffer); // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½È°ï¿½ï¿½
     glBindRenderbuffer(GL_RENDERBUFFER, m_msaaDepthStencilBuffer);
     glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, width, height);
     glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, m_msaaDepthStencilBuffer);
 
-    // ¿Ï·á È®ÀÎ
+    // ï¿½Ï·ï¿½ È®ï¿½ï¿½
     auto gBufferResult = glCheckFramebufferStatus(GL_FRAMEBUFFER);
     if (gBufferResult != GL_FRAMEBUFFER_COMPLETE)
     {
-        SPDLOG_ERROR("failed to create gBuffer: {}", gBufferResult); // ·Î±× Ãâ·Â
+        SPDLOG_ERROR("failed to create gBuffer: {}", gBufferResult); // ï¿½Î±ï¿½ ï¿½ï¿½ï¿½
         return false;
     }
 
@@ -281,8 +281,8 @@ bool Framebuffer::InitSSAO(int32 width, int32 height)
     glGenFramebuffers(1, &m_resolveFbo);
     glBindFramebuffer(GL_FRAMEBUFFER, m_resolveFbo);
 
-    // SSAO´Â GL_RED Ã¤³Î¸¸ ÀÖÀ¸¸é ÃæºÐÇÕ´Ï´Ù (¸Þ¸ð¸® Àý¾à)
-    // Á¤¹Ðµµ¸¦ À§ÇØ GL_R16F È¤Àº GL_RED »ç¿ë
+    // SSAOï¿½ï¿½ GL_RED Ã¤ï¿½Î¸ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½Õ´Ï´ï¿½ (ï¿½Þ¸ï¿½ ï¿½ï¿½ï¿½ï¿½)
+    // ï¿½ï¿½ï¿½Ðµï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ GL_R16F È¤ï¿½ï¿½ GL_RED ï¿½ï¿½ï¿½
     auto texture = Texture::Create(width, height, GL_R16F, GL_RED, GL_FLOAT);
     texture->SetFilter(GL_NEAREST, GL_NEAREST);
 
@@ -336,8 +336,8 @@ bool Framebuffer::InitPostProcess(int32 width, int32 height, bool useDepth)
     glGenFramebuffers(1, &m_resolveFbo);
     glBindFramebuffer(GL_FRAMEBUFFER, m_resolveFbo);
 
-    // 1. ÄÃ·¯ Ã·ºÎ¹° (1°³¸¸ »ý¼º!)
-    // HDRÀ» À§ÇØ GL_RGBA16F »ç¿ë
+    // 1. ï¿½Ã·ï¿½ Ã·ï¿½Î¹ï¿½ (1ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½!)
+    // HDRï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ GL_RGBA16F ï¿½ï¿½ï¿½
     auto texture = Texture::Create(width, height, GL_RGBA16F, GL_RGBA, GL_FLOAT);
     texture->SetFilter(GL_LINEAR, GL_LINEAR);
     texture->SetWrap(GL_CLAMP_TO_EDGE, GL_CLAMP_TO_EDGE);
@@ -345,15 +345,15 @@ bool Framebuffer::InitPostProcess(int32 width, int32 height, bool useDepth)
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, texture->Get(), 0);
     m_resolveTextures.push_back(std::move(texture));
 
-    // 2. Draw Buffer ¼³Á¤ (0¹ø ÇÏ³ª¸¸!)
+    // 2. Draw Buffer ï¿½ï¿½ï¿½ï¿½ (0ï¿½ï¿½ ï¿½Ï³ï¿½ï¿½ï¿½!)
     uint32 attachments[1] = { GL_COLOR_ATTACHMENT0 };
     glDrawBuffers(1, attachments);
 
-    // 3. (¼±ÅÃ) ±íÀÌ ¹öÆÛ°¡ ÇÊ¿äÇÏ´Ù¸é Ãß°¡ (BlitCopyDepth¸¦ À§ÇØ ÇÊ¿äÇÒ ¼ö ÀÖÀ½)
-    // º¸Åë PostProcess ÀÚÃ¼´Â ±íÀÌ Å×½ºÆ®¸¦ ²ô°í ±×¸®Áö¸¸, 
-    // Forward RenderingÀ» À§ÇØ ±íÀÌ¸¦ º¹»çÇØ¿Ã °ø°£ÀÌ ÇÊ¿äÇÏ´Ù¸é »ý¼ºÇØ¾ß ÇÔ.
-    // 2. ±íÀÌ ¹öÆÛ »ý¼º (¿É¼Ç Ã³¸®!)
-    if (useDepth) // <--- ¿©±â°¡ ÇÙ½É º¯°æÁ¡
+    // 3. (ï¿½ï¿½ï¿½ï¿½) ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Û°ï¿½ ï¿½Ê¿ï¿½ï¿½Ï´Ù¸ï¿½ ï¿½ß°ï¿½ (BlitCopyDepthï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Ê¿ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½)
+    // ï¿½ï¿½ï¿½ï¿½ PostProcess ï¿½ï¿½Ã¼ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½×½ï¿½Æ®ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½×¸ï¿½ï¿½ï¿½ï¿½ï¿½, 
+    // Forward Renderingï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Ì¸ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ø¿ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ê¿ï¿½ï¿½Ï´Ù¸ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ø¾ï¿½ ï¿½ï¿½.
+    // 2. ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ (ï¿½É¼ï¿½ Ã³ï¿½ï¿½!)
+    if (useDepth) // <--- ï¿½ï¿½ï¿½â°¡ ï¿½Ù½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
     {
         glGenRenderbuffers(1, &m_msaaDepthStencilBuffer);
         glBindRenderbuffer(GL_RENDERBUFFER, m_msaaDepthStencilBuffer);

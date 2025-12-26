@@ -10,6 +10,7 @@
 #include "Resources/StaticMesh.h"
 #include "Resources/Texture.h"
 #include "Components/Camera.h"
+#include "Framebuffers/PostProcessFramebuffer.h"
 
 #include "Pipelines/SRP/StandardRenderContext.h"
 
@@ -42,9 +43,9 @@ bool StandardPostProcessPass::Init(int32 width, int32 height)
 	m_plane = ScreenMesh::Create();
 	if (!m_plane) return false;
 
-	m_frameBuffer = Framebuffer::Create(width, height, 1);
-	m_pingPongFBOs[0] = Framebuffer::Create(width, height, 1);
-	m_pingPongFBOs[1] = Framebuffer::Create(width, height, 1);
+	m_frameBuffer	  = PostProcessFramebuffer::Create(width, height, true);
+	m_pingPongFBOs[0] = PostProcessFramebuffer::Create(width, height, false);
+	m_pingPongFBOs[1] = PostProcessFramebuffer::Create(width, height, false);
 
 	return (m_frameBuffer && m_pingPongFBOs[0] && m_pingPongFBOs[1]);
 }
@@ -55,7 +56,6 @@ void StandardPostProcessPass::Render(RenderContext* context)
 	glDisable(GL_CULL_FACE);
 
 	// 0. 메인 씬 텍스처 준비
-	m_frameBuffer->Resolve();
 	auto sceneTexture = m_frameBuffer->GetColorAttachment(0);
 
 	// [STEP 1] 밝은 영역 추출 (Threshold Pass)
@@ -104,7 +104,7 @@ void StandardPostProcessPass::Render(RenderContext* context)
 	}
 
 	// [STEP 3] 최종 합성 (Composite & Tone Mapping)
-	Framebuffer::BindToDefault();
+	FramebufferBase::BindToDefault();
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -141,9 +141,9 @@ void StandardPostProcessPass::Render(RenderContext* context)
 
 void StandardPostProcessPass::Resize(int32 width, int32 height)
 {
-	m_frameBuffer = Framebuffer::Create(width, height, 1);
-	m_pingPongFBOs[0] = Framebuffer::Create(width, height, 1);
-	m_pingPongFBOs[1] = Framebuffer::Create(width, height, 1);
+	m_frameBuffer = PostProcessFramebuffer::Create(width, height, true);
+	m_pingPongFBOs[0] = PostProcessFramebuffer::Create(width, height, false);
+	m_pingPongFBOs[1] = PostProcessFramebuffer::Create(width, height, false);
 
 	if (m_compositeProgram)
 	{

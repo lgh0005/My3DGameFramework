@@ -16,6 +16,7 @@
 #include "Graphics/ShadowMap.h"
 #include "Components/SpotLight.h"
 #include "Components/Transform.h"
+#include "Framebuffers/PostProcessFramebuffer.h"
 
 #include "Pipelines/SRP/StandardRenderContext.h"
 
@@ -55,7 +56,7 @@ void StandardDeferredLightingPass::Render(RenderContext* context)
 	if (!tPos || !tNormal || !tAlbedo || !tEmission) return;
 
 	// 2. 그리기 준비 (Output FBO 설정)
-	Framebuffer* targetFBO = stdCtx->GetTargetFramebuffer();
+	PostProcessFramebuffer* targetFBO = stdCtx->GetTargetFramebuffer();
 	if (targetFBO)
 	{
 		targetFBO->Bind();

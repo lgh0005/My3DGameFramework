@@ -62,7 +62,6 @@ add_library(Engine STATIC
    "Graphics/Buffer.h"              "Graphics/Buffer.cpp" 
    "Graphics/VertexLayout.h"        "Graphics/VertexLayout.cpp"
    "Graphics/Vertex.h"              "Graphics/Vertex.cpp"
-   "Graphics/FrameBuffer.h"         "Graphics/FrameBuffer.cpp"
    "Graphics/UniformBuffer.h"       "Graphics/UniformBuffer.cpp"
    "Graphics/Uniform.h"             "Graphics/Uniform.cpp"
    "Graphics/Frustum.h"             "Graphics/Frustum.cpp"
@@ -70,6 +69,15 @@ add_library(Engine STATIC
    "Graphics/CubeFramebuffer.h"     "Graphics/CubeFramebuffer.cpp"
    "Graphics/SkyLight.h"            "Graphics/SkyLight.cpp"
    "Graphics/ShadowMap.h"           "Graphics/ShadowMap.cpp"
+   "Graphics/FrameBuffer.h"         "Graphics/FrameBuffer.cpp"
+
+   # Framebuffers
+   "Framebuffers/FramebufferBase.h"     "Framebuffers/FramebufferBase.cpp"
+   "Framebuffers/BRDFLookUpFramebuffer.h"         "Framebuffers/BRDFLookUpFramebuffer.cpp"
+   "Framebuffers/GBufferFramebuffer.h"         "Framebuffers/GBufferFramebuffer.cpp"
+   "Framebuffers/MSAAFramebuffer.h"         "Framebuffers/MSAAFramebuffer.cpp"
+   "Framebuffers/PostProcessFrameBuffer.h"         "Framebuffers/PostProcessFrameBuffer.cpp"
+   "Framebuffers/SSAOFramebuffer.h"         "Framebuffers/SSAOFramebuffer.cpp"
 
    # Resources
    "Resources/Resource.h"           "Resources/Resource.cpp"
@@ -117,7 +125,7 @@ add_library(Engine STATIC
    "Managers/AudioManager.h"        "Managers/AudioManager.cpp"
    "Managers/PhysicsManager.h"      "Managers/PhysicsManager.cpp"
 
-)
+  )
 
 # 2. [PCH 설정] EnginePCH.h를 PCH로 사용합니다.
 target_precompile_headers(Engine  PUBLIC EnginePCH.h)

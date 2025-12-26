@@ -204,7 +204,7 @@ void UniversalPostProcessPass::Render(RenderContext* context)
 
 void UniversalPostProcessPass::Resize(int32 width, int32 height)
 {
-	m_frameBuffer = Framebuffer::Create(width, height, 1);
+	m_frameBuffer = Framebuffer::CreatePostProcess(width, height, true);
 
 	// Bloom Mip Chain 犁积己 (Init 内靛客 悼老茄 肺流)
 	m_bloomMips.clear();

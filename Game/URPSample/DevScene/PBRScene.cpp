@@ -156,8 +156,8 @@ bool PBRScene::CreateNessesaryRenderPasses()
 	{
 		auto prog = Program::Create
 		(
-			"./Resources/Shaders/test_pbr_testing.vert",
-			"./Resources/Shaders/test_pbr_testing.frag"
+			"./Resources/Shaders/Forward_PBR.vert",
+			"./Resources/Shaders/Forward_PBR.frag"
 		); if (!prog) return false;
 		AddCustomRenderPass("simpleHDR", HDRRenderPass::Create(std::move(prog)));
 	}

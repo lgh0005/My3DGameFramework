@@ -13,6 +13,7 @@
 #include "Components/Transform.h"
 #include "Components/SpotLight.h"
 #include "Components/Animator.h"
+#include "Framebuffers/GBufferFramebuffer.h"
 
 #include "Pipelines/SRP/StandardRenderPipeline.h"
 #include "Pipelines/SRP/StandardRenderContext.h"
@@ -38,7 +39,7 @@ bool StandardGeometryPass::Init(int32 width, int32 height)
 	);
 	if (!m_staticGeometryProgram || !m_skinnedGeometryProgram) return false;
 
-	m_gBuffer = Framebuffer::CreateGBuffer(width, height);
+	m_gBuffer = GBufferFramebuffer::Create(width, height);
 	if (!m_gBuffer) return false;
 
 	return true;
@@ -106,10 +107,9 @@ void StandardGeometryPass::Render(RenderContext* context)
 	Framebuffer::BindToDefault();
 }
 
-
 void StandardGeometryPass::Resize(int32 width, int32 height)
 {
-	m_gBuffer = Framebuffer::CreateGBuffer(width, height);
+	m_gBuffer = GBufferFramebuffer::Create(width, height);
 }
 
 /*================================================//
