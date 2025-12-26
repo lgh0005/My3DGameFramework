@@ -30,6 +30,13 @@ FramebufferUPtr Framebuffer::CreateBRDFLUT(int32 width, int32 height)
     return std::move(fbo);
 }
 
+FramebufferUPtr Framebuffer::CreatePostProcess(int32 width, int32 height, bool useDepth)
+{
+    auto fbo = FramebufferUPtr(new Framebuffer());
+    if (!fbo->InitPostProcess(width, height, useDepth)) return nullptr;
+    return std::move(fbo);
+}
+
 void Framebuffer::BindToDefault()
 {
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -81,6 +88,15 @@ void Framebuffer::Resolve() const
 
     // 상태 복구
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
+}
+
+void Framebuffer::AttachTexture(Texture* texture, int32 attachmentIndex)
+{
+    glBindFramebuffer(GL_FRAMEBUFFER, m_resolveFbo);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + attachmentIndex,
+        GL_TEXTURE_2D, texture->Get(), 0);
+    uint32 attachments[1] = { GL_COLOR_ATTACHMENT0 + (uint32)attachmentIndex };
+    glDrawBuffers(1, attachments);
 }
 
 const TexturePtr Framebuffer::GetColorAttachment(int32 index) const
@@ -306,6 +322,47 @@ bool Framebuffer::InitBRDFLUT(int32 width, int32 height)
         SPDLOG_ERROR("BRDF LUT Framebuffer Incomplete!");
         return false;
     }
+
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    return true;
+}
+
+bool Framebuffer::InitPostProcess(int32 width, int32 height, bool useDepth)
+{
+    m_width = width;
+    m_height = height;
+    m_samples = 1;
+
+    glGenFramebuffers(1, &m_resolveFbo);
+    glBindFramebuffer(GL_FRAMEBUFFER, m_resolveFbo);
+
+    // 1. 컬러 첨부물 (1개만 생성!)
+    // HDR을 위해 GL_RGBA16F 사용
+    auto texture = Texture::Create(width, height, GL_RGBA16F, GL_RGBA, GL_FLOAT);
+    texture->SetFilter(GL_LINEAR, GL_LINEAR);
+    texture->SetWrap(GL_CLAMP_TO_EDGE, GL_CLAMP_TO_EDGE);
+
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, texture->Get(), 0);
+    m_resolveTextures.push_back(std::move(texture));
+
+    // 2. Draw Buffer 설정 (0번 하나만!)
+    uint32 attachments[1] = { GL_COLOR_ATTACHMENT0 };
+    glDrawBuffers(1, attachments);
+
+    // 3. (선택) 깊이 버퍼가 필요하다면 추가 (BlitCopyDepth를 위해 필요할 수 있음)
+    // 보통 PostProcess 자체는 깊이 테스트를 끄고 그리지만, 
+    // Forward Rendering을 위해 깊이를 복사해올 공간이 필요하다면 생성해야 함.
+    // 2. 깊이 버퍼 생성 (옵션 처리!)
+    if (useDepth) // <--- 여기가 핵심 변경점
+    {
+        glGenRenderbuffers(1, &m_msaaDepthStencilBuffer);
+        glBindRenderbuffer(GL_RENDERBUFFER, m_msaaDepthStencilBuffer);
+        glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, width, height);
+        glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, m_msaaDepthStencilBuffer);
+    }
+
+    if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+        return false;
 
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     return true;

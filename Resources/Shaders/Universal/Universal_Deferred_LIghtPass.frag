@@ -234,7 +234,7 @@ void main()
         vec2 brdf  = texture(brdfLUT, vec2(max(dot(N, V), 0.0), Roughness)).rg;
         vec3 specular = prefilteredColor * (kS * brdf.x + brdf.y);
         
-        float iblStrength = 1.0;
+        float iblStrength = 0.4;
         ambient = (kD * diffuse + specular) * FinalAO * iblStrength;
     }
     else
