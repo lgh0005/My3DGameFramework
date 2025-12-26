@@ -14,6 +14,17 @@ public:
 	virtual ~UniversalGlobalUniforms();
 	virtual void PreRender(RenderContext* context) override;
 
+/*==============================//
+//   UBO update helper methods  //
+//==============================*/
+private:
+	void UpdateCameraUBO(Camera* camera);
+	void UpdateLightUBO
+	(
+		const std::vector<Light*>& lights,
+		const glm::vec3& viewPos
+	);
+
 private:
 	UniversalGlobalUniforms();
 	bool Init();

@@ -62,6 +62,27 @@ void StandardSSAOPass::Resize(int32 width, int32 height)
     m_ssaoBlurFBO = SSAOFramebuffer::Create(width, height);
 }
 
+void StandardSSAOPass::Render(RenderContext* context)
+{
+    // 0. 자신의 렌더 패스에 활용되고 있는 RenderContext로 캐스팅
+    auto stdCtx = (StandardRenderContext*)context;
+    
+    // 1. SSAO 계산 (G-Buffer -> Raw SSAO)
+    ComputeSSAO(stdCtx);
+
+    // 2. 노이즈 제거 (Raw SSAO -> Blurred SSAO)
+    BlurSSAOResult(stdCtx);
+
+    // 3. context에 ssao 결과 캐싱
+    stdCtx->SetSSAOTexture(m_ssaoBlurFBO->GetColorAttachment(0).get());
+    
+    // 4. 복귀
+    Framebuffer::BindToDefault();
+}
+
+/*==============================//
+//   ssao pass helper methods   //
+//==============================*/
 void StandardSSAOPass::GenerateKernel()
 {
     std::uniform_real_distribution<float> randomFloats(0.0, 1.0);
@@ -112,13 +133,11 @@ void StandardSSAOPass::GenerateNoiseTexture()
     m_noiseTexture->SetData(ssaoNoise.data());
 }
 
-void StandardSSAOPass::Render(RenderContext* context)
+void StandardSSAOPass::ComputeSSAO(StandardRenderContext* context)
 {
-    // 0. 자신의 렌더 패스에 활용되고 있는 RenderContext로 캐스팅
-    auto stdCtx = (StandardRenderContext*)context;
-    Camera* camera = stdCtx->GetCamera();
-    Texture* gPos = stdCtx->GetGBufferPosition();
-    Texture* gNormal = stdCtx->GetGBufferNormal();
+    Camera* camera = context->GetCamera();
+    Texture* gPos = context->GetGBufferPosition();
+    Texture* gNormal = context->GetGBufferNormal();
     if (!camera || !gPos || !gNormal) return;
 
     m_ssaoFBO->Bind();
@@ -140,21 +159,18 @@ void StandardSSAOPass::Render(RenderContext* context)
     m_ssaoProgram->SetUniform("view", camera->GetViewMatrix());
 
     m_screenQuad->Draw(m_ssaoProgram.get());
+}
 
+void StandardSSAOPass::BlurSSAOResult(StandardRenderContext* context)
+{
     // SSAO Blur
     m_ssaoBlurFBO->Bind();
     glClear(GL_COLOR_BUFFER_BIT);
 
     m_ssaoBlurProgram->Use();
-
     glActiveTexture(GL_TEXTURE0);
     m_ssaoFBO->GetColorAttachment(0)->Bind();
     m_ssaoBlurProgram->SetUniform("ssaoInput", 0);
 
     m_screenQuad->Draw();
-
-    // context에 ssao 결과 캐싱
-    stdCtx->SetSSAOTexture(m_ssaoBlurFBO->GetColorAttachment(0).get());
-
-    Framebuffer::BindToDefault();
 }

@@ -9,6 +9,7 @@ CLASS_PTR(Framebuffer)
 CLASS_PTR(PostProcessFramebuffer)
 CLASS_PTR(ScreenMesh)
 CLASS_PTR(RenderContext)
+CLASS_PTR(Texture)
 #pragma endregion
 
 CLASS_PTR(StandardPostProcessPass)
@@ -23,6 +24,14 @@ public:
 	PostProcessFramebuffer* GetFramebuffer() const { return m_frameBuffer.get(); }
 	virtual void Render(RenderContext* context) override;
 	void Resize(int32 width, int32 height);
+
+/*=============================================//
+//   standard post-processing helper methods   //
+//=============================================*/
+private:
+	void ExtractBrightAreas(Texture* sceneTexture);
+	Texture* ComputeGaussianBlur();
+	void RenderCompositePass(Texture* sceneTexture, Texture* bloomTexture);
 
 private:
 	StandardPostProcessPass() = default;

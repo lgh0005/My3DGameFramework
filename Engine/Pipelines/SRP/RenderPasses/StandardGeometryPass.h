@@ -27,12 +27,13 @@ public:
 	GBufferFramebuffer* GetGBuffer() { return m_gBuffer.get(); }
 
 	virtual void Render(RenderContext* context) override;
-
 	void Resize(int32 width, int32 height);
 
 private:
 	StandardGeometryPass() = default;
 	bool Init(int32 width, int32 height);
+	void RenderStaticGeometry(const std::vector<MeshRenderer*>& meshes);
+	void RenderSkinnedGeometry(const std::vector<MeshRenderer*>& meshes);
 
 	GBufferFramebufferUPtr m_gBuffer;
 	ProgramUPtr m_staticGeometryProgram;

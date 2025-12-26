@@ -26,8 +26,10 @@ ShadowPassUPtr ShadowPass::Create(int32 resolution)
 
 bool ShadowPass::Init(int32 resolution)
 {
+	// 0. 그림자의 해상도 설정 : 기본값 1024
 	m_resolution = resolution;
 
+	// 1. 그림자 셰이더 프로그램 생성
 	m_staticDepthProgram = Program::Create
 	(
 		"./Resources/Shaders/Common/Common_Shadow_DepthPass_Static.vert",
@@ -38,9 +40,10 @@ bool ShadowPass::Init(int32 resolution)
 		"./Resources/Shaders/Common/Common_Shadow_DepthPass_Skinned.vert",
 		"./Resources/Shaders/Common/Common_Shadow_DepthPass_Skinned.frag"
 	);
-	if (!m_staticDepthProgram || !m_skinnedDepthProgram)
-		return false;
+	if (!m_staticDepthProgram || !m_skinnedDepthProgram) return false;
 
+	// 2. 그림자가 드리워지는 최대 조명 개수 만큼 그림자 맵 생성
+	// 최대(MAX_SHADOW_CASTER) 8개
 	m_shadowMaps.resize(MAX_SHADOW_CASTER);
 	for (int i = 0; i < MAX_SHADOW_CASTER; ++i)
 	{
@@ -88,63 +91,18 @@ void ShadowPass::Render(RenderContext* context)
 		light->SetLightSpaceMatrix(lightSpaceMatrix);
 
 		// 2-5. StaticMesh 렌더링
-		if (m_staticDepthProgram)
-		{
-			m_staticDepthProgram->Use();
-			m_staticDepthProgram->SetUniform("lightSpaceMatrix", lightSpaceMatrix);
-
-			for (const auto* renderer : staticMeshes)
-			{
-				auto model = renderer->GetTransform().GetWorldMatrix();
-				m_staticDepthProgram->SetUniform("model", model);
-				renderer->GetMesh()->Draw(m_staticDepthProgram.get());
-			}
-		}
+		RenderStaticMeshes(staticMeshes, lightSpaceMatrix);
 
 		// 2-6. SkinnedMesh 렌더링
-		if (m_skinnedDepthProgram)
-		{
-			m_skinnedDepthProgram->Use();
-			m_skinnedDepthProgram->SetUniform("lightSpaceMatrix", lightSpaceMatrix);
-
-			// G-Buffer에서 그릴 대상 중 SkinnedMesh를 가져옴
-			for (const auto* renderer : skinnedMeshes)
-			{
-				GameObject* go = renderer->GetOwner();
-				auto model = renderer->GetTransform().GetWorldMatrix();
-				m_skinnedDepthProgram->SetUniform("model", model);
-
-				Animator* animator = go->GetComponent<Animator>();
-				if (animator)
-				{
-					auto finalMatrices = animator->GetFinalBoneMatrices();
-					for (int i = 0; i < finalMatrices.size(); ++i)
-						m_skinnedDepthProgram->SetUniform
-						("finalBoneMatrices[" + std::to_string(i) + "]", finalMatrices[i]);
-				}
-
-				renderer->GetMesh()->Draw(m_skinnedDepthProgram.get());
-			}
-		}
+		RenderSkinnedMeshes(skinnedMeshes, lightSpaceMatrix);
 	}
 
 	glCullFace(GL_BACK);
 
 	// 3. 그림자를 구운 텍스쳐를 Context에 등록
-	for (int i = 0; i < MAX_SHADOW_CASTER; ++i)
-	{
-		if (m_shadowMaps[i])
-		{
-			// ShadowMap 클래스 내부의 Texture를 가져옵니다.
-			Texture* tex = m_shadowMaps[i]->GetShadowMap().get();
-			context->SetShadowMap(i, tex);
-		}
-		else
-		{
-			context->SetShadowMap(i, nullptr);
-		}
-	}
+	RegisterShadowMapsToContext(context);
 }
+
 
 glm::mat4 ShadowPass::CalculateLightSpaceMatrix(Light* light)
 {
@@ -173,8 +131,75 @@ glm::mat4 ShadowPass::CalculateLightSpaceMatrix(Light* light)
 		lightProjection = glm::perspective(glm::radians((cutoff[0] + cutoff[1]) * 2.0f),
 			1.0f, 1.0f, 100.0f);
 		break;
+
+	// TODO : Point Light에 대한 그림자 처리는 이후에 고려 필요
 	}
 
 	// 조명 기준의 VP 행렬 반환
 	return lightProjection * lightView;
+}
+
+void ShadowPass::RenderStaticMeshes
+(
+	const std::vector<MeshRenderer*>& meshes, 
+	const glm::mat4& lightSpaceMatrix
+)
+{
+	if (!m_staticDepthProgram || meshes.empty()) return;
+
+	m_staticDepthProgram->Use();
+	m_staticDepthProgram->SetUniform("lightSpaceMatrix", lightSpaceMatrix);
+
+	for (const auto* renderer : meshes)
+	{
+		auto model = renderer->GetTransform().GetWorldMatrix();
+		m_staticDepthProgram->SetUniform("model", model);
+		renderer->GetMesh()->Draw(m_staticDepthProgram.get());
+	}
+}
+
+void ShadowPass::RenderSkinnedMeshes
+(
+	const std::vector<MeshRenderer*>& meshes, 
+	const glm::mat4& lightSpaceMatrix
+)
+{
+	if (!m_skinnedDepthProgram || meshes.empty()) return;
+
+	m_skinnedDepthProgram->Use();
+	m_skinnedDepthProgram->SetUniform("lightSpaceMatrix", lightSpaceMatrix);
+
+	for (const auto* renderer : meshes)
+	{
+		GameObject* go = renderer->GetOwner();
+		auto model = renderer->GetTransform().GetWorldMatrix();
+		m_skinnedDepthProgram->SetUniform("model", model);
+
+		Animator* animator = go->GetComponent<Animator>();
+		if (animator)
+		{
+			const auto& finalMatrices = animator->GetFinalBoneMatrices();
+			for (int i = 0; i < finalMatrices.size(); ++i)
+				m_skinnedDepthProgram->SetUniform
+				("finalBoneMatrices[" + std::to_string(i) + "]", finalMatrices[i]);
+		}
+
+		renderer->GetMesh()->Draw(m_skinnedDepthProgram.get());
+	}
+}
+
+void ShadowPass::RegisterShadowMapsToContext(RenderContext* context)
+{
+	for (int i = 0; i < MAX_SHADOW_CASTER; ++i)
+	{
+		if (m_shadowMaps[i])
+		{
+			Texture* tex = m_shadowMaps[i]->GetShadowMap().get();
+			context->SetShadowMap(i, tex);
+		}
+		else
+		{
+			context->SetShadowMap(i, nullptr);
+		}
+	}
 }

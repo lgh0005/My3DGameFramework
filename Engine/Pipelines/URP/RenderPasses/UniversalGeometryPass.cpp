@@ -62,52 +62,65 @@ void UniversalGeometryPass::Render(RenderContext* context)
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glEnable(GL_DEPTH_TEST);
 	glDisable(GL_BLEND);
-
+	
 	// 3. Static Mesh 그리기 (정적 오브젝트)
-	if (m_staticGeometryProgram)
-	{
-		m_staticGeometryProgram->Use();
-		for (const auto* renderer : stdCtx->GetStaticMeshRenderers())
-		{
-			MeshPtr mesh = renderer->GetMesh();
-			auto model = renderer->GetTransform().GetWorldMatrix();
-			auto material = renderer->GetMaterial();
-
-			material->SetToProgram(m_staticGeometryProgram.get());
-			m_staticGeometryProgram->SetUniform("model", model);
-
-			mesh->Draw(m_staticGeometryProgram.get());
-		}
-	}
+	RenderStaticGeometry(stdCtx->GetStaticMeshRenderers());
 
 	// 4. Skinned Mesh 그리기 (애니메이션 오브젝트)
-	if (m_skinnedGeometryProgram)
-	{
-		m_skinnedGeometryProgram->Use();
-		for (const auto* renderer : stdCtx->GetSkinnedMeshRenderers())
-		{
-			GameObject* go = renderer->GetOwner();
-			MeshPtr mesh = renderer->GetMesh();
-			auto material = renderer->GetMaterial();
-			auto& transform = go->GetTransform();
-			Animator* animator = go->GetComponent<Animator>();
+	RenderSkinnedGeometry(stdCtx->GetSkinnedMeshRenderers());
 
-			material->SetToProgram(m_skinnedGeometryProgram.get());
-
-			auto finalMatrices = animator->GetFinalBoneMatrices();
-			for (int i = 0; i < finalMatrices.size(); ++i)
-				m_skinnedGeometryProgram->SetUniform("finalBoneMatrices[" + std::to_string(i) + "]", finalMatrices[i]);
-			m_skinnedGeometryProgram->SetUniform("model", transform.GetWorldMatrix());
-
-			mesh->Draw(m_skinnedGeometryProgram.get());
-		}
-	}
-
-	// 4. context에 gBuffer 캐싱
+	// 5. context에 gBuffer 캐싱
 	stdCtx->SetGBuffer(m_gBuffer.get());
 
-	// 5. 그리기 완료 후 기본 프레임버퍼로 복귀
+	// 6. 그리기 완료 후 기본 프레임버퍼로 복귀
 	Framebuffer::BindToDefault();
+}
+
+void UniversalGeometryPass::RenderStaticGeometry(const std::vector<MeshRenderer*>& meshes)
+{
+	if (!m_staticGeometryProgram || meshes.empty()) return;
+
+	m_staticGeometryProgram->Use();
+	for (const auto* renderer : meshes)
+	{
+		MeshPtr mesh = renderer->GetMesh();
+		auto model = renderer->GetTransform().GetWorldMatrix();
+		auto material = renderer->GetMaterial();
+
+		if (material) material->SetToProgram(m_staticGeometryProgram.get());
+		m_staticGeometryProgram->SetUniform("model", model);
+
+		if (mesh) mesh->Draw(m_staticGeometryProgram.get());
+	}
+}
+
+void UniversalGeometryPass::RenderSkinnedGeometry(const std::vector<MeshRenderer*>& meshes)
+{
+	if (!m_skinnedGeometryProgram || meshes.empty()) return;
+
+	m_skinnedGeometryProgram->Use();
+	for (const auto* renderer : meshes)
+	{
+		GameObject* go = renderer->GetOwner();
+		MeshPtr mesh = renderer->GetMesh();
+		auto material = renderer->GetMaterial();
+		auto& transform = go->GetTransform();
+		Animator* animator = go->GetComponent<Animator>();
+
+		if (material) material->SetToProgram(m_skinnedGeometryProgram.get());
+
+		// 애니메이션 행렬 전송
+		if (animator)
+		{
+			const auto& finalMatrices = animator->GetFinalBoneMatrices();
+			for (int i = 0; i < finalMatrices.size(); ++i)
+				m_skinnedGeometryProgram->SetUniform("finalBoneMatrices[" + std::to_string(i) + "]", finalMatrices[i]);
+		}
+
+		m_skinnedGeometryProgram->SetUniform("model", transform.GetWorldMatrix());
+
+		if (mesh) mesh->Draw(m_skinnedGeometryProgram.get());
+	}
 }
 
 void UniversalGeometryPass::Resize(int32 width, int32 height)

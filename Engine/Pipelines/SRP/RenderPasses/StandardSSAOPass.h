@@ -11,6 +11,7 @@ CLASS_PTR(Program)
 CLASS_PTR(ScreenMesh)
 CLASS_PTR(StaticMesh)
 CLASS_PTR(RenderContext)
+CLASS_PTR(StandardRenderContext)
 #pragma endregion
 
 CLASS_PTR(StandardSSAOPass)
@@ -24,12 +25,19 @@ public:
 	);
 	virtual void Render(RenderContext* context) override;
 	void Resize(int32 width, int32 height);
+	
+/*==============================//
+//   ssao pass helper methods   //
+//==============================*/
+private:
+	void ComputeSSAO(StandardRenderContext* context);
+	void BlurSSAOResult(StandardRenderContext* context);
+	void GenerateKernel();
+	void GenerateNoiseTexture();
 
 private:
 	StandardSSAOPass() = default;
 	bool Init(int32 width, int32 height);
-	void GenerateKernel();
-	void GenerateNoiseTexture();
 
 	ScreenMeshUPtr		   m_screenQuad{ nullptr };
 

@@ -33,6 +33,8 @@ public:
 private:
 	UniversalGeometryPass();
 	bool Init(int32 width, int32 height);
+	void RenderStaticGeometry(const std::vector<MeshRenderer*>& meshes);
+	void RenderSkinnedGeometry(const std::vector<MeshRenderer*>& meshes);
 
 	GBufferFramebufferUPtr m_gBuffer;
 	ProgramUPtr m_staticGeometryProgram;

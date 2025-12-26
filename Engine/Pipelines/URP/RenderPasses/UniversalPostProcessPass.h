@@ -32,6 +32,13 @@ public:
 
 	PostProcessFramebuffer* GetFramebuffer() const { return m_frameBuffer.get(); }
 
+/*==============================================//
+//   universal post-processing helper methods   //
+//==============================================*/
+private:
+	Texture* RenderKawaseBloom(Texture* hdrTexture);
+	void RenderComposite(Texture* hdrTexture, Texture* bloomTexture);
+
 private:
 	UniversalPostProcessPass() = default;
 	bool Init(int32 width, int32 height);

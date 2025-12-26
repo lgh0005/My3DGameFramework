@@ -44,36 +44,59 @@ bool UniversalDeferredLightingPass::Init()
 	return true;
 }
 
-// TODO : IBL 광원 효과 유니폼 변수들도 넣어줘야함
-// HDRRenderPass 내용을 참고
 void UniversalDeferredLightingPass::Render(RenderContext* context)
 {
 	// 0. Context 캐스팅 및 유효성 검사
 	auto stdCtx = (UniversalRenderContext*)context;
 	if (!stdCtx) return;
 
+	// 1. 포스트 프로세싱 프레임 버퍼에 GBuffer 내용 그리기
+	BeginDrawOnPostProcessFBO(stdCtx);
+
+	// 2. SSAO 텍스쳐 바인딩
+	BindSSAOTexture(stdCtx);
+
+	// 3. 그림자 맵 바인딩
+	BindShadowMaps(stdCtx);
+
+	// 4. SkyLight으로부터 IBL 속성 바인딩
+	BindIBLMaps(stdCtx);
+
+	// 4. RenderContext로부터 조명 행렬 가져오기
+	GetLightMatricesFromContext(stdCtx);
+
+	// 6. 그리기
+	m_plane->Draw();
+
+	glDepthMask(GL_TRUE);
+	glEnable(GL_DEPTH_TEST);
+}
+
+/*==========================================//
+//   deferred lighting pass helper methods  //
+//==========================================*/
+void UniversalDeferredLightingPass::BeginDrawOnPostProcessFBO(UniversalRenderContext* context)
+{
 	// 1. Context에서 G-Buffer 텍스처 가져오기
-	Texture* tPos = stdCtx->GetGBufferPosition();
-	Texture* tNormal = stdCtx->GetGBufferNormal();
-	Texture* tAlbedo = stdCtx->GetGBufferAlbedo();
-	Texture* tEmission = stdCtx->GetGBufferEmission();
+	Texture* tPos = context->GetGBufferPosition();
+	Texture* tNormal = context->GetGBufferNormal();
+	Texture* tAlbedo = context->GetGBufferAlbedo();
+	Texture* tEmission = context->GetGBufferEmission();
 	if (!tPos || !tNormal || !tAlbedo || !tEmission) return;
 
 	// 2. 그리기 준비 (Output FBO 설정)
-	// INFO : m_postProcessPass의 BeginDraw 역할을 여기서 수행한다고 보면 됨
-	PostProcessFramebuffer* targetFBO = stdCtx->GetTargetFramebuffer();
+	PostProcessFramebuffer* targetFBO = context->GetTargetFramebuffer();
 	if (targetFBO)
 	{
 		targetFBO->Bind();
 		glViewport(0, 0, targetFBO->GetWidth(), targetFBO->GetHeight());
-		glDisable(GL_DEPTH_TEST);
-		glDepthMask(GL_FALSE);
-		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+		glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 		glClear(GL_COLOR_BUFFER_BIT);
 	}
 	else
 	{
 		Framebuffer::BindToDefault();
+		// 텍스처 크기를 기준으로 뷰포트 설정
 		glViewport(0, 0, tPos->GetWidth(), tPos->GetHeight());
 		glDisable(GL_DEPTH_TEST);
 		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
@@ -94,22 +117,12 @@ void UniversalDeferredLightingPass::Render(RenderContext* context)
 
 	glActiveTexture(GL_TEXTURE3); tEmission->Bind();
 	m_deferredLightProgram->SetUniform("gEmission", 3);
+}
 
-	// 4. Shadow Maps 바인딩 (Pipeline 데이터 사용 - 기존 유지)
-	const int shadowStartSlot = 4;
-	for (int i = 0; i < MAX_SHADOW_CASTER; ++i)
-	{
-		glActiveTexture(GL_TEXTURE4 + i);
-
-		Texture* shadowMap = stdCtx->GetShadowMap(i);
-		if (shadowMap) shadowMap->Bind();
-
-		std::string uniformName = "shadowMaps[" + std::to_string(i) + "]";
-		m_deferredLightProgram->SetUniform(uniformName, shadowStartSlot + i);
-	}
-
-	// 5. SSAO 텍스처 바인딩 (Context 데이터 사용)
-	Texture* tSSAO = stdCtx->GetSSAOTexture();
+void UniversalDeferredLightingPass::BindSSAOTexture(UniversalRenderContext* context)
+{
+	// 4. SSAO 텍스처 바인딩 (Context 데이터 사용)
+	Texture* tSSAO = context->GetSSAOTexture();
 	if (tSSAO)
 	{
 		glActiveTexture(GL_TEXTURE12);
@@ -121,9 +134,27 @@ void UniversalDeferredLightingPass::Render(RenderContext* context)
 	{
 		m_deferredLightProgram->SetUniform("useSSAO", false);
 	}
+}
 
+void UniversalDeferredLightingPass::BindShadowMaps(UniversalRenderContext* context)
+{
+	// 5. Shadow Maps 바인딩 (Pipeline 데이터 사용 - 기존 유지)
+	for (int i = 0; i < MAX_SHADOW_CASTER; ++i)
+	{
+		glActiveTexture(GL_TEXTURE4 + i);
+
+		Texture* shadowMap = context->GetShadowMap(i);
+		if (shadowMap) shadowMap->Bind();
+
+		std::string uniformName = "shadowMaps[" + std::to_string(i) + "]";
+		m_deferredLightProgram->SetUniform(uniformName, 4 + i);
+	}
+}
+
+void UniversalDeferredLightingPass::BindIBLMaps(UniversalRenderContext* context)
+{
 	// 6. IBL (SkyLight) Binding [Slot 13-15]
-	SkyLight* skyLight = stdCtx->GetSkyLight();
+	SkyLight* skyLight = context->GetSkyLight();
 	m_deferredLightProgram->SetUniform("useIBL", true);
 	if (skyLight)
 	{
@@ -154,10 +185,13 @@ void UniversalDeferredLightingPass::Render(RenderContext* context)
 			m_deferredLightProgram->SetUniform("brdfLUT", 15);
 		}
 	}
+}
 
-	// 7. Light Matrices 전송(Context의 Culled List 사용)
+void UniversalDeferredLightingPass::GetLightMatricesFromContext(UniversalRenderContext* context)
+{
+	// 6. Light Matrices 전송(Context의 Culled List 사용)
 	// Scene 전체 조명이 아니라, Context에 담긴 조명만 처리
-	const auto& lights = stdCtx->GetLights();
+	const auto& lights = context->GetScene()->GetLights();
 	for (auto* light : lights)
 	{
 		int32 idx = light->GetShadowMapIndex();
@@ -167,10 +201,4 @@ void UniversalDeferredLightingPass::Render(RenderContext* context)
 			m_deferredLightProgram->SetUniform(uName, light->GetLightSpaceMatrix());
 		}
 	}
-
-	// 7. 그리기
-	m_plane->Draw();
-
-	glDepthMask(GL_TRUE);
-	glEnable(GL_DEPTH_TEST);
 }

@@ -47,15 +47,37 @@ void StandardDeferredLightingPass::Render(RenderContext* context)
 	auto stdCtx = (StandardRenderContext*)context;
 	if (!stdCtx) return;
 
+	// 1. 포스트 프로세싱 프레임 버퍼에 GBuffer 내용 그리기
+	BeginDrawOnPostProcessFBO(stdCtx);
+
+	// 2. SSAO 텍스쳐 바인딩
+	BindSSAOTexture(stdCtx);
+
+	// 3. 그림자 맵 바인딩
+	BindShadowMaps(stdCtx);
+
+	// 4. RenderContext로부터 조명 행렬 가져오기
+	GetLightMatricesFromContext(stdCtx);
+
+	// 5. 그리기
+	m_plane->Draw();
+	glEnable(GL_DEPTH_TEST);
+}
+
+/*==========================================//
+//   deferred lighting pass helper methods  //
+//==========================================*/
+void StandardDeferredLightingPass::BeginDrawOnPostProcessFBO(StandardRenderContext* context)
+{
 	// 1. Context에서 G-Buffer 텍스처 가져오기
-	Texture* tPos = stdCtx->GetGBufferPosition();
-	Texture* tNormal = stdCtx->GetGBufferNormal();
-	Texture* tAlbedo = stdCtx->GetGBufferAlbedo();
-	Texture* tEmission = stdCtx->GetGBufferEmission();
+	Texture* tPos = context->GetGBufferPosition();
+	Texture* tNormal = context->GetGBufferNormal();
+	Texture* tAlbedo = context->GetGBufferAlbedo();
+	Texture* tEmission = context->GetGBufferEmission();
 	if (!tPos || !tNormal || !tAlbedo || !tEmission) return;
 
 	// 2. 그리기 준비 (Output FBO 설정)
-	PostProcessFramebuffer* targetFBO = stdCtx->GetTargetFramebuffer();
+	PostProcessFramebuffer* targetFBO = context->GetTargetFramebuffer();
 	if (targetFBO)
 	{
 		targetFBO->Bind();
@@ -87,9 +109,12 @@ void StandardDeferredLightingPass::Render(RenderContext* context)
 
 	glActiveTexture(GL_TEXTURE3); tEmission->Bind();
 	m_deferredLightProgram->SetUniform("gEmission", 3);
+}
 
+void StandardDeferredLightingPass::BindSSAOTexture(StandardRenderContext* context)
+{
 	// 4. SSAO 텍스처 바인딩 (Context 데이터 사용)
-	Texture* tSSAO = stdCtx->GetSSAOTexture();
+	Texture* tSSAO = context->GetSSAOTexture();
 	if (tSSAO)
 	{
 		glActiveTexture(GL_TEXTURE12);
@@ -101,22 +126,28 @@ void StandardDeferredLightingPass::Render(RenderContext* context)
 	{
 		m_deferredLightProgram->SetUniform("useSSAO", false);
 	}
+}
 
+void StandardDeferredLightingPass::BindShadowMaps(StandardRenderContext* context)
+{
 	// 5. Shadow Maps 바인딩 (Pipeline 데이터 사용 - 기존 유지)
 	for (int i = 0; i < MAX_SHADOW_CASTER; ++i)
 	{
 		glActiveTexture(GL_TEXTURE4 + i);
 
-		Texture* shadowMap = stdCtx->GetShadowMap(i);
+		Texture* shadowMap = context->GetShadowMap(i);
 		if (shadowMap) shadowMap->Bind();
 
 		std::string uniformName = "shadowMaps[" + std::to_string(i) + "]";
 		m_deferredLightProgram->SetUniform(uniformName, 4 + i);
 	}
+}
 
+void StandardDeferredLightingPass::GetLightMatricesFromContext(StandardRenderContext* context)
+{
 	// 6. Light Matrices 전송(Context의 Culled List 사용)
 	// Scene 전체 조명이 아니라, Context에 담긴 조명만 처리
-	const auto& lights = stdCtx->GetScene()->GetLights();
+	const auto& lights = context->GetScene()->GetLights();
 	for (auto* light : lights)
 	{
 		int32 idx = light->GetShadowMapIndex();
@@ -126,8 +157,4 @@ void StandardDeferredLightingPass::Render(RenderContext* context)
 			m_deferredLightProgram->SetUniform(uName, light->GetLightSpaceMatrix());
 		}
 	}
-
-	// 7. 그리기
-	m_plane->Draw();
-	glEnable(GL_DEPTH_TEST);
 }

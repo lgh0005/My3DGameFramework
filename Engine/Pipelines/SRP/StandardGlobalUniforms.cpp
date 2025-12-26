@@ -28,92 +28,112 @@ bool StandardGlobalUniforms::Init()
 
 void StandardGlobalUniforms::PreRender(RenderContext* context)
 {
+	if (!context) return;
+
 	// 0. context로부터 필요한 정보 얻어오기
 	auto camera = context->GetCamera();
 	auto lights = context->GetLights();
 
-	// 1. 카메라 UBO
-	if (m_cameraUBO)
-	{
-		CameraData camData;
-		camData.view = camera->GetViewMatrix();
-		camData.projection = camera->GetProjectionMatrix();
-		camData.viewPos = camera->GetTransform().GetPosition();
-		m_cameraUBO->SetData(&camData, sizeof(CameraData));
-	}
+	if (!camera) return;
 
-	// 2. 조명 UBO
-	if (m_lightUBO)
-	{
-		LightData lightData = {};
-		lightData.viewPos = camera->GetTransform().GetPosition();
-		int32 lightCount = 0;
-		int32 shadowCasterCount = 0;
+	// 1. 카메라 데이터 업데이트
+	UpdateCameraUBO(camera);
 
-		// 조명 데이터 주입 분류
-		for (auto* light : lights)
+	// 2. 조명 데이터 업데이트 (Specular 계산을 위해 ViewPos 필요)
+	UpdateLightUBO(lights, camera->GetTransform().GetPosition());
+}
+
+/*==============================//
+//   UBO update helper methods  //
+//==============================*/
+void StandardGlobalUniforms::UpdateCameraUBO(Camera* camera)
+{
+	if (!m_cameraUBO || !camera) return;
+
+	CameraData camData;
+	camData.view = camera->GetViewMatrix();
+	camData.projection = camera->GetProjectionMatrix();
+	camData.viewPos = camera->GetTransform().GetPosition();
+
+	m_cameraUBO->SetData(&camData, sizeof(CameraData));
+}
+
+void StandardGlobalUniforms::UpdateLightUBO
+(
+	const std::vector<Light*>& lights, 
+	const glm::vec3& viewPos
+)
+{
+	if (!m_lightUBO) return;
+
+	LightData lightData = {};
+	lightData.viewPos = viewPos;
+
+	int32 lightCount = 0;
+	int32 shadowCasterCount = 0;
+
+	for (auto* light : lights)
+	{
+		if (lightCount >= MAX_LIGHTS) break;
+
+		auto& info = lightData.lights[lightCount];
+		auto& transform = light->GetTransform();
+
+		// [공통 속성]
+		info.position = transform.GetPosition();
+		info.direction = transform.GetForwardVector();
+		info.ambient = light->GetAmbient();
+		info.diffuse = light->GetDiffuse();
+		info.specular = light->GetSpecular();
+		info.intensity = light->GetIntensity();
+
+		// [그림자 캐스팅 필요 판정]
+		if (light->IsCastShadow() && shadowCasterCount < MAX_SHADOW_CASTER)
 		{
-			if (lightCount >= MAX_LIGHTS) break;
-
-			auto& info = lightData.lights[lightCount];
-			auto& transform = light->GetTransform();
-
-			// [공통 속성]
-			info.position = transform.GetPosition();
-			info.direction = transform.GetForwardVector();
-			info.ambient = light->GetAmbient();
-			info.diffuse = light->GetDiffuse();
-			info.specular = light->GetSpecular();
-			info.intensity = light->GetIntensity();
-
-			// [그림자 캐스팅 필요 판정]
-			if (light->IsCastShadow() && shadowCasterCount < MAX_SHADOW_CASTER)
-			{
-				info.shadowMapIndex = shadowCasterCount;
-				light->SetShadowMapIndex(shadowCasterCount);
-				shadowCasterCount++;
-			}
-			else
-			{
-				info.shadowMapIndex = -1;
-				light->SetShadowMapIndex(-1);
-			}
-
-			// [타입별 속성]
-			switch (light->GetComponentType())
-			{
-				case ComponentType::DirectionalLight:
-				{
-					info.type = 0;
-					info.attenuation = glm::vec3(1.0f, 0.0f, 0.0f);
-					info.cutoff = glm::vec2(0.0f, 0.0f);
-					break;
-				}
-
-				case ComponentType::PointLight:
-				{
-					info.type = 1;
-					auto point = static_cast<PointLight*>(light);
-					info.attenuation = point->GetAttenuation();
-					info.cutoff = glm::vec2(0.0f, 0.0f);
-					break;
-				}
-
-				case ComponentType::SpotLight:
-				{
-					info.type = 2;
-					auto spot = static_cast<SpotLight*>(light);
-					glm::vec2 cutoff = spot->GetCutoff();
-					info.attenuation = spot->GetAttenuation();
-					info.cutoff.x = cosf(glm::radians(cutoff[0]));
-					info.cutoff.y = cosf(glm::radians(cutoff[0] + cutoff[1]));
-					break;
-				}
-			}
-			lightCount++;
+			info.shadowMapIndex = shadowCasterCount;
+			light->SetShadowMapIndex(shadowCasterCount);
+			shadowCasterCount++;
+		}
+		else
+		{
+			info.shadowMapIndex = -1;
+			light->SetShadowMapIndex(-1);
 		}
 
-		lightData.lightCount = lightCount;
-		m_lightUBO->SetData(&lightData, sizeof(LightData));
+		// [타입별 속성]
+		switch (light->GetComponentType())
+		{
+		case ComponentType::DirectionalLight:
+		{
+			info.type = 0;
+			info.attenuation = glm::vec3(1.0f, 0.0f, 0.0f);
+			info.cutoff = glm::vec2(0.0f, 0.0f);
+			break;
+		}
+
+		case ComponentType::PointLight:
+		{
+			info.type = 1;
+			auto point = static_cast<PointLight*>(light);
+			info.attenuation = point->GetAttenuation();
+			info.cutoff = glm::vec2(0.0f, 0.0f);
+			break;
+		}
+
+		case ComponentType::SpotLight:
+		{
+			info.type = 2;
+			auto spot = static_cast<SpotLight*>(light);
+			glm::vec2 cutoff = spot->GetCutoff();
+			info.attenuation = spot->GetAttenuation();
+			info.cutoff.x = cosf(glm::radians(cutoff[0]));
+			info.cutoff.y = cosf(glm::radians(cutoff[0] + cutoff[1]));
+			break;
+		}
+		}
+		lightCount++;
 	}
+
+	lightData.lightCount = lightCount;
+	m_lightUBO->SetData(&lightData, sizeof(LightData));
 }
