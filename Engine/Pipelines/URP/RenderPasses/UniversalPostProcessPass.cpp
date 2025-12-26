@@ -7,9 +7,9 @@
 #include "Resources/ScreenMesh.h"
 #include "Resources/StaticMesh.h"
 #include "Resources/Texture.h"
-#include "Graphics/FrameBuffer.h"
 #include "Graphics/Geometry.h"
 #include "Components/Camera.h"
+#include "Framebuffers/PostProcessFrameBuffer.h"
 
 #include "Pipelines/URP/UniversalRenderContext.h"
 
@@ -31,7 +31,7 @@ bool UniversalPostProcessPass::Init(int32 width, int32 height)
 	if (!m_bloomProgram) return false;
 
 	// Bloom용 FBO 및 텍스처 생성 (추가됨)
-	m_bloomFBO = Framebuffer::CreatePostProcess(1, 1, false); // 크기는 매번 바꿀거라 임시 생성
+	m_bloomFBO = PostProcessFramebuffer::Create(1, 1, false); // 크기는 매번 바꿀거라 임시 생성
 	m_bloomMips.clear();
 
 	int32 mipWidth = width;
@@ -67,7 +67,7 @@ bool UniversalPostProcessPass::Init(int32 width, int32 height)
 	if (!m_plane) return false;
 
 	// 3. 프레임 버퍼 생성
-	m_frameBuffer = Framebuffer::CreatePostProcess(width, height, true);
+	m_frameBuffer = PostProcessFramebuffer::Create(width, height, true);
 	if (!m_frameBuffer) return false;
 
 	return true;
@@ -204,7 +204,7 @@ void UniversalPostProcessPass::Render(RenderContext* context)
 
 void UniversalPostProcessPass::Resize(int32 width, int32 height)
 {
-	m_frameBuffer = Framebuffer::CreatePostProcess(width, height, true);
+	m_frameBuffer = PostProcessFramebuffer::Create(width, height, true);
 
 	// Bloom Mip Chain 재생성 (Init 코드와 동일한 로직)
 	m_bloomMips.clear();

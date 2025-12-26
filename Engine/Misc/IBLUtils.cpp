@@ -7,7 +7,7 @@
 #include "Resources/Texture.h"
 #include "Resources/ScreenMesh.h"
 #include "Graphics/CubeFramebuffer.h"
-#include "Graphics/FrameBuffer.h"
+#include "Framebuffers/BRDFLookUpFramebuffer.h"
 
 CubeTexturePtr IBLUtils::CreateCubemapFromHDR(Texture* hdrTexture, int32 resolution)
 {
@@ -207,7 +207,7 @@ TexturePtr IBLUtils::CreateBRDFLUT()
 	);
 	if (!brdfProgram) return nullptr;
 
-	auto lookupFramebuffer = Framebuffer::CreateBRDFLUT(resolution, resolution);
+	auto lookupFramebuffer = BRDFLookUpFramebuffer::Create(resolution, resolution);
 	if (!lookupFramebuffer) return nullptr;
 
 	lookupFramebuffer->Bind();

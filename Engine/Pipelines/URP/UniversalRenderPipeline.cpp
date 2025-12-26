@@ -15,7 +15,6 @@
 #include "Core/GameObject.h"
 #include "Core/RenderPass.h"
 #include "Graphics/Program.h"
-#include "Graphics/FrameBuffer.h"
 #include "Graphics/ShadowMap.h"
 #include "Resources/Texture.h"
 #include "Resources/CubeTexture.h"
@@ -26,6 +25,8 @@
 #include "Components/Transform.h"
 #include "Components/MeshRenderer.h"
 #include "Components/Animator.h"
+#include "Framebuffers/PostProcessFramebuffer.h"
+#include "Framebuffers/GBufferFramebuffer.h"
 
 UniversalRenderPipelineUPtr UniversalRenderPipeline::Create()
 {
@@ -162,7 +163,11 @@ void UniversalRenderPipeline::RenderIMGUIContext()
 
 #pragma endregion
 
-void UniversalRenderPipeline::BlitCopyDepth(Framebuffer* src, Framebuffer* dst, int32 width, int32 height)
+void UniversalRenderPipeline::BlitCopyDepth
+(
+	GBufferFramebuffer* src, PostProcessFramebuffer* dst,
+	int32 width, int32 height
+)
 {
 	if (!src || !dst) return;
 

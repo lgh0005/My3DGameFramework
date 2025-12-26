@@ -1,8 +1,8 @@
 #pragma once
-#include "FramebufferBase.h"
+#include "Framebuffer.h"
 
 CLASS_PTR(BRDFLookUpFramebuffer)
-class BRDFLookUpFramebuffer : public FramebufferBase
+class BRDFLookUpFramebuffer : public Framebuffer
 {
 public:
 	virtual ~BRDFLookUpFramebuffer();

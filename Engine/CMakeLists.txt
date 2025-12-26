@@ -69,14 +69,13 @@ add_library(Engine STATIC
    "Graphics/CubeFramebuffer.h"     "Graphics/CubeFramebuffer.cpp"
    "Graphics/SkyLight.h"            "Graphics/SkyLight.cpp"
    "Graphics/ShadowMap.h"           "Graphics/ShadowMap.cpp"
-   "Graphics/FrameBuffer.h"         "Graphics/FrameBuffer.cpp"
 
    # Framebuffers
-   "Framebuffers/FramebufferBase.h"     "Framebuffers/FramebufferBase.cpp"
-   "Framebuffers/BRDFLookUpFramebuffer.h"         "Framebuffers/BRDFLookUpFramebuffer.cpp"
-   "Framebuffers/GBufferFramebuffer.h"         "Framebuffers/GBufferFramebuffer.cpp"
+   "Framebuffers/Framebuffer.h"             "Framebuffers/Framebuffer.cpp"
+   "Framebuffers/BRDFLookUpFramebuffer.h"   "Framebuffers/BRDFLookUpFramebuffer.cpp"
+   "Framebuffers/GBufferFramebuffer.h"      "Framebuffers/GBufferFramebuffer.cpp"
    "Framebuffers/MSAAFramebuffer.h"         "Framebuffers/MSAAFramebuffer.cpp"
-   "Framebuffers/PostProcessFrameBuffer.h"         "Framebuffers/PostProcessFrameBuffer.cpp"
+   "Framebuffers/PostProcessFramebuffer.h"  "Framebuffers/PostProcessFramebuffer.cpp"
    "Framebuffers/SSAOFramebuffer.h"         "Framebuffers/SSAOFramebuffer.cpp"
 
    # Resources

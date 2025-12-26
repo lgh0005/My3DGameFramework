@@ -5,7 +5,6 @@
 #include "Core/GameObject.h"
 #include "Core/RenderContext.h"
 #include "Graphics/Program.h"
-#include "Graphics/FrameBuffer.h"
 #include "Resources/Mesh.h"
 #include "Resources/Material.h"
 #include "Resources/Texture.h"
@@ -14,6 +13,7 @@
 #include "Components/Transform.h"
 #include "Components/SpotLight.h"
 #include "Components/Animator.h"
+#include "Framebuffers/GBufferFramebuffer.h"
 
 #include "Pipelines/URP/UniversalRenderPipeline.h"
 #include "Pipelines/URP/UniversalRenderContext.h"
@@ -30,8 +30,6 @@ UniversalGeometryPassUPtr UniversalGeometryPass::Create(int32 width, int32 heigh
 
 bool UniversalGeometryPass::Init(int32 width, int32 height)
 {
-	// TODO : UniversalRenderPipeline에는 더 많은 머티리얼 인자들이 들어가니까
-	// 관련해서 셰이더에 패킹을 어떻게 해야 할 지도 생각을 해보긴 해야함.
 	m_staticGeometryProgram = Program::Create
 	(
 		"./Resources/Shaders/Universal/Universal_Deferred_GeometryPass_Static.vert",
@@ -44,7 +42,7 @@ bool UniversalGeometryPass::Init(int32 width, int32 height)
 	);
 	if (!m_staticGeometryProgram || !m_skinnedGeometryProgram) return false;
 
-	m_gBuffer = Framebuffer::CreateGBuffer(width, height);
+	m_gBuffer = GBufferFramebuffer::Create(width, height);
 	if (!m_gBuffer) return false;
 
 	return true;
@@ -114,7 +112,7 @@ void UniversalGeometryPass::Render(RenderContext* context)
 
 void UniversalGeometryPass::Resize(int32 width, int32 height)
 {
-	m_gBuffer = Framebuffer::CreateGBuffer(width, height);
+	m_gBuffer = GBufferFramebuffer::Create(width, height);
 }
 
 /*=================================================//

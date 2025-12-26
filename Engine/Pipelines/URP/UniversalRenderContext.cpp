@@ -1,9 +1,10 @@
 #include "EnginePch.h"
 #include "UniversalRenderContext.h"
-#include "Graphics/FrameBuffer.h"
+#include "Framebuffers/PostProcessFramebuffer.h"
+#include "Framebuffers/GBufferFramebuffer.h"
 #include "Resources/Texture.h"
 
-void UniversalRenderContext::SetGBuffer(Framebuffer* gBuffer)
+void UniversalRenderContext::SetGBuffer(GBufferFramebuffer* gBuffer)
 {
 	m_gBuffer = gBuffer;
 	if (m_gBuffer)

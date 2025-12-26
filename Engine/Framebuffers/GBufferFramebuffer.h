@@ -1,8 +1,8 @@
 #pragma once
-#include "FramebufferBase.h"
+#include "Framebuffer.h"
 
 CLASS_PTR(GBufferFramebuffer)
-class GBufferFramebuffer : public FramebufferBase
+class GBufferFramebuffer : public Framebuffer
 {
 public:
 	virtual ~GBufferFramebuffer();

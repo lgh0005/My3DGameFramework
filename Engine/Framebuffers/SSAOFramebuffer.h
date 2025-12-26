@@ -1,8 +1,8 @@
 #pragma once
-#include "FramebufferBase.h"
+#include "Framebuffer.h"
 
 CLASS_PTR(SSAOFramebuffer)
-class SSAOFramebuffer : public FramebufferBase
+class SSAOFramebuffer : public Framebuffer
 {
 public:
 	virtual ~SSAOFramebuffer();

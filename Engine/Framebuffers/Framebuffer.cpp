@@ -1,29 +1,29 @@
 #include "EnginePch.h"
-#include "FramebufferBase.h"
+#include "Framebuffer.h"
 #include "Resources/Texture.h"
 
-FramebufferBase::~FramebufferBase()
+Framebuffer::~Framebuffer()
 {
     if (m_fbo) glDeleteFramebuffers(1, &m_fbo);
     if (m_depthBuffer) glDeleteRenderbuffers(1, &m_depthBuffer);
 }
 
-void FramebufferBase::BindToDefault()
+void Framebuffer::BindToDefault()
 {
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
-void FramebufferBase::Bind() const
+void Framebuffer::Bind() const
 {
     glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
 }
 
-const TexturePtr FramebufferBase::GetColorAttachment(int32 index) const
+const TexturePtr Framebuffer::GetColorAttachment(int32 index) const
 {
     return GetTexture(index);
 }
 
-const TexturePtr FramebufferBase::GetTexture(int32 index) const
+const TexturePtr Framebuffer::GetTexture(int32 index) const
 {
     if (index < 0 || index >= m_textures.size()) return nullptr;
     return m_textures[index];

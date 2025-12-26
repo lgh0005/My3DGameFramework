@@ -4,11 +4,11 @@
 CLASS_PTR(Texture)
 #pragma endregion
 
-CLASS_PTR(FramebufferBase)
-class FramebufferBase
+CLASS_PTR(Framebuffer)
+class Framebuffer
 {
 public:
-    virtual ~FramebufferBase();
+    virtual ~Framebuffer();
 
     static void BindToDefault();
     void Bind() const;
@@ -21,7 +21,7 @@ public:
     int32 GetHeight() const { return m_height; }
 
 protected:
-    FramebufferBase() = default;
+    Framebuffer() = default;
 
     // FBO ID
     uint32 m_fbo{ 0 };

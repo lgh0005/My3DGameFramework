@@ -13,12 +13,12 @@
 #include "Resources/StaticMesh.h" 
 #include "Resources/Texture.h"
 #include "Resources/CubeTexture.h"
-#include "Graphics/FrameBuffer.h"  
 #include "Graphics/ShadowMap.h"
 #include "Graphics/SkyLight.h"
 #include "Components/Camera.h"
 #include "Components/SpotLight.h"
 #include "Components/Transform.h"
+#include "Framebuffers/PostProcessFramebuffer.h"
 
 #include "Pipelines/URP/UniversalRenderContext.h"
 
@@ -61,7 +61,7 @@ void UniversalDeferredLightingPass::Render(RenderContext* context)
 
 	// 2. 그리기 준비 (Output FBO 설정)
 	// INFO : m_postProcessPass의 BeginDraw 역할을 여기서 수행한다고 보면 됨
-	Framebuffer* targetFBO = stdCtx->GetTargetFramebuffer();
+	PostProcessFramebuffer* targetFBO = stdCtx->GetTargetFramebuffer();
 	if (targetFBO)
 	{
 		targetFBO->Bind();

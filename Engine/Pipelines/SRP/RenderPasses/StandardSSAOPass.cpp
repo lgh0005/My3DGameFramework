@@ -8,7 +8,6 @@
 #include "Resources/ScreenMesh.h"
 #include "Resources/StaticMesh.h"
 #include "Graphics/Geometry.h"
-#include "Graphics/FrameBuffer.h"
 #include "Graphics/Program.h"
 #include "Framebuffers/SSAOFramebuffer.h"
 

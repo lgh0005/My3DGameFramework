@@ -8,8 +8,8 @@
 #include "Resources/ScreenMesh.h"
 #include "Resources/StaticMesh.h"
 #include "Graphics/Geometry.h"
-#include "Graphics/FrameBuffer.h"
 #include "Graphics/Program.h"
+#include "Framebuffers/SSAOFramebuffer.h"
 
 #include "Pipelines/URP/UniversalRenderPipeline.h"
 #include "Pipelines/URP/UniversalRenderContext.h"
@@ -39,8 +39,8 @@ bool UniversalSSAOPass::Init(int32 width, int32 height)
     if (!m_ssaoProgram || !m_ssaoBlurProgram) return false;
 
     // FBO 생성 (우리가 추가한 CreateSSAO 사용)
-    m_ssaoFBO = Framebuffer::CreateSSAO(width, height);
-    m_ssaoBlurFBO = Framebuffer::CreateSSAO(width, height);
+    m_ssaoFBO = SSAOFramebuffer::Create(width, height);
+    m_ssaoBlurFBO = SSAOFramebuffer::Create(width, height);
     if (!m_ssaoFBO || !m_ssaoBlurFBO) return false;
 
     // 화면 전체를 덮는 Quad 생성
@@ -60,9 +60,8 @@ bool UniversalSSAOPass::Init(int32 width, int32 height)
 
 void UniversalSSAOPass::Resize(int32 width, int32 height)
 {
-    // FBO 재생성 (단순하게 새로 만듦)
-    m_ssaoFBO = Framebuffer::CreateSSAO(width, height);
-    m_ssaoBlurFBO = Framebuffer::CreateSSAO(width, height);
+    m_ssaoFBO = SSAOFramebuffer::Create(width, height);
+    m_ssaoBlurFBO = SSAOFramebuffer::Create(width, height);
 }
 
 void UniversalSSAOPass::GenerateKernel()

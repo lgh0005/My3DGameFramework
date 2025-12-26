@@ -4,7 +4,6 @@
 #include "Core/Scene.h"
 #include "Core/RenderContext.h"
 #include "Graphics/Program.h"
-#include "Graphics/FrameBuffer.h"
 #include "Graphics/Geometry.h"
 #include "Resources/ScreenMesh.h"
 #include "Resources/StaticMesh.h"
@@ -104,7 +103,7 @@ void StandardPostProcessPass::Render(RenderContext* context)
 	}
 
 	// [STEP 3] 최종 합성 (Composite & Tone Mapping)
-	FramebufferBase::BindToDefault();
+	Framebuffer::BindToDefault();
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 

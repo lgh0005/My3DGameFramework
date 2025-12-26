@@ -6,6 +6,7 @@ CLASS_PTR(Scene)
 CLASS_PTR(Camera)
 CLASS_PTR(Texture)
 CLASS_PTR(Framebuffer)
+CLASS_PTR(SSAOFramebuffer)
 CLASS_PTR(Program)
 CLASS_PTR(ScreenMesh)
 CLASS_PTR(StaticMesh)
@@ -36,8 +37,8 @@ private:
 	std::vector<glm::vec3> m_ssaoKernel;
 	TextureUPtr            m_noiseTexture{ nullptr };
 
-	FramebufferUPtr        m_ssaoFBO{ nullptr };	 // Raw SSAO
-	FramebufferUPtr        m_ssaoBlurFBO{ nullptr }; // Blurred SSAO
+	SSAOFramebufferUPtr        m_ssaoFBO{ nullptr };	 // Raw SSAO
+	SSAOFramebufferUPtr        m_ssaoBlurFBO{ nullptr }; // Blurred SSAO
 
 	ProgramUPtr            m_ssaoProgram{ nullptr };
 	ProgramUPtr            m_ssaoBlurProgram{ nullptr };
