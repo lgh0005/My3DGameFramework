@@ -89,6 +89,11 @@ std::vector<AssetFmt::RawNode> AssetUtils::ReadRawNodes(std::ifstream& file)
         nodes[i].name = ReadString(file);
         nodes[i].parentIndex = ReadData<int32>(file);
         nodes[i].localTransform = ReadData<glm::mat4>(file);
+
+        uint32 meshCount = ReadData<uint32>(file);
+        nodes[i].meshIndices.resize(meshCount);
+        for (uint32 m = 0; m < meshCount; ++m)
+            nodes[i].meshIndices[m] = ReadData<uint32>(file);
     }
 
     return nodes;

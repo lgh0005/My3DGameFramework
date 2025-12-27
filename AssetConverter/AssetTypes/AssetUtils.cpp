@@ -74,6 +74,11 @@ void AssetUtils::WriteRawNodes(std::ofstream& file, const std::vector<AssetFmt::
 
         // 로컬 변환 행렬 (glm::mat4)
         WriteData(file, node.localTransform);
+
+        // 메쉬 인덱스 정보 저장
+        uint32 meshCount = (uint32)node.meshIndices.size();
+        WriteData(file, meshCount);
+        for (uint32 idx : node.meshIndices) WriteData(file, idx);
     }
 }
 
@@ -91,6 +96,14 @@ std::vector<AssetFmt::RawNode> AssetUtils::ReadRawNodes(std::ifstream& file)
         nodes[i].name = ReadString(file);
         nodes[i].parentIndex = ReadData<int32>(file);
         nodes[i].localTransform = ReadData<glm::mat4>(file);
+
+        // 메쉬 인덱스 정보 읽기
+        uint32 meshCount = ReadData<uint32>(file);
+
+        // 벡터 리사이즈 및 데이터 채우기
+        nodes[i].meshIndices.resize(meshCount);
+        for (uint32 m = 0; m < meshCount; ++m)
+            nodes[i].meshIndices[m] = ReadData<uint32>(file);
     }
 
     return nodes;

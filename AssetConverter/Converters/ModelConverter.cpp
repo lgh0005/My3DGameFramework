@@ -74,8 +74,14 @@ bool ModelConverter::RunConversion()
     }
 
     // 3. 노드/메쉬 처리 (재귀 호출 시작)
-    LOG_INFO("Processing meshes...");
-    ProcessNode(scene->mRootNode, scene);
+    LOG_INFO("Processing meshes... Total: {}", scene->mNumMeshes);
+    m_rawModel.meshes.reserve(scene->mNumMeshes);
+    for (uint32 i = 0; i < scene->mNumMeshes; ++i)
+    {
+        ProcessMesh(scene->mMeshes[i], scene);
+    }
+
+    // ProcessNode(scene->mRootNode, scene);
 
     // 4. 계층 구조 완성 (Hierarchy Extraction)
     LOG_INFO("Processing node hierarchy...");
@@ -110,7 +116,7 @@ bool ModelConverter::WriteCustomModelFile()
     LOG_WARN(">>> [WRITER] Start Offset: {}", pos);
 
     // 1. Header
-    uint32 magic = 0x4D594D44; uint32 version = 2;
+    uint32 magic = 0x4D594D44; uint32 version = 3;
     uint32 matCount = (uint32)m_rawModel.materials.size();
     uint32 meshCount = (uint32)m_rawModel.meshes.size();
     bool hasSkeleton = m_rawModel.hasSkeleton;
@@ -215,20 +221,6 @@ void ModelConverter::CreateORMTextureFromAssimp(aiMaterial* material, AssetFmt::
 /*====================================//
 //   default assimp process methods   //
 //====================================*/
-void ModelConverter::ProcessNode(aiNode* node, const aiScene* scene)
-{
-    for (uint32 i = 0; i < node->mNumMeshes; i++)
-    {
-        aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
-        ProcessMesh(mesh, scene);
-    }
-
-    for (uint32 i = 0; i < node->mNumChildren; i++)
-    {
-        ProcessNode(node->mChildren[i], scene);
-    }
-}
-
 void ModelConverter::ProcessHierarchy(aiNode* node, int32 parentIndex, int32& currentIndex)
 {
     AssetFmt::RawNode rawNode;
@@ -240,14 +232,22 @@ void ModelConverter::ProcessHierarchy(aiNode* node, int32 parentIndex, int32& cu
     // 2. 행렬 변환 (Assimp -> GLM)
     rawNode.localTransform = Utils::ConvertToGLMMat4(node->mTransformation);
 
-    // 3. 리스트에 추가 (현재 인덱스 = currentIndex)
+    // 3. 메쉬 인덱스 정보 복사
+    if (node->mNumMeshes > 0)
+    {
+        rawNode.meshIndices.resize(node->mNumMeshes);
+        for (uint32 i = 0; i < node->mNumMeshes; ++i)
+            rawNode.meshIndices[i] = node->mMeshes[i];
+    }
+
+    // 4. 리스트에 추가 (현재 인덱스 = currentIndex)
     int32 myIndex = currentIndex;
     m_rawModel.nodes.push_back(rawNode);
 
-    // 4. 인덱스 증가
+    // 5. 인덱스 증가
     currentIndex++;
 
-    // 5. 자식 노드 순회 (재귀 호출)
+    // 6. 자식 노드 순회 (재귀 호출)
     for (uint32 i = 0; i < node->mNumChildren; i++)
         ProcessHierarchy(node->mChildren[i], myIndex, currentIndex);
 }

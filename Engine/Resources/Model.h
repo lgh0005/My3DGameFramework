@@ -36,12 +36,17 @@ public:
 
 	void Draw(const Program* program) const;
 
+/*======================================//
+//   3d model load instancing methods   //
+//======================================*/
+private:
+
+
 /*=================================================================//
 //   3d model load process methods : assimp (raw 3d model files)   //
 //=================================================================*/
 private:
 	bool LoadByAssimp(const std::string& filename);
-	void ProcessAssimpNode(aiNode* node, const aiScene* scene);
 	void ProcessAssimpHierarchy(aiNode* node, int32 parentIndex, int32& currentIndex);
 	void ProcessAssimpMaterials(const aiScene* scene, const std::filesystem::path& modelDir);
 	void ProcessAssimpMesh(aiMesh* mesh, const aiScene* scene);

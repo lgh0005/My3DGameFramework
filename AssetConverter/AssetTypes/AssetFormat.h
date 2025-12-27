@@ -95,6 +95,7 @@ namespace AssetFmt
         std::string name;
         int32_t parentIndex = -1; // -1이면 루트
         glm::mat4 localTransform; // 초기 변환 (T-Pose)
+        std::vector<uint32> meshIndices;
     };
 
     // RawAnimChannel
@@ -121,7 +122,7 @@ namespace AssetFmt
     struct RawModel
     {
         uint32 magicNumber = 0x4D594D44; // 'MYMD'
-        uint32 version = 2;
+        uint32 version = 3;
         std::vector<AssetFmt::RawMaterial> materials;
         std::vector<AssetFmt::RawMesh> meshes;
         std::vector<AssetFmt::RawBoneInfo> boneOffsetInfos;

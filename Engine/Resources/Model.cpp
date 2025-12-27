@@ -47,6 +47,11 @@ void Model::Draw(const Program* program) const
         mesh->Draw(program);
 }
 
+/*======================================//
+//   3d model load instancing methods   //
+//======================================*/
+
+
 /*=================================================================//
 //   3d model load process methods : assimp (raw 3d model files)   //
 //=================================================================*/
@@ -82,8 +87,11 @@ bool Model::LoadByAssimp(const std::string& filename)
     // 3. 머티리얼 처리 (함수 분리)
     ProcessAssimpMaterials(scene, modelDir);
 
-    // 4. 노드 및 메쉬 처리 (함수 분리)
-    ProcessAssimpNode(scene->mRootNode, scene);
+    // 4. 메쉬 처리
+    // ProcessAssimpNode(scene->mRootNode, scene);
+    m_meshes.reserve(scene->mNumMeshes);
+    for (uint32 i = 0; i < scene->mNumMeshes; i++)
+        ProcessAssimpMesh(scene->mMeshes[i], scene);
 
     // 5. 계층 구조 추출 (런타임 생성)
     int32 currentIndex = 0;
@@ -92,25 +100,20 @@ bool Model::LoadByAssimp(const std::string& filename)
     return true;
 }
 
-void Model::ProcessAssimpNode(aiNode* node, const aiScene* scene)
-{
-    for (uint32 i = 0; i < node->mNumMeshes; i++)
-    {
-        auto meshIndex = node->mMeshes[i];
-        auto mesh = scene->mMeshes[meshIndex];
-        ProcessAssimpMesh(mesh, scene);
-    }
-
-    for (uint32 i = 0; i < node->mNumChildren; i++)
-        ProcessAssimpNode(node->mChildren[i], scene);
-}
-
 void Model::ProcessAssimpHierarchy(aiNode* node, int32 parentIndex, int32& currentIndex)
 {
     AssetFmt::RawNode rawNode;
     rawNode.name = node->mName.C_Str();
     rawNode.parentIndex = parentIndex;
     rawNode.localTransform = Utils::ConvertToGLMMat4(node->mTransformation);
+
+    // 메쉬 인덱스 정보 복사
+    if (node->mNumMeshes > 0)
+    {
+        rawNode.meshIndices.resize(node->mNumMeshes);
+        for (uint32 i = 0; i < node->mNumMeshes; ++i)
+            rawNode.meshIndices[i] = node->mMeshes[i];
+    }
 
     int32 myIndex = currentIndex;
     m_nodes.push_back(rawNode);
@@ -333,7 +336,7 @@ bool Model::ReadBinaryModelHeader(std::ifstream& inFile, uint32& outMatCount, ui
     }
 
     auto version = AssetUtils::ReadData<uint32>(inFile);
-    if (version != 2)
+    if (version != 3)
     {
         SPDLOG_WARN("Version mismatch! Expected 2, Got {}", version);
     }
@@ -526,7 +529,6 @@ void Model::CreateBinaryStaticMesh(const AssetFmt::RawMesh& rawMesh)
 /*==========================================//
 //   model texture loading helper methods   //
 //==========================================*/
-
 TexturePtr Model::LoadMaterialTexture(aiMaterial* material, aiTextureType type, const std::filesystem::path& parentDir)
 {
     if (material->GetTextureCount(type) <= 0) return nullptr;
