@@ -123,6 +123,27 @@ glm::vec3 Transform::GetRightVector() const
 /*==========================//
 //  calculate model matrix  //
 //==========================*/
+void Transform::SetLocalMatrix(const glm::mat4& matrix)
+{
+	glm::vec3 scale;
+	glm::quat rotation;
+	glm::vec3 translation;
+	glm::vec3 skew;
+	glm::vec4 perspective;
+
+	if (glm::decompose(matrix, scale, rotation, translation, skew, perspective))
+	{
+		m_position = translation;
+		m_rotation = rotation;
+		m_scale = scale;
+		SetTransformDirty();
+	}
+	else
+	{
+		SPDLOG_WARN("Failed to decompose matrix in Transform::SetLocalMatrix");
+	}
+}
+
 glm::mat4 Transform::GetLocalMatrix() const
 {
 	glm::mat4 transMat = glm::translate(glm::mat4(1.0f), m_position);

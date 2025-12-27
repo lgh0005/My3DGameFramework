@@ -1,5 +1,9 @@
-#include "EnginePch.h"
+ï»¿#include "EnginePch.h"
 #include "Model.h"
+#include "Core/Scene.h"
+#include "Core/GameObject.h"
+#include "Components/Transform.h"
+#include "Components/MeshRenderer.h"
 #include "Resources/Mesh.h"
 #include "Resources/StaticMesh.h"
 #include "Resources/SkinnedMesh.h"
@@ -26,7 +30,7 @@ ModelUPtr Model::Load(const std::string& filename)
 {
     auto model = ModelUPtr(new Model());
 
-    // ÆÄÀÏ È®Àå¸í ºñ±³ ÈÄ ·Îµå
+    // íŒŒì¼ í™•ì¥ëª… ë¹„êµ í›„ ë¡œë“œ
     std::string ext = std::filesystem::path(filename).extension().string();
     std::transform(ext.begin(), ext.end(), ext.begin(), ::tolower);
     if (ext == ".mymodel")
@@ -50,7 +54,99 @@ void Model::Draw(const Program* program) const
 /*======================================//
 //   3d model load instancing methods   //
 //======================================*/
+GameObject* Model::Instantiate(Scene* scene)
+{
+    if (!scene)
+    {
+        SPDLOG_ERROR("Scene is null during instantiation!");
+        return nullptr;
+    }
 
+    if (m_nodes.empty())
+    {
+        SPDLOG_WARN("Model has no nodes to instantiate.");
+        return nullptr;
+    }
+
+    // 1. ì„ì‹œ ì €ì¥ì†Œ (ì¸ë±ìŠ¤ -> GameObject Raw Pointer)
+    // ì†Œìœ ê¶Œì€ ì¦‰ì‹œ Sceneìœ¼ë¡œ ë„˜ê¸°ì§€ë§Œ, ë¶€ëª¨ ì—°ê²°ì„ ìœ„í•´ í¬ì¸í„°ëŠ” ê°€ì§€ê³  ìˆì–´ì•¼ í•¨.
+    std::vector<GameObject*> parts(m_nodes.size(), nullptr);
+    GameObject* root = nullptr;
+
+    // 2. ëª¨ë“  ë…¸ë“œ ìˆœíšŒí•˜ë©° ìƒì„±
+    for (usize i = 0; i < m_nodes.size(); ++i)
+    {
+        const auto& nodeData = m_nodes[i];
+
+        // 2-1. GameObject ìƒì„±
+        auto go = GameObject::Create();
+        go->SetName(nodeData.name);
+
+        // 2-2. Transform ì„¤ì • (T-Pose)
+        // Transformì€ GO ìƒì„± ì‹œ ìë™ ìƒì„±ë˜ë¯€ë¡œ GetTransform() ì‚¬ìš©
+        go->GetTransform().SetLocalMatrix(nodeData.localTransform);
+
+        // 2-3. MeshRenderer ë¶€ì°©
+        if (!nodeData.meshIndices.empty())
+        {
+            for (uint32 meshIdx : nodeData.meshIndices)
+            {
+                // í¸ì˜ìƒ GetMesh í—¬í¼ê°€ ìˆë‹¤ê³  ê°€ì •í•˜ê±°ë‚˜ ì§ì ‘ ì ‘ê·¼
+                // (ì—¬ê¸°ì„œëŠ” íƒ€ì… ì²´í¬ í›„ ìƒì„± ì˜ˆì‹œ)
+                if (meshIdx < m_meshes.size())
+                {
+                    auto& meshRes = m_meshes[meshIdx];
+                    // íƒ€ì…ì— ë”°ë¼ Skinned/Static ìƒì„±
+                    if (meshRes->GetResourceType() == ResourceType::SkinnedMesh)
+                    {
+                        auto mesh = std::static_pointer_cast<SkinnedMesh>(meshRes);
+                        auto renderer = MeshRenderer::Create(mesh, mesh->GetMaterial());
+                        go->AddComponent(std::move(renderer));
+                    }
+                    else
+                    {
+                        auto mesh = std::static_pointer_cast<StaticMesh>(meshRes);
+                        auto renderer = MeshRenderer::Create(mesh, mesh->GetMaterial());
+                        go->AddComponent(std::move(renderer));
+                    }
+                }
+            }
+        }
+        // 2-4. ì„ì‹œ ì €ì¥ì†Œ ë“±ë¡
+        parts[i] = go.get();
+
+        // 2-5. Sceneì— ì†Œìœ ê¶Œ ì´ì „ (ì¤‘ìš”!)
+        // ì´ì œ goëŠ” nullptrì´ ë¨
+        scene->AddGameObject(std::move(go));
+    }
+
+    // 3. ê³„ì¸µ êµ¬ì¡° ì—°ê²° (ë¶€ëª¨-ìì‹)
+    // ëª¨ë“  GOê°€ ìƒì„±ëœ í›„ì— ì—°ê²°í•˜ëŠ” ê²ƒì´ ì•ˆì „í•¨ (ì¸ë±ìŠ¤ ìˆœì„œ ë¬¸ì œ í•´ê²°)
+    for (usize i = 0; i < m_nodes.size(); ++i)
+    {
+        const auto& nodeData = m_nodes[i];
+        GameObject* currentGO = parts[i];
+
+        if (nodeData.parentIndex >= 0)
+        {
+            // ë¶€ëª¨ê°€ ìˆìœ¼ë©´ ì—°ê²°
+            GameObject* parentGO = parts[nodeData.parentIndex];
+            if (parentGO)
+            {
+                // GameObject::SetParent -> Transform::SetParentë¡œ ìœ„ì„
+                currentGO->SetParent(parentGO);
+            }
+        }
+        else
+        {
+            // ë¶€ëª¨ê°€ ì—†ìœ¼ë©´ ë£¨íŠ¸
+            // (ì²« ë²ˆì§¸ ë£¨íŠ¸ë§Œ ë°˜í™˜ìš©ìœ¼ë¡œ ì €ì¥)
+            if (!root) root = currentGO;
+        }
+    }
+
+    return root;
+}
 
 /*=================================================================//
 //   3d model load process methods : assimp (raw 3d model files)   //
@@ -59,8 +155,8 @@ bool Model::LoadByAssimp(const std::string& filename)
 {
     Assimp::Importer importer;
 
-    // 1. Import Flags ¼³Á¤ (ModelConverter¿Í µ¿ÀÏÇÏ°Ô ¸ÂÃã)
-    // ³ë¸Ö/ÅºÁ¨Æ® °è»ê, UV ÇÃ¸³, »À °¡ÁßÄ¡ Á¦ÇÑ µî ÇÊ¼ö ¿É¼Ç Àû¿ë
+    // 1. Import Flags ì„¤ì • (ModelConverterì™€ ë™ì¼í•˜ê²Œ ë§ì¶¤)
+    // ë…¸ë©€/íƒ„ì  íŠ¸ ê³„ì‚°, UV í”Œë¦½, ë¼ˆ ê°€ì¤‘ì¹˜ ì œí•œ ë“± í•„ìˆ˜ ì˜µì…˜ ì ìš©
     const uint32 flags =
         aiProcess_Triangulate |
         aiProcess_CalcTangentSpace |
@@ -74,26 +170,26 @@ bool Model::LoadByAssimp(const std::string& filename)
         return false;
     }
 
-    // 2. ÃÊ±âÈ­ (±âÁ¸ µ¥ÀÌÅÍ Å¬¸®¾î)
+    // 2. ì´ˆê¸°í™” (ê¸°ì¡´ ë°ì´í„° í´ë¦¬ì–´)
     m_meshes.clear();
     m_materials.clear();
     /*m_boneInfoMap.clear();
     m_BoneCounter = 0;*/
     m_skeleton = Skeleton::Create();
 
-    // ÅØ½ºÃ³ ·Îµå¸¦ À§ÇÑ µğ·ºÅä¸® °æ·Î °è»ê
+    // í…ìŠ¤ì²˜ ë¡œë“œë¥¼ ìœ„í•œ ë””ë ‰í† ë¦¬ ê²½ë¡œ ê³„ì‚°
     std::filesystem::path modelDir = std::filesystem::path(filename).parent_path();
 
-    // 3. ¸ÓÆ¼¸®¾ó Ã³¸® (ÇÔ¼ö ºĞ¸®)
+    // 3. ë¨¸í‹°ë¦¬ì–¼ ì²˜ë¦¬ (í•¨ìˆ˜ ë¶„ë¦¬)
     ProcessAssimpMaterials(scene, modelDir);
 
-    // 4. ¸Ş½¬ Ã³¸®
+    // 4. ë©”ì‰¬ ì²˜ë¦¬
     // ProcessAssimpNode(scene->mRootNode, scene);
     m_meshes.reserve(scene->mNumMeshes);
     for (uint32 i = 0; i < scene->mNumMeshes; i++)
         ProcessAssimpMesh(scene->mMeshes[i], scene);
 
-    // 5. °èÃş ±¸Á¶ ÃßÃâ (·±Å¸ÀÓ »ı¼º)
+    // 5. ê³„ì¸µ êµ¬ì¡° ì¶”ì¶œ (ëŸ°íƒ€ì„ ìƒì„±)
     int32 currentIndex = 0;
     ProcessAssimpHierarchy(scene->mRootNode, -1, currentIndex);
 
@@ -107,7 +203,7 @@ void Model::ProcessAssimpHierarchy(aiNode* node, int32 parentIndex, int32& curre
     rawNode.parentIndex = parentIndex;
     rawNode.localTransform = Utils::ConvertToGLMMat4(node->mTransformation);
 
-    // ¸Ş½¬ ÀÎµ¦½º Á¤º¸ º¹»ç
+    // ë©”ì‰¬ ì¸ë±ìŠ¤ ì •ë³´ ë³µì‚¬
     if (node->mNumMeshes > 0)
     {
         rawNode.meshIndices.resize(node->mNumMeshes);
@@ -297,7 +393,7 @@ bool Model::LoadByBinary(const std::string& filename)
 
     std::filesystem::path modelDir = std::filesystem::path(filename).parent_path();
 
-    // µ¥ÀÌÅÍ¸¦ ¹Ş¾Æ¿Ã Áö¿ª º¯¼ö (ÂüÁ¶·Î ³Ñ°Ü¼­ Ã¤¿ò)
+    // ë°ì´í„°ë¥¼ ë°›ì•„ì˜¬ ì§€ì—­ ë³€ìˆ˜ (ì°¸ì¡°ë¡œ ë„˜ê²¨ì„œ ì±„ì›€)
     uint32 matCount = 0;
     uint32 meshCount = 0;
     bool hasSkeleton = false;
@@ -341,12 +437,12 @@ bool Model::ReadBinaryModelHeader(std::ifstream& inFile, uint32& outMatCount, ui
         SPDLOG_WARN("Version mismatch! Expected 2, Got {}", version);
     }
 
-    // °ªµéÀ» ÀĞ¾î¼­ ÂüÁ¶ ÀÎÀÚ¿¡ ÇÒ´ç
+    // ê°’ë“¤ì„ ì½ì–´ì„œ ì°¸ì¡° ì¸ìì— í• ë‹¹
     outMatCount = AssetUtils::ReadData<uint32>(inFile);
     outMeshCount = AssetUtils::ReadData<uint32>(inFile);
     outHasSkeleton = AssetUtils::ReadData<bool>(inFile);
 
-    // Àü¿ª AABB´Â ÇöÀç Model Å¬·¡½º ¸â¹ö°¡ ¾Æ´Ï¸é ¿©±â¼­ ÀĞ°í ¹ö¸®°Å³ª, ¸â¹ö¿¡ ÀúÀåÇÕ´Ï´Ù.
+    // ì „ì—­ AABBëŠ” í˜„ì¬ Model í´ë˜ìŠ¤ ë©¤ë²„ê°€ ì•„ë‹ˆë©´ ì—¬ê¸°ì„œ ì½ê³  ë²„ë¦¬ê±°ë‚˜, ë©¤ë²„ì— ì €ì¥í•©ë‹ˆë‹¤.
     auto globalMin = AssetUtils::ReadData<glm::vec3>(inFile);
     auto globalMax = AssetUtils::ReadData<glm::vec3>(inFile);
 
@@ -357,11 +453,11 @@ void Model::ReadBinaryNodes(std::ifstream& inFile) { m_nodes = AssetUtils::ReadR
 
 void Model::ReadBinarySkeleton(std::ifstream& inFile)
 {
-    // ·ÎÄÃ º¯¼ö¿¡ ¸ÕÀú ÀĞ¾îµéÀÓ
+    // ë¡œì»¬ ë³€ìˆ˜ì— ë¨¼ì € ì½ì–´ë“¤ì„
     Skeleton::BoneMap boneMap;
     int32 maxId = 0;
 
-    // 1. »À Á¤º¸ º¤ÅÍ ÀĞ±â (Loop Read ÇÊ¼ö!)
+    // 1. ë¼ˆ ì •ë³´ ë²¡í„° ì½ê¸° (Loop Read í•„ìˆ˜!)
     uint32 bCount = AssetUtils::ReadData<uint32>(inFile);
     std::vector<AssetFmt::RawBoneInfo> rawBoneInfos(bCount);
 
@@ -372,7 +468,7 @@ void Model::ReadBinarySkeleton(std::ifstream& inFile)
     }
     maxId = (int32_t)rawBoneInfos.size();
 
-    // 2. ÀÌ¸§ ¸ÅÇÎ ÀĞ±â
+    // 2. ì´ë¦„ ë§¤í•‘ ì½ê¸°
     uint32 mapCount = AssetUtils::ReadData<uint32>(inFile);
     for (uint32 i = 0; i < mapCount; ++i)
     {
@@ -388,7 +484,7 @@ void Model::ReadBinarySkeleton(std::ifstream& inFile)
         boneMap[name] = info;
     }
 
-    // 3. ´Ù ÀĞÀº µ¥ÀÌÅÍ¸¦ Skeleton¿¡ ÁÖÀÔ
+    // 3. ë‹¤ ì½ì€ ë°ì´í„°ë¥¼ Skeletonì— ì£¼ì…
     if (m_skeleton) m_skeleton->SetData(boneMap, maxId);
 }
 
@@ -397,10 +493,10 @@ void Model::ReadBinaryMaterials(std::ifstream& inFile, uint32 matCount, const st
     m_materials.resize(matCount);
     for (uint32 i = 0; i < matCount; ++i)
     {
-        // Raw Data ÀĞ±â
+        // Raw Data ì½ê¸°
         auto rawMat = AssetUtils::ReadRawMaterial(inFile);
 
-        // Engine Material »ı¼º
+        // Engine Material ìƒì„±
         auto material = Material::Create();
         material->albedoFactor = rawMat.albedoFactor;
         material->metallicFactor = rawMat.metallicFactor;
@@ -449,10 +545,10 @@ void Model::ReadBinaryMeshes(std::ifstream& inFile, uint32 meshCount)
 
     for (uint32 i = 0; i < meshCount; ++i)
     {
-        // 1. ÆÄÀÏ¿¡¼­ Raw µ¥ÀÌÅÍ µ¢¾î¸® ÀĞ±â
+        // 1. íŒŒì¼ì—ì„œ Raw ë°ì´í„° ë©ì–´ë¦¬ ì½ê¸°
         auto rawMesh = AssetUtils::ReadRawMesh(inFile);
 
-        // 2. Å¸ÀÔ¿¡ µû¶ó ÀûÀıÇÑ ÇÔ¼ö È£Ãâ (ºĞ±â Ã³¸®)
+        // 2. íƒ€ì…ì— ë”°ë¼ ì ì ˆí•œ í•¨ìˆ˜ í˜¸ì¶œ (ë¶„ê¸° ì²˜ë¦¬)
         if (rawMesh.isSkinned)
         {
             CreateBinarySkinnedMesh(rawMesh);
@@ -483,23 +579,23 @@ void Model::CreateBinarySkinnedMesh(const AssetFmt::RawMesh& rawMesh)
         }
     }
 
-    // 2. ¿£Áø ¸Ş½¬ °´Ã¼ »ı¼º
+    // 2. ì—”ì§„ ë©”ì‰¬ ê°ì²´ ìƒì„±
     auto mesh = SkinnedMesh::Create(engineVerts, rawMesh.indices, GL_TRIANGLES);
 
-    // 3. ¹Ù¿îµù ¹Ú½º ¼³Á¤
+    // 3. ë°”ìš´ë”© ë°•ìŠ¤ ì„¤ì •
     mesh->SetLocalBounds(RenderBounds::CreateFromMinMax(rawMesh.aabbMin, rawMesh.aabbMax));
     
-    // 4. ¸ÓÆ¼¸®¾ó ¿¬°á
+    // 4. ë¨¸í‹°ë¦¬ì–¼ ì—°ê²°
     if (rawMesh.materialIndex < m_materials.size())
         mesh->SetMaterial(m_materials[rawMesh.materialIndex]);
 
-    // 5. µî·Ï
+    // 5. ë“±ë¡
     m_meshes.push_back(std::move(mesh));
 }
 
 void Model::CreateBinaryStaticMesh(const AssetFmt::RawMesh& rawMesh)
 {
-    // 1. Á¤Á¡ º¯È¯ (Raw -> Engine)
+    // 1. ì •ì  ë³€í™˜ (Raw -> Engine)
     std::vector<StaticVertex> engineVerts(rawMesh.staticVertices.size());
     for (size_t v = 0; v < rawMesh.staticVertices.size(); ++v)
     {
@@ -512,17 +608,17 @@ void Model::CreateBinaryStaticMesh(const AssetFmt::RawMesh& rawMesh)
         dst.tangent = src.tangent;
     }
 
-    // 2. ¿£Áø ¸Ş½¬ °´Ã¼ »ı¼º
+    // 2. ì—”ì§„ ë©”ì‰¬ ê°ì²´ ìƒì„±
     auto mesh = StaticMesh::Create(engineVerts, rawMesh.indices, GL_TRIANGLES);
 
-    // 3. ¹Ù¿îµù ¹Ú½º ¼³Á¤
+    // 3. ë°”ìš´ë”© ë°•ìŠ¤ ì„¤ì •
     mesh->SetLocalBounds(RenderBounds::CreateFromMinMax(rawMesh.aabbMin, rawMesh.aabbMax));
 
-    // 4. ¸ÓÆ¼¸®¾ó ¿¬°á
+    // 4. ë¨¸í‹°ë¦¬ì–¼ ì—°ê²°
     if (rawMesh.materialIndex < m_materials.size())
         mesh->SetMaterial(m_materials[rawMesh.materialIndex]);
 
-    // 5. µî·Ï
+    // 5. ë“±ë¡
     m_meshes.push_back(std::move(mesh));
 }
 
@@ -543,17 +639,17 @@ TexturePtr Model::LoadTexture(const std::string& path, const std::filesystem::pa
 {
     if (path.empty()) return nullptr;
 
-    // 1. ÆÄÀÏ ÀÌ¸§¸¸ ÃßÃâ (¿¹: "texture/diffuse.jpg" -> "diffuse.jpg")
+    // 1. íŒŒì¼ ì´ë¦„ë§Œ ì¶”ì¶œ (ì˜ˆ: "texture/diffuse.jpg" -> "diffuse.jpg")
     std::string filenameOnly = std::filesystem::path(path).filename().string();
     if (filenameOnly.empty()) return nullptr;
 
     TexturePtr tex;
 
-    // 2. [ÃÖÀûÈ­] KTX Æ÷¸Ë ·Îµå ½Ãµµ
+    // 2. [ìµœì í™”] KTX í¬ë§· ë¡œë“œ ì‹œë„
     tex = LoadTextureFromKTX(filenameOnly, parentDir);
     if (tex) return tex;
 
-    // 3. [±âº»] ¿øº» ÀÌ¹ÌÁö(png, jpg µî) ·Îµå
+    // 3. [ê¸°ë³¸] ì›ë³¸ ì´ë¯¸ì§€(png, jpg ë“±) ë¡œë“œ
     tex = LoadTextureFromImage(filenameOnly, parentDir);
     if (tex) return tex;
 
@@ -562,16 +658,16 @@ TexturePtr Model::LoadTexture(const std::string& path, const std::filesystem::pa
 
 TexturePtr Model::LoadTextureFromKTX(const std::string& filename, const std::filesystem::path& parentDir)
 {
-    // 1. KTX °æ·Î ±¸¼º
+    // 1. KTX ê²½ë¡œ êµ¬ì„±
     std::filesystem::path ktxPath = parentDir / filename;
     ktxPath.replace_extension(".ktx");
     std::string ktxFullPath = ktxPath.string();
 
-    // 2. ¸®¼Ò½º ¸Å´ÏÀú Ä³½Ã È®ÀÎ
+    // 2. ë¦¬ì†ŒìŠ¤ ë§¤ë‹ˆì € ìºì‹œ í™•ì¸
     auto cachedTex = RESOURCE.GetResource<Texture>(ktxFullPath);
     if (cachedTex) return cachedTex;
 
-    // 3. ÆÄÀÏÀÌ ½ÇÁ¦·Î Á¸ÀçÇÏ´ÂÁö È®ÀÎ ÈÄ ·Îµå
+    // 3. íŒŒì¼ì´ ì‹¤ì œë¡œ ì¡´ì¬í•˜ëŠ”ì§€ í™•ì¸ í›„ ë¡œë“œ
     if (std::filesystem::exists(ktxPath))
     {
         auto texture = Texture::CreateFromKtxImage(ktxFullPath);
@@ -587,24 +683,24 @@ TexturePtr Model::LoadTextureFromKTX(const std::string& filename, const std::fil
 
 TexturePtr Model::LoadTextureFromImage(const std::string& filename, const std::filesystem::path& parentDir)
 {
-    // 1. ¿øº» °æ·Î ±¸¼º
+    // 1. ì›ë³¸ ê²½ë¡œ êµ¬ì„±
     std::filesystem::path originalPath = parentDir / filename;
     std::string originalFullPath = originalPath.string();
 
-    // 2. ¸®¼Ò½º ¸Å´ÏÀú Ä³½Ã È®ÀÎ
+    // 2. ë¦¬ì†ŒìŠ¤ ë§¤ë‹ˆì € ìºì‹œ í™•ì¸
     auto cachedTex = RESOURCE.GetResource<Texture>(originalFullPath);
     if (cachedTex) return cachedTex;
 
-    // 3. ÀÌ¹ÌÁö ·Îµå ½Ãµµ (Image Å¬·¡½º »ç¿ë)
+    // 3. ì´ë¯¸ì§€ ë¡œë“œ ì‹œë„ (Image í´ë˜ìŠ¤ ì‚¬ìš©)
     auto image = Image::Load(originalFullPath);
     if (!image)
     {
-        // ¿øº»Á¶Â÷ ¾øÀ¸¸é ¿¡·¯ ·Î±× Ãâ·Â
+        // ì›ë³¸ì¡°ì°¨ ì—†ìœ¼ë©´ ì—ëŸ¬ ë¡œê·¸ ì¶œë ¥
         SPDLOG_ERROR("Failed to load texture image: {}", originalFullPath);
         return nullptr;
     }
 
-    // 4. ÅØ½ºÃ³ »ı¼º ¹× µî·Ï
+    // 4. í…ìŠ¤ì²˜ ìƒì„± ë° ë“±ë¡
     auto texture = Texture::CreateFromImage(image.get());
     RESOURCE.AddResource<Texture>(std::move(texture), originalFullPath);
 
@@ -616,7 +712,7 @@ TexturePtr Model::LoadTextureFromImage(const std::string& filename, const std::f
 //============================*/
 void Model::ExtractBoneWeightForVertices(std::vector<SkinnedVertex>& vertices, aiMesh* mesh, const aiScene* scene)
 {
-    // SkeletonÀÌ »ı¼ºµÇ¾î ÀÖ¾î¾ß ÇÔ
+    // Skeletonì´ ìƒì„±ë˜ì–´ ìˆì–´ì•¼ í•¨
     if (!m_skeleton) return;
 
     for (uint32 i = 0; i < mesh->mNumBones; ++i)
@@ -624,14 +720,14 @@ void Model::ExtractBoneWeightForVertices(std::vector<SkinnedVertex>& vertices, a
         aiBone* bone = mesh->mBones[i];
         std::string boneName = bone->mName.C_Str();
 
-        // [À§ÀÓ] Skeleton¿¡°Ô µî·Ï ¹× ID ¹ß±Ş ¿äÃ»
+        // [ìœ„ì„] Skeletonì—ê²Œ ë“±ë¡ ë° ID ë°œê¸‰ ìš”ì²­
         int32 boneID = m_skeleton->AddBone
         (
             boneName,
             Utils::ConvertToGLMMat4(bone->mOffsetMatrix)
         );
 
-        // ¿şÀÌÆ® Á¤º¸ ÁÖÀÔ
+        // ì›¨ì´íŠ¸ ì •ë³´ ì£¼ì…
         for (uint32 w = 0; w < bone->mNumWeights; ++w)
         {
             const auto& weightData = bone->mWeights[w];

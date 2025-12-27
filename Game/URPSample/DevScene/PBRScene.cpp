@@ -275,47 +275,82 @@ bool PBRScene::CreateSceneContext()
 		AddGameObject(std::move(cubeObj));
 	}
 
-	// 7. 모델
+	//// 7. 모델
+	//{
+	//	// 1. 리소스 먼저 확보 (Model과 Animation)
+	//	auto model = RESOURCE.GetResource<Model>("aliensoldier");
+	//	auto anim1 = RESOURCE.GetResource<Animation>("Idle");
+	//	auto anim2 = RESOURCE.GetResource<Animation>("Walk");
+	//	auto animCtrl = AnimController::Create();
+	//	animCtrl->AddState("Idle", anim1);
+	//	animCtrl->AddState("Walk", anim2);
+	//	animCtrl->SetTransitionDuration("Idle", "Walk", 0.2f);
+	//	animCtrl->SetTransitionDuration("Walk", "Idle", 0.2f);
+	//	animCtrl->SetStartState("Idle");
+
+	//	// 2. GameObject 생성
+	//	auto modelGo = GameObject::Create();
+	//	modelGo->SetName("Soldier");
+	//	modelGo->GetTransform().SetPosition(glm::vec3(2.0f, 0.0f, -2.0f));
+	//	modelGo->GetTransform().SetScale(glm::vec3(0.025f));
+
+	//	// 3. 애니메이터 생성
+	//	auto animator = Animator::Create(model, std::move(animCtrl));
+	//	if (animator) modelGo->AddComponent(std::move(animator));
+
+	//	// 4. Model 안의 모든 Mesh 조각을 MeshRenderer 컴포넌트로 추가
+	//	for (uint32 i = 0; i < model->GetMeshCount(); ++i)
+	//	{
+	//		SkinnedMeshPtr mesh = model->GetSkinnedMesh(i);
+	//		auto renderer = MeshRenderer::Create(mesh, mesh->GetMaterial());
+	//		modelGo->AddComponent(std::move(renderer));
+	//	}
+
+	//	// 5. PlayerController
+	//	auto script = PlayerController::Create();
+	//	modelGo->AddComponent(std::move(script));
+
+	//	// 5. 씬에 GameObject 등록
+	//	AddGameObject(std::move(modelGo));
+	//}
+
+	// 7. 모델 (TEST)
 	{
-		// 1. 리소스 먼저 확보 (Model과 Animation)
+		// 1. 리소스 확보 (동일함)
 		auto model = RESOURCE.GetResource<Model>("aliensoldier");
-		auto anim1 = RESOURCE.GetResource<Animation>("Idle");
-		auto anim2 = RESOURCE.GetResource<Animation>("Walk");
-		auto animCtrl = AnimController::Create();
+		/*auto anim1 = RESOURCE.GetResource<Animation>("Idle");
+		auto anim2 = RESOURCE.GetResource<Animation>("Walk");*/
+
+		/*auto animCtrl = AnimController::Create();
 		animCtrl->AddState("Idle", anim1);
 		animCtrl->AddState("Walk", anim2);
 		animCtrl->SetTransitionDuration("Idle", "Walk", 0.2f);
 		animCtrl->SetTransitionDuration("Walk", "Idle", 0.2f);
-		animCtrl->SetStartState("Idle");
+		animCtrl->SetStartState("Idle");*/
 
-		// 2. GameObject 생성
-		auto modelGo = GameObject::Create();
-		modelGo->SetName("Soldier");
-		modelGo->GetTransform().SetPosition(glm::vec3(2.0f, 0.0f, -2.0f));
-		modelGo->GetTransform().SetScale(glm::vec3(0.025f));
+		GameObject* rootGO = model->Instantiate(this);
 
-		// 3. 애니메이터 생성
-		auto animator = Animator::Create(model, std::move(animCtrl));
-		if (animator) modelGo->AddComponent(std::move(animator));
-
-		// 4. Model 안의 모든 Mesh 조각을 MeshRenderer 컴포넌트로 추가
-		for (uint32 i = 0; i < model->GetMeshCount(); ++i)
+		if (rootGO)
 		{
-			SkinnedMeshPtr mesh = model->GetSkinnedMesh(i);
-			auto renderer = MeshRenderer::Create(mesh, mesh->GetMaterial());
-			modelGo->AddComponent(std::move(renderer));
+			// 2. 이름 및 Transform 설정
+			rootGO->SetName("Soldier");
+
+			// 계층 구조이므로 루트만 옮기면 자식들(팔, 다리 등)은 자동으로 따라옵니다.
+			rootGO->GetTransform().SetPosition(glm::vec3(2.0f, 0.0f, -2.0f));
+			rootGO->GetTransform().SetScale(glm::vec3(0.025f));
+
+			// 3. 애니메이터 부착
+			// 루트 오브젝트에 Animator를 붙입니다.
+			/*auto animator = Animator::Create(model, std::move(animCtrl));
+			if (animator) rootGO->AddComponent(std::move(animator));*/
+
+			// 4. PlayerController 부착
+			/*auto script = PlayerController::Create();
+			rootGO->AddComponent(std::move(script));*/
 		}
-
-		// 5. PlayerController
-		auto script = PlayerController::Create();
-		modelGo->AddComponent(std::move(script));
-
-		// 5. 씬에 GameObject 등록
-		AddGameObject(std::move(modelGo));
 	}
 
 	// 3. 구 49개 (ORM 텍스쳐 테스트)
-
 	// TestSpheresForORMTexture(hdrPass);
 	// TestSpheresForPBRChart(hdrPass);
 	TestSpheresForPBRChartDeferred();

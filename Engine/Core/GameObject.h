@@ -16,6 +16,8 @@ public:
 	void AddComponent(ComponentUPtr component);
 	template<typename T>
 	T* GetComponent() const;
+	template<typename T>
+	T* GetComponentInParent() const;
 
 	// 필요 멤버들의 getter와 setter들
 	Transform& GetTransform()    const	     { return *m_transform; }
@@ -63,5 +65,27 @@ inline T* GameObject::GetComponent() const
 			return static_cast<T*>(comp.get());
 	}
 	return nullptr;
+}
+
+template<typename T>
+inline T* GameObject::GetComponentInParent() const
+{
+	// 1. 나 자신에게 있는지 먼저 확인
+	T* comp = GetComponent<T>();
+	if (comp) return comp;
+
+	// 2. 부모 탐색 시작
+	Transform* current = m_transform->GetParent();
+	while (current != nullptr)
+	{
+		GameObject* parentGO = current->GetOwner();
+		if (parentGO)
+		{
+			comp = parentGO->GetComponent<T>();
+			if (comp) return comp;
+		}
+		// 계속 위로 올라감
+		current = current->GetParent();
+	}
 }
 #pragma endregion

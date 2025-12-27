@@ -40,6 +40,7 @@ public:
 	glm::vec3 GetRightVector() const;   // 오른쪽 (+X)
 
 	// 월드 또는 로컬 모델 행렬
+	void SetLocalMatrix(const glm::mat4& matrix);
 	glm::mat4 GetLocalMatrix() const;
 	glm::mat4 GetWorldMatrix() const;
 
