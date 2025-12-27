@@ -1,10 +1,12 @@
 ﻿#pragma once
 #include "Graphics/Uniform.h"
+#include "RenderContext.h"
 
 #pragma region FORWARD_DECLARATION
 CLASS_PTR(GameObject)
 CLASS_PTR(Component)
 CLASS_PTR(MeshRenderer)
+CLASS_PTR(MeshOutline)
 CLASS_PTR(Light)
 CLASS_PTR(Camera)
 CLASS_PTR(Animator)
@@ -36,12 +38,10 @@ public:
 public:
 	const std::vector<Light*>& GetLights() const { return m_lights; }
 	const std::vector<Camera*>& GetAllCameras() const { return m_cameras; }
-
 	Camera* GetMainCamera() const { return m_mainCamera; }
 	void SetMainCamera(Camera* camera) { m_mainCamera = camera; }
 	SkyLight* GetSkyLight() const { return m_sky.get(); }
 	void SetSkyLight(SkyLightUPtr skyLight);
-
 	GeneralRenderPass* GetCustomRenderPass(const std::string& name);
 
 /*================================//
@@ -52,6 +52,7 @@ public:
 	auto& GetCustomRenderPasses() { return m_customPasses; }
 	auto& GetStaticMeshRenderers() { return m_staticMeshRenderers; }
 	auto& GetSkinnedMeshRenderers() { return m_skinnedMeshRenderers; }
+	auto& GetMeshOutlines() { return m_outlines; }
 
 /*================================//
 //   scene update cycle methods   //
@@ -93,6 +94,7 @@ protected:
 	std::vector<AudioListener*> m_audioListeners;
 	std::vector<MeshRenderer*>  m_staticMeshRenderers;
 	std::vector<MeshRenderer*>  m_skinnedMeshRenderers;
+	std::vector<MeshOutline*>   m_outlines;
 
 	// 하늘 텍스쳐
 	SkyLightUPtr				m_sky;

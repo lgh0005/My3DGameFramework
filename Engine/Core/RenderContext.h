@@ -5,6 +5,7 @@ CLASS_PTR(Scene)
 CLASS_PTR(Camera)
 CLASS_PTR(MeshRenderer)
 CLASS_PTR(Light)
+CLASS_PTR(MeshOutline)
 CLASS_PTR(SkyLight)
 CLASS_PTR(CubeTexture)
 CLASS_PTR(Texture)
@@ -19,6 +20,7 @@ class RenderContext
 public:
 	virtual ~RenderContext();
 	void Reset(Scene* scene, Camera* camera);
+	void AddMeshOutline(MeshOutline* outline);
 	void AddStaticMeshRenderer(MeshRenderer* renderer);
 	void AddSkinnedMeshRenderer(MeshRenderer* renderer);
 	void AddLight(Light* light);
@@ -32,6 +34,7 @@ public:
 	SkyLight* GetSkyLight() const;
 	const std::vector<MeshRenderer*>& GetStaticMeshRenderers() const;
 	const std::vector<MeshRenderer*>& GetSkinnedMeshRenderers() const;
+	const std::vector<MeshOutline*>& GetMeshOutlines() const;
 	const std::vector<Light*>& GetLights() const;
 
 /*====================================//
@@ -52,6 +55,7 @@ protected:
 	LightVectorRawPtr		   m_lights;
 
 	// Result (실제 렌더링 목록)
+	std::vector<MeshOutline*>  m_culledMeshOutlines;
 	std::vector<MeshRenderer*> m_culledStaticMeshRenderers;
 	std::vector<MeshRenderer*> m_culledSkinnedMeshRenderers;
 	std::vector<Light*>        m_culledLights;

@@ -10,6 +10,7 @@
 #include "Components/PointLight.h"
 #include "Components/DirectionalLight.h"
 #include "Components/MeshRenderer.h"
+#include "Components/MeshOutline.h"
 #include "Components/Camera.h"
 #include "Components/Animator.h"
 #include "Components/Script.h"
@@ -108,6 +109,11 @@ void Scene::RegisterComponent(Component* component)
 				}
 			}
 			
+			break;
+		}
+		case ComponentType::MeshOutline:
+		{
+			m_outlines.push_back(static_cast<MeshOutline*>(component));
 			break;
 		}
 	}

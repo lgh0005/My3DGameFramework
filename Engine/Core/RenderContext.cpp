@@ -3,6 +3,7 @@
 #include "Graphics/SkyLight.h"
 #include "Components/MeshRenderer.h"
 #include "Components/Light.h"
+#include "Components/MeshOutline.h"
 #include "Resources/CubeTexture.h"
 #include "Resources/Texture.h"
 
@@ -25,11 +26,23 @@ void RenderContext::Reset(Scene* scene, Camera* camera)
 		m_lights			   = &scene->GetLights();
 		m_skyLight			   = m_currentScene->GetSkyLight();
 	}
+	else
+	{
+		m_staticMeshRenderers = nullptr;
+		m_skinnedMeshRenderers = nullptr;
+		m_lights = nullptr;
+		m_skyLight = nullptr;
+	}
 
 	// 3. 결과 벡터 초기화
 	m_culledStaticMeshRenderers.clear();
 	m_culledSkinnedMeshRenderers.clear();
 	m_culledLights.clear();
+}
+
+void RenderContext::AddMeshOutline(MeshOutline* outline)
+{
+	m_culledMeshOutlines.push_back(outline);
 }
 
 void RenderContext::AddStaticMeshRenderer(MeshRenderer* renderer)
@@ -63,6 +76,11 @@ Camera* RenderContext::GetCamera() const
 SkyLight* RenderContext::GetSkyLight() const
 {
 	return m_skyLight;
+}
+
+const std::vector<MeshOutline*>& RenderContext::GetMeshOutlines() const
+{
+	return m_culledMeshOutlines;
 }
 
 const std::vector<MeshRenderer*>& RenderContext::GetStaticMeshRenderers() const

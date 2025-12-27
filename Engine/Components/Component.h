@@ -16,7 +16,8 @@ enum class ComponentType
 	MeshRenderer,
 	Script,
 	AudioSource,
-	AudioListener
+	AudioListener,
+	MeshOutline
 };
 
 CLASS_PTR(Component)

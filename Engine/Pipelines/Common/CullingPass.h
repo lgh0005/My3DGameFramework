@@ -13,7 +13,6 @@ class CullingPass : public ContextRenderPass
 public:
 	static CullingPassUPtr Create();
 	virtual ~CullingPass();
-
 	virtual void Render(RenderContext* context) override;
 
 /*=====================//
@@ -22,6 +21,7 @@ public:
 private:
 	void CullStaticMeshRenderers(Scene* scene, StandardRenderContext* context);
 	void CullSkinnedMeshRenderers(Scene* scene, StandardRenderContext* context);
+	void CullMeshOutlines(Scene* scene, StandardRenderContext* context);
 	void CullSceneLights(Scene* scene, StandardRenderContext* context);
 
 private:

@@ -32,7 +32,7 @@ public:
 	auto& GetNodes() { return m_nodes; }
 	
 	// TODO : GenerateGameObjectHierarchy와 같은 함수가
-	// 추가될 수 있음.
+	// 추가될 수 있음. (Instantiate)
 
 	void Draw(const Program* program) const;
 

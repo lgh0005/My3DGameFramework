@@ -2,7 +2,9 @@
 #include "CullingPass.h"
 #include "Pipelines/SRP/StandardRenderContext.h"
 #include "Core/Scene.h"
+#include "Core/GameObject.h"
 #include "Components/MeshRenderer.h"
+#include "Components/MeshOutline.h"
 #include "Components/Camera.h"
 
 CullingPass::CullingPass() = default;
@@ -38,7 +40,10 @@ void CullingPass::Render(RenderContext* context)
     // 3. Skinned Mesh Renderer 컬링
     CullSkinnedMeshRenderers(scene, stdContext);
 
-    // 4. Light는 컬링하지 않고 모두 포함 (조명 범위는 Geometry Pass 결과에 의존)
+    // 4. Mesh Outline 컬링
+    CullMeshOutlines(scene, stdContext);
+
+    // 5. Light는 컬링하지 않고 모두 포함 (조명 범위는 Geometry Pass 결과에 의존)
     CullSceneLights(scene, stdContext);
 }
 
@@ -68,6 +73,29 @@ void CullingPass::CullSkinnedMeshRenderers(Scene* scene, StandardRenderContext* 
     }
 }
 
+void CullingPass::CullMeshOutlines(Scene* scene, StandardRenderContext* context)
+{
+    // Scene이 가지고 있는 전체 아웃라인 리스트 순회
+    const auto& outlines = scene->GetMeshOutlines();
+    for (auto* outline : outlines)
+    {
+        // 1. 소유자(GameObject) 확인
+        auto owner = outline->GetOwner();
+        if (!owner) continue;
+
+        // 2. 형제 컴포넌트인 MeshRenderer 찾기
+        auto renderer = owner->GetComponent<MeshRenderer>();
+
+        // 렌더러가 없으면 그릴 형체도 없으므로 스킵
+        if (!renderer) continue;
+
+        // 3. 렌더러의 바운딩 박스를 이용해 절두체 검사
+        // TODO :엄밀히 따지면 아웃라인 두께만큼 Bounds를 확장해야 할 수 있음.
+        if (m_frustum->CheckBounds(renderer->GetWorldBounds()))
+            context->AddMeshOutline(outline);
+    }
+}
+
 void CullingPass::CullSceneLights(Scene* scene, StandardRenderContext* context)
 {
     // LightSource는 LightPass가 사용하므로 그대로 복사합니다.
@@ -75,3 +103,4 @@ void CullingPass::CullSceneLights(Scene* scene, StandardRenderContext* context)
     const auto& lightSource = scene->GetLights();
     for (auto* light : lightSource) context->AddLight(light);
 }
+

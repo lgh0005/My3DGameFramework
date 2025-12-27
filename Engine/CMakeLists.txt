@@ -26,6 +26,7 @@ add_library(Engine STATIC
    "Pipelines/Common/CullingPass.h" "Pipelines/Common/CullingPass.cpp"
    "Pipelines/Common/ShadowPass.h"  "Pipelines/Common/ShadowPass.cpp"
    "Pipelines/Common/SkyboxPass.h"  "Pipelines/Common/SkyboxPass.cpp"
+   "Pipelines/Common/OutlinePass.h" "Pipelines/Common/OutlinePass.cpp"
 
    # Standard Render Pipeline
    "Pipelines/SRP/RenderPasses/StandardPostProcessPass.h" "Pipelines/SRP/RenderPasses/StandardPostProcessPass.cpp"
@@ -112,7 +113,8 @@ add_library(Engine STATIC
    "Components/Animator.h"          "Components/Animator.cpp"
    "Components/MeshRenderer.h"      "Components/MeshRenderer.cpp"
    "Components/AudioSource.h"       "Components/AudioSource.cpp"
-   "Components/AudioListener.h"       "Components/AudioListener.cpp"
+   "Components/AudioListener.h"     "Components/AudioListener.cpp"
+   "Components/MeshOutline.h"       "Components/MeshOutline.cpp"
 
    # Managers
    "Managers/TimeManager.h"         "Managers/TimeManager.cpp"
@@ -124,7 +126,7 @@ add_library(Engine STATIC
    "Managers/AudioManager.h"        "Managers/AudioManager.cpp"
    "Managers/PhysicsManager.h"      "Managers/PhysicsManager.cpp"
 
-  )
+ )
 
 # 2. [PCH 설정] EnginePCH.h를 PCH로 사용합니다.
 target_precompile_headers(Engine  PUBLIC EnginePCH.h)
