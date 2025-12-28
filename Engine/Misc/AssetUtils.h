@@ -70,8 +70,8 @@ inline static T AssetUtils::ReadData(std::ifstream& file)
 template<typename T>
 inline static void AssetUtils::ReadVector(std::ifstream& file, std::vector<T>& vec)
 {
-	uint32_t count = 0;
-	file.read(reinterpret_cast<char*>(&count), sizeof(uint32_t));
+	uint32 count = 0;
+	file.read(reinterpret_cast<char*>(&count), sizeof(uint32));
 
 	vec.resize(count);
 	if (count > 0)

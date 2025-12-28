@@ -69,84 +69,7 @@ GameObject* Model::Instantiate(Scene* scene)
         return nullptr;
     }
 
-    // 1. 임시 저장소 (인덱스 -> GameObject Raw Pointer)
-    // 소유권은 즉시 Scene으로 넘기지만, 부모 연결을 위해 포인터는 가지고 있어야 함.
-    std::vector<GameObject*> parts(m_nodes.size(), nullptr);
-    GameObject* root = nullptr;
-
-    // 2. 모든 노드 순회하며 생성
-    for (usize i = 0; i < m_nodes.size(); ++i)
-    {
-        const auto& nodeData = m_nodes[i];
-
-        // 2-1. GameObject 생성
-        auto go = GameObject::Create();
-        go->SetName(nodeData.name);
-
-        // 2-2. Transform 설정 (T-Pose)
-        // Transform은 GO 생성 시 자동 생성되므로 GetTransform() 사용
-        go->GetTransform().SetLocalMatrix(nodeData.localTransform);
-
-        // 2-3. MeshRenderer 부착
-        if (!nodeData.meshIndices.empty())
-        {
-            for (uint32 meshIdx : nodeData.meshIndices)
-            {
-                // 편의상 GetMesh 헬퍼가 있다고 가정하거나 직접 접근
-                // (여기서는 타입 체크 후 생성 예시)
-                if (meshIdx < m_meshes.size())
-                {
-                    auto& meshRes = m_meshes[meshIdx];
-                    // 타입에 따라 Skinned/Static 생성
-                    if (meshRes->GetResourceType() == ResourceType::SkinnedMesh)
-                    {
-                        auto mesh = std::static_pointer_cast<SkinnedMesh>(meshRes);
-                        auto renderer = SkinnedMeshRenderer::Create(mesh, mesh->GetMaterial());
-                        go->AddComponent(std::move(renderer));
-                    }
-                    else
-                    {
-                        auto mesh = std::static_pointer_cast<StaticMesh>(meshRes);
-                        auto renderer = StaticMeshRenderer::Create(mesh, mesh->GetMaterial());
-                        go->AddComponent(std::move(renderer));
-                    }
-                }
-            }
-        }
-        // 2-4. 임시 저장소 등록
-        parts[i] = go.get();
-
-        // 2-5. Scene에 소유권 이전 (중요!)
-        // 이제 go는 nullptr이 됨
-        scene->AddGameObject(std::move(go));
-    }
-
-    // 3. 계층 구조 연결 (부모-자식)
-    // 모든 GO가 생성된 후에 연결하는 것이 안전함 (인덱스 순서 문제 해결)
-    for (usize i = 0; i < m_nodes.size(); ++i)
-    {
-        const auto& nodeData = m_nodes[i];
-        GameObject* currentGO = parts[i];
-
-        if (nodeData.parentIndex >= 0)
-        {
-            // 부모가 있으면 연결
-            GameObject* parentGO = parts[nodeData.parentIndex];
-            if (parentGO)
-            {
-                // GameObject::SetParent -> Transform::SetParent로 위임
-                currentGO->SetParent(parentGO);
-            }
-        }
-        else
-        {
-            // 부모가 없으면 루트
-            // (첫 번째 루트만 반환용으로 저장)
-            if (!root) root = currentGO;
-        }
-    }
-
-    return root;
+    // TODO :
 }
 
 /*=================================================================//
@@ -214,6 +137,7 @@ void Model::ProcessAssimpHierarchy(aiNode* node, int32 parentIndex, int32& curre
 
     int32 myIndex = currentIndex;
     m_nodes.push_back(rawNode);
+    if (parentIndex >= 0) m_nodes[parentIndex].children.push_back(myIndex);
     currentIndex++;
 
     for (uint32 i = 0; i < node->mNumChildren; i++)
@@ -450,7 +374,10 @@ bool Model::ReadBinaryModelHeader(std::ifstream& inFile, uint32& outMatCount, ui
     return true;
 }
 
-void Model::ReadBinaryNodes(std::ifstream& inFile) { m_nodes = AssetUtils::ReadRawNodes(inFile); }
+void Model::ReadBinaryNodes(std::ifstream& inFile) 
+{
+    m_nodes = AssetUtils::ReadRawNodes(inFile); 
+}
 
 void Model::ReadBinarySkeleton(std::ifstream& inFile)
 {

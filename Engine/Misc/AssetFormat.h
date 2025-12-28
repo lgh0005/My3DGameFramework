@@ -96,6 +96,7 @@ namespace AssetFmt
         int32_t parentIndex = -1; // -1이면 루트
         glm::mat4 localTransform; // 초기 변환 (T-Pose)
         std::vector<uint32> meshIndices;
+        std::vector<int32> children;
     };
 
     // RawAnimChannel

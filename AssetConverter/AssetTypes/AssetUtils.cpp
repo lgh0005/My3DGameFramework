@@ -1,8 +1,8 @@
-#include "pch.h"
+ï»¿#include "pch.h"
 #include "AssetUtils.h"
 
 /*========================================//
-//   ModelConverterÀÇ ÆÄÀÏ ¾²±â À¯Æ¿ ÇÔ¼ö   //
+//   ModelConverterì˜ íŒŒì¼ ì“°ê¸° ìœ í‹¸ í•¨ìˆ˜   //
 //========================================*/
 void AssetUtils::WriteString(std::ofstream& file, const std::string& str)
 {
@@ -12,7 +12,7 @@ void AssetUtils::WriteString(std::ofstream& file, const std::string& str)
 }
 
 /*========================================//
-//   ModelConverterÀÇ ÆÄÀÏ ÀĞ±â À¯Æ¿ ÇÔ¼ö   //
+//   ModelConverterì˜ íŒŒì¼ ì½ê¸° ìœ í‹¸ í•¨ìˆ˜   //
 //========================================*/
 std::string AssetUtils::ReadString(std::ifstream& file)
 {
@@ -59,26 +59,27 @@ void AssetUtils::WriteRawMesh(std::ofstream& file, const AssetFmt::RawMesh& mesh
 
 void AssetUtils::WriteRawNodes(std::ofstream& file, const std::vector<AssetFmt::RawNode>& nodes)
 {
-    // 1. ³ëµå °³¼ö ÀúÀå (vector size)
+    // 1. ë…¸ë“œ ê°œìˆ˜ ì €ì¥ (vector size)
     uint32 count = (uint32)nodes.size();
     WriteData(file, count);
 
-    // 2. °¢ ³ëµå Á¤º¸ ¼øÈ¸ ÀúÀå
+    // 2. ê° ë…¸ë“œ ì •ë³´ ìˆœíšŒ ì €ì¥
     for (const auto& node : nodes)
     {
-        // ÀÌ¸§ (°¡º¯ ±æÀÌ ¹®ÀÚ¿­)
+        // ì´ë¦„ (ê°€ë³€ ê¸¸ì´ ë¬¸ìì—´)
         WriteString(file, node.name);
 
-        // ºÎ¸ğ ÀÎµ¦½º (int32)
+        // ë¶€ëª¨ ì¸ë±ìŠ¤ (int32)
         WriteData(file, node.parentIndex);
 
-        // ·ÎÄÃ º¯È¯ Çà·Ä (glm::mat4)
+        // ë¡œì»¬ ë³€í™˜ í–‰ë ¬ (glm::mat4)
         WriteData(file, node.localTransform);
 
-        // ¸Ş½¬ ÀÎµ¦½º Á¤º¸ ÀúÀå
-        uint32 meshCount = (uint32)node.meshIndices.size();
-        WriteData(file, meshCount);
-        for (uint32 idx : node.meshIndices) WriteData(file, idx);
+        // ë©”ì‰¬ ì¸ë±ìŠ¤ ì •ë³´ ì €ì¥
+        WriteVector(file, node.meshIndices);
+
+        // ìì‹ ì¸ë±ìŠ¤ ì €ì¥
+        WriteVector(file, node.children);
     }
 }
 
@@ -86,21 +87,21 @@ std::vector<AssetFmt::RawNode> AssetUtils::ReadRawNodes(std::ifstream& file)
 {
     std::vector<AssetFmt::RawNode> nodes;
 
-    // 1. ³ëµå °³¼ö ÀĞ±â
+    // 1. ë…¸ë“œ ê°œìˆ˜ ì½ê¸°
     uint32 count = ReadData<uint32>(file);
     nodes.resize(count);
 
-    // 2. °¢ ³ëµå Á¤º¸ ÀĞ±â
+    // 2. ê° ë…¸ë“œ ì •ë³´ ì½ê¸°
     for (uint32 i = 0; i < count; ++i)
     {
         nodes[i].name = ReadString(file);
         nodes[i].parentIndex = ReadData<int32>(file);
         nodes[i].localTransform = ReadData<glm::mat4>(file);
 
-        // ¸Ş½¬ ÀÎµ¦½º Á¤º¸ ÀĞ±â
+        // ë©”ì‰¬ ì¸ë±ìŠ¤ ì •ë³´ ì½ê¸°
         uint32 meshCount = ReadData<uint32>(file);
 
-        // º¤ÅÍ ¸®»çÀÌÁî ¹× µ¥ÀÌÅÍ Ã¤¿ì±â
+        // ë²¡í„° ë¦¬ì‚¬ì´ì¦ˆ ë° ë°ì´í„° ì±„ìš°ê¸°
         nodes[i].meshIndices.resize(meshCount);
         for (uint32 m = 0; m < meshCount; ++m)
             nodes[i].meshIndices[m] = ReadData<uint32>(file);

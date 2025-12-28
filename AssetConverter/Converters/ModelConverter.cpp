@@ -244,10 +244,13 @@ void ModelConverter::ProcessHierarchy(aiNode* node, int32 parentIndex, int32& cu
     int32 myIndex = currentIndex;
     m_rawModel.nodes.push_back(rawNode);
 
-    // 5. 인덱스 증가
+    // 5. 부모 노드의 children 리스트에 '나(myIndex)'를 등록
+    if (parentIndex >= 0) m_rawModel.nodes[parentIndex].children.push_back(myIndex);
+
+    // 6. 인덱스 증가
     currentIndex++;
 
-    // 6. 자식 노드 순회 (재귀 호출)
+    // 7. 자식 노드 순회 (재귀 호출)
     for (uint32 i = 0; i < node->mNumChildren; i++)
         ProcessHierarchy(node->mChildren[i], myIndex, currentIndex);
 }
