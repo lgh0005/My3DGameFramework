@@ -6,6 +6,7 @@ CLASS_PTR(Program)
 CLASS_PTR(Scene)
 CLASS_PTR(Camera)
 CLASS_PTR(CubeTexture)
+CLASS_PTR(StaticMeshRenderer)
 #pragma endregion
 
 CLASS_PTR(EnvironmentRenderPass)
@@ -20,8 +21,8 @@ public:
 
     virtual void Render(Scene* scene, Camera* camera) override;
 
-    const std::vector<MeshRenderer*>& GetRenderers() const;
-    void AddRenderer(MeshRenderer* meshRenderer);
+    const std::vector<StaticMeshRenderer*>& GetRenderers() const;
+    void AddRenderer(StaticMeshRenderer* meshRenderer);
 
 private:
     EnvironmentRenderPass() = default;
@@ -33,5 +34,5 @@ private:
 
     CubeTexturePtr m_cubeTexture;
     ProgramUPtr m_envProgram;
-    std::vector<MeshRenderer*> m_renderers;
+    std::vector<StaticMeshRenderer*> m_renderers;
 };

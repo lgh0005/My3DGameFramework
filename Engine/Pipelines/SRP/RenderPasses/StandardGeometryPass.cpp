@@ -9,6 +9,8 @@
 #include "Resources/Material.h"
 #include "Resources/Texture.h"
 #include "Components/MeshRenderer.h"
+#include "Components/StaticMeshRenderer.h"
+#include "Components/SkinnedMeshRenderer.h"
 #include "Components/Transform.h"
 #include "Components/SpotLight.h"
 #include "Components/Animator.h"
@@ -72,7 +74,7 @@ void StandardGeometryPass::Render(RenderContext* context)
 	Framebuffer::BindToDefault();
 }
 
-void StandardGeometryPass::RenderStaticGeometry(const std::vector<MeshRenderer*>& meshes)
+void StandardGeometryPass::RenderStaticGeometry(const std::vector<StaticMeshRenderer*>& meshes)
 {
 	if (!m_staticGeometryProgram || meshes.empty()) return;
 
@@ -90,7 +92,7 @@ void StandardGeometryPass::RenderStaticGeometry(const std::vector<MeshRenderer*>
 	}
 }
 
-void StandardGeometryPass::RenderSkinnedGeometry(const std::vector<MeshRenderer*>& meshes)
+void StandardGeometryPass::RenderSkinnedGeometry(const std::vector<SkinnedMeshRenderer*>& meshes)
 {
 	if (!m_skinnedGeometryProgram || meshes.empty()) return;
 
@@ -127,22 +129,22 @@ void StandardGeometryPass::Resize(int32 width, int32 height)
 /*================================================//
 //   standard geometry pass getters and setters   //
 //================================================*/
-void StandardGeometryPass::AddStaticMeshRenderer(MeshRenderer* staticMeshRenderer)
+void StandardGeometryPass::AddStaticMeshRenderer(StaticMeshRenderer* staticMeshRenderer)
 {
 	m_staticMeshRenderers.push_back(staticMeshRenderer);
 }
 
-void StandardGeometryPass::AddSkinnedMeshRenderer(MeshRenderer* skinnedMeshRenderer)
+void StandardGeometryPass::AddSkinnedMeshRenderer(SkinnedMeshRenderer* skinnedMeshRenderer)
 {
 	m_skinnedMeshRenderers.push_back(skinnedMeshRenderer);
 }
 
-const std::vector<MeshRenderer*>& StandardGeometryPass::GetSkinnedMeshRenderers() const
-{
-	return m_skinnedMeshRenderers;
-}
-
-const std::vector<MeshRenderer*>& StandardGeometryPass::GetStaticMeshRenderers() const
+const std::vector<StaticMeshRenderer*>& StandardGeometryPass::GetStaticMeshRenderers() const
 {
 	return m_staticMeshRenderers;
+}
+
+const std::vector<SkinnedMeshRenderer*>& StandardGeometryPass::GetSkinnedMeshRenderers() const
+{
+	return m_skinnedMeshRenderers;
 }

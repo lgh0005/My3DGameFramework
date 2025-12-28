@@ -10,6 +10,7 @@
 #include "Graphics/SkyLight.h"
 #include "Components/Camera.h"
 #include "Components/MeshRenderer.h"
+#include "Components/StaticMeshRenderer.h"
 #include "Components/Transform.h"
 #include "Core/GameObject.h"
 
@@ -88,12 +89,12 @@ void HDRRenderPass::Render(Scene* scene, Camera* camera)
     }
 }
 
-const std::vector<MeshRenderer*>& HDRRenderPass::GetRenderers() const
+const std::vector<StaticMeshRenderer*>& HDRRenderPass::GetRenderers() const
 {
     return m_renderers;
 }
 
-void HDRRenderPass::AddRenderer(MeshRenderer* meshRenderer)
+void HDRRenderPass::AddRenderer(StaticMeshRenderer* meshRenderer)
 {
     m_renderers.push_back(meshRenderer);
 }

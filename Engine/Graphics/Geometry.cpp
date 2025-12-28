@@ -213,12 +213,12 @@ StaticMeshUPtr GeometryGenerator::CreateSphere
     }
 
     indices.resize(latiSegmentCount * longiSegmentCount * 6);
-    for (uint32_t i = 0; i < latiSegmentCount; i++)
+    for (uint32 i = 0; i < latiSegmentCount; i++)
     {
-        for (uint32_t j = 0; j < longiSegmentCount; j++)
+        for (uint32 j = 0; j < longiSegmentCount; j++)
         {
-            uint32_t vertexOffset = i * circleVertCount + j;
-            uint32_t indexOffset = (i * longiSegmentCount + j) * 6;
+            uint32 vertexOffset = i * circleVertCount + j;
+            uint32 indexOffset = (i * longiSegmentCount + j) * 6;
             indices[indexOffset] = vertexOffset;
             indices[indexOffset + 1] = vertexOffset + 1;
             indices[indexOffset + 2] = vertexOffset + 1 + circleVertCount;

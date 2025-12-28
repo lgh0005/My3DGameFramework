@@ -6,7 +6,7 @@
 #include "Resources/Mesh.h"
 #include "Resources/Material.h"
 #include "Components/Camera.h"
-#include "Components/MeshRenderer.h"
+#include "Components/InstancedMeshRenderer.h"
 #include "Components/Transform.h"
 #include "Components/SpotLight.h"
 #include "Core/GameObject.h"
@@ -50,12 +50,12 @@ void InstancedRenderPass::Render(Scene* scene, Camera* camera)
     }
 }
 
-const std::vector<MeshRenderer*>& InstancedRenderPass::GetRenderers() const
+const std::vector<InstancedMeshRenderer*>& InstancedRenderPass::GetRenderers() const
 {
     return m_renderers;
 }
 
-void InstancedRenderPass::AddRenderer(MeshRenderer* meshRenderer)
+void InstancedRenderPass::AddRenderer(InstancedMeshRenderer* meshRenderer)
 {
     m_renderers.push_back(meshRenderer);
 }

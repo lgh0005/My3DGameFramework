@@ -24,7 +24,8 @@
 
 #include "Components/Camera.h"
 #include "Components/Transform.h"
-#include "Components/MeshRenderer.h"
+#include "Components/StaticMeshRenderer.h"
+#include "Components/SkinnedMeshRenderer.h"
 #include "Components/SpotLight.h"
 #include "Components/DirectionalLight.h"
 #include "Components/PointLight.h"
@@ -254,7 +255,7 @@ bool PBRScene::CreateSceneContext()
 		lightComp->SetDistance(128.0f);
 		lightGo->AddComponent(std::move(lightComp));
 		
-		auto renderer = MeshRenderer::Create
+		auto renderer = StaticMeshRenderer::Create
 		(RESOURCE.GetResource<StaticMesh>("Cube"), RESOURCE.GetResource<Material>("solidColor"));
 		lightGo->AddComponent(std::move(renderer));
 
@@ -269,7 +270,7 @@ bool PBRScene::CreateSceneContext()
 		cubeTransform.SetPosition(glm::vec3(0.0f, -0.5f, 0.0f));
 		cubeTransform.SetScale(glm::vec3(40.0f, 1.0f, 40.0f));
 
-		auto meshRenderer = MeshRenderer::Create
+		auto meshRenderer = StaticMeshRenderer::Create
 		(RESOURCE.GetResource<StaticMesh>("Cube"), RESOURCE.GetResource<Material>("GroundMat"));
 		cubeObj->AddComponent(std::move(meshRenderer));
 		AddGameObject(std::move(cubeObj));
@@ -410,7 +411,7 @@ void PBRScene::TestSpheresForORMTexture(HDRRenderPass* hdrPass)
 			pbrMat->roughnessFactor = roughnessFactor; // 열에 따라 거칠기 조절
 
 			// 렌더러 등록
-			auto mr = MeshRenderer::Create(sphereMesh, pbrMat);
+			auto mr = StaticMeshRenderer::Create(sphereMesh, pbrMat);
 			hdrPass->AddRenderer(mr.get());
 			sphereObj->AddComponent(std::move(mr));
 			AddGameObject(std::move(sphereObj));
@@ -463,7 +464,7 @@ void PBRScene::TestSpheresForPBRChart(HDRRenderPass* hdrPass)
 			pbrMat->roughnessFactor = roughnessValue; // 팩터로 조절
 
 			// 렌더러 등록
-			auto mr = MeshRenderer::Create(sphereMesh, pbrMat);
+			auto mr = StaticMeshRenderer::Create(sphereMesh, pbrMat);
 			mr->SetRenderStage(RenderStage::Forward);
 			hdrPass->AddRenderer(mr.get());
 			sphereObj->AddComponent(std::move(mr));
@@ -517,7 +518,7 @@ void PBRScene::TestSpheresForPBRChartDeferred()
 			pbrMat->roughnessFactor = roughnessValue; // 팩터로 조절
 
 			// 렌더러 등록
-			auto mr = MeshRenderer::Create(sphereMesh, pbrMat);
+			auto mr = StaticMeshRenderer::Create(sphereMesh, pbrMat);
 			sphereObj->AddComponent(std::move(mr));
 			AddGameObject(std::move(sphereObj));
 		}

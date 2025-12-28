@@ -11,7 +11,8 @@
 #include "Components/Light.h"
 #include "Components/SpotLight.h"
 #include "Components/Transform.h"
-#include "Components/MeshRenderer.h"
+#include "Components/StaticMeshRenderer.h"
+#include "Components/SkinnedMeshRenderer.h"
 #include "Components/Animator.h"
 #include "Pipelines/SRP/StandardRenderContext.h"
 #include "Pipelines/SRP/StandardRenderPipeline.h"
@@ -103,7 +104,6 @@ void ShadowPass::Render(RenderContext* context)
 	RegisterShadowMapsToContext(context);
 }
 
-
 glm::mat4 ShadowPass::CalculateLightSpaceMatrix(Light* light)
 {
 	if (!light) return glm::mat4(1.0f);
@@ -141,7 +141,7 @@ glm::mat4 ShadowPass::CalculateLightSpaceMatrix(Light* light)
 
 void ShadowPass::RenderStaticMeshes
 (
-	const std::vector<MeshRenderer*>& meshes, 
+	const std::vector<StaticMeshRenderer*>& meshes,
 	const glm::mat4& lightSpaceMatrix
 )
 {
@@ -160,7 +160,7 @@ void ShadowPass::RenderStaticMeshes
 
 void ShadowPass::RenderSkinnedMeshes
 (
-	const std::vector<MeshRenderer*>& meshes, 
+	const std::vector<SkinnedMeshRenderer*>& meshes,
 	const glm::mat4& lightSpaceMatrix
 )
 {

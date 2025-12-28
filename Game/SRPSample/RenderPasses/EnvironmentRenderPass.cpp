@@ -8,6 +8,7 @@
 #include "Resources/CubeTexture.h"
 #include "Components/Camera.h"
 #include "Components/MeshRenderer.h"
+#include "Components/StaticMeshRenderer.h"
 #include "Components/Transform.h"
 #include "Components/SpotLight.h"
 #include "Core/GameObject.h"
@@ -59,12 +60,12 @@ void EnvironmentRenderPass::Render(Scene* scene, Camera* camera)
 	}
 }
 
-const std::vector<MeshRenderer*>& EnvironmentRenderPass::GetRenderers() const
+const std::vector<StaticMeshRenderer*>& EnvironmentRenderPass::GetRenderers() const
 {
 	return m_renderers;
 }
 
-void EnvironmentRenderPass::AddRenderer(MeshRenderer* meshRenderer)
+void EnvironmentRenderPass::AddRenderer(StaticMeshRenderer* meshRenderer)
 {
 	m_renderers.push_back(meshRenderer);
 }

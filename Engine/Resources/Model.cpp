@@ -3,7 +3,8 @@
 #include "Core/Scene.h"
 #include "Core/GameObject.h"
 #include "Components/Transform.h"
-#include "Components/MeshRenderer.h"
+#include "Components/StaticMeshRenderer.h"
+#include "Components/SkinnedMeshRenderer.h"
 #include "Resources/Mesh.h"
 #include "Resources/StaticMesh.h"
 #include "Resources/SkinnedMesh.h"
@@ -100,13 +101,13 @@ GameObject* Model::Instantiate(Scene* scene)
                     if (meshRes->GetResourceType() == ResourceType::SkinnedMesh)
                     {
                         auto mesh = std::static_pointer_cast<SkinnedMesh>(meshRes);
-                        auto renderer = MeshRenderer::Create(mesh, mesh->GetMaterial());
+                        auto renderer = SkinnedMeshRenderer::Create(mesh, mesh->GetMaterial());
                         go->AddComponent(std::move(renderer));
                     }
                     else
                     {
                         auto mesh = std::static_pointer_cast<StaticMesh>(meshRes);
-                        auto renderer = MeshRenderer::Create(mesh, mesh->GetMaterial());
+                        auto renderer = StaticMeshRenderer::Create(mesh, mesh->GetMaterial());
                         go->AddComponent(std::move(renderer));
                     }
                 }

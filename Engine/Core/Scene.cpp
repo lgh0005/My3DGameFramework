@@ -9,7 +9,9 @@
 #include "Components/Light.h"
 #include "Components/PointLight.h"
 #include "Components/DirectionalLight.h"
-#include "Components/MeshRenderer.h"
+#include "Components/StaticMeshRenderer.h"
+#include "Components/SkinnedMeshRenderer.h"
+#include "Components/InstancedMeshRenderer.h"
 #include "Components/MeshOutline.h"
 #include "Components/Camera.h"
 #include "Components/Animator.h"
@@ -72,43 +74,25 @@ void Scene::RegisterComponent(Component* component)
 			m_audioListeners.push_back(static_cast<AudioListener*>(component));
 			break;
 		}
-		// TODO : 중첩 switch-case문은 좋은 방식은 아니므로 
-		// 가독성을 위해 따로 함수로 뺄 필요 있음
-		// TODO : 이후에 MeshRenderer를 상위 클래스로 StaticMeshRenderer, SkinnedMeshRenderer 등이
-		// 생겨날 수도 있음. 그럴 경우에는 위의 Light처럼 처리를 해야 할 수도 있다.
-		// InstancedMesh에 대한 분화는 좀 더 생각을 해봐야 함.
-		case ComponentType::MeshRenderer:
+		case ComponentType::StaticMeshRenderer:
 		{
-			auto meshRenderer = static_cast<MeshRenderer*>(component);
-			ResourceType meshType = meshRenderer->GetMesh()->GetResourceType();
-			RenderStage stage = meshRenderer->GetRenderStage();
-
-			if (stage == RenderStage::Forward) return;
-
-			switch (meshType)
-			{
-				case ResourceType::StaticMesh:
-				{
-					m_staticMeshRenderers.push_back(meshRenderer);
-					break;
-				}
-
-				case ResourceType::SkinnedMesh:
-				{
-					m_skinnedMeshRenderers.push_back(meshRenderer);
-					break;
-				}
-				case ResourceType::InstancedMesh:
-				{
-					// TODO : 메쉬의 어떤 속성을 다르게 하여 인스턴싱을
-					// 할 지는 모르기 때문에 이는 따로 처리할 필요가 있음
-					// 현재는 커스텀 포워드 렌더링 패스를 제작해서 넣는 것으로 함.
-					// 이쪽은 예를 들어, 조명의 영향을 받는 무수한 풀밭을 그리고 
-					// 싶을 때 활용할 수 있음.
-					break;
-				}
-			}
-			
+			auto mr = static_cast<StaticMeshRenderer*>(component);
+			if (mr->GetRenderStage() == RenderStage::Forward) return;
+			m_staticMeshRenderers.push_back(mr);
+			break;
+		}
+		case ComponentType::SkinnedMeshRenderer:
+		{
+			auto mr = static_cast<SkinnedMeshRenderer*>(component);
+			if (mr->GetRenderStage() == RenderStage::Forward) return;
+			m_skinnedMeshRenderers.push_back(mr);
+			break;
+		}
+		case ComponentType::InstancedMeshRenderer:
+		{
+			auto mr = static_cast<InstancedMeshRenderer*>(component);
+			if (mr->GetRenderStage() == RenderStage::Forward) return;
+			m_instancedMeshRenderers.push_back(mr);
 			break;
 		}
 		case ComponentType::MeshOutline:

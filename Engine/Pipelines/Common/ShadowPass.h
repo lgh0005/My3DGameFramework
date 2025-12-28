@@ -6,6 +6,8 @@ CLASS_PTR(Scene)
 CLASS_PTR(Camera)
 CLASS_PTR(Program)
 CLASS_PTR(ShadowMap)
+CLASS_PTR(StaticMeshRenderer)
+CLASS_PTR(SkinnedMeshRenderer)
 CLASS_PTR(RenderContext)
 #pragma endregion
 
@@ -28,13 +30,13 @@ private:
 	glm::mat4 CalculateLightSpaceMatrix(Light* light);
 	void RenderStaticMeshes
 	(
-		const std::vector<MeshRenderer*>& meshes, 
+		const std::vector<StaticMeshRenderer*>& meshes,
 		const glm::mat4& lightSpaceMatrix
 	);
 
 	void RenderSkinnedMeshes
 	(
-		const std::vector<MeshRenderer*>& meshes, 
+		const std::vector<SkinnedMeshRenderer*>& meshes,
 		const glm::mat4& lightSpaceMatrix
 	);
 

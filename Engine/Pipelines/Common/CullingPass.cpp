@@ -3,7 +3,8 @@
 #include "Pipelines/SRP/StandardRenderContext.h"
 #include "Core/Scene.h"
 #include "Core/GameObject.h"
-#include "Components/MeshRenderer.h"
+#include "Components/StaticMeshRenderer.h"
+#include "Components/SkinnedMeshRenderer.h"
 #include "Components/MeshOutline.h"
 #include "Components/Camera.h"
 
@@ -83,10 +84,11 @@ void CullingPass::CullMeshOutlines(Scene* scene, StandardRenderContext* context)
         auto owner = outline->GetOwner();
         if (!owner) continue;
 
-        // 2. 형제 컴포넌트인 MeshRenderer 찾기
-        auto renderer = owner->GetComponent<MeshRenderer>();
-
-        // 렌더러가 없으면 그릴 형체도 없으므로 스킵
+        // 2. MeshRenderer 찾기
+        MeshRenderer* renderer = nullptr;
+        renderer = owner->GetComponent<StaticMeshRenderer>();
+        if (!renderer) renderer = owner->GetComponent<SkinnedMeshRenderer>();
+        // TODO : InstancedMeshRenderer도 추가 필요
         if (!renderer) continue;
 
         // 3. 렌더러의 바운딩 박스를 이용해 절두체 검사

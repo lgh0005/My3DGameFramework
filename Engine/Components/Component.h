@@ -13,11 +13,13 @@ enum class ComponentType
 	SpotLight,
 	PointLight,
 	Transform,
-	MeshRenderer,
 	Script,
 	AudioSource,
 	AudioListener,
-	MeshOutline
+	MeshOutline,
+	SkinnedMeshRenderer,
+	StaticMeshRenderer,
+	InstancedMeshRenderer
 };
 
 CLASS_PTR(Component)

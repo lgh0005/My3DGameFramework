@@ -6,7 +6,8 @@
 #include "Core/GameObject.h"
 #include "Graphics/Program.h"
 #include "Resources/Mesh.h"
-#include "Components/MeshRenderer.h"
+#include "Components/StaticMeshRenderer.h"
+#include "Components/SkinnedMeshRenderer.h"
 #include "Components/MeshOutline.h"
 #include "Components/Animator.h"
 #include "Components/Transform.h"
@@ -68,6 +69,7 @@ void OutlinePass::Render(RenderContext* context)
 /*==============================//
 //   outlining helper methods   //
 //==============================*/
+// TODO : null 체크는 한 번 씩 해줘야함.
 void OutlinePass::MaskMeshes(const std::vector<MeshOutline*>& outlines)
 {
 	// [Pass 1] 마스킹 (Masking)
@@ -109,7 +111,7 @@ void OutlinePass::MaskStaticMeshes(const std::vector<MeshOutline*>& outlines)
 		if (owner->GetComponent<Animator>()) continue;
 
 		// [심플한 해결책] "내 몸에 붙은 렌더러 내놔"
-		auto* renderer = owner->GetComponent<MeshRenderer>();
+		auto* renderer = owner->GetComponent<StaticMeshRenderer>();
 		auto mesh = renderer->GetMesh();
 		m_staticProgram->SetUniform("model", renderer->GetTransform().GetWorldMatrix());
 		mesh->Draw(m_staticProgram.get());
@@ -126,7 +128,7 @@ void OutlinePass::MaskSkinnedMeshes(const std::vector<MeshOutline*>& outlines)
 		auto* owner = outline->GetOwner();
 		auto* animator = owner->GetComponent<Animator>();
 		if (!animator) continue;
-		auto* renderer = owner->GetComponent<MeshRenderer>();
+		auto* renderer = owner->GetComponent<SkinnedMeshRenderer>();
 		auto mesh = renderer->GetMesh();
 
 		m_skinnedProgram->SetUniform("model", renderer->GetTransform().GetWorldMatrix());
@@ -151,7 +153,7 @@ void OutlinePass::DrawStaticMeshOutlines(const std::vector<MeshOutline*>& outlin
 		m_staticProgram->SetUniform("outlineColor", outline->GetColor());
 		m_staticProgram->SetUniform("outlineThickness", outline->GetThickness());
 
-		auto* renderer = owner->GetComponent<MeshRenderer>();
+		auto* renderer = owner->GetComponent<StaticMeshRenderer>();
 		auto mesh = renderer->GetMesh();
 		m_staticProgram->SetUniform("model", renderer->GetTransform().GetWorldMatrix());
 		mesh->Draw(m_staticProgram.get());
@@ -172,7 +174,7 @@ void OutlinePass::DrawSkinnedMeshOutlines(const std::vector<MeshOutline*>& outli
 		m_skinnedProgram->SetUniform("outlineColor", outline->GetColor());
 		m_skinnedProgram->SetUniform("outlineThickness", outline->GetThickness());
 
-		auto* renderer = owner->GetComponent<MeshRenderer>();
+		auto* renderer = owner->GetComponent<SkinnedMeshRenderer>();
 		auto mesh = renderer->GetMesh();
 		m_skinnedProgram->SetUniform("model", renderer->GetTransform().GetWorldMatrix());
 

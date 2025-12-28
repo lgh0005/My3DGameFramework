@@ -1,7 +1,8 @@
 ﻿#include "EnginePch.h"
 #include "RenderContext.h"
 #include "Graphics/SkyLight.h"
-#include "Components/MeshRenderer.h"
+#include "Components/StaticMeshRenderer.h"
+#include "Components/SkinnedMeshRenderer.h"
 #include "Components/Light.h"
 #include "Components/MeshOutline.h"
 #include "Resources/CubeTexture.h"
@@ -45,12 +46,12 @@ void RenderContext::AddMeshOutline(MeshOutline* outline)
 	m_culledMeshOutlines.push_back(outline);
 }
 
-void RenderContext::AddStaticMeshRenderer(MeshRenderer* renderer)
+void RenderContext::AddStaticMeshRenderer(StaticMeshRenderer* renderer)
 {
 	m_culledStaticMeshRenderers.push_back(renderer);
 }
 
-void RenderContext::AddSkinnedMeshRenderer(MeshRenderer* renderer)
+void RenderContext::AddSkinnedMeshRenderer(SkinnedMeshRenderer* renderer)
 {
 	m_culledSkinnedMeshRenderers.push_back(renderer);
 }
@@ -83,12 +84,12 @@ const std::vector<MeshOutline*>& RenderContext::GetMeshOutlines() const
 	return m_culledMeshOutlines;
 }
 
-const std::vector<MeshRenderer*>& RenderContext::GetStaticMeshRenderers() const
+const std::vector<StaticMeshRenderer*>& RenderContext::GetStaticMeshRenderers() const
 {
 	return m_culledStaticMeshRenderers;
 }
 
-const std::vector<MeshRenderer*>& RenderContext::GetSkinnedMeshRenderers() const
+const std::vector<SkinnedMeshRenderer*>& RenderContext::GetSkinnedMeshRenderers() const
 {
 	return m_culledSkinnedMeshRenderers;
 }

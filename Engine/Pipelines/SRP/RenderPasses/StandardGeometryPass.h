@@ -8,6 +8,8 @@ CLASS_PTR(Scene)
 CLASS_PTR(Framebuffer)
 CLASS_PTR(RenderContext)
 CLASS_PTR(GBufferFramebuffer)
+CLASS_PTR(StaticMeshRenderer)
+CLASS_PTR(SkinnedMeshRenderer)
 #pragma endregion
 
 CLASS_PTR(StandardGeometryPass)
@@ -20,10 +22,10 @@ public:
 		int32 heigh = WINDOW_HEIGHT
 	);
 
-	void AddStaticMeshRenderer(MeshRenderer* staticMeshRenderer);
-	void AddSkinnedMeshRenderer(MeshRenderer* skinnedMeshRenderer);
-	const std::vector<MeshRenderer*>& GetSkinnedMeshRenderers() const;
-	const std::vector<MeshRenderer*>& GetStaticMeshRenderers() const;
+	void AddStaticMeshRenderer(StaticMeshRenderer* staticMeshRenderer);
+	void AddSkinnedMeshRenderer(SkinnedMeshRenderer* skinnedMeshRenderer);
+	const std::vector<StaticMeshRenderer*>& GetStaticMeshRenderers() const;
+	const std::vector<SkinnedMeshRenderer*>& GetSkinnedMeshRenderers() const;
 	GBufferFramebuffer* GetGBuffer() { return m_gBuffer.get(); }
 
 	virtual void Render(RenderContext* context) override;
@@ -32,12 +34,13 @@ public:
 private:
 	StandardGeometryPass() = default;
 	bool Init(int32 width, int32 height);
-	void RenderStaticGeometry(const std::vector<MeshRenderer*>& meshes);
-	void RenderSkinnedGeometry(const std::vector<MeshRenderer*>& meshes);
+	void RenderStaticGeometry(const std::vector<StaticMeshRenderer*>& meshes);
+	void RenderSkinnedGeometry(const std::vector<SkinnedMeshRenderer*>& meshes);
 
 	GBufferFramebufferUPtr m_gBuffer;
 	ProgramUPtr m_staticGeometryProgram;
 	ProgramUPtr m_skinnedGeometryProgram;
-	std::vector<MeshRenderer*> m_skinnedMeshRenderers;
-	std::vector<MeshRenderer*> m_staticMeshRenderers;
+	std::vector<StaticMeshRenderer*> m_staticMeshRenderers;
+	std::vector<SkinnedMeshRenderer*> m_skinnedMeshRenderers;
+
 };

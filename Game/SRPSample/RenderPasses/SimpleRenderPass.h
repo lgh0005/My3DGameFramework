@@ -5,6 +5,7 @@
 CLASS_PTR(Program)
 CLASS_PTR(Scene)
 CLASS_PTR(Camera)
+CLASS_PTR(StaticMeshRenderer)
 #pragma endregion
 
 CLASS_PTR(SimpleRenderPass)
@@ -14,12 +15,12 @@ public:
     static SimpleRenderPassUPtr Create(ProgramUPtr program);
     virtual void Render(Scene* scene, Camera* camera) override;
 
-    const std::vector<MeshRenderer*>& GetRenderers() const;
-    void AddRenderer(MeshRenderer* meshRenderer);
+    const std::vector<StaticMeshRenderer*>& GetRenderers() const;
+    void AddRenderer(StaticMeshRenderer* meshRenderer);
 
 private:
     SimpleRenderPass() = default;
     bool Init(ProgramUPtr program);
     ProgramUPtr m_simpleProgram;
-    std::vector<MeshRenderer*> m_renderers;
+    std::vector<StaticMeshRenderer*> m_renderers;
 };

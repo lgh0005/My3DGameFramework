@@ -5,7 +5,9 @@
 #pragma region FORWARD_DECLARATION
 CLASS_PTR(GameObject)
 CLASS_PTR(Component)
-CLASS_PTR(MeshRenderer)
+CLASS_PTR(StaticMeshRenderer)
+CLASS_PTR(SkinnedMeshRenderer)
+CLASS_PTR(InstancedMeshRenderer)
 CLASS_PTR(MeshOutline)
 CLASS_PTR(Light)
 CLASS_PTR(Camera)
@@ -92,8 +94,9 @@ protected:
 	std::vector<Script*>        m_scripts;
 	std::vector<AudioSource*>   m_audioSources;
 	std::vector<AudioListener*> m_audioListeners;
-	std::vector<MeshRenderer*>  m_staticMeshRenderers;
-	std::vector<MeshRenderer*>  m_skinnedMeshRenderers;
+	std::vector<StaticMeshRenderer*>  m_staticMeshRenderers;
+	std::vector<SkinnedMeshRenderer*>  m_skinnedMeshRenderers;
+	std::vector<InstancedMeshRenderer*> m_instancedMeshRenderers;
 	std::vector<MeshOutline*>   m_outlines;
 
 	// 하늘 텍스쳐

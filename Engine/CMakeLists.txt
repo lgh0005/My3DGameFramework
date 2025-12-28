@@ -104,6 +104,7 @@ add_library(Engine STATIC
    "Components/Light.h"             "Components/Light.cpp"
    "Components/Script.h"            "Components/Script.cpp"
    "Components/PhysicsComponent.h"  "Components/PhysicsComponent.cpp"
+   "Components/MeshRenderer.h"      "Components/MeshRenderer.cpp"
 
    "Components/Camera.h"            "Components/Camera.cpp"
    "Components/Transform.h"         "Components/Transform.cpp"
@@ -111,10 +112,12 @@ add_library(Engine STATIC
    "Components/PointLight.h"        "Components/PointLight.cpp"
    "Components/SpotLight.h"         "Components/SpotLight.cpp"
    "Components/Animator.h"          "Components/Animator.cpp"
-   "Components/MeshRenderer.h"      "Components/MeshRenderer.cpp"
    "Components/AudioSource.h"       "Components/AudioSource.cpp"
    "Components/AudioListener.h"     "Components/AudioListener.cpp"
    "Components/MeshOutline.h"       "Components/MeshOutline.cpp"
+   "Components/StaticMeshRenderer.h"   "Components/StaticMeshRenderer.cpp"
+   "Components/SkinnedMeshRenderer.h"  "Components/SkinnedMeshRenderer.cpp"
+   "Components/InstancedMeshRenderer.h" "Components/InstancedMeshRenderer.cpp"
 
    # Managers
    "Managers/TimeManager.h"         "Managers/TimeManager.cpp"
@@ -126,7 +129,7 @@ add_library(Engine STATIC
    "Managers/AudioManager.h"        "Managers/AudioManager.cpp"
    "Managers/PhysicsManager.h"      "Managers/PhysicsManager.cpp"
 
- )
+)
 
 # 2. [PCH 설정] EnginePCH.h를 PCH로 사용합니다.
 target_precompile_headers(Engine  PUBLIC EnginePCH.h)
