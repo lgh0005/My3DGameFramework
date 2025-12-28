@@ -35,6 +35,22 @@ public:
 	Transform& GetTransform();
 	const Transform& GetTransform() const;
 
+/*========================================//
+//   component life-cycle state methods   //
+//=========================================*/
+public:
+	// TODO : 추가해야 할 메서드
+	// 0. Awake
+	// 1. Start
+	// 2. FixedUpdate
+	// 3. Update
+	// 4. LateUpdate
+	
+	// TODO : 자신을 소유하는 게임 오브젝트 상태를
+	// 추적해서 상태를 추적하는 메서드를 작성
+	// 1. Destroy
+	// 2. SetActive
+
 protected:
 	GameObject* m_owner	   { nullptr };
 };

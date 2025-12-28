@@ -14,7 +14,7 @@ void AudioListener::Update()
 
 	// 2. 위치 및 방향 데이터 추출
 	// TODO: 계층 구조 도입 시 GetWorldPosition() 사용
-	glm::vec3 pos = transform.GetPosition();
+	glm::vec3 pos = transform.GetWorldPosition();
 	glm::vec3 fwd = transform.GetForwardVector();
 	glm::vec3 up = transform.GetUpVector();
 

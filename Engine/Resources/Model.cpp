@@ -3,6 +3,7 @@
 #include "Core/Scene.h"
 #include "Core/GameObject.h"
 #include "Components/Transform.h"
+#include "Components/Animator.h"
 #include "Components/StaticMeshRenderer.h"
 #include "Components/SkinnedMeshRenderer.h"
 #include "Resources/Mesh.h"
@@ -55,24 +56,82 @@ void Model::Draw(const Program* program) const
 /*======================================//
 //   3d model load instancing methods   //
 //======================================*/
-GameObject* Model::Instantiate(Scene* scene)
+GameObjectUPtr Model::Instantiate(Scene* scene, Animator* animator)
 {
-    if (!scene)
+    if (!scene || m_nodes.empty()) return nullptr;
+
+    // 2. 재귀 생성 시작 (받은 포인터를 그대로 넘김)
+    GameObjectUPtr root = CreateGameObjectFromNode(scene, nullptr, m_nodes[0], animator);
+
+    // TODO : 생명주기 초기화(Start 등)는 나중으로 미룸
+
+    return std::move(root);
+}
+
+GameObjectUPtr Model::CreateGameObjectFromNode
+(
+    Scene* scene,
+    GameObject* parent,
+    const AssetFmt::RawNode& node,
+    Animator* animator
+)
+{
+    // 1. GameObject 생성
+    auto goUPtr = GameObject::Create();
+    GameObject* currentGO = goUPtr.get();
+
+    // 2. 기본 정보 설정 (이름, Transform)
+    currentGO->SetName(node.name);
+    currentGO->GetTransform().SetLocalMatrix(node.localTransform);
+
+    // 3. 계층 구조 연결
+    if (parent) currentGO->SetParent(parent);
+
+    // 4. Mesh Renderer 부착
+    for (uint32 meshIndex : node.meshIndices)
     {
-        SPDLOG_ERROR("Scene is null during instantiation!");
-        return nullptr;
+        // 유효성 검사
+        if (meshIndex >= m_meshes.size()) continue;
+        auto meshRes = m_meshes[meshIndex];
+
+        // 머티리얼 찾기
+        uint32 matIdx = meshRes->GetMaterialIndex();
+        MaterialPtr material = nullptr;
+        if (matIdx < m_materials.size()) material = m_materials[matIdx];
+        else material = meshRes->GetMaterial();
+
+        // [Renderer 생성] 리소스 타입에 따라 분기
+        switch (meshRes->GetResourceType())
+        {
+            case ResourceType::StaticMesh:
+            {
+                auto staticMesh = std::static_pointer_cast<StaticMesh>(meshRes);
+                auto renderer = StaticMeshRenderer::Create(staticMesh, material);
+                currentGO->AddComponent(std::move(renderer));
+                break;
+            }
+
+            case ResourceType::SkinnedMesh:
+            {
+                auto skinnedMesh = std::static_pointer_cast<SkinnedMesh>(meshRes);
+                auto renderer = SkinnedMeshRenderer::Create(skinnedMesh, material, animator);
+                currentGO->AddComponent(std::move(renderer));
+                break;
+            }
+        }
     }
 
-    if (m_nodes.empty())
+    // 5. 자식 노드 재귀 호출 (Hierarchy 구성)
+    for (int32 childIndex : node.children)
     {
-        SPDLOG_WARN("Model has no nodes to instantiate.");
-        return nullptr;
+        if (childIndex >= 0 && childIndex < m_nodes.size())
+        {
+            GameObjectUPtr childGO = CreateGameObjectFromNode(scene, currentGO, m_nodes[childIndex], animator);
+            if (childGO) scene->AddGameObject(std::move(childGO));
+        }
     }
 
-    // TODO : Scene의 생명주기 설계 먼저 필요.
-    // 특히, "런타임에 Instantiate가 되려면" 현재 씬 생명주기를 먼저 잡아놔야함
-    // 이 메서드는 초기에 모델을 로드하는 것과 동시에 런타임에 모델이 생성되는
-    // 것도 같이 지원되어야 하는 입장이기에 먼저 씬의 생명주기를 잡아 놓는다.
+    return goUPtr;
 }
 
 /*=================================================================//
@@ -140,7 +199,9 @@ void Model::ProcessAssimpHierarchy(aiNode* node, int32 parentIndex, int32& curre
 
     int32 myIndex = currentIndex;
     m_nodes.push_back(rawNode);
-    if (parentIndex >= 0) m_nodes[parentIndex].children.push_back(myIndex);
+    if (parentIndex >= 0 && parentIndex < m_nodes.size())
+        m_nodes[parentIndex].children.push_back(myIndex);
+
     currentIndex++;
 
     for (uint32 i = 0; i < node->mNumChildren; i++)
@@ -195,7 +256,7 @@ void Model::ProcessAssimpMaterials(const aiScene* scene, const std::filesystem::
         material->ao = LoadTex(aiTextureType_AMBIENT_OCCLUSION);
         material->specular = LoadTex(aiTextureType_SPECULAR);
         material->height = LoadTex(aiTextureType_HEIGHT);
-        // [Glossiness Fallback]
+
         auto glossTex = LoadTex(aiTextureType_SHININESS);
         if (!material->roughness && glossTex)
         {
@@ -257,7 +318,10 @@ void Model::ProcessAssimpSkinnedMesh(aiMesh* mesh, const aiScene* scene)
     glMesh->SetLocalBounds(RenderBounds::CreateFromMinMax(minBound, maxBound));
 
     if (mesh->mMaterialIndex >= 0 && mesh->mMaterialIndex < m_materials.size())
+    {
         glMesh->SetMaterial(m_materials[mesh->mMaterialIndex]);
+        glMesh->SetMaterialIndex(mesh->mMaterialIndex);
+    }
 
     m_meshes.push_back(std::move(glMesh));
 }
@@ -302,7 +366,10 @@ void Model::ProcessAssimpStaticMesh(aiMesh* mesh, const aiScene* scene)
     glMesh->SetLocalBounds(RenderBounds::CreateFromMinMax(minBound, maxBound));
 
     if (mesh->mMaterialIndex >= 0 && mesh->mMaterialIndex < m_materials.size())
+    {
         glMesh->SetMaterial(m_materials[mesh->mMaterialIndex]);
+        glMesh->SetMaterialIndex(mesh->mMaterialIndex);
+    }
 
     m_meshes.push_back(std::move(glMesh));
 }
@@ -504,7 +571,8 @@ void Model::CreateBinarySkinnedMesh(const AssetFmt::RawMesh& rawMesh)
         dst.texCoord = src.texCoord;
         dst.tangent = src.tangent;
 
-        for (int j = 0; j < 4; ++j) {
+        for (int j = 0; j < 4; ++j) 
+        {
             dst.weights[j] = src.weights[j];
             dst.boneIDs[j] = src.boneIDs[j];
         }
@@ -518,7 +586,10 @@ void Model::CreateBinarySkinnedMesh(const AssetFmt::RawMesh& rawMesh)
     
     // 4. 머티리얼 연결
     if (rawMesh.materialIndex < m_materials.size())
+    {
         mesh->SetMaterial(m_materials[rawMesh.materialIndex]);
+        mesh->SetMaterialIndex(rawMesh.materialIndex);
+    }
 
     // 5. 등록
     m_meshes.push_back(std::move(mesh));
@@ -547,7 +618,10 @@ void Model::CreateBinaryStaticMesh(const AssetFmt::RawMesh& rawMesh)
 
     // 4. 머티리얼 연결
     if (rawMesh.materialIndex < m_materials.size())
+    {
         mesh->SetMaterial(m_materials[rawMesh.materialIndex]);
+        mesh->SetMaterialIndex(rawMesh.materialIndex);
+    }
 
     // 5. 등록
     m_meshes.push_back(std::move(mesh));

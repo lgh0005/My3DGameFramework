@@ -35,7 +35,7 @@ void EnvironmentRenderPass::Render(Scene* scene, Camera* camera)
 {
 	auto projection = camera->GetProjectionMatrix();
 	auto view = camera->GetViewMatrix();
-	auto cameraPos = camera->GetTransform().GetPosition();
+	auto cameraPos = camera->GetTransform().GetWorldPosition();
 
 	// TEMP : 이는 현재 큐브에 환경맵 텍스쳐를 입힌 것 뿐
 	// 이후에 PBR 기반 렌더링 시 다르게 사용할 수 있음

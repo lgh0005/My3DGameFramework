@@ -71,8 +71,6 @@ protected:
 //================================*/
 protected:
 	void UpdateBehaviours();
-	void UpdateTransforms();
-	void UpdateTransformRecursive(GameObject* go);
 	void UpdateSceneSystems();
 
 protected:

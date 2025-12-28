@@ -16,9 +16,11 @@ public:
 	int32 GetBoneCount() const; 
 	int32 GetBoneID(const std::string& name) const;
 	int32 AddBone(const std::string& name, const glm::mat4& offset);
+	const glm::mat4& GetBoneOffset(int32 boneID) const;
 
 private:
 	Skeleton() = default;
 	BoneMap m_boneInfoMap;
-	int32 m_boneCounter = 0;
+	int32 m_boneCounter	{ 0 };
+	std::vector<glm::mat4> m_boneOffsets;
 };

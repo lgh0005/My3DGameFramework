@@ -174,7 +174,7 @@ void Scene::Update()
 	UpdateBehaviours();
 
 	// [Phase 2] Transforms (Calculation)
-	UpdateTransforms();
+	// UpdateTransforms();
 
 	// [Phase 3] Systems (Output)
 	UpdateSceneSystems();
@@ -193,36 +193,6 @@ void Scene::UpdateBehaviours()
 
 	// 2. 애니메이터 Update
 	for (auto* animator : m_animators) animator->Update();
-}
-
-void Scene::UpdateTransforms()
-{
-	// 1. 루트 오브젝트만 찾아서 계층 순회 시작
-	for (auto& go : m_gameObjects)
-	{
-		if (go->GetTransform().GetParent() == nullptr)
-			UpdateTransformRecursive(go.get());
-	}
-}
-
-void Scene::UpdateTransformRecursive(GameObject* go)
-{
-	if (!go) return;
-
-	// [SetActive 로직] 
-	// Unity/Unreal 방식: 부모가 비활성되면 자식도 로직상 비활성 취급
-	// 따라서 여기서 IsActive 체크를 해서, 꺼져있으면 자식들 순회도 안 하고 리턴
-	// if (!go->IsActive()) return;
-
-	// 1. 내 월드 행렬 갱신
-	go->GetTransform().Update();
-
-	// 2. 자식들 재귀 호출
-	for (Transform* childTransform : go->GetTransform().GetChildren())
-	{
-		GameObject* childGO = childTransform->GetOwner();
-		if (childGO) UpdateTransformRecursive(childGO);
-	}
 }
 
 void Scene::UpdateSceneSystems()

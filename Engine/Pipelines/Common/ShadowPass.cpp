@@ -115,7 +115,7 @@ glm::mat4 ShadowPass::CalculateLightSpaceMatrix(Light* light)
 
 	// 행렬 연산에 필요한 것들을 가져오기
 	auto& transform = light->GetTransform();
-	glm::vec3 pos = transform.GetPosition();
+	glm::vec3 pos = transform.GetWorldPosition();
 	glm::vec3 dir = transform.GetForwardVector();
 	glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f);
 	glm::mat4 lightProjection;
@@ -127,17 +127,17 @@ glm::mat4 ShadowPass::CalculateLightSpaceMatrix(Light* light)
 	float farPlane = 100.0f;
 	switch (light->GetComponentType())
 	{
-	case ComponentType::DirectionalLight:
-		lightProjection = glm::ortho(-size, size, -size, size, nearPlane, farPlane);
-		break;
+		case ComponentType::DirectionalLight:
+			lightProjection = glm::ortho(-size, size, -size, size, nearPlane, farPlane);
+			break;
 
-	case ComponentType::SpotLight:
-		glm::vec2 cutoff = static_cast<SpotLight*>(light)->GetCutoff();
-		lightProjection = glm::perspective(glm::radians((cutoff[0] + cutoff[1]) * 2.0f),
-			1.0f, 1.0f, 100.0f);
-		break;
+		case ComponentType::SpotLight:
+			glm::vec2 cutoff = static_cast<SpotLight*>(light)->GetCutoff();
+			lightProjection = glm::perspective(glm::radians((cutoff[0] + cutoff[1]) * 2.0f),
+				1.0f, 1.0f, 100.0f);
+			break;
 
-	// TODO : Point Light에 대한 그림자 처리는 이후에 고려 필요
+		// TODO : Point Light에 대한 그림자 처리는 이후에 고려 필요
 	}
 
 	// 조명 기준의 VP 행렬 반환

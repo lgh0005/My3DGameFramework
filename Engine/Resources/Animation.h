@@ -14,30 +14,29 @@ class Animation : public Resource
 public:
     static const ResourceType s_ResourceType = ResourceType::Animation;
     virtual ResourceType GetResourceType() const override { return ResourceType::Animation; }
+
+    // TODO : .myanim 전용 Load 메서드와 애니메이션 파일 전용 Load 메서드를 따로 만들 필요는 있어보인다.
 	static AnimationUPtr Load(const std::string& filePath, Model* model = nullptr);
 
     AnimChannel* FindChannel(const std::string& name);
     float GetTicksPerSecond() const { return m_ticksPerSecond; }
     float GetDuration() const { return m_duration; }
+    const std::string& GetName() const { return m_name; }
 
-/*====================================================================//
-//   keyframe load process methods : assimp (raw 3d keyframe files)   //
-//====================================================================*/
+/*===================================//
+//   keyframe load process methods   //
+//===================================*/
 private:
     bool LoadByAssimp(const std::string& filePath, Model* model);
-    void ReadMissingBones(const aiAnimation* animation, Model& model);
-
-/*=======================================================//
-//   .myanim file load process methods : .myanim file    //
-//=======================================================*/
-private:
     bool LoadByBinary(const std::string& filePath);
+    void ParseAssimpChannels(const aiAnimation* animation);
 
 private:
     Animation() = default;
 
     std::string m_name;
-    float m_duration;
-    float m_ticksPerSecond;
+    float m_duration            { 0.0f };
+    float m_ticksPerSecond      { 0.0f };
     std::vector<AnimChannelUPtr> m_channels;
+    std::unordered_map<std::string, AnimChannel*> m_channelMap;
 };

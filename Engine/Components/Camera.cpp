@@ -40,7 +40,7 @@ void Camera::SetAspectRatio(float aspectRatio)
 glm::mat4 Camera::GetViewMatrix() const
 {
     const Transform& transform = GetTransform();
-    glm::vec3 position = transform.GetPosition();
+    glm::vec3 position = transform.GetWorldPosition();
     glm::vec3 forward = transform.GetForwardVector();
     glm::vec3 up = transform.GetUpVector();
     return glm::lookAt(position, position + forward, up);
@@ -59,7 +59,7 @@ glm::mat4 Camera::GetViewProjectionMatrix() const
 void Camera::LookAt(const glm::vec3& target, const glm::vec3& up)
 {
     Transform& transform = GetTransform();
-    glm::vec3 position = transform.GetPosition();
+    glm::vec3 position = transform.GetWorldPosition();
     glm::vec3 direction = glm::normalize(target - position);
     glm::quat rotation = glm::quatLookAt(direction, up);
     transform.SetRotation(rotation);

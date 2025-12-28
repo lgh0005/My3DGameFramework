@@ -8,36 +8,71 @@ TransformUPtr Transform::Create()
 	return transform;
 }
 
-void Transform::Update()
+/*====================================================//
+//                 Core Logic (Lazy Update)           //
+//====================================================*/
+void Transform::UpdateTransform() const
 {
-	if (!m_isTransformDirty) return;
+	// 1. 부모가 있다면 부모부터 최신 상태인지 확인
+	if (m_parent) m_parent->GetWorldMatrix();
 
-	// 1. 로컬 행렬은 여기서 잠깐 계산하고
+	// 2. 로컬 행렬 계산 (SRT)
 	glm::mat4 localMat = GetLocalMatrix();
 
-	// 2. 월드 행렬(멤버)에 결과를 저장
+	// 3. 월드 행렬 계산
 	if (m_parent) m_worldMatrix = m_parent->GetWorldMatrix() * localMat;
 	else m_worldMatrix = localMat;
 
-	// 3. 월드 좌표계 상의 데이터 갱신
-	UpdateWorldTransform();
+	// 4. 월드 속성 캐싱 (Position, Rotation, Scale 분해)
+	m_worldPosition = glm::vec3(m_worldMatrix[3]);
+	m_worldScale.x = glm::length(glm::vec3(m_worldMatrix[0]));
+	m_worldScale.y = glm::length(glm::vec3(m_worldMatrix[1]));
+	m_worldScale.z = glm::length(glm::vec3(m_worldMatrix[2]));
 
-	// 3. 갱신을 했으므로 더 이상 dirty하지 않음.
+	if (m_worldScale.x <= glm::epsilon<float>() ||
+		m_worldScale.y <= glm::epsilon<float>() ||
+		m_worldScale.z <= glm::epsilon<float>())
+	{
+		m_worldRotation = glm::quat(1.0f, 0.0f, 0.0f, 0.0f);
+	}
+	else
+	{
+		glm::mat3 rotationMat;
+		rotationMat[0] = glm::vec3(m_worldMatrix[0]) / m_worldScale.x;
+		rotationMat[1] = glm::vec3(m_worldMatrix[1]) / m_worldScale.y;
+		rotationMat[2] = glm::vec3(m_worldMatrix[2]) / m_worldScale.z;
+		m_worldRotation = glm::quat_cast(rotationMat);
+	}
+
+	// 5. 갱신 완료 -> Dirty 해제
 	m_isTransformDirty = false;
 }
 
-/*====================//
-//  position methods  //
-//====================*/
+void Transform::UpdateWorldInverseTransform() const
+{
+	m_worldInverseMatrix = glm::affineInverse(m_worldMatrix);
+	m_isWorldInverseDirty = false;
+}
+
+void Transform::SetTransformDirty()
+{
+	// 이미 Dirty라면 자식들도 이미 Dirty일 것이므로 패스 (중복 호출 방지)
+	if (m_isTransformDirty) return;
+
+	m_isTransformDirty = true;
+	m_isWorldInverseDirty = true;
+
+	// 자식들도 다 Dirty로 만듦 (부모가 움직이면 자식도 월드 좌표가 바뀌니까)
+	for (Transform* child : m_children) child->SetTransformDirty();
+}
+
+/*====================================================//
+//                 Transformation (Local)             //
+//====================================================*/
 void Transform::SetPosition(const glm::vec3& position)
 {
 	m_position = position;
 	SetTransformDirty();
-}
-
-const glm::vec3& Transform::GetPosition() const
-{
-	return m_position;
 }
 
 void Transform::Translate(const glm::vec3& delta)
@@ -46,9 +81,6 @@ void Transform::Translate(const glm::vec3& delta)
 	SetTransformDirty();
 }
 
-/*====================//
-//  rotation methods  //
-//====================*/
 void Transform::SetRotation(const glm::vec3& eulerAnglesDegrees)
 {
 	glm::vec3 eulerRadians = glm::radians(eulerAnglesDegrees);
@@ -62,12 +94,6 @@ void Transform::SetRotation(const glm::quat& rotation)
 	SetTransformDirty();
 }
 
-void Transform::SetRotation(const glm::vec3& axis, float angleRadians)
-{
-	m_rotation = glm::angleAxis(angleRadians, glm::normalize(axis));
-	SetTransformDirty();
-}
-
 void Transform::Rotate(const glm::vec3& eulerAnglesDegrees)
 {
 	glm::vec3 eulerRadians = glm::radians(eulerAnglesDegrees);
@@ -77,59 +103,78 @@ void Transform::Rotate(const glm::vec3& eulerAnglesDegrees)
 	SetTransformDirty();
 }
 
-glm::vec3 Transform::GetRotationEuler() const
-{
-	glm::vec3 eulerRadians = glm::eulerAngles(m_rotation);
-	return glm::degrees(eulerRadians);
-}
-
-const glm::quat& Transform::GetRotationQuat() const
-{
-	return m_rotation;
-}
-
-/*=================//
-//  scale methods  //
-//=================*/
 void Transform::SetScale(const glm::vec3& scale)
 {
 	m_scale = scale;
 	SetTransformDirty();
 }
 
-const glm::vec3& Transform::GetScale() const
+glm::vec3 Transform::GetRotationEuler() const
 {
-	return m_scale;
+	glm::vec3 eulerRadians = glm::eulerAngles(m_rotation);
+	return glm::degrees(eulerRadians);
 }
 
-/*============================//
-//  direction vector methods  //
-//============================*/
+/*====================================================//
+//                 World Properties (Getter)          //
+//====================================================*/
+glm::mat4 Transform::GetWorldMatrix() const
+{
+	if (m_isTransformDirty) UpdateTransform();
+	return m_worldMatrix;
+}
+
+glm::mat4 Transform::GetWorldInverseMatrix() const
+{
+	if (m_isTransformDirty) UpdateTransform();
+	if (m_isWorldInverseDirty) UpdateWorldInverseTransform();
+	return m_worldInverseMatrix;
+}
+
+glm::vec3 Transform::GetWorldPosition() const
+{
+	if (m_isTransformDirty) UpdateTransform();
+	return m_worldPosition;
+}
+
+glm::vec3 Transform::GetWorldScale() const
+{
+	if (m_isTransformDirty) UpdateTransform();
+	return m_worldScale;
+}
+
+glm::quat Transform::GetWorldRotation() const
+{
+	if (m_isTransformDirty) UpdateTransform();
+	return m_worldRotation;
+}
+
 glm::vec3 Transform::GetForwardVector() const
 {
-	return glm::normalize(glm::vec3(m_worldMatrix[2])) * -1.0f;
+	glm::mat4 world = GetWorldMatrix();
+	return glm::normalize(glm::vec3(world[2])) * -1.0f;
 }
 
 glm::vec3 Transform::GetUpVector() const
 {
-	return glm::normalize(glm::vec3(m_worldMatrix[1]));
+	glm::mat4 world = GetWorldMatrix();
+	return glm::normalize(glm::vec3(world[1]));
 }
 
 glm::vec3 Transform::GetRightVector() const
 {
-	return glm::normalize(glm::vec3(m_worldMatrix[0]));
+	glm::mat4 world = GetWorldMatrix();
+	return glm::normalize(glm::vec3(world[0]));
 }
 
-/*==========================//
-//  calculate model matrix  //
-//==========================*/
+/*====================================================//
+//                 Matrix Calculation                 //
+//====================================================*/
 void Transform::SetLocalMatrix(const glm::mat4& matrix)
 {
-	glm::vec3 scale;
-	glm::quat rotation;
-	glm::vec3 translation;
-	glm::vec3 skew;
+	glm::vec3 scale, translation, skew;
 	glm::vec4 perspective;
+	glm::quat rotation;
 
 	if (glm::decompose(matrix, scale, rotation, translation, skew, perspective))
 	{
@@ -152,29 +197,37 @@ glm::mat4 Transform::GetLocalMatrix() const
 	return transMat * rotMat * scaleMat;
 }
 
-glm::mat4 Transform::GetWorldMatrix() const
-{
-	return m_worldMatrix;
-}
-
-/*==========================//
-//  hierarchical structure  //
-//==========================*/
+/*====================================================//
+//                 Hierarchy System                   //
+//====================================================*/
 void Transform::SetParent(Transform* parent)
 {
-	// 1. 자기 자신을 부모로 설정하거나 이미 올바른 부모로
-	// 설정되었다면 return.
+	// 1. 자기 자신이나, 이미 같은 부모라면 무시
 	if (this == parent || m_parent == parent) return;
 
-	// 2. 이전 부모가 남아 있는 것이 있다면 갱신 및 새 부모 설정
+	// 2. 기존 부모와의 연결 끊기
 	if (m_parent) m_parent->RemoveChild(this);
+
+	// 3. 새 부모 설정
 	m_parent = parent;
 
-	// 3. 자식 명단에 등록
+	// 4. 새 부모의 자식 리스트에 등록
 	if (m_parent) m_parent->AddChild(this);
 
-	// TODO: 부모가 바뀌었으니 월드 행렬을 다시 계산해야 함 (Dirty Flag 등)
-	Update();
+	// 5. 부모가 바뀌었으므로 월드 행렬을 다시 계산해야 함 (Dirty 마킹)
+	SetTransformDirty();
+}
+
+void Transform::AddChild(Transform* child)
+{
+	auto it = std::find(m_children.begin(), m_children.end(), child);
+	if (it == m_children.end()) m_children.push_back(child);
+}
+
+void Transform::RemoveChild(Transform* child)
+{
+	auto it = std::find(m_children.begin(), m_children.end(), child);
+	if (it != m_children.end()) m_children.erase(it);
 }
 
 GameObject* Transform::GetChildGameObjectByIndex(usize index) const
@@ -187,59 +240,10 @@ GameObject* Transform::GetChildGameObjectByName(const std::string& name) const
 {
 	for (Transform* child : m_children)
 	{
-		GameObject* owner = child->GetOwner(); 
+		GameObject* owner = child->GetOwner();
 		if (!owner) continue;
 		if (owner->GetName() == name) return owner;
 	}
 
 	return nullptr;
-}
-
-void Transform::AddChild(Transform* child)
-{
-	// 이미 있는지 확인하고 넣음 (중복 방지)
-	auto it = std::find(m_children.begin(), m_children.end(), child);
-	if (it == m_children.end()) m_children.push_back(child);
-}
-
-void Transform::RemoveChild(Transform* child)
-{
-	auto it = std::find(m_children.begin(), m_children.end(), child);
-	if (it != m_children.end()) m_children.erase(it);
-}
-
-void Transform::UpdateWorldTransform()
-{
-	// 1. 위치 갱신
-	m_worldPosition = glm::vec3(m_worldMatrix[3]);
-
-	// 2. 스케일 갱신
-	m_worldScale.x = glm::length(glm::vec3(m_worldMatrix[0]));
-	m_worldScale.y = glm::length(glm::vec3(m_worldMatrix[1]));
-	m_worldScale.z = glm::length(glm::vec3(m_worldMatrix[2]));
-
-	// 3. 회전 갱신
-	if (m_worldScale.x <= 0.0001f || m_worldScale.y <= 0.0001f || m_worldScale.z <= 0.0001f)
-		m_worldRotation = glm::quat(1.0f, 0.0f, 0.0f, 0.0f);
-	else
-	{
-		glm::mat3 rotationMat;
-		rotationMat[0] = glm::vec3(m_worldMatrix[0]) / m_worldScale.x;
-		rotationMat[1] = glm::vec3(m_worldMatrix[1]) / m_worldScale.y;
-		rotationMat[2] = glm::vec3(m_worldMatrix[2]) / m_worldScale.z;
-		m_worldRotation = glm::quat_cast(rotationMat);
-	}
-}
-
-void Transform::SetTransformDirty()
-{
-	// 1. 이미 dirty 상태라면, 자식들도 이미 dirty일 테니 중복 호출 방지
-	if (m_isTransformDirty) return;
-
-	// 2. 나를 Dirty로 마킹
-	m_isTransformDirty = true;
-
-	// 3. 내 자식들도 전부 Dirty로 전파 (재귀 호출)
-	for (Transform* child : m_children)
-		child->SetTransformDirty();
 }

@@ -447,12 +447,72 @@ bool DevScene::CreateSceneContext()
 		AddGameObject(std::move(cubeObj));
 	}
 
-	// 7. 모델
+	//// 7. 모델
+	//{
+	//	// 1. 리소스 먼저 확보 (Model과 Animation)
+	//	auto model = RESOURCE.GetResource<Model>("aliensoldier");
+	//	auto anim1 = RESOURCE.GetResource<Animation>("Idle");
+	//	auto anim2 = RESOURCE.GetResource<Animation>("Walk");
+	//	auto animCtrl = AnimController::Create();
+	//	animCtrl->AddState("Idle", anim1);
+	//	animCtrl->AddState("Walk", anim2);
+	//	animCtrl->SetTransitionDuration("Idle", "Walk", 0.2f);
+	//	animCtrl->SetTransitionDuration("Walk", "Idle", 0.2f);
+	//	animCtrl->SetStartState("Idle");
+
+	//	// 2. GameObject 생성
+	//	auto modelGo = GameObject::Create();
+	//	modelGo->SetName("Soldier");
+	//	modelGo->GetTransform().SetPosition(glm::vec3(2.0f, 0.0f, -2.0f));
+	//	modelGo->GetTransform().SetScale(glm::vec3(0.025f));
+
+	//	// 3. 애니메이터 생성
+	//	auto animator = Animator::Create(model, std::move(animCtrl));
+
+	//	// 4. Model 안의 모든 Mesh 조각을 MeshRenderer 컴포넌트로 추가
+	//	for (uint32 i = 0; i < model->GetMeshCount(); ++i)
+	//	{
+	//		// TEMP : 우선은 메쉬를 욱여넣기
+	//		SkinnedMeshPtr mesh = model->GetSkinnedMesh(i);
+	//		auto renderer = SkinnedMeshRenderer::Create(mesh, mesh->GetMaterial(), animator.get());
+	//		modelGo->AddComponent(std::move(renderer));
+	//	}
+	//	if (animator) modelGo->AddComponent(std::move(animator));
+
+	//	// 5. PlayerController
+	//	auto script = PlayerController::Create();
+	//	modelGo->AddComponent(std::move(script));
+
+	//	// 5. 씬에 GameObject 등록
+	//	AddGameObject(std::move(modelGo));
+	//}
+
+	//// 가방
+	//{
+	//	auto modelGo = GameObject::Create();
+	//	modelGo->SetName("Backpack");
+	//	modelGo->GetTransform().SetPosition(glm::vec3(6.0f, 1.0f, -6.0f));
+	//	modelGo->GetTransform().SetScale(glm::vec3(1.5f));
+
+	//	auto model = RESOURCE.GetResource<Model>("backpack");
+	//	for (uint32 i = 0; i < model->GetMeshCount(); ++i)
+	//	{
+	//		StaticMeshPtr mesh = model->GetStaticMesh(i);
+	//		auto renderer = StaticMeshRenderer::Create(mesh, mesh->GetMaterial());
+	//		modelGo->AddComponent((std::move(renderer)));
+	//	}
+
+	//	AddGameObject(std::move(modelGo));
+	//}
+
+	// 7. 모델 (Alien Soldier - Skinned Mesh)
 	{
-		// 1. 리소스 먼저 확보 (Model과 Animation)
+		// 1. 리소스 확보
 		auto model = RESOURCE.GetResource<Model>("aliensoldier");
 		auto anim1 = RESOURCE.GetResource<Animation>("Idle");
 		auto anim2 = RESOURCE.GetResource<Animation>("Walk");
+
+		// 2. AnimController 생성 및 설정
 		auto animCtrl = AnimController::Create();
 		animCtrl->AddState("Idle", anim1);
 		animCtrl->AddState("Walk", anim2);
@@ -460,49 +520,59 @@ bool DevScene::CreateSceneContext()
 		animCtrl->SetTransitionDuration("Walk", "Idle", 0.2f);
 		animCtrl->SetStartState("Idle");
 
-		// 2. GameObject 생성
-		auto modelGo = GameObject::Create();
-		modelGo->SetName("Soldier");
-		modelGo->GetTransform().SetPosition(glm::vec3(2.0f, 0.0f, -2.0f));
-		modelGo->GetTransform().SetScale(glm::vec3(0.025f));
-
-		// 3. 애니메이터 생성
+		// 3. Animator 컴포넌트 미리 생성
+		// (Instantiate 내부에서 SkinnedMeshRenderer들이 바인딩할 때 필요하므로 포인터 따기)
 		auto animator = Animator::Create(model, std::move(animCtrl));
+		Animator* animatorPtr = animator.get();
 
-		// 4. Model 안의 모든 Mesh 조각을 MeshRenderer 컴포넌트로 추가
-		for (uint32 i = 0; i < model->GetMeshCount(); ++i)
+		// 4. Instantiate (이제 한 줄로 끝!)
+		// 내부에서 노드 계층 구조 생성 + 자식들 Scene 등록 + 렌더러 부착까지 다 해줍니다.
+		GameObjectUPtr rootUPtr = model->Instantiate(this, animatorPtr);
+
+		if (rootUPtr)
 		{
-			// TEMP : 우선은 메쉬를 욱여넣기
-			SkinnedMeshPtr mesh = model->GetSkinnedMesh(i);
-			auto renderer = SkinnedMeshRenderer::Create(mesh, mesh->GetMaterial(), animator.get());
-			modelGo->AddComponent(std::move(renderer));
+			GameObject* rootGO = rootUPtr.get();
+
+			// 5. Root 설정 (이름, Transform)
+			rootGO->SetName("Soldier");
+			rootGO->GetTransform().SetPosition(glm::vec3(2.0f, 0.0f, -2.0f));
+			rootGO->GetTransform().SetScale(glm::vec3(0.025f));
+			rootGO->GetTransform().SetRotation(glm::vec3(0.0f, 45.0f, 0.0f));
+
+			// 6. 핵심 컴포넌트 부착
+			// (GameObject::AddComponent 수정 덕분에 Scene에 자동 등록됨)
+			rootGO->AddComponent(std::move(animator));
+			rootGO->AddComponent(PlayerController::Create());
+
+			// 7. 마지막으로 Root를 씬에 입주 신고
+			AddGameObject(std::move(rootUPtr));
+
+			SPDLOG_INFO("AlienSoldier instantiated successfully!");
 		}
-		if (animator) modelGo->AddComponent(std::move(animator));
-
-		// 5. PlayerController
-		auto script = PlayerController::Create();
-		modelGo->AddComponent(std::move(script));
-
-		// 5. 씬에 GameObject 등록
-		AddGameObject(std::move(modelGo));
 	}
 
-	// 가방
+	// 가방 (Backpack - Static Mesh)
 	{
-		auto modelGo = GameObject::Create();
-		modelGo->SetName("Backpack");
-		modelGo->GetTransform().SetPosition(glm::vec3(6.0f, 1.0f, -6.0f));
-		modelGo->GetTransform().SetScale(glm::vec3(1.5f));
-
 		auto model = RESOURCE.GetResource<Model>("backpack");
-		for (uint32 i = 0; i < model->GetMeshCount(); ++i)
-		{
-			StaticMeshPtr mesh = model->GetStaticMesh(i);
-			auto renderer = StaticMeshRenderer::Create(mesh, mesh->GetMaterial());
-			modelGo->AddComponent((std::move(renderer)));
-		}
 
-		AddGameObject(std::move(modelGo));
+		// 1. Instantiate (애니메이터 없으므로 nullptr 전달)
+		// StaticMeshRenderer는 Animator 인자가 필요 없으므로 안전함.
+		GameObjectUPtr rootUPtr = model->Instantiate(this);
+
+		if (rootUPtr)
+		{
+			GameObject* rootGO = rootUPtr.get();
+
+			// 2. Root 설정
+			rootGO->SetName("Backpack");
+			rootGO->GetTransform().SetPosition(glm::vec3(6.0f, 2.0f, -6.0f));
+			rootGO->GetTransform().SetScale(glm::vec3(0.0125f));
+
+			// 3. 추가 컴포넌트가 없다면 바로 입주 신고
+			AddGameObject(std::move(rootUPtr));
+
+			SPDLOG_INFO("Backpack instantiated successfully!");
+		}
 	}
 
 	// 잔디밭

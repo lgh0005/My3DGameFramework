@@ -6,6 +6,7 @@
 #pragma region FORWARD_DECLARATION
 CLASS_PTR(Model)
 CLASS_PTR(AnimController)
+CLASS_PTR(Transform)
 #pragma endregion
 
 CLASS_PTR(Animator)
@@ -21,9 +22,23 @@ public:
 	const std::vector<glm::mat4>& GetFinalBoneMatrices() const { return m_finalBoneMatrices; }
 	const RenderBounds& GetCurrentLocalBounds() const { return m_currentLocalAABB; }
 
+/*========================================//
+//   animation initialize logic methods   //
+//========================================*/
+private:
+	void BindBoneTransforms();
+	void RecursiveBindBoneTransforms(Transform* nodeTransform);
+
 /*====================================//
 //   animation update logic methods   //
 //====================================*/
+private:
+	void UpdateAnimationToTransforms();
+	void CalculateFinalBoneMatrices();
+
+/*==============//
+//   legacies   //
+//==============*/
 private:
 	void UpdateAnimationController();
 	void UpdateBoneTransforms();
@@ -33,13 +48,20 @@ private:
 	Animator() = default;
 	bool Init(ModelPtr model, AnimControllerUPtr controller);
 
-	std::vector<glm::mat4> m_finalBoneMatrices;
-	std::vector<glm::mat4> m_globalTransforms; // TEMP
-	std::vector<glm::vec3> m_globalJointPositions;
-	std::vector<Pose>	   m_poses;
-
 	ModelPtr m_currentModel;
 	AnimControllerUPtr m_controller;
 
+	std::vector<glm::mat4> m_finalBoneMatrices;
+	std::unordered_map<std::string, Transform*> m_boneTransformMap;
+	std::vector<Transform*> m_skinningTransforms;
+
 	RenderBounds m_currentLocalAABB;
+
+/*==============//
+//   legacies   //
+//==============*/
+private:
+	std::vector<glm::mat4> m_globalTransforms; // TEMP
+	std::vector<glm::vec3> m_globalJointPositions;
+	std::vector<Pose>	   m_poses;
 };

@@ -10,40 +10,59 @@ public:
 	static TransformUPtr Create();
 	static const ComponentType s_ComponentType = ComponentType::Transform;
 	virtual ComponentType GetComponentType() const override { return ComponentType::Transform; }
-	void Update();
 
+/*====================================================//
+//                 Transformation (Local)             //
+//====================================================*/
+public:
 	// 위치
 	void SetPosition(const glm::vec3& position);
-	const glm::vec3& GetPosition() const;
+	void SetLocalPosition(const glm::vec3& position) { SetPosition(position); }
+	const glm::vec3& GetLocalPosition() const { return m_position; }
 	void Translate(const glm::vec3& delta);
 
 	// 회전
 	void SetRotation(const glm::vec3& eulerAnglesDegrees);
 	void SetRotation(const glm::quat& rotation);
+	void SetLocalRotation(const glm::quat& rotation) { SetRotation(rotation); }
 	void SetRotation(const glm::vec3& axis, float angleRadians);
-	glm::vec3 GetRotationEuler() const;
-	const glm::quat& GetRotationQuat() const;
 	void Rotate(const glm::vec3& eulerAnglesDegrees);
+	const glm::quat& GetLocalRotation() const { return m_rotation; }
+	glm::vec3 GetRotationEuler() const;
 
 	// 스케일
 	void SetScale(const glm::vec3& scale);
-	const glm::vec3& GetScale() const;
+	void SetLocalScale(const glm::vec3& scale) { SetScale(scale); }
+	const glm::vec3& GetLocalScale() const { return m_scale; }
 
+/*====================================================//
+//                 World Properties (Getter)          //
+//====================================================*/
+public:
 	// 월드 좌표계
-	glm::vec3 Transform::GetWorldPosition() const { return m_worldPosition; }
-	glm::vec3 Transform::GetWorldScale() const { return m_worldScale; }
-	glm::quat Transform::GetWorldRotation() const { return m_worldRotation; }
+	glm::vec3 Transform::GetWorldPosition() const;
+	glm::vec3 Transform::GetWorldScale()	const;
+	glm::quat Transform::GetWorldRotation() const;
 
 	// 방향 벡터
 	glm::vec3 GetForwardVector() const; // 앞쪽   (-Z)
 	glm::vec3 GetUpVector() const;      // 위쪽   (+Y)
 	glm::vec3 GetRightVector() const;   // 오른쪽 (+X)
 
+/*====================================================//
+//                 Matrix Calculation                 //
+//====================================================*/
+public:
 	// 월드 또는 로컬 모델 행렬
 	void SetLocalMatrix(const glm::mat4& matrix);
 	glm::mat4 GetLocalMatrix() const;
 	glm::mat4 GetWorldMatrix() const;
+	glm::mat4 GetWorldInverseMatrix() const;
 
+/*====================================================//
+//                 Hierarchy System                   //
+//====================================================*/
+public:
 	// 계층 구조
 	void SetParent(Transform* parent);
 	Transform* GetParent() const { return m_parent; }
@@ -54,22 +73,24 @@ public:
 private:
 	void AddChild(Transform* child);
 	void RemoveChild(Transform* child);
-	void UpdateWorldTransform();
+	void UpdateTransform() const;
+	void UpdateWorldInverseTransform() const;
 	void SetTransformDirty();
-
-	glm::mat4 m_worldMatrix { 1.0f };
-	bool m_isTransformDirty	{ true };
 
 private:
 	Transform() = default;
-	glm::vec3 m_position		{ 0.0f, 0.0f, 0.0f };
-	glm::quat m_rotation		{ 1.0f, 0.0f, 0.0f, 0.0f };
-	glm::vec3 m_scale			{ 1.0f, 1.0f, 1.0f };
+	glm::vec3 m_position				{ 0.0f, 0.0f, 0.0f };
+	glm::quat m_rotation				{ 1.0f, 0.0f, 0.0f, 0.0f };
+	glm::vec3 m_scale					{ 1.0f, 1.0f, 1.0f };
 
-	glm::vec3 m_worldPosition	{ 0.0f, 0.0f, 0.0f };
-	glm::quat m_worldRotation	{ 1.0f, 0.0f, 0.0f, 0.0f };
-	glm::vec3 m_worldScale		{ 1.0f, 1.0f, 1.0f };
-
-	Transform* m_parent		{ nullptr };
+	Transform* m_parent					{ nullptr };
 	std::vector<Transform*> m_children;
+
+	mutable glm::mat4 m_worldMatrix		{ 1.0f };
+	mutable bool m_isTransformDirty		{ true };
+	mutable glm::vec3 m_worldPosition	{ 0.0f, 0.0f, 0.0f };
+	mutable glm::quat m_worldRotation	{ 1.0f, 0.0f, 0.0f, 0.0f };
+	mutable glm::vec3 m_worldScale		{ 1.0f, 1.0f, 1.0f };
+	mutable glm::mat4 m_worldInverseMatrix{ 1.0f };
+	mutable bool m_isWorldInverseDirty{ true };
 };

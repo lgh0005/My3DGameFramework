@@ -25,16 +25,21 @@ public:
 
     void SetMaterial(MaterialPtr material) { m_material = material; }
     MaterialPtr GetMaterial() const { return m_material; }
+
+    void SetMaterialIndex(uint32 index) { m_materialIndex = index; }
+    uint32 GetMaterialIndex() const { return m_materialIndex; }
+
     void SetLocalBounds(const RenderBounds& bounds) { m_localBounds = bounds; }
     const RenderBounds& GetLocalBounds() const { return m_localBounds; }
 
 protected:
     Mesh() = default;
-    usize  m_indexCount;
-    uint32 m_primitiveType;
+    usize  m_indexCount{ 0 };
+    uint32 m_primitiveType{ 0 };
     VertexLayoutUPtr m_vertexLayout;
     BufferPtr m_vertexBuffer;
     BufferPtr m_indexBuffer;
     MaterialPtr m_material;
+    uint32 m_materialIndex  { 0 };
     RenderBounds m_localBounds;
 };

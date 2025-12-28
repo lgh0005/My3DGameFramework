@@ -41,8 +41,8 @@ void PhysicsComponent::SyncTransformToPhysics()
 	JPH::BodyInterface& bodyInterface = GetBodyInterface();
 
 	//// 1. 현재 Transform 좌표를 Jolt로 변환
-	JPH::RVec3 jPos = Utils::ToJoltVec3(transform.GetPosition());
-	JPH::Quat jRot = Utils::ToJoltQuat(transform.GetRotationQuat());
+	JPH::RVec3 jPos = Utils::ToJoltVec3(transform.GetWorldPosition());
+	JPH::Quat jRot = Utils::ToJoltQuat(transform.GetWorldRotation());
 
 	// 2. 물리 엔진 위치 강제 설정 (텔레포트)
 	// Activate flag: 이동 후 잠자던 물체를 깨울 것인가? (보통 Yes)

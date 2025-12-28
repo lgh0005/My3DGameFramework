@@ -31,18 +31,14 @@ AnimationUPtr Animation::Load(const std::string& filePath, Model* model)
 
 AnimChannel* Animation::FindChannel(const std::string& name)
 {
-	auto it = std::find_if // TODO : 이후에는 이분 탐색을 쓰도록 수정해야 할 수 있음.
-	(
-		m_channels.begin(), m_channels.end(),
-		[&](const AnimChannelUPtr& bonePtr) { return bonePtr->GetBoneName() == name; }
-	);
-	if (it == m_channels.end()) return nullptr;
-	else return it->get();
+	auto it = m_channelMap.find(name);
+	if (it != m_channelMap.end()) return it->second;
+	return nullptr;
 }
 
-/*====================================================================//
-//   keyframe load process methods : assimp (raw 3d keyframe files)   //
-//====================================================================*/
+/*===================================//
+//   keyframe load process methods   //
+//===================================*/
 bool Animation::LoadByAssimp(const std::string& animationPath, Model* model)
 {
 	Assimp::Importer importer;
@@ -58,35 +54,11 @@ bool Animation::LoadByAssimp(const std::string& animationPath, Model* model)
 	m_duration = (float)animation->mDuration;
 	m_ticksPerSecond = (float)animation->mTicksPerSecond;
 
-	ReadMissingBones(animation, *model);
+	ParseAssimpChannels(animation);
 
 	return true;
 }
 
-void Animation::ReadMissingBones(const aiAnimation* animation, Model& model)
-{
-	uint32 size = animation->mNumChannels;
-	
-	auto skeleton = model.GetSkeleton();
-	if (!skeleton)
-	{
-		SPDLOG_WARN("Animation loaded for a model without skeleton!");
-		return;
-	}
-
-	for (int i = 0; i < size; i++)
-	{
-		auto channel = animation->mChannels[i];
-		std::string boneName = channel->mNodeName.C_Str();
-
-		int32 boneID = skeleton->AddBone(boneName, glm::mat4(1.0f));
-		m_channels.push_back(AnimChannel::Create(boneName, boneID, channel));
-	}
-}
-
-/*=======================================================//
-//   .myanim file load process methods : .myanim file    //
-//=======================================================*/
 bool Animation::LoadByBinary(const std::string& filePath)
 {
 	std::ifstream inFile(filePath, std::ios::binary);
@@ -113,18 +85,38 @@ bool Animation::LoadByBinary(const std::string& filePath)
 	m_channels.reserve(rawAnim.channels.size());
 	for (auto& rawCh : rawAnim.channels)
 	{
-		// RawAnimChannel 데이터를 std::move로 런타임 클래스에 넘김
-		m_channels.push_back(AnimChannel::Create
+		std::string boneName = rawCh.nodeName;
+
+		auto newChannel = AnimChannel::Create
 		(
-			rawCh.nodeName,
-			0, // ID는 Dummy
+			boneName,
+			-1,
 			std::move(rawCh.positions),
 			std::move(rawCh.rotations),
 			std::move(rawCh.scales)
-		));
+		);
+
+		m_channelMap[boneName] = newChannel.get();
+		m_channels.push_back(std::move(newChannel));
 	}
 
 	inFile.close();
 	SPDLOG_INFO("Loaded binary animation: {} ({} channels)", filePath, m_channels.size());
 	return true;
+}
+
+void Animation::ParseAssimpChannels(const aiAnimation* animation)
+{
+	uint32 size = animation->mNumChannels;
+	for (uint32 i = 0; i < size; i++)
+	{
+		aiNodeAnim* channel = animation->mChannels[i];
+		std::string boneName = channel->mNodeName.C_Str();
+
+		// ID는 -1로 설정 (이름으로 매핑하므로 ID 불필요)
+		auto newChannel = AnimChannel::Create(boneName, -1, channel);
+
+		m_channelMap[boneName] = newChannel.get();
+		m_channels.push_back(std::move(newChannel));
+	}
 }

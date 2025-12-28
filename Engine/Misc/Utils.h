@@ -37,4 +37,11 @@ public:
 	// AABB 좌표를 얻어오는 유틸 함수
 	static glm::vec3 Min(const glm::vec3& a, const glm::vec3& b);
 	static glm::vec3 Max(const glm::vec3& a, const glm::vec3& b);
+
+
+/*==================================//
+//   Common Constants (공용 상수)    //
+//==================================*/
+public:
+	inline static const glm::mat4 IdentityMat4 = glm::mat4(1.0f);
 };

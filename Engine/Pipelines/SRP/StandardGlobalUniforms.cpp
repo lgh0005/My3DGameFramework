@@ -40,7 +40,7 @@ void StandardGlobalUniforms::PreRender(RenderContext* context)
 	UpdateCameraUBO(camera);
 
 	// 2. 조명 데이터 업데이트 (Specular 계산을 위해 ViewPos 필요)
-	UpdateLightUBO(lights, camera->GetTransform().GetPosition());
+	UpdateLightUBO(lights, camera->GetTransform().GetWorldPosition());
 }
 
 /*==============================//
@@ -53,7 +53,7 @@ void StandardGlobalUniforms::UpdateCameraUBO(Camera* camera)
 	CameraData camData;
 	camData.view = camera->GetViewMatrix();
 	camData.projection = camera->GetProjectionMatrix();
-	camData.viewPos = camera->GetTransform().GetPosition();
+	camData.viewPos = camera->GetTransform().GetWorldPosition();
 
 	m_cameraUBO->SetData(&camData, sizeof(CameraData));
 }
@@ -80,7 +80,7 @@ void StandardGlobalUniforms::UpdateLightUBO
 		auto& transform = light->GetTransform();
 
 		// [공통 속성]
-		info.position = transform.GetPosition();
+		info.position = transform.GetWorldPosition();
 		info.direction = transform.GetForwardVector();
 		info.ambient = light->GetAmbient();
 		info.diffuse = light->GetDiffuse();
@@ -103,33 +103,33 @@ void StandardGlobalUniforms::UpdateLightUBO
 		// [타입별 속성]
 		switch (light->GetComponentType())
 		{
-		case ComponentType::DirectionalLight:
-		{
-			info.type = 0;
-			info.attenuation = glm::vec3(1.0f, 0.0f, 0.0f);
-			info.cutoff = glm::vec2(0.0f, 0.0f);
-			break;
-		}
+			case ComponentType::DirectionalLight:
+			{
+				info.type = 0;
+				info.attenuation = glm::vec3(1.0f, 0.0f, 0.0f);
+				info.cutoff = glm::vec2(0.0f, 0.0f);
+				break;
+			}
 
-		case ComponentType::PointLight:
-		{
-			info.type = 1;
-			auto point = static_cast<PointLight*>(light);
-			info.attenuation = point->GetAttenuation();
-			info.cutoff = glm::vec2(0.0f, 0.0f);
-			break;
-		}
+			case ComponentType::PointLight:
+			{
+				info.type = 1;
+				auto point = static_cast<PointLight*>(light);
+				info.attenuation = point->GetAttenuation();
+				info.cutoff = glm::vec2(0.0f, 0.0f);
+				break;
+			}
 
-		case ComponentType::SpotLight:
-		{
-			info.type = 2;
-			auto spot = static_cast<SpotLight*>(light);
-			glm::vec2 cutoff = spot->GetCutoff();
-			info.attenuation = spot->GetAttenuation();
-			info.cutoff.x = cosf(glm::radians(cutoff[0]));
-			info.cutoff.y = cosf(glm::radians(cutoff[0] + cutoff[1]));
-			break;
-		}
+			case ComponentType::SpotLight:
+			{
+				info.type = 2;
+				auto spot = static_cast<SpotLight*>(light);
+				glm::vec2 cutoff = spot->GetCutoff();
+				info.attenuation = spot->GetAttenuation();
+				info.cutoff.x = cosf(glm::radians(cutoff[0]));
+				info.cutoff.y = cosf(glm::radians(cutoff[0] + cutoff[1]));
+				break;
+			}
 		}
 		lightCount++;
 	}

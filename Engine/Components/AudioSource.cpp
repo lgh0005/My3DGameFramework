@@ -69,7 +69,7 @@ void AudioSource::Update()
 
 	// TODO: 추후 Transform 계층 구조(Parent-Child) 구현 시
 	// GetWorldPosition()으로 교체 필요
-	auto pos = transform.GetPosition();
+	auto pos = transform.GetWorldPosition();
 	ma_sound_set_position(&m_sound, pos.x, pos.y, pos.z);
 
 	// 2. 방향 동기화

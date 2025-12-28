@@ -35,10 +35,23 @@ public:
 	// 게임 오브젝트가 가져야 할 기본 메서드들
 	// TODO : 추가해야 할 메서드
 	// 0. Find
-	// 1. Destroy
-	// 2. SetActive
 	// 3. DontDestroyOnLoad
 	// 4. Instantiate
+
+/*==========================================//
+//   game object life-cycle state methods   //
+//==========================================*/
+private:
+	// TODO : 추가해야 할 메서드
+	// 0. Awake
+	// 1. Start
+	// 2. FixedUpdate
+	// 3. Update
+	// 4. LateUpdate
+	// 5. Destroy
+	// 6. SetActive
+	// 7. OnEnable
+	// 8. OnDisable
 
 private:
 	GameObject() = default;
