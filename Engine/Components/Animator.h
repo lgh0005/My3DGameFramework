@@ -22,26 +22,19 @@ public:
 	const std::vector<glm::mat4>& GetFinalBoneMatrices() const { return m_finalBoneMatrices; }
 	const RenderBounds& GetCurrentLocalBounds() const { return m_currentLocalAABB; }
 
-/*========================================//
-//   animation initialize logic methods   //
-//========================================*/
+/*==================================//
+//   animation initialize methods   //
+//==================================*/
 private:
 	void BindBoneTransforms();
 	void RecursiveBindBoneTransforms(Transform* nodeTransform);
 
-/*====================================//
-//   animation update logic methods   //
-//====================================*/
+/*==============================//
+//   animation update methods   //
+//==============================*/
 private:
 	void UpdateAnimationToTransforms();
 	void CalculateFinalBoneMatrices();
-
-/*==============//
-//   legacies   //
-//==============*/
-private:
-	void UpdateAnimationController();
-	void UpdateBoneTransforms();
 	void UpdateCurrentPoseLocalBounds();
 
 private:
@@ -56,12 +49,4 @@ private:
 	std::vector<Transform*> m_skinningTransforms;
 
 	RenderBounds m_currentLocalAABB;
-
-/*==============//
-//   legacies   //
-//==============*/
-private:
-	std::vector<glm::mat4> m_globalTransforms; // TEMP
-	std::vector<glm::vec3> m_globalJointPositions;
-	std::vector<Pose>	   m_poses;
 };
