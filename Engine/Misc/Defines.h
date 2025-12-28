@@ -40,6 +40,10 @@ using className ## WPtr = std::weak_ptr<className>;
 #define MAX_LIGHTS 32
 #define MAX_SHADOW_CASTER 8
 
+// max bone influence value
+#define MAX_BONES 100
+#define MAX_BONE_INFLUENCE 4
+
 /*===============================//
 //   Jolt physics const macros   //
 //===============================*/

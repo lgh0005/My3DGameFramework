@@ -8,30 +8,31 @@
 SkinnedMeshRenderer::~SkinnedMeshRenderer() = default;
 SkinnedMeshRenderer::SkinnedMeshRenderer() = default;
 
-SkinnedMeshRendererUPtr SkinnedMeshRenderer::Create(SkinnedMeshPtr mesh, MaterialPtr material)
+SkinnedMeshRendererUPtr SkinnedMeshRenderer::Create(SkinnedMeshPtr mesh, MaterialPtr material, Animator* animator)
 {
 	auto renderer = SkinnedMeshRendererUPtr(new SkinnedMeshRenderer());
-	if (!renderer->Init(mesh, material)) return nullptr;
+	if (!renderer->Init(mesh, material, animator)) return nullptr;
 	return std::move(renderer);
 }
 
-bool SkinnedMeshRenderer::Init(SkinnedMeshPtr mesh, MaterialPtr material)
+bool SkinnedMeshRenderer::Init(SkinnedMeshPtr mesh, MaterialPtr material, Animator* animator)
 {
 	m_mesh = mesh;
 	m_material = material;
+    m_referenceAnimator = animator;
 	if (!m_mesh || !m_material) return false;
 	return true;
 }
 
 RenderBounds SkinnedMeshRenderer::GetWorldBounds() const
 {
-	Super::GetWorldBounds();
+    if (!m_mesh) return RenderBounds();
 
     // 1. 기본 AABB는 T-Pose AABB를 사용.
     RenderBounds bounds = m_mesh->GetLocalBounds();
 
     // 2. Animator의 최신 AABB와 Union
-    auto* animator = GetOwner()->GetComponent<Animator>();
+    auto* animator = GetAnimator();
     if (animator)
     {
         // Animator가 Update()에서 계산한 최신 포즈의 AABB를 가져와 Union
@@ -45,12 +46,5 @@ RenderBounds SkinnedMeshRenderer::GetWorldBounds() const
 
 Animator* SkinnedMeshRenderer::GetAnimator() const
 {
-    // 1. 이미 찾았으면 리턴
-    if (m_cachedAnimator) return m_cachedAnimator;
-
-    // 2. 아직 없으면 지금 찾음
-    auto owner = GetOwner();
-    if (owner) m_cachedAnimator = owner->GetComponentInParent<Animator>();
-
-    return m_cachedAnimator;
+    return m_referenceAnimator;
 }

@@ -14,15 +14,19 @@ class SkinnedMeshRenderer : public MeshRenderer
 
 public:
 	virtual ~SkinnedMeshRenderer();
-	static SkinnedMeshRendererUPtr Create(SkinnedMeshPtr mesh, MaterialPtr material);
+	static SkinnedMeshRendererUPtr Create
+	(
+		SkinnedMeshPtr mesh, 
+		MaterialPtr material, 
+		Animator* animator
+	);
 	static const ComponentType s_ComponentType = ComponentType::SkinnedMeshRenderer;
 	virtual ComponentType GetComponentType() const override { return s_ComponentType; }
 	virtual RenderBounds GetWorldBounds() const override;
-
 	Animator* GetAnimator() const;
 
 private:
 	SkinnedMeshRenderer();
-	bool Init(SkinnedMeshPtr mesh, MaterialPtr material);
-	mutable Animator* m_cachedAnimator{ nullptr };
+	bool Init(SkinnedMeshPtr mesh, MaterialPtr material, Animator* animator);
+	Animator* m_referenceAnimator{ nullptr };
 };

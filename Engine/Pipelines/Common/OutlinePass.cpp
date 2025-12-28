@@ -126,15 +126,17 @@ void OutlinePass::MaskSkinnedMeshes(const std::vector<MeshOutline*>& outlines)
 	for (auto* outline : outlines)
 	{
 		auto* owner = outline->GetOwner();
-		auto* animator = owner->GetComponent<Animator>();
-		if (!animator) continue;
 		auto* renderer = owner->GetComponent<SkinnedMeshRenderer>();
+		if (!renderer) continue;
+		m_skinnedProgram->SetUniform("model", renderer->GetTransform().GetWorldMatrix());
+
 		auto mesh = renderer->GetMesh();
+		if (!mesh) continue;
 
 		m_skinnedProgram->SetUniform("model", renderer->GetTransform().GetWorldMatrix());
-		const auto& finalMatrices = animator->GetFinalBoneMatrices();
-		for (int i = 0; i < finalMatrices.size(); ++i)
-			m_skinnedProgram->SetUniform("finalBoneMatrices[" + std::to_string(i) + "]", finalMatrices[i]);
+		Animator* animator = renderer->GetAnimator();
+		if (animator) m_skinnedProgram->SetUniform("finalBoneMatrices", animator->GetFinalBoneMatrices());
+		else m_skinnedProgram->SetUniform("finalBoneMatrices", GetIdentityBones());
 
 		mesh->Draw(m_skinnedProgram.get());
 	}
@@ -167,20 +169,22 @@ void OutlinePass::DrawSkinnedMeshOutlines(const std::vector<MeshOutline*>& outli
 	for (auto* outline : outlines)
 	{
 		auto* owner = outline->GetOwner();
-		auto* animator = owner->GetComponent<Animator>();
-		if (!animator) continue;
+		auto* renderer = owner->GetComponent<SkinnedMeshRenderer>();
+		if (!renderer) continue;
 
-		// [Pass 2] 실제 두께와 색상 적용
+		auto mesh = renderer->GetMesh();
+		if (!mesh) continue;
+
+		// 실제 두께와 색상 적용
 		m_skinnedProgram->SetUniform("outlineColor", outline->GetColor());
 		m_skinnedProgram->SetUniform("outlineThickness", outline->GetThickness());
-
-		auto* renderer = owner->GetComponent<SkinnedMeshRenderer>();
-		auto mesh = renderer->GetMesh();
 		m_skinnedProgram->SetUniform("model", renderer->GetTransform().GetWorldMatrix());
 
-		const auto& finalMatrices = animator->GetFinalBoneMatrices();
-		for (int i = 0; i < finalMatrices.size(); ++i)
-			m_skinnedProgram->SetUniform("finalBoneMatrices[" + std::to_string(i) + "]", finalMatrices[i]);
+		// 의존성 주입된 Animator 사용 + T-Pose Fallback
+		Animator* animator = renderer->GetAnimator();
+		if (animator) m_skinnedProgram->SetUniform("finalBoneMatrices", animator->GetFinalBoneMatrices());
+		else m_skinnedProgram->SetUniform("finalBoneMatrices", GetIdentityBones());
+
 		mesh->Draw(m_skinnedProgram.get());
 	}
 }

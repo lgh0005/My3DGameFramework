@@ -468,15 +468,16 @@ bool DevScene::CreateSceneContext()
 
 		// 3. 애니메이터 생성
 		auto animator = Animator::Create(model, std::move(animCtrl));
-		if (animator) modelGo->AddComponent(std::move(animator));
 
 		// 4. Model 안의 모든 Mesh 조각을 MeshRenderer 컴포넌트로 추가
 		for (uint32 i = 0; i < model->GetMeshCount(); ++i)
 		{
+			// TEMP : 우선은 메쉬를 욱여넣기
 			SkinnedMeshPtr mesh = model->GetSkinnedMesh(i);
-			auto renderer = SkinnedMeshRenderer::Create(mesh, mesh->GetMaterial());
+			auto renderer = SkinnedMeshRenderer::Create(mesh, mesh->GetMaterial(), animator.get());
 			modelGo->AddComponent(std::move(renderer));
 		}
+		if (animator) modelGo->AddComponent(std::move(animator));
 
 		// 5. PlayerController
 		auto script = PlayerController::Create();

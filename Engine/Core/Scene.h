@@ -57,18 +57,23 @@ public:
 	auto& GetMeshOutlines() { return m_outlines; }
 
 /*================================//
+//   scene life cycle methods   //
+//================================*/
+protected:
+	void FlushCreateQueue();
+	void FlushDestroyQueue();
+	std::vector<GameObjectUPtr> m_pendingQueue;
+	std::vector<GameObjectUPtr> m_destroyQueue;
+	std::vector<GameObjectUPtr> m_gameObjects; // 게임 오브젝트 소유권
+
+/*================================//
 //   scene update cycle methods   //
 //================================*/
 protected:
-	// TODO : 이후 Destroy와 같은 것을 구현할 때,
-	// 자신이 파괴될 지 말지를 큐에 넣는 메서드가 필요.
-	// TODO : 메서드 이름 좀 더 고려 필요. 일단 임시로 이렇게 적겠음.
 	void UpdateBehaviours();
 	void UpdateTransforms();
 	void UpdateTransformRecursive(GameObject* go);
 	void UpdateSceneSystems();
-	void FlushDestroyQueue();
-	std::vector<GameObjectUPtr> m_destroyQueue;
 
 protected:
 	Scene();
@@ -78,9 +83,6 @@ protected:
 	virtual bool CreateNessesaryRenderPasses() = 0;
 	virtual bool CreateSceneContext()          = 0;
 	bool Init();
-
-	// 게임 오브젝트 소유권
-	std::vector<GameObjectUPtr> m_gameObjects;
 
 	// 주요 참조 (캐싱)
 	// TOOD : 이후에는 Main Camera를 딱히 이렇게 하나의 변수로 다믄 것이 아니라

@@ -28,6 +28,22 @@ glm::vec3 Utils::GetAttenuationCoeff(float distance)
 	return glm::vec3(kc, glm::max<float>(kl, 0.0f), glm::max<float>(kq * kq, 0.0f));
 }
 
+/*==============================//
+//   셰이더 파일 로드 유틸 함수   //
+//==============================*/
+std::optional<std::string> Utils::LoadTextFile(const std::string& filename)
+{
+	std::ifstream fin(filename);
+	if (!fin.is_open())
+	{
+		SPDLOG_ERROR("failed to open file: {}", filename);
+		return {};
+	}
+	std::stringstream text;
+	text << fin.rdbuf();
+	return text.str();
+}
+
 /*============================//
 //   assimp to glm 유틸 함수   //
 //============================*/

@@ -99,25 +99,18 @@ void StandardGeometryPass::RenderSkinnedGeometry(const std::vector<SkinnedMeshRe
 	m_skinnedGeometryProgram->Use();
 	for (const auto* renderer : meshes)
 	{
-		GameObject* go = renderer->GetOwner();
 		MeshPtr mesh = renderer->GetMesh();
-		auto material = renderer->GetMaterial();
-		auto& transform = go->GetTransform();
-		Animator* animator = go->GetComponent<Animator>();
+		if (!mesh) continue;
 
+		auto material = renderer->GetMaterial();
 		if (material) material->SetToProgram(m_skinnedGeometryProgram.get());
 
-		// 애니메이션 행렬 전송
-		if (animator)
-		{
-			const auto& finalMatrices = animator->GetFinalBoneMatrices();
-			for (int i = 0; i < finalMatrices.size(); ++i)
-				m_skinnedGeometryProgram->SetUniform("finalBoneMatrices[" + std::to_string(i) + "]", finalMatrices[i]);
-		}
-
-		m_skinnedGeometryProgram->SetUniform("model", transform.GetWorldMatrix());
-
-		if (mesh) mesh->Draw(m_skinnedGeometryProgram.get());
+		Animator* animator = renderer->GetAnimator();
+		if (animator) m_skinnedGeometryProgram->SetUniform("finalBoneMatrices", animator->GetFinalBoneMatrices());
+		else m_skinnedGeometryProgram->SetUniform("finalBoneMatrices", GetIdentityBones());
+	
+		m_skinnedGeometryProgram->SetUniform("model", renderer->GetTransform().GetWorldMatrix());
+		mesh->Draw(m_skinnedGeometryProgram.get());
 	}
 }
 

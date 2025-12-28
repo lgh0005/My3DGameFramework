@@ -18,6 +18,11 @@
 #include "Pipelines/SRP/StandardRenderPipeline.h"
 #include "Pipelines/SRP/RenderPasses/StandardGeometryPass.h"
 
+// [참고] Program 클래스에 vector<mat4>를 한 번에 보내는 기능이 있다고 가정하거나,
+// 없다면 기존처럼 루프를 돌려야 하지만, 성능상 배열 업로드가 좋습니다.
+// 여기서는 기존 방식을 유지하되 로직만 보여드립니다.
+// TODO : 지금 for문을 돌면서 Matrix를 보내고 있는데 이후에는 그냥 배열 째로 보내도록 수정 필요
+
 ShadowPassUPtr ShadowPass::Create(int32 resolution)
 {
 	auto pass = ShadowPassUPtr(new ShadowPass());
@@ -175,14 +180,9 @@ void ShadowPass::RenderSkinnedMeshes
 		auto model = renderer->GetTransform().GetWorldMatrix();
 		m_skinnedDepthProgram->SetUniform("model", model);
 
-		Animator* animator = go->GetComponent<Animator>();
-		if (animator)
-		{
-			const auto& finalMatrices = animator->GetFinalBoneMatrices();
-			for (int i = 0; i < finalMatrices.size(); ++i)
-				m_skinnedDepthProgram->SetUniform
-				("finalBoneMatrices[" + std::to_string(i) + "]", finalMatrices[i]);
-		}
+		Animator* animator = renderer->GetAnimator();
+		if (animator) m_skinnedDepthProgram->SetUniform("finalBoneMatrices", animator->GetFinalBoneMatrices());
+		else m_skinnedDepthProgram->SetUniform("finalBoneMatrices", GetIdentityBones());
 
 		renderer->GetMesh()->Draw(m_skinnedDepthProgram.get());
 	}

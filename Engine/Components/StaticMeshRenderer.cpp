@@ -23,11 +23,5 @@ bool StaticMeshRenderer::Init(StaticMeshPtr mesh, MaterialPtr material)
 
 RenderBounds StaticMeshRenderer::GetWorldBounds() const
 {
-	Super::GetWorldBounds();
-
-    // 1. 기본 AABB는 T-Pose AABB를 사용.
-    RenderBounds bounds = m_mesh->GetLocalBounds();
-
-    // 2. Transform의 최신 행렬 적용
-    return bounds.Transform(GetTransform().GetWorldMatrix());
+	return Super::GetWorldBounds();
 }

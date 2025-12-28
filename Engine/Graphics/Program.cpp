@@ -91,3 +91,9 @@ void Program::SetUniform(const std::string& name, const glm::mat4& value) const
     auto loc = glGetUniformLocation(m_program, name.c_str());
     glUniformMatrix4fv(loc, 1, GL_FALSE, glm::value_ptr(value));
 }
+
+void Program::SetUniform(const std::string& name, const std::vector<glm::mat4>& value) const
+{
+    auto loc = glGetUniformLocation(m_program, name.c_str());
+    glUniformMatrix4fv(loc, (GLsizei)value.size(), GL_FALSE, glm::value_ptr(value[0]));
+}

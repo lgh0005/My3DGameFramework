@@ -27,31 +27,29 @@ bool CullingPass::Init()
 
 void CullingPass::Render(RenderContext* context)
 {
-    // Context는 StandardRenderContext로 다운캐스팅 가능하다고 가정
-    StandardRenderContext* stdContext = (StandardRenderContext*)context;
-    Scene* scene = stdContext->GetScene();
-    Camera* camera = stdContext->GetCamera();
+    Scene* scene = context->GetScene();
+    Camera* camera = context->GetCamera();
 
     // 1. Frustum 업데이트 (카메라의 View-Projection 행렬 사용)
     m_frustum->Update(camera->GetViewProjectionMatrix());
 
     // 2. Static Mesh Renderer 컬링
-    CullStaticMeshRenderers(scene, stdContext);
+    CullStaticMeshRenderers(scene, context);
 
     // 3. Skinned Mesh Renderer 컬링
-    CullSkinnedMeshRenderers(scene, stdContext);
+    CullSkinnedMeshRenderers(scene, context);
 
     // 4. Mesh Outline 컬링
-    CullMeshOutlines(scene, stdContext);
+    CullMeshOutlines(scene, context);
 
     // 5. Light는 컬링하지 않고 모두 포함 (조명 범위는 Geometry Pass 결과에 의존)
-    CullSceneLights(scene, stdContext);
+    CullSceneLights(scene, context);
 }
 
 /*=====================//
 //   culling methods   //
 //=====================*/
-void CullingPass::CullStaticMeshRenderers(Scene* scene, StandardRenderContext* context)
+void CullingPass::CullStaticMeshRenderers(Scene* scene, RenderContext* context)
 {
     // TODO : 최적화가 가능한 요소로 옥트트리와 같은 공간 분할로
     // 절두체 범위에 들어가는 대상들을 빠르게 탐색 가능 (O(logn))
@@ -63,7 +61,7 @@ void CullingPass::CullStaticMeshRenderers(Scene* scene, StandardRenderContext* c
     }
 }
 
-void CullingPass::CullSkinnedMeshRenderers(Scene* scene, StandardRenderContext* context)
+void CullingPass::CullSkinnedMeshRenderers(Scene* scene, RenderContext* context)
 {
     // 3. Skinned Mesh Renderer 컬링
     for (auto* renderer : scene->GetSkinnedMeshRenderers())
@@ -74,7 +72,7 @@ void CullingPass::CullSkinnedMeshRenderers(Scene* scene, StandardRenderContext* 
     }
 }
 
-void CullingPass::CullMeshOutlines(Scene* scene, StandardRenderContext* context)
+void CullingPass::CullMeshOutlines(Scene* scene, RenderContext* context)
 {
     // Scene이 가지고 있는 전체 아웃라인 리스트 순회
     const auto& outlines = scene->GetMeshOutlines();
@@ -98,7 +96,7 @@ void CullingPass::CullMeshOutlines(Scene* scene, StandardRenderContext* context)
     }
 }
 
-void CullingPass::CullSceneLights(Scene* scene, StandardRenderContext* context)
+void CullingPass::CullSceneLights(Scene* scene, RenderContext* context)
 {
     // LightSource는 LightPass가 사용하므로 그대로 복사합니다.
     // TODO : 이후에 Light Volume에 의한 최적화를 위해 일단 그대로 둔다.

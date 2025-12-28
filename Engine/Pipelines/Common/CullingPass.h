@@ -4,7 +4,7 @@
 
 #pragma region FORWARD_DECLARATION
 CLASS_PTR(Scene)
-CLASS_PTR(StandardRenderContext)
+CLASS_PTR(RenderContext)
 #pragma endregion
 
 CLASS_PTR(CullingPass)
@@ -19,10 +19,10 @@ public:
 //   culling methods   //
 //=====================*/
 private:
-	void CullStaticMeshRenderers(Scene* scene, StandardRenderContext* context);
-	void CullSkinnedMeshRenderers(Scene* scene, StandardRenderContext* context);
-	void CullMeshOutlines(Scene* scene, StandardRenderContext* context);
-	void CullSceneLights(Scene* scene, StandardRenderContext* context);
+	void CullStaticMeshRenderers(Scene* scene, RenderContext* context);
+	void CullSkinnedMeshRenderers(Scene* scene, RenderContext* context);
+	void CullMeshOutlines(Scene* scene, RenderContext* context);
+	void CullSceneLights(Scene* scene, RenderContext* context);
 
 private:
 	CullingPass();

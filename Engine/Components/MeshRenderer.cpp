@@ -12,4 +12,5 @@
 RenderBounds MeshRenderer::GetWorldBounds() const
 {
     if (!m_mesh) return RenderBounds();
+    return m_mesh->GetLocalBounds().Transform(GetTransform().GetWorldMatrix());
 }

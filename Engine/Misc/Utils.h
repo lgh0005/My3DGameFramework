@@ -15,6 +15,9 @@ public:
 	// 조명 연산 전용 유틸 함수
 	static glm::vec3 GetAttenuationCoeff(float distance);
 
+	// 셰이더 파일 로드 유틸 함수
+	static std::optional<std::string> LoadTextFile(const std::string& filename);
+
 	// assimp to glm 유틸 함수
 	static glm::mat4 ConvertToGLMMat4(const aiMatrix4x4& aiMat);
 	static glm::vec3 ConvertToGLMVec(const aiVector3D& vec);

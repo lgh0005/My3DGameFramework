@@ -18,7 +18,7 @@ public:
 	void Update();
 
 	AnimController* GetController() const { return m_controller.get(); }
-	std::vector<glm::mat4> GetFinalBoneMatrices() const { return m_finalBoneMatrices; }
+	const std::vector<glm::mat4>& GetFinalBoneMatrices() const { return m_finalBoneMatrices; }
 	const RenderBounds& GetCurrentLocalBounds() const { return m_currentLocalAABB; }
 
 /*====================================//
