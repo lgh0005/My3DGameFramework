@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 
 #pragma region FORWARD_DECLARATION
 CLASS_PTR(Scene)
@@ -13,28 +13,28 @@ public:
 	~GameObject();
 	static GameObjectUPtr Create();
 
-	// ÄÄÆ÷³ÍÆ® ¸Ş¼­µåµé
+	// ì»´í¬ë„ŒíŠ¸ ë©”ì„œë“œë“¤
 	void AddComponent(ComponentUPtr component);
 	template<typename T>
 	T* GetComponent() const;
 	template<typename T>
 	T* GetComponentInParent() const;
 
-	// ÇÊ¿ä ¸â¹öµéÀÇ getter¿Í setterµé
+	// í•„ìš” ë©¤ë²„ë“¤ì˜ getterì™€ setterë“¤
 	Transform& GetTransform()    const	     { return *m_transform; }
 	const std::string& GetName() const		 { return m_name; }
 	void SetName(const std::string& name)	 { m_name = name; }
 	const std::vector<ComponentUPtr>& GetAllComponents() 
 								 const		 { return m_components; }
 
-	// °èÃş ±¸Á¶ ¸Ş¼­µåµé
+	// ê³„ì¸µ êµ¬ì¡° ë©”ì„œë“œë“¤
 	void SetParent(GameObject* parent);
 	void AddChild(GameObject* child);
 	GameObject* GetChildByIndex(usize index);
 	GameObject* GetChildByName(const std::string& name);
 
-	// °ÔÀÓ ¿ÀºêÁ§Æ®°¡ °¡Á®¾ß ÇÒ ±âº» ¸Ş¼­µåµé
-	// TODO : Ãß°¡ÇØ¾ß ÇÒ ¸Ş¼­µå
+	// ê²Œì„ ì˜¤ë¸Œì íŠ¸ê°€ ê°€ì ¸ì•¼ í•  ê¸°ë³¸ ë©”ì„œë“œë“¤
+	// TODO : ì¶”ê°€í•´ì•¼ í•  ë©”ì„œë“œ
 	// 0. Find
 	// 3. DontDestroyOnLoad
 	// 4. Instantiate
@@ -43,7 +43,7 @@ public:
 //   game object life-cycle state methods   //
 //==========================================*/
 private:
-	// TODO : Ãß°¡ÇØ¾ß ÇÒ ¸Ş¼­µå
+	// TODO : ì¶”ê°€í•´ì•¼ í•  ë©”ì„œë“œ
 	// 0. Awake
 	// 1. Start
 	// 2. FixedUpdate
@@ -58,7 +58,7 @@ private:
 	GameObject();
 	bool Init();
 
-	// °ÔÀÓ ¿ÀºêÁ§Æ® ±âÁØ ÇÊ¿ä ¸â¹öµé
+	// ê²Œì„ ì˜¤ë¸Œì íŠ¸ ê¸°ì¤€ í•„ìš” ë©¤ë²„ë“¤
 	Transform*		m_transform					 { nullptr };
 	std::string		m_name						 { "GameObject" };
 	bool			m_active					 { true };
@@ -84,11 +84,11 @@ inline T* GameObject::GetComponent() const
 template<typename T>
 inline T* GameObject::GetComponentInParent() const
 {
-	// 1. ³ª ÀÚ½Å¿¡°Ô ÀÖ´ÂÁö ¸ÕÀú È®ÀÎ
+	// 1. ë‚˜ ìì‹ ì—ê²Œ ìˆëŠ”ì§€ ë¨¼ì € í™•ì¸
 	T* comp = GetComponent<T>();
 	if (comp) return comp;
 
-	// 2. ºÎ¸ğ Å½»ö ½ÃÀÛ
+	// 2. ë¶€ëª¨ íƒìƒ‰ ì‹œì‘
 	Transform* current = m_transform->GetParent();
 	while (current != nullptr)
 	{
@@ -98,7 +98,7 @@ inline T* GameObject::GetComponentInParent() const
 			comp = parentGO->GetComponent<T>();
 			if (comp) return comp;
 		}
-		// °è¼Ó À§·Î ¿Ã¶ó°¨
+		// ê³„ì† ìœ„ë¡œ ì˜¬ë¼ê°
 		current = current->GetParent();
 	}
 	return nullptr;

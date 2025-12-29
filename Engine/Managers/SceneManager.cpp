@@ -1,4 +1,4 @@
-#include "EnginePch.h"
+ï»¿#include "EnginePch.h"
 #include "SceneManager.h"
 
 void SceneManager::LoadScene
@@ -7,21 +7,21 @@ void SceneManager::LoadScene
 	const std::string& pipeline
 )
 {
-	// 1. µî·ÏµÈ ¾ÀÀ» ¸ÕÀú Ã£±â
+	// 1. ë“±ë¡ëœ ì”¬ì„ ë¨¼ì € ì°¾ê¸°
 	auto it = m_scenes.find(scene);
 	if (it == m_scenes.end())
 	{
-		SPDLOG_ERROR("Failed to find scene registration for name: {}", scene);
+		LOG_ERROR("Failed to find scene registration for name: {}", scene);
 		return;
 	}
 
-	// 2. ÆÄÀÌÇÁ ¶óÀÎ ±³Ã¼
+	// 2. íŒŒì´í”„ ë¼ì¸ êµì²´
 	RENDER.SetPipeline(pipeline);
 
-	// 3. ±âÁ¸ ¾À Á¤¸®
+	// 3. ê¸°ì¡´ ì”¬ ì •ë¦¬
 	m_activeScene.reset();
 
-	// 4. »õ ¾À »ý¼º (Factory È£Ãâ)
+	// 4. ìƒˆ ì”¬ ìƒì„± (Factory í˜¸ì¶œ)
 	m_activeScene = it->second();
 	if (m_activeScene)
 	{
@@ -31,11 +31,11 @@ void SceneManager::LoadScene
 		RENDER.UpdateViewport(&width, &height);
 		OnScreenResize(width, height);
 
-		SPDLOG_INFO("Successfully loaded scene: {}", scene);
+		LOG_INFO("Successfully loaded scene: {}", scene);
 	}
 	else
 	{
-		SPDLOG_ERROR("Failed to create scene instance: {}", scene);
+		LOG_ERROR("Failed to create scene instance: {}", scene);
 	}
 }
 
@@ -54,4 +54,5 @@ void SceneManager::Clear()
 {
 	m_activeScene.reset();
 	m_scenes.clear();
+	LOG_INFO("RenderManager Cleared.");
 }

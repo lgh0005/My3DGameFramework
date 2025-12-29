@@ -1,4 +1,4 @@
-#include "EnginePch.h"
+﻿#include "EnginePch.h"
 #include "Shader.h"
 
 Shader::Shader() = default;
@@ -37,8 +37,8 @@ bool Shader::LoadFile(const std::string& filename, GLenum shaderType)
     {
         char infoLog[1024];
         glGetShaderInfoLog(m_shader, 1024, nullptr, infoLog);
-        SPDLOG_ERROR("failed to compile shader: \"{}\"", filename);
-        SPDLOG_ERROR("reason: {}", infoLog);
+        LOG_ERROR("failed to compile shader: \"{}\"", filename);
+        LOG_ERROR("reason: {}", infoLog);
         return false;
     }
     return true;

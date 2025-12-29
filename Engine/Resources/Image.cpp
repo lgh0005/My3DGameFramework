@@ -1,4 +1,4 @@
-#include "EnginePch.h"
+﻿#include "EnginePch.h"
 #include "Image.h"
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image/stb_image.h"
@@ -59,7 +59,7 @@ bool Image::LoadWithStb(const std::string& filepath, bool flipVertical)
     m_data = stbi_load(filepath.c_str(), &m_width, &m_height, &m_channelCount, 0);
     if (!m_data)
     {
-        SPDLOG_ERROR("failed to load image: {}", filepath);
+        LOG_ERROR("failed to load image: {}", filepath);
         return false;
     }
     return true;
@@ -73,7 +73,7 @@ bool Image::LoadWithStbFloat(const std::string& filepath, bool flipVertical)
     m_data = (uint8*)stbi_loadf(filepath.c_str(), &m_width, &m_height, &m_channelCount, 0);
     if (!m_data)
     {
-        SPDLOG_ERROR("failed to load HDR image: {}", filepath);
+        LOG_ERROR("failed to load HDR image: {}", filepath);
         return false;
     }
     return true;

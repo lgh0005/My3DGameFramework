@@ -1,4 +1,4 @@
-#include "Animation.h"
+ï»¿#include "Animation.h"
 #include "Resources/Model.h"
 #include "Resources/AnimChannel.h"
 #include "Resources/Skeleton.h"
@@ -11,7 +11,7 @@ AnimationUPtr Animation::Load(const std::string& filePath, Model* model)
 {
 	auto animation = AnimationUPtr(new Animation());
 
-	// ÆÄÀÏ È®Àå¸í ºñ±³ ÈÄ ·Îµå : .myanimÀ¸·Î ·ÎµåÇÏ´Â °ÍÀ» ÃßÃµ
+	// íŒŒì¼ í™•ì¥ëª… ë¹„êµ í›„ ë¡œë“œ : .myanimìœ¼ë¡œ ë¡œë“œí•˜ëŠ” ê²ƒì„ ì¶”ì²œ
 	std::string ext = std::filesystem::path(filePath).extension().string();
 	std::transform(ext.begin(), ext.end(), ext.begin(), ::tolower);
 	if (ext == ".myanim")
@@ -20,10 +20,10 @@ AnimationUPtr Animation::Load(const std::string& filePath, Model* model)
 	}
 	else
 	{
-		// Assimp ·Îµå ½Ã¿¡´Â Model Æ÷ÀÎÅÍ°¡ ÇÊ¼ö
+		// Assimp ë¡œë“œ ì‹œì—ëŠ” Model í¬ì¸í„°ê°€ í•„ìˆ˜
 		if (!model)
 		{
-			SPDLOG_ERROR("Model pointer is required for Assimp animation loading: {}", filePath);
+			LOG_ERROR("Model pointer is required for Assimp animation loading: {}", filePath);
 			return nullptr;
 		}
 		if (!animation->LoadByAssimp(filePath, model)) return nullptr;
@@ -48,7 +48,7 @@ bool Animation::LoadByAssimp(const std::string& animationPath, Model* model)
 	const aiScene* scene = importer.ReadFile(animationPath, aiProcess_LimitBoneWeights);
 	if (!scene || !scene->mRootNode)
 	{
-		SPDLOG_ERROR("Failed to load animation file: {}", animationPath);
+		LOG_ERROR("Failed to load animation file: {}", animationPath);
 		return false;
 	}
 
@@ -67,24 +67,24 @@ bool Animation::LoadByBinary(const std::string& filePath)
 	std::ifstream inFile(filePath, std::ios::binary);
 	if (!inFile)
 	{
-		SPDLOG_ERROR("Failed to open animation file: {}", filePath);
+		LOG_ERROR("Failed to open animation file: {}", filePath);
 		return false;
 	}
 
-	// AssetUtils°¡ Æ÷¸Ë¿¡ ¸ÂÃç¼­ ±¸Á¶Ã¼·Î ½Ï ÀĞ¾î¿È
+	// AssetUtilsê°€ í¬ë§·ì— ë§ì¶°ì„œ êµ¬ì¡°ì²´ë¡œ ì‹¹ ì½ì–´ì˜´
 	AssetFmt::RawAnimation rawAnim = AssetUtils::ReadRawAnimation(inFile);
 	if (rawAnim.magic != 0x414E494D)
 	{
-		SPDLOG_ERROR("Invalid animation file magic.");
+		LOG_ERROR("Invalid animation file magic.");
 		return false;
 	}
 
-	// ¸â¹ö º¯¼ö Ã¤¿ì±â
+	// ë©¤ë²„ ë³€ìˆ˜ ì±„ìš°ê¸°
 	m_name = rawAnim.name;
 	m_duration = rawAnim.duration;
 	m_ticksPerSecond = rawAnim.ticksPerSecond;
 
-	// Ã¤³Î º¯È¯ (Raw -> Runtime)
+	// ì±„ë„ ë³€í™˜ (Raw -> Runtime)
 	m_channels.reserve(rawAnim.channels.size());
 	for (auto& rawCh : rawAnim.channels)
 	{
@@ -104,7 +104,7 @@ bool Animation::LoadByBinary(const std::string& filePath)
 	}
 
 	inFile.close();
-	SPDLOG_INFO("Loaded binary animation: {} ({} channels)", filePath, m_channels.size());
+	LOG_INFO("Loaded binary animation: {} ({} channels)", filePath, m_channels.size());
 	return true;
 }
 
@@ -116,7 +116,7 @@ void Animation::ParseAssimpChannels(const aiAnimation* animation)
 		aiNodeAnim* channel = animation->mChannels[i];
 		std::string boneName = channel->mNodeName.C_Str();
 
-		// ID´Â -1·Î ¼³Á¤ (ÀÌ¸§À¸·Î ¸ÅÇÎÇÏ¹Ç·Î ID ºÒÇÊ¿ä)
+		// IDëŠ” -1ë¡œ ì„¤ì • (ì´ë¦„ìœ¼ë¡œ ë§¤í•‘í•˜ë¯€ë¡œ ID ë¶ˆí•„ìš”)
 		auto newChannel = AnimChannel::Create(boneName, -1, channel);
 
 		m_channelMap[boneName] = newChannel.get();

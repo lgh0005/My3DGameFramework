@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 #include "Resources/Resource.h"
 
 class ResourceManager
@@ -32,25 +32,25 @@ template<typename T>
 inline void ResourceManager::AddResource(std::shared_ptr<T> resource, 
 					const std::string& name, const std::string& path)
 {
-	// 0. ¸®¼Ò½º À¯È¿¼º Ã¼Å©
+	// 0. ë¦¬ì†ŒìŠ¤ ìœ íš¨ì„± ì²´í¬
 	if (!resource)
 	{
-		SPDLOG_ERROR("Attempted to add null resource: {}", name);
+		LOG_ERROR("Attempted to add null resource: {}", name);
 		return;
 	}
 
-	// 1. Áßº¹ Ã¼Å©
+	// 1. ì¤‘ë³µ ì²´í¬
 	if (m_resources.find(name) != m_resources.end())
 	{
-		SPDLOG_WARN("Resource '{}' already exists. Overwriting.", name);
+		LOG_WARN("Resource '{}' already exists. Overwriting.", name);
 	}
 
-	// 2. ¸®¼Ò½º ÀÚÃ¼¿¡ Å°(ÀÌ¸§/°æ·Î) ÁÖÀÔ (³ªÁß¿¡ ¸®¼Ò½º¸¸ º¸°íµµ ¹ºÁö ¾Ë ¼ö ÀÖ°Ô)
+	// 2. ë¦¬ì†ŒìŠ¤ ìì²´ì— í‚¤(ì´ë¦„/ê²½ë¡œ) ì£¼ì… (ë‚˜ì¤‘ì— ë¦¬ì†ŒìŠ¤ë§Œ ë³´ê³ ë„ ë­”ì§€ ì•Œ ìˆ˜ ìˆê²Œ)
 	resource->SetName(name);
 	if (path.empty()) resource->SetPath("@VirtualPath/" + name);
 	else			  resource->SetPath(path);
 
-	// 3. ÅëÇÕ ¸Ê¿¡ ÀúÀå (ÀÚµ¿ ¾÷Ä³½ºÆÃ)
+	// 3. í†µí•© ë§µì— ì €ì¥ (ìë™ ì—…ìºìŠ¤íŒ…)
 	m_resources[name] = resource;
 }
 

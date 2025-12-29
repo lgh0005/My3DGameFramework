@@ -1,28 +1,28 @@
-#pragma once
+ï»¿#pragma once
 #include <Jolt/Jolt.h>
 #include <Jolt/Physics/Body/BodyActivationListener.h>
 #include <Jolt/Physics/Collision/ContactListener.h>
 #include <Jolt/Physics/Collision/BroadPhase/BroadPhaseLayer.h>
 
 /*===================//
-//   Jolt ¼³Á¤ »ó¼ö   //
+//   Jolt ì„¤ì • ìƒìˆ˜   //
 //===================*/
 namespace JoltConfig
 {
-    constexpr JPH::uint cMaxBodies = 65536;				// ÃÖ´ë ¹Ùµğ(¹°Ã¼) ¼ö
-    constexpr JPH::uint cNumBodyMutexes = 0;				// ¹ÂÅØ½º ¼ö (0 = ±âº»°ª, ÀÚµ¿ ¼³Á¤)
-    constexpr JPH::uint cMaxBodyPairs = 65536;				// ÃÖ´ë ¹Ùµğ ½Ö
-    constexpr JPH::uint cMaxContactConstraints = 10240;	// ÃÖ´ë Á¢ÃË Á¦¾à Á¶°Ç
+    constexpr JPH::uint cMaxBodies = 65536;				// ìµœëŒ€ ë°”ë””(ë¬¼ì²´) ìˆ˜
+    constexpr JPH::uint cNumBodyMutexes = 0;				// ë®¤í…ìŠ¤ ìˆ˜ (0 = ê¸°ë³¸ê°’, ìë™ ì„¤ì •)
+    constexpr JPH::uint cMaxBodyPairs = 65536;				// ìµœëŒ€ ë°”ë”” ìŒ
+    constexpr JPH::uint cMaxContactConstraints = 10240;	// ìµœëŒ€ ì ‘ì´‰ ì œì•½ ì¡°ê±´
 }
 
 /*==========================================//
-//   ·¹ÀÌ¾î Á¤ÀÇ (°ÔÀÓ¿¡¼­ »ç¿ëÇÒ Ãæµ¹ ±×·ì)   //
+//   ë ˆì´ì–´ ì •ì˜ (ê²Œì„ì—ì„œ ì‚¬ìš©í•  ì¶©ëŒ ê·¸ë£¹)   //
 //==========================================*/
-// TODO : ÀÌÈÄ¿¡ ÇÊ¿äÇÑ ·¹ÀÌ¾î°¡ ÀÖ´Ù¸é Ãß°¡ÇÒ ÇÊ¿ä°¡ ÀÖÀ½
+// TODO : ì´í›„ì— í•„ìš”í•œ ë ˆì´ì–´ê°€ ìˆë‹¤ë©´ ì¶”ê°€í•  í•„ìš”ê°€ ìˆìŒ
 namespace Layers
 {
-    static constexpr JPH::ObjectLayer NON_MOVING = 0; // Á¤Àû (º®, ¹Ù´Ú)
-    static constexpr JPH::ObjectLayer MOVING = 1;     // µ¿Àû (ÇÃ·¹ÀÌ¾î, Àû)
+    static constexpr JPH::ObjectLayer NON_MOVING = 0; // ì •ì  (ë²½, ë°”ë‹¥)
+    static constexpr JPH::ObjectLayer MOVING = 1;     // ë™ì  (í”Œë ˆì´ì–´, ì )
     static constexpr JPH::ObjectLayer NUM_LAYERS = 2;
 };
 
@@ -34,9 +34,9 @@ namespace BroadPhaseLayers
 };
 
 /*================================//
-//   ÇïÆÛ Å¬·¡½º ¼±¾ğ (±ÔÄ¢ Á¤ÀÇ)   //
+//   í—¬í¼ í´ë˜ìŠ¤ ì„ ì–¸ (ê·œì¹™ ì •ì˜)   //
 //================================*/
-// ObjectLayer -> BroadPhaseLayer º¯È¯±â
+// ObjectLayer -> BroadPhaseLayer ë³€í™˜ê¸°
 class BPLayerInterfaceImpl final : public JPH::BroadPhaseLayerInterface
 {
 public:
@@ -52,14 +52,14 @@ private:
     JPH::BroadPhaseLayer mObjectToBroadPhase[Layers::NUM_LAYERS];
 };
 
-// BroadPhaseLayer °£ Ãæµ¹ ÇÊÅÍ
+// BroadPhaseLayer ê°„ ì¶©ëŒ í•„í„°
 class ObjectVsBroadPhaseLayerFilterImpl : public JPH::ObjectVsBroadPhaseLayerFilter
 {
 public:
     virtual bool ShouldCollide(JPH::ObjectLayer inLayer1, JPH::BroadPhaseLayer inLayer2) const override;
 };
 
-// ObjectLayer °£ Ãæµ¹ ÇÊÅÍ
+// ObjectLayer ê°„ ì¶©ëŒ í•„í„°
 class ObjectLayerPairFilterImpl : public JPH::ObjectLayerPairFilter
 {
 public:
@@ -67,7 +67,7 @@ public:
 };
 
 /*=============================//
-//   ¸®½º³Ê ¼±¾ğ (ÀÌº¥Æ® ¼ö½Å)   //
+//   ë¦¬ìŠ¤ë„ˆ ì„ ì–¸ (ì´ë²¤íŠ¸ ìˆ˜ì‹ )   //
 //=============================*/
 class MyBodyActivationListener : public JPH::BodyActivationListener
 {
@@ -98,7 +98,7 @@ public:
 };
 
 /*==========================//
-//   Jolt Äİ¹é ·¡ÆÛ Å¬·¡½º   //
+//   Jolt ì½œë°± ë˜í¼ í´ë˜ìŠ¤   //
 //==========================*/
 class PhysicsCallbacks
 {

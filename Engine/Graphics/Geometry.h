@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include <cmath>
 #include <algorithm>
 #include <glm/gtc/matrix_access.hpp>

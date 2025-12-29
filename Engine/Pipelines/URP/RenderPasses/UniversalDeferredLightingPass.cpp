@@ -1,4 +1,4 @@
-#include "EnginePch.h"
+ï»¿#include "EnginePch.h"
 #include "UniversalDeferredLightingPass.h"
 
 #include "Pipelines/Common/ShadowPass.h"
@@ -49,26 +49,26 @@ bool UniversalDeferredLightingPass::Init()
 
 void UniversalDeferredLightingPass::Render(RenderContext* context)
 {
-	// 0. Context Ä³½ºÆÃ ¹× À¯È¿¼º °Ë»ç
+	// 0. Context ìºìŠ¤íŒ… ë° ìœ íš¨ì„± ê²€ì‚¬
 	auto stdCtx = (UniversalRenderContext*)context;
 	if (!stdCtx) return;
 
-	// 1. Æ÷½ºÆ® ÇÁ·Î¼¼½Ì ÇÁ·¹ÀÓ ¹öÆÛ¿¡ GBuffer ³»¿ë ±×¸®±â
+	// 1. í¬ìŠ¤íŠ¸ í”„ë¡œì„¸ì‹± í”„ë ˆì„ ë²„í¼ì— GBuffer ë‚´ìš© ê·¸ë¦¬ê¸°
 	BeginDrawOnPostProcessFBO(stdCtx);
 
-	// 2. SSAO ÅØ½ºÃÄ ¹ÙÀÎµù
+	// 2. SSAO í…ìŠ¤ì³ ë°”ì¸ë”©
 	BindSSAOTexture(stdCtx);
 
-	// 3. ±×¸²ÀÚ ¸Ê ¹ÙÀÎµù
+	// 3. ê·¸ë¦¼ì ë§µ ë°”ì¸ë”©
 	BindShadowMaps(stdCtx);
 
-	// 4. SkyLightÀ¸·ÎºÎÅÍ IBL ¼Ó¼º ¹ÙÀÎµù
+	// 4. SkyLightìœ¼ë¡œë¶€í„° IBL ì†ì„± ë°”ì¸ë”©
 	BindIBLMaps(stdCtx);
 
-	// 4. RenderContext·ÎºÎÅÍ Á¶¸í Çà·Ä °¡Á®¿À±â
+	// 4. RenderContextë¡œë¶€í„° ì¡°ëª… í–‰ë ¬ ê°€ì ¸ì˜¤ê¸°
 	GetLightMatricesFromContext(stdCtx);
 
-	// 6. ±×¸®±â
+	// 6. ê·¸ë¦¬ê¸°
 	m_plane->Draw();
 
 	glDepthMask(GL_TRUE);
@@ -80,14 +80,14 @@ void UniversalDeferredLightingPass::Render(RenderContext* context)
 //==========================================*/
 void UniversalDeferredLightingPass::BeginDrawOnPostProcessFBO(UniversalRenderContext* context)
 {
-	// 1. Context¿¡¼­ G-Buffer ÅØ½ºÃ³ °¡Á®¿À±â
+	// 1. Contextì—ì„œ G-Buffer í…ìŠ¤ì²˜ ê°€ì ¸ì˜¤ê¸°
 	Texture* tPos = context->GetGBufferPosition();
 	Texture* tNormal = context->GetGBufferNormal();
 	Texture* tAlbedo = context->GetGBufferAlbedo();
 	Texture* tEmission = context->GetGBufferEmission();
 	if (!tPos || !tNormal || !tAlbedo || !tEmission) return;
 
-	// 2. ±×¸®±â ÁØºñ (Output FBO ¼³Á¤)
+	// 2. ê·¸ë¦¬ê¸° ì¤€ë¹„ (Output FBO ì„¤ì •)
 	PostProcessFramebuffer* targetFBO = context->GetTargetFramebuffer();
 	if (targetFBO)
 	{
@@ -99,7 +99,7 @@ void UniversalDeferredLightingPass::BeginDrawOnPostProcessFBO(UniversalRenderCon
 	else
 	{
 		Framebuffer::BindToDefault();
-		// ÅØ½ºÃ³ Å©±â¸¦ ±âÁØÀ¸·Î ºäÆ÷Æ® ¼³Á¤
+		// í…ìŠ¤ì²˜ í¬ê¸°ë¥¼ ê¸°ì¤€ìœ¼ë¡œ ë·°í¬íŠ¸ ì„¤ì •
 		glViewport(0, 0, tPos->GetWidth(), tPos->GetHeight());
 		glDisable(GL_DEPTH_TEST);
 		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
@@ -108,7 +108,7 @@ void UniversalDeferredLightingPass::BeginDrawOnPostProcessFBO(UniversalRenderCon
 
 	m_deferredLightProgram->Use();
 
-	// 3. G-Buffer ÅØ½ºÃ³ ¹ÙÀÎµù (Context µ¥ÀÌÅÍ »ç¿ë)
+	// 3. G-Buffer í…ìŠ¤ì²˜ ë°”ì¸ë”© (Context ë°ì´í„° ì‚¬ìš©)
 	glActiveTexture(GL_TEXTURE0); tPos->Bind();
 	m_deferredLightProgram->SetUniform("gPosition", 0);
 
@@ -124,7 +124,7 @@ void UniversalDeferredLightingPass::BeginDrawOnPostProcessFBO(UniversalRenderCon
 
 void UniversalDeferredLightingPass::BindSSAOTexture(UniversalRenderContext* context)
 {
-	// 4. SSAO ÅØ½ºÃ³ ¹ÙÀÎµù (Context µ¥ÀÌÅÍ »ç¿ë)
+	// 4. SSAO í…ìŠ¤ì²˜ ë°”ì¸ë”© (Context ë°ì´í„° ì‚¬ìš©)
 	Texture* tSSAO = context->GetSSAOTexture();
 	if (tSSAO)
 	{
@@ -141,7 +141,7 @@ void UniversalDeferredLightingPass::BindSSAOTexture(UniversalRenderContext* cont
 
 void UniversalDeferredLightingPass::BindShadowMaps(UniversalRenderContext* context)
 {
-	// 5. Shadow Maps ¹ÙÀÎµù (Pipeline µ¥ÀÌÅÍ »ç¿ë - ±âÁ¸ À¯Áö)
+	// 5. Shadow Maps ë°”ì¸ë”© (Pipeline ë°ì´í„° ì‚¬ìš© - ê¸°ì¡´ ìœ ì§€)
 	for (int i = 0; i < MAX_SHADOW_CASTER; ++i)
 	{
 		glActiveTexture(GL_TEXTURE4 + i);
@@ -192,8 +192,8 @@ void UniversalDeferredLightingPass::BindIBLMaps(UniversalRenderContext* context)
 
 void UniversalDeferredLightingPass::GetLightMatricesFromContext(UniversalRenderContext* context)
 {
-	// 6. Light Matrices Àü¼Û(ContextÀÇ Culled List »ç¿ë)
-	// Scene ÀüÃ¼ Á¶¸íÀÌ ¾Æ´Ï¶ó, Context¿¡ ´ã±ä Á¶¸í¸¸ Ã³¸®
+	// 6. Light Matrices ì „ì†¡(Contextì˜ Culled List ì‚¬ìš©)
+	// Scene ì „ì²´ ì¡°ëª…ì´ ì•„ë‹ˆë¼, Contextì— ë‹´ê¸´ ì¡°ëª…ë§Œ ì²˜ë¦¬
 	const auto& lights = context->GetScene()->GetLights();
 	for (auto* light : lights)
 	{

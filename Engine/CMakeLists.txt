@@ -50,14 +50,14 @@ add_library(Engine STATIC
    "Pipelines/URP/RenderPasses/UniversalOutlinePass.h"   "Pipelines/URP/RenderPasses/UniversalOutlinePass.cpp"
 
    # Misc
-   "Misc/Defines.h"
-   "Misc/Types.h"
+   "Misc/Defines.h"                 "Misc/Types.h"
    "Misc/ImguiManager.h"            "Misc/ImguiManager.cpp"
    "Misc/Utils.h"                   "Misc/Utils.cpp"       
    "Misc/IBLUtils.h"                "Misc/IBLUtils.cpp"
    "Misc/AssetFormat.h"             "Misc/AssetFormat.cpp"
    "Misc/AssetUtils.h"              "Misc/AssetUtils.cpp"
    "Misc/PhysicsHelper.h"           "Misc/PhysicsHelper.cpp"
+   "Managers/Logger.h"                  "Managers/Logger.cpp"
 
    # Graphics
    "Graphics/Shader.h"              "Graphics/Shader.cpp"

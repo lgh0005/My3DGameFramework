@@ -1,4 +1,4 @@
-#include "pch.h"
+ï»¿#include "pch.h"
 #include "SimpleRenderPass.h"
 
 #include "Core/Scene.h"
@@ -32,7 +32,7 @@ void SimpleRenderPass::Render(Scene* scene, Camera* camera)
 {
     m_simpleProgram->Use();
 
-    //// TOOD : ÀÌÁ¦ ÀÌ°Í ¿ª½Ãµµ UBO·Î ´ëÃ¼ ÇÒ ÇÊ¿ä ÀÖÀ½
+    //// TOOD : ì´ì œ ì´ê²ƒ ì—­ì‹œë„ UBOë¡œ ëŒ€ì²´ í•  í•„ìš” ìžˆìŒ
     auto projection = camera->GetProjectionMatrix();
     auto view = camera->GetViewMatrix();
 
@@ -45,7 +45,7 @@ void SimpleRenderPass::Render(Scene* scene, Camera* camera)
         auto lightMvp = projection * view * lightModel;
         m_simpleProgram->SetUniform("transform", lightMvp);
 
-        // »ö»óÀ» ÇÏ¾á»ö(1.0, 1.0, 1.0, 1.0)À¸·Î °íÁ¤
+        // ìƒ‰ìƒì„ í•˜ì–€ìƒ‰(1.0, 1.0, 1.0, 1.0)ìœ¼ë¡œ ê³ ì •
         m_simpleProgram->SetUniform("color", glm::vec4(1.0f));
 
         renderer->Render(m_simpleProgram.get());

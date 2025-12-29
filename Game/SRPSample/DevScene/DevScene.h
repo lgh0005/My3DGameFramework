@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include "Core/Scene.h"
 
 #pragma region FORWARD_DECLARATION

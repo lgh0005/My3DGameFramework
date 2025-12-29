@@ -10,7 +10,7 @@ bool WindowManager::Init(int32 width, int32 height, const std::string& title)
     {
         const char* description = nullptr;
         glfwGetError(&description);
-        SPDLOG_ERROR("failed to initialize glfw: {}", description);
+        LOG_ERROR("failed to initialize glfw: {}", description);
         return false;
     }
 
@@ -20,7 +20,7 @@ bool WindowManager::Init(int32 width, int32 height, const std::string& title)
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
     // glfw 윈도우 생성
-    SPDLOG_INFO("Create glfw window");
+    LOG_INFO("Create glfw window");
     m_window = glfwCreateWindow(width, height, title.c_str(), nullptr, nullptr);
     if (!m_window)
     {
@@ -40,14 +40,14 @@ bool WindowManager::Init(int32 width, int32 height, const std::string& title)
         return false;
     }
     auto glVersion = glGetString(GL_VERSION);
-    SPDLOG_INFO("OpenGL context version: {}", reinterpret_cast<const char*>(glVersion));
+    LOG_INFO("OpenGL context version: {}", reinterpret_cast<const char*>(glVersion));
 
     // glfw 콜백 함수 등록
     RegisterStaticEventCallbacks();
 
     // SPIR-V 확장 지원 체크
-    if (glfwExtensionSupported("GL_ARB_gl_spirv")) SPDLOG_INFO("SPIR-V supported!");
-    else SPDLOG_WARN("SPIR-V not supported on this system!");
+    if (glfwExtensionSupported("GL_ARB_gl_spirv")) LOG_INFO("SPIR-V supported!");
+    else LOG_WARN("SPIR-V not supported on this system!");
 
     return true;
 }
@@ -72,6 +72,8 @@ void WindowManager::DestroyWindow()
         glfwDestroyWindow(m_window);
         m_window = nullptr;
     }
+
+    LOG_INFO("WindowMager : window destroyed.");
 }
 
 /*=====================//
@@ -82,18 +84,14 @@ void WindowManager::HandleFramebufferSizeChange(GLFWwindow* window, int32 width,
     // 높이나 너비가 0이라면 프레임 버퍼의 크기 변환을 건너 뛴다.
     if (width <= 0 || height <= 0) return;
 
-    SPDLOG_INFO("framebuffer size changed: ({} x {})", width, height);
+    LOG_INFO("framebuffer size changed: ({} x {})", width, height);
     
-    /// <summary>
-    /// 1. 렌더러 (FBO 재생성, Viewport 설정)
-    /// WindowManager -> Renderer -> RenderPipeline을 타고 가서 Viewport를 변경
-    /// </summary>
+    // 1. 렌더러 (FBO 재생성, Viewport 설정)
+    // WindowManager -> Renderer -> RenderPipeline을 타고 가서 Viewport를 변경
     RENDER.OnResize(width, height);
    
-    /// <summary>
-    /// 2. 화면 크기에 맞게 종횡비를 맞추면서 렌더링
-    /// Scene의 카메라 컴포넌트의 종횡비를 변경
-    /// </summary>
+    // 2. 화면 크기에 맞게 종횡비를 맞추면서 렌더링
+    // Scene의 카메라 컴포넌트의 종횡비를 변경
     SCENE.OnScreenResize(width, height);
 }
 
@@ -101,12 +99,12 @@ void WindowManager::HandleWindowIconified(GLFWwindow* window, int32 iconified)
 {
     if (iconified == GLFW_TRUE)
     {
-        SPDLOG_INFO("Window Minimized");
+        LOG_INFO("Window Minimized");
         WINDOW.SetIconified(true);
     }
     else
     {
-        SPDLOG_INFO("Window Restored");
+        LOG_INFO("Window Restored");
         WINDOW.SetIconified(false);
     }
 }

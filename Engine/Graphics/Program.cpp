@@ -1,4 +1,4 @@
-#include "EnginePch.h"
+﻿#include "EnginePch.h"
 #include "Graphics/Shader.h"
 #include "Graphics/Program.h"
 
@@ -41,7 +41,7 @@ bool Program::Link(const std::vector<ShaderPtr>& shaders)
     {
         char infoLog[1024];
         glGetProgramInfoLog(m_program, 1024, nullptr, infoLog);
-        SPDLOG_ERROR("failed to link program: {}", infoLog);
+        LOG_ERROR("failed to link program: {}", infoLog);
         return false;
     }
     return true;

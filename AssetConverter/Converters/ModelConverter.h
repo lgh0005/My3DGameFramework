@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 #include "AssetTypes/AssetFormat.h"
 
 class ModelConverter
@@ -17,10 +17,10 @@ private:
 	bool WriteCustomModelFile();
 	void CreateORMTextureFromAssimp(aiMaterial* material, AssetFmt::RawMaterial& rawMat, int32 index);
 
-	// ¸ğµ¨ µ¥ÀÌÅÍ ±¸Á¶Ã¼
+	// ëª¨ë¸ ë°ì´í„° êµ¬ì¡°ì²´
 	AssetFmt::RawModel m_rawModel;
 
-	// °æ·Î ¹®ÀÚ¿­ ¸â¹ö
+	// ê²½ë¡œ ë¬¸ìì—´ ë©¤ë²„
 	std::string m_inputPath;
 	std::string m_outputPath;
 	std::string m_modelDirectory;

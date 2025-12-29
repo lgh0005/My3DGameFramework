@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include "Misc/AssetFormat.h"
 #include "Resources/Pose.h"
 

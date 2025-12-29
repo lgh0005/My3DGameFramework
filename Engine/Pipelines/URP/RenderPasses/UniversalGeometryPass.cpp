@@ -1,4 +1,4 @@
-#include "EnginePch.h"
+ï»¿#include "EnginePch.h"
 #include "UniversalGeometryPass.h"
 
 #include "Core/Scene.h"
@@ -52,29 +52,29 @@ bool UniversalGeometryPass::Init(int32 width, int32 height)
 
 void UniversalGeometryPass::Render(RenderContext* context)
 {
-	// 0. ÀÚ½ÅÀÇ ·»´õ ÆĞ½º¿¡ È°¿ëµÇ°í ÀÖ´Â RenderContext·Î Ä³½ºÆÃ
+	// 0. ìì‹ ì˜ ë Œë” íŒ¨ìŠ¤ì— í™œìš©ë˜ê³  ìˆëŠ” RenderContextë¡œ ìºìŠ¤íŒ…
 	auto stdCtx = (UniversalRenderContext*)context;
 
-	// 1. G-Buffer FBO ¹ÙÀÎµù
+	// 1. G-Buffer FBO ë°”ì¸ë”©
 	m_gBuffer->Bind();
 
-	// 2. È­¸é Å¬¸®¾î
+	// 2. í™”ë©´ í´ë¦¬ì–´
 	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 	glViewport(0, 0, m_gBuffer->GetWidth(), m_gBuffer->GetHeight());
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glEnable(GL_DEPTH_TEST);
 	glDisable(GL_BLEND);
 	
-	// 3. Static Mesh ±×¸®±â (Á¤Àû ¿ÀºêÁ§Æ®)
+	// 3. Static Mesh ê·¸ë¦¬ê¸° (ì •ì  ì˜¤ë¸Œì íŠ¸)
 	RenderStaticGeometry(stdCtx->GetStaticMeshRenderers());
 
-	// 4. Skinned Mesh ±×¸®±â (¾Ö´Ï¸ŞÀÌ¼Ç ¿ÀºêÁ§Æ®)
+	// 4. Skinned Mesh ê·¸ë¦¬ê¸° (ì• ë‹ˆë©”ì´ì…˜ ì˜¤ë¸Œì íŠ¸)
 	RenderSkinnedGeometry(stdCtx->GetSkinnedMeshRenderers());
 
-	// 5. context¿¡ gBuffer Ä³½Ì
+	// 5. contextì— gBuffer ìºì‹±
 	stdCtx->SetGBuffer(m_gBuffer.get());
 
-	// 6. ±×¸®±â ¿Ï·á ÈÄ ±âº» ÇÁ·¹ÀÓ¹öÆÛ·Î º¹±Í
+	// 6. ê·¸ë¦¬ê¸° ì™„ë£Œ í›„ ê¸°ë³¸ í”„ë ˆì„ë²„í¼ë¡œ ë³µê·€
 	Framebuffer::BindToDefault();
 }
 

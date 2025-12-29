@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 
 CLASS_PTR(Uniformbuffer)
 class Uniformbuffer
@@ -10,7 +10,7 @@ public:
 	uint32 Get() const { return m_buffer; }
 	void Bind() const;
 
-	// µ¥ÀÌÅÍ ÀüÃ¼ È¤Àº ÀÏºÎ¸¦ ¾÷µ¥ÀÌÆ®ÇÏ´Â ÇÙ½É ÇÔ¼ö
+	// ë°ì´í„° ì „ì²´ í˜¹ì€ ì¼ë¶€ë¥¼ ì—…ë°ì´íŠ¸í•˜ëŠ” í•µì‹¬ í•¨ìˆ˜
 	void SetData(const void* data, uint32 size, uint32 offset = 0);
 
 private:

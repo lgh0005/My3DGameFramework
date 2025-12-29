@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 #define MAX_BONE_INFLUENCE 4
 
 namespace AssetFmt
@@ -93,8 +93,8 @@ namespace AssetFmt
     struct RawNode
     {
         std::string name;
-        int32_t parentIndex = -1; // -1ÀÌ¸é ·çÆ®
-        glm::mat4 localTransform; // ÃÊ±â º¯È¯ (T-Pose)
+        int32_t parentIndex = -1; // -1ì´ë©´ ë£¨íŠ¸
+        glm::mat4 localTransform; // ì´ˆê¸° ë³€í™˜ (T-Pose)
         std::vector<uint32> meshIndices;
         std::vector<int32> children;
     };
@@ -102,7 +102,7 @@ namespace AssetFmt
     // RawAnimChannel
     struct RawAnimChannel
     {
-        std::string nodeName; // ¿òÁ÷ÀÏ ³ëµåÀÇ ÀÌ¸§ (RawNodeÀÇ name°ú ¸ÅÄª)
+        std::string nodeName; // ì›€ì§ì¼ ë…¸ë“œì˜ ì´ë¦„ (RawNodeì˜ nameê³¼ ë§¤ì¹­)
         std::vector<RawKeyPosition> positions;
         std::vector<RawKeyRotation> rotations;
         std::vector<RawKeyScale>    scales;

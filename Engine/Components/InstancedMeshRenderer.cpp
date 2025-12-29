@@ -1,4 +1,4 @@
-#include "EnginePch.h"
+ï»¿#include "EnginePch.h"
 #include "InstancedMeshRenderer.h"
 #include "Resources/InstancedMesh.h"
 #include "Resources/Material.h"
@@ -26,7 +26,7 @@ bool InstancedMeshRenderer::Init(InstancedMeshPtr mesh, MaterialPtr material)
 
 RenderBounds InstancedMeshRenderer::GetWorldBounds() const
 {
-	// TODO : ÀÌÈÄ¿¡´Â ¿ùµå °æ°è¸¦ ¾î¶»°Ô ÇØ¾ß ÇÒ Áö °í¹Î ÇÊ¿ä
+	// TODO : ì´í›„ì—ëŠ” ì›”ë“œ ê²½ê³„ë¥¼ ì–´ë–»ê²Œ í•´ì•¼ í•  ì§€ ê³ ë¯¼ í•„ìš”
 	return RenderBounds::Empty();
 }
 

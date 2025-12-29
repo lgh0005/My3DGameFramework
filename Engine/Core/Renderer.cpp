@@ -1,4 +1,4 @@
-#include "EnginePch.h"
+ï»¿#include "EnginePch.h"
 #include "Renderer.h"
 #include "Core/Scene.h"
 #include "Core/RenderPipeline.h"
@@ -15,7 +15,7 @@ RendererUPtr Renderer::Create()
 
 void Renderer::Init()
 {
-	// ±âº» OpenGL »óÅÂ ¼³Á¤ (ÃÊ±âÈ­)
+	// ê¸°ë³¸ OpenGL ìƒíƒœ ì„¤ì • (ì´ˆê¸°í™”)
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);
 	glCullFace(GL_BACK);
@@ -28,20 +28,20 @@ void Renderer::Init()
 
 void Renderer::Render(Scene* scene)
 {
-	// ÆÄÀÌÇÁ¶óÀÎÀÌ ¾ÆÁ÷ ¼¼ÆÃµÇÁö ¾Ê¾ÒÀ¸¸é ¹«½Ã (¾ÈÀüÀåÄ¡)
+	// íŒŒì´í”„ë¼ì¸ì´ ì•„ì§ ì„¸íŒ…ë˜ì§€ ì•Šì•˜ìœ¼ë©´ ë¬´ì‹œ (ì•ˆì „ìž¥ì¹˜)
 	if (m_pipeline)
 	{
 		m_pipeline->Render(scene);
 	}
 	else
 	{
-		// ÆÄÀÌÇÁ¶óÀÎÀÌ ¾øÀ» ¶§ È­¸é Å¬¸®¾î
+		// íŒŒì´í”„ë¼ì¸ì´ ì—†ì„ ë•Œ í™”ë©´ í´ë¦¬ì–´
 		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	}
 }
 
-// TODO : ¸®»çÀÌÂ¡ ·ÎÁ÷ °ËÅä ÇÊ¿ä
+// TODO : ë¦¬ì‚¬ì´ì§• ë¡œì§ ê²€í†  í•„ìš”
 void Renderer::OnResize(int32 width, int32 height)
 {
 	m_pipeline->OnResize(width, height);

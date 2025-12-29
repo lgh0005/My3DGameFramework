@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include "Resources/Mesh.h"
 #include "Graphics/Vertex.h"
 

@@ -1,4 +1,4 @@
-#include "EnginePch.h"
+ï»¿#include "EnginePch.h"
 #include "UniversalPostProcessPass.h"
 
 #include "Core/Scene.h"
@@ -33,13 +33,13 @@ bool UniversalPostProcessPass::Init(int32 width, int32 height)
 	);
 	if (!m_bloomProgram) return false;
 
-	// Bloom¿ë FBO ¹× ÅØ½ºÃ³ »ı¼º (Ãß°¡µÊ)
-	m_bloomFBO = PostProcessFramebuffer::Create(1, 1, false); // Å©±â´Â ¸Å¹ø ¹Ù²Ü°Å¶ó ÀÓ½Ã »ı¼º
+	// Bloomìš© FBO ë° í…ìŠ¤ì²˜ ìƒì„± (ì¶”ê°€ë¨)
+	m_bloomFBO = PostProcessFramebuffer::Create(1, 1, false); // í¬ê¸°ëŠ” ë§¤ë²ˆ ë°”ê¿€ê±°ë¼ ì„ì‹œ ìƒì„±
 	m_bloomMips.clear();
 
 	int32 mipWidth = width;
 	int32 mipHeight = height;
-	for (int i = 0; i < 5; i++) // 5´Ü°è Á¤µµÀÇ Mip Chain »ı¼º
+	for (int i = 0; i < 5; i++) // 5ë‹¨ê³„ ì •ë„ì˜ Mip Chain ìƒì„±
 	{
 		mipWidth >>= 1;
 		mipHeight >>= 1;
@@ -50,14 +50,14 @@ bool UniversalPostProcessPass::Init(int32 width, int32 height)
 		mip.height = mipHeight;
 		mip.texture = Texture::Create(mipWidth, mipHeight, GL_R11F_G11F_B10F, GL_RGB, GL_FLOAT);
 		
-		// Áß¿ä: Linear ÇÊÅÍ¸µ°ú Clamp ¼³Á¤
+		// ì¤‘ìš”: Linear í•„í„°ë§ê³¼ Clamp ì„¤ì •
 		mip.texture->SetFilter(GL_LINEAR, GL_LINEAR);
 		mip.texture->SetWrap(GL_CLAMP_TO_EDGE, GL_CLAMP_TO_EDGE);
 
 		m_bloomMips.push_back(std::move(mip));
 	}
 
-	// 2. FXAA, Åæ ¸ÅÇÎ ±×¸®°í °¨¸¶ ÄÚ·º¼Ç 
+	// 2. FXAA, í†¤ ë§¤í•‘ ê·¸ë¦¬ê³  ê°ë§ˆ ì½”ë ‰ì…˜ 
 	m_compositeProgram = Program::Create
 	(
 		"./Resources/Shaders/Universal/Universal_Post_PostProcess.vert",
@@ -65,11 +65,11 @@ bool UniversalPostProcessPass::Init(int32 width, int32 height)
 	);
 	if (!m_compositeProgram) return false;
 
-	// 2. ½ºÅ©¸° ¸Ş½¬ »ı¼º
+	// 2. ìŠ¤í¬ë¦° ë©”ì‰¬ ìƒì„±
 	m_plane = ScreenMesh::Create();
 	if (!m_plane) return false;
 
-	// 3. ÇÁ·¹ÀÓ ¹öÆÛ »ı¼º
+	// 3. í”„ë ˆì„ ë²„í¼ ìƒì„±
 	m_frameBuffer = PostProcessFramebuffer::Create(width, height, true);
 	if (!m_frameBuffer) return false;
 
@@ -78,7 +78,7 @@ bool UniversalPostProcessPass::Init(int32 width, int32 height)
 
 void UniversalPostProcessPass::Render(RenderContext* context)
 {
-	// 0. Lighting Pass¿¡¼­ ±×·ÁÁø ¿øº» HDR ÀÌ¹ÌÁö °¡Á®¿À±â
+	// 0. Lighting Passì—ì„œ ê·¸ë ¤ì§„ ì›ë³¸ HDR ì´ë¯¸ì§€ ê°€ì ¸ì˜¤ê¸°
 	auto hdrTexture = m_frameBuffer->GetColorAttachment(0).get();
 	if (!hdrTexture || m_bloomMips.empty()) return;
 
@@ -93,7 +93,7 @@ void UniversalPostProcessPass::Resize(int32 width, int32 height)
 {
 	m_frameBuffer = PostProcessFramebuffer::Create(width, height, true);
 
-	// Bloom Mip Chain Àç»ı¼º (Init ÄÚµå¿Í µ¿ÀÏÇÑ ·ÎÁ÷)
+	// Bloom Mip Chain ì¬ìƒì„± (Init ì½”ë“œì™€ ë™ì¼í•œ ë¡œì§)
 	m_bloomMips.clear();
 	int32 mipWidth = width;
 	int32 mipHeight = height;
@@ -133,7 +133,7 @@ Texture* UniversalPostProcessPass::RenderKawaseBloom(Texture* hdrTexture)
 	//====================================================*/
 	m_bloomProgram->SetUniform("threshold", m_threshold);
 
-	// [¼öÁ¤] AttachTexture¿¡ 0¹ø ÀÎµ¦½º ¸í½Ã
+	// [ìˆ˜ì •] AttachTextureì— 0ë²ˆ ì¸ë±ìŠ¤ ëª…ì‹œ
 	m_bloomFBO->AttachTexture(m_bloomMips[0].texture.get(), 0);
 	glViewport(0, 0, m_bloomMips[0].width, m_bloomMips[0].height);
 	glClear(GL_COLOR_BUFFER_BIT);
@@ -181,7 +181,7 @@ Texture* UniversalPostProcessPass::RenderKawaseBloom(Texture* hdrTexture)
 
 	for (int32 i = (int32)m_bloomMips.size() - 1; i > 0; i--)
 	{
-		// Target: Upper Mip (ÀÌ¹Ì ±×·ÁÁø °Í À§¿¡ µ¡Ä¥)
+		// Target: Upper Mip (ì´ë¯¸ ê·¸ë ¤ì§„ ê²ƒ ìœ„ì— ë§ì¹ )
 		m_bloomFBO->AttachTexture(m_bloomMips[i - 1].texture.get(), 0);
 		glViewport(0, 0, m_bloomMips[i - 1].width, m_bloomMips[i - 1].height);
 
@@ -198,7 +198,7 @@ Texture* UniversalPostProcessPass::RenderKawaseBloom(Texture* hdrTexture)
 
 	glDisable(GL_BLEND);
 
-	// ÃÖÁ¾ °á°ú´Â °¡Àå Å« ¹Ó¸Ê(Mip[0])¿¡ ´©Àû
+	// ìµœì¢… ê²°ê³¼ëŠ” ê°€ì¥ í° ë°‰ë§µ(Mip[0])ì— ëˆ„ì 
 	return m_bloomMips[0].texture.get();
 }
 
@@ -206,7 +206,7 @@ void UniversalPostProcessPass::RenderComposite(Texture* hdrTexture, Texture* blo
 {
 	if (!hdrTexture) return;
 
-	// ÃÖÁ¾ È­¸é(Backbuffer)¿¡ ±×¸± ÁØºñ
+	// ìµœì¢… í™”ë©´(Backbuffer)ì— ê·¸ë¦´ ì¤€ë¹„
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	glViewport(0, 0, hdrTexture->GetWidth(), hdrTexture->GetHeight());
 
@@ -218,7 +218,7 @@ void UniversalPostProcessPass::RenderComposite(Texture* hdrTexture, Texture* blo
 	m_compositeProgram->SetUniform("gamma", m_gamma);
 	m_compositeProgram->SetUniform("exposure", m_exposure);
 
-	// ÅØ½ºÃ³ 0¹ø ½½·Ô ¹ÙÀÎµù (HDR ¿øº»)
+	// í…ìŠ¤ì²˜ 0ë²ˆ ìŠ¬ë¡¯ ë°”ì¸ë”© (HDR ì›ë³¸)
 	glActiveTexture(GL_TEXTURE0);
 	hdrTexture->Bind();
 	m_compositeProgram->SetUniform("screenTexture", 0);
@@ -241,7 +241,7 @@ void UniversalPostProcessPass::RenderComposite(Texture* hdrTexture, Texture* blo
 
 	m_plane->Draw();
 
-	// »óÅÂ º¹±¸
+	// ìƒíƒœ ë³µêµ¬
 	glEnable(GL_CULL_FACE);
 	glEnable(GL_DEPTH_TEST);
 }

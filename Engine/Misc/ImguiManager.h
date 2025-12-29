@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include "imgui.h"
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
@@ -9,7 +9,7 @@ class ImGuiManager
 
 public:
 	void Init(bool enable);
-	void ShutDown();
+	void Clear();
 	void BeginFrame();
 	void EndFrame();
 	bool Begin(const char* name, 

@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 #include <glm/glm.hpp>
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
@@ -12,35 +12,35 @@ class Utils
 {
 public:
 
-	// Á¶¸í ¿¬»ê Àü¿ë À¯Æ¿ ÇÔ¼ö
+	// ì¡°ëª… ì—°ì‚° ì „ìš© ìœ í‹¸ í•¨ìˆ˜
 	static glm::vec3 GetAttenuationCoeff(float distance);
 
-	// ¼ÎÀÌ´õ ÆÄÀÏ ·Îµå À¯Æ¿ ÇÔ¼ö
+	// ì…°ì´ë” íŒŒì¼ ë¡œë“œ ìœ í‹¸ í•¨ìˆ˜
 	static std::optional<std::string> LoadTextFile(const std::string& filename);
 
-	// assimp to glm À¯Æ¿ ÇÔ¼ö
+	// assimp to glm ìœ í‹¸ í•¨ìˆ˜
 	static glm::mat4 ConvertToGLMMat4(const aiMatrix4x4& aiMat);
 	static glm::vec3 ConvertToGLMVec(const aiVector3D& vec);
 	static glm::quat ConvertToGLMQuat(const aiQuaternion& pOrientation);
 
-	// Jolt to glm À¯Æ¿ ÇÔ¼ö
+	// Jolt to glm ìœ í‹¸ í•¨ìˆ˜
 	static glm::vec3 ToGlmVec3(const JPH::Vec3& v);
 	static glm::quat ToGlmQuat(const JPH::Quat& q);
 
-	// glm to Jolt À¯Æ¿ ÇÔ¼ö
+	// glm to Jolt ìœ í‹¸ í•¨ìˆ˜
 	static JPH::Vec3 ToJoltVec3(const glm::vec3& v);
 	static JPH::Quat ToJoltQuat(const glm::quat& q);
 
-	// SSAO ¿¬»êÀ» À§ÇÑ Lerp ÇÔ¼ö
+	// SSAO ì—°ì‚°ì„ ìœ„í•œ Lerp í•¨ìˆ˜
 	static float Lerp(float a, float b, float f);
 
-	// AABB ÁÂÇ¥¸¦ ¾ò¾î¿À´Â À¯Æ¿ ÇÔ¼ö
+	// AABB ì¢Œí‘œë¥¼ ì–»ì–´ì˜¤ëŠ” ìœ í‹¸ í•¨ìˆ˜
 	static glm::vec3 Min(const glm::vec3& a, const glm::vec3& b);
 	static glm::vec3 Max(const glm::vec3& a, const glm::vec3& b);
 
 
 /*==================================//
-//   Common Constants (°ø¿ë »ó¼ö)    //
+//   Common Constants (ê³µìš© ìƒìˆ˜)    //
 //==================================*/
 public:
 	inline static const glm::mat4 IdentityMat4 = glm::mat4(1.0f);

@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 
 #pragma region FORWARD_DECLARATION
 CLASS_PTR(Animation)
@@ -29,15 +29,15 @@ private:
 	void TransitTo(std::shared_ptr<AnimState> nextState, float duration);
 	AnimStateMap m_states;
 
-	// ÇöÀç/´ÙÀ½ »óÅÂ (Æ÷ÀÎÅÍ·Î °¡¸®Å´)
+	// í˜„ì¬/ë‹¤ìŒ ìƒíƒœ (í¬ì¸í„°ë¡œ ê°€ë¦¬í‚´)
 	AnimStatePtr m_currentState;
 	AnimStatePtr m_nextState;
 
-	// ½Ã°£ °ü¸®
+	// ì‹œê°„ ê´€ë¦¬
 	float m_currentTime = 0.0f;
     float m_nextTime = 0.0f;
 
-	// ºí·»µù Á¦¾î
+	// ë¸”ë Œë”© ì œì–´
     bool  m_isBlending = false;
     float m_blendTimer = 0.0f;
     float m_blendDuration = 0.0f;

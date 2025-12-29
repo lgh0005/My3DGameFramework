@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 #include "Core/RenderPipeline.h"
 
 #pragma region FORWARD_DECLARATION
@@ -34,23 +34,23 @@ private:
 		int32 height = WINDOW_HEIGHT
 	);
 
-	// TODO : PBR ±â¹İ ·»´õ¸µ ÆÄÀÌÇÁ¶óÀÎ
-	// SRP¿¡ ¾²¿´´ø ÀÏºÎ ·»´õ¸µ ÆÄÀÌÇÁ¶óÀÎÀ» Àç»ç¿ëÇÏ°Å³ª Á¶±İ ¼öÁ¤
-	// ÇÊ¿äÇÒ ¼ö ÀÖÀ½.
+	// TODO : PBR ê¸°ë°˜ ë Œë”ë§ íŒŒì´í”„ë¼ì¸
+	// SRPì— ì“°ì˜€ë˜ ì¼ë¶€ ë Œë”ë§ íŒŒì´í”„ë¼ì¸ì„ ì¬ì‚¬ìš©í•˜ê±°ë‚˜ ì¡°ê¸ˆ ìˆ˜ì •
+	// í•„ìš”í•  ìˆ˜ ìˆìŒ.
 
-	// °øÅë ÇÊ¼ö ·»´õ ÆĞ½º
+	// ê³µí†µ í•„ìˆ˜ ë Œë” íŒ¨ìŠ¤
 	CullingPassUPtr		         m_cullingPass      { nullptr };
 	ShadowPassUPtr				 m_shadowPass		{ nullptr };
 	SkyboxPassUPtr               m_skyboxPass       { nullptr };
 
-	// URP ÇÊ¼ö ·»´õ ÆĞ½º
+	// URP í•„ìˆ˜ ë Œë” íŒ¨ìŠ¤
 	UniversalPostProcessPassUPtr m_postProcessPass	{ nullptr };
 	UniversalGeometryPassUPtr    m_geometryPass     { nullptr };
 	UniversalSSAOPassUPtr		 m_ssaoPass			{ nullptr };
 	UniversalDeferredLightingPassUPtr  m_deferredLightPass  { nullptr };
 	UniversalOutlinePassUPtr		 m_outlinePass		{ nullptr };
 
-	// URP °øÅë À¯´ÏÆû º¯¼ö ¹öÆÛ
+	// URP ê³µí†µ ìœ ë‹ˆí¼ ë³€ìˆ˜ ë²„í¼
 	UniversalGlobalUniformsUPtr  m_globalUniforms	{ nullptr }; 
 
 /*================================//

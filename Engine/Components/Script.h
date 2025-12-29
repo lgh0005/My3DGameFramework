@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 #include "Component.h"
 
 CLASS_PTR(Script)
@@ -9,13 +9,13 @@ public:
 	static const ComponentType s_ComponentType = ComponentType::Script;
 	virtual ComponentType GetComponentType() const override { return ComponentType::Script; }
 
-	// TODO : Awake, FixedUpdate, LateUpdate µîÀÇ ºĞ±â ÇÊ¿äÇÒ ¼ö ÀÖÀ½
+	// TODO : Awake, FixedUpdate, LateUpdate ë“±ì˜ ë¶„ê¸° í•„ìš”í•  ìˆ˜ ìˆìŒ
 	virtual void Start()   {}
 	virtual void Update()  {}
 
 	// TODO :
 	// 0. OnEnable, OnDisable, OnDestroy
-	// 1. Ãæµ¹ ½Ã ¹ß»ıÇÒ ÀÌº¥Æ® ¸Ş¼­µå : OnTrigger, OnCollision
+	// 1. ì¶©ëŒ ì‹œ ë°œìƒí•  ì´ë²¤íŠ¸ ë©”ì„œë“œ : OnTrigger, OnCollision
 protected:
 	Script();
 };

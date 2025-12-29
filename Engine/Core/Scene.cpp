@@ -125,7 +125,7 @@ GeneralRenderPass* Scene::GetCustomRenderPass(const std::string& name)
 void Scene::AddCustomRenderPass(const std::string& name, GeneralRenderPassUPtr pass)
 {
 	if (m_customPasses.find(name) != m_customPasses.end())
-		SPDLOG_WARN("Custom random pass '{}' already exists. Overwriting.", name);
+		LOG_WARN("Custom random pass '{}' already exists. Overwriting.", name);
 
 	m_customPasses[name] = std::move(pass);
 }
@@ -137,19 +137,19 @@ bool Scene::Init()
 {
 	if (!LoadNessesaryResources())
 	{
-		SPDLOG_ERROR("failed to load resources.");
+		LOG_ERROR("failed to load resources.");
 		return false;
 	}
 
 	if (!CreateNessesaryRenderPasses())
 	{
-		SPDLOG_ERROR("failed to create render passes.");
+		LOG_ERROR("failed to create render passes.");
 		return false;
 	}
 
 	if (!CreateSceneContext())
 	{
-		SPDLOG_ERROR("failed to create scene context.");
+		LOG_ERROR("failed to create scene context.");
 		return false;
 	}
 

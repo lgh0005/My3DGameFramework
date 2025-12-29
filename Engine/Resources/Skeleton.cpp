@@ -1,4 +1,4 @@
-#include "EnginePch.h"
+ï»¿#include "EnginePch.h"
 #include "Skeleton.h"
 
 Skeleton::Skeleton() = default;
@@ -11,24 +11,24 @@ SkeletonUPtr Skeleton::Create()
 
 int32 Skeleton::AddBone(const std::string& name, const glm::mat4& offset)
 {
-	// 1. ÀÌ¹Ì µî·ÏµÈ »ÀÀÎÁö È®ÀÎ
+	// 1. ì´ë¯¸ ë“±ë¡ëœ ë¼ˆì¸ì§€ í™•ì¸
 	auto it = m_boneInfoMap.find(name);
 	if (it != m_boneInfoMap.end()) return it->second.id;
 
-	// 2. »õ·Î¿î »À µî·Ï
+	// 2. ìƒˆë¡œìš´ ë¼ˆ ë“±ë¡
 	AssetFmt::RawBoneInfo newBoneInfo;
 	newBoneInfo.id = m_boneCounter;
 	newBoneInfo.offset = offset;
 
 	m_boneInfoMap[name] = newBoneInfo;
 
-	// 3. º¤ÅÍ Ä³½Ã¿¡ ¿ÀÇÁ¼Â Çà·Ä ÀúÀå (ÀÎµ¦½º = ID)
+	// 3. ë²¡í„° ìºì‹œì— ì˜¤í”„ì…‹ í–‰ë ¬ ì €ì¥ (ì¸ë±ìŠ¤ = ID)
 	if (m_boneOffsets.size() <= m_boneCounter)
 		m_boneOffsets.resize(m_boneCounter + 1);
 
 	m_boneOffsets[m_boneCounter] = offset;
 
-	// ID ¹İÈ¯ ÈÄ Ä«¿îÅÍ Áõ°¡
+	// ID ë°˜í™˜ í›„ ì¹´ìš´í„° ì¦ê°€
 	return m_boneCounter++;
 }
 
@@ -43,18 +43,18 @@ void Skeleton::InitializeVertexBoneData(SkinnedVertex& vertex)
 
 void Skeleton::AddBoneWeightToVertex(SkinnedVertex& vertex, int32 boneID, float weight)
 {
-	// ºó ½½·Ô(-1)À» Ã£¾Æ ¿şÀÌÆ® ÁÖÀÔ
+	// ë¹ˆ ìŠ¬ë¡¯(-1)ì„ ì°¾ì•„ ì›¨ì´íŠ¸ ì£¼ì…
 	for (int i = 0; i < MAX_BONE_INFLUENCE; ++i)
 	{
 		if (vertex.boneIDs[i] < 0)
 		{
 			vertex.weights[i] = weight;
 			vertex.boneIDs[i] = boneID;
-			return; // ÁÖÀÔ ¼º°ø ½Ã ¸®ÅÏ
+			return; // ì£¼ì… ì„±ê³µ ì‹œ ë¦¬í„´
 		}
 	}
 
-	SPDLOG_WARN("Vertex has too many bone influences. Limit is {}", MAX_BONE_INFLUENCE);
+	LOG_WARN("Vertex has too many bone influences. Limit is {}", MAX_BONE_INFLUENCE);
 }
 
 void Skeleton::SetData(const BoneMap& map, int32 count)
@@ -62,8 +62,8 @@ void Skeleton::SetData(const BoneMap& map, int32 count)
 	m_boneInfoMap = map;
 	m_boneCounter = count;
 
-	// ¸Ê µ¥ÀÌÅÍ¸¦ ±â¹İÀ¸·Î º¤ÅÍ Ä³½Ã Àç±¸Ãà
-	m_boneOffsets.clear(); // ¾ÈÀüÇÏ°Ô ºñ¿ì°í ½ÃÀÛ
+	// ë§µ ë°ì´í„°ë¥¼ ê¸°ë°˜ìœ¼ë¡œ ë²¡í„° ìºì‹œ ì¬êµ¬ì¶•
+	m_boneOffsets.clear(); // ì•ˆì „í•˜ê²Œ ë¹„ìš°ê³  ì‹œì‘
 	m_boneOffsets.resize(count, Utils::IdentityMat4);
 
 	for (const auto& [name, info] : m_boneInfoMap)

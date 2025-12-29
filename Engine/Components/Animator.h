@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include "Component.h"
 #include "Resources/Animation.h"
 #include "Graphics/Geometry.h"

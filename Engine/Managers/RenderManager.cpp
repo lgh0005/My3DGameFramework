@@ -1,4 +1,4 @@
-#include "EnginePch.h"
+ï»¿#include "EnginePch.h"
 #include "RenderManager.h"
 
 bool RenderManager::Init()
@@ -15,19 +15,19 @@ void RenderManager::SetPipeline(const std::string& name)
 	auto it = m_pipelines.find(name);
 	if (it == m_pipelines.end())
 	{
-		SPDLOG_ERROR("Failed to find pipeline factory: {}", name);
+		LOG_ERROR("Failed to find pipeline factory: {}", name);
 		return;
 	}
 
 	RenderPipelineUPtr newPipeline = it->second();
 	m_renderer->SetPipeline(std::move(newPipeline));
 
-	// ¸®»çÀÌÁî µ¿±âÈ­
+	// ë¦¬ì‚¬ì´ì¦ˆ ë™ê¸°í™”
 	int32 width, height;
 	glfwGetFramebufferSize(WINDOW.GetWindow(), &width, &height);
 	m_renderer->OnResize(width, height);
 
-	SPDLOG_INFO("Switched RenderPipeline to: {}", name);
+	LOG_INFO("Switched RenderPipeline to: {}", name);
 }
 
 void RenderManager::UpdateViewport(int32* outWidth, int32* outHeight)
@@ -39,12 +39,13 @@ void RenderManager::UpdateViewport(int32* outWidth, int32* outHeight)
 	if (outWidth) *outWidth = width;
 	if (outHeight) *outHeight = height;
 
-	SPDLOG_INFO("Viewport synced to window size: {}x{}", width, height);
+	LOG_INFO("Viewport synced to window size: {}x{}", width, height);
 }
 
 void RenderManager::Clear()
 {
 	m_renderer.reset();
+	LOG_INFO("RenderManager Cleared.");
 }
 
 void RenderManager::Render(Scene* scene)

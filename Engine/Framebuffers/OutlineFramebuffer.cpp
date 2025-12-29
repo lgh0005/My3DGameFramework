@@ -1,4 +1,4 @@
-#include "EnginePch.h"
+ï»¿#include "EnginePch.h"
 #include "OutlineFramebuffer.h"
 #include "Resources/Texture.h"
 
@@ -20,14 +20,14 @@ bool OutlineFramebuffer::Init(int32 width, int32 height)
     glGenFramebuffers(1, &m_fbo);
     glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
 
-    // 1. Color Attachment (¸¶½ºÅ© ¹× »ö»ó Á¤º¸ ÀúÀå)
-    // GL_RGB È¤Àº GL_RGBA »ç¿ë (»ö»óµµ ÀúÀåÇØ¾ß ÇÏ¹Ç·Î)
+    // 1. Color Attachment (ë§ˆìŠ¤í¬ ë° ìƒ‰ìƒ ì •ë³´ ì €ì¥)
+    // GL_RGB í˜¹ì€ GL_RGBA ì‚¬ìš© (ìƒ‰ìƒë„ ì €ì¥í•´ì•¼ í•˜ë¯€ë¡œ)
     auto texture = Texture::Create(width, height, GL_RGB, GL_RGB, GL_UNSIGNED_BYTE);
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, texture->Get(), 0);
     m_textures.push_back(std::move(texture));
 
-    // [Áß¿ä] Depth Buffer´Â ÇÊ¿ä ¾ø½À´Ï´Ù! 
-    // ÀÌÀ¯: ¿ì¸®´Â "Always On Top (X-Ray)" È¿°ú¸¦ ³¾ °Å¶ó¼­ ±íÀÌ Å×½ºÆ®¸¦ ²ø °ÍÀÌ±â ¶§¹®ÀÔ´Ï´Ù.
+    // [ì¤‘ìš”] Depth BufferëŠ” í•„ìš” ì—†ìŠµë‹ˆë‹¤! 
+    // ì´ìœ : ìš°ë¦¬ëŠ” "Always On Top (X-Ray)" íš¨ê³¼ë¥¼ ë‚¼ ê±°ë¼ì„œ ê¹Šì´ í…ŒìŠ¤íŠ¸ë¥¼ ëŒ ê²ƒì´ê¸° ë•Œë¬¸ì…ë‹ˆë‹¤.
     if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
         return false;
 

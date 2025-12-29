@@ -1,4 +1,4 @@
-#include "EnginePch.h"
+ï»¿#include "EnginePch.h"
 #include "BRDFLookUpFramebuffer.h"
 #include "Resources/Texture.h"
 
@@ -17,26 +17,26 @@ bool BRDFLookUpFramebuffer::Init(int32 width, int32 height)
     m_width = width;
     m_height = height;
 
-    // 1. ºÎ¸ğÀÇ m_fbo »ç¿ë
+    // 1. ë¶€ëª¨ì˜ m_fbo ì‚¬ìš©
     glGenFramebuffers(1, &m_fbo);
     glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
 
-    // 2. ÅØ½ºÃ³ »ı¼º (R16F)
+    // 2. í…ìŠ¤ì²˜ ìƒì„± (R16F)
     auto texture = Texture::Create(width, height, GL_RG16F, GL_RG, GL_FLOAT);
     texture->SetFilter(GL_LINEAR, GL_LINEAR);
     texture->SetWrap(GL_CLAMP_TO_EDGE, GL_CLAMP_TO_EDGE);
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, texture->Get(), 0);
     
-    // 3. ºÎ¸ğÀÇ ÅØ½ºÃ³ ÄÁÅ×ÀÌ³Ê¿¡ µî·Ï
+    // 3. ë¶€ëª¨ì˜ í…ìŠ¤ì²˜ ì»¨í…Œì´ë„ˆì— ë“±ë¡
     m_textures.push_back(std::move(texture));
 
-    // 4. Draw Buffer ¼³Á¤
+    // 4. Draw Buffer ì„¤ì •
     uint32 attachments[1] = { GL_COLOR_ATTACHMENT0 };
     glDrawBuffers(1, attachments);
 
     if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
     {
-        SPDLOG_ERROR("BRDF LUT Framebuffer Incomplete!");
+        LOG_ERROR("BRDF LUT Framebuffer Incomplete!");
         return false;
     }
 

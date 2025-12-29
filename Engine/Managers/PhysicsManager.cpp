@@ -49,7 +49,7 @@ void PhysicsManager::Init()
 	m_PhysicsSystem->SetBodyActivationListener(m_BodyActivationListener);
 	m_PhysicsSystem->SetContactListener(m_ContactListener);
 
-	SPDLOG_INFO("Jolt Physics Initialized Successfully.");
+	LOG_INFO("Jolt Physics Initialized Successfully.");
 }
 
 void PhysicsManager::Update()
@@ -93,7 +93,7 @@ void PhysicsManager::Clear()
 		Factory::sInstance = nullptr;
 	}
 
-	SPDLOG_INFO("Jolt Physics Cleared.");
+	LOG_INFO("PhysicsManager : Jolt Physics Cleared.");
 }
 
 BodyInterface& PhysicsManager::GetBodyInterface() const

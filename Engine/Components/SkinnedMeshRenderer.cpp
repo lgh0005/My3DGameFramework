@@ -1,4 +1,4 @@
-#include "EnginePch.h"
+ï»¿#include "EnginePch.h"
 #include "SkinnedMeshRenderer.h"
 #include "Core/GameObject.h"
 #include "Components/Animator.h"
@@ -31,19 +31,19 @@ RenderBounds SkinnedMeshRenderer::GetWorldBounds() const
 {
     if (!m_mesh) return RenderBounds::Empty();
 
-    // 1. ±âº» AABB´Â T-Pose AABB¸¦ »ç¿ë.
+    // 1. ê¸°ë³¸ AABBëŠ” T-Pose AABBë¥¼ ì‚¬ìš©.
     RenderBounds bounds = m_mesh->GetLocalBounds();
 
-    // 2. AnimatorÀÇ ÃÖ½Å AABB¿Í Union
+    // 2. Animatorì˜ ìµœì‹  AABBì™€ Union
     auto* animator = GetAnimator();
     if (animator)
     {
-        // Animator°¡ Update()¿¡¼­ °è»êÇÑ ÃÖ½Å Æ÷ÁîÀÇ AABB¸¦ °¡Á®¿Í Union
+        // Animatorê°€ Update()ì—ì„œ ê³„ì‚°í•œ ìµœì‹  í¬ì¦ˆì˜ AABBë¥¼ ê°€ì ¸ì™€ Union
         const RenderBounds& dynamicBounds = animator->GetCurrentLocalBounds();
         bounds = bounds.Union(dynamicBounds);
     }
 
-    // 3. TransformÀÇ ÃÖ½Å Çà·Ä Àû¿ë
+    // 3. Transformì˜ ìµœì‹  í–‰ë ¬ ì ìš©
     return bounds.Transform(GetTransform().GetWorldMatrix());
 }
 

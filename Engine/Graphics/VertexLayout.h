@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 CLASS_PTR(VertexLayout)
 class VertexLayout

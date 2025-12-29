@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include "Framebuffer.h"
 
 CLASS_PTR(BRDFLookUpFramebuffer)

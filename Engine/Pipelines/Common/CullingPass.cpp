@@ -1,4 +1,4 @@
-#include "EnginePch.h"
+ï»¿#include "EnginePch.h"
 #include "CullingPass.h"
 #include "Pipelines/SRP/StandardRenderContext.h"
 #include "Core/Scene.h"
@@ -30,19 +30,19 @@ void CullingPass::Render(RenderContext* context)
     Scene* scene = context->GetScene();
     Camera* camera = context->GetCamera();
 
-    // 1. Frustum ¾÷µ¥ÀÌÆ® (Ä«¸Þ¶óÀÇ View-Projection Çà·Ä »ç¿ë)
+    // 1. Frustum ì—…ë°ì´íŠ¸ (ì¹´ë©”ë¼ì˜ View-Projection í–‰ë ¬ ì‚¬ìš©)
     m_frustum->Update(camera->GetViewProjectionMatrix());
 
-    // 2. Static Mesh Renderer ÄÃ¸µ
+    // 2. Static Mesh Renderer ì»¬ë§
     CullStaticMeshRenderers(scene, context);
 
-    // 3. Skinned Mesh Renderer ÄÃ¸µ
+    // 3. Skinned Mesh Renderer ì»¬ë§
     CullSkinnedMeshRenderers(scene, context);
 
-    // 4. Mesh Outline ÄÃ¸µ
+    // 4. Mesh Outline ì»¬ë§
     CullMeshOutlines(scene, context);
 
-    // 5. Light´Â ÄÃ¸µÇÏÁö ¾Ê°í ¸ðµÎ Æ÷ÇÔ (Á¶¸í ¹üÀ§´Â Geometry Pass °á°ú¿¡ ÀÇÁ¸)
+    // 5. LightëŠ” ì»¬ë§í•˜ì§€ ì•Šê³  ëª¨ë‘ í¬í•¨ (ì¡°ëª… ë²”ìœ„ëŠ” Geometry Pass ê²°ê³¼ì— ì˜ì¡´)
     CullSceneLights(scene, context);
 }
 
@@ -51,11 +51,11 @@ void CullingPass::Render(RenderContext* context)
 //=====================*/
 void CullingPass::CullStaticMeshRenderers(Scene* scene, RenderContext* context)
 {
-    // TODO : ÃÖÀûÈ­°¡ °¡´ÉÇÑ ¿ä¼Ò·Î ¿ÁÆ®Æ®¸®¿Í °°Àº °ø°£ ºÐÇÒ·Î
-    // ÀýµÎÃ¼ ¹üÀ§¿¡ µé¾î°¡´Â ´ë»óµéÀ» ºü¸£°Ô Å½»ö °¡´É (O(logn))
+    // TODO : ìµœì í™”ê°€ ê°€ëŠ¥í•œ ìš”ì†Œë¡œ ì˜¥íŠ¸íŠ¸ë¦¬ì™€ ê°™ì€ ê³µê°„ ë¶„í• ë¡œ
+    // ì ˆë‘ì²´ ë²”ìœ„ì— ë“¤ì–´ê°€ëŠ” ëŒ€ìƒë“¤ì„ ë¹ ë¥´ê²Œ íƒìƒ‰ ê°€ëŠ¥ (O(logn))
     for (auto* renderer : scene->GetStaticMeshRenderers())
     {
-        // O(N) ¼±Çü °Ë»ç: CheckBounds°¡ ¼º°øÇÏ¸é (È­¸é¿¡ º¸ÀÌ°Å³ª °ÉÃÄ ÀÖÀ¸¸é)
+        // O(N) ì„ í˜• ê²€ì‚¬: CheckBoundsê°€ ì„±ê³µí•˜ë©´ (í™”ë©´ì— ë³´ì´ê±°ë‚˜ ê±¸ì³ ìžˆìœ¼ë©´)
         if (m_frustum->CheckBounds(renderer->GetWorldBounds()))
             context->AddStaticMeshRenderer(renderer);
     }
@@ -63,10 +63,10 @@ void CullingPass::CullStaticMeshRenderers(Scene* scene, RenderContext* context)
 
 void CullingPass::CullSkinnedMeshRenderers(Scene* scene, RenderContext* context)
 {
-    // 3. Skinned Mesh Renderer ÄÃ¸µ
+    // 3. Skinned Mesh Renderer ì»¬ë§
     for (auto* renderer : scene->GetSkinnedMeshRenderers())
     {
-        // Skinned Mesh´Â GetWorldBounds() ³»ºÎ¿¡ Animator/Transform ·ÎÁ÷ÀÌ Æ÷ÇÔµÇ¾î ÀÖ½À´Ï´Ù.
+        // Skinned MeshëŠ” GetWorldBounds() ë‚´ë¶€ì— Animator/Transform ë¡œì§ì´ í¬í•¨ë˜ì–´ ìžˆìŠµë‹ˆë‹¤.
         if (m_frustum->CheckBounds(renderer->GetWorldBounds()))
             context->AddSkinnedMeshRenderer(renderer);
     }
@@ -74,23 +74,23 @@ void CullingPass::CullSkinnedMeshRenderers(Scene* scene, RenderContext* context)
 
 void CullingPass::CullMeshOutlines(Scene* scene, RenderContext* context)
 {
-    // SceneÀÌ °¡Áö°í ÀÖ´Â ÀüÃ¼ ¾Æ¿ô¶óÀÎ ¸®½ºÆ® ¼øÈ¸
+    // Sceneì´ ê°€ì§€ê³  ìžˆëŠ” ì „ì²´ ì•„ì›ƒë¼ì¸ ë¦¬ìŠ¤íŠ¸ ìˆœíšŒ
     const auto& outlines = scene->GetMeshOutlines();
     for (auto* outline : outlines)
     {
-        // 1. ¼ÒÀ¯ÀÚ(GameObject) È®ÀÎ
+        // 1. ì†Œìœ ìž(GameObject) í™•ì¸
         auto owner = outline->GetOwner();
         if (!owner) continue;
 
-        // 2. MeshRenderer Ã£±â
+        // 2. MeshRenderer ì°¾ê¸°
         MeshRenderer* renderer = nullptr;
         renderer = owner->GetComponent<StaticMeshRenderer>();
         if (!renderer) renderer = owner->GetComponent<SkinnedMeshRenderer>();
-        // TODO : InstancedMeshRendererµµ Ãß°¡ ÇÊ¿ä
+        // TODO : InstancedMeshRendererë„ ì¶”ê°€ í•„ìš”
         if (!renderer) continue;
 
-        // 3. ·»´õ·¯ÀÇ ¹Ù¿îµù ¹Ú½º¸¦ ÀÌ¿ëÇØ ÀýµÎÃ¼ °Ë»ç
-        // TODO :¾ö¹ÐÈ÷ µûÁö¸é ¾Æ¿ô¶óÀÎ µÎ²²¸¸Å­ Bounds¸¦ È®ÀåÇØ¾ß ÇÒ ¼ö ÀÖÀ½.
+        // 3. ë Œë”ëŸ¬ì˜ ë°”ìš´ë”© ë°•ìŠ¤ë¥¼ ì´ìš©í•´ ì ˆë‘ì²´ ê²€ì‚¬
+        // TODO :ì—„ë°€ížˆ ë”°ì§€ë©´ ì•„ì›ƒë¼ì¸ ë‘ê»˜ë§Œí¼ Boundsë¥¼ í™•ìž¥í•´ì•¼ í•  ìˆ˜ ìžˆìŒ.
         if (m_frustum->CheckBounds(renderer->GetWorldBounds()))
             context->AddMeshOutline(outline);
     }
@@ -98,8 +98,8 @@ void CullingPass::CullMeshOutlines(Scene* scene, RenderContext* context)
 
 void CullingPass::CullSceneLights(Scene* scene, RenderContext* context)
 {
-    // LightSource´Â LightPass°¡ »ç¿ëÇÏ¹Ç·Î ±×´ë·Î º¹»çÇÕ´Ï´Ù.
-    // TODO : ÀÌÈÄ¿¡ Light Volume¿¡ ÀÇÇÑ ÃÖÀûÈ­¸¦ À§ÇØ ÀÏ´Ü ±×´ë·Î µÐ´Ù.
+    // LightSourceëŠ” LightPassê°€ ì‚¬ìš©í•˜ë¯€ë¡œ ê·¸ëŒ€ë¡œ ë³µì‚¬í•©ë‹ˆë‹¤.
+    // TODO : ì´í›„ì— Light Volumeì— ì˜í•œ ìµœì í™”ë¥¼ ìœ„í•´ ì¼ë‹¨ ê·¸ëŒ€ë¡œ ë‘”ë‹¤.
     const auto& lightSource = scene->GetLights();
     for (auto* light : lightSource) context->AddLight(light);
 }

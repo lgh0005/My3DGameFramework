@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 #include "Core/RenderPipeline.h"
 
 #pragma region FORWARD_DECLARATION
@@ -34,19 +34,19 @@ private:
 		int32 height = WINDOW_HEIGHT
 	);
 
-	// °øÅë ÇÊ¼ö ·»´õ ÆĞ½º
+	// ê³µí†µ í•„ìˆ˜ ë Œë” íŒ¨ìŠ¤
 	CullingPassUPtr					  m_cullingPass		  { nullptr };
 	ShadowPassUPtr					  m_shadowPass		  { nullptr };
 	SkyboxPassUPtr                    m_skyboxPass		  { nullptr };
 
-	// SRP ÇÊ¼ö ·»´õ ÆĞ½º
+	// SRP í•„ìˆ˜ ë Œë” íŒ¨ìŠ¤
 	StandardPostProcessPassUPtr		  m_postProcessPass	  { nullptr };
 	StandardGeometryPassUPtr		  m_geometryPass	  { nullptr };
 	StandardDeferredLightingPassUPtr  m_deferredLightPass { nullptr };
 	StandardSSAOPassUPtr			  m_ssaoPass		  { nullptr };
 	StandardOutlinePassUPtr		      m_outlinePass		  { nullptr };
 
-	// SRP °øÅë À¯´ÏÆû º¯¼ö ¹öÆÛ
+	// SRP ê³µí†µ ìœ ë‹ˆí¼ ë³€ìˆ˜ ë²„í¼
 	StandardGlobalUniformsUPtr        m_globalUniforms	  { nullptr };
 
 /*================================//

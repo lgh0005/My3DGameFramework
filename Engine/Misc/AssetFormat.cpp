@@ -1,4 +1,4 @@
-#include "EnginePch.h"
+﻿#include "EnginePch.h"
 #include "AssetFormat.h"
 
 bool AssetFmt::RawImage::IsValid() const

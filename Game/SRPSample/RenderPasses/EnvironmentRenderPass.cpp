@@ -1,4 +1,4 @@
-#include "pch.h"
+ï»¿#include "pch.h"
 #include "EnvironmentRenderPass.h"
 
 #include "Core/Scene.h"
@@ -40,11 +40,11 @@ void EnvironmentRenderPass::Render(Scene* scene, Camera* camera)
 	auto view = camera->GetViewMatrix();
 	auto cameraPos = camera->GetTransform().GetWorldPosition();
 
-	// TEMP : ÀÌ´Â ÇöÀç Å¥ºê¿¡ È¯°æ¸Ê ÅØ½ºÃÄ¸¦ ÀÔÈù °Í »Ó
-	// ÀÌÈÄ¿¡ PBR ±â¹Ý ·»´õ¸µ ½Ã ´Ù¸£°Ô »ç¿ëÇÒ ¼ö ÀÖÀ½
+	// TEMP : ì´ëŠ” í˜„ìž¬ íë¸Œì— í™˜ê²½ë§µ í…ìŠ¤ì³ë¥¼ ìž…ížŒ ê²ƒ ë¿
+	// ì´í›„ì— PBR ê¸°ë°˜ ë Œë”ë§ ì‹œ ë‹¤ë¥´ê²Œ ì‚¬ìš©í•  ìˆ˜ ìžˆìŒ
 	m_envProgram->Use();
 
-	// TOOD : ÀÌÁ¦ ÀÌ°Í ¿ª½Ãµµ UBO·Î ´ëÃ¼ ÇÒ ÇÊ¿ä ÀÖÀ½
+	// TOOD : ì´ì œ ì´ê²ƒ ì—­ì‹œë„ UBOë¡œ ëŒ€ì²´ í•  í•„ìš” ìžˆìŒ
 	m_envProgram->SetUniform("view", view);
 	m_envProgram->SetUniform("projection", projection);
 	m_envProgram->SetUniform("cameraPos", cameraPos);

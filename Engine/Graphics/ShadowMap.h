@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #pragma region FORWARD_DECLARATION
 CLASS_PTR(Texture)

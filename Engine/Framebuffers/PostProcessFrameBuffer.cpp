@@ -1,4 +1,4 @@
-#include "EnginePch.h"
+ï»¿#include "EnginePch.h"
 #include "PostProcessFrameBuffer.h"
 #include "Resources/Texture.h"
 
@@ -17,24 +17,24 @@ bool PostProcessFramebuffer::Init(int32 width, int32 height, bool useDepth)
 	m_width = width;
 	m_height = height;
 
-	// 2. FBO »ý¼º
+	// 2. FBO ìƒì„±
 	glGenFramebuffers(1, &m_fbo);
 	glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
 
-	// 3. ÄÃ·¯ ÅØ½ºÃ³ »ý¼º (HDR: RGBA16F)
-	// Bloom, ToneMapping µîÀ» À§ÇØ HDR Æ÷¸Ë ÇÊ¼ö
+	// 3. ì»¬ëŸ¬ í…ìŠ¤ì²˜ ìƒì„± (HDR: RGBA16F)
+	// Bloom, ToneMapping ë“±ì„ ìœ„í•´ HDR í¬ë§· í•„ìˆ˜
 	auto texture = Texture::Create(width, height, GL_RGBA16F, GL_RGBA, GL_FLOAT);
 	texture->SetFilter(GL_LINEAR, GL_LINEAR);
 	texture->SetWrap(GL_CLAMP_TO_EDGE, GL_CLAMP_TO_EDGE);
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, texture->Get(), 0);
 	m_textures.push_back(std::move(texture));
 
-	// 4. Draw Buffer ¼³Á¤
+	// 4. Draw Buffer ì„¤ì •
 	uint32 attachments[1] = { GL_COLOR_ATTACHMENT0 };
 	glDrawBuffers(1, attachments);
 
-	// 5. ±íÀÌ ¹öÆÛ (¿É¼Ç)
-	// SRP ¸ÞÀÎ ¹öÆÛ·Î ¾µ ¶§´Â Depth°¡ ÇÊ¿äÇÏ°í, Bloom ÇÎÆþ¿ëÀÏ ¶§´Â ºÒÇÊ¿ä
+	// 5. ê¹Šì´ ë²„í¼ (ì˜µì…˜)
+	// SRP ë©”ì¸ ë²„í¼ë¡œ ì“¸ ë•ŒëŠ” Depthê°€ í•„ìš”í•˜ê³ , Bloom í•‘íìš©ì¼ ë•ŒëŠ” ë¶ˆí•„ìš”
 	if (useDepth)
 	{
 		glGenRenderbuffers(1, &m_depthBuffer);
@@ -43,10 +43,10 @@ bool PostProcessFramebuffer::Init(int32 width, int32 height, bool useDepth)
 		glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, m_depthBuffer);
 	}
 
-	// 6. ¿Ï¼º È®ÀÎ
+	// 6. ì™„ì„± í™•ì¸
 	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
 	{
-		SPDLOG_ERROR("PostProcess Framebuffer Init Failed!");
+		LOG_ERROR("PostProcess Framebuffer Init Failed!");
 		return false;
 	}
 
@@ -56,14 +56,14 @@ bool PostProcessFramebuffer::Init(int32 width, int32 height, bool useDepth)
 
 void PostProcessFramebuffer::AttachTexture(Texture* texture, int32 attachmentIndex)
 {
-	// 1. ºÎ¸ð Å¬·¡½ºÀÇ °øÅë ¸â¹ö m_fbo »ç¿ë
+	// 1. ë¶€ëª¨ í´ëž˜ìŠ¤ì˜ ê³µí†µ ë©¤ë²„ m_fbo ì‚¬ìš©
 	glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
 
-	// 2. ÅØ½ºÃ³ ±³Ã¼ (ÁöÁ¤ÇÑ ÀÎµ¦½º ½½·Ô¿¡ ³¢¿ì±â)
+	// 2. í…ìŠ¤ì²˜ êµì²´ (ì§€ì •í•œ ì¸ë±ìŠ¤ ìŠ¬ë¡¯ì— ë¼ìš°ê¸°)
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + attachmentIndex,
 		GL_TEXTURE_2D, texture->Get(), 0);
 
-	// 3. Draw Buffer °»½Å
+	// 3. Draw Buffer ê°±ì‹ 
 	uint32 attachments[1] = { GL_COLOR_ATTACHMENT0 + (uint32)attachmentIndex };
 	glDrawBuffers(1, attachments);
 }

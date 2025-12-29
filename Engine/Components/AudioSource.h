@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 #include "Components/Component.h"
 #include "Resources/AudioClip.h"
 
@@ -34,6 +34,6 @@ private:
 
 	AudioClipPtr	m_clip		  { nullptr };
 
-	ma_sound		m_sound 	  {  };// »ç¿îµå °´Ã¼
-	ma_decoder		m_decoder	  {  };// ¸Ş¸ğ¸® µğÄÚµù¿ë (SFXÀÏ ¶§¸¸ »ç¿ë)
+	ma_sound		m_sound 	  {  };// ì‚¬ìš´ë“œ ê°ì²´
+	ma_decoder		m_decoder	  {  };// ë©”ëª¨ë¦¬ ë””ì½”ë”©ìš© (SFXì¼ ë•Œë§Œ ì‚¬ìš©)
 };

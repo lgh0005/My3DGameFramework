@@ -1,4 +1,4 @@
-#include "pch.h"
+ï»¿#include "pch.h"
 #include "AnimationConverter.h"
 
 bool AnimationConverter::Convert
@@ -8,21 +8,21 @@ bool AnimationConverter::Convert
 	const std::string& outputPath
 )
 {
-	// 1. ÃÊ±âÈ­
+	// 1. ì´ˆê¸°í™”
 	m_validNodeNames.clear();
 
 	LOG_INFO(" [AnimConverter] Start Conversion");
 	LOG_INFO(" - Source: {}", animPath);
 	LOG_INFO(" - Ref Model: {}", refModelPath);
 
-	// 2. ÂüÁ¶ ¸ğµ¨(.mymodel) ·Îµå ¹× »À ÀÌ¸§ °ËÁõ¿ë Set ±¸Ãà
+	// 2. ì°¸ì¡° ëª¨ë¸(.mymodel) ë¡œë“œ ë° ë¼ˆ ì´ë¦„ ê²€ì¦ìš© Set êµ¬ì¶•
 	if (!LoadReferenceSkeleton(refModelPath))
 	{
 		LOG_ERROR("Failed to load reference model nodes.");
 		return false;
 	}
 
-	// 3. Assimp·Î ¾Ö´Ï¸ŞÀÌ¼Ç ÆÄÀÏ ·Îµå
+	// 3. Assimpë¡œ ì• ë‹ˆë©”ì´ì…˜ íŒŒì¼ ë¡œë“œ
 	Assimp::Importer importer;
 	const aiScene* scene = importer.ReadFile(animPath, aiProcess_LimitBoneWeights);
 	if (!scene || !scene->mRootNode)
@@ -37,12 +37,12 @@ bool AnimationConverter::Convert
 		return false;
 	}
 
-	// 4. ¾Ö´Ï¸ŞÀÌ¼Ç Å¬¸³º°·Î ºĞ¸® ÀúÀå
+	// 4. ì• ë‹ˆë©”ì´ì…˜ í´ë¦½ë³„ë¡œ ë¶„ë¦¬ ì €ì¥
 	int32 animCount = scene->mNumAnimations;
 	LOG_INFO("Found {} animations.", animCount);
 
-	// Ãâ·Â °æ·Î ºĞÇØ (¿¹: Assets/Player.myanim -> Dir: Assets, Stem: Player)
-	// TODO : ÇØ´ç ¹®ÀÚ¿­À» µû·Î ¸â¹ö·Î µÑ ÇÊ¿ä°¡ ÀÖ´Ù.
+	// ì¶œë ¥ ê²½ë¡œ ë¶„í•´ (ì˜ˆ: Assets/Player.myanim -> Dir: Assets, Stem: Player)
+	// TODO : í•´ë‹¹ ë¬¸ìì—´ì„ ë”°ë¡œ ë©¤ë²„ë¡œ ë‘˜ í•„ìš”ê°€ ìˆë‹¤.
 	std::filesystem::path outPathObj(outputPath);
 	std::string parentDir = outPathObj.parent_path().string();
 	std::string fileStem = outPathObj.stem().string();
@@ -53,18 +53,18 @@ bool AnimationConverter::Convert
 		aiAnimation* srcAnim = scene->mAnimations[i];
 		AssetFmt::RawAnimation rawAnim;
 
-		// 4-1. º¯È¯ (Convert)
+		// 4-1. ë³€í™˜ (Convert)
 		if (!ProcessSingleClip(srcAnim, rawAnim)) continue;
 
-		// 4-2. ÆÄÀÏ¸í °áÁ¤ (¿øº»ÆÄÀÏ¸í_Å¬¸³¸í.myanim)
-		// ¿¹: Player_Idle.myanim, Player_Run.myanim
+		// 4-2. íŒŒì¼ëª… ê²°ì • (ì›ë³¸íŒŒì¼ëª…_í´ë¦½ëª….myanim)
+		// ì˜ˆ: Player_Idle.myanim, Player_Run.myanim
 		std::string safeAnimName = rawAnim.name;
-		// (ÇÊ¿äÇÏ´Ù¸é ¿©±â¼­ °ø¹éÀÌ³ª Æ¯¼ö¹®ÀÚ¸¦ _·Î Ä¡È¯ÇÏ´Â ·ÎÁ÷ Ãß°¡)
+		// (í•„ìš”í•˜ë‹¤ë©´ ì—¬ê¸°ì„œ ê³µë°±ì´ë‚˜ íŠ¹ìˆ˜ë¬¸ìë¥¼ _ë¡œ ì¹˜í™˜í•˜ëŠ” ë¡œì§ ì¶”ê°€)
 
 		std::string finalName = fmt::format("{}_{}.myanim", fileStem, safeAnimName);
 		std::filesystem::path finalPath = std::filesystem::path(parentDir) / finalName;
 
-		// 4-3. ÀúÀå (Write)
+		// 4-3. ì €ì¥ (Write)
 		if (WriteAnimationFile(finalPath.string(), rawAnim))
 		{
 			LOG_INFO("   -> Exported: {}", finalName);
@@ -80,23 +80,23 @@ bool AnimationConverter::LoadReferenceSkeleton(const std::string& path)
 	std::ifstream inFile(path, std::ios::binary);
 	if (!inFile) return false;
 
-	// 1. Çì´õ °ËÁõ
+	// 1. í—¤ë” ê²€ì¦
 	uint32_t magic = AssetUtils::ReadData<uint32_t>(inFile);
 	if (magic != 0x4D594D44) return false; // MYMD
 
 	uint32 version = AssetUtils::ReadData<uint32>(inFile);
 
-	// 2. ºÒÇÊ¿äÇÑ Á¤º¸ °Ç³Ê¶Ù±â (ÀĞ¾î¼­ ¹ö¸²)
+	// 2. ë¶ˆí•„ìš”í•œ ì •ë³´ ê±´ë„ˆë›°ê¸° (ì½ì–´ì„œ ë²„ë¦¼)
 	AssetUtils::ReadData<uint32_t>(inFile); // matCount
 	AssetUtils::ReadData<uint32_t>(inFile); // meshCount
 	AssetUtils::ReadData<bool>(inFile);     // hasSkeleton
 	AssetUtils::ReadData<glm::vec3>(inFile); // AABB Min
 	AssetUtils::ReadData<glm::vec3>(inFile); // AABB Max
 
-	// 3. RawNode ¸®½ºÆ® ÀĞ±â
+	// 3. RawNode ë¦¬ìŠ¤íŠ¸ ì½ê¸°
 	auto nodes = AssetUtils::ReadRawNodes(inFile);
 
-	// 4. À¯È¿ ³ëµå ÀÌ¸§ µî·Ï
+	// 4. ìœ íš¨ ë…¸ë“œ ì´ë¦„ ë“±ë¡
 	for (const auto& node : nodes) m_validNodeNames.insert(node.name);
 
 	LOG_INFO(" - Reference Model Valid Nodes: {}", m_validNodeNames.size());
@@ -113,22 +113,22 @@ bool AnimationConverter::ProcessSingleClip(aiAnimation* srcAnim, AssetFmt::RawAn
 	outAnim.duration = (float)srcAnim->mDuration;
 	outAnim.ticksPerSecond = (srcAnim->mTicksPerSecond != 0.0) ? (float)srcAnim->mTicksPerSecond : 25.0f;
 
-	// Ã¤³Î ¼øÈ¸
+	// ì±„ë„ ìˆœíšŒ
 	for (uint32 i = 0; i < srcAnim->mNumChannels; ++i)
 	{
 		aiNodeAnim* srcChannel = srcAnim->mChannels[i];
 		std::string nodeName = srcChannel->mNodeName.C_Str();
 
-		// ÂüÁ¶ ¸ğµ¨¿¡ Á¸ÀçÇÏ´Â ³ëµåÀÎÁö Ã¼Å©
+		// ì°¸ì¡° ëª¨ë¸ì— ì¡´ì¬í•˜ëŠ” ë…¸ë“œì¸ì§€ ì²´í¬
 		if (m_validNodeNames.find(nodeName) == m_validNodeNames.end()) continue;
 
-		// À¯È¿ÇÏ´Ù¸é Ã¤³Î Ãß°¡
+		// ìœ íš¨í•˜ë‹¤ë©´ ì±„ë„ ì¶”ê°€
 		AssetFmt::RawAnimChannel dstChannel;
 		ProcessChannel(srcChannel, dstChannel);
 		outAnim.channels.push_back(std::move(dstChannel));
 	}
 
-	// Ã¤³ÎÀÌ ÇÏ³ªµµ ¾øÀ¸¸é ½ÇÆĞ Ã³¸®
+	// ì±„ë„ì´ í•˜ë‚˜ë„ ì—†ìœ¼ë©´ ì‹¤íŒ¨ ì²˜ë¦¬
 	return !outAnim.channels.empty();
 }
 
@@ -136,23 +136,23 @@ std::string AnimationConverter::MakeSafeName(const std::string& rawName)
 {
 	std::string safeName = rawName;
 
-	// 1. ±¸ºĞÀÚ(|, :) µÚÀÇ ÁøÂ¥ ÀÌ¸§¸¸ ÃßÃâ
+	// 1. êµ¬ë¶„ì(|, :) ë’¤ì˜ ì§„ì§œ ì´ë¦„ë§Œ ì¶”ì¶œ
 	usize lastSeparator = safeName.find_last_of("|:");
 	if (lastSeparator != std::string::npos)
 		safeName = safeName.substr(lastSeparator + 1);
 
-	// 2. ÆÄÀÏ ½Ã½ºÅÛ ±İÁö ¹®ÀÚ ¹× °ø¹é Ä¡È¯
+	// 2. íŒŒì¼ ì‹œìŠ¤í…œ ê¸ˆì§€ ë¬¸ì ë° ê³µë°± ì¹˜í™˜
 	const std::string invalidChars = "<>:\"/\\|?* ";
 	for (char& c : safeName)
 	{
-		// ±İÁö ¹®ÀÚ°¡ Æ÷ÇÔµÇ¾î ÀÖ´Ù¸é '_'·Î º¯°æ
+		// ê¸ˆì§€ ë¬¸ìê°€ í¬í•¨ë˜ì–´ ìˆë‹¤ë©´ '_'ë¡œ ë³€ê²½
 		if (invalidChars.find(c) != std::string::npos)
 		{
 			c = '_';
 		}
 	}
 
-	// 3. ¸¸¾à ´Ù Áö¿ö¼­ ºó ¹®ÀÚ¿­ÀÌ µÆ´Ù¸é ±âº»°ª ºÎ¿©
+	// 3. ë§Œì•½ ë‹¤ ì§€ì›Œì„œ ë¹ˆ ë¬¸ìì—´ì´ ëë‹¤ë©´ ê¸°ë³¸ê°’ ë¶€ì—¬
 	if (safeName.empty()) safeName = "Unnamed_Anim";
 
 	return safeName;
@@ -179,9 +179,9 @@ void AnimationConverter::ProcessChannel(aiNodeAnim* srcChannel, AssetFmt::RawAni
 	for (uint32 i = 0; i < srcChannel->mNumRotationKeys; ++i)
 	{
 		const auto& k = srcChannel->mRotationKeys[i];
-		// Assimp (w, x, y, z) -> GLM Quat »ı¼ºÀÚ (w, x, y, z) È®ÀÎ ÇÊ¼ö!
-		// GLM ¹öÀü¿¡ µû¶ó quat(w, x, y, z) ¶Ç´Â quat(x, y, z, w)ÀÏ ¼ö ÀÖÀ½.
-		// ÀÏ¹İÀûÀ¸·Î glm::quat(w, x, y, z) ÀÔ´Ï´Ù.
+		// Assimp (w, x, y, z) -> GLM Quat ìƒì„±ì (w, x, y, z) í™•ì¸ í•„ìˆ˜!
+		// GLM ë²„ì „ì— ë”°ë¼ quat(w, x, y, z) ë˜ëŠ” quat(x, y, z, w)ì¼ ìˆ˜ ìˆìŒ.
+		// ì¼ë°˜ì ìœ¼ë¡œ glm::quat(w, x, y, z) ì…ë‹ˆë‹¤.
 		dstChannel.rotations[i] = 
 		{
 			glm::quat((float)k.mValue.w, (float)k.mValue.x, (float)k.mValue.y, (float)k.mValue.z),

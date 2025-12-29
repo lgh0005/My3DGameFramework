@@ -14,14 +14,17 @@ void ImGuiManager::Init(bool enable)
 
 	ImGui_ImplGlfw_InitForOpenGL(WINDOW.GetWindow(), true);
 	ImGui_ImplOpenGL3_Init("#version 460 core");
+
+	LOG_INFO("ImGUIManager Initialized Successfully.");
 }
 
-void ImGuiManager::ShutDown()
+void ImGuiManager::Clear()
 {
 	if (!m_isEnable) return;
 	ImGui_ImplOpenGL3_Shutdown();
 	ImGui_ImplGlfw_Shutdown();
 	ImGui::DestroyContext();
+	LOG_INFO("ImGUIManager Cleared.");
 }
 
 void ImGuiManager::BeginFrame()

@@ -133,14 +133,14 @@ CubeTextureUPtr CubeTexture::LoadKtx(const std::string& ktxFilePath)
     );
     if (result != KTX_SUCCESS)
     {
-        SPDLOG_ERROR("Failed to load KTX cubemap: {}", ktxFilePath);
+        LOG_ERROR("Failed to load KTX cubemap: {}", ktxFilePath);
         return nullptr;
     }
 
     // 2. 큐브맵 검증
     if (!kTexture->isCubemap)
     {
-        SPDLOG_ERROR("Texture is not a cubemap: {}", ktxFilePath);
+        LOG_ERROR("Texture is not a cubemap: {}", ktxFilePath);
         ktxTexture_Destroy(kTexture);
         return nullptr;
     }
@@ -149,7 +149,7 @@ CubeTextureUPtr CubeTexture::LoadKtx(const std::string& ktxFilePath)
     result = ktxTexture_GLUpload(kTexture, &textureID, &target, &glerror);
     if (result != KTX_SUCCESS)
     {
-        SPDLOG_ERROR("Failed to upload KTX cubemap: {}", ktxFilePath);
+        LOG_ERROR("Failed to upload KTX cubemap: {}", ktxFilePath);
         ktxTexture_Destroy(kTexture);
         return nullptr;
     }

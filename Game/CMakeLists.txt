@@ -1,4 +1,4 @@
-# 1. "Game"ÀÌ¶ó´Â ÀÌ¸§ÀÇ ½ÇÇà ÆÄÀÏ(.exe)À» ¸¸µì´Ï´Ù.
+ï»¿# 1. "Game"ì´ë¼ëŠ” ì´ë¦„ì˜ ì‹¤í–‰ íŒŒì¼(.exe)ì„ ë§Œë“­ë‹ˆë‹¤.
 add_executable(Game
 
     # Core
@@ -24,16 +24,16 @@ add_executable(Game
 
  )
 
-# 2. [PCH ¼³Á¤] Game/pch.h¸¦ Game Å¸°Ù Àü¿ë(PRIVATE) PCH·Î »ç¿ëÇÕ´Ï´Ù.
+# 2. [PCH ì„¤ì •] Game/pch.hë¥¼ Game íƒ€ê²Ÿ ì „ìš©(PRIVATE) PCHë¡œ ì‚¬ìš©í•©ë‹ˆë‹¤.
 target_precompile_headers(Game PRIVATE pch.h)
 
-# 3. [°æ·Î ¼³Á¤] pchÀÇ À§Ä¡¸¦ ¾Ë¸®±â À§ÇØ ÇÊ¿äÇÕ´Ï´Ù.
+# 3. [ê²½ë¡œ ì„¤ì •] pchì˜ ìœ„ì¹˜ë¥¼ ì•Œë¦¬ê¸° ìœ„í•´ í•„ìš”í•©ë‹ˆë‹¤.
 target_include_directories(Game PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 
-# 3. [¸µÅ© ¼³Á¤] Game Å¸°ÙÀº Engine ¶óÀÌºê·¯¸®°¡ ÇÊ¿äÇÕ´Ï´Ù.
+# 3. [ë§í¬ ì„¤ì •] Game íƒ€ê²Ÿì€ Engine ë¼ì´ë¸ŒëŸ¬ë¦¬ê°€ í•„ìš”í•©ë‹ˆë‹¤.
 target_link_libraries(Game PRIVATE Engine)
 
-# 4. Resource Æú´õ¸¦ ºôµå Æú´õ¿¡ µ¤¾î¾²±â
+# 4. Resource í´ë”ë¥¼ ë¹Œë“œ í´ë”ì— ë®ì–´ì“°ê¸°
 set(RESOURCE_SRC_DIR "${CMAKE_SOURCE_DIR}/Resources")
 set(RESOURCE_DEST_DIR "${CMAKE_CURRENT_BINARY_DIR}/Resources")
 

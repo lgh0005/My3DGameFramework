@@ -1,4 +1,4 @@
-#include "EnginePch.h"
+Ôªø#include "EnginePch.h"
 #include "StandardPostProcessPass.h"
 
 #include "Core/Scene.h"
@@ -57,16 +57,16 @@ void StandardPostProcessPass::Render(RenderContext* context)
 	glDisable(GL_DEPTH_TEST);
 	glDisable(GL_CULL_FACE);
 
-	// 0. ∏ﬁ¿Œ æ¿ ≈ÿΩ∫√≥ ¡ÿ∫Ò
+	// 0. Î©îÏù∏ Ïî¨ ÌÖçÏä§Ï≤ò Ï§ÄÎπÑ
 	auto sceneTexture = m_frameBuffer->GetColorAttachment(0).get();
 
-	// 1. π‡¿∫ øµø™ √ﬂ√‚
+	// 1. Î∞ùÏùÄ ÏòÅÏó≠ Ï∂îÏ∂ú
 	ExtractBrightAreas(sceneTexture);
 
-	// 2. ∞°øÏΩ√æ» ∫Ì∑Ø ºˆ«‡ (∞·∞˙π∞ ≈ÿΩ∫√≥∏¶ πﬁæ∆ø»)
+	// 2. Í∞ÄÏö∞ÏãúÏïà Î∏îÎü¨ ÏàòÌñâ (Í≤∞Í≥ºÎ¨º ÌÖçÏä§Ï≤òÎ•º Î∞õÏïÑÏò¥)
 	Texture* finalBloomTexture = ComputeGaussianBlur();
 
-	// 3. √÷¡æ «’º∫
+	// 3. ÏµúÏ¢Ö Ìï©ÏÑ±
 	RenderCompositePass(sceneTexture, finalBloomTexture);
 
 	glEnable(GL_DEPTH_TEST);
@@ -95,7 +95,7 @@ void StandardPostProcessPass::Resize(int32 width, int32 height)
 //=============================================*/
 void StandardPostProcessPass::ExtractBrightAreas(Texture* sceneTexture)
 {
-	// π‡¿∫ øµø™¿ª √ﬂ√‚«ÿº≠ PingPong[0]ø° ±◊∏≥¥œ¥Ÿ.
+	// Î∞ùÏùÄ ÏòÅÏó≠ÏùÑ Ï∂îÏ∂úÌï¥ÏÑú PingPong[0]Ïóê Í∑∏Î¶ΩÎãàÎã§.
 	m_pingPongFBOs[0]->Bind();
 	glViewport(0, 0, m_frameBuffer->GetWidth(), m_frameBuffer->GetHeight());
 
@@ -114,45 +114,45 @@ Texture* StandardPostProcessPass::ComputeGaussianBlur()
 {
 	bool horizontal = true;
 	bool firstDraw = true;
-	int amount = 10; // ¬¶ºˆ ±«¿Â
+	int amount = 10; // ÏßùÏàò Í∂åÏû•
 
 	m_blurProgram->Use();
 	for (uint32 i = 0; i < amount; i++)
 	{
-		// ¿Ãπ¯ø° ±◊∏± ¥ÎªÛ FBO πŸ¿Œµ˘
+		// Ïù¥Î≤àÏóê Í∑∏Î¶¥ ÎåÄÏÉÅ FBO Î∞îÏù∏Îî©
 		m_pingPongFBOs[horizontal]->Bind();
 		m_blurProgram->SetUniform("horizontal", horizontal);
 
-		// ¿Ã¿¸ ¥‹∞Ë¿« ∞·∞˙π∞(≈ÿΩ∫√≥) πŸ¿Œµ˘
+		// Ïù¥Ï†Ñ Îã®Í≥ÑÏùò Í≤∞Í≥ºÎ¨º(ÌÖçÏä§Ï≤ò) Î∞îÏù∏Îî©
 		glActiveTexture(GL_TEXTURE0);
 		if (firstDraw)
 		{
-			// √π π¯¬∞¥¬ Threshold ∞·∞˙(PingPong[0])∏¶ ªÁøÎ
+			// Ï≤´ Î≤àÏß∏Îäî Threshold Í≤∞Í≥º(PingPong[0])Î•º ÏÇ¨Ïö©
 			m_pingPongFBOs[0]->GetColorAttachment(0)->Bind();
 			firstDraw = false;
 		}
 		else
 		{
-			// ±◊ ø‹ø°¥¬ π›¥Î¬  FBO¿« ≈ÿΩ∫√≥∏¶ ªÁøÎ
+			// Í∑∏ Ïô∏ÏóêÎäî Î∞òÎåÄÏ™Ω FBOÏùò ÌÖçÏä§Ï≤òÎ•º ÏÇ¨Ïö©
 			m_pingPongFBOs[!horizontal]->GetColorAttachment(0)->Bind();
 		}
 
 		m_blurProgram->SetUniform("image", 0);
 		m_plane->Draw();
 
-		// πÊ«‚ ¿¸»Ø
+		// Î∞©Ìñ• Ï†ÑÌôò
 		horizontal = !horizontal;
 	}
 
-	// ∑Á«¡∞° ≥°≥≠ »ƒ, √÷¡æ ∞·∞˙¥¬ πÊ±› ±◊∏Æ±‚∏¶ ∏∂ƒ£ FBO¿« ≈ÿΩ∫√≥∞° æ∆¥œ∂Û
-	// ∏∂¡ˆ∏∑ ∑Á«¡ø°º≠ 'Source'∑Œ æ≤∑¡ «ﬂ¥¯ ≈ÿΩ∫√≥ ¬ ø° ¥„∞‹ ¿÷Ω¿¥œ¥Ÿ.
-	// (loop∞° ¬¶ºˆ π¯ µπ∏È horizontal¿∫ ¥ŸΩ√ true∞° µ» ªÛ≈¬∑Œ ¡æ∑·µ  -> !horizontal¿Œ false(0π¯)ø° ∞·∞˙ ¿÷¿Ω)
+	// Î£®ÌîÑÍ∞Ä ÎÅùÎÇú ÌõÑ, ÏµúÏ¢Ö Í≤∞Í≥ºÎäî Î∞©Í∏à Í∑∏Î¶¨Í∏∞Î•º ÎßàÏπú FBOÏùò ÌÖçÏä§Ï≤òÍ∞Ä ÏïÑÎãàÎùº
+	// ÎßàÏßÄÎßâ Î£®ÌîÑÏóêÏÑú 'Source'Î°ú Ïì∞Î†§ ÌñàÎçò ÌÖçÏä§Ï≤ò Ï™ΩÏóê Îã¥Í≤® ÏûàÏäµÎãàÎã§.
+	// (loopÍ∞Ä ÏßùÏàò Î≤à ÎèåÎ©¥ horizontalÏùÄ Îã§Ïãú trueÍ∞Ä Îêú ÏÉÅÌÉúÎ°ú Ï¢ÖÎ£åÎê® -> !horizontalÏù∏ false(0Î≤à)Ïóê Í≤∞Í≥º ÏûàÏùå)
 	return m_pingPongFBOs[!horizontal]->GetColorAttachment(0).get();
 }
 
 void StandardPostProcessPass::RenderCompositePass(Texture* sceneTexture, Texture* bloomTexture)
 {
-	// »≠∏È(Default Framebuffer)¿∏∑Œ ∫π±Õ
+	// ÌôîÎ©¥(Default Framebuffer)ÏúºÎ°ú Î≥µÍ∑Ä
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
@@ -172,7 +172,7 @@ void StandardPostProcessPass::RenderCompositePass(Texture* sceneTexture, Texture
 		)
 	);
 
-	// Slot 0: ø¯∫ª ¿Â∏È (HDR)
+	// Slot 0: ÏõêÎ≥∏ Ïû•Î©¥ (HDR)
 	if (sceneTexture)
 	{
 		glActiveTexture(GL_TEXTURE0);
@@ -180,7 +180,7 @@ void StandardPostProcessPass::RenderCompositePass(Texture* sceneTexture, Texture
 		m_compositeProgram->SetUniform("tex", 0);
 	}
 
-	// Slot 1: Bloom ≈ÿΩ∫√≥
+	// Slot 1: Bloom ÌÖçÏä§Ï≤ò
 	if (bloomTexture)
 	{
 		glActiveTexture(GL_TEXTURE1);

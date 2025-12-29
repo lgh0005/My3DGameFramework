@@ -1,9 +1,9 @@
-#pragma once
+ï»¿#pragma once
 
 enum class ConversionMode
 {
     None = 0,
-    Verify,     // --check (Python ¿¬µ¿ È®ÀÎ¿ë)
+    Verify,     // --check (Python ì—°ë™ í™•ì¸ìš©)
     Model,      // -m
     Animation,  // -a
     ORM         // -orm
@@ -13,17 +13,17 @@ struct ParseResult
 {
     ConversionMode mode = ConversionMode::None;
 
-    // [°øÅë] Ãâ·Â °æ·Î (ÆÄÀÏ ÀüÃ¼ °æ·Î)
+    // [ê³µí†µ] ì¶œë ¥ ê²½ë¡œ (íŒŒì¼ ì „ì²´ ê²½ë¡œ)
     std::string outputPath;
 
     // [Model]
     std::string inputPath;
     bool extractOrm = false;
 
-    // [Animation] ¾Ö´Ï¸ŞÀÌ¼ÇÀÇ ±âÁØÀÌ µÇ´Â ¸ğµ¨ ÆÄÀÏ
+    // [Animation] ì• ë‹ˆë©”ì´ì…˜ì˜ ê¸°ì¤€ì´ ë˜ëŠ” ëª¨ë¸ íŒŒì¼
     std::string refModelPath;
 
-    // [ORM Texture] °³º° PBR ÅØ½ºÃ³ ÆĞÅ·¿ë
+    // [ORM Texture] ê°œë³„ PBR í…ìŠ¤ì²˜ íŒ¨í‚¹ìš©
     std::string aoMapPath;
     std::string roughnessMapPath;
     std::string metallicMapPath;

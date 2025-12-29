@@ -22,7 +22,7 @@ bool Animator::Init(ModelPtr model, AnimControllerUPtr controller)
 {
 	if (!model)
 	{
-		SPDLOG_ERROR("Animator::Init failed: model is nullptr");
+		LOG_ERROR("Animator::Init failed: model is nullptr");
 		return false;
 	}
 
@@ -32,7 +32,7 @@ bool Animator::Init(ModelPtr model, AnimControllerUPtr controller)
     m_controller = std::move(controller);
     if (!m_controller)
     {
-        SPDLOG_ERROR("Animator initialized without AnimController!");
+        LOG_ERROR("Animator initialized without AnimController!");
         return false;
     }
 
@@ -40,7 +40,7 @@ bool Animator::Init(ModelPtr model, AnimControllerUPtr controller)
     auto skeleton = m_currentModel->GetSkeleton();
     if (!skeleton)
     {
-        SPDLOG_WARN("Animator initialized with a model having no skeleton.");
+        LOG_WARN("Animator initialized with a model having no skeleton.");
         return false;
     }
 
@@ -64,7 +64,7 @@ void Animator::BindBoneTransforms()
         // 1. 재귀적으로 모든 자식 Transform을 맵에 등록
         RecursiveBindBoneTransforms(&owner->GetTransform());
 
-        SPDLOG_INFO("Animator Binding: Found {} transforms in hierarchy.", m_boneTransformMap.size());
+        LOG_INFO("Animator Binding: Found {} transforms in hierarchy.", m_boneTransformMap.size());
 
         // 2. Skeleton 정보를 기반으로 Skinning용 Transform 벡터 채우기
         auto skeleton = m_currentModel->GetSkeleton();
@@ -81,7 +81,7 @@ void Animator::BindBoneTransforms()
                         m_skinningTransforms[info.id] = m_boneTransformMap[name];
                 }
             }
-            SPDLOG_INFO("Animator Binding: Mapped {} / {} bones.", mappedCount, skeleton->GetBoneCount());
+            LOG_INFO("Animator Binding: Mapped {} / {} bones.", mappedCount, skeleton->GetBoneCount());
         }
     }
 }

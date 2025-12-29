@@ -1,11 +1,11 @@
-#pragma once 
+Ôªø#pragma once 
 
 struct CameraData
 {
     glm::mat4 view;         // 64 bytes
     glm::mat4 projection;   // 64 bytes
     glm::vec3 viewPos;      // 12 bytes
-    float pad0;             // 4 bytes (√— 144 bytes)
+    float pad0;             // 4 bytes (Ï¥ù 144 bytes)
 };
 
 struct LightData
@@ -24,5 +24,5 @@ struct LightData
 
     } lights[MAX_LIGHTS];  // 128 * 32 = 4096 bytes
     glm::vec3 viewPos;     // 12 bytes
-    int32 lightCount;      // 4 bytes (√— 4112 bytes)
+    int32 lightCount;      // 4 bytes (Ï¥ù 4112 bytes)
 };

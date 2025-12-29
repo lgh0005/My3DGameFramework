@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include <functional>
 #include "Core/Renderer.h"
 #include "Core/RenderPipeline.h"

@@ -1,4 +1,4 @@
-#include "EnginePch.h"
+ï»¿#include "EnginePch.h"
 #include "AudioClip.h"
 #include <fstream>
 
@@ -24,30 +24,30 @@ bool AudioClip::InitSFX(const std::string& filepath)
 	m_type = AudioType::SFX;
 	m_path = filepath;
 
-	// 1. ÆÄÀÏÀ» ¹ÙÀÌ³Ê¸® ¸ğµå, Ä¿¼­¸¦ ¸Ç ³¡¿¡ µĞ »óÅÂ·Î ¿­±â
+	// 1. íŒŒì¼ì„ ë°”ì´ë„ˆë¦¬ ëª¨ë“œ, ì»¤ì„œë¥¼ ë§¨ ëì— ë‘” ìƒíƒœë¡œ ì—´ê¸°
 	std::ifstream file(filepath, std::ios::binary | std::ios::ate);
 	if (!file.is_open())
 	{
-		SPDLOG_ERROR("Failed to open audio file: {}", filepath);
+		LOG_ERROR("Failed to open audio file: {}", filepath);
 		return false;
 	}
 
-	// 2. ÆÄÀÏ Å©±â ÃøÁ¤
+	// 2. íŒŒì¼ í¬ê¸° ì¸¡ì •
 	std::streamsize size = file.tellg();
 	if (size <= 0)
 	{
-		SPDLOG_ERROR("Audio file is empty: {}", filepath);
+		LOG_ERROR("Audio file is empty: {}", filepath);
 		return false;
 	}
 
-	// 3. Ä¿¼­¸¦ ´Ù½Ã ÆÄÀÏÀÇ ¸Ç Ã³À½À¸·Î µ¹¸³´Ï´Ù.
+	// 3. ì»¤ì„œë¥¼ ë‹¤ì‹œ íŒŒì¼ì˜ ë§¨ ì²˜ìŒìœ¼ë¡œ ëŒë¦½ë‹ˆë‹¤.
 	file.seekg(0, std::ios::beg);
 
-	// 4. ¹öÆÛ Å©±â ÇÒ´ç ¹× µ¥ÀÌÅÍ ÀĞ±â
+	// 4. ë²„í¼ í¬ê¸° í• ë‹¹ ë° ë°ì´í„° ì½ê¸°
 	m_audioBuffer.resize(size);
 	if (!file.read((char*)m_audioBuffer.data(), size))
 	{
-		SPDLOG_ERROR("Failed to read audio file: {}", filepath);
+		LOG_ERROR("Failed to read audio file: {}", filepath);
 		return false;
 	}
 
@@ -59,11 +59,11 @@ bool AudioClip::InitBGM(const std::string& filepath)
 	m_type = AudioType::BGM;
 	m_path = filepath;
 
-	// ÆÄÀÏÀÌ ½ÇÁ¦·Î Á¸ÀçÇÏ´ÂÁö Á¤µµ¸¸ Ã¼Å©
+	// íŒŒì¼ì´ ì‹¤ì œë¡œ ì¡´ì¬í•˜ëŠ”ì§€ ì •ë„ë§Œ ì²´í¬
 	std::ifstream file(filepath);
 	if (!file.good())
 	{
-		SPDLOG_ERROR("BGM file not found: {}", filepath);
+		LOG_ERROR("BGM file not found: {}", filepath);
 		return false;
 	}
 

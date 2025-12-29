@@ -1,4 +1,4 @@
-#include "EnginePch.h"
+ï»¿#include "EnginePch.h"
 #include "GameObject.h"
 #include "Core/Scene.h"
 #include "Components/Component.h"
@@ -16,7 +16,7 @@ GameObjectUPtr GameObject::Create()
 
 bool GameObject::Init()
 {
-	// ±âº»ÀûÀ¸·Î TransformÀ» ¼ÒÀ¯
+	// ê¸°ë³¸ì ìœ¼ë¡œ Transformì„ ì†Œìœ 
 	auto transform = Transform::Create();
 	if (!transform) return false;
 	m_transform = transform.get();
@@ -35,10 +35,10 @@ void GameObject::AddComponent(ComponentUPtr component)
 
 void GameObject::SetParent(GameObject* parent)
 {
-	// parent°¡ nullptrÀÌ¸é ºÎ¸ð¸¦ ¾ø¾Ø´Ù(Root·Î ¸¸µç´Ù)´Â ÀÇ¹Ì
+	// parentê°€ nullptrì´ë©´ ë¶€ëª¨ë¥¼ ì—†ì•¤ë‹¤(Rootë¡œ ë§Œë“ ë‹¤)ëŠ” ì˜ë¯¸
 	Transform* parentTransform = (parent != nullptr) ? &parent->GetTransform() : nullptr;
 	
-	// Transform¿¡°Ô ½ÇÁ¦ ·ÎÁ÷ À§ÀÓ
+	// Transformì—ê²Œ ì‹¤ì œ ë¡œì§ ìœ„ìž„
 	m_transform->SetParent(parentTransform);
 }
 
@@ -46,7 +46,7 @@ void GameObject::AddChild(GameObject* child)
 {
 	if (child == nullptr) return;
 
-	// "³Ê ³» ÀÚ½ÄÀÌ µÅ¶ó" == "³ÊÀÇ ºÎ¸ð´Â ³ª´Ù"
+	// "ë„ˆ ë‚´ ìžì‹ì´ ë¼ë¼" == "ë„ˆì˜ ë¶€ëª¨ëŠ” ë‚˜ë‹¤"
 	child->SetParent(this);
 }
 

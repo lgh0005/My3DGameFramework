@@ -1,4 +1,4 @@
-#include "EnginePch.h"
+ï»¿#include "EnginePch.h"
 #include "PlayerController.h"
 #include "Core/GameObject.h"
 #include "Components/Animator.h"
@@ -38,10 +38,10 @@ void PlayerController::HandleMovement(float dt)
     float speed = m_moveSpeed * dt;
     m_isMoving = false;
 
-    // 1. È­»ìÇ¥ ÀÔ·Â Ã³¸®
+    // 1. í™”ì‚´í‘œ ì…ë ¥ ì²˜ë¦¬
     if (INPUT_MGR.GetButton("Player_Up"))
     {
-        // ¸ğµ¨ ±âÁØ ¾Õ(Forward)À¸·Î ÀÌµ¿
+        // ëª¨ë¸ ê¸°ì¤€ ì•(Forward)ìœ¼ë¡œ ì´ë™
         transform.Translate(transform.GetForwardVector() * speed);
         m_isMoving = true;
     }
@@ -50,7 +50,7 @@ void PlayerController::HandleMovement(float dt)
         transform.Translate(transform.GetForwardVector() * -speed);
         m_isMoving = true;
     }
-    // ÁÂ¿ì ÀÌµ¿ ½Ã ¸ğµ¨ÀÌ È¸ÀüÇÏÁö ¾Ê´Â´Ù¸é ±×³É ¿·À¸·Î ÀÌµ¿ (°Ô°ÉÀ½)
+    // ì¢Œìš° ì´ë™ ì‹œ ëª¨ë¸ì´ íšŒì „í•˜ì§€ ì•ŠëŠ”ë‹¤ë©´ ê·¸ëƒ¥ ì˜†ìœ¼ë¡œ ì´ë™ (ê²Œê±¸ìŒ)
     if (INPUT_MGR.GetButton("Player_Right"))
     {
         transform.Translate(transform.GetRightVector() * speed);

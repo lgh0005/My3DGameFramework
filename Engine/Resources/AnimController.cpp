@@ -1,4 +1,4 @@
-#include "EnginePch.h"
+ï»¿#include "EnginePch.h"
 #include "AnimController.h"
 #include "Resources/Animation.h"
 #include "Resources/AnimState.h"
@@ -35,7 +35,7 @@ void AnimController::SetStartState(const std::string& name)
         m_currentState = it->second;
         m_currentTime = 0.0f;
 
-        // ÃÊ±âÈ­ ½Ã ºí·»µù »óÅÂ Á¤¸®
+        // ì´ˆê¸°í™” ì‹œ ë¸”ë Œë”© ìƒíƒœ ì •ë¦¬
         m_nextState = nullptr;
         m_isBlending = false;
     }
@@ -43,29 +43,29 @@ void AnimController::SetStartState(const std::string& name)
 
 void AnimController::Play(const std::string& stateName)
 {
-    CrossFade(stateName, 0.0f); // 0ÃÊ ºí·»µù = Áï½Ã Àç»ı
+    CrossFade(stateName, 0.0f); // 0ì´ˆ ë¸”ë Œë”© = ì¦‰ì‹œ ì¬ìƒ
 }
 
 void AnimController::CrossFade(const std::string& nextStateName, float duration)
 {
     auto it = m_states.find(nextStateName);
-    if (it == m_states.end()) return; // ¾ø´Â »óÅÂ¸é ¹«½Ã
+    if (it == m_states.end()) return; // ì—†ëŠ” ìƒíƒœë©´ ë¬´ì‹œ
 
     auto targetState = it->second;
 
-    // ÀÌ¹Ì ±× »óÅÂ¸é ¹«½Ã
+    // ì´ë¯¸ ê·¸ ìƒíƒœë©´ ë¬´ì‹œ
     if (m_currentState == targetState) return;
     if (m_isBlending && m_nextState == targetState) return;
 
-    // [Duration °áÁ¤ ·ÎÁ÷]
+    // [Duration ê²°ì • ë¡œì§]
     if (duration < 0.0f && m_currentState)
     {
-        // AnimState Å¬·¡½ºÀÇ Ä¸½¶È­µÈ ¸Ş¼­µå »ç¿ë
+        // AnimState í´ë˜ìŠ¤ì˜ ìº¡ìŠí™”ëœ ë©”ì„œë“œ ì‚¬ìš©
         duration = m_currentState->GetTransitionDuration(nextStateName);
-        if (duration < 0.0f) duration = 0.2f; // ±âº»°ª
+        if (duration < 0.0f) duration = 0.2f; // ê¸°ë³¸ê°’
     }
 
-    // À½¼ö ¹æÁö
+    // ìŒìˆ˜ ë°©ì§€
     if (duration < 0.0f) duration = 0.0f;
 
     TransitTo(targetState, duration);
@@ -79,7 +79,7 @@ void AnimController::TransitTo(std::shared_ptr<AnimState> nextState, float durat
     m_blendTimer = 0.0f;
     m_isBlending = (duration > 0.0f);
 
-    // Áï½Ã ±³Ã¼
+    // ì¦‰ì‹œ êµì²´
     if (!m_isBlending)
     {
         m_currentState = m_nextState;
@@ -131,11 +131,11 @@ void AnimController::Update(float deltaTime)
 
 Pose AnimController::GetPose(const std::string& nodeName, const Pose& defaultPose) const
 {
-    // A. ÇöÀç Æ÷Áî
+    // A. í˜„ì¬ í¬ì¦ˆ
     Pose poseA = defaultPose;
     bool hasA = false;
 
-    // A. ÇöÀç »óÅÂ Æ÷Áî
+    // A. í˜„ì¬ ìƒíƒœ í¬ì¦ˆ
     if (m_currentState && m_currentState->GetClip())
     {
         // Animation -> AnimChannel -> GetPose
@@ -149,7 +149,7 @@ Pose AnimController::GetPose(const std::string& nodeName, const Pose& defaultPos
 
     if (!m_isBlending) return poseA;
 
-    // B. ´ÙÀ½ »óÅÂ Æ÷Áî (ºí·»µù)
+    // B. ë‹¤ìŒ ìƒíƒœ í¬ì¦ˆ (ë¸”ë Œë”©)
     if (m_nextState && m_nextState->GetClip())
     {
         Pose poseB = defaultPose;
@@ -162,7 +162,7 @@ Pose AnimController::GetPose(const std::string& nodeName, const Pose& defaultPos
             hasB = true;
         }
 
-        // µÑ Áß ÇÏ³ª¶óµµ ¾Ö´Ï¸ŞÀÌ¼ÇÀÌ ÀÖÀ¸¸é ¼¯´Â´Ù
+        // ë‘˜ ì¤‘ í•˜ë‚˜ë¼ë„ ì• ë‹ˆë©”ì´ì…˜ì´ ìˆìœ¼ë©´ ì„ëŠ”ë‹¤
         if (hasA || hasB)
         {
             float factor = glm::clamp(m_blendTimer / m_blendDuration, 0.0f, 1.0f);

@@ -36,7 +36,7 @@ bool SSAOFramebuffer::Init(int32 width, int32 height)
 
     if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
     {
-        SPDLOG_ERROR("SSAO Framebuffer Incomplete!");
+        LOG_ERROR("SSAO Framebuffer Incomplete!");
         return false;
     }
 

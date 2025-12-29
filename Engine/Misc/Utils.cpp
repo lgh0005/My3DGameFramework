@@ -1,12 +1,12 @@
-#include "EnginePch.h"
+ï»¿#include "EnginePch.h"
 #include "Utils.h"
 #include <glm/gtx/matrix_decompose.hpp>
 
 /*============================//
-//   Á¶¸í ¿¬»ê Àü¿ë À¯Æ¿ ÇÔ¼ö   //
+//   ì¡°ëª… ì—°ì‚° ì „ìš© ìœ í‹¸ í•¨ìˆ˜   //
 //============================*/
-// Á¶¸í °¨¼è ÇÔ¼ö : °Å¸®¸¦ ³ÖÀ¸¸é ±×¿¡ µû¸¥ Á¶¸í °¨¼è °è¼ö¸¦ °è»êÇØÁØ´Ù.
-// °æÇèÀûÀ¸·Î ¾òÀº °è¼ö¿¡ ´ëÇÑ ±Ù»ç½Ä
+// ì¡°ëª… ê°ì‡  í•¨ìˆ˜ : ê±°ë¦¬ë¥¼ ë„£ìœ¼ë©´ ê·¸ì— ë”°ë¥¸ ì¡°ëª… ê°ì‡  ê³„ìˆ˜ë¥¼ ê³„ì‚°í•´ì¤€ë‹¤.
+// ê²½í—˜ì ìœ¼ë¡œ ì–»ì€ ê³„ìˆ˜ì— ëŒ€í•œ ê·¼ì‚¬ì‹
 glm::vec3 Utils::GetAttenuationCoeff(float distance)
 {
 	const auto linear_coeff = glm::vec4
@@ -29,14 +29,14 @@ glm::vec3 Utils::GetAttenuationCoeff(float distance)
 }
 
 /*==============================//
-//   ¼ÎÀÌ´õ ÆÄÀÏ ·Îµå À¯Æ¿ ÇÔ¼ö   //
+//   ì…°ì´ë” íŒŒì¼ ë¡œë“œ ìœ í‹¸ í•¨ìˆ˜   //
 //==============================*/
 std::optional<std::string> Utils::LoadTextFile(const std::string& filename)
 {
 	std::ifstream fin(filename);
 	if (!fin.is_open())
 	{
-		SPDLOG_ERROR("failed to open file: {}", filename);
+		LOG_ERROR("failed to open file: {}", filename);
 		return {};
 	}
 	std::stringstream text;
@@ -45,7 +45,7 @@ std::optional<std::string> Utils::LoadTextFile(const std::string& filename)
 }
 
 /*============================//
-//   assimp to glm À¯Æ¿ ÇÔ¼ö   //
+//   assimp to glm ìœ í‹¸ í•¨ìˆ˜   //
 //============================*/
 glm::mat4 Utils::ConvertToGLMMat4(const aiMatrix4x4& from)
 {
@@ -68,7 +68,7 @@ glm::quat Utils::ConvertToGLMQuat(const aiQuaternion& pOrientation)
 }
 
 /*==========================//
-//   Jolt to glm À¯Æ¿ ÇÔ¼ö   //
+//   Jolt to glm ìœ í‹¸ í•¨ìˆ˜   //
 //==========================*/
 glm::vec3 Utils::ToGlmVec3(const JPH::Vec3& v)
 {
@@ -81,7 +81,7 @@ glm::quat Utils::ToGlmQuat(const JPH::Quat& q)
 }
 
 /*==========================//
-//   glm to Jolt À¯Æ¿ ÇÔ¼ö   //
+//   glm to Jolt ìœ í‹¸ í•¨ìˆ˜   //
 //==========================*/
 JPH::Vec3 Utils::ToJoltVec3(const glm::vec3& v)
 {
@@ -94,7 +94,7 @@ JPH::Quat Utils::ToJoltQuat(const glm::quat& q)
 }
 
 /*===============================//
-//   SSAO ¿¬»êÀ» À§ÇÑ Lerp ÇÔ¼ö   //
+//   SSAO ì—°ì‚°ì„ ìœ„í•œ Lerp í•¨ìˆ˜   //
 //===============================*/
 float Utils::Lerp(float a, float b, float f)
 {
@@ -102,11 +102,11 @@ float Utils::Lerp(float a, float b, float f)
 }
 
 /*==================================//
-//   AABB ÁÂÇ¥¸¦ ¾ò¾î¿À´Â À¯Æ¿ ÇÔ¼ö   //
+//   AABB ì¢Œí‘œë¥¼ ì–»ì–´ì˜¤ëŠ” ìœ í‹¸ í•¨ìˆ˜   //
 //==================================*/
 glm::vec3 Utils::Min(const glm::vec3& a, const glm::vec3& b)
 {
-	// °¢ ¼ººĞº°·Î ÃÖ¼Ú°ªÀ» ÃëÇÏ¿© »õ·Î¿î vec3¸¦ »ı¼º
+	// ê° ì„±ë¶„ë³„ë¡œ ìµœì†Ÿê°’ì„ ì·¨í•˜ì—¬ ìƒˆë¡œìš´ vec3ë¥¼ ìƒì„±
 	return glm::vec3
 	(
 		std::min<float>(a.x, b.x),
@@ -117,7 +117,7 @@ glm::vec3 Utils::Min(const glm::vec3& a, const glm::vec3& b)
 
 glm::vec3 Utils::Max(const glm::vec3& a, const glm::vec3& b)
 {
-	// °¢ ¼ººĞº°·Î ÃÖ´ñ°ªÀ» ÃëÇÏ¿© »õ·Î¿î vec3¸¦ »ı¼º
+	// ê° ì„±ë¶„ë³„ë¡œ ìµœëŒ“ê°’ì„ ì·¨í•˜ì—¬ ìƒˆë¡œìš´ vec3ë¥¼ ìƒì„±
 	return glm::vec3
 	(
 		glm::max<float>(a.x, b.x),

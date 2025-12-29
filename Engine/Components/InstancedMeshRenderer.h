@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include "MeshRenderer.h"
 
 #pragma region FORWARD_DECLARATION

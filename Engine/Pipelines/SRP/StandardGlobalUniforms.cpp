@@ -1,4 +1,4 @@
-#include "EnginePch.h"
+ï»¿#include "EnginePch.h"
 #include "StandardGlobalUniforms.h"
 #include "Graphics/UniformBuffer.h"
 #include "Core/RenderContext.h"
@@ -30,16 +30,16 @@ void StandardGlobalUniforms::PreRender(RenderContext* context)
 {
 	if (!context) return;
 
-	// 0. context·ÎºÎÅÍ ÇÊ¿äÇÑ Á¤º¸ ¾ò¾î¿À±â
+	// 0. contextë¡œë¶€í„° í•„ìš”í•œ ì •ë³´ ì–»ì–´ì˜¤ê¸°
 	auto camera = context->GetCamera();
 	auto lights = context->GetLights();
 
 	if (!camera) return;
 
-	// 1. Ä«¸Þ¶ó µ¥ÀÌÅÍ ¾÷µ¥ÀÌÆ®
+	// 1. ì¹´ë©”ë¼ ë°ì´í„° ì—…ë°ì´íŠ¸
 	UpdateCameraUBO(camera);
 
-	// 2. Á¶¸í µ¥ÀÌÅÍ ¾÷µ¥ÀÌÆ® (Specular °è»êÀ» À§ÇØ ViewPos ÇÊ¿ä)
+	// 2. ì¡°ëª… ë°ì´í„° ì—…ë°ì´íŠ¸ (Specular ê³„ì‚°ì„ ìœ„í•´ ViewPos í•„ìš”)
 	UpdateLightUBO(lights, camera->GetTransform().GetWorldPosition());
 }
 
@@ -79,7 +79,7 @@ void StandardGlobalUniforms::UpdateLightUBO
 		auto& info = lightData.lights[lightCount];
 		auto& transform = light->GetTransform();
 
-		// [°øÅë ¼Ó¼º]
+		// [ê³µí†µ ì†ì„±]
 		info.position = transform.GetWorldPosition();
 		info.direction = transform.GetForwardVector();
 		info.ambient = light->GetAmbient();
@@ -87,7 +87,7 @@ void StandardGlobalUniforms::UpdateLightUBO
 		info.specular = light->GetSpecular();
 		info.intensity = light->GetIntensity();
 
-		// [±×¸²ÀÚ Ä³½ºÆÃ ÇÊ¿ä ÆÇÁ¤]
+		// [ê·¸ë¦¼ìž ìºìŠ¤íŒ… í•„ìš” íŒì •]
 		if (light->IsCastShadow() && shadowCasterCount < MAX_SHADOW_CASTER)
 		{
 			info.shadowMapIndex = shadowCasterCount;
@@ -100,7 +100,7 @@ void StandardGlobalUniforms::UpdateLightUBO
 			light->SetShadowMapIndex(-1);
 		}
 
-		// [Å¸ÀÔº° ¼Ó¼º]
+		// [íƒ€ìž…ë³„ ì†ì„±]
 		switch (light->GetComponentType())
 		{
 			case ComponentType::DirectionalLight:

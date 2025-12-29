@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 #include "Core/RenderPass.h"
 
 #pragma region FORWARD_DECLARATION
@@ -8,7 +8,7 @@ CLASS_PTR(Camera)
 CLASS_PTR(StaticMeshRenderer)
 #pragma endregion
 
-// TODO : ÀÌÈÄ¿¡ URPÀÇ DeferredLightingPass·Î ½Â°İµÇ¾î¾ß ÇÒ ·»´õ ÆĞ½º
+// TODO : ì´í›„ì— URPì˜ DeferredLightingPassë¡œ ìŠ¹ê²©ë˜ì–´ì•¼ í•  ë Œë” íŒ¨ìŠ¤
 CLASS_PTR(HDRRenderPass)
 class HDRRenderPass : public GeneralRenderPass
 {

@@ -1,4 +1,4 @@
-#include "EnginePch.h"
+ï»¿#include "EnginePch.h"
 #include "MSAAFramebuffer.h"
 #include "Resources/Texture.h"
 
@@ -28,8 +28,8 @@ void MSAAFramebuffer::Resolve() const
     glBindFramebuffer(GL_READ_FRAMEBUFFER, m_msaaFbo);
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, m_fbo);
 
-    // ÄÃ·¯ ¹öÆÛ º¹»ç (Linear º¸°£ ¾È µÊ, Nearest¸¸ °¡´É)
-    // ¿©·¯ °³ÀÇ Attachment°¡ ÀÖ´Ù¸é ¹İº¹¹®À¸·Î Ã³¸® °¡´É (¿©±â¼± 0¹ø¸¸ ¿¹½Ã)
+    // ì»¬ëŸ¬ ë²„í¼ ë³µì‚¬ (Linear ë³´ê°„ ì•ˆ ë¨, Nearestë§Œ ê°€ëŠ¥)
+    // ì—¬ëŸ¬ ê°œì˜ Attachmentê°€ ìˆë‹¤ë©´ ë°˜ë³µë¬¸ìœ¼ë¡œ ì²˜ë¦¬ ê°€ëŠ¥ (ì—¬ê¸°ì„  0ë²ˆë§Œ ì˜ˆì‹œ)
     glBlitFramebuffer
     (
         0, 0, m_width, m_height,
@@ -37,7 +37,7 @@ void MSAAFramebuffer::Resolve() const
         GL_COLOR_BUFFER_BIT, GL_NEAREST
     );
 
-    // »óÅÂ º¹±¸
+    // ìƒíƒœ ë³µêµ¬
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
@@ -48,7 +48,7 @@ bool MSAAFramebuffer::Init(int32 width, int32 height, int32 samples)
     m_samples = samples;
 
     // ====================================================
-    // 1. MSAA FBO »ı¼º (Drawing Target)
+    // 1. MSAA FBO ìƒì„± (Drawing Target)
     // ====================================================
     glGenFramebuffers(1, &m_msaaFbo);
     glBindFramebuffer(GL_FRAMEBUFFER, m_msaaFbo);
@@ -57,7 +57,7 @@ bool MSAAFramebuffer::Init(int32 width, int32 height, int32 samples)
     uint32 colorBuffer;
     glGenRenderbuffers(1, &colorBuffer);
     glBindRenderbuffer(GL_RENDERBUFFER, colorBuffer);
-    // HDRÀ» À§ÇØ GL_RGBA16F »ç¿ë
+    // HDRì„ ìœ„í•´ GL_RGBA16F ì‚¬ìš©
     glRenderbufferStorageMultisample(GL_RENDERBUFFER, samples, GL_RGBA16F, width, height);
     glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_RENDERBUFFER, colorBuffer);
     m_msaaColorBuffers.push_back(colorBuffer);
@@ -68,15 +68,15 @@ bool MSAAFramebuffer::Init(int32 width, int32 height, int32 samples)
     glRenderbufferStorageMultisample(GL_RENDERBUFFER, samples, GL_DEPTH24_STENCIL8, width, height);
     glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, m_msaaDepthStencilBuffer);
 
-    // 1-3. »óÅÂ È®ÀÎ
+    // 1-3. ìƒíƒœ í™•ì¸
     if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
         return false;
 
     // ====================================================
-    // 2. Resolve FBO »ı¼º (Texture Target - ºÎ¸ğ ¸â¹ö »ç¿ë)
+    // 2. Resolve FBO ìƒì„± (Texture Target - ë¶€ëª¨ ë©¤ë²„ ì‚¬ìš©)
     // ====================================================
-    // Forward Rendering °á°ú¸¦ ÅØ½ºÃ³·Î ½á¸ÔÀ¸·Á¸é(PostProcess µî) ÀÌ°Ô ÇÊ¿äÇÔ
-    glGenFramebuffers(1, &m_fbo); // ºÎ¸ğ ¸â¹ö m_fbo
+    // Forward Rendering ê²°ê³¼ë¥¼ í…ìŠ¤ì²˜ë¡œ ì¨ë¨¹ìœ¼ë ¤ë©´(PostProcess ë“±) ì´ê²Œ í•„ìš”í•¨
+    glGenFramebuffers(1, &m_fbo); // ë¶€ëª¨ ë©¤ë²„ m_fbo
     glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
 
     auto texture = Texture::Create(width, height, GL_RGBA16F, GL_RGBA, GL_FLOAT);
@@ -85,10 +85,10 @@ bool MSAAFramebuffer::Init(int32 width, int32 height, int32 samples)
 
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, texture->Get(), 0);
 
-    // ºÎ¸ğÀÇ ÅØ½ºÃ³ ¸®½ºÆ®¿¡ µî·Ï
+    // ë¶€ëª¨ì˜ í…ìŠ¤ì²˜ ë¦¬ìŠ¤íŠ¸ì— ë“±ë¡
     m_textures.push_back(std::move(texture));
 
-    // DrawBuffer ¼³Á¤
+    // DrawBuffer ì„¤ì •
     uint32 attachments[1] = { GL_COLOR_ATTACHMENT0 };
     glDrawBuffers(1, attachments);
 

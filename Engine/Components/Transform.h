@@ -1,8 +1,8 @@
-#pragma once
+ï»¿#pragma once
 #include "Component.h"
 
 // TODO:
-// 1. ºÎ¸ğ-ÀÚ½ÄÀÇ ÄÄÆ÷³ÍÆ®µéÀÇ Active ¼øÈ¸´Â TransformÀ» ÅëÇØ¼­.
+// 1. ë¶€ëª¨-ìì‹ì˜ ì»´í¬ë„ŒíŠ¸ë“¤ì˜ Active ìˆœíšŒëŠ” Transformì„ í†µí•´ì„œ.
 CLASS_PTR(Transform)
 class Transform : public Component
 {
@@ -16,13 +16,13 @@ public:
 //                 Transformation (Local)             //
 //====================================================*/
 public:
-	// À§Ä¡
+	// ìœ„ì¹˜
 	void SetPosition(const glm::vec3& position);
 	void SetLocalPosition(const glm::vec3& position) { SetPosition(position); }
 	const glm::vec3& GetLocalPosition() const { return m_position; }
 	void Translate(const glm::vec3& delta);
 
-	// È¸Àü
+	// íšŒì „
 	void SetRotation(const glm::vec3& eulerAnglesDegrees);
 	void SetRotation(const glm::quat& rotation);
 	void SetLocalRotation(const glm::quat& rotation) { SetRotation(rotation); }
@@ -31,7 +31,7 @@ public:
 	const glm::quat& GetLocalRotation() const { return m_rotation; }
 	glm::vec3 GetRotationEuler() const;
 
-	// ½ºÄÉÀÏ
+	// ìŠ¤ì¼€ì¼
 	void SetScale(const glm::vec3& scale);
 	void SetLocalScale(const glm::vec3& scale) { SetScale(scale); }
 	const glm::vec3& GetLocalScale() const { return m_scale; }
@@ -40,21 +40,21 @@ public:
 //                 World Properties (Getter)          //
 //====================================================*/
 public:
-	// ¿ùµå ÁÂÇ¥°è
+	// ì›”ë“œ ì¢Œí‘œê³„
 	glm::vec3 Transform::GetWorldPosition() const;
 	glm::vec3 Transform::GetWorldScale()	const;
 	glm::quat Transform::GetWorldRotation() const;
 
-	// ¹æÇâ º¤ÅÍ
-	glm::vec3 GetForwardVector() const; // ¾ÕÂÊ   (-Z)
-	glm::vec3 GetUpVector() const;      // À§ÂÊ   (+Y)
-	glm::vec3 GetRightVector() const;   // ¿À¸¥ÂÊ (+X)
+	// ë°©í–¥ ë²¡í„°
+	glm::vec3 GetForwardVector() const; // ì•ìª½   (-Z)
+	glm::vec3 GetUpVector() const;      // ìœ„ìª½   (+Y)
+	glm::vec3 GetRightVector() const;   // ì˜¤ë¥¸ìª½ (+X)
 
 /*====================================================//
 //                 Matrix Calculation                 //
 //====================================================*/
 public:
-	// ¿ùµå ¶Ç´Â ·ÎÄÃ ¸ğµ¨ Çà·Ä
+	// ì›”ë“œ ë˜ëŠ” ë¡œì»¬ ëª¨ë¸ í–‰ë ¬
 	void SetLocalMatrix(const glm::mat4& matrix);
 	glm::mat4 GetLocalMatrix() const;
 	glm::mat4 GetWorldMatrix() const;
@@ -64,7 +64,7 @@ public:
 //                 Hierarchy System                   //
 //====================================================*/
 public:
-	// °èÃş ±¸Á¶
+	// ê³„ì¸µ êµ¬ì¡°
 	void SetParent(Transform* parent);
 	Transform* GetParent() const { return m_parent; }
 	const std::vector<Transform*>& GetChildren() const { return m_children; }

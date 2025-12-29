@@ -1,9 +1,9 @@
-#include "pch.h"
+ï»¿#include "pch.h"
 #include "My3DGameFramework.h"
 
 int main()
 {
-	// 1. ¾îÇÃ¸®ÄÉÀÌ¼Ç(¿£Áø) ÀÎ½ºÅÏ½º »ý¼º
+	// 1. ì–´í”Œë¦¬ì¼€ì´ì…˜(ì—”ì§„) ì¸ìŠ¤í„´ìŠ¤ ìƒì„±
 	auto app = My3DGameFramework::Create
 	(
 		WINDOW_WIDTH, WINDOW_HEIGHT,
@@ -11,11 +11,11 @@ int main()
 	);
 	if (!app)
 	{
-		SPDLOG_CRITICAL("failed to create application instance.");
+		LOG_FATAL("failed to create application instance.");
 		return 1;
 	}
 
-	// 2. °ÔÀÓ ½ÇÇà
+	// 2. ê²Œìž„ ì‹¤í–‰
 	// Now working: DevLevel, PBRLevel
 	app->Run("PBRLevel");
 

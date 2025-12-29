@@ -1,12 +1,12 @@
-#include "pch.h"
+ï»¿#include "pch.h"
 #include "Utils.h"
 
 /*==================================//
-//   AABB ÁÂÇ¥¸¦ ¾ò¾î¿À´Â À¯Æ¿ ÇÔ¼ö   //
+//   AABB ì¢Œí‘œë¥¼ ì–»ì–´ì˜¤ëŠ” ìœ í‹¸ í•¨ìˆ˜   //
 //==================================*/
 glm::vec3 Utils::Min(const glm::vec3& a, const glm::vec3& b)
 {
-	// °¢ ¼ººĞº°·Î ÃÖ¼Ú°ªÀ» ÃëÇÏ¿© »õ·Î¿î vec3¸¦ »ı¼º
+	// ê° ì„±ë¶„ë³„ë¡œ ìµœì†Ÿê°’ì„ ì·¨í•˜ì—¬ ìƒˆë¡œìš´ vec3ë¥¼ ìƒì„±
 	return glm::vec3
 	(
 		std::min<float>(a.x, b.x),
@@ -17,7 +17,7 @@ glm::vec3 Utils::Min(const glm::vec3& a, const glm::vec3& b)
 
 glm::vec3 Utils::Max(const glm::vec3& a, const glm::vec3& b)
 {
-	// °¢ ¼ººĞº°·Î ÃÖ´ñ°ªÀ» ÃëÇÏ¿© »õ·Î¿î vec3¸¦ »ı¼º
+	// ê° ì„±ë¶„ë³„ë¡œ ìµœëŒ“ê°’ì„ ì·¨í•˜ì—¬ ìƒˆë¡œìš´ vec3ë¥¼ ìƒì„±
 	return glm::vec3
 	(
 		glm::max<float>(a.x, b.x),
@@ -27,7 +27,7 @@ glm::vec3 Utils::Max(const glm::vec3& a, const glm::vec3& b)
 }
 
 /*============================//
-//   assimp to glm À¯Æ¿ ÇÔ¼ö   //
+//   assimp to glm ìœ í‹¸ í•¨ìˆ˜   //
 //============================*/
 glm::mat4 Utils::ConvertToGLMMat4(const aiMatrix4x4& from)
 {

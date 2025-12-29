@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 
 class TimeManager
 {
@@ -27,6 +27,6 @@ private:
 	int32 m_frameCount = 0;
 	float m_fps = 0.0f;
 
-	float m_fixedDeltaTime = 1.0f / 60.0f; // ±âº»°ª 60hz (0.01666...)
-	double m_accumulator = 0.0;            // ½Ã°£ÀÌ ½×ÀÌ´Â ´©Àû±â
+	float m_fixedDeltaTime = 1.0f / 60.0f; // ê¸°ë³¸ê°’ 60hz (0.01666...)
+	double m_accumulator = 0.0;            // ì‹œê°„ì´ ìŒ“ì´ëŠ” ëˆ„ì ê¸°
 };

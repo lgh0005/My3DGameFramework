@@ -1,4 +1,4 @@
-#include "EnginePch.h"
+ï»¿#include "EnginePch.h"
 #include "PBRScene.h"
 
 #include "Core/GameObject.h"
@@ -49,21 +49,21 @@ PBRSceneUPtr PBRScene::Create()
 
 bool PBRScene::LoadNessesaryResources()
 {
-	// Å¥ºê ¸Ş½¬
+	// íë¸Œ ë©”ì‰¬
 	{
 		auto cubeMesh = GeometryGenerator::CreateBox();
 		if (!cubeMesh) return false;
 		RESOURCE.AddResource<StaticMesh>(std::move(cubeMesh), "Cube");
 	}
 
-	// ±¸ ¸Ş½¬
+	// êµ¬ ë©”ì‰¬
 	{
 		auto sphereMesh = GeometryGenerator::CreateSphere();
 		if (!sphereMesh) return false;
 		RESOURCE.AddResource<StaticMesh>(std::move(sphereMesh), "Sphere");
 	}
 
-	// ´Ü»ö ¸ÓÆ¼¸®¾ó
+	// ë‹¨ìƒ‰ ë¨¸í‹°ë¦¬ì–¼
 	{
 		auto solidColorMat = Material::Create();
 		if (!solidColorMat) return false;
@@ -76,9 +76,9 @@ bool PBRScene::LoadNessesaryResources()
 		RESOURCE.AddResource<Material>(std::move(solidColorMat), "solidColor");
 	}
 
-	// ¼è°ø ¸ÓÆ¼¸®¾ó #1
+	// ì‡ ê³µ ë¨¸í‹°ë¦¬ì–¼ #1
 	{
-		// TODO : ÀÌÈÄ¿¡´Â ktx·Î ÇÑ ¹ø ±¸¿ï ÇÊ¿ä°¡ ÀÖÀ½.
+		// TODO : ì´í›„ì—ëŠ” ktxë¡œ í•œ ë²ˆ êµ¬ìš¸ í•„ìš”ê°€ ìˆìŒ.
 		auto rustedIronMat = Material::Create();
 		if (!rustedIronMat) return false;
 		rustedIronMat->diffuse = Texture::CreateFromImage
@@ -92,9 +92,9 @@ bool PBRScene::LoadNessesaryResources()
 		RESOURCE.AddResource<Material>(std::move(rustedIronMat), "Rusted_Iron");
 	}
 
-	// ¼è°ø ¸ÓÆ¼¸®¾ó #2
+	// ì‡ ê³µ ë¨¸í‹°ë¦¬ì–¼ #2
 	{
-		// TODO : ÀÌÈÄ¿¡´Â ktx·Î ÇÑ ¹ø ±¸¿ï ÇÊ¿ä°¡ ÀÖÀ½.
+		// TODO : ì´í›„ì—ëŠ” ktxë¡œ í•œ ë²ˆ êµ¬ìš¸ í•„ìš”ê°€ ìˆìŒ.
 		auto rustedIronMat = Material::Create();
 		if (!rustedIronMat) return false;
 		rustedIronMat->diffuse = Texture::CreateFromImage
@@ -106,7 +106,7 @@ bool PBRScene::LoadNessesaryResources()
 		RESOURCE.AddResource<Material>(std::move(rustedIronMat), "Rusted_Iron_orm");
 	}
 
-	// HDR Å¥ºê¸Ê ¸ÓÆ¼¸®¾ó
+	// HDR íë¸Œë§µ ë¨¸í‹°ë¦¬ì–¼
 	{
 		auto hdrCubeMat = Material::Create();
 		if (!hdrCubeMat) return false;
@@ -115,7 +115,7 @@ bool PBRScene::LoadNessesaryResources()
 		RESOURCE.AddResource<Material>(std::move(hdrCubeMat), "hdrCubeMat");
 	}
 
-	// HDR Skybox »ı¼º (IBLUtils »ç¿ë)
+	// HDR Skybox ìƒì„± (IBLUtils ì‚¬ìš©)
 	{
 		auto hdrImage = Image::LoadHDR("./Resources/Images/IBL/mirrored_hall_4k.hdr");
 		auto hdrTex = Texture::CreateFromHDR(hdrImage.get());
@@ -133,13 +133,13 @@ bool PBRScene::LoadNessesaryResources()
 		SetSkyLight(std::move(sky));
 	}
 
-	// 0-4. ¸ÓÆ¼¸®¾ó 2
+	// 0-4. ë¨¸í‹°ë¦¬ì–¼ 2
 	{
 		auto box1Mat = Material::Create();
 		RESOURCE.AddResource<Material>(std::move(box1Mat), "GroundMat");
 	}
 	
-	// 0-2. ¸ğµ¨°ú ¾Ö´Ï¸ŞÀÌ¼Ç #1
+	// 0-2. ëª¨ë¸ê³¼ ì• ë‹ˆë©”ì´ì…˜ #1
 	{
 		auto model = Model::Load("./Resources/Models/spacesoldier/aliensoldier.mymodel");
 		auto anim1 = Animation::Load("./Resources/Models/spacesoldier/Idle.myanim");
@@ -154,7 +154,7 @@ bool PBRScene::LoadNessesaryResources()
 
 bool PBRScene::CreateNessesaryRenderPasses()
 {
-	// °£´ÜÇÑ ¸ÓÆ¼¸®¾ó Æ÷¿öµå ·»´õ ÆĞ½º
+	// ê°„ë‹¨í•œ ë¨¸í‹°ë¦¬ì–¼ í¬ì›Œë“œ ë Œë” íŒ¨ìŠ¤
 	{
 		auto prog = Program::Create
 		(
@@ -169,32 +169,32 @@ bool PBRScene::CreateNessesaryRenderPasses()
 
 bool PBRScene::CreateSceneContext()
 {
-	// 0. Ãß°¡ÇÑ ·»´õÆĞ½º °¡Á®¿À±â
+	// 0. ì¶”ê°€í•œ ë Œë”íŒ¨ìŠ¤ ê°€ì ¸ì˜¤ê¸°
 	HDRRenderPass* hdrPass = (HDRRenderPass*)GetCustomRenderPass("simpleHDR");
 
-	// 1. Ä«¸Ş¶ó ¿ÀºêÁ§Æ® Ãß°¡
+	// 1. ì¹´ë©”ë¼ ì˜¤ë¸Œì íŠ¸ ì¶”ê°€
 	{
-		// GameObject »ı¼º ¹× ¾À¿¡ µî·Ï
+		// GameObject ìƒì„± ë° ì”¬ì— ë“±ë¡
 		auto cameraObj = GameObject::Create(); if (!cameraObj) return false;
 		auto camera = Camera::Create();		   if (!camera)	   return false;
 		auto* cameraPtr = camera.get();
 
-		// Ä«¸Ş¶ó ÄÄÆ÷³ÍÆ® »ı¼º ¹× Ãß°¡
+		// ì¹´ë©”ë¼ ì»´í¬ë„ŒíŠ¸ ìƒì„± ë° ì¶”ê°€
 		cameraObj->GetTransform().SetPosition(glm::vec3(0.0f, 2.5f, 8.0f));
 		camera->SetProjection(45.0f, (float)WINDOW_WIDTH / (float)WINDOW_HEIGHT, 0.01f, 100.0f);
 		cameraObj->AddComponent(std::move(camera));
 
-		// Ä«¸Ş¶ó ÄÁÆ®·Ñ·¯ »ı¼º ¹× Ãß°¡
+		// ì¹´ë©”ë¼ ì»¨íŠ¸ë¡¤ëŸ¬ ìƒì„± ë° ì¶”ê°€
 		auto cameraCtrl = CameraController::Create();
 		cameraObj->AddComponent(std::move(cameraCtrl));
 
-		SetMainCamera(cameraPtr); // ¸ŞÀÎ Ä«¸Ş¶ó·Î ¼³Á¤
+		SetMainCamera(cameraPtr); // ë©”ì¸ ì¹´ë©”ë¼ë¡œ ì„¤ì •
 		AddGameObject(std::move(cameraObj));
 	}
 
-	// 2. Á¶¸í Ãß°¡
+	// 2. ì¡°ëª… ì¶”ê°€
 	{
-		// 2. Á¶¸í Ãß°¡ 1
+		// 2. ì¡°ëª… ì¶”ê°€ 1
 		{
 			auto lightGo = GameObject::Create();
 			lightGo->SetName("PointLight1");
@@ -205,7 +205,7 @@ bool PBRScene::CreateSceneContext()
 			AddGameObject(std::move(lightGo));
 		}
 
-		// 2. Á¶¸í Ãß°¡ 2
+		// 2. ì¡°ëª… ì¶”ê°€ 2
 		{
 			auto lightGo = GameObject::Create();
 			lightGo->SetName("PointLight2");
@@ -216,7 +216,7 @@ bool PBRScene::CreateSceneContext()
 			AddGameObject(std::move(lightGo));
 		}
 
-		// 2. Á¶¸í Ãß°¡ 3
+		// 2. ì¡°ëª… ì¶”ê°€ 3
 		{
 			auto lightGo = GameObject::Create();
 			lightGo->SetName("PointLight3");
@@ -227,7 +227,7 @@ bool PBRScene::CreateSceneContext()
 			AddGameObject(std::move(lightGo));
 		}
 
-		// 2. Á¶¸í Ãß°¡ 4
+		// 2. ì¡°ëª… ì¶”ê°€ 4
 		{
 			auto lightGo = GameObject::Create();
 			lightGo->SetName("PointLight4");
@@ -239,7 +239,7 @@ bool PBRScene::CreateSceneContext()
 		}
 	}
 	
-	// 3. ±×¸²ÀÚ°¡ ÀÖ´Â Á¶¸í Ãß°¡
+	// 3. ê·¸ë¦¼ìê°€ ìˆëŠ” ì¡°ëª… ì¶”ê°€
 	{
 		auto lightGo = GameObject::Create();
 		lightGo->SetName("SpotLight");
@@ -259,7 +259,7 @@ bool PBRScene::CreateSceneContext()
 		AddGameObject(std::move(lightGo));
 	}
 
-	// 6. Å¥ºê »ı¼º #3
+	// 6. íë¸Œ ìƒì„± #3
 	{
 		auto cubeObj = GameObject::Create();
 		cubeObj->SetName("Ground");
@@ -273,14 +273,14 @@ bool PBRScene::CreateSceneContext()
 		AddGameObject(std::move(cubeObj));
 	}
 
-	// 7. ¸ğµ¨ (TEST)
+	// 7. ëª¨ë¸ (TEST)
 	{
-		// 1. ¸®¼Ò½º È®º¸
+		// 1. ë¦¬ì†ŒìŠ¤ í™•ë³´
 		auto model = RESOURCE.GetResource<Model>("aliensoldier");
 		auto anim1 = RESOURCE.GetResource<Animation>("Idle");
 		auto anim2 = RESOURCE.GetResource<Animation>("Walk");
 
-		// 2. AnimController »ı¼º ¹× ¼³Á¤
+		// 2. AnimController ìƒì„± ë° ì„¤ì •
 		auto animCtrl = AnimController::Create();
 		animCtrl->AddState("Idle", anim1);
 		animCtrl->AddState("Walk", anim2);
@@ -288,38 +288,38 @@ bool PBRScene::CreateSceneContext()
 		animCtrl->SetTransitionDuration("Walk", "Idle", 0.2f);
 		animCtrl->SetStartState("Idle");
 
-		// 3. Animator ÄÄÆ÷³ÍÆ® ¸ÕÀú »ı¼º (ÀÇÁ¸¼º ÁÖÀÔÀ» À§ÇØ)
-		// ÁÖÀÇ: animator UPtrÀº ³ªÁß¿¡ AddComponent·Î ¼ÒÀ¯±ÇÀÌ ³Ñ¾î°¡¹Ç·Î,
-		// Instantiate¿¡ ³Ñ°ÜÁÙ Raw Pointer¸¦ ¹Ì¸® µû³õ½À´Ï´Ù.
+		// 3. Animator ì»´í¬ë„ŒíŠ¸ ë¨¼ì € ìƒì„± (ì˜ì¡´ì„± ì£¼ì…ì„ ìœ„í•´)
+		// ì£¼ì˜: animator UPtrì€ ë‚˜ì¤‘ì— AddComponentë¡œ ì†Œìœ ê¶Œì´ ë„˜ì–´ê°€ë¯€ë¡œ,
+		// Instantiateì— ë„˜ê²¨ì¤„ Raw Pointerë¥¼ ë¯¸ë¦¬ ë”°ë†“ìŠµë‹ˆë‹¤.
 		auto animator = Animator::Create(model, std::move(animCtrl));
 		Animator* animatorPtr = animator.get();
 
-		// 4. ¸ğµ¨ ÀÎ½ºÅÏ½ºÈ­ (¾À¿¡ µî·Ï + ·»´õ·¯ »ı¼º + Animator ÁÖÀÔ)
-		// Instantiate ³»ºÎ¿¡¼­ SkinnedMeshRendererµéÀÌ animatorPtr¸¦ ÂüÁ¶ÇÏ°Ô µË´Ï´Ù.
+		// 4. ëª¨ë¸ ì¸ìŠ¤í„´ìŠ¤í™” (ì”¬ì— ë“±ë¡ + ë Œë”ëŸ¬ ìƒì„± + Animator ì£¼ì…)
+		// Instantiate ë‚´ë¶€ì—ì„œ SkinnedMeshRendererë“¤ì´ animatorPtrë¥¼ ì°¸ì¡°í•˜ê²Œ ë©ë‹ˆë‹¤.
 		auto rootGO = model->Instantiate(this, animatorPtr);
 
 		if (rootGO)
 		{
-			// 5. Root GameObject ¼³Á¤
+			// 5. Root GameObject ì„¤ì •
 			rootGO->SetName("Soldier");
 
-			// À§Ä¡ ¹× Å©±â Á¶Á¤ (³Ê¹« Å©°Å³ª ÀÛÁö ¾Ê°Ô)
+			// ìœ„ì¹˜ ë° í¬ê¸° ì¡°ì • (ë„ˆë¬´ í¬ê±°ë‚˜ ì‘ì§€ ì•Šê²Œ)
 			rootGO->GetTransform().SetPosition(glm::vec3(2.0f, 0.0f, -2.0f));
-			rootGO->GetTransform().SetScale(glm::vec3(0.025f)); // ¸ğµ¨ ´ÜÀ§¿¡ µû¶ó Á¶Àı ÇÊ¿ä
+			rootGO->GetTransform().SetScale(glm::vec3(0.025f)); // ëª¨ë¸ ë‹¨ìœ„ì— ë”°ë¼ ì¡°ì ˆ í•„ìš”
 
-			// 6. ¾Æ±î ¸¸µç Animator ÄÄÆ÷³ÍÆ®¸¦ Root¿¡ ºÎÂø
-			// ÀÌÁ¦ Animator´Â ÀÌ GameObject(Root)ÀÇ TransformÀ» Á¦¾îÇÏ°Ô µË´Ï´Ù.
+			// 6. ì•„ê¹Œ ë§Œë“  Animator ì»´í¬ë„ŒíŠ¸ë¥¼ Rootì— ë¶€ì°©
+			// ì´ì œ AnimatorëŠ” ì´ GameObject(Root)ì˜ Transformì„ ì œì–´í•˜ê²Œ ë©ë‹ˆë‹¤.
 			rootGO->AddComponent(std::move(animator));
 
-			// 7. PlayerController ºÎÂø (Å°º¸µå Á¶ÀÛ¿ë)
+			// 7. PlayerController ë¶€ì°© (í‚¤ë³´ë“œ ì¡°ì‘ìš©)
 			rootGO->AddComponent(PlayerController::Create());
 
-			// ÀÌÁ¦ ¾À¿¡ µî·ÏÇÕ´Ï´Ù!
+			// ì´ì œ ì”¬ì— ë“±ë¡í•©ë‹ˆë‹¤!
 			AddGameObject(std::move(rootGO));
 		}
 	}
 
-	// 3. ±¸ 49°³ (ORM ÅØ½ºÃÄ Å×½ºÆ®)
+	// 3. êµ¬ 49ê°œ (ORM í…ìŠ¤ì³ í…ŒìŠ¤íŠ¸)
 	// TestSpheresForORMTexture(hdrPass);
 	// TestSpheresForPBRChart(hdrPass);
 	TestSpheresForPBRChartDeferred();
@@ -334,8 +334,8 @@ void PBRScene::TestSpheresForORMTexture(HDRRenderPass* hdrPass)
 {
 	auto sphereMesh = RESOURCE.GetResource<StaticMesh>("Sphere");
 
-	// [ÇÙ½É] ¹Ì¸® ·ÎµåÇØµĞ 'Rusted_Iron_orm' ¸ÓÆ¼¸®¾óÀ» °¡Á®¿É´Ï´Ù.
-	// ÀÌ ¸ÓÆ¼¸®¾ó ¾È¿¡´Â ÀÌ¹Ì Diffuse, Normal, ORM ÅØ½ºÃ³°¡ µé¾îÀÖ½À´Ï´Ù.
+	// [í•µì‹¬] ë¯¸ë¦¬ ë¡œë“œí•´ë‘” 'Rusted_Iron_orm' ë¨¸í‹°ë¦¬ì–¼ì„ ê°€ì ¸ì˜µë‹ˆë‹¤.
+	// ì´ ë¨¸í‹°ë¦¬ì–¼ ì•ˆì—ëŠ” ì´ë¯¸ Diffuse, Normal, ORM í…ìŠ¤ì²˜ê°€ ë“¤ì–´ìˆìŠµë‹ˆë‹¤.
 	auto baseMat = RESOURCE.GetResource<Material>("Rusted_Iron_orm");
 
 	const int rows = 7;
@@ -359,26 +359,26 @@ void PBRScene::TestSpheresForORMTexture(HDRRenderPass* hdrPass)
 			auto sphereObj = GameObject::Create();
 			sphereObj->GetTransform().SetPosition(glm::vec3(x, y, 0.0f));
 
-			// [Áß¿ä] °¢ ±¸Ã¼¸¶´Ù °³º°ÀûÀÎ ÆÄ¶ó¹ÌÅÍ¸¦ °¡Á®¾ß ÇÏ¹Ç·Î »õ ¸ÓÆ¼¸®¾ó »ı¼º
+			// [ì¤‘ìš”] ê° êµ¬ì²´ë§ˆë‹¤ ê°œë³„ì ì¸ íŒŒë¼ë¯¸í„°ë¥¼ ê°€ì ¸ì•¼ í•˜ë¯€ë¡œ ìƒˆ ë¨¸í‹°ë¦¬ì–¼ ìƒì„±
 			MaterialPtr pbrMat = Material::Create();
 
-			// 1. ÅØ½ºÃ³ °øÀ¯ (Texture Pointer Copy)
-			// ÀÌ¹ÌÁö¸¦ »õ·Î ·ÎµåÇÏ´Â°Ô ¾Æ´Ï¶ó, baseMatÀÌ µé°í ÀÖ´Â ÅØ½ºÃ³ Æ÷ÀÎÅÍ¸¸ º¹»çÇÕ´Ï´Ù.
-			// µû¶ó¼­ ¸Ş¸ğ¸® ³¶ºñ ¾øÀÌ ÅØ½ºÃ³¸¦ Àç»ç¿ëÇÕ´Ï´Ù.
+			// 1. í…ìŠ¤ì²˜ ê³µìœ  (Texture Pointer Copy)
+			// ì´ë¯¸ì§€ë¥¼ ìƒˆë¡œ ë¡œë“œí•˜ëŠ”ê²Œ ì•„ë‹ˆë¼, baseMatì´ ë“¤ê³  ìˆëŠ” í…ìŠ¤ì²˜ í¬ì¸í„°ë§Œ ë³µì‚¬í•©ë‹ˆë‹¤.
+			// ë”°ë¼ì„œ ë©”ëª¨ë¦¬ ë‚­ë¹„ ì—†ì´ í…ìŠ¤ì²˜ë¥¼ ì¬ì‚¬ìš©í•©ë‹ˆë‹¤.
 			if (baseMat)
 			{
 				pbrMat->diffuse = baseMat->diffuse;
 				pbrMat->normal = baseMat->normal;
-				pbrMat->orm = baseMat->orm; // ORM ÅØ½ºÃ³ ¿¬°á
+				pbrMat->orm = baseMat->orm; // ORM í…ìŠ¤ì²˜ ì—°ê²°
 			}
 
-			// 2. Factor °ª ¼³Á¤ (Grid Logic)
-			// ¼ÎÀÌ´õ ¿¬»ê: FinalValue = TextureValue * FactorValue
-			pbrMat->albedoFactor = glm::vec4(1.0f); // ¿øº» ÅØ½ºÃ³ »ö»ó ±×´ë·Î (Tint ¾øÀ½)
-			pbrMat->metallicFactor = metallicFactor;  // Çà¿¡ µû¶ó ±İ¼Ó¼º Á¶Àı
-			pbrMat->roughnessFactor = roughnessFactor; // ¿­¿¡ µû¶ó °ÅÄ¥±â Á¶Àı
+			// 2. Factor ê°’ ì„¤ì • (Grid Logic)
+			// ì…°ì´ë” ì—°ì‚°: FinalValue = TextureValue * FactorValue
+			pbrMat->albedoFactor = glm::vec4(1.0f); // ì›ë³¸ í…ìŠ¤ì²˜ ìƒ‰ìƒ ê·¸ëŒ€ë¡œ (Tint ì—†ìŒ)
+			pbrMat->metallicFactor = metallicFactor;  // í–‰ì— ë”°ë¼ ê¸ˆì†ì„± ì¡°ì ˆ
+			pbrMat->roughnessFactor = roughnessFactor; // ì—´ì— ë”°ë¼ ê±°ì¹ ê¸° ì¡°ì ˆ
 
-			// ·»´õ·¯ µî·Ï
+			// ë Œë”ëŸ¬ ë“±ë¡
 			auto mr = StaticMeshRenderer::Create(sphereMesh, pbrMat);
 			hdrPass->AddRenderer(mr.get());
 			sphereObj->AddComponent(std::move(mr));
@@ -391,8 +391,8 @@ void PBRScene::TestSpheresForPBRChart(HDRRenderPass* hdrPass)
 {
 	auto sphereMesh = RESOURCE.GetResource<StaticMesh>("Sphere");
 
-	// [ÃÖÀûÈ­] ¸ğµç ±¸°¡ °øÀ¯ÇÒ ±âº» ÅØ½ºÃ³µé (White)
-	// ÅØ½ºÃ³ °ª(1.0) * ÆÑÅÍ °ª(¼³Á¤°ª) = ÃÖÁ¾ °ª
+	// [ìµœì í™”] ëª¨ë“  êµ¬ê°€ ê³µìœ í•  ê¸°ë³¸ í…ìŠ¤ì²˜ë“¤ (White)
+	// í…ìŠ¤ì²˜ ê°’(1.0) * íŒ©í„° ê°’(ì„¤ì •ê°’) = ìµœì¢… ê°’
 	TexturePtr sharedWhite = Texture::CreateWhite();
 
 	const int rows = 7;
@@ -416,22 +416,22 @@ void PBRScene::TestSpheresForPBRChart(HDRRenderPass* hdrPass)
 			auto sphereObj = GameObject::Create();
 			sphereObj->GetTransform().SetPosition(glm::vec3(x, y, 0.0f));
 
-			// ¸ÓÆ¼¸®¾ó »ı¼º
+			// ë¨¸í‹°ë¦¬ì–¼ ìƒì„±
 			MaterialPtr pbrMat = Material::Create();
 
-			// 1. ÅØ½ºÃ³´Â ¸ğµÎ White·Î ÅëÀÏ (°øÀ¯)
+			// 1. í…ìŠ¤ì²˜ëŠ” ëª¨ë‘ Whiteë¡œ í†µì¼ (ê³µìœ )
 			pbrMat->diffuse = sharedWhite;
 			pbrMat->metallic = sharedWhite;
 			pbrMat->roughness = sharedWhite;
 			pbrMat->ao = sharedWhite;
-			// NormalÀÌ ¾øÀ¸¸é SetToProgram¿¡¼­ ÀÚµ¿À¸·Î Blue(Flat)°¡ ¹ÙÀÎµùµÇ¹Ç·Î »ı·« °¡´É
+			// Normalì´ ì—†ìœ¼ë©´ SetToProgramì—ì„œ ìë™ìœ¼ë¡œ Blue(Flat)ê°€ ë°”ì¸ë”©ë˜ë¯€ë¡œ ìƒëµ ê°€ëŠ¥
 
-			// 2. Factor¿¡ °ªÀ» ¼³Á¤ [ÇÙ½É!]
-			pbrMat->albedoFactor = glm::vec4(0.6f, 0.3f, 0.2f, 1.0f); // »¡°£°ø
-			pbrMat->metallicFactor = metallicValue;   // ÆÑÅÍ·Î Á¶Àı
-			pbrMat->roughnessFactor = roughnessValue; // ÆÑÅÍ·Î Á¶Àı
+			// 2. Factorì— ê°’ì„ ì„¤ì • [í•µì‹¬!]
+			pbrMat->albedoFactor = glm::vec4(0.6f, 0.3f, 0.2f, 1.0f); // ë¹¨ê°„ê³µ
+			pbrMat->metallicFactor = metallicValue;   // íŒ©í„°ë¡œ ì¡°ì ˆ
+			pbrMat->roughnessFactor = roughnessValue; // íŒ©í„°ë¡œ ì¡°ì ˆ
 
-			// ·»´õ·¯ µî·Ï
+			// ë Œë”ëŸ¬ ë“±ë¡
 			auto mr = StaticMeshRenderer::Create(sphereMesh, pbrMat);
 			mr->SetRenderStage(RenderStage::Forward);
 			hdrPass->AddRenderer(mr.get());
@@ -445,8 +445,8 @@ void PBRScene::TestSpheresForPBRChartDeferred()
 {
 	auto sphereMesh = RESOURCE.GetResource<StaticMesh>("Sphere");
 
-	// [ÃÖÀûÈ­] ¸ğµç ±¸°¡ °øÀ¯ÇÒ ±âº» ÅØ½ºÃ³µé (White)
-	// ÅØ½ºÃ³ °ª(1.0) * ÆÑÅÍ °ª(¼³Á¤°ª) = ÃÖÁ¾ °ª
+	// [ìµœì í™”] ëª¨ë“  êµ¬ê°€ ê³µìœ í•  ê¸°ë³¸ í…ìŠ¤ì²˜ë“¤ (White)
+	// í…ìŠ¤ì²˜ ê°’(1.0) * íŒ©í„° ê°’(ì„¤ì •ê°’) = ìµœì¢… ê°’
 	TexturePtr sharedWhite = Texture::CreateWhite();
 
 	const int rows = 7;
@@ -470,22 +470,22 @@ void PBRScene::TestSpheresForPBRChartDeferred()
 			auto sphereObj = GameObject::Create();
 			sphereObj->GetTransform().SetPosition(glm::vec3(x, y, 0.0f));
 
-			// ¸ÓÆ¼¸®¾ó »ı¼º
+			// ë¨¸í‹°ë¦¬ì–¼ ìƒì„±
 			MaterialPtr pbrMat = Material::Create();
 
-			// 1. ÅØ½ºÃ³´Â ¸ğµÎ White·Î ÅëÀÏ (°øÀ¯)
+			// 1. í…ìŠ¤ì²˜ëŠ” ëª¨ë‘ Whiteë¡œ í†µì¼ (ê³µìœ )
 			pbrMat->diffuse = sharedWhite;
 			pbrMat->metallic = sharedWhite;
 			pbrMat->roughness = sharedWhite;
 			pbrMat->ao = sharedWhite;
-			// NormalÀÌ ¾øÀ¸¸é SetToProgram¿¡¼­ ÀÚµ¿À¸·Î Blue(Flat)°¡ ¹ÙÀÎµùµÇ¹Ç·Î »ı·« °¡´É
+			// Normalì´ ì—†ìœ¼ë©´ SetToProgramì—ì„œ ìë™ìœ¼ë¡œ Blue(Flat)ê°€ ë°”ì¸ë”©ë˜ë¯€ë¡œ ìƒëµ ê°€ëŠ¥
 
-			// 2. Factor¿¡ °ªÀ» ¼³Á¤ [ÇÙ½É!]
-			pbrMat->albedoFactor = glm::vec4(0.025f, 0.025f, 0.025f, 1.0f); // »ö»ó
-			pbrMat->metallicFactor = metallicValue;   // ÆÑÅÍ·Î Á¶Àı
-			pbrMat->roughnessFactor = roughnessValue; // ÆÑÅÍ·Î Á¶Àı
+			// 2. Factorì— ê°’ì„ ì„¤ì • [í•µì‹¬!]
+			pbrMat->albedoFactor = glm::vec4(0.025f, 0.025f, 0.025f, 1.0f); // ìƒ‰ìƒ
+			pbrMat->metallicFactor = metallicValue;   // íŒ©í„°ë¡œ ì¡°ì ˆ
+			pbrMat->roughnessFactor = roughnessValue; // íŒ©í„°ë¡œ ì¡°ì ˆ
 
-			// ·»´õ·¯ µî·Ï
+			// ë Œë”ëŸ¬ ë“±ë¡
 			auto mr = StaticMeshRenderer::Create(sphereMesh, pbrMat);
 			sphereObj->AddComponent(std::move(mr));
 			AddGameObject(std::move(sphereObj));

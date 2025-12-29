@@ -1,8 +1,8 @@
-find_package(assimp CONFIG REQUIRED)
+ï»¿find_package(assimp CONFIG REQUIRED)
 find_package(spdlog CONFIG REQUIRED)
 find_package(glm CONFIG REQUIRED)
 
-# 1. "AssetConverter"ÀÌ¶ó´Â ÀÌ¸§ÀÇ ½ÇÇà ÆÄÀÏ(.exe)À» ¸¸µì´Ï´Ù.
+# 1. "AssetConverter"ì´ë¼ëŠ” ì´ë¦„ì˜ ì‹¤í–‰ íŒŒì¼(.exe)ì„ ë§Œë“­ë‹ˆë‹¤.
 add_executable(AssetConverter
     
     # Core
@@ -27,13 +27,13 @@ add_executable(AssetConverter
 
  )
 
-# 2. [PCH ¼³Á¤] AssetConverter/pch.h¸¦ AsssetConverter Å¸°Ù Àü¿ë(PRIVATE) PCH·Î »ç¿ëÇÕ´Ï´Ù.
+# 2. [PCH ì„¤ì •] AssetConverter/pch.hë¥¼ AsssetConverter íƒ€ê²Ÿ ì „ìš©(PRIVATE) PCHë¡œ ì‚¬ìš©í•©ë‹ˆë‹¤.
 target_precompile_headers(AssetConverter PRIVATE pch.h)
 
-# 3. [°æ·Î ¼³Á¤] pchÀÇ À§Ä¡¸¦ ¾Ë¸®±â À§ÇØ ÇÊ¿äÇÕ´Ï´Ù.
+# 3. [ê²½ë¡œ ì„¤ì •] pchì˜ ìœ„ì¹˜ë¥¼ ì•Œë¦¬ê¸° ìœ„í•´ í•„ìš”í•©ë‹ˆë‹¤.
 target_include_directories(AssetConverter PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 
-# 4. ¿ÜºÎ ¶óÀÌºê·¯¸®¸¦ ¿©±â¿¡ ¸µÅ©
+# 4. ì™¸ë¶€ ë¼ì´ë¸ŒëŸ¬ë¦¬ë¥¼ ì—¬ê¸°ì— ë§í¬
 target_link_libraries(AssetConverter PUBLIC
 
     spdlog::spdlog

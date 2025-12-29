@@ -84,7 +84,7 @@ bool CubeFramebuffer::InitWithColorAttachment(const CubeTexturePtr& colorAttachm
     auto result = glCheckFramebufferStatus(GL_FRAMEBUFFER);
     if (result != GL_FRAMEBUFFER_COMPLETE)
     {
-        SPDLOG_ERROR("failed to create framebuffer: 0x{:04x}", result);
+        LOG_ERROR("failed to create framebuffer: 0x{:04x}", result);
         return false;
     }
 

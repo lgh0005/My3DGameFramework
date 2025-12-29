@@ -1,4 +1,4 @@
-#include "EnginePch.h"
+ï»¿#include "EnginePch.h"
 #include "ShadowPass.h"
 
 #include "Core/Scene.h"
@@ -30,10 +30,10 @@ ShadowPassUPtr ShadowPass::Create(int32 resolution)
 
 bool ShadowPass::Init(int32 resolution)
 {
-	// 0. ±×¸²ÀÚÀÇ ÇØ»óµµ ¼³Á¤ : ±âº»°ª 1024
+	// 0. ê·¸ë¦¼ìì˜ í•´ìƒë„ ì„¤ì • : ê¸°ë³¸ê°’ 1024
 	m_resolution = resolution;
 
-	// 1. ±×¸²ÀÚ ¼ÎÀÌ´õ ÇÁ·Î±×·¥ »ı¼º
+	// 1. ê·¸ë¦¼ì ì…°ì´ë” í”„ë¡œê·¸ë¨ ìƒì„±
 	m_staticDepthProgram = Program::Create
 	(
 		"./Resources/Shaders/Common/Common_Shadow_DepthPass_Static.vert",
@@ -46,15 +46,15 @@ bool ShadowPass::Init(int32 resolution)
 	);
 	if (!m_staticDepthProgram || !m_skinnedDepthProgram) return false;
 
-	// 2. ±×¸²ÀÚ°¡ µå¸®¿öÁö´Â ÃÖ´ë Á¶¸í °³¼ö ¸¸Å­ ±×¸²ÀÚ ¸Ê »ı¼º
-	// ÃÖ´ë(MAX_SHADOW_CASTER) 8°³
+	// 2. ê·¸ë¦¼ìê°€ ë“œë¦¬ì›Œì§€ëŠ” ìµœëŒ€ ì¡°ëª… ê°œìˆ˜ ë§Œí¼ ê·¸ë¦¼ì ë§µ ìƒì„±
+	// ìµœëŒ€(MAX_SHADOW_CASTER) 8ê°œ
 	m_shadowMaps.resize(MAX_SHADOW_CASTER);
 	for (int i = 0; i < MAX_SHADOW_CASTER; ++i)
 	{
 		m_shadowMaps[i] = ShadowMap::Create(resolution, resolution);
 		if (!m_shadowMaps[i])
 		{
-			SPDLOG_ERROR("Failed to create ShadowMap index {}", i);
+			LOG_ERROR("Failed to create ShadowMap index {}", i);
 			return false;
 		}
 	}
@@ -64,46 +64,46 @@ bool ShadowPass::Init(int32 resolution)
 
 void ShadowPass::Render(RenderContext* context)
 {
-	// 0. Context À¯È¿¼º °Ë»ç ¹× ÇÊ¿ä Á¤º¸ °¡Á®¿À±â
+	// 0. Context ìœ íš¨ì„± ê²€ì‚¬ ë° í•„ìš” ì •ë³´ ê°€ì ¸ì˜¤ê¸°
 	if (!context) return;
 	auto lights = context->GetLights();
 	auto staticMeshes = context->GetStaticMeshRenderers();
 	auto skinnedMeshes = context->GetSkinnedMeshRenderers();
 
-	// 1. °øÅë ¼³Á¤
+	// 1. ê³µí†µ ì„¤ì •
 	glEnable(GL_DEPTH_TEST);
 	glCullFace(GL_FRONT);
 
-	// 2. ÀüÃ¼ Á¶¸í ¸®½ºÆ® ¼øÈ¸
+	// 2. ì „ì²´ ì¡°ëª… ë¦¬ìŠ¤íŠ¸ ìˆœíšŒ
 	for (auto* light : lights)
 	{
-		// 2-1. ±×¸²ÀÚ Ä³½ºÆÃÀÌ ÇÊ¿äÇÑ Á¶¸íÀÎÁö °Ë»ç
+		// 2-1. ê·¸ë¦¼ì ìºìŠ¤íŒ…ì´ í•„ìš”í•œ ì¡°ëª…ì¸ì§€ ê²€ì‚¬
 		if (!light->IsCastShadow()) continue;
 
-		// 2-2. ±×¸²ÀÚ ¸Ê ÀÎµ¦½º °Ë»ç
+		// 2-2. ê·¸ë¦¼ì ë§µ ì¸ë±ìŠ¤ ê²€ì‚¬
 		int32 shadowIdx = light->GetShadowMapIndex();
 		if (shadowIdx >= MAX_SHADOW_CASTER) continue;
 
-		// 2-3. ±×¸²ÀÚ ¸Ê ¹ÙÀÎµù
+		// 2-3. ê·¸ë¦¼ì ë§µ ë°”ì¸ë”©
 		auto& currentShadowMap = m_shadowMaps[shadowIdx];
 		currentShadowMap->Bind();
 		glViewport(0, 0, m_resolution, m_resolution);
 		glClear(GL_DEPTH_BUFFER_BIT);
 
-		// 2-4. Á¶¸í Çà·Ä °è»ê
+		// 2-4. ì¡°ëª… í–‰ë ¬ ê³„ì‚°
 		glm::mat4 lightSpaceMatrix = CalculateLightSpaceMatrix(light);
 		light->SetLightSpaceMatrix(lightSpaceMatrix);
 
-		// 2-5. StaticMesh ·»´õ¸µ
+		// 2-5. StaticMesh ë Œë”ë§
 		RenderStaticMeshes(staticMeshes, lightSpaceMatrix);
 
-		// 2-6. SkinnedMesh ·»´õ¸µ
+		// 2-6. SkinnedMesh ë Œë”ë§
 		RenderSkinnedMeshes(skinnedMeshes, lightSpaceMatrix);
 	}
 
 	glCullFace(GL_BACK);
 
-	// 3. ±×¸²ÀÚ¸¦ ±¸¿î ÅØ½ºÃÄ¸¦ Context¿¡ µî·Ï
+	// 3. ê·¸ë¦¼ìë¥¼ êµ¬ìš´ í…ìŠ¤ì³ë¥¼ Contextì— ë“±ë¡
 	RegisterShadowMapsToContext(context);
 }
 
@@ -111,7 +111,7 @@ glm::mat4 ShadowPass::CalculateLightSpaceMatrix(Light* light)
 {
 	if (!light) return glm::mat4(1.0f);
 
-	// Çà·Ä ¿¬»ê¿¡ ÇÊ¿äÇÑ °ÍµéÀ» °¡Á®¿À±â
+	// í–‰ë ¬ ì—°ì‚°ì— í•„ìš”í•œ ê²ƒë“¤ì„ ê°€ì ¸ì˜¤ê¸°
 	auto& transform = light->GetTransform();
 	glm::vec3 pos = transform.GetWorldPosition();
 	glm::vec3 dir = transform.GetForwardVector();
@@ -119,7 +119,7 @@ glm::mat4 ShadowPass::CalculateLightSpaceMatrix(Light* light)
 	glm::mat4 lightProjection;
 	glm::mat4 lightView = glm::lookAt(pos, pos + dir, up);
 
-	// Á¶¸íÀÇ Å¸ÀÔ º°·Î Á¶¸í ±âÁØÀÇ projection, view Çà·ÄÀ» °è»ê
+	// ì¡°ëª…ì˜ íƒ€ì… ë³„ë¡œ ì¡°ëª… ê¸°ì¤€ì˜ projection, view í–‰ë ¬ì„ ê³„ì‚°
 	float size = 20.0f;
 	float nearPlane = 0.1f;
 	float farPlane = 100.0f;
@@ -135,10 +135,10 @@ glm::mat4 ShadowPass::CalculateLightSpaceMatrix(Light* light)
 				1.0f, 1.0f, 100.0f);
 			break;
 
-		// TODO : Point Light¿¡ ´ëÇÑ ±×¸²ÀÚ Ã³¸®´Â ÀÌÈÄ¿¡ °í·Á ÇÊ¿ä
+		// TODO : Point Lightì— ëŒ€í•œ ê·¸ë¦¼ì ì²˜ë¦¬ëŠ” ì´í›„ì— ê³ ë ¤ í•„ìš”
 	}
 
-	// Á¶¸í ±âÁØÀÇ VP Çà·Ä ¹İÈ¯
+	// ì¡°ëª… ê¸°ì¤€ì˜ VP í–‰ë ¬ ë°˜í™˜
 	return lightProjection * lightView;
 }
 

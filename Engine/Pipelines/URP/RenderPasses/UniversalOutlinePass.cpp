@@ -1,7 +1,7 @@
-#include "EnginePch.h"
+ï»¿#include "EnginePch.h"
 #include "UniversalOutlinePass.h"
 
-// ÇÊ¼ö Çì´õ Æ÷ÇÔ
+// í•„ìˆ˜ í—¤ë” í¬í•¨
 #include "Core/RenderContext.h"
 #include "Core/GameObject.h"
 #include "Graphics/Program.h"
@@ -74,33 +74,33 @@ bool UniversalOutlinePass::Init
 
 void UniversalOutlinePass::Render(RenderContext* context)
 {
-	// 0. ÀÚ½ÅÀÇ ·»´õ ÆĞ½º¿¡ È°¿ëµÇ°í ÀÖ´Â RenderContext·Î Ä³½ºÆÃ
+	// 0. ìì‹ ì˜ ë Œë” íŒ¨ìŠ¤ì— í™œìš©ë˜ê³  ìˆëŠ” RenderContextë¡œ ìºìŠ¤íŒ…
 	auto stdCtx = (UniversalRenderContext*)context;
 
-	// 1. ±×¸± ´ë»óÀÌ ¾øÀ¸¸é ºü¸¥ ¸®ÅÏ
+	// 1. ê·¸ë¦´ ëŒ€ìƒì´ ì—†ìœ¼ë©´ ë¹ ë¥¸ ë¦¬í„´
 	const auto& outlines = context->GetMeshOutlines();
 	if (outlines.empty()) return;
 
-	// [Pass 1] ¸¶½ºÅ© ÅØ½ºÃ³ »ı¼º (Mask Generation)
+	// [Pass 1] ë§ˆìŠ¤í¬ í…ìŠ¤ì²˜ ìƒì„± (Mask Generation)
 	m_maskFBO->Bind();
 
-	// ¹è°æÀº °ËÀº»ö(0,0,0)À¸·Î Å¬¸®¾î
+	// ë°°ê²½ì€ ê²€ì€ìƒ‰(0,0,0)ìœ¼ë¡œ í´ë¦¬ì–´
 	glViewport(0, 0, m_maskFBO->GetWidth(), m_maskFBO->GetHeight());
 	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	// [ÇÙ½É] ±íÀÌ Å×½ºÆ® ²ô±â (Always On Top / X-Ray)
-	// º® µÚ¿¡ ÀÖµç ¸»µç ¹«Á¶°Ç ¸¶½ºÅ©¸¦ ±×¸³´Ï´Ù.
+	// [í•µì‹¬] ê¹Šì´ í…ŒìŠ¤íŠ¸ ë„ê¸° (Always On Top / X-Ray)
+	// ë²½ ë’¤ì— ìˆë“  ë§ë“  ë¬´ì¡°ê±´ ë§ˆìŠ¤í¬ë¥¼ ê·¸ë¦½ë‹ˆë‹¤.
 	glDepthFunc(GL_ALWAYS);
 	glDisable(GL_DEPTH_TEST);
-	glDisable(GL_CULL_FACE); // ±¸¸Û ¾øÀÌ ²Ë Ã¤¿ì±â À§ÇØ ÄÃ¸µ ²û
+	glDisable(GL_CULL_FACE); // êµ¬ë© ì—†ì´ ê½‰ ì±„ìš°ê¸° ìœ„í•´ ì»¬ë§ ë”
 
-	// ¸¶½ºÅ· ·»´õ¸µ (´Ü»öÀ¸·Î ±×¸®±â)
+	// ë§ˆìŠ¤í‚¹ ë Œë”ë§ (ë‹¨ìƒ‰ìœ¼ë¡œ ê·¸ë¦¬ê¸°)
 	MaskMeshes(outlines);
 
 	glDepthFunc(GL_LESS);
 
-	// ´Ù½Ã ¸ŞÀÎ È­¸é(µğÆúÆ® FBO)À¸·Î º¹±Í
+	// ë‹¤ì‹œ ë©”ì¸ í™”ë©´(ë””í´íŠ¸ FBO)ìœ¼ë¡œ ë³µê·€
 	auto* target = stdCtx->GetTargetFramebuffer();
 	if (target)
 	{
@@ -109,35 +109,35 @@ void UniversalOutlinePass::Render(RenderContext* context)
 	}
 	else
 	{
-		// TODO : ºäÆ÷Æ® ¹Ù²Ù´Â ·ÎÁ÷ ¼öÁ¤ ÇÊ¿ä
+		// TODO : ë·°í¬íŠ¸ ë°”ê¾¸ëŠ” ë¡œì§ ìˆ˜ì • í•„ìš”
 		Framebuffer::BindToDefault();
 		glViewport(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
 	}
 
-	// [Pass 2] ÇÕ¼º (Composition)
-	// È­¸é ÀüÃ¼¿¡ µ¤¾î¾º¿ï °ÍÀÌ¹Ç·Î ±íÀÌ Å×½ºÆ® ²û
+	// [Pass 2] í•©ì„± (Composition)
+	// í™”ë©´ ì „ì²´ì— ë®ì–´ì”Œìš¸ ê²ƒì´ë¯€ë¡œ ê¹Šì´ í…ŒìŠ¤íŠ¸ ë”
 	glDisable(GL_DEPTH_TEST);
 
-	// Åõ¸íÇÑ ¹è°æ(discard)°ú ÇÕ¼ºÇÏ±â À§ÇØ ºí·»µù ÄÑ±â
+	// íˆ¬ëª…í•œ ë°°ê²½(discard)ê³¼ í•©ì„±í•˜ê¸° ìœ„í•´ ë¸”ë Œë”© ì¼œê¸°
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	m_postProgram->Use();
 
-	// 0¹ø ½½·Ô¿¡ ¸¶½ºÅ© ÅØ½ºÃ³ ¹ÙÀÎµù
+	// 0ë²ˆ ìŠ¬ë¡¯ì— ë§ˆìŠ¤í¬ í…ìŠ¤ì²˜ ë°”ì¸ë”©
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, m_maskFBO->GetTexture()->Get());
 	m_postProgram->SetUniform("stencilTexture", 0);
 
-	// ÇØ»óµµ ¹× µÎ²² Àü´Ş
+	// í•´ìƒë„ ë° ë‘ê»˜ ì „ë‹¬
 	m_postProgram->SetUniform("canvasSize", glm::vec2(m_maskFBO->GetWidth(), m_maskFBO->GetHeight()));
 	m_postProgram->SetUniform("outlineSize", m_thickness);
 	m_postProgram->SetUniform("outlineColor", glm::vec4(m_color, 1.0f));
 
-	// ScreenMesh·Î È­¸é ²Ë Â÷°Ô ±×¸®±â
+	// ScreenMeshë¡œ í™”ë©´ ê½‰ ì°¨ê²Œ ê·¸ë¦¬ê¸°
 	m_screenMesh->Draw();
 
-	// »óÅÂ º¹±¸
+	// ìƒíƒœ ë³µêµ¬
 	glDisable(GL_BLEND);
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);
@@ -162,11 +162,11 @@ void UniversalOutlinePass::MaskStaticMeshes(const std::vector<MeshOutline*>& out
 		auto* owner = outline->GetOwner();
 		if (!owner) continue;
 
-		// StaticMeshRenderer¸¸ °ñ¶ó³¿
+		// StaticMeshRendererë§Œ ê³¨ë¼ëƒ„
 		auto* renderer = owner->GetComponent<StaticMeshRenderer>();
 		if (!renderer) continue;
 
-		// Static¿ë À¯´ÏÆû ¼³Á¤ (Bone ÇÊ¿ä ¾øÀ½)
+		// Staticìš© ìœ ë‹ˆí¼ ì„¤ì • (Bone í•„ìš” ì—†ìŒ)
 		m_maskStaticProgram->SetUniform("model", renderer->GetTransform().GetWorldMatrix());
 		m_maskStaticProgram->SetUniform("outlineColor", outline->GetColor());
 
@@ -182,15 +182,15 @@ void UniversalOutlinePass::MaskSkinnedMeshes(const std::vector<MeshOutline*>& ou
 		auto* owner = outline->GetOwner();
 		if (!owner) continue;
 
-		// SkinnedMeshRenderer¸¸ °ñ¶ó³¿
+		// SkinnedMeshRendererë§Œ ê³¨ë¼ëƒ„
 		auto* renderer = owner->GetComponent<SkinnedMeshRenderer>();
 		if (!renderer) continue;
 
-		// Skinned¿ë À¯´ÏÆû ¼³Á¤
+		// Skinnedìš© ìœ ë‹ˆí¼ ì„¤ì •
 		m_maskSkinnedProgram->SetUniform("model", renderer->GetTransform().GetWorldMatrix());
 		m_maskSkinnedProgram->SetUniform("outlineColor", outline->GetColor());
 
-		// Bone Çà·Ä Àü´Ş
+		// Bone í–‰ë ¬ ì „ë‹¬
 		Animator* animator = renderer->GetAnimator();
 		if (animator) m_maskSkinnedProgram->SetUniform("finalBoneMatrices", animator->GetFinalBoneMatrices());
 		else m_maskSkinnedProgram->SetUniform("finalBoneMatrices", GetIdentityBones());

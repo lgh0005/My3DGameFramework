@@ -1,4 +1,4 @@
-#include "pch.h"
+ï»¿#include "pch.h"
 #include "HDRRenderPass.h"
 
 #include "Core/Scene.h"
@@ -29,8 +29,8 @@ bool HDRRenderPass::Init(ProgramUPtr program)
     m_simpleProgram = std::move(program);
     if (!m_simpleProgram) return false;
 
-    // ÅØ½ºÃ³ ½½·Ô ¹øÈ£´Â º¯ÇÏÁö ¾ÊÀ¸¹Ç·Î ÇÑ ¹ø¸¸ ¼¼ÆÃ
-    // TODO : SRPµµ ÀÌ·¸°Ô ¼öÁ¤ÇÏ±â. 
+    // í…ìŠ¤ì²˜ ìŠ¬ë¡¯ ë²ˆí˜¸ëŠ” ë³€í•˜ì§€ ì•Šìœ¼ë¯€ë¡œ í•œ ë²ˆë§Œ ì„¸íŒ…
+    // TODO : SRPë„ ì´ë ‡ê²Œ ìˆ˜ì •í•˜ê¸°. 
     m_simpleProgram->Use();
     m_simpleProgram->SetUniform("material.diffuse", (int)TextureSlot::SLOT_ALBEDO);
     m_simpleProgram->SetUniform("material.normal", (int)TextureSlot::SLOT_NORMAL);
@@ -47,7 +47,7 @@ void HDRRenderPass::Render(Scene* scene, Camera* camera)
 
     auto sky = scene->GetSkyLight();
     {
-        // Irradiance Àû¿ë
+        // Irradiance ì ìš©
         auto* irradianceMap = sky->GetIrradianceMap();
         if (irradianceMap)
         {
@@ -56,7 +56,7 @@ void HDRRenderPass::Render(Scene* scene, Camera* camera)
             m_simpleProgram->SetUniform("irradianceMap", 10);
         }
 
-        // prefilter Àû¿ë
+        // prefilter ì ìš©
         auto* prefilter = sky->GetPrefilterMap();
         if (prefilter)
         {
@@ -65,7 +65,7 @@ void HDRRenderPass::Render(Scene* scene, Camera* camera)
             m_simpleProgram->SetUniform("prefilterMap", 11);
         }
 
-        // BRDF Àû¿ë
+        // BRDF ì ìš©
         auto* brdf = sky->GetBRDFLookUp();
         if (brdf)
         {
@@ -75,13 +75,13 @@ void HDRRenderPass::Render(Scene* scene, Camera* camera)
         } 
     }
 
-    // ¸ðµ¨ ±×¸®±â
+    // ëª¨ë¸ ê·¸ë¦¬ê¸°
     for (const auto* renderer : m_renderers)
     {
         GameObject* go = renderer->GetOwner();
         auto& transform = go->GetTransform();
 
-        // 2. ¸ðµ¨ Çà·Ä Àü¼Û
+        // 2. ëª¨ë¸ í–‰ë ¬ ì „ì†¡
         auto modelMatrix = transform.GetWorldMatrix();
         m_simpleProgram->SetUniform("model", modelMatrix);
 

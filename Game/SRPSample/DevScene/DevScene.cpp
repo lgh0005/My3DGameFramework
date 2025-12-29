@@ -552,8 +552,6 @@ bool DevScene::CreateSceneContext()
 
 			// 7. 마지막으로 Root를 씬에 입주 신고
 			AddGameObject(std::move(rootUPtr));
-
-			SPDLOG_INFO("AlienSoldier instantiated successfully!");
 		}
 	}
 
@@ -576,8 +574,6 @@ bool DevScene::CreateSceneContext()
 
 			// 3. 추가 컴포넌트가 없다면 바로 입주 신고
 			AddGameObject(std::move(rootUPtr));
-
-			SPDLOG_INFO("Backpack instantiated successfully!");
 		}
 	}
 

@@ -1,7 +1,7 @@
-#include "pch.h"
+ï»¿#include "pch.h"
 #include "My3DGameFramework.h"
 
-// [»ç¿ëÀÚ Á¤ÀÇ ÄÁÅÙÃ÷ Çì´õµé]
+// [ì‚¬ìš©ì ì •ì˜ ì»¨í…ì¸  í—¤ë”ë“¤]
 #pragma region CONTENTS_HEADERS
 #include "Pipelines/SRP/StandardRenderPipeline.h"
 #include "SRPSample/DevScene/DevScene.h"
@@ -28,15 +28,15 @@ bool My3DGameFramework::Init(int32 width, int32 height, const std::string& title
 
 void My3DGameFramework::OnInit()
 {
-    // 0. SRP Àü¿ë ¾À
+    // 0. SRP ì „ìš© ì”¬
     RegisterLevel<DevScene, StandardRenderPipeline>
     (
-        "DevLevel",     // Level Name (RunÇÒ ¶§ »ç¿ë)
+        "DevLevel",     // Level Name (Runí•  ë•Œ ì‚¬ìš©)
         "DevScene",     // Scene Key
         "Standard"      // Pipeline Key
     );
 
-    // 1. TODO : URP Àü¿ë ¾ÀÀ» ¸¸µé¾î¼­ Ãß°¡ÇØ¾ß ÇÔ.
+    // 1. TODO : URP ì „ìš© ì”¬ì„ ë§Œë“¤ì–´ì„œ ì¶”ê°€í•´ì•¼ í•¨.
     RegisterLevel<PBRScene, UniversalRenderPipeline>
     (
         "PBRLevel",

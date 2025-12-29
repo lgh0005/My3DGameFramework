@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 
 #pragma region FORWARD_DECLARATION
 CLASS_PTR(Texture)
@@ -36,6 +36,6 @@ private:
 	CubeTexturePtr	m_prefilterMap		{ nullptr };
 	TexturePtr		m_brdfLookUp		{ nullptr };
 
-	// TODO : ÀÌÈÄ¿¡ ÇÏ´ÃÀÇ È¸Àü(½Ã°£ °æ°ú¿¡ µû¸¥ ÇÏ´Ã È¸Àü µî)
-	// µî °ú °°ÀÌ ÇÏ´Ã ÀÚÃ¼ÀûÀ¸·Î Ãß°¡ÀûÀÎ ¸â¹öµéÀÌ ÇÊ¿äÇÏ°Ô µÉ ¼öµµ ÀÖÀ½
+	// TODO : ì´í›„ì— í•˜ëŠ˜ì˜ íšŒì „(ì‹œê°„ ê²½ê³¼ì— ë”°ë¥¸ í•˜ëŠ˜ íšŒì „ ë“±)
+	// ë“± ê³¼ ê°™ì´ í•˜ëŠ˜ ìžì²´ì ìœ¼ë¡œ ì¶”ê°€ì ì¸ ë©¤ë²„ë“¤ì´ í•„ìš”í•˜ê²Œ ë  ìˆ˜ë„ ìžˆìŒ
 };

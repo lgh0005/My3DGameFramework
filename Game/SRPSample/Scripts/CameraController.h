@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include "Components/Script.h"
 
 CLASS_PTR(CameraController)

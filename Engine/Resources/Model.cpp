@@ -187,7 +187,7 @@ bool Model::LoadByAssimp(const std::string& filename)
     const aiScene* scene = importer.ReadFile(filename, flags);
     if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
     {
-        SPDLOG_ERROR("Failed to load model (Assimp): {}", filename);
+        LOG_ERROR("Failed to load model (Assimp): {}", filename);
         return false;
     }
 
@@ -408,7 +408,7 @@ bool Model::LoadByBinary(const std::string& filename)
     std::ifstream inFile(filename, std::ios::binary);
     if (!inFile)
     {
-        SPDLOG_ERROR("Failed to open binary model file (V3): {}", filename);
+        LOG_ERROR("Failed to open binary model file (V3): {}", filename);
         return false;
     }
 
@@ -438,7 +438,7 @@ bool Model::LoadByBinary(const std::string& filename)
     // 5. Meshes Read
     ReadBinaryMeshes(inFile, meshCount);
 
-    SPDLOG_INFO("Model loaded successfully (Binary): {}", filename);
+    LOG_INFO("Model loaded successfully (Binary): {}", filename);
     inFile.close();
     return true;
 }
@@ -448,14 +448,14 @@ bool Model::ReadBinaryModelHeader(std::ifstream& inFile, uint32& outMatCount, ui
     auto magic = AssetUtils::ReadData<uint32>(inFile);
     if (magic != 0x4D594D44)
     {
-        SPDLOG_ERROR("Invalid Magic Number");
+        LOG_ERROR("Invalid Magic Number");
         return false;
     }
 
     auto version = AssetUtils::ReadData<uint32>(inFile);
     if (version != 3)
     {
-        SPDLOG_WARN("Version mismatch! Expected 2, Got {}", version);
+        LOG_WARN("Version mismatch! Expected 2, Got {}", version);
     }
 
     // 값들을 읽어서 참조 인자에 할당
@@ -715,7 +715,7 @@ TexturePtr Model::LoadTextureFromImage(const std::string& filename, const std::f
     if (!image)
     {
         // 원본조차 없으면 에러 로그 출력
-        SPDLOG_ERROR("Failed to load texture image: {}", originalFullPath);
+        LOG_ERROR("Failed to load texture image: {}", originalFullPath);
         return nullptr;
     }
 

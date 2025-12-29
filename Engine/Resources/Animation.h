@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 #include "Resources/Resource.h"
 #include "Resources/AnimChannel.h"
 #include "Misc/AssetFormat.h"
@@ -16,7 +16,7 @@ public:
     static const ResourceType s_ResourceType = ResourceType::Animation;
     virtual ResourceType GetResourceType() const override { return ResourceType::Animation; }
 
-    // TODO : .myanim Àü¿ë Load ¸Ş¼­µå¿Í ¾Ö´Ï¸ŞÀÌ¼Ç ÆÄÀÏ Àü¿ë Load ¸Ş¼­µå¸¦ µû·Î ¸¸µé ÇÊ¿ä´Â ÀÖ¾îº¸ÀÎ´Ù.
+    // TODO : .myanim ì „ìš© Load ë©”ì„œë“œì™€ ì• ë‹ˆë©”ì´ì…˜ íŒŒì¼ ì „ìš© Load ë©”ì„œë“œë¥¼ ë”°ë¡œ ë§Œë“¤ í•„ìš”ëŠ” ìˆì–´ë³´ì¸ë‹¤.
 	static AnimationUPtr Load(const std::string& filePath, Model* model = nullptr);
 
     AnimChannel* FindChannel(const std::string& name);

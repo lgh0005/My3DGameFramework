@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include "Graphics/Geometry.h"
 
 CLASS_PTR(Frustum)

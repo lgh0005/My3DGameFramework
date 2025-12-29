@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 
 class AnimationConverter
 {
@@ -20,6 +20,6 @@ private:
     bool WriteAnimationFile(const std::string& finalPath, const AssetFmt::RawAnimation& anim);
 
 private:
-    // m_rawAnim ¸â¹ö º¯¼ö Á¦°Å (Áö¿ª º¯¼ö »ç¿ë)
+    // m_rawAnim ë©¤ë²„ ë³€ìˆ˜ ì œê±° (ì§€ì—­ ë³€ìˆ˜ ì‚¬ìš©)
     std::unordered_set<std::string> m_validNodeNames;
 };

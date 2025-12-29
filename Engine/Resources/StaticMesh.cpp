@@ -1,4 +1,4 @@
-#include "EnginePch.h"
+ï»¿#include "EnginePch.h"
 #include "StaticMesh.h"
 #include "Resources/Material.h"
 #include "Graphics/Buffer.h"
@@ -57,28 +57,28 @@ void StaticMesh::ComputeTangents(std::vector<StaticVertex>& vertices, const std:
         const auto& v1 = vertices[i1];
         const auto& v2 = vertices[i2];
 
-        // Edge(º¯) º¤ÅÍ
+        // Edge(ë³€) ë²¡í„°
         glm::vec3 edge1 = v1.position - v0.position;
         glm::vec3 edge2 = v2.position - v0.position;
 
-        // Delta UV º¤ÅÍ
+        // Delta UV ë²¡í„°
         glm::vec2 deltaUV1 = v1.texCoord - v0.texCoord;
         glm::vec2 deltaUV2 = v2.texCoord - v0.texCoord;
 
-        // Çà·Ä½Ä(Determinant) °è»ê
+        // í–‰ë ¬ì‹(Determinant) ê³„ì‚°
         float det = (deltaUV1.x * deltaUV2.y - deltaUV1.y * deltaUV2.x);
 
         if (det != 0.0f)
         {
             float invDet = 1.0f / det;
 
-            // [ÇÙ½É] »ï°¢ÇüÀÇ Tangent´Â ÇÏ³ªÀÔ´Ï´Ù!
+            // [í•µì‹¬] ì‚¼ê°í˜•ì˜ TangentëŠ” í•˜ë‚˜ì…ë‹ˆë‹¤!
             glm::vec3 tangent;
             tangent.x = invDet * (deltaUV2.y * edge1.x - deltaUV1.y * edge2.x);
             tangent.y = invDet * (deltaUV2.y * edge1.y - deltaUV1.y * edge2.y);
             tangent.z = invDet * (deltaUV2.y * edge1.z - deltaUV1.y * edge2.z);
 
-            // [´©Àû] ±¸ÇØÁø ÇÏ³ªÀÇ Tangent¸¦ ¼¼ Á¤Á¡¿¡ ¸ğµÎ ´õÇØÁİ´Ï´Ù.
+            // [ëˆ„ì ] êµ¬í•´ì§„ í•˜ë‚˜ì˜ Tangentë¥¼ ì„¸ ì •ì ì— ëª¨ë‘ ë”í•´ì¤ë‹ˆë‹¤.
             tangents[i0] += tangent;
             tangents[i1] += tangent;
             tangents[i2] += tangent;
@@ -91,7 +91,7 @@ void StaticMesh::ComputeTangents(std::vector<StaticVertex>& vertices, const std:
         }
     }
 
-    // 3. Á¤±ÔÈ­ (Normalize) - Æò±Õ³½ ¹æÇâÀ» ´ÜÀ§ º¤ÅÍ·Î ¸¸µê
+    // 3. ì •ê·œí™” (Normalize) - í‰ê· ë‚¸ ë°©í–¥ì„ ë‹¨ìœ„ ë²¡í„°ë¡œ ë§Œë“¦
     for (usize i = 0; i < vertices.size(); i++)
     {
         if (glm::length(tangents[i]) > glm::epsilon<float>())

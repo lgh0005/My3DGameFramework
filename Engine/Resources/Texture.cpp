@@ -1,4 +1,4 @@
-#include "EnginePch.h"
+ï»¿#include "EnginePch.h"
 #include "Texture.h"
 #include "Resources/Image.h"
 
@@ -41,7 +41,7 @@ TextureUPtr Texture::CreateFromHDR(const Image* image)
     GLenum internalFormat = GL_RGB16F;
     GLenum format = GL_RGB;
 
-    // Ã¤³Î ¼ö¿¡ µû¸¥ Æ÷¸Ë °áÁ¤
+    // ì±„ë„ ìˆ˜ì— ë”°ë¥¸ í¬ë§· ê²°ì •
     if (image->GetChannelCount() == 4)
     {
         internalFormat = GL_RGBA16F;
@@ -53,14 +53,14 @@ TextureUPtr Texture::CreateFromHDR(const Image* image)
         format = GL_RGB;
     }
 
-    // HDR µ¥ÀÌÅÍ´Â float Å¸ÀÔÀÌ¹Ç·Î GL_FLOAT ¸í½Ã
+    // HDR ë°ì´í„°ëŠ” float íƒ€ì…ì´ë¯€ë¡œ GL_FLOAT ëª…ì‹œ
     texture->SetTextureFormat(image->GetWidth(), image->GetHeight(),
         internalFormat, format, GL_FLOAT);
 
-    // µ¥ÀÌÅÍ ¾÷·Îµå
+    // ë°ì´í„° ì—…ë¡œë“œ
     texture->SetData(image->GetData());
 
-    // HDR¿ë ÆÄ¶ó¹ÌÅÍ ¼³Á¤
+    // HDRìš© íŒŒë¼ë¯¸í„° ì„¤ì •
     texture->SetWrap(GL_CLAMP_TO_EDGE, GL_CLAMP_TO_EDGE);
     texture->SetFilter(GL_LINEAR, GL_LINEAR);
 
@@ -69,11 +69,11 @@ TextureUPtr Texture::CreateFromHDR(const Image* image)
 
 TextureUPtr Texture::CreateFromKtxImage(const std::string& ktxFilePath)
 {
-    // 1. °øÅë ·Î´õ È£Ãâ
+    // 1. ê³µí†µ ë¡œë” í˜¸ì¶œ
     auto texture = LoadKtx(ktxFilePath);
     if (!texture) return nullptr;
 
-    // 2. ÀÏ¹İ ÅØ½ºÃÄ ¼³Á¤: ¹İº¹(Repeat) Çã¿ë, Mipmap »ç¿ë
+    // 2. ì¼ë°˜ í…ìŠ¤ì³ ì„¤ì •: ë°˜ë³µ(Repeat) í—ˆìš©, Mipmap ì‚¬ìš©
     texture->SetWrap(GL_REPEAT, GL_REPEAT);
     texture->SetFilter(GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR);
 
@@ -82,11 +82,11 @@ TextureUPtr Texture::CreateFromKtxImage(const std::string& ktxFilePath)
 
 TextureUPtr Texture::CreateFromKtxHDR(const std::string& ktxFilePath)
 {
-    // 1. °øÅë ·Î´õ È£Ãâ
+    // 1. ê³µí†µ ë¡œë” í˜¸ì¶œ
     auto texture = LoadKtx(ktxFilePath);
     if (!texture) return nullptr;
 
-    // 2. HDR ¼³Á¤: ¸ğ¼­¸® Clamp ÇÊ¼ö, Linear ÇÊÅÍ¸µ (MipmapÀº »óÈ²¿¡ µû¶ó ´Ù¸§)
+    // 2. HDR ì„¤ì •: ëª¨ì„œë¦¬ Clamp í•„ìˆ˜, Linear í•„í„°ë§ (Mipmapì€ ìƒí™©ì— ë”°ë¼ ë‹¤ë¦„)
     texture->SetWrap(GL_CLAMP_TO_EDGE, GL_CLAMP_TO_EDGE);
     texture->SetFilter(GL_LINEAR, GL_LINEAR);
 
@@ -123,7 +123,7 @@ void Texture::SetBorderColor(const glm::vec4& color) const
 
 void Texture::SetData(const void* data, uint32 size)
 {
-    // size´Â °ËÁõ¿ëÀ¸·Î ¾µ ¼ö ÀÖÁö¸¸ ¿©±â¼± ´Ü¼øÇÏ°Ô ÀüÃ¼ ¾÷·Îµå¶ó°í °¡Á¤
+    // sizeëŠ” ê²€ì¦ìš©ìœ¼ë¡œ ì“¸ ìˆ˜ ìˆì§€ë§Œ ì—¬ê¸°ì„  ë‹¨ìˆœí•˜ê²Œ ì „ì²´ ì—…ë¡œë“œë¼ê³  ê°€ì •
     Bind();
     glTexSubImage2D(m_target, 0, 0, 0, m_width, m_height, m_format, m_type, data);
 }
@@ -187,11 +187,11 @@ TextureUPtr Texture::LoadKtx(const std::string& ktxFilePath)
     );
     if (result != KTX_SUCCESS) 
     {
-        SPDLOG_ERROR("Failed to load KTX texture: {}", ktxFilePath);
+        LOG_ERROR("Failed to load KTX texture: {}", ktxFilePath);
         return nullptr;
     }
 
-    // GPU ¾÷·Îµå
+    // GPU ì—…ë¡œë“œ
     result = ktxTexture_GLUpload(kTexture, &textureID, &target, &glerror);
     if (result != KTX_SUCCESS) 
     {
@@ -205,7 +205,7 @@ TextureUPtr Texture::LoadKtx(const std::string& ktxFilePath)
     texture->m_height = kTexture->baseHeight;
     texture->m_target = target;
 
-    // Æ÷¸Ë Á¤º¸ ÀúÀå
+    // í¬ë§· ì •ë³´ ì €ì¥
     GLint format = 0;
     glBindTexture(target, textureID);
     glGetTexLevelParameteriv(target, 0, GL_TEXTURE_INTERNAL_FORMAT, &format);

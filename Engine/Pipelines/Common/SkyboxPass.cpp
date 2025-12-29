@@ -1,4 +1,4 @@
-#include "EnginePch.h"
+ï»¿#include "EnginePch.h"
 #include "SkyboxPass.h"
 
 #include "Core/Scene.h"
@@ -38,7 +38,7 @@ bool SkyboxPass::Init()
 
 void SkyboxPass::Render(RenderContext* context)
 {
-	// 0. ÀÚ½ÅÀÇ ·»´õ ÆÐ½º¿¡ È°¿ëµÇ°í ÀÖ´Â RenderContext·Î Ä³½ºÆÃ
+	// 0. ìžì‹ ì˜ ë Œë” íŒ¨ìŠ¤ì— í™œìš©ë˜ê³  ìžˆëŠ” RenderContextë¡œ ìºìŠ¤íŒ…
 	auto camera = context->GetCamera();
 	auto skyTexture = context->GetSkyLight()->GetSkybox();
 	if (!skyTexture) return;
@@ -54,7 +54,7 @@ void SkyboxPass::Render(RenderContext* context)
 	auto transform = projection * skyboxView;
 	m_skyboxProgram->SetUniform("transform", transform);
 
-	// ÅØ½ºÃ³ ¹ÙÀÎµù
+	// í…ìŠ¤ì²˜ ë°”ì¸ë”©
 	glActiveTexture(GL_TEXTURE0);
 	skyTexture->Bind();
 	m_skyboxProgram->SetUniform("skybox", 0);

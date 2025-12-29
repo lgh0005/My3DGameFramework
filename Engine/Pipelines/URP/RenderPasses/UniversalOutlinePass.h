@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 #include "Core/RenderPass.h"
 
 #pragma region FORWARD_DECLARATION
@@ -40,9 +40,9 @@ private:
 
 	OutlineFramebufferUPtr m_maskFBO;
 	ScreenMeshUPtr m_screenMesh;
-	ProgramUPtr m_maskStaticProgram;  // Static ¸¶½ºÅ©¿ë
-	ProgramUPtr m_maskSkinnedProgram; // Skinned ¸¶½ºÅ©¿ë
-	ProgramUPtr m_postProgram;		  // ÇÕ¼º¿ë
+	ProgramUPtr m_maskStaticProgram;  // Static ë§ˆìŠ¤í¬ìš©
+	ProgramUPtr m_maskSkinnedProgram; // Skinned ë§ˆìŠ¤í¬ìš©
+	ProgramUPtr m_postProgram;		  // í•©ì„±ìš©
 	glm::vec3 m_color{ 1.0f };
 	float m_thickness{ 2.0f };
 };

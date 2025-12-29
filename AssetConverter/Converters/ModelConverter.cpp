@@ -1,13 +1,13 @@
-#include "pch.h"
+ï»¿#include "pch.h"
 #include "ModelConverter.h"
 
 /*==========================================//
-//  [Public Entry] º¯È¯ ½ÃÀÛ ¹× »óÅÂ ÃÊ±âÈ­   //
+//  [Public Entry] ë³€í™˜ ì‹œì‘ ë° ìƒíƒœ ì´ˆê¸°í™”   //
 //==========================================*/
 bool ModelConverter::Convert(const std::string& inputPath, 
                              const std::string& outputPath, bool extractORM)
 {
-    // [Áß¿ä] »óÅÂ ÃÊ±âÈ­ (State Clear)
+    // [ì¤‘ìš”] ìƒíƒœ ì´ˆê¸°í™” (State Clear)
     m_rawModel = AssetFmt::RawModel();
     m_boneNameToIdMap.clear();
     m_boneCounter = 0;
@@ -16,14 +16,14 @@ bool ModelConverter::Convert(const std::string& inputPath,
     m_outputPath.clear();
     m_modelDirectory.clear();
     
-    // ·Î±× Ãâ·Â ¹× ÀÔÃâ·Â °æ·Î Ä³½Ì
+    // ë¡œê·¸ ì¶œë ¥ ë° ì…ì¶œë ¥ ê²½ë¡œ ìºì‹±
     LOG_INFO(" [ModelConverter] Start Conversion");
     LOG_INFO(" - Input:  {}", inputPath);
     LOG_INFO(" - Output: {}", outputPath);
     m_inputPath = inputPath;
     m_outputPath = outputPath;
 
-    // ½ÇÁ¦ ·ÎÁ÷ ½ÇÇà
+    // ì‹¤ì œ ë¡œì§ ì‹¤í–‰
     bool result = RunConversion();
 
     if (result) LOG_INFO(" [Success] Conversion Completed.");
@@ -37,18 +37,18 @@ bool ModelConverter::Convert(const std::string& inputPath,
 //============================*/
 bool ModelConverter::RunConversion()
 {
-    // 0. ÃÊ±âÈ­
-    m_rawModel = AssetFmt::RawModel(); // ¸ğµ¨ µ¥ÀÌÅÍ ÃÊ±âÈ­
+    // 0. ì´ˆê¸°í™”
+    m_rawModel = AssetFmt::RawModel(); // ëª¨ë¸ ë°ì´í„° ì´ˆê¸°í™”
     m_boneNameToIdMap.clear();
     m_boneCounter = 0;
 
-    // 0-1. ¸ğµ¨ ÀÌ¸§°ú »óÀ§ °æ·Î¸¦ ÃßÃâ
+    // 0-1. ëª¨ë¸ ì´ë¦„ê³¼ ìƒìœ„ ê²½ë¡œë¥¼ ì¶”ì¶œ
     const fs::path outPath(m_outputPath);
     m_modelDirectory = outPath.parent_path().string();
     m_modelName = outPath.stem().string();
     if (m_modelName.empty()) m_modelName = "unnamed_model";
 
-    // 1. Assimp ÀÓÆ÷ÅÍ ½ÇÇà
+    // 1. Assimp ì„í¬í„° ì‹¤í–‰
     Assimp::Importer importer;
     const aiScene* scene = importer.ReadFile
     (
@@ -65,7 +65,7 @@ bool ModelConverter::RunConversion()
         return false;
     }
 
-    // 2. ¸ÓÆ¼¸®¾ó Ã³¸®
+    // 2. ë¨¸í‹°ë¦¬ì–¼ ì²˜ë¦¬
     LOG_INFO("Processing materials... Total: {}", scene->mNumMaterials);
     m_rawModel.materials.reserve(scene->mNumMaterials);
     for (uint32 i = 0; i < scene->mNumMaterials; ++i)
@@ -73,7 +73,7 @@ bool ModelConverter::RunConversion()
         m_rawModel.materials.push_back(ProcessMaterial(scene->mMaterials[i], i));
     }
 
-    // 3. ³ëµå/¸Ş½¬ Ã³¸® (Àç±Í È£Ãâ ½ÃÀÛ)
+    // 3. ë…¸ë“œ/ë©”ì‰¬ ì²˜ë¦¬ (ì¬ê·€ í˜¸ì¶œ ì‹œì‘)
     LOG_INFO("Processing meshes... Total: {}", scene->mNumMeshes);
     m_rawModel.meshes.reserve(scene->mNumMeshes);
     for (uint32 i = 0; i < scene->mNumMeshes; ++i)
@@ -83,18 +83,18 @@ bool ModelConverter::RunConversion()
 
     // ProcessNode(scene->mRootNode, scene);
 
-    // 4. °èÃş ±¸Á¶ ¿Ï¼º (Hierarchy Extraction)
+    // 4. ê³„ì¸µ êµ¬ì¡° ì™„ì„± (Hierarchy Extraction)
     LOG_INFO("Processing node hierarchy...");
     int32 startIndex = 0;
     ProcessHierarchy(scene->mRootNode, -1, startIndex);
     LOG_INFO(" - Total Nodes extracted: {}", m_rawModel.nodes.size());
 
-    // 5. ½ºÄÌ·¹Åæ Á¸Àç ¿©ºÎ ÃÖÁ¾ È®Á¤
+    // 5. ìŠ¤ì¼ˆë ˆí†¤ ì¡´ì¬ ì—¬ë¶€ ìµœì¢… í™•ì •
     m_rawModel.hasSkeleton = (m_boneCounter > 0);
     if (m_rawModel.hasSkeleton) LOG_INFO(" - Skeleton Detected (Total Bones: {})", m_boneCounter);
     else LOG_INFO(" - Static Mesh Detected (No Skeleton)");
 
-    // 6. ÆÄÀÏ ÀúÀå (Á÷·ÄÈ­)
+    // 6. íŒŒì¼ ì €ì¥ (ì§ë ¬í™”)
     LOG_INFO("Writing Binary File...");
     if (!WriteCustomModelFile())
     {
@@ -111,7 +111,7 @@ bool ModelConverter::WriteCustomModelFile()
     std::ofstream outFile(m_outputPath, std::ios::binary);
     if (!outFile) return false;
 
-    // [DEBUG] ½ÃÀÛ À§Ä¡
+    // [DEBUG] ì‹œì‘ ìœ„ì¹˜
     long pos = (long)outFile.tellp();
     LOG_WARN(">>> [WRITER] Start Offset: {}", pos);
 
@@ -138,7 +138,7 @@ bool ModelConverter::WriteCustomModelFile()
     if (hasSkeleton)
     {
         uint32 boneCount = (uint32)m_rawModel.boneOffsetInfos.size();
-        AssetUtils::WriteData(outFile, boneCount); // °³¼ö
+        AssetUtils::WriteData(outFile, boneCount); // ê°œìˆ˜
 
         for (const auto& info : m_rawModel.boneOffsetInfos)
         {
@@ -171,10 +171,10 @@ bool ModelConverter::WriteCustomModelFile()
 
 void ModelConverter::CreateORMTextureFromAssimp(aiMaterial* material, AssetFmt::RawMaterial& rawMat, int32 index)
 {
-    // 0. ¿É¼ÇÀÌ ²¨Á®ÀÖÀ¸¸é Áï½Ã ¸®ÅÏ
+    // 0. ì˜µì…˜ì´ êº¼ì ¸ìˆìœ¼ë©´ ì¦‰ì‹œ ë¦¬í„´
     if (!m_extractORM) return;
 
-    // 0. ÀÔ·Â ÅØ½ºÃ³ ÆÄÀÏ¸í ¾ò¾î¿À±â
+    // 0. ì…ë ¥ í…ìŠ¤ì²˜ íŒŒì¼ëª… ì–»ì–´ì˜¤ê¸°
     std::string aoFile = GetTexturePath(material, aiTextureType_AMBIENT_OCCLUSION);
     std::string roughFile = GetTexturePath(material, aiTextureType_DIFFUSE_ROUGHNESS);
     std::string metalFile = GetTexturePath(material, aiTextureType_METALNESS);
@@ -182,39 +182,39 @@ void ModelConverter::CreateORMTextureFromAssimp(aiMaterial* material, AssetFmt::
     if (aoFile.empty() && roughFile.empty() &&
         metalFile.empty() && glossyFile.empty()) return;
 
-    // 1. Àı´ë °æ·Î Á¶¸³ 
-    // INFO : ÀÔ·Â ¸ğµ¨ Æú´õ ±âÁØÀ¸·Î ao, roughness, metallic ÅØ½ºÃÄ°¡ °°ÀÌ ÀÖ´Ù°í °¡Á¤
+    // 1. ì ˆëŒ€ ê²½ë¡œ ì¡°ë¦½ 
+    // INFO : ì…ë ¥ ëª¨ë¸ í´ë” ê¸°ì¤€ìœ¼ë¡œ ao, roughness, metallic í…ìŠ¤ì³ê°€ ê°™ì´ ìˆë‹¤ê³  ê°€ì •
     std::string aoAbs    = ResolveTexturePath(aoFile);
     std::string roughAbs = ResolveTexturePath(roughFile);
     std::string metalAbs = ResolveTexturePath(metalFile);
     std::string glossAbs = ResolveTexturePath(glossyFile);
 
-    // 3. Roughness vs Glossiness °áÁ¤ ·ÎÁ÷
+    // 3. Roughness vs Glossiness ê²°ì • ë¡œì§
     std::string finalRoughPath = roughAbs;
     bool invertRoughness = false;
     if (finalRoughPath.empty() && !glossAbs.empty())
     {
         finalRoughPath = glossAbs;
-        invertRoughness = true; // ORM Packer¿¡°Ô "ÀÌ°Å µÚÁı¾î¼­ ½á¶ó"¶ó°í Áö½Ã
+        invertRoughness = true; // ORM Packerì—ê²Œ "ì´ê±° ë’¤ì§‘ì–´ì„œ ì¨ë¼"ë¼ê³  ì§€ì‹œ
         LOG_INFO("  - Roughness map missing. Using Glossiness map instead (Inverted).");
     }
 
-    // 4. ORM Ãâ·Â ÆÄÀÏ¸í °áÁ¤ ¹× ÀúÀå Àı´ë °æ·Î Á¶¸³
-    // INFO : Ãâ·Â ÆÄÀÏ Æ÷¸äÀº {ModelName}_{Index}_ORM.png
-    // INFO : Ãâ·Â °æ·Î´Â .mymodelÀÌ Ãâ·ÂµÇ´Â °æ·Î¿Í µ¿ÀÏ
+    // 4. ORM ì¶œë ¥ íŒŒì¼ëª… ê²°ì • ë° ì €ì¥ ì ˆëŒ€ ê²½ë¡œ ì¡°ë¦½
+    // INFO : ì¶œë ¥ íŒŒì¼ í¬ë©§ì€ {ModelName}_{Index}_ORM.png
+    // INFO : ì¶œë ¥ ê²½ë¡œëŠ” .mymodelì´ ì¶œë ¥ë˜ëŠ” ê²½ë¡œì™€ ë™ì¼
     fs::path outPath(m_outputPath);
     std::string ormFileName = fmt::format("{}_{}_ORM.png", m_modelName, index);
     fs::path savePath = outPath.parent_path() / ormFileName;
     LOG_INFO("[ORM Packer] Baking to: {}", savePath.string());
 
-    // 5. º¯È¯ ½ÇÇà (¸¶Áö¸· ÀÎÀÚ·Î ¹İÀü ¿©ºÎ Àü´Ş)
+    // 5. ë³€í™˜ ì‹¤í–‰ (ë§ˆì§€ë§‰ ì¸ìë¡œ ë°˜ì „ ì—¬ë¶€ ì „ë‹¬)
     if (!CONV_ORM.Convert(aoAbs, finalRoughPath, metalAbs, savePath.string(), invertRoughness))
     {
         LOG_ERROR("[ORM Packer] Failed to pack ORM texture.");
         return;
     }
 
-    // 4) RawMaterial¿¡´Â "ÆÄÀÏ¸í¸¸" ÀúÀå (¿£Áø ·Î´õ Á¤Ã¥°ú ÀÏÄ¡)
+    // 4) RawMaterialì—ëŠ” "íŒŒì¼ëª…ë§Œ" ì €ì¥ (ì—”ì§„ ë¡œë” ì •ì±…ê³¼ ì¼ì¹˜)
     rawMat.textures.push_back({ ormFileName, AssetFmt::RawTextureType::ORM });
 }
 
@@ -225,14 +225,14 @@ void ModelConverter::ProcessHierarchy(aiNode* node, int32 parentIndex, int32& cu
 {
     AssetFmt::RawNode rawNode;
 
-    // 1. ±âº» Á¤º¸ º¹»ç
+    // 1. ê¸°ë³¸ ì •ë³´ ë³µì‚¬
     rawNode.name = node->mName.C_Str();
     rawNode.parentIndex = parentIndex;
 
-    // 2. Çà·Ä º¯È¯ (Assimp -> GLM)
+    // 2. í–‰ë ¬ ë³€í™˜ (Assimp -> GLM)
     rawNode.localTransform = Utils::ConvertToGLMMat4(node->mTransformation);
 
-    // 3. ¸Ş½¬ ÀÎµ¦½º Á¤º¸ º¹»ç
+    // 3. ë©”ì‰¬ ì¸ë±ìŠ¤ ì •ë³´ ë³µì‚¬
     if (node->mNumMeshes > 0)
     {
         rawNode.meshIndices.resize(node->mNumMeshes);
@@ -240,17 +240,17 @@ void ModelConverter::ProcessHierarchy(aiNode* node, int32 parentIndex, int32& cu
             rawNode.meshIndices[i] = node->mMeshes[i];
     }
 
-    // 4. ¸®½ºÆ®¿¡ Ãß°¡ (ÇöÀç ÀÎµ¦½º = currentIndex)
+    // 4. ë¦¬ìŠ¤íŠ¸ì— ì¶”ê°€ (í˜„ì¬ ì¸ë±ìŠ¤ = currentIndex)
     int32 myIndex = currentIndex;
     m_rawModel.nodes.push_back(rawNode);
 
-    // 5. ºÎ¸ğ ³ëµåÀÇ children ¸®½ºÆ®¿¡ '³ª(myIndex)'¸¦ µî·Ï
+    // 5. ë¶€ëª¨ ë…¸ë“œì˜ children ë¦¬ìŠ¤íŠ¸ì— 'ë‚˜(myIndex)'ë¥¼ ë“±ë¡
     if (parentIndex >= 0) m_rawModel.nodes[parentIndex].children.push_back(myIndex);
 
-    // 6. ÀÎµ¦½º Áõ°¡
+    // 6. ì¸ë±ìŠ¤ ì¦ê°€
     currentIndex++;
 
-    // 7. ÀÚ½Ä ³ëµå ¼øÈ¸ (Àç±Í È£Ãâ)
+    // 7. ìì‹ ë…¸ë“œ ìˆœíšŒ (ì¬ê·€ í˜¸ì¶œ)
     for (uint32 i = 0; i < node->mNumChildren; i++)
         ProcessHierarchy(node->mChildren[i], myIndex, currentIndex);
 }
@@ -261,7 +261,7 @@ void ModelConverter::ProcessMesh(aiMesh* mesh, const aiScene* scene)
     rawMesh.name = mesh->mName.C_Str();
     rawMesh.materialIndex = mesh->mMaterialIndex;
 
-    // [LOG] ¸Ş½¬ ±âº» Á¤º¸ Ãâ·Â
+    // [LOG] ë©”ì‰¬ ê¸°ë³¸ ì •ë³´ ì¶œë ¥
     LOG_INFO("Processing Mesh: '{}'", rawMesh.name);
     LOG_INFO("  - Material Index: {}", rawMesh.materialIndex);
     LOG_INFO("  - Vertex Count: {}", mesh->mNumVertices);
@@ -270,23 +270,23 @@ void ModelConverter::ProcessMesh(aiMesh* mesh, const aiScene* scene)
     LOG_INFO("  - Has TextureCoords: {}", mesh->HasTextureCoords(0) ? "Yes" : "No");
     LOG_INFO("  - Has Tangents: {}", mesh->HasTangentsAndBitangents() ? "Yes" : "No");
 
-    // 1. ½ºÅ²µå(¾Ö´Ï¸ŞÀÌ¼Ç) ¸Ş½¬ÀÎÁö ÆÇ´Ü
+    // 1. ìŠ¤í‚¨ë“œ(ì• ë‹ˆë©”ì´ì…˜) ë©”ì‰¬ì¸ì§€ íŒë‹¨
     rawMesh.isSkinned = (mesh->mNumBones > 0);
     LOG_INFO("  - Mesh Type: {}", rawMesh.isSkinned ? "Skinned Mesh" : "Static Mesh");
 
-    // 2. ¹Ù¿îµù ¹Ú½º ÃÊ±âÈ­ (ÃÖ´ë°ªÀ¸·Î µÚÁı¾î¼­ ½ÃÀÛ)
+    // 2. ë°”ìš´ë”© ë°•ìŠ¤ ì´ˆê¸°í™” (ìµœëŒ€ê°’ìœ¼ë¡œ ë’¤ì§‘ì–´ì„œ ì‹œì‘)
     rawMesh.aabbMin = glm::vec3(FLT_MAX);
     rawMesh.aabbMax = glm::vec3(-FLT_MAX);
 
-    // 2. Å¸ÀÔº° Á¤Á¡ Ã³¸® (ÇÔ¼ö ºĞ¸®)
+    // 2. íƒ€ì…ë³„ ì •ì  ì²˜ë¦¬ (í•¨ìˆ˜ ë¶„ë¦¬)
     if (rawMesh.isSkinned) ProcessSkinnedMesh(mesh, rawMesh);
     else ProcessStaticMesh(mesh, rawMesh);
 
-    // [LOG] AABB °á°ú È®ÀÎ (³Ê¹« Å©°Å³ª ÀÛÀ¸¸é ½ºÄÉÀÏ/´ÜÀ§ ¹®Á¦ ÀÇ½É)
+    // [LOG] AABB ê²°ê³¼ í™•ì¸ (ë„ˆë¬´ í¬ê±°ë‚˜ ì‘ìœ¼ë©´ ìŠ¤ì¼€ì¼/ë‹¨ìœ„ ë¬¸ì œ ì˜ì‹¬)
     LOG_INFO("  - AABB Min: ({:.4f}, {:.4f}, {:.4f})", rawMesh.aabbMin.x, rawMesh.aabbMin.y, rawMesh.aabbMin.z);
     LOG_INFO("  - AABB Max: ({:.4f}, {:.4f}, {:.4f})", rawMesh.aabbMax.x, rawMesh.aabbMax.y, rawMesh.aabbMax.z);
 
-    // 4. ÀÎµ¦½º º¹»ç (°øÅë)
+    // 4. ì¸ë±ìŠ¤ ë³µì‚¬ (ê³µí†µ)
     rawMesh.indices.reserve(mesh->mNumFaces * 3);
     for (uint32 i = 0; i < mesh->mNumFaces; i++)
     {
@@ -295,20 +295,20 @@ void ModelConverter::ProcessMesh(aiMesh* mesh, const aiScene* scene)
         rawMesh.indices.push_back(mesh->mFaces[i].mIndices[2]);
     }
 
-    // 5. ÃÖÁ¾ °á°ú ¸ğµ¨¿¡ Ãß°¡
+    // 5. ìµœì¢… ê²°ê³¼ ëª¨ë¸ì— ì¶”ê°€
     m_rawModel.meshes.push_back(std::move(rawMesh));
 }
 
 void ModelConverter::ProcessSkinnedMesh(aiMesh* mesh, AssetFmt::RawMesh& rawMesh)
 {
-    // 1. Á¤Á¡ µ¥ÀÌÅÍ Ã¤¿ì±â
+    // 1. ì •ì  ë°ì´í„° ì±„ìš°ê¸°
     rawMesh.skinnedVertices.resize(mesh->mNumVertices);
 
     for (uint32 i = 0; i < mesh->mNumVertices; i++)
     {
         auto& v = rawMesh.skinnedVertices[i];
 
-        // À§Ä¡, ³ë¸Ö
+        // ìœ„ì¹˜, ë…¸ë©€
         v.position = { mesh->mVertices[i].x, mesh->mVertices[i].y, mesh->mVertices[i].z };
         v.normal = { mesh->mNormals[i].x, mesh->mNormals[i].y, mesh->mNormals[i].z };
 
@@ -320,14 +320,14 @@ void ModelConverter::ProcessSkinnedMesh(aiMesh* mesh, AssetFmt::RawMesh& rawMesh
         if (mesh->mTangents) v.tangent = { mesh->mTangents[i].x, mesh->mTangents[i].y, mesh->mTangents[i].z };
         else v.tangent = { 0.0f, 0.0f, 0.0f };
 
-        // AABB °»½Å (Global & Local)
+        // AABB ê°±ì‹  (Global & Local)
         rawMesh.aabbMin = Utils::Min(rawMesh.aabbMin, v.position);
         rawMesh.aabbMax = Utils::Max(rawMesh.aabbMax, v.position);
         m_rawModel.globalAABBMin = Utils::Min(m_rawModel.globalAABBMin, v.position);
         m_rawModel.globalAABBMax = Utils::Max(m_rawModel.globalAABBMax, v.position);
     }
 
-    // 2. »À °¡ÁßÄ¡ ÃßÃâ (ÀÌ¹Ì º°µµ ÇÔ¼ö·Î ºĞ¸®µÇ¾î ÀÖÀ½)
+    // 2. ë¼ˆ ê°€ì¤‘ì¹˜ ì¶”ì¶œ (ì´ë¯¸ ë³„ë„ í•¨ìˆ˜ë¡œ ë¶„ë¦¬ë˜ì–´ ìˆìŒ)
     ExtractBoneWeights(rawMesh.skinnedVertices, mesh);
 }
 
@@ -339,7 +339,7 @@ void ModelConverter::ProcessStaticMesh(aiMesh* mesh, AssetFmt::RawMesh& rawMesh)
     {
         auto& v = rawMesh.staticVertices[i];
 
-        // À§Ä¡, ³ë¸Ö
+        // ìœ„ì¹˜, ë…¸ë©€
         v.position = { mesh->mVertices[i].x, mesh->mVertices[i].y, mesh->mVertices[i].z };
         v.normal = { mesh->mNormals[i].x, mesh->mNormals[i].y, mesh->mNormals[i].z };
 
@@ -351,7 +351,7 @@ void ModelConverter::ProcessStaticMesh(aiMesh* mesh, AssetFmt::RawMesh& rawMesh)
         if (mesh->mTangents) v.tangent = { mesh->mTangents[i].x, mesh->mTangents[i].y, mesh->mTangents[i].z };
         else v.tangent = { 0.0f, 0.0f, 0.0f };
 
-        // AABB °»½Å (Global & Local)
+        // AABB ê°±ì‹  (Global & Local)
         rawMesh.aabbMin = Utils::Min(rawMesh.aabbMin, v.position);
         rawMesh.aabbMax = Utils::Max(rawMesh.aabbMax, v.position);
         m_rawModel.globalAABBMin = Utils::Min(m_rawModel.globalAABBMin, v.position);
@@ -366,12 +366,12 @@ AssetFmt::RawMaterial ModelConverter::ProcessMaterial(aiMaterial* material, int3
     if (material->Get(AI_MATKEY_NAME, name) == AI_SUCCESS) rawMat.name = name.C_Str();
     else rawMat.name = "DefaultMaterial";
 
-    // 1. ¸ÓÆ¼¸®¾ó ¼Ó¼º ÃßÃâ
+    // 1. ë¨¸í‹°ë¦¬ì–¼ ì†ì„± ì¶”ì¶œ
     aiColor4D color;
     float value;
 
     // 1-1. Albedo (Base Color)
-    // GLTF °°Àº PBR Æ÷¸ËÀº AI_MATKEY_BASE_COLOR¸¦ ¾²°í, ·¹°Å½Ã´Â COLOR_DIFFUSE¸¦ ¾¸. ¿ì¼±¼øÀ§ Ã¼Å©.
+    // GLTF ê°™ì€ PBR í¬ë§·ì€ AI_MATKEY_BASE_COLORë¥¼ ì“°ê³ , ë ˆê±°ì‹œëŠ” COLOR_DIFFUSEë¥¼ ì”€. ìš°ì„ ìˆœìœ„ ì²´í¬.
     if (material->Get(AI_MATKEY_BASE_COLOR, color) == AI_SUCCESS) rawMat.albedoFactor = { color.r, color.g, color.b, color.a };
     else if (material->Get(AI_MATKEY_COLOR_DIFFUSE, color) == AI_SUCCESS) rawMat.albedoFactor = { color.r, color.g, color.b, 1.0f };
 
@@ -384,14 +384,14 @@ AssetFmt::RawMaterial ModelConverter::ProcessMaterial(aiMaterial* material, int3
     if (material->Get(AI_MATKEY_METALLIC_FACTOR, value) == AI_SUCCESS) rawMat.metallicFactor = value;
     if (material->Get(AI_MATKEY_ROUGHNESS_FACTOR, value) == AI_SUCCESS) rawMat.roughnessFactor = value;
 
-    // [LOG] ÃßÃâµÈ Factor °ª È®ÀÎ
+    // [LOG] ì¶”ì¶œëœ Factor ê°’ í™•ì¸
     LOG_INFO("  [Factors]");
     LOG_INFO("   - Albedo Color: ({:.2f}, {:.2f}, {:.2f}, {:.2f})", rawMat.albedoFactor.r, rawMat.albedoFactor.g, rawMat.albedoFactor.b, rawMat.albedoFactor.a);
     LOG_INFO("   - Metallic: {:.2f}, Roughness: {:.2f}", rawMat.metallicFactor, rawMat.roughnessFactor);
 
-    // 2. ÅØ½ºÃ³ ÃßÃâ (Helper Lambda È°¿ë)
+    // 2. í…ìŠ¤ì²˜ ì¶”ì¶œ (Helper Lambda í™œìš©)
 
-    // Base Color (¿ì¼±¼øÀ§ Ã³¸®)
+    // Base Color (ìš°ì„ ìˆœìœ„ ì²˜ë¦¬)
     std::string baseColorPath = GetTexturePath(material, aiTextureType_BASE_COLOR);
     if (!baseColorPath.empty()) rawMat.textures.push_back({ baseColorPath, AssetFmt::RawTextureType::Albedo });
     else AddTextureToMaterial(rawMat, material, aiTextureType_DIFFUSE, AssetFmt::RawTextureType::Albedo);
@@ -404,10 +404,10 @@ AssetFmt::RawMaterial ModelConverter::ProcessMaterial(aiMaterial* material, int3
     AddTextureToMaterial(rawMat, material, aiTextureType_METALNESS, AssetFmt::RawTextureType::Metallic);
     AddTextureToMaterial(rawMat, material, aiTextureType_SHININESS, AssetFmt::RawTextureType::Glossiness);
 
-    // 3. ÀÚµ¿ ORM ÅØ½ºÃÄ »ı¼º
+    // 3. ìë™ ORM í…ìŠ¤ì³ ìƒì„±
     CreateORMTextureFromAssimp(material, rawMat, index);
 
-    // 4. ÅØ½ºÃÄ ¸ÅÇÎ ·Î±ë
+    // 4. í…ìŠ¤ì³ ë§¤í•‘ ë¡œê¹…
     LogFinalMappedTextures(material, rawMat);
 
     return rawMat;
@@ -423,16 +423,16 @@ std::string ModelConverter::ResolveTexturePath(const std::string& relativePath)
     fs::path p(relativePath);
     fs::path inputDir = fs::path(m_inputPath).parent_path();
 
-    // 1. ÀÌ¹Ì Àı´ë °æ·ÎÀÌ°í Á¸ÀçÇÏ´Â °æ¿ì
+    // 1. ì´ë¯¸ ì ˆëŒ€ ê²½ë¡œì´ê³  ì¡´ì¬í•˜ëŠ” ê²½ìš°
     if (p.is_absolute() && fs::exists(p)) return p.string();
 
-    // 2. ÀÔ·Â ÆÄÀÏ°ú °°Àº Æú´õ¿¡ ÀÖ´Â °æ¿ì
+    // 2. ì…ë ¥ íŒŒì¼ê³¼ ê°™ì€ í´ë”ì— ìˆëŠ” ê²½ìš°
     if (fs::exists(inputDir / p)) return (inputDir / p).string();
 
-    // 3. ÆÄÀÏ¸í¸¸ ¶¼¼­ °°Àº Æú´õ¿¡ ÀÖ´ÂÁö È®ÀÎ (°æ·Î°¡ ²¿¿´À» ¶§ ´ëºñ)
+    // 3. íŒŒì¼ëª…ë§Œ ë–¼ì„œ ê°™ì€ í´ë”ì— ìˆëŠ”ì§€ í™•ì¸ (ê²½ë¡œê°€ ê¼¬ì˜€ì„ ë•Œ ëŒ€ë¹„)
     if (fs::exists(inputDir / p.filename())) return (inputDir / p.filename()).string();
 
-    return ""; // ¸ø Ã£À½
+    return ""; // ëª» ì°¾ìŒ
 }
 
 void ModelConverter::AddTextureToMaterial(AssetFmt::RawMaterial& rawMat, aiMaterial* aiMat, aiTextureType aiType, AssetFmt::RawTextureType rawType)
@@ -454,13 +454,13 @@ std::string ModelConverter::GetTexturePath(aiMaterial* material, aiTextureType t
     aiString filepath;
     if (material->GetTexture(type, 0, &filepath) != AI_SUCCESS) return "";
 
-    // ÆÄÀÏ ÀÌ¸§¸¸ ÃßÃâ (°æ·Î Á¤±ÔÈ­)
+    // íŒŒì¼ ì´ë¦„ë§Œ ì¶”ì¶œ (ê²½ë¡œ ì •ê·œí™”)
     std::filesystem::path fullPath(filepath.C_Str());
     std::string filename = fullPath.filename().string();
     if (filename.empty()) return "";
 
-    // [¼³°è °áÁ¤] ¸®ÅÏ°ªÀº "ÆÄÀÏ ÀÌ¸§"¸¸.
-    // INFO : ¹İµå½Ã .mymodel°ú ÀÌ¸¦ ÀÌ·ç´Â ¸ğµç ÅØ½ºÃÄ´Â °°Àº °æ·Î¿¡ ÀÖ°Ô µÈ´Ù.
+    // [ì„¤ê³„ ê²°ì •] ë¦¬í„´ê°’ì€ "íŒŒì¼ ì´ë¦„"ë§Œ.
+    // INFO : ë°˜ë“œì‹œ .mymodelê³¼ ì´ë¥¼ ì´ë£¨ëŠ” ëª¨ë“  í…ìŠ¤ì³ëŠ” ê°™ì€ ê²½ë¡œì— ìˆê²Œ ëœë‹¤.
     return filename;
 }
 
@@ -484,11 +484,11 @@ void ModelConverter::LogFinalMappedTextures(aiMaterial* material, const AssetFmt
         case AssetFmt::RawTextureType::ORM: typeStr = "ORM (Packed)"; break;
         default: typeStr = "Unknown"; break;
         }
-        // Á¤·ÄÀ» ¸ÂÃç¼­ º¸±â ÆíÇÏ°Ô Ãâ·Â
+        // ì •ë ¬ì„ ë§ì¶°ì„œ ë³´ê¸° í¸í•˜ê²Œ ì¶œë ¥
         LOG_INFO("   - {:<12} : {}", typeStr, tex.fileName);
     }
 
-    // °Ë»çÇÒ ÅØ½ºÃ³ Å¸ÀÔ°ú ÀÌ¸§À» ¸ÅÇÎ
+    // ê²€ì‚¬í•  í…ìŠ¤ì²˜ íƒ€ì…ê³¼ ì´ë¦„ì„ ë§¤í•‘
     const struct { aiTextureType type; const char* name; } checkList[] = 
     {
         { aiTextureType_DIFFUSE, "DIFFUSE (Legacy)" },
@@ -507,7 +507,7 @@ void ModelConverter::LogFinalMappedTextures(aiMaterial* material, const AssetFmt
     aiString debugPath;
     for (const auto& check : checkList)
     {
-        // °¢ Å¸ÀÔÀÇ 0¹ø ÀÎµ¦½º(Ã¹ ¹øÂ° ÅØ½ºÃ³)¸¸ È®ÀÎ
+        // ê° íƒ€ì…ì˜ 0ë²ˆ ì¸ë±ìŠ¤(ì²« ë²ˆì§¸ í…ìŠ¤ì²˜)ë§Œ í™•ì¸
         if (material->GetTexture(check.type, 0, &debugPath) == AI_SUCCESS)
             LOG_TRACE("   [Assimp Debug] Found {:<15} : {}", check.name, debugPath.C_Str());
     }
@@ -518,14 +518,14 @@ void ModelConverter::LogFinalMappedTextures(aiMaterial* material, const AssetFmt
 //==============================*/
 void ModelConverter::ExtractBoneWeights(std::vector<AssetFmt::RawSkinnedVertex>& vertices, aiMesh* mesh)
 {
-    // ¸Ş½¬°¡ °¡Áø ¸ğµç »À¸¦ ¼øÈ¸
+    // ë©”ì‰¬ê°€ ê°€ì§„ ëª¨ë“  ë¼ˆë¥¼ ìˆœíšŒ
     for (uint32 i = 0; i < mesh->mNumBones; ++i)
     {
         aiBone* bone = mesh->mBones[i];
         int32 boneID = -1;
         std::string boneName = bone->mName.C_Str();
 
-        // 1. »À µî·Ï ´Ü°è (Global Bone Registry)
+        // 1. ë¼ˆ ë“±ë¡ ë‹¨ê³„ (Global Bone Registry)
         if (m_boneNameToIdMap.find(boneName) == m_boneNameToIdMap.end())
         {
             AssetFmt::RawBoneInfo newBoneInfo;
@@ -534,37 +534,37 @@ void ModelConverter::ExtractBoneWeights(std::vector<AssetFmt::RawSkinnedVertex>&
 
             m_rawModel.boneOffsetInfos.push_back(newBoneInfo);
 
-            // ¸Ê¿¡ µî·ÏÇÏ°í Ä«¿îÅÍ Áõ°¡
+            // ë§µì— ë“±ë¡í•˜ê³  ì¹´ìš´í„° ì¦ê°€
             boneID = m_boneCounter;
             m_boneNameToIdMap[boneName] = boneID;
             m_boneCounter++;
         }
         else
         {
-            // [ÀÌ¹Ì µî·ÏµÈ »À] ID¸¸ °¡Á®¿È
+            // [ì´ë¯¸ ë“±ë¡ëœ ë¼ˆ] IDë§Œ ê°€ì ¸ì˜´
             boneID = m_boneNameToIdMap[boneName];
         }
 
-        // 2. °¡ÁßÄ¡ ÁÖÀÔ ´Ü°è (Vertex Weight Assignment)
-        // ÀÌ »À°¡ ¿µÇâÀ» ÁÖ´Â ¸ğµç Á¤Á¡À» ¼øÈ¸
+        // 2. ê°€ì¤‘ì¹˜ ì£¼ì… ë‹¨ê³„ (Vertex Weight Assignment)
+        // ì´ ë¼ˆê°€ ì˜í–¥ì„ ì£¼ëŠ” ëª¨ë“  ì •ì ì„ ìˆœíšŒ
         for (uint32 j = 0; j < bone->mNumWeights; ++j)
         {
             const auto& weightData = bone->mWeights[j];
             uint32 vertexId = weightData.mVertexId;
             float weight = weightData.mWeight;
 
-            // ¾ÈÀü ÀåÄ¡: Á¤Á¡ ÀÎµ¦½º°¡ ¹üÀ§ ¹ÛÀÌ¸é ¹«½Ã
+            // ì•ˆì „ ì¥ì¹˜: ì •ì  ì¸ë±ìŠ¤ê°€ ë²”ìœ„ ë°–ì´ë©´ ë¬´ì‹œ
             if (vertexId >= vertices.size()) continue;
 
-            // ÇØ´ç Á¤Á¡ÀÇ ºó ½½·Ô(-1)À» Ã£¾Æ¼­ Ã¤¿ò (ÃÖ´ë 4°³)
+            // í•´ë‹¹ ì •ì ì˜ ë¹ˆ ìŠ¬ë¡¯(-1)ì„ ì°¾ì•„ì„œ ì±„ì›€ (ìµœëŒ€ 4ê°œ)
             auto& v = vertices[vertexId];
             for (int k = 0; k < MAX_BONE_INFLUENCE; ++k)
             {
-                if (v.boneIDs[k] < 0) // -1ÀÌ¸é ºñ¾îÀÖ´Ù´Â ¶æ
+                if (v.boneIDs[k] < 0) // -1ì´ë©´ ë¹„ì–´ìˆë‹¤ëŠ” ëœ»
                 {
                     v.boneIDs[k] = boneID;
                     v.weights[k] = weight;
-                    break; // Ã¤¿üÀ¸¸é ´ÙÀ½ Á¤Á¡À¸·Î
+                    break; // ì±„ì› ìœ¼ë©´ ë‹¤ìŒ ì •ì ìœ¼ë¡œ
                 }
             }
         }

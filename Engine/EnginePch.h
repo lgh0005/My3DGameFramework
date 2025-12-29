@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 
 // C++
 #include <string>
@@ -9,9 +9,6 @@
 #include <sstream>
 #include <random>
 #include <optional>
-
-// Logger
-#include <spdlog/spdlog.h>
 
 // OpenGL
 #define GLM_ENABLE_EXPERIMENTAL
@@ -33,6 +30,7 @@
 #define IMGUI     ImGuiManager::Instance()
 
 // Managers
+#include "Managers/Logger.h"
 #include "Managers/TimeManager.h"
 #include "Managers/WindowManager.h"
 #include "Managers/InputManager.h"
@@ -42,8 +40,9 @@
 #include "Managers/AudioManager.h"
 #include "Managers/PhysicsManager.h"
 
-// TODO : ÀÏºÎ ¿ÜºÎ Çì´õ ¶§¹®¿¡ ³×ÀÌ¹Ö ÄÁº¥¼ÇÀÌ
-// Ãæµ¹ÇÏ´Â ¸ğ¾ç. ÀÌ¸§À» Á¶±İ ¼öÁ¤ÇØº¼ ÇÊ¿ä°¡ ÀÖÀ½.
+// TODO : ì¼ë¶€ ì™¸ë¶€ í—¤ë” ë•Œë¬¸ì— ë„¤ì´ë° ì»¨ë²¤ì…˜ì´
+// ì¶©ëŒí•˜ëŠ” ëª¨ì–‘. ì´ë¦„ì„ ì¡°ê¸ˆ ìˆ˜ì •í•´ë³¼ í•„ìš”ê°€ ìˆìŒ.
+#define LOGGER	  Logger::Instance()
 #define TIME	  TimeManager::Instance()
 #define WINDOW	  WindowManager::Instance()
 #define INPUT_MGR	  InputManager::Instance()

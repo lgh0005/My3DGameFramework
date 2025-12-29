@@ -1,14 +1,14 @@
-#pragma once
+ï»¿#pragma once
 
 class Utils
 {
 public:
 
-	// AABB ÁÂÇ¥¸¦ ¾ò¾î¿À´Â À¯Æ¿ ÇÔ¼ö
+	// AABB ì¢Œí‘œë¥¼ ì–»ì–´ì˜¤ëŠ” ìœ í‹¸ í•¨ìˆ˜
 	static glm::vec3 Min(const glm::vec3& a, const glm::vec3& b);
 	static glm::vec3 Max(const glm::vec3& a, const glm::vec3& b);
 
-	// assimp to glm À¯Æ¿ ÇÔ¼ö
+	// assimp to glm ìœ í‹¸ í•¨ìˆ˜
 	static glm::mat4 ConvertToGLMMat4(const aiMatrix4x4& aiMat);
 	static glm::vec3 ConvertToGLMVec(const aiVector3D& vec);
 	static glm::quat ConvertToGLMQuat(const aiQuaternion& pOrientation);

@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include "AssetTypes/AssetFormat.h"
 
 class ORMTexturePacker

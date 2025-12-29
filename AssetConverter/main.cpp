@@ -1,31 +1,31 @@
-#include "pch.h"
+ï»¿#include "pch.h"
 #include "Utils/ArgumentParser.h"
 
 int main(int argc, char* argv[])
 {
-    // Logger ÃÊ±âÈ­
+    // Logger ì´ˆê¸°í™”
     LOGGER.Init(argc);
 
-    // 2. ÀÎÀÚ ÆÄ½Ì (ArgumentParser ÀÌ¿ë)
+    // 2. ì¸ì íŒŒì‹± (ArgumentParser ì´ìš©)
     ParseResult args = ArgumentParser::Parse(argc, argv);
 
-    // 3. ÆÄ½Ì ½ÇÆĞ ½Ã
+    // 3. íŒŒì‹± ì‹¤íŒ¨ ì‹œ
     if (!args.IsValid())
     {
-        // ArgumentParser ³»ºÎ¿¡¼­ ÀÌ¹Ì ¿¡·¯ ·Î±×³ª Usage¸¦ Ãâ·ÂÇßÀ» °ÍÀÓ
-        // Python Ãø¿¡ ½ÇÆĞ(-1)¸¦ ¾Ë¸²
+        // ArgumentParser ë‚´ë¶€ì—ì„œ ì´ë¯¸ ì—ëŸ¬ ë¡œê·¸ë‚˜ Usageë¥¼ ì¶œë ¥í–ˆì„ ê²ƒì„
+        // Python ì¸¡ì— ì‹¤íŒ¨(-1)ë¥¼ ì•Œë¦¼
         return -1;
     }
 
     bool success = false;
 
-    // 4. ¸ğµåº° ºĞ±â ½ÇÇà
+    // 4. ëª¨ë“œë³„ ë¶„ê¸° ì‹¤í–‰
     switch (args.mode)
     {
     // [Verify Mode]
     case ConversionMode::Verify:
 
-        // Python GUI°¡ "--check"¸¦ º¸³ÂÀ» ¶§ "AssetConverter verified" ¹®ÀÚ¿­À» ±â´Ù¸²
+        // Python GUIê°€ "--check"ë¥¼ ë³´ëƒˆì„ ë•Œ "AssetConverter verified" ë¬¸ìì—´ì„ ê¸°ë‹¤ë¦¼
         std::cout << "AssetConverter verified" << std::endl;
         return 0;
     
@@ -58,7 +58,7 @@ int main(int argc, char* argv[])
         break;
     }
 
-    // 5. °á°ú ¸®ÅÏ
+    // 5. ê²°ê³¼ ë¦¬í„´
     if (success)
     {
         LOG_INFO(">>> [SUCCESS] Processing finished.");

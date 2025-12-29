@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include "Core/RenderPass.h"
 
 #pragma region FORWARD_DECLARATION

@@ -42,13 +42,13 @@ bool AudioSource::Init(const AudioClipPtr& audioClip)
 		}
 
 		default:
-			SPDLOG_WARN("Unknown AudioType");
+			LOG_WARN("Unknown AudioType");
 			return false;
 	}
 
 	if (!success)
 	{
-		SPDLOG_ERROR("Failed to init sound.");
+		LOG_ERROR("Failed to init sound.");
 		return false;
 	}
 

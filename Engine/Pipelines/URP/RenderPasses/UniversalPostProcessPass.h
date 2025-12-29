@@ -1,4 +1,4 @@
-#pragma once
+Ôªø#pragma once
 #include "Core/RenderPass.h"
 
 #pragma region FORWARD_DECLARATION
@@ -52,6 +52,6 @@ private:
 	float m_exposure		  { 0.7f };
 	float m_threshold		  { 1.0f };
 
-	PostProcessFramebufferUPtr m_bloomFBO;				  // Bloom √≥∏ÆøÎ FBO
-	std::vector<KawaseBloomMips> m_bloomMips; // Bloom ≈ÿΩ∫√≥ √º¿Œ (∫∏≈Î 5~6¥‹∞Ë)
+	PostProcessFramebufferUPtr m_bloomFBO;				  // Bloom Ï≤òÎ¶¨Ïö© FBO
+	std::vector<KawaseBloomMips> m_bloomMips; // Bloom ÌÖçÏä§Ï≤ò Ï≤¥Ïù∏ (Î≥¥ÌÜµ 5~6Îã®Í≥Ñ)
 };

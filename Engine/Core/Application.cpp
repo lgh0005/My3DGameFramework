@@ -8,12 +8,15 @@ Application::~Application() { Shutdown(); }
 
 bool Application::Init(int32 width, int32 height, const std::string& title)
 {
-	SPDLOG_INFO("Engine Initialization Started...");
+	// 0. Logger 초기화
+	LOGGER.Init();
+
+	LOG_INFO("Engine Initialization Started...");
 
 	// 1. 윈도우 생성 (가장 먼저 되어야 함)
 	if (!WINDOW.Init(width, height, title))
 	{
-		SPDLOG_ERROR("Window Init Failed!");
+		LOG_ERROR("Window Init Failed!");
 		return false;
 	}
 
@@ -34,12 +37,12 @@ bool Application::Init(int32 width, int32 height, const std::string& title)
 void Application::Run(const std::string& startLevelName)
 {
 	// [Start] 프로그램 시작 확인 문구
-	SPDLOG_INFO("Start Program!");
+	LOG_INFO("Start Program!");
 
 	// 0. 첫 시작할 레벨이 등록되었는 지 확인
 	if (m_levelMap.find(startLevelName) == m_levelMap.end())
 	{
-		SPDLOG_ERROR("Failed to find level: {}", startLevelName);
+		LOG_ERROR("Failed to find level: {}", startLevelName);
 		return;
 	}
 
@@ -117,18 +120,18 @@ void Application::Shutdown()
 	if (isShutdown) return;
 	isShutdown = true;
 
-	SPDLOG_INFO("Engine Shutdown Started...");
+	LOG_INFO("Engine Shutdown Started...");
 
 	SCENE.Clear();      // 씬/게임 오브젝트 정리
 	PHYSICS.Clear();    // 물리 엔진 정리
 	RENDER.Clear();     // 렌더 리소스/셰이더 정리
 
-	IMGUI.ShutDown();
+	IMGUI.Clear();
 	AUDIO.Clear();
 	RESOURCE.Clear();   // 로드된 텍스처/모델 등 정리
 
 	WINDOW.DestroyWindow(); // 윈도우 파괴
 
-	SPDLOG_INFO("Program terminated successfully.");
-	spdlog::shutdown();
+	LOG_INFO("Program terminated successfully.");
+	LOGGER.Clear();
 }

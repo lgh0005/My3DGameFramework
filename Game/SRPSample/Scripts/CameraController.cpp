@@ -1,4 +1,4 @@
-#include "pch.h"
+ï»¿#include "pch.h"
 #include "CameraController.h"
 #include "Components/Transform.h"
 #include "PlayerController.h"
@@ -61,7 +61,7 @@ void CameraController::HandleRotation(float dt)
     if (INPUT_MGR.GetButtonDown("ControlCamera"))
     {
         m_controlEnabled = true;
-        m_prevMousePos = INPUT_MGR.GetMousePos(); // Å¬¸¯ ¼ø°£ Æ¢´Â Çö»ó ¹æÁö
+        m_prevMousePos = INPUT_MGR.GetMousePos(); // í´ë¦­ ìˆœê°„ íŠ€ëŠ” í˜„ìƒ ë°©ì§€
     }
     else if (INPUT_MGR.GetButtonUp("ControlCamera"))
     {
@@ -69,16 +69,16 @@ void CameraController::HandleRotation(float dt)
     }
     if (!m_controlEnabled) return;
 
-    // ¸¶¿ì½º µ¨Å¸ °è»ê
+    // ë§ˆìš°ìŠ¤ ë¸íƒ€ ê³„ì‚°
     glm::vec2 currentPos = INPUT_MGR.GetMousePos();
     glm::vec2 delta = currentPos - m_prevMousePos;
     m_prevMousePos = currentPos;
 
-    // È¸Àü Àû¿ë
+    // íšŒì „ ì ìš©
     m_yaw -= delta.x * m_rotSpeed;
     m_pitch -= delta.y * m_rotSpeed;
 
-    // Áü¹ú¶ô ¹æÁö ¹× °¢µµ Á¦ÇÑ
+    // ì§ë²Œë½ ë°©ì§€ ë° ê°ë„ ì œí•œ
     if (m_yaw < 0.0f)   m_yaw += 360.0f;
     if (m_yaw > 360.0f) m_yaw -= 360.0f;
 

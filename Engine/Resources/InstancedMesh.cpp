@@ -1,4 +1,4 @@
-#include "EnginePch.h"
+ï»¿#include "EnginePch.h"
 #include "InstancedMesh.h"
 #include "Graphics/VertexLayout.h"
 #include "Resources/Material.h"
@@ -32,24 +32,24 @@ void InstancedMesh::Draw() const
 bool InstancedMesh::Init(StaticMeshPtr baseMesh, BufferPtr instanceBuffer, 
                          int32 instanceCount, SetupFunc setupFunc)
 {
-    // TODO : ÇöÀç´Â StaticMesh¸¦ ÀüÁ¦·Î ÀÎ½ºÅÏ½ÌÀ» ¼öÇà.
-    // ÀÌÈÄ¿¡´Â "´Ù¸¥ ¾Ö´Ï¸ÞÀÌ¼Ç¿¡ °°Àº ¸ðµ¨"À» ÀÎ½ºÅÏ½Ì ÇØ¾ß ÇÒ ¼öµµ ÀÖÀ½.
-    // 1. ºÎ¸ðÀÇ ¸â¹ö¸¦ baseMeshÀÇ °ÍÀ¸·Î ¼³Á¤ (Æ÷ÀÎÅÍ °øÀ¯)
-    // 2. ±âÈ¸°¡ µÈ´Ù¸é SSBO¸¦ ÀÌ¿ëÇÑ "¾Ö´Ï¸ÞÀÌ¼Ç ¸ðµ¨ ÀÎ½ºÅÏ½Ì"µµ ÀÌ·ÐÀûÀ¸·Î °¡´ÉÇÔ.
+    // TODO : í˜„ìž¬ëŠ” StaticMeshë¥¼ ì „ì œë¡œ ì¸ìŠ¤í„´ì‹±ì„ ìˆ˜í–‰.
+    // ì´í›„ì—ëŠ” "ë‹¤ë¥¸ ì• ë‹ˆë©”ì´ì…˜ì— ê°™ì€ ëª¨ë¸"ì„ ì¸ìŠ¤í„´ì‹± í•´ì•¼ í•  ìˆ˜ë„ ìžˆìŒ.
+    // 1. ë¶€ëª¨ì˜ ë©¤ë²„ë¥¼ baseMeshì˜ ê²ƒìœ¼ë¡œ ì„¤ì • (í¬ì¸í„° ê³µìœ )
+    // 2. ê¸°íšŒê°€ ëœë‹¤ë©´ SSBOë¥¼ ì´ìš©í•œ "ì• ë‹ˆë©”ì´ì…˜ ëª¨ë¸ ì¸ìŠ¤í„´ì‹±"ë„ ì´ë¡ ì ìœ¼ë¡œ ê°€ëŠ¥í•¨.
     m_vertexBuffer = baseMesh->GetVertexBuffer();
     m_indexBuffer = baseMesh->GetIndexBuffer();
     m_indexCount = baseMesh->GetIndexCount();
     m_primitiveType = GL_TRIANGLES;
 
-    // 2. ÀÎ½ºÅÏ½º µ¥ÀÌÅÍ´Â Á÷Á¢ ¼ÒÀ¯
+    // 2. ì¸ìŠ¤í„´ìŠ¤ ë°ì´í„°ëŠ” ì§ì ‘ ì†Œìœ 
     m_instanceBuffer = instanceBuffer;
     m_instanceCount = instanceCount;
 
-    // 3. InstancedMesh¸¸ÀÇ "ÇÏÀÌºê¸®µå VAO" »ý¼º
+    // 3. InstancedMeshë§Œì˜ "í•˜ì´ë¸Œë¦¬ë“œ VAO" ìƒì„±
     m_vertexLayout = VertexLayout::Create();
     m_vertexLayout->Bind();
 
-    // 4. ¿øº» ¸Þ½¬(Per-Vertex)ÀÇ VBO/IBO ¹ÙÀÎµù ¹× ¼Ó¼º ¼³Á¤
+    // 4. ì›ë³¸ ë©”ì‰¬(Per-Vertex)ì˜ VBO/IBO ë°”ì¸ë”© ë° ì†ì„± ì„¤ì •
     m_vertexBuffer->Bind();
     m_indexBuffer->Bind();
     m_vertexLayout->SetAttrib(0, 3, GL_FLOAT, false, sizeof(StaticVertex), offsetof(StaticVertex, position));
@@ -84,13 +84,13 @@ InstancedMesh::SetupFunc InstancedMesh::Mat4Layout()
         {
             usize vec4Size = sizeof(glm::vec4);
 
-            // mat4´Â vec4 4°³·Î ÂÉ°³¼­ ¼³Á¤
+            // mat4ëŠ” vec4 4ê°œë¡œ ìª¼ê°œì„œ ì„¤ì •
             layout->SetAttrib(startIndex + 0, 4, GL_FLOAT, false, sizeof(glm::mat4), vec4Size * 0);
             layout->SetAttrib(startIndex + 1, 4, GL_FLOAT, false, sizeof(glm::mat4), vec4Size * 1);
             layout->SetAttrib(startIndex + 2, 4, GL_FLOAT, false, sizeof(glm::mat4), vec4Size * 2);
             layout->SetAttrib(startIndex + 3, 4, GL_FLOAT, false, sizeof(glm::mat4), vec4Size * 3);
 
-            // 4°³ ¼Ó¼º ¸ðµÎ Divisor¸¦ 1·Î ¼³Á¤
+            // 4ê°œ ì†ì„± ëª¨ë‘ Divisorë¥¼ 1ë¡œ ì„¤ì •
             layout->SetAttribDivisor(startIndex + 0, 1);
             layout->SetAttribDivisor(startIndex + 1, 1);
             layout->SetAttribDivisor(startIndex + 2, 1);

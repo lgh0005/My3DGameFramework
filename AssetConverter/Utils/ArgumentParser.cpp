@@ -1,4 +1,4 @@
-#include "pch.h"
+ï»¿#include "pch.h"
 #include "ArgumentParser.h"
 
 ParseResult ArgumentParser::Parse(int argc, char* argv[])
@@ -6,10 +6,10 @@ ParseResult ArgumentParser::Parse(int argc, char* argv[])
 	ParseResult result;
 	if (argc < 2) return result;
 
-	// 0. Ã¹ ¹øÂ° ÀÎÀÚ¸¦ ÅëÇØ¼­ ÇöÀç ¾î¶² ¸í·ÉÀÌ µé¾î¿Ô´Â Áö¸¦ Ã¼Å©
+	// 0. ì²« ë²ˆì§¸ ì¸ìë¥¼ í†µí•´ì„œ í˜„ì¬ ì–´ë–¤ ëª…ë ¹ì´ ë“¤ì–´ì™”ëŠ” ì§€ë¥¼ ì²´í¬
 	std::string command = argv[1];
 
-	// 1. verify ´Ü°è
+	// 1. verify ë‹¨ê³„
 	if (command == "--check")
 	{
 		result.mode = ConversionMode::Verify;
@@ -40,9 +40,9 @@ ParseResult ArgumentParser::Parse(int argc, char* argv[])
 			return result;
 		}
 		result.mode = ConversionMode::Animation;
-		result.inputPath = argv[2];    // ¾Ö´Ï¸ŞÀÌ¼Ç ÆÄÀÏ
-		result.refModelPath = argv[3]; // ±âÁØ ¸ğµ¨ ÆÄÀÏ
-		result.outputPath = argv[4];   // Ãâ·Â ÆÄÀÏ
+		result.inputPath = argv[2];    // ì• ë‹ˆë©”ì´ì…˜ íŒŒì¼
+		result.refModelPath = argv[3]; // ê¸°ì¤€ ëª¨ë¸ íŒŒì¼
+		result.outputPath = argv[4];   // ì¶œë ¥ íŒŒì¼
 	}
 
 	// 4. [ORM] exe --orm <ao_or_none> <rough_or_none> <metal_or_none> <out_png> [--invert-roughness]
@@ -70,10 +70,10 @@ ParseResult ArgumentParser::Parse(int argc, char* argv[])
 			if (opt == "--invert-roughness") result.invertRoughness = true;
 		}
 
-		// out ÀÎÀÚ À¯¹« Á¡°Ë
+		// out ì¸ì ìœ ë¬´ ì ê²€
 		if (result.outputPath.empty()) return ParseResult{};
 
-		// ÃÖ¼Ò 1°³ ÀÔ·ÂÀº ÀÖ´ÂÁö Á¡°Ë
+		// ìµœì†Œ 1ê°œ ì…ë ¥ì€ ìˆëŠ”ì§€ ì ê²€
 		if (result.aoMapPath.empty() && 
 			result.roughnessMapPath.empty() && 
 			result.metallicMapPath.empty()) return ParseResult{};

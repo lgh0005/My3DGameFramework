@@ -1,4 +1,4 @@
-#include "EnginePch.h"
+ï»¿#include "EnginePch.h"
 #include "UniformBuffer.h"
 
 Uniformbuffer::Uniformbuffer() = default;
@@ -28,7 +28,7 @@ void Uniformbuffer::Init(uint32 size, uint32 bindingPoint)
     glBindBuffer(GL_UNIFORM_BUFFER, m_buffer);
     glBufferData(GL_UNIFORM_BUFFER, size, nullptr, GL_DYNAMIC_DRAW);
 
-    // ¹öÆÛ ID¸¦ ÁöÁ¤µÈ Binding Point¿¡ ¿¬°á
+    // ë²„í¼ IDë¥¼ ì§€ì •ëœ Binding Pointì— ì—°ê²°
     glBindBufferBase(GL_UNIFORM_BUFFER, m_bindingPoint, m_buffer);
     glBindBuffer(GL_UNIFORM_BUFFER, 0);
 }

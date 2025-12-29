@@ -1,8 +1,8 @@
-#include "EnginePch.h"
+ï»¿#include "EnginePch.h"
 #include "AssetUtils.h"
 
 /*========================================//
-//   ModelConverterÀÇ ÆÄÀÏ ¾²±â À¯Æ¿ ÇÔ¼ö   //
+//   ModelConverterì˜ íŒŒì¼ ì“°ê¸° ìœ í‹¸ í•¨ìˆ˜   //
 //========================================*/
 void AssetUtils::WriteString(std::ofstream& file, const std::string& str)
 {
@@ -12,7 +12,7 @@ void AssetUtils::WriteString(std::ofstream& file, const std::string& str)
 }
 
 /*========================================//
-//   ModelConverterÀÇ ÆÄÀÏ ÀĞ±â À¯Æ¿ ÇÔ¼ö   //
+//   ModelConverterì˜ íŒŒì¼ ì½ê¸° ìœ í‹¸ í•¨ìˆ˜   //
 //========================================*/
 std::string AssetUtils::ReadString(std::ifstream& file)
 {
@@ -32,7 +32,7 @@ AssetFmt::RawMaterial AssetUtils::ReadRawMaterial(std::ifstream& file)
 {
     AssetFmt::RawMaterial mat;
 
-    // 1. ÀÌ¸§
+    // 1. ì´ë¦„
     mat.name = AssetUtils::ReadString(file);
 
     // 2. Factors
@@ -58,7 +58,7 @@ AssetFmt::RawMesh AssetUtils::ReadRawMesh(std::ifstream& file)
 {
     AssetFmt::RawMesh mesh;
 
-    // 1. ±âº» Á¤º¸
+    // 1. ê¸°ë³¸ ì •ë³´
     mesh.name = AssetUtils::ReadString(file);
     mesh.materialIndex = AssetUtils::ReadData<uint32_t>(file);
     mesh.isSkinned = AssetUtils::ReadData<bool>(file);
@@ -67,7 +67,7 @@ AssetFmt::RawMesh AssetUtils::ReadRawMesh(std::ifstream& file)
     mesh.aabbMin = AssetUtils::ReadData<glm::vec3>(file);
     mesh.aabbMax = AssetUtils::ReadData<glm::vec3>(file);
 
-    // 3. Vectors (AssetUtils::WriteVector¿¡ ´ëÀÀ)
+    // 3. Vectors (AssetUtils::WriteVectorì— ëŒ€ì‘)
     AssetUtils::ReadVector(file, mesh.staticVertices);
     AssetUtils::ReadVector(file, mesh.skinnedVertices);
     AssetUtils::ReadVector(file, mesh.indices);
@@ -79,11 +79,11 @@ std::vector<AssetFmt::RawNode> AssetUtils::ReadRawNodes(std::ifstream& file)
 {
     std::vector<AssetFmt::RawNode> nodes;
 
-    // 1. ³ëµå °³¼ö ÀĞ±â
+    // 1. ë…¸ë“œ ê°œìˆ˜ ì½ê¸°
     uint32 count = ReadData<uint32>(file);
     nodes.resize(count);
 
-    // 2. °¢ ³ëµå Á¤º¸ ÀĞ±â
+    // 2. ê° ë…¸ë“œ ì •ë³´ ì½ê¸°
     for (uint32 i = 0; i < count; ++i)
     {
         auto& node = nodes[i];

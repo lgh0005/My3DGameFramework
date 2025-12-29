@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 
 #pragma region FORWARD_DECLARATION
 CLASS_PTR(GameObject)
@@ -39,15 +39,15 @@ public:
 //   component life-cycle state methods   //
 //=========================================*/
 public:
-	// TODO : Ãß°¡ÇØ¾ß ÇÒ ¸Ş¼­µå
+	// TODO : ì¶”ê°€í•´ì•¼ í•  ë©”ì„œë“œ
 	// 0. Awake
 	// 1. Start
 	// 2. FixedUpdate
 	// 3. Update
 	// 4. LateUpdate
 	
-	// TODO : ÀÚ½ÅÀ» ¼ÒÀ¯ÇÏ´Â °ÔÀÓ ¿ÀºêÁ§Æ® »óÅÂ¸¦
-	// ÃßÀûÇØ¼­ »óÅÂ¸¦ ÃßÀûÇÏ´Â ¸Ş¼­µå¸¦ ÀÛ¼º
+	// TODO : ìì‹ ì„ ì†Œìœ í•˜ëŠ” ê²Œì„ ì˜¤ë¸Œì íŠ¸ ìƒíƒœë¥¼
+	// ì¶”ì í•´ì„œ ìƒíƒœë¥¼ ì¶”ì í•˜ëŠ” ë©”ì„œë“œë¥¼ ì‘ì„±
 	// 1. Destroy
 	// 2. SetActive
 

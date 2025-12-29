@@ -60,11 +60,11 @@ bool GBufferFramebuffer::Init(int32 width, int32 height)
     glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, width, height);
     glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, m_depthBuffer);
 
-    // �Ϸ� Ȯ��
+    // Result check
     auto gBufferResult = glCheckFramebufferStatus(GL_FRAMEBUFFER);
     if (gBufferResult != GL_FRAMEBUFFER_COMPLETE)
     {
-        SPDLOG_ERROR("failed to create gBuffer: {}", gBufferResult); // �α� ���
+        LOG_ERROR("failed to create gBuffer: {}", gBufferResult);
         return false;
     }
 

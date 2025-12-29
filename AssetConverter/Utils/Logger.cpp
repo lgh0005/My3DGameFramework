@@ -1,38 +1,38 @@
-#include "pch.h"
+ï»¿#include "pch.h"
 #include "Logger.h"
 
 void Logger::Init(int argc)
 {
-    // ¿©·¯ ½ÌÅ©¸¦ ´ãÀ» º¤ÅÍ »ı¼º
+    // ì—¬ëŸ¬ ì‹±í¬ë¥¼ ë‹´ì„ ë²¡í„° ìƒì„±
     std::vector<spdlog::sink_ptr> logSinks;
 
-    // 1. ÄÜ¼Ö ½ÌÅ© (±âÁ¸ ±â´É)
+    // 1. ì½˜ì†” ì‹±í¬ (ê¸°ì¡´ ê¸°ëŠ¥)
     auto consoleSink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
-    // ÄÜ¼Ö ÆĞÅÏ: »ö»ó(%^...%$) Æ÷ÇÔ
+    // ì½˜ì†” íŒ¨í„´: ìƒ‰ìƒ(%^...%$) í¬í•¨
     consoleSink->set_pattern("%^[%T] [%n] %v%$");
     logSinks.push_back(consoleSink);
 
-    // 2. ÆÄÀÏ ½ÌÅ© (Ãß°¡ ±â´É)
-    // "AssetConverter.log" ÆÄÀÏ¿¡ ÀúÀå, true = µ¤¾î¾²±â (½ÇÇàÇÒ ¶§¸¶´Ù »õ·Î ÀÛ¼º)
-    // false·Î ÇÏ¸é °è¼Ó ÀÌ¾î¾²±â(append) µË´Ï´Ù. µğ¹ö±ë¿ëÀ¸·Î´Â true°¡ ÆíÇÕ´Ï´Ù.
+    // 2. íŒŒì¼ ì‹±í¬ (ì¶”ê°€ ê¸°ëŠ¥)
+    // "AssetConverter.log" íŒŒì¼ì— ì €ì¥, true = ë®ì–´ì“°ê¸° (ì‹¤í–‰í•  ë•Œë§ˆë‹¤ ìƒˆë¡œ ì‘ì„±)
+    // falseë¡œ í•˜ë©´ ê³„ì† ì´ì–´ì“°ê¸°(append) ë©ë‹ˆë‹¤. ë””ë²„ê¹…ìš©ìœ¼ë¡œëŠ” trueê°€ í¸í•©ë‹ˆë‹¤.
     auto fileSink = std::make_shared<spdlog::sinks::basic_file_sink_mt>("AssetConverter.log", true);
-    // ÆÄÀÏ ÆĞÅÏ: ³¯Â¥¿Í ·Î±× ·¹º§À» ¸íÈ®È÷ Ç¥½Ã (»ö»ó ÄÚµå Á¦¿Ü)
+    // íŒŒì¼ íŒ¨í„´: ë‚ ì§œì™€ ë¡œê·¸ ë ˆë²¨ì„ ëª…í™•íˆ í‘œì‹œ (ìƒ‰ìƒ ì½”ë“œ ì œì™¸)
     fileSink->set_pattern("[%Y-%m-%d %T] [%l] %v");
     logSinks.push_back(fileSink);
 
-    // 3. ·Î°Å »ı¼º (½ÌÅ© ¸ñ·ÏÀ» Àü´Ş)
-    // "CONVERTER"¶ó´Â ÀÌ¸§À¸·Î À§ µÎ ½ÌÅ©¸¦ ¸ğµÎ »ç¿ëÇÏ´Â ·Î°Å¸¦ ¸¸µì´Ï´Ù.
+    // 3. ë¡œê±° ìƒì„± (ì‹±í¬ ëª©ë¡ì„ ì „ë‹¬)
+    // "CONVERTER"ë¼ëŠ” ì´ë¦„ìœ¼ë¡œ ìœ„ ë‘ ì‹±í¬ë¥¼ ëª¨ë‘ ì‚¬ìš©í•˜ëŠ” ë¡œê±°ë¥¼ ë§Œë“­ë‹ˆë‹¤.
     m_logger = std::make_shared<spdlog::logger>("CONVERTER", begin(logSinks), end(logSinks));
-    spdlog::register_logger(m_logger); // (¼±ÅÃ) Àü¿ª ·Î°Å ·¹Áö½ºÆ®¸®¿¡ µî·Ï
+    spdlog::register_logger(m_logger); // (ì„ íƒ) ì „ì—­ ë¡œê±° ë ˆì§€ìŠ¤íŠ¸ë¦¬ì— ë“±ë¡
 
-    // 4. ·Î±× ·¹º§ ¹× ÇÃ·¯½Ã ¼³Á¤
+    // 4. ë¡œê·¸ ë ˆë²¨ ë° í”ŒëŸ¬ì‹œ ì„¤ì •
     m_logger->set_level(spdlog::level::trace);
 
-    // [Áß¿ä] Trace ·¹º§ ÀÌ»óÀÇ ·Î±×°¡ ÂïÈú ¶§¸¶´Ù Áï½Ã ÆÄÀÏ¿¡ ¾¹´Ï´Ù.
-    // ÇÁ·Î±×·¥ÀÌ ºñÁ¤»ó Á¾·á(Crash)µÇ¾îµµ ·Î±×°¡ ÆÄÀÏ¿¡ ³²°Ô ÇÏ·Á¸é ÇÊ¼öÀÔ´Ï´Ù.
+    // [ì¤‘ìš”] Trace ë ˆë²¨ ì´ìƒì˜ ë¡œê·¸ê°€ ì°í ë•Œë§ˆë‹¤ ì¦‰ì‹œ íŒŒì¼ì— ì”ë‹ˆë‹¤.
+    // í”„ë¡œê·¸ë¨ì´ ë¹„ì •ìƒ ì¢…ë£Œ(Crash)ë˜ì–´ë„ ë¡œê·¸ê°€ íŒŒì¼ì— ë‚¨ê²Œ í•˜ë ¤ë©´ í•„ìˆ˜ì…ë‹ˆë‹¤.
     m_logger->flush_on(spdlog::level::trace);
 
-    // 5. ½ÇÇà ¸ğµå ·Î±×
+    // 5. ì‹¤í–‰ ëª¨ë“œ ë¡œê·¸
     if (argc <= 1)
     {
         m_logger->info("AssetConverter build Succeeded.");

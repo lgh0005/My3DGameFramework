@@ -1,4 +1,4 @@
-#include "EnginePch.h"
+ï»¿#include "EnginePch.h"
 #include "UniversalSSAOPass.h"
 
 #include "Core/Scene.h"
@@ -38,19 +38,19 @@ bool UniversalSSAOPass::Init(int32 width, int32 height)
     );
     if (!m_ssaoProgram || !m_ssaoBlurProgram) return false;
 
-    // FBO »ý¼º (¿ì¸®°¡ Ãß°¡ÇÑ CreateSSAO »ç¿ë)
+    // FBO ìƒì„± (ìš°ë¦¬ê°€ ì¶”ê°€í•œ CreateSSAO ì‚¬ìš©)
     m_ssaoFBO = SSAOFramebuffer::Create(width, height);
     m_ssaoBlurFBO = SSAOFramebuffer::Create(width, height);
     if (!m_ssaoFBO || !m_ssaoBlurFBO) return false;
 
-    // È­¸é ÀüÃ¼¸¦ µ¤´Â Quad »ý¼º
+    // í™”ë©´ ì „ì²´ë¥¼ ë®ëŠ” Quad ìƒì„±
     m_screenQuad = ScreenMesh::Create();
     if (!m_screenQuad) return false;
 
     GenerateKernel();
     GenerateNoiseTexture();
 
-    // Ä¿³ÎÀº ÃÊ±âÈ­ÇÒ ¶§ ÇÑ ¹ø ¸¸ Àü¼Û
+    // ì»¤ë„ì€ ì´ˆê¸°í™”í•  ë•Œ í•œ ë²ˆ ë§Œ ì „ì†¡
     m_ssaoProgram->Use();
     for (uint32 i = 0; i < 64; ++i)
         m_ssaoProgram->SetUniform("samples[" + std::to_string(i) + "]", m_ssaoKernel[i]);
@@ -66,19 +66,19 @@ void UniversalSSAOPass::Resize(int32 width, int32 height)
 
 void UniversalSSAOPass::Render(RenderContext* context)
 {
-    // 0. ÀÚ½ÅÀÇ ·»´õ ÆÐ½º¿¡ È°¿ëµÇ°í ÀÖ´Â RenderContext·Î Ä³½ºÆÃ
+    // 0. ìžì‹ ì˜ ë Œë” íŒ¨ìŠ¤ì— í™œìš©ë˜ê³  ìžˆëŠ” RenderContextë¡œ ìºìŠ¤íŒ…
     auto stdCtx = (UniversalRenderContext*)context;
     
-    // 1. SSAO °è»ê (G-Buffer -> Raw SSAO)
+    // 1. SSAO ê³„ì‚° (G-Buffer -> Raw SSAO)
     ComputeSSAO(stdCtx);
 
-    // 2. ³ëÀÌÁî Á¦°Å (Raw SSAO -> Blurred SSAO)
+    // 2. ë…¸ì´ì¦ˆ ì œê±° (Raw SSAO -> Blurred SSAO)
     BlurSSAOResult(stdCtx);
 
-    // 3. context¿¡ ssao °á°ú Ä³½Ì
+    // 3. contextì— ssao ê²°ê³¼ ìºì‹±
     stdCtx->SetSSAOTexture(m_ssaoBlurFBO->GetColorAttachment(0).get());
 
-    // 4. º¹±Í
+    // 4. ë³µê·€
     Framebuffer::BindToDefault();
 }
 
@@ -125,13 +125,13 @@ void UniversalSSAOPass::GenerateNoiseTexture()
         ssaoNoise.push_back(noise);
     }
 
-    // Texture::Create¸¦ »ç¿ëÇÏ¿© Æ÷¸Ë ÁöÁ¤ (GL_RGB16F or GL_RGB32F)
-    // 4x4 Å©±â, ³ëÀÌÁî´Â ¹Ýº¹µÇ¾î¾ß ÇÏ¹Ç·Î GL_REPEAT ÇÊ¼ö
+    // Texture::Createë¥¼ ì‚¬ìš©í•˜ì—¬ í¬ë§· ì§€ì • (GL_RGB16F or GL_RGB32F)
+    // 4x4 í¬ê¸°, ë…¸ì´ì¦ˆëŠ” ë°˜ë³µë˜ì–´ì•¼ í•˜ë¯€ë¡œ GL_REPEAT í•„ìˆ˜
     m_noiseTexture = Texture::Create(4, 4, GL_RGB16F, GL_RGB, GL_FLOAT);
     m_noiseTexture->SetFilter(GL_NEAREST, GL_NEAREST);
     m_noiseTexture->SetWrap(GL_REPEAT, GL_REPEAT);
 
-    // µ¥ÀÌÅÍ ¾÷·Îµå (¿ì¸®°¡ Ãß°¡ÇÑ SetData »ç¿ë)
+    // ë°ì´í„° ì—…ë¡œë“œ (ìš°ë¦¬ê°€ ì¶”ê°€í•œ SetData ì‚¬ìš©)
     m_noiseTexture->SetData(ssaoNoise.data());
 }
 
@@ -147,7 +147,7 @@ void UniversalSSAOPass::ComputeSSAO(UniversalRenderContext* context)
 
     m_ssaoProgram->Use();
 
-    // ÅØ½ºÃ³ ¹ÙÀÎµù
+    // í…ìŠ¤ì²˜ ë°”ì¸ë”©
     glActiveTexture(GL_TEXTURE0); gPos->Bind();
     glActiveTexture(GL_TEXTURE1); gNormal->Bind();
     glActiveTexture(GL_TEXTURE2); m_noiseTexture->Bind();
@@ -156,7 +156,7 @@ void UniversalSSAOPass::ComputeSSAO(UniversalRenderContext* context)
     m_ssaoProgram->SetUniform("gNormal", 1);
     m_ssaoProgram->SetUniform("texNoise", 2);
 
-    // Ä«¸Þ¶ó Çà·Ä Àü¼Û (Context¿¡¼­ °¡Á®¿Â Ä«¸Þ¶ó »ç¿ë)
+    // ì¹´ë©”ë¼ í–‰ë ¬ ì „ì†¡ (Contextì—ì„œ ê°€ì ¸ì˜¨ ì¹´ë©”ë¼ ì‚¬ìš©)
     m_ssaoProgram->SetUniform("projection", camera->GetProjectionMatrix());
     m_ssaoProgram->SetUniform("view", camera->GetViewMatrix());
 

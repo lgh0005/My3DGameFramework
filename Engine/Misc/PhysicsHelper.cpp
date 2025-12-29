@@ -1,4 +1,4 @@
-#include "EnginePch.h"
+ï»¿#include "EnginePch.h"
 #include "Misc/PhysicsHelper.h"
 
 /*==========================//
@@ -57,9 +57,9 @@ bool ObjectLayerPairFilterImpl::ShouldCollide(JPH::ObjectLayer inObject1, JPH::O
     switch (inObject1)
     {
     case Layers::NON_MOVING:
-        return inObject2 == Layers::MOVING; // Á¤Àû vs Á¤Àû Ãæµ¹ X
+        return inObject2 == Layers::MOVING; // ì •ì  vs ì •ì  ì¶©ëŒ X
     case Layers::MOVING:
-        return true; // µ¿Àû ¹°Ã¼´Â ´Ù Ãæµ¹
+        return true; // ë™ì  ë¬¼ì²´ëŠ” ë‹¤ ì¶©ëŒ
     default:
         return false;
     }
@@ -70,12 +70,12 @@ bool ObjectLayerPairFilterImpl::ShouldCollide(JPH::ObjectLayer inObject1, JPH::O
 //==============================*/
 void MyBodyActivationListener::OnBodyActivated(const JPH::BodyID& inBodyID, uint64 inBodyUserData)
 { 
-    /* ·Î±× */ 
+    /* ë¡œê·¸ */ 
 }
 
 void MyBodyActivationListener::OnBodyDeactivated(const JPH::BodyID& inBodyID, uint64 inBodyUserData)
 {
-    /* ·Î±× */ 
+    /* ë¡œê·¸ */ 
 }
 
 JPH::ValidateResult MyContactListener::OnContactValidate
@@ -93,7 +93,7 @@ void MyContactListener::OnContactAdded
     const JPH::ContactManifold& inManifold, JPH::ContactSettings& ioSettings
 )
 {
-    /* Ãæµ¹ ½ÃÀÛ */ 
+    /* ì¶©ëŒ ì‹œì‘ */ 
 }
 
 void MyContactListener::OnContactPersisted
@@ -102,12 +102,12 @@ void MyContactListener::OnContactPersisted
     const JPH::ContactManifold& inManifold, JPH::ContactSettings& ioSettings
 ) 
 {
-    /* Ãæµ¹ Áß */ 
+    /* ì¶©ëŒ ì¤‘ */ 
 }
 
 void MyContactListener::OnContactRemoved(const JPH::SubShapeIDPair& inSubShapePair)
 {
-    /* Ãæµ¹ ³¡ */ 
+    /* ì¶©ëŒ ë */ 
 }
 
 /*======================//
@@ -120,13 +120,13 @@ void PhysicsCallbacks::TraceImpl(const char* inFMT, ...)
     char buffer[1024];
     vsnprintf(buffer, sizeof(buffer), inFMT, list);
     va_end(list);
-    SPDLOG_INFO("Jolt: {}", buffer);
+    LOG_INFO("Jolt: {}", buffer);
 }
 
 #ifdef JPH_ENABLE_ASSERTS
 bool PhysicsCallbacks::AssertFailedImpl(const char* inExpression, const char* inMessage, const char* inFile, uint32 inLine)
 {
-    SPDLOG_ERROR("Jolt Assert: {}:{}: ({}) {}", inFile, inLine, inExpression, inMessage ? inMessage : "");
+    LOG_ERROR("Jolt Assert: {}:{}: ({}) {}", inFile, inLine, inExpression, inMessage ? inMessage : "");
     return true; // Breakpoint
 }
 #endif

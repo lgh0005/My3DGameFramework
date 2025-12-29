@@ -1,4 +1,4 @@
-#pragma once
+Ôªø#pragma once
 #include "miniaudio/miniaudio.h"
 
 enum class AudioType
@@ -17,7 +17,7 @@ public:
 	void Clear();
 	ma_engine* GetEngine() { return &m_audioEngine; }
 
-	// TODO : ±◊∑Ï : sfx, bgm ∫∞∑Œ ¿Ω«‚ ≈Î¡¶
+	// TODO : Í∑∏Î£π : sfx, bgm Î≥ÑÎ°ú ÏùåÌñ• ÌÜµÏ†ú
 	ma_sound_group* GetGroup(AudioType type);
 	void SetGroupVolume(AudioType type, float volume);
 	void SetMasterVolume(float volume);

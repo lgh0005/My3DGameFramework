@@ -188,7 +188,7 @@ void Transform::SetLocalMatrix(const glm::mat4& matrix)
 	}
 	else
 	{
-		SPDLOG_WARN("Failed to decompose matrix in Transform::SetLocalMatrix");
+		LOG_WARN("Failed to decompose matrix in Transform::SetLocalMatrix");
 	}
 }
 

@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 
 CLASS_PTR(Pose)
 class Pose
@@ -8,20 +8,20 @@ public:
     glm::quat rotation  { 1.0f, 0.0f, 0.0f, 0.0f }; // Identity
     glm::vec3 scale     { 1.0f };
 
-    // ±âº» »ı¼ºÀÚ / ¼Ò¸êÀÚ
+    // ê¸°ë³¸ ìƒì„±ì / ì†Œë©¸ì
     Pose();
     Pose(const glm::vec3& p, const glm::quat& r, const glm::vec3& s);
     ~Pose();
 
-    // Çà·Ä º¯È¯ (ÃÖÁ¾ ´Ü°è¿¡¼­¸¸ È£Ãâ)
+    // í–‰ë ¬ ë³€í™˜ (ìµœì¢… ë‹¨ê³„ì—ì„œë§Œ í˜¸ì¶œ)
     glm::mat4 ToMat4() const;
 
-    // º¸°£ ÇÔ¼ö
+    // ë³´ê°„ í•¨ìˆ˜
     static Pose Interpolate(const Pose& a, const Pose& b, float factor);
 
-    // Çà·Ä¿¡¼­ Pose ÃßÃâ
+    // í–‰ë ¬ì—ì„œ Pose ì¶”ì¶œ
     static Pose FromMat4(const glm::mat4& mat);
 
-    // ´ÜÀ§ Æ÷Áî
+    // ë‹¨ìœ„ í¬ì¦ˆ
     static Pose Identity();
 };

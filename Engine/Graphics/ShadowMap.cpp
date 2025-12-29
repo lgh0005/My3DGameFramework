@@ -1,4 +1,4 @@
-#include "EnginePch.h"
+﻿#include "EnginePch.h"
 #include "ShadowMap.h"
 #include "Resources/Texture.h"
 
@@ -37,7 +37,7 @@ bool ShadowMap::Init(int32 width, int32 height)
     auto status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
     if (status != GL_FRAMEBUFFER_COMPLETE) 
     {
-        SPDLOG_ERROR("failed to complete shadow map framebuffer: {:x}", status);
+        LOG_ERROR("failed to complete shadow map framebuffer: {:x}", status);
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
         return false;
     }

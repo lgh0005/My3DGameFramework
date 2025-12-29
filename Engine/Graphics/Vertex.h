@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #define MAX_BONE_INFLUENCE 4
 
 struct ScreenVertex

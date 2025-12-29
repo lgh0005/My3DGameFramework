@@ -1,4 +1,4 @@
-#include "pch.h"
+ï»¿#include "pch.h"
 #include "ORMTexturePacker.h"
 #include <algorithm>
 #include <cmath>
@@ -18,7 +18,7 @@ bool ORMTexturePacker::Convert(const std::string& aoPath, const std::string& rou
 {
 	AssetFmt::RawImage ao, roughness, metallic;
 
-	// 1. ÀÌ¹ÌÁö ·Îµå (°¢°¢ÀÇ ·Îµå ½ÇÆĞ°¡ ÀüÃ¼ ½ÇÆĞ·Î ÀÌ¾îÁöÁö ¾Ê°Ô ¼öÁ¤)
+	// 1. ì´ë¯¸ì§€ ë¡œë“œ (ê°ê°ì˜ ë¡œë“œ ì‹¤íŒ¨ê°€ ì „ì²´ ì‹¤íŒ¨ë¡œ ì´ì–´ì§€ì§€ ì•Šê²Œ ìˆ˜ì •)
 	LoadImageToRaw(aoPath, ao);
 	LoadImageToRaw(roughPath, roughness);
 	LoadImageToRaw(metalPath, metallic);
@@ -28,7 +28,7 @@ bool ORMTexturePacker::Convert(const std::string& aoPath, const std::string& rou
 		return false;
 	}
 
-	// 2. ÃÖÁ¾ ÀÌ¹ÌÁö ÇØ»óµµ °áÁ¤ (°¡Àå Å« width¿Í height¸¦ µû¸§)
+	// 2. ìµœì¢… ì´ë¯¸ì§€ í•´ìƒë„ ê²°ì • (ê°€ì¥ í° widthì™€ heightë¥¼ ë”°ë¦„)
 	int32 finalWidth = 0;
 	int32 finalHeight = 0;
 
@@ -48,7 +48,7 @@ bool ORMTexturePacker::Convert(const std::string& aoPath, const std::string& rou
 		finalHeight = std::max(finalHeight, metallic.height);
 	}
 
-	// 3. ÃÖÁ¾ ORM ÀÌ¹ÌÁö »ı¼º
+	// 3. ìµœì¢… ORM ì´ë¯¸ì§€ ìƒì„±
 	AssetFmt::RawImage ormImage;
 	ormImage.width = finalWidth;
 	ormImage.height = finalHeight;
@@ -61,9 +61,9 @@ bool ORMTexturePacker::Convert(const std::string& aoPath, const std::string& rou
 		{
 			usize idx = (usize)(y * finalWidth + x) * 3;
 
-			// ÇØ»óµµ º¸Á¤ (Scaling)
-			// ÇöÀç ÇÈ¼¿ À§Ä¡(x, y)¸¦ ¿øº» ÀÌ¹ÌÁöÀÇ ºñÀ²¿¡ ¸ÂÃç º¯È¯ÇÕ´Ï´Ù.
-			// ¿¹: 1024 Äµ¹ö½ºÀÇ 512 ÁÂÇ¥ -> 512 ÀÌ¹ÌÁöÀÇ 256 ÁÂÇ¥·Î ¸ÅÇÎ
+			// í•´ìƒë„ ë³´ì • (Scaling)
+			// í˜„ì¬ í”½ì…€ ìœ„ì¹˜(x, y)ë¥¼ ì›ë³¸ ì´ë¯¸ì§€ì˜ ë¹„ìœ¨ì— ë§ì¶° ë³€í™˜í•©ë‹ˆë‹¤.
+			// ì˜ˆ: 1024 ìº”ë²„ìŠ¤ì˜ 512 ì¢Œí‘œ -> 512 ì´ë¯¸ì§€ì˜ 256 ì¢Œí‘œë¡œ ë§¤í•‘
 
 			// ambient occlusion
 			uint8 r_val = 255; // Default AO = 255 (no occlusion)
@@ -93,14 +93,14 @@ bool ORMTexturePacker::Convert(const std::string& aoPath, const std::string& rou
 				b_val = GetPixelChannel(metallic, srcX, srcY);
 			}
 
-			// ORM ÀÌ¹ÌÁö¿¡ °ª ÇÒ´ç
+			// ORM ì´ë¯¸ì§€ì— ê°’ í• ë‹¹
 			ormImage.pixels[idx] = r_val;     // R: AO
 			ormImage.pixels[idx + 1] = g_val; // G: Roughness
 			ormImage.pixels[idx + 2] = b_val; // B: Metallic
 		}
 	}
 
-	// 4. ÀúÀå
+	// 4. ì €ì¥
 	int32 result = stbi_write_png
 	(
 		outPngPath.c_str(),
@@ -140,7 +140,7 @@ bool ORMTexturePacker::LoadImageToRaw(const std::string& filepath, AssetFmt::Raw
 	outImage.height = height;
 	outImage.channels = channels;
 
-	// µ¥ÀÌÅÍ º¹»ç ¹× stb_image ¸Ş¸ğ¸® ÇØÁ¦
+	// ë°ì´í„° ë³µì‚¬ ë° stb_image ë©”ëª¨ë¦¬ í•´ì œ
 	usize totalBytes = (usize)width * height * channels;
 	outImage.pixels.assign(data, data + totalBytes);
 	stbi_image_free(data);
@@ -150,12 +150,12 @@ bool ORMTexturePacker::LoadImageToRaw(const std::string& filepath, AssetFmt::Raw
 
 uint8 ORMTexturePacker::GetPixelChannel(const AssetFmt::RawImage& img, int32 px, int32 py)
 {
-	// À¯È¿ÇÏÁö ¾Ê°Å³ª ¹üÀ§ ¹ÛÀÌ¸é 0 (°ËÀº»ö) ¹İÈ¯
+	// ìœ íš¨í•˜ì§€ ì•Šê±°ë‚˜ ë²”ìœ„ ë°–ì´ë©´ 0 (ê²€ì€ìƒ‰) ë°˜í™˜
 	if (!img.IsValid() || px >= img.width || py >= img.height) return 0;
 
-	// (y * width + x) * channels: ÇÈ¼¿ÀÇ ½ÃÀÛ À§Ä¡
+	// (y * width + x) * channels: í”½ì…€ì˜ ì‹œì‘ ìœ„ì¹˜
 	usize index = (usize)(py * img.width + px) * img.channels;
 
-	// ¼¼ Ã¤³Î °ªÀÌ ¸ğµÎ °°À¸¹Ç·Î, Ã¹ ¹øÂ° Ã¤³Î(R)À» »ç¿ë
+	// ì„¸ ì±„ë„ ê°’ì´ ëª¨ë‘ ê°™ìœ¼ë¯€ë¡œ, ì²« ë²ˆì§¸ ì±„ë„(R)ì„ ì‚¬ìš©
 	return img.pixels[index];
 }

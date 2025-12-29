@@ -1,4 +1,4 @@
-#include "EnginePch.h"
+ï»¿#include "EnginePch.h"
 #include "TimeManager.h"
 
 void TimeManager::Init()
@@ -13,11 +13,11 @@ void TimeManager::Update()
     m_currentTime = glfwGetTime();
     m_deltaTime = static_cast<float>(m_currentTime - m_lastTime);
 
-    // [Áß¿ä] ³ª¼±Çü Á×À½(Spiral of Death) ¹æÁö
-    // °ÔÀÓÀÌ ³Ê¹« ´À·ÁÁ®¼­ ÇÑ ÇÁ·¹ÀÓ¿¡ 1ÃÊ°¡ °É·È´Ù°í Ä¨½Ã´Ù.
-    // ÀÌ°É ±×´ë·Î ¹°¸® ¿£Áø¿¡ ³ÖÀ¸¸é ¹°¸® ¾÷µ¥ÀÌÆ®¸¦ 60¹ø µ¹·Á¾ß ÇÏ°í,
-    // ±×·¯¸é ´ÙÀ½ ÇÁ·¹ÀÓÀº ´õ ´À·ÁÁ®¼­ ¿µ¿øÈ÷ ¸ØÃä´Ï´Ù.
-    // ±×·¡¼­ DeltaTime¿¡ »óÇÑ¼±(0.25ÃÊ)À» µÓ´Ï´Ù.
+    // [ì¤‘ìš”] ë‚˜ì„ í˜• ì£½ìŒ(Spiral of Death) ë°©ì§€
+    // ê²Œì„ì´ ë„ˆë¬´ ëŠë ¤ì ¸ì„œ í•œ í”„ë ˆì„ì— 1ì´ˆê°€ ê±¸ë ¸ë‹¤ê³  ì¹©ì‹œë‹¤.
+    // ì´ê±¸ ê·¸ëŒ€ë¡œ ë¬¼ë¦¬ ì—”ì§„ì— ë„£ìœ¼ë©´ ë¬¼ë¦¬ ì—…ë°ì´íŠ¸ë¥¼ 60ë²ˆ ëŒë ¤ì•¼ í•˜ê³ ,
+    // ê·¸ëŸ¬ë©´ ë‹¤ìŒ í”„ë ˆì„ì€ ë” ëŠë ¤ì ¸ì„œ ì˜ì›íˆ ë©ˆì¶¥ë‹ˆë‹¤.
+    // ê·¸ë˜ì„œ DeltaTimeì— ìƒí•œì„ (0.25ì´ˆ)ì„ ë‘¡ë‹ˆë‹¤.
     if (m_deltaTime > 0.25f) m_deltaTime = 0.25f;
 
     m_lastTime = m_currentTime;
@@ -37,10 +37,10 @@ void TimeManager::CalculateFPS()
 
 bool TimeManager::CheckFixedUpdate()
 {
-    // ´©ÀûµÈ ½Ã°£ÀÌ °íÁ¤ ½Ã°£(1/60ÃÊ)º¸´Ù Å©´Ù¸é
+    // ëˆ„ì ëœ ì‹œê°„ì´ ê³ ì • ì‹œê°„(1/60ì´ˆ)ë³´ë‹¤ í¬ë‹¤ë©´
     if (m_accumulator >= m_fixedDeltaTime)
     {
-        // °íÁ¤ ½Ã°£¸¸Å­ ´ú¾î³»°í true ¹İÈ¯
+        // ê³ ì • ì‹œê°„ë§Œí¼ ëœì–´ë‚´ê³  true ë°˜í™˜
         m_accumulator -= m_fixedDeltaTime;
         return true;
     }

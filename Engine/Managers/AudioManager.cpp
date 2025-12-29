@@ -1,20 +1,20 @@
-#include "EnginePch.h"
+ï»¿#include "EnginePch.h"
 #define MINIAUDIO_IMPLEMENTATION
 #include "miniaudio/miniaudio.h"
 #include "AudioManager.h"
 
 bool AudioManager::Init()
 {
-	// 1. ¿£Áø ÃÊ±âÈ­
+	// 1. ì—”ì§„ ì´ˆê¸°í™”
 	ma_result result;
 	result = ma_engine_init(NULL, &m_audioEngine);
 	if (result != MA_SUCCESS)
 	{
-		SPDLOG_ERROR("Failed to initialize audio engine.");
+		LOG_ERROR("Failed to initialize audio engine.");
 		return false;
 	}
 
-	// 2. »ç¿îµå ±×·ì ÃÊ±âÈ­
+	// 2. ì‚¬ìš´ë“œ ê·¸ë£¹ ì´ˆê¸°í™”
 	for (int i = 0; i < (int32)AudioType::MAX; ++i)
 	{
 		result = ma_sound_group_init
@@ -27,7 +27,7 @@ bool AudioManager::Init()
 
 		if (result != MA_SUCCESS)
 		{
-			SPDLOG_ERROR("Failed to initialize sound group index: {}", i);
+			LOG_ERROR("Failed to initialize sound group index: {}", i);
 			return false;
 		}
 	}
@@ -41,14 +41,15 @@ void AudioManager::Clear()
 
 	for (int i = 0; i < (int)AudioType::MAX; ++i)
 	{
-		// ÃÊ±âÈ­µÈ ÀûÀÌ ÀÖ´Â ±×·ì¸¸ ÇØÁ¦ (È¤½Ã ¸ð¸¦ ¾ÈÀüÀåÄ¡)
-		// miniaudio´Â uninitÀ» ¿©·¯ ¹ø È£ÃâÇØµµ ³»ºÎÀûÀ¸·Î Ã¼Å©ÇÏÁö ¾ÊÀ» ¼ö ÀÖÀ¸´Ï
-		// Init¿¡¼­ ¼º°øÇßÀ» ¶§¸¸ È®½ÇÈ÷ ÇØÁ¦ÇÏ´Â ·ÎÁ÷ÀÌ¸é ´õ ÁÁ½À´Ï´Ù.
-		// ¿©±â¼± ±×³É ¼ø¼­´ë·Î ´Ù ÇØÁ¦ÇÕ´Ï´Ù.
+		// ì´ˆê¸°í™”ëœ ì ì´ ìžˆëŠ” ê·¸ë£¹ë§Œ í•´ì œ (í˜¹ì‹œ ëª¨ë¥¼ ì•ˆì „ìž¥ì¹˜)
+		// miniaudioëŠ” uninitì„ ì—¬ëŸ¬ ë²ˆ í˜¸ì¶œí•´ë„ ë‚´ë¶€ì ìœ¼ë¡œ ì²´í¬í•˜ì§€ ì•Šì„ ìˆ˜ ìžˆìœ¼ë‹ˆ
+		// Initì—ì„œ ì„±ê³µí–ˆì„ ë•Œë§Œ í™•ì‹¤ížˆ í•´ì œí•˜ëŠ” ë¡œì§ì´ë©´ ë” ì¢‹ìŠµë‹ˆë‹¤.
+		// ì—¬ê¸°ì„  ê·¸ëƒ¥ ìˆœì„œëŒ€ë¡œ ë‹¤ í•´ì œí•©ë‹ˆë‹¤.
 		ma_sound_group_uninit(&m_groups[i]);
 	}
 
 	ma_engine_uninit(&m_audioEngine);
+	LOG_INFO("AudioManager Cleared.");
 }
 
 ma_sound_group* AudioManager::GetGroup(AudioType type)

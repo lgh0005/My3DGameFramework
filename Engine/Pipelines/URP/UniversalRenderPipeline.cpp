@@ -1,4 +1,4 @@
-#include "EnginePch.h"
+ï»¿#include "EnginePch.h"
 #include "UniversalRenderPipeline.h"
 
 #include "Pipelines/Common/CullingPass.h"
@@ -41,39 +41,39 @@ UniversalRenderPipelineUPtr UniversalRenderPipeline::Create()
 
 bool UniversalRenderPipeline::Init()
 {
-	// UBO »ý¼º
+	// UBO ìƒì„±
 	m_globalUniforms = UniversalGlobalUniforms::Create();
 	if (!m_globalUniforms) return false;
 
-	// ÄÃ¸µ ÆÐ½º »ý¼º
+	// ì»¬ë§ íŒ¨ìŠ¤ ìƒì„±
 	m_cullingPass = CullingPass::Create();
 	if (!m_cullingPass) return false;
 
-	// ¾Æ¿ô¶óÀÎ ÆÐ½º »ý¼º
+	// ì•„ì›ƒë¼ì¸ íŒ¨ìŠ¤ ìƒì„±
 	m_outlinePass = UniversalOutlinePass::Create();
 	if (!m_outlinePass) return false;
 
-	// ¼Îµµ¿ì ÆÐ½º »ý¼º
+	// ì…°ë„ìš° íŒ¨ìŠ¤ ìƒì„±
 	m_shadowPass = ShadowPass::Create();
 	if (!m_shadowPass) return false;
 
-	// Skybox ÆÐ½º »ý¼º
+	// Skybox íŒ¨ìŠ¤ ìƒì„±
 	m_skyboxPass = SkyboxPass::Create();
 	if (!m_skyboxPass) return false;
 
-	// SSAO ÆÐ½º »ý¼º
+	// SSAO íŒ¨ìŠ¤ ìƒì„±
 	m_ssaoPass = UniversalSSAOPass::Create();
 	if (!m_ssaoPass) return false;
 
-	// Æ÷½ºÆ®-ÇÁ·Î¼¼½Ì ÆÐ½º »ý¼º
+	// í¬ìŠ¤íŠ¸-í”„ë¡œì„¸ì‹± íŒ¨ìŠ¤ ìƒì„±
 	m_postProcessPass = UniversalPostProcessPass::Create();
 	if (!m_postProcessPass) return false;
 
-	// G-buffer ÆÐ½º »ý¼º
+	// G-buffer íŒ¨ìŠ¤ ìƒì„±
 	m_geometryPass = UniversalGeometryPass::Create();
 	if (!m_geometryPass) return false;
 
-	// Light ÆÐ½º »ý¼º
+	// Light íŒ¨ìŠ¤ ìƒì„±
 	m_deferredLightPass = UniversalDeferredLightingPass::Create();
 	if (!m_deferredLightPass) return false;
 
@@ -82,7 +82,7 @@ bool UniversalRenderPipeline::Init()
 
 void UniversalRenderPipeline::Render(Scene* scene)
 {
-	// TEMP : Ã¹ ºäÆ÷Æ® ¼³Á¤.
+	// TEMP : ì²« ë·°í¬íŠ¸ ì„¤ì •.
 	int width, height;
 	glfwGetFramebufferSize(WINDOW.GetWindow(), &width, &height);
 	glViewport(0, 0, width, height);
@@ -90,57 +90,57 @@ void UniversalRenderPipeline::Render(Scene* scene)
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glEnable(GL_DEPTH_TEST);
 
-	// TODO : PBR ·»´õ¸µÀ» À§ÇÑ URP ·»´õÆÐ½ºµé Áö³ª¸é¼­ Context ±â¹Ý ·»´õ¸µ ¼öÇà
+	// TODO : PBR ë Œë”ë§ì„ ìœ„í•œ URP ë Œë”íŒ¨ìŠ¤ë“¤ ì§€ë‚˜ë©´ì„œ Context ê¸°ë°˜ ë Œë”ë§ ìˆ˜í–‰
 	/*====================================//
 	//   get essential scene properties   //
 	//====================================*/
-	// ¸ÞÀÎ Ä«¸Þ¶ó ¼Ó¼º °¡Á®¿À±â
+	// ë©”ì¸ ì¹´ë©”ë¼ ì†ì„± ê°€ì ¸ì˜¤ê¸°
 	auto* camera = scene->GetMainCamera();
 	if (!camera) return;
 
-	// 0. ½ºÅÃ ¿µ¿ª¿¡ StandardRenderContext »ý¼º
+	// 0. ìŠ¤íƒ ì˜ì—­ì— StandardRenderContext ìƒì„±
 	UniversalRenderContext context;
 	context.Reset(scene, camera);
 
-	// [ÆÐ½º 0] ÄÃ¸µ ÆÐ½º : ÀýµÎÃ¼ ¹üÀ§ ¾È¿¡ ÀÖ´Â ´ë»ó¸¸ Ãß¸®±â
+	// [íŒ¨ìŠ¤ 0] ì»¬ë§ íŒ¨ìŠ¤ : ì ˆë‘ì²´ ë²”ìœ„ ì•ˆì— ìžˆëŠ” ëŒ€ìƒë§Œ ì¶”ë¦¬ê¸°
 	m_cullingPass->Render(&context);
 
-	// 1. ubo °»½Å
+	// 1. ubo ê°±ì‹ 
 	m_globalUniforms->PreRender(&context);
 
 	/*================================//
 	//   main scene rendergin logic   //
 	//================================*/
-	// [ÆÐ½º 1] ±×¸²ÀÚ ÆÐ½º: m_shadowMap¿¡ ±íÀÌ Á¤º¸ ±â·Ï
+	// [íŒ¨ìŠ¤ 1] ê·¸ë¦¼ìž íŒ¨ìŠ¤: m_shadowMapì— ê¹Šì´ ì •ë³´ ê¸°ë¡
 	m_shadowPass->Render(&context);
 
-	// [ÆÐ½º 2] µðÆÛµå ¼ÎÀÌµù : G-buffer Ã¤¿ì±â
+	// [íŒ¨ìŠ¤ 2] ë””í¼ë“œ ì…°ì´ë”© : G-buffer ì±„ìš°ê¸°
 	m_geometryPass->Render(&context);
 
-	// [ÆÐ½º 3] SSAO
+	// [íŒ¨ìŠ¤ 3] SSAO
 	m_ssaoPass->Render(&context);
 
-	// [ÆÐ½º 4] Deferred Lighting ÆÐ½º: G-buffer¸¦ ±â¹ÝÀ¸·Î ¶óÀÌÆÃ ¿¬»ê ½ÃÀÛ
-	// Æ÷½ºÆ® ÇÁ·Î¼¼½ÌÀ» À§ÇØ Æ÷½ºÆ® ÇÁ·Î¼¼½º ÇÁ·¹ÀÓ ¹öÆÛ°Ô ±×¸²À» ±×¸²
+	// [íŒ¨ìŠ¤ 4] Deferred Lighting íŒ¨ìŠ¤: G-bufferë¥¼ ê¸°ë°˜ìœ¼ë¡œ ë¼ì´íŒ… ì—°ì‚° ì‹œìž‘
+	// í¬ìŠ¤íŠ¸ í”„ë¡œì„¸ì‹±ì„ ìœ„í•´ í¬ìŠ¤íŠ¸ í”„ë¡œì„¸ìŠ¤ í”„ë ˆìž„ ë²„í¼ê²Œ ê·¸ë¦¼ì„ ê·¸ë¦¼
 	context.SetTargetFramebuffer(m_postProcessPass->GetFramebuffer());
 	m_deferredLightPass->Render(&context);
 
-	// Æ÷½ºÆ® ÇÁ·Î¼¼½º ÇÁ·¹ÀÓ ¹öÆÛ¿¡ ±íÀÌ º¹»ç
+	// í¬ìŠ¤íŠ¸ í”„ë¡œì„¸ìŠ¤ í”„ë ˆìž„ ë²„í¼ì— ê¹Šì´ ë³µì‚¬
 	auto gBuffer = m_geometryPass->GetGBuffer();
 	auto postFBO = m_postProcessPass->GetFramebuffer();
 	BlitCopyDepth(gBuffer, postFBO, gBuffer->GetWidth(), gBuffer->GetHeight());
 
-	// [ÆÐ½º 5] Æ÷¿öµå ¼ÎÀÌµù
+	// [íŒ¨ìŠ¤ 5] í¬ì›Œë“œ ì…°ì´ë”©
 	for (const auto& [name, pass] : scene->GetCustomRenderPasses())
 		pass->Render(scene, camera);
 
-	// [ÆÐ½º 6] ½ºÄ«ÀÌ¹Ú½º ÆÐ½º
+	// [íŒ¨ìŠ¤ 6] ìŠ¤ì¹´ì´ë°•ìŠ¤ íŒ¨ìŠ¤
 	m_skyboxPass->Render(&context);
 
-	// [ÆÐ½º 7] ¾Æ¿ô¶óÀÎ ÆÐ½º
+	// [íŒ¨ìŠ¤ 7] ì•„ì›ƒë¼ì¸ íŒ¨ìŠ¤
 	m_outlinePass->Render(&context);
 
-	// [ÆÐ½º 7] Æ÷½ºÆ® ÇÁ·Î¼¼½Ì ÆÐ½º
+	// [íŒ¨ìŠ¤ 7] í¬ìŠ¤íŠ¸ í”„ë¡œì„¸ì‹± íŒ¨ìŠ¤
 	m_postProcessPass->Render(&context);
 
 	/*=========================//
