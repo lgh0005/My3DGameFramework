@@ -27,7 +27,6 @@ add_library(Engine STATIC
    "Pipelines/Common/CullingPass.h" "Pipelines/Common/CullingPass.cpp"
    "Pipelines/Common/ShadowPass.h"  "Pipelines/Common/ShadowPass.cpp"
    "Pipelines/Common/SkyboxPass.h"  "Pipelines/Common/SkyboxPass.cpp"
-   "Pipelines/Common/OutlinePass.h" "Pipelines/Common/OutlinePass.cpp"
 
    # Standard Render Pipeline
    "Pipelines/SRP/RenderPasses/StandardPostProcessPass.h" "Pipelines/SRP/RenderPasses/StandardPostProcessPass.cpp"
@@ -38,6 +37,7 @@ add_library(Engine STATIC
    "Pipelines/SRP/StandardGlobalUniforms.h"    "Pipelines/SRP/StandardGlobalUniforms.cpp"
    "Pipelines/SRP/StandardRenderContext.h"     "Pipelines/SRP/StandardRenderContext.cpp"
    "Pipelines/SRP/StandardRenderPipeline.h"    "Pipelines/SRP/StandardRenderPipeline.cpp"
+   "Pipelines/SRP/RenderPasses/StandardOutlinePass.h" "Pipelines/SRP/RenderPasses/StandardOutlinePass.cpp"
 
    # Universal Render Pipeline
    "Pipelines/URP/RenderPasses/UniversalGeometryPass.h" "Pipelines/URP/RenderPasses/UniversalGeometryPass.cpp"
@@ -47,6 +47,7 @@ add_library(Engine STATIC
    "Pipelines/URP/UniversalGlobalUniforms.h"   "Pipelines/URP/UniversalGlobalUniforms.cpp"
    "Pipelines/URP/UniversalRenderContext.h"    "Pipelines/URP/UniversalRenderContext.cpp"
    "Pipelines/URP/UniversalRenderPipeline.h"   "Pipelines/URP/UniversalRenderPipeline.cpp"
+   "Pipelines/URP/RenderPasses/UniversalOutlinePass.h"   "Pipelines/URP/RenderPasses/UniversalOutlinePass.cpp"
 
    # Misc
    "Misc/Defines.h"

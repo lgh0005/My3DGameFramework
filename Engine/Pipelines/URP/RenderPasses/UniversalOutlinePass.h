@@ -7,12 +7,12 @@ CLASS_PTR(OutlineFramebuffer)
 CLASS_PTR(ScreenMesh)
 #pragma endregion
 
-CLASS_PTR(OutlinePass)
-class OutlinePass : public ContextRenderPass
+CLASS_PTR(UniversalOutlinePass)
+class UniversalOutlinePass : public ContextRenderPass
 {
 public:
-	virtual ~OutlinePass();
-	static OutlinePassUPtr Create
+	virtual ~UniversalOutlinePass();
+	static UniversalOutlinePassUPtr Create
 	(
 		int32 width = WINDOW_WIDTH,
 		int32 height = WINDOW_HEIGHT,
@@ -30,10 +30,10 @@ private:
 	void MaskSkinnedMeshes(const std::vector<MeshOutline*>& outlines);
 
 private:
-	OutlinePass();
+	UniversalOutlinePass();
 	bool Init
 	(
-		int32 width, int32 height, 
+		int32 width, int32 height,
 		const glm::vec3& color,
 		float thickness
 	);
@@ -42,7 +42,7 @@ private:
 	ScreenMeshUPtr m_screenMesh;
 	ProgramUPtr m_maskStaticProgram;  // Static 마스크용
 	ProgramUPtr m_maskSkinnedProgram; // Skinned 마스크용
-	ProgramUPtr m_postProgram; // 합성용
-	glm::vec3 m_color		{ 1.0f };
-	float m_thickness		{ 2.0f };
+	ProgramUPtr m_postProgram;		  // 합성용
+	glm::vec3 m_color{ 1.0f };
+	float m_thickness{ 2.0f };
 };

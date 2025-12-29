@@ -5,11 +5,10 @@
 CLASS_PTR(CullingPass)
 CLASS_PTR(ShadowPass)
 CLASS_PTR(SkyboxPass)
-CLASS_PTR(OutlinePass)
-CLASS_PTR(StandardSkyboxPass)
 CLASS_PTR(StandardDeferredLightingPass)
 CLASS_PTR(StandardGeometryPass)
 CLASS_PTR(StandardSSAOPass)
+CLASS_PTR(StandardOutlinePass)
 CLASS_PTR(StandardPostProcessPass)
 CLASS_PTR(StandardGlobalUniforms)
 CLASS_PTR(GBufferFramebuffer)
@@ -39,13 +38,13 @@ private:
 	CullingPassUPtr					  m_cullingPass		  { nullptr };
 	ShadowPassUPtr					  m_shadowPass		  { nullptr };
 	SkyboxPassUPtr                    m_skyboxPass		  { nullptr };
-	OutlinePassUPtr					  m_outlinePass		  { nullptr };
 
 	// SRP 필수 렌더 패스
 	StandardPostProcessPassUPtr		  m_postProcessPass	  { nullptr };
 	StandardGeometryPassUPtr		  m_geometryPass	  { nullptr };
 	StandardDeferredLightingPassUPtr  m_deferredLightPass { nullptr };
 	StandardSSAOPassUPtr			  m_ssaoPass		  { nullptr };
+	StandardOutlinePassUPtr		      m_outlinePass		  { nullptr };
 
 	// SRP 공통 유니폼 변수 버퍼
 	StandardGlobalUniformsUPtr        m_globalUniforms	  { nullptr };

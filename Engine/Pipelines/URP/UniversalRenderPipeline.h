@@ -8,6 +8,7 @@ CLASS_PTR(SkyboxPass)
 CLASS_PTR(UniversalPostProcessPass)
 CLASS_PTR(UniversalGeometryPass)
 CLASS_PTR(UniversalSSAOPass)
+CLASS_PTR(UniversalOutlinePass)
 CLASS_PTR(UniversalDeferredLightingPass)
 CLASS_PTR(UniversalGlobalUniforms)
 CLASS_PTR(GBufferFramebuffer)
@@ -47,6 +48,7 @@ private:
 	UniversalGeometryPassUPtr    m_geometryPass     { nullptr };
 	UniversalSSAOPassUPtr		 m_ssaoPass			{ nullptr };
 	UniversalDeferredLightingPassUPtr  m_deferredLightPass  { nullptr };
+	UniversalOutlinePassUPtr		 m_outlinePass		{ nullptr };
 
 	// URP 공통 유니폼 변수 버퍼
 	UniversalGlobalUniformsUPtr  m_globalUniforms	{ nullptr }; 

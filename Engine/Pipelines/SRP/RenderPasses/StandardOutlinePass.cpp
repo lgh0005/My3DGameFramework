@@ -1,5 +1,5 @@
 #include "EnginePch.h"
-#include "OutlinePass.h"
+#include "StandardOutlinePass.h"
 
 // 필수 헤더 포함
 #include "Core/RenderContext.h"
@@ -19,21 +19,21 @@
 #include "Pipelines/SRP/StandardRenderContext.h"
 #include "Pipelines/SRP/RenderPasses/StandardPostProcessPass.h"
 
-OutlinePass::OutlinePass() = default;
-OutlinePass::~OutlinePass() = default;
+StandardOutlinePass::StandardOutlinePass() = default;
+StandardOutlinePass::~StandardOutlinePass() = default;
 
-OutlinePassUPtr OutlinePass::Create
+StandardOutlinePassUPtr StandardOutlinePass::Create
 (
 	int32 width, int32 height, 
 	const glm::vec3& color,
 	float thickness)
 {
-	auto pass = OutlinePassUPtr(new OutlinePass());
+	auto pass = StandardOutlinePassUPtr(new StandardOutlinePass());
 	if (!pass->Init(width, height, color, thickness)) return nullptr;
 	return std::move(pass);
 }
 
-bool OutlinePass::Init
+bool StandardOutlinePass::Init
 (
 	int32 width, int32 height, 
 	const glm::vec3& color,
@@ -72,8 +72,7 @@ bool OutlinePass::Init
 	return (m_maskFBO && m_screenMesh);
 }
 
-// TODO : 이후 SRP, URP를 분리해야 할 필요가 있다
-void OutlinePass::Render(RenderContext* context)
+void StandardOutlinePass::Render(RenderContext* context)
 {
 	// 0. 자신의 렌더 패스에 활용되고 있는 RenderContext로 캐스팅
 	auto stdCtx = (StandardRenderContext*)context;
@@ -148,14 +147,13 @@ void OutlinePass::Render(RenderContext* context)
 /*==============================//
 //   outlining helper methods   //
 //==============================*/
-// TODO : null 체크는 한 번 씩 해줘야함.
-void OutlinePass::MaskMeshes(const std::vector<MeshOutline*>& outlines)
+void StandardOutlinePass::MaskMeshes(const std::vector<MeshOutline*>& outlines)
 {
 	MaskStaticMeshes(outlines);
 	MaskSkinnedMeshes(outlines);
 }
 
-void OutlinePass::MaskStaticMeshes(const std::vector<MeshOutline*>& outlines)
+void StandardOutlinePass::MaskStaticMeshes(const std::vector<MeshOutline*>& outlines)
 {
 	m_maskStaticProgram->Use();
 
@@ -176,7 +174,7 @@ void OutlinePass::MaskStaticMeshes(const std::vector<MeshOutline*>& outlines)
 	}
 }
 
-void OutlinePass::MaskSkinnedMeshes(const std::vector<MeshOutline*>& outlines)
+void StandardOutlinePass::MaskSkinnedMeshes(const std::vector<MeshOutline*>& outlines)
 {
 	m_maskSkinnedProgram->Use();
 	for (auto* outline : outlines)

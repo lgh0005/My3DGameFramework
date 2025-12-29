@@ -8,6 +8,7 @@
 #include "Pipelines/URP/RenderPasses/UniversalSSAOPass.h"
 #include "Pipelines/URP/RenderPasses/UniversalPostProcessPass.h"
 #include "Pipelines/URP/RenderPasses/UniversalDeferredLightingPass.h"
+#include "Pipelines/URP/RenderPasses/UniversalOutlinePass.h"
 #include "Pipelines/URP/UniversalGlobalUniforms.h"
 #include "Pipelines/URP/UniversalRenderContext.h"
 
@@ -47,6 +48,10 @@ bool UniversalRenderPipeline::Init()
 	// 컬링 패스 생성
 	m_cullingPass = CullingPass::Create();
 	if (!m_cullingPass) return false;
+
+	// 아웃라인 패스 생성
+	m_outlinePass = UniversalOutlinePass::Create();
+	if (!m_outlinePass) return false;
 
 	// 셰도우 패스 생성
 	m_shadowPass = ShadowPass::Create();
@@ -131,6 +136,9 @@ void UniversalRenderPipeline::Render(Scene* scene)
 
 	// [패스 6] 스카이박스 패스
 	m_skyboxPass->Render(&context);
+
+	// [패스 7] 아웃라인 패스
+	m_outlinePass->Render(&context);
 
 	// [패스 7] 포스트 프로세싱 패스
 	m_postProcessPass->Render(&context);
