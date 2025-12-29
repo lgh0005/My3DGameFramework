@@ -41,9 +41,8 @@ void SkinnedMesh::Init(const std::vector<SkinnedVertex>& vertices,
     m_vertexLayout->SetAttrib(5, 4, GL_FLOAT, false, sizeof(SkinnedVertex), offsetof(SkinnedVertex, weights));
 }
 
-void SkinnedMesh::Draw(const Program* program) const
+void SkinnedMesh::Draw() const
 {
     m_vertexLayout->Bind();
-    if (m_material) m_material->SetToProgram(program);
     glDrawElements(m_primitiveType, m_indexBuffer->GetCount(), GL_UNSIGNED_INT, 0);
 }

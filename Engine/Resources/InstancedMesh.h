@@ -26,7 +26,8 @@ public:
         int32         instanceCount,
         SetupFunc setupFunc
     );
-	virtual void Draw(const Program* program) const override;
+	virtual void Draw() const override;
+    int32 GetInstanceCount() const { return m_instanceCount; }
 
 private:
     InstancedMesh();

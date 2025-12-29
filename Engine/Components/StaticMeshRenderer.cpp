@@ -1,6 +1,9 @@
 #include "EnginePch.h"
 #include "StaticMeshRenderer.h"
 #include "Resources/StaticMesh.h"
+#include "Resources/Material.h"
+#include "Graphics/Program.h"
+#include "Graphics/VertexLayout.h"
 #include "Components/Transform.h"
 
 StaticMeshRenderer::StaticMeshRenderer() = default;
@@ -24,4 +27,10 @@ bool StaticMeshRenderer::Init(StaticMeshPtr mesh, MaterialPtr material)
 RenderBounds StaticMeshRenderer::GetWorldBounds() const
 {
 	return Super::GetWorldBounds();
+}
+
+void StaticMeshRenderer::Render(Program* program) const
+{
+	if (m_material) m_material->SetToProgram(program);
+	m_mesh->Draw();
 }

@@ -54,12 +54,9 @@ void EnvironmentRenderPass::Render(Scene* scene, Camera* camera)
 
 	for (const auto* renderer : m_renderers)
 	{
-		MeshPtr mesh = renderer->GetMesh();
 		auto& transform = renderer->GetTransform();
-		if (!mesh) continue;
-
 		m_envProgram->SetUniform("model", transform.GetWorldMatrix());
-		mesh->Draw(m_envProgram.get());
+		renderer->Render(m_envProgram.get());
 	}
 }
 

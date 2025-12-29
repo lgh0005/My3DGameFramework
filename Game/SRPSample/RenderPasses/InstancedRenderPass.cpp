@@ -39,17 +39,10 @@ void InstancedRenderPass::Render(Scene* scene, Camera* camera)
 
     for (const auto* renderer : m_renderers)
     {
-        MeshPtr mesh = renderer->GetMesh();
-        auto material = renderer->GetMaterial();
-        if (!mesh || !material) continue;
-
-        material->SetToProgram(m_instanceProgram.get());
-
         // (셰이더가 aInstanceOffset으로 직접 위치를 계산)
         auto& transform = renderer->GetTransform();
         m_instanceProgram->SetUniform("model", transform.GetWorldMatrix());
-
-        mesh->Draw(m_instanceProgram.get());
+        renderer->Render(m_instanceProgram.get());
     }
 }
 

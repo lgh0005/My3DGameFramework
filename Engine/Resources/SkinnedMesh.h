@@ -22,7 +22,7 @@ public:
         uint32 primitiveType = GL_TRIANGLES
     );
     virtual ~SkinnedMesh() override;
-    virtual void Draw(const Program* program) const override;
+    virtual void Draw() const override;
 
 private:
     SkinnedMesh();

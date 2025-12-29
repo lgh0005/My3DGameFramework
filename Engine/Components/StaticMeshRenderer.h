@@ -4,6 +4,7 @@
 #pragma region FORWARD_DECLARATION
 CLASS_PTR(StaticMesh)
 CLASS_PTR(Material)
+CLASS_PTR(Program)
 #pragma endregion
 
 CLASS_PTR(StaticMeshRenderer)
@@ -17,6 +18,7 @@ public:
 	static const ComponentType s_ComponentType = ComponentType::StaticMeshRenderer;
 	virtual ComponentType GetComponentType() const override { return s_ComponentType; }
 	virtual RenderBounds GetWorldBounds() const override;
+	virtual void Render(Program* program) const;
 
 private:
 	StaticMeshRenderer();

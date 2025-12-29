@@ -138,7 +138,7 @@ Texture* StandardPostProcessPass::ComputeGaussianBlur()
 		}
 
 		m_blurProgram->SetUniform("image", 0);
-		m_plane->Draw(m_blurProgram.get());
+		m_plane->Draw();
 
 		// 방향 전환
 		horizontal = !horizontal;

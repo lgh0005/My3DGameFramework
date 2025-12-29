@@ -105,9 +105,8 @@ void StaticMesh::ComputeTangents(std::vector<StaticVertex>& vertices, const std:
     }
 }
 
-void StaticMesh::Draw(const Program* program) const
+void StaticMesh::Draw() const
 {
     m_vertexLayout->Bind();
-    if (m_material) m_material->SetToProgram(program);
     glDrawElements(m_primitiveType, m_indexBuffer->GetCount(), GL_UNSIGNED_INT, 0);
 }

@@ -84,14 +84,9 @@ void StandardGeometryPass::RenderStaticGeometry(const std::vector<StaticMeshRend
 	m_staticGeometryProgram->Use();
 	for (const auto* renderer : meshes)
 	{
-		MeshPtr mesh = renderer->GetMesh();
 		auto model = renderer->GetTransform().GetWorldMatrix();
-		auto material = renderer->GetMaterial();
-
-		if (material) material->SetToProgram(m_staticGeometryProgram.get());
 		m_staticGeometryProgram->SetUniform("model", model);
-
-		if (mesh) mesh->Draw(m_staticGeometryProgram.get());
+		renderer->Render(m_staticGeometryProgram.get());
 	}
 }
 
@@ -102,18 +97,14 @@ void StandardGeometryPass::RenderSkinnedGeometry(const std::vector<SkinnedMeshRe
 	m_skinnedGeometryProgram->Use();
 	for (const auto* renderer : meshes)
 	{
-		MeshPtr mesh = renderer->GetMesh();
-		if (!mesh) continue;
-
-		auto material = renderer->GetMaterial();
-		if (material) material->SetToProgram(m_skinnedGeometryProgram.get());
+		auto model = renderer->GetTransform().GetWorldMatrix();
+		m_skinnedGeometryProgram->SetUniform("model", model);
 
 		Animator* animator = renderer->GetAnimator();
 		if (animator) m_skinnedGeometryProgram->SetUniform("finalBoneMatrices", animator->GetFinalBoneMatrices());
 		else m_skinnedGeometryProgram->SetUniform("finalBoneMatrices", GetIdentityBones());
 	
-		m_skinnedGeometryProgram->SetUniform("model", renderer->GetTransform().GetWorldMatrix());
-		mesh->Draw(m_skinnedGeometryProgram.get());
+		renderer->Render(m_skinnedGeometryProgram.get());
 	}
 }
 

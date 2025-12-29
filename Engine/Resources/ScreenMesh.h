@@ -16,7 +16,7 @@ public:
 	static ScreenMeshUPtr Create();
 	static const ResourceType s_ResourceType = ResourceType::ScreenMesh;
 	virtual ResourceType GetResourceType() const override { return ResourceType::ScreenMesh; }
-	virtual void Draw(const Program* program = nullptr) const override;
+	virtual void Draw() const override;
 
 private:
 	ScreenMesh();

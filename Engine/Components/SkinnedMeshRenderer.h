@@ -5,6 +5,7 @@
 CLASS_PTR(SkinnedMesh)
 CLASS_PTR(Material)
 CLASS_PTR(Animator)
+CLASS_PTR(Program)
 #pragma endregion
 
 CLASS_PTR(SkinnedMeshRenderer)
@@ -24,6 +25,7 @@ public:
 	virtual ComponentType GetComponentType() const override { return s_ComponentType; }
 	virtual RenderBounds GetWorldBounds() const override;
 	Animator* GetAnimator() const;
+	virtual void Render(Program* program) const override;
 
 private:
 	SkinnedMeshRenderer();

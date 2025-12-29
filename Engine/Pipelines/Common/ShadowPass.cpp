@@ -157,7 +157,7 @@ void ShadowPass::RenderStaticMeshes
 	{
 		auto model = renderer->GetTransform().GetWorldMatrix();
 		m_staticDepthProgram->SetUniform("model", model);
-		renderer->GetMesh()->Draw(m_staticDepthProgram.get());
+		renderer->Render(m_staticDepthProgram.get());
 	}
 }
 
@@ -174,7 +174,6 @@ void ShadowPass::RenderSkinnedMeshes
 
 	for (const auto* renderer : meshes)
 	{
-		GameObject* go = renderer->GetOwner();
 		auto model = renderer->GetTransform().GetWorldMatrix();
 		m_skinnedDepthProgram->SetUniform("model", model);
 
@@ -182,7 +181,7 @@ void ShadowPass::RenderSkinnedMeshes
 		if (animator) m_skinnedDepthProgram->SetUniform("finalBoneMatrices", animator->GetFinalBoneMatrices());
 		else m_skinnedDepthProgram->SetUniform("finalBoneMatrices", GetIdentityBones());
 
-		renderer->GetMesh()->Draw(m_skinnedDepthProgram.get());
+		renderer->Render(m_skinnedDepthProgram.get());
 	}
 }
 

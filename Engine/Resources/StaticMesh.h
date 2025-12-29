@@ -27,7 +27,7 @@ public:
         std::vector<StaticVertex>& vertices,
         const std::vector<uint32>& indices
     );
-    virtual void Draw(const Program* program) const override;
+    virtual void Draw() const override;
 
 private:
     StaticMesh();

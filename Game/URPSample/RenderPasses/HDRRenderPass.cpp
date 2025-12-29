@@ -79,16 +79,13 @@ void HDRRenderPass::Render(Scene* scene, Camera* camera)
     for (const auto* renderer : m_renderers)
     {
         GameObject* go = renderer->GetOwner();
-        MeshPtr mesh = renderer->GetMesh();
         auto& transform = go->GetTransform();
-        auto material = renderer->GetMaterial();
-        material->SetToProgram(m_simpleProgram.get());
 
         // 2. 모델 행렬 전송
         auto modelMatrix = transform.GetWorldMatrix();
         m_simpleProgram->SetUniform("model", modelMatrix);
 
-        mesh->Draw(m_simpleProgram.get());
+        renderer->Render(m_simpleProgram.get());
     }
 }
 

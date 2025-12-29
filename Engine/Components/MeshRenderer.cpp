@@ -2,6 +2,7 @@
 #include "MeshRenderer.h"
 
 #include "Components/Transform.h"
+#include "Graphics/Program.h"
 #include "Resources/Mesh.h"
 #include "Resources/Material.h"
 

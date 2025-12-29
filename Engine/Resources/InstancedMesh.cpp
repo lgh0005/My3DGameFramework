@@ -16,10 +16,9 @@ InstancedMeshUPtr InstancedMesh::Create(StaticMeshPtr baseMesh, BufferPtr instan
     return std::move(renderer);
 }
 
-void InstancedMesh::Draw(const Program* program) const
+void InstancedMesh::Draw() const
 {
     m_vertexLayout->Bind();
-    if (m_material) m_material->SetToProgram(program);
     glDrawElementsInstanced
     (
         m_primitiveType,
@@ -40,7 +39,6 @@ bool InstancedMesh::Init(StaticMeshPtr baseMesh, BufferPtr instanceBuffer,
     m_vertexBuffer = baseMesh->GetVertexBuffer();
     m_indexBuffer = baseMesh->GetIndexBuffer();
     m_indexCount = baseMesh->GetIndexCount();
-    m_material = baseMesh->GetMaterial(); // 재질도 따라감
     m_primitiveType = GL_TRIANGLES;
 
     // 2. 인스턴스 데이터는 직접 소유

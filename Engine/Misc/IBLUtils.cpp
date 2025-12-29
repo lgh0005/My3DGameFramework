@@ -57,7 +57,7 @@ CubeTexturePtr IBLUtils::CreateCubemapFromHDR(Texture* hdrTexture, int32 resolut
 		sphericalToCubeProgram->SetUniform("transform", captureProjection * captureViews[i]);
 		captureFBO->Bind(i);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		cubeMesh->Draw(sphericalToCubeProgram.get());
+		cubeMesh->Draw();
 	}
 	glEnable(GL_CULL_FACE);
 	CubeFramebuffer::BindToDefault();
@@ -118,7 +118,7 @@ CubeTexturePtr IBLUtils::CreateIrradianceMap(CubeTexture* src)
 		convolutionProgram->SetUniform("transform", captureProjection * captureViews[i]);
 		captureFBO->Bind(i);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		cubeMesh->Draw(convolutionProgram.get());
+		cubeMesh->Draw();
 	}
 	glEnable(GL_CULL_FACE);
 	CubeFramebuffer::BindToDefault();
@@ -183,7 +183,7 @@ CubeTexturePtr IBLUtils::CreatePrefilteredMap(CubeTexture* src)
 			preFilteredProgram->SetUniform("transform", captureProjection * captureViews[i]);
 			framebuffer->Bind(i);
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-			cubeMesh->Draw(preFilteredProgram.get());
+			cubeMesh->Draw();
 		}
 	}
 	glEnable(GL_CULL_FACE);

@@ -50,12 +50,6 @@ ModelUPtr Model::Load(const std::string& filename)
     return std::move(model);
 }
 
-void Model::Draw(const Program* program) const
-{
-    for (auto& mesh : m_meshes)
-        mesh->Draw(program);
-}
-
 /*======================================//
 //   3d model load instancing methods   //
 //======================================*/
@@ -98,10 +92,12 @@ GameObjectUPtr Model::CreateGameObjectFromNode
         auto meshRes = m_meshes[meshIndex];
 
         // 머티리얼 찾기
-        uint32 matIdx = meshRes->GetMaterialIndex();
+        uint32 matIdx = 0;
+        if (meshIndex < m_meshMaterialIndices.size())
+            matIdx = m_meshMaterialIndices[meshIndex];
+
         MaterialPtr material = nullptr;
         if (matIdx < m_materials.size()) material = m_materials[matIdx];
-        else material = meshRes->GetMaterial();
 
         // [Renderer 생성] 리소스 타입에 따라 분기
         switch (meshRes->GetResourceType())
@@ -162,8 +158,7 @@ bool Model::LoadByAssimp(const std::string& filename)
     // 2. 초기화 (기존 데이터 클리어)
     m_meshes.clear();
     m_materials.clear();
-    /*m_boneInfoMap.clear();
-    m_BoneCounter = 0;*/
+    m_meshMaterialIndices.clear();
     m_skeleton = Skeleton::Create();
 
     // 텍스처 로드를 위한 디렉토리 경로 계산
@@ -173,8 +168,8 @@ bool Model::LoadByAssimp(const std::string& filename)
     ProcessAssimpMaterials(scene, modelDir);
 
     // 4. 메쉬 처리
-    // ProcessAssimpNode(scene->mRootNode, scene);
     m_meshes.reserve(scene->mNumMeshes);
+    m_meshMaterialIndices.reserve(scene->mNumMeshes);
     for (uint32 i = 0; i < scene->mNumMeshes; i++)
         ProcessAssimpMesh(scene->mMeshes[i], scene);
 
@@ -319,13 +314,9 @@ void Model::ProcessAssimpSkinnedMesh(aiMesh* mesh, const aiScene* scene)
     // 4. Create Mesh
     auto glMesh = SkinnedMesh::Create(vertices, indices, GL_TRIANGLES);
     glMesh->SetLocalBounds(RenderBounds::CreateFromMinMax(minBound, maxBound));
-
-    if (mesh->mMaterialIndex >= 0 && mesh->mMaterialIndex < m_materials.size())
-    {
-        glMesh->SetMaterial(m_materials[mesh->mMaterialIndex]);
-        glMesh->SetMaterialIndex(mesh->mMaterialIndex);
-    }
-
+    
+    // 5. 정점과 인덱스 정보 push
+    m_meshMaterialIndices.push_back(mesh->mMaterialIndex);
     m_meshes.push_back(std::move(glMesh));
 }
 
@@ -368,12 +359,8 @@ void Model::ProcessAssimpStaticMesh(aiMesh* mesh, const aiScene* scene)
     auto glMesh = StaticMesh::Create(vertices, indices, GL_TRIANGLES);
     glMesh->SetLocalBounds(RenderBounds::CreateFromMinMax(minBound, maxBound));
 
-    if (mesh->mMaterialIndex >= 0 && mesh->mMaterialIndex < m_materials.size())
-    {
-        glMesh->SetMaterial(m_materials[mesh->mMaterialIndex]);
-        glMesh->SetMaterialIndex(mesh->mMaterialIndex);
-    }
-
+    // 4. 정점과 인덱스 정보 push
+    m_meshMaterialIndices.push_back(mesh->mMaterialIndex);
     m_meshes.push_back(std::move(glMesh));
 }
 
@@ -543,6 +530,8 @@ void Model::ReadBinaryMeshes(std::ifstream& inFile, uint32 meshCount)
 {
     m_meshes.clear();
     m_meshes.reserve(meshCount);
+    m_meshMaterialIndices.clear();
+    m_meshMaterialIndices.reserve(meshCount);
 
     for (uint32 i = 0; i < meshCount; ++i)
     {
@@ -550,14 +539,8 @@ void Model::ReadBinaryMeshes(std::ifstream& inFile, uint32 meshCount)
         auto rawMesh = AssetUtils::ReadRawMesh(inFile);
 
         // 2. 타입에 따라 적절한 함수 호출 (분기 처리)
-        if (rawMesh.isSkinned)
-        {
-            CreateBinarySkinnedMesh(rawMesh);
-        }
-        else
-        {
-            CreateBinaryStaticMesh(rawMesh);
-        }
+        if (rawMesh.isSkinned) CreateBinarySkinnedMesh(rawMesh);
+        else CreateBinaryStaticMesh(rawMesh);
     }
 }
 
@@ -587,12 +570,8 @@ void Model::CreateBinarySkinnedMesh(const AssetFmt::RawMesh& rawMesh)
     // 3. 바운딩 박스 설정
     mesh->SetLocalBounds(RenderBounds::CreateFromMinMax(rawMesh.aabbMin, rawMesh.aabbMax));
     
-    // 4. 머티리얼 연결
-    if (rawMesh.materialIndex < m_materials.size())
-    {
-        mesh->SetMaterial(m_materials[rawMesh.materialIndex]);
-        mesh->SetMaterialIndex(rawMesh.materialIndex);
-    }
+    // 4. 머티리얼 인덱스 저장
+    m_meshMaterialIndices.push_back(rawMesh.materialIndex);
 
     // 5. 등록
     m_meshes.push_back(std::move(mesh));
@@ -619,12 +598,8 @@ void Model::CreateBinaryStaticMesh(const AssetFmt::RawMesh& rawMesh)
     // 3. 바운딩 박스 설정
     mesh->SetLocalBounds(RenderBounds::CreateFromMinMax(rawMesh.aabbMin, rawMesh.aabbMax));
 
-    // 4. 머티리얼 연결
-    if (rawMesh.materialIndex < m_materials.size())
-    {
-        mesh->SetMaterial(m_materials[rawMesh.materialIndex]);
-        mesh->SetMaterialIndex(rawMesh.materialIndex);
-    }
+    // 4. 머티리얼 인덱스 저장
+    m_meshMaterialIndices.push_back(rawMesh.materialIndex);
 
     // 5. 등록
     m_meshes.push_back(std::move(mesh));

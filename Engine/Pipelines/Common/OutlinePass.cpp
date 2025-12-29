@@ -106,15 +106,13 @@ void OutlinePass::MaskStaticMeshes(const std::vector<MeshOutline*>& outlines)
 	for (auto* outline : outlines)
 	{
 		auto* owner = outline->GetOwner();
+		if (!owner) continue;
 
-		// Animator가 있으면 Static 패스가 아니므로 스킵
-		if (owner->GetComponent<Animator>()) continue;
-
-		// [심플한 해결책] "내 몸에 붙은 렌더러 내놔"
 		auto* renderer = owner->GetComponent<StaticMeshRenderer>();
-		auto mesh = renderer->GetMesh();
+		if (!renderer) continue;
+
 		m_staticProgram->SetUniform("model", renderer->GetTransform().GetWorldMatrix());
-		mesh->Draw(m_staticProgram.get());
+		renderer->Render(m_staticProgram.get());
 	}
 }
 
@@ -128,17 +126,15 @@ void OutlinePass::MaskSkinnedMeshes(const std::vector<MeshOutline*>& outlines)
 		auto* owner = outline->GetOwner();
 		auto* renderer = owner->GetComponent<SkinnedMeshRenderer>();
 		if (!renderer) continue;
+
+		// 1. 파이프라인 데이터 설정
 		m_skinnedProgram->SetUniform("model", renderer->GetTransform().GetWorldMatrix());
 
-		auto mesh = renderer->GetMesh();
-		if (!mesh) continue;
-
-		m_skinnedProgram->SetUniform("model", renderer->GetTransform().GetWorldMatrix());
 		Animator* animator = renderer->GetAnimator();
 		if (animator) m_skinnedProgram->SetUniform("finalBoneMatrices", animator->GetFinalBoneMatrices());
 		else m_skinnedProgram->SetUniform("finalBoneMatrices", GetIdentityBones());
 
-		mesh->Draw(m_skinnedProgram.get());
+		renderer->Render(m_skinnedProgram.get());
 	}
 }
 
@@ -149,16 +145,17 @@ void OutlinePass::DrawStaticMeshOutlines(const std::vector<MeshOutline*>& outlin
 	for (auto* outline : outlines)
 	{
 		auto* owner = outline->GetOwner();
-		if (owner->GetComponent<Animator>()) continue;
+		if (!owner) continue;
+
+		auto* renderer = owner->GetComponent<StaticMeshRenderer>();
+		if (!renderer) continue;
 
 		// [Pass 2] 실제 두께와 색상 적용
 		m_staticProgram->SetUniform("outlineColor", outline->GetColor());
 		m_staticProgram->SetUniform("outlineThickness", outline->GetThickness());
-
-		auto* renderer = owner->GetComponent<StaticMeshRenderer>();
-		auto mesh = renderer->GetMesh();
 		m_staticProgram->SetUniform("model", renderer->GetTransform().GetWorldMatrix());
-		mesh->Draw(m_staticProgram.get());
+
+		renderer->Render(m_staticProgram.get());
 	}
 }
 
@@ -169,11 +166,10 @@ void OutlinePass::DrawSkinnedMeshOutlines(const std::vector<MeshOutline*>& outli
 	for (auto* outline : outlines)
 	{
 		auto* owner = outline->GetOwner();
+		if (!owner) continue;
+
 		auto* renderer = owner->GetComponent<SkinnedMeshRenderer>();
 		if (!renderer) continue;
-
-		auto mesh = renderer->GetMesh();
-		if (!mesh) continue;
 
 		// 실제 두께와 색상 적용
 		m_skinnedProgram->SetUniform("outlineColor", outline->GetColor());
@@ -185,6 +181,6 @@ void OutlinePass::DrawSkinnedMeshOutlines(const std::vector<MeshOutline*>& outli
 		if (animator) m_skinnedProgram->SetUniform("finalBoneMatrices", animator->GetFinalBoneMatrices());
 		else m_skinnedProgram->SetUniform("finalBoneMatrices", GetIdentityBones());
 
-		mesh->Draw(m_skinnedProgram.get());
+		renderer->Render(m_skinnedProgram.get());
 	}
 }

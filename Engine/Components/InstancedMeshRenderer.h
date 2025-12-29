@@ -4,6 +4,7 @@
 #pragma region FORWARD_DECLARATION
 CLASS_PTR(InstancedMesh)
 CLASS_PTR(Material)
+CLASS_PTR(Program)
 #pragma endregion
 
 CLASS_PTR(InstancedMeshRenderer)
@@ -17,8 +18,10 @@ public:
 	static const ComponentType s_ComponentType = ComponentType::InstancedMeshRenderer;
 	virtual ComponentType GetComponentType() const override { return s_ComponentType; }
 	virtual RenderBounds GetWorldBounds() const override;
+	virtual void Render(Program* program) const;
 
 private:
 	InstancedMeshRenderer();
 	bool Init(InstancedMeshPtr mesh, MaterialPtr material);
+	InstancedMesh* m_instancedMeshCache	{ nullptr };
 };

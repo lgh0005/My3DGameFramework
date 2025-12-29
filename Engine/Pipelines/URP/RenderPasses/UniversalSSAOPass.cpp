@@ -160,7 +160,7 @@ void UniversalSSAOPass::ComputeSSAO(UniversalRenderContext* context)
     m_ssaoProgram->SetUniform("projection", camera->GetProjectionMatrix());
     m_ssaoProgram->SetUniform("view", camera->GetViewMatrix());
 
-    m_screenQuad->Draw(m_ssaoProgram.get());
+    m_screenQuad->Draw();
 }
 
 void UniversalSSAOPass::BlurSSAOResult(UniversalRenderContext* context)

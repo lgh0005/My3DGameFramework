@@ -39,11 +39,7 @@ void SimpleRenderPass::Render(Scene* scene, Camera* camera)
     for (const auto* renderer : m_renderers)
     {
         GameObject* go = renderer->GetOwner();
-        MeshPtr mesh = renderer->GetMesh();
         auto& transform = go->GetTransform();
-        auto material = renderer->GetMaterial();
-
-        material->SetToProgram(m_simpleProgram.get());
 
         auto lightModel = transform.GetWorldMatrix();
         auto lightMvp = projection * view * lightModel;
@@ -52,7 +48,7 @@ void SimpleRenderPass::Render(Scene* scene, Camera* camera)
         // 색상을 하얀색(1.0, 1.0, 1.0, 1.0)으로 고정
         m_simpleProgram->SetUniform("color", glm::vec4(1.0f));
 
-        mesh->Draw(m_simpleProgram.get());
+        renderer->Render(m_simpleProgram.get());
     }
 }
 

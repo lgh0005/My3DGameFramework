@@ -4,6 +4,9 @@
 #include "Components/Animator.h"
 #include "Components/Transform.h"
 #include "Resources/SkinnedMesh.h"
+#include "Resources/Material.h"
+#include "Graphics/Program.h"
+#include "Graphics/VertexLayout.h"
 
 SkinnedMeshRenderer::~SkinnedMeshRenderer() = default;
 SkinnedMeshRenderer::SkinnedMeshRenderer() = default;
@@ -47,4 +50,10 @@ RenderBounds SkinnedMeshRenderer::GetWorldBounds() const
 Animator* SkinnedMeshRenderer::GetAnimator() const
 {
     return m_referenceAnimator;
+}
+
+void SkinnedMeshRenderer::Render(Program* program) const
+{
+    if (m_material) m_material->SetToProgram(program);
+    m_mesh->Draw();
 }

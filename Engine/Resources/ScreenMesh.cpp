@@ -55,7 +55,7 @@ void ScreenMesh::Init()
 	m_vertexLayout->SetAttrib(2, 2, GL_FLOAT, false, sizeof(ScreenVertex), offsetof(ScreenVertex, texCoord));
 }
 
-void ScreenMesh::Draw(const Program* program) const
+void ScreenMesh::Draw() const
 {
 	m_vertexLayout->Bind();
 	glDrawElements(m_primitiveType, m_indexBuffer->GetCount(), GL_UNSIGNED_INT, 0);

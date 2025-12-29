@@ -5,6 +5,7 @@
 #pragma region FORWARD_DECLARATION
 CLASS_PTR(Mesh)
 CLASS_PTR(Material)
+CLASS_PTR(Program)
 #pragma endregion
 
 enum class RenderStage
@@ -19,17 +20,22 @@ class MeshRenderer : public Component
 public:
 	virtual ~MeshRenderer();
 	virtual RenderBounds GetWorldBounds() const;
+	virtual void Render(Program* program) const = 0;
 
 	void SetMesh(MeshPtr mesh) { m_mesh = mesh; }
 	MeshPtr GetMesh() const { return m_mesh; }
-	void SetMaterial(MaterialPtr material) { m_material = material; }
-	MaterialPtr GetMaterial() const { return m_material; }
 	void SetRenderStage(RenderStage stage) { m_renderStage = stage; }
 	RenderStage GetRenderStage() const { return m_renderStage; }
+
+	void SetMaterial(MaterialPtr material) { m_material = material; }
+	MaterialPtr GetMaterial() const { return m_material; }
+	void SetMaterialIndex(uint32 index) { m_materialIndex = index; }
+	uint32 GetMaterialIndex() const { return m_materialIndex; }
 
 protected:
 	MeshRenderer();
 	MeshPtr m_mesh;
 	MaterialPtr m_material;
+	uint32 m_materialIndex{ 0 };
 	RenderStage m_renderStage	{ RenderStage::Deferred };
 };

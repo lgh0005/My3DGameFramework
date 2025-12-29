@@ -617,7 +617,7 @@ void DevScene::PlantTenThousandGrass(InstancedRenderPass* pass)
 		grassCount,
 		InstancedMesh::Vec3Layout()
 	);
-	instancedGrass->SetMaterial(grassMat);
+	// instancedGrass->SetMaterial(grassMat);
 
 	auto grassGo = GameObject::Create();
 	grassGo->SetName("Grass_Field");

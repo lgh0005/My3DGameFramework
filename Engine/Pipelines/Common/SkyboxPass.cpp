@@ -59,7 +59,7 @@ void SkyboxPass::Render(RenderContext* context)
 	skyTexture->Bind();
 	m_skyboxProgram->SetUniform("skybox", 0);
 
-	m_cubeMesh->Draw(m_skyboxProgram.get());
+	m_cubeMesh->Draw();
 
 	glCullFace(GL_BACK);
 	glDepthFunc(GL_LESS);
