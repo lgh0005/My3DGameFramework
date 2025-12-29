@@ -13,6 +13,7 @@ CLASS_PTR(HDRRenderPass)
 class HDRRenderPass : public GeneralRenderPass
 {
 public:
+	virtual ~HDRRenderPass();
 	static HDRRenderPassUPtr Create(ProgramUPtr program);
 	virtual void Render(Scene* scene, Camera* camera) override;
 
@@ -20,7 +21,7 @@ public:
 	void AddRenderer(StaticMeshRenderer* meshRenderer);
 
 private:
-	HDRRenderPass() = default;
+	HDRRenderPass();
 	bool Init(ProgramUPtr program);
 
 	ProgramUPtr m_simpleProgram;

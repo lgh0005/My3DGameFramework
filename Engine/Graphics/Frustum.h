@@ -7,6 +7,7 @@ class Frustum
 	enum Side { Left = 0, Right, Bottom, Top, Near, Far };
 
 public:
+	~Frustum();
 	static FrustumUPtr Create();
 	void Update(const glm::mat4& vp);
 	void SetMargin(float margin) { m_margin = margin; }

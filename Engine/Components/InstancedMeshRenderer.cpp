@@ -22,5 +22,5 @@ bool InstancedMeshRenderer::Init(InstancedMeshPtr mesh, MaterialPtr material)
 
 RenderBounds InstancedMeshRenderer::GetWorldBounds() const
 {
-	return RenderBounds();
+	return RenderBounds::Empty();
 }

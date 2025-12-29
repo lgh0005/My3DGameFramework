@@ -1,19 +1,17 @@
 #include "EnginePch.h"
 #include "UniformBuffer.h"
 
+Uniformbuffer::Uniformbuffer() = default;
+Uniformbuffer::~Uniformbuffer()
+{
+    if (m_buffer) glDeleteBuffers(1, &m_buffer);
+}
+
 UniformbufferUPtr Uniformbuffer::Create(uint32 size, uint32 bindingPoint)
 {
     auto uniformbuffer = UniformbufferUPtr(new Uniformbuffer());
     uniformbuffer->Init(size, bindingPoint);
     return std::move(uniformbuffer);
-}
-
-Uniformbuffer::~Uniformbuffer()
-{
-    if (m_buffer)
-    {
-        glDeleteBuffers(1, &m_buffer);
-    }
 }
 
 void Uniformbuffer::Bind() const

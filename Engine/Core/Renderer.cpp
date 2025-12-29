@@ -2,7 +2,9 @@
 #include "Renderer.h"
 #include "Core/Scene.h"
 #include "Core/RenderPipeline.h"
-#include "Pipelines/SRP/StandardRenderPipeline.h"
+
+Renderer::Renderer() = default;
+Renderer::~Renderer() = default;
 
 RendererUPtr Renderer::Create()
 {

@@ -14,6 +14,7 @@ CLASS_PTR(StandardDeferredLightingPass)
 class StandardDeferredLightingPass : public ContextRenderPass
 {
 public:
+	virtual ~StandardDeferredLightingPass();
 	static StandardDeferredLightingPassUPtr Create();
 	virtual void Render(RenderContext* context) override;
 	void SetSSAOTexture(Texture* ssaoTex) { m_ssaoTexture = ssaoTex; }
@@ -28,7 +29,7 @@ private:
 	void GetLightMatricesFromContext(StandardRenderContext* context);
 
 private:
-	StandardDeferredLightingPass() = default;
+	StandardDeferredLightingPass();
 	bool Init();
 
 	ScreenMeshPtr m_plane;

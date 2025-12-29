@@ -11,8 +11,8 @@ CLASS_PTR(CullingPass)
 class CullingPass : public ContextRenderPass
 {
 public:
-	static CullingPassUPtr Create();
 	virtual ~CullingPass();
+	static CullingPassUPtr Create();
 	virtual void Render(RenderContext* context) override;
 
 /*=====================//

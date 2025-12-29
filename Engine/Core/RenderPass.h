@@ -12,7 +12,7 @@ CLASS_PTR(RenderContext)
 class RenderPass
 {
 public:
-	virtual ~RenderPass() = default;
+	virtual ~RenderPass();
 
 protected:
 	RenderPass();

@@ -14,7 +14,7 @@ public:
 	void SetData(const void* data, uint32 size, uint32 offset = 0);
 
 private:
-	Uniformbuffer() = default;
+	Uniformbuffer();
 	void Init(uint32 size, uint32 bindingPoint);
 
 	uint32 m_buffer			{ 0 };

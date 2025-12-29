@@ -13,6 +13,9 @@
 
 #include "Pipelines/SRP/StandardRenderContext.h"
 
+StandardPostProcessPass::StandardPostProcessPass() = default;
+StandardPostProcessPass::~StandardPostProcessPass() = default;
+
 StandardPostProcessPassUPtr StandardPostProcessPass::Create(int32 width, int32 height)
 {
 	auto pass = StandardPostProcessPassUPtr(new StandardPostProcessPass());

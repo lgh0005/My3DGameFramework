@@ -2,6 +2,7 @@
 #include "MSAAFramebuffer.h"
 #include "Resources/Texture.h"
 
+MSAAFramebuffer::MSAAFramebuffer() = default;
 MSAAFramebuffer::~MSAAFramebuffer()
 {
     if (m_msaaFbo) glDeleteFramebuffers(1, &m_msaaFbo);

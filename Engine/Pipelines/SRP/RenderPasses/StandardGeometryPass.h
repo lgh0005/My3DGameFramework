@@ -16,6 +16,7 @@ CLASS_PTR(StandardGeometryPass)
 class StandardGeometryPass : public ContextRenderPass
 {
 public:
+	virtual ~StandardGeometryPass();
 	static StandardGeometryPassUPtr Create
 	(
 		int32 width = WINDOW_WIDTH,
@@ -32,7 +33,7 @@ public:
 	void Resize(int32 width, int32 height);
 
 private:
-	StandardGeometryPass() = default;
+	StandardGeometryPass();
 	bool Init(int32 width, int32 height);
 	void RenderStaticGeometry(const std::vector<StaticMeshRenderer*>& meshes);
 	void RenderSkinnedGeometry(const std::vector<SkinnedMeshRenderer*>& meshes);

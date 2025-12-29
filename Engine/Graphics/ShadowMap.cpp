@@ -2,17 +2,17 @@
 #include "ShadowMap.h"
 #include "Resources/Texture.h"
 
+ShadowMap::ShadowMap() = default;
+ShadowMap::~ShadowMap()
+{
+    if (m_framebuffer) glDeleteFramebuffers(1, &m_framebuffer);
+}
+
 ShadowMapUPtr ShadowMap::Create(int32 width, int32 height)
 {
     auto shadowMap = ShadowMapUPtr(new ShadowMap());
     if (!shadowMap->Init(width, height)) return nullptr;
     return std::move(shadowMap);
-}
-
-ShadowMap::~ShadowMap() 
-{
-    if (m_framebuffer) 
-        glDeleteFramebuffers(1, &m_framebuffer);
 }
 
 void ShadowMap::Bind() const 

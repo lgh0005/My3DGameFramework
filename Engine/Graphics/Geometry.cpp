@@ -6,8 +6,11 @@
 /*===================//
 //   Plane methods   //
 //===================*/
+
 CullingPlane::CullingPlane(const glm::vec3& normal, float dist)
     : m_normal(normal), m_distance(dist) {}
+CullingPlane::CullingPlane() = default;
+CullingPlane::~CullingPlane() = default;
 
 CullingPlane CullingPlane::Create(const glm::vec4& eq)
 {
@@ -29,17 +32,16 @@ float CullingPlane::GetDistanceToPoint(const glm::vec3& point) const
     return glm::dot(m_normal, point) + m_distance;
 }
 
-// [DEBUG]
-void CullingPlane::Flip()
-{
-    m_normal *= -1.0f;
-    m_distance *= -1.0f;
-}
-
 /*==========================//
 //   RenderBounds methods   //
 //==========================*/
-RenderBounds::RenderBounds() : m_center(0.0f), m_extents(0.0f) {}
+RenderBounds::~RenderBounds() = default;
+RenderBounds::RenderBounds() = default;
+
+RenderBounds RenderBounds::Empty()
+{
+    return Create(glm::vec3(0.0f), glm::vec3(0.0f));
+}
 
 RenderBounds RenderBounds::Create(const glm::vec3& center, 
                                   const glm::vec3& extents)

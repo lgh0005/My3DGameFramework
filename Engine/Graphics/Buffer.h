@@ -14,7 +14,7 @@ public:
     void Bind() const;
 
 private:
-    Buffer() {}
+    Buffer();
     bool Init(uint32 bufferType, uint32 usage, 
         const void* data, usize stride, usize count);
     uint32 m_buffer     { 0 };

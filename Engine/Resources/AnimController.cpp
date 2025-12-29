@@ -5,6 +5,9 @@
 #include "Resources/AnimChannel.h"
 #include "Resources/Pose.h"
 
+AnimController::AnimController() = default;
+AnimController::~AnimController() = default;
+
 AnimControllerUPtr AnimController::Create()
 {
     return AnimControllerUPtr(new AnimController());

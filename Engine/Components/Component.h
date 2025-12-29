@@ -26,7 +26,7 @@ CLASS_PTR(Component)
 class Component
 {
 public:
-	virtual ~Component() = default;
+	virtual ~Component();
 	virtual ComponentType GetComponentType() const = 0;
 	bool MatchesType(ComponentType type) const;
 
@@ -52,5 +52,6 @@ public:
 	// 2. SetActive
 
 protected:
+	Component();
 	GameObject* m_owner	   { nullptr };
 };

@@ -27,7 +27,7 @@ public:
     void SetUniform(const std::string& name, const std::vector<glm::mat4>& value) const;
 
 private:
-    Program() = default;
+    Program();
     bool Link(const std::vector<ShaderPtr>& shaders);
     usize m_program{ 0 };
 };

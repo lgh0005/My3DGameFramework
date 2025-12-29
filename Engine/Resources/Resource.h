@@ -19,7 +19,7 @@ CLASS_PTR(Resource)
 class Resource
 {
 public:
-	virtual ~Resource() = default;
+	virtual ~Resource();
 	virtual ResourceType GetResourceType() const = 0;
 	bool MatchesType(ResourceType type) const;
 
@@ -30,6 +30,7 @@ public:
 	void SetName(const std::string& name) { m_name = name; }
 
 protected:
+	Resource();
 	std::string m_path;
 	std::string m_name;
 };

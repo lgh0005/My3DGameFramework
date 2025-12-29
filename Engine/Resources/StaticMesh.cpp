@@ -5,6 +5,7 @@
 #include "Graphics/VertexLayout.h"
 #include "Graphics/Program.h"
 
+StaticMesh::StaticMesh() = default;
 StaticMesh::~StaticMesh() = default;
 
 StaticMeshUPtr StaticMesh::Create(const std::vector<StaticVertex>& vertices,

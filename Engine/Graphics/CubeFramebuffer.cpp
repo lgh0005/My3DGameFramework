@@ -2,6 +2,13 @@
 #include "CubeFramebuffer.h"
 #include "Resources/CubeTexture.h"
 
+CubeFramebuffer::CubeFramebuffer() = default;
+CubeFramebuffer::~CubeFramebuffer()
+{
+    if (m_depthStencilBuffer) glDeleteRenderbuffers(1, &m_depthStencilBuffer);
+    if (m_framebuffer) glDeleteFramebuffers(1, &m_framebuffer);
+}
+
 CubeFramebufferUPtr CubeFramebuffer::Create(const CubeTexturePtr colorAttachment, uint32 mipLevel)
 {
     auto framebuffer = CubeFramebufferUPtr(new CubeFramebuffer());
@@ -13,18 +20,6 @@ CubeFramebufferUPtr CubeFramebuffer::Create(const CubeTexturePtr colorAttachment
 void CubeFramebuffer::BindToDefault()
 {
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
-}
-
-CubeFramebuffer::~CubeFramebuffer()
-{
-    if (m_depthStencilBuffer) 
-    {
-        glDeleteRenderbuffers(1, &m_depthStencilBuffer);
-    }
-    if (m_framebuffer) 
-    {
-        glDeleteFramebuffers(1, &m_framebuffer);
-    }
 }
 
 void CubeFramebuffer::Bind(int32 cubeIndex) const

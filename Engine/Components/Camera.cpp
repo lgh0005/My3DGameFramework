@@ -2,6 +2,9 @@
 #include "Camera.h"
 #include "Components/Transform.h"
 
+Camera::Camera() = default;
+Camera::~Camera() = default;
+
 CameraUPtr Camera::Create()
 {
     auto camera = CameraUPtr(new Camera());

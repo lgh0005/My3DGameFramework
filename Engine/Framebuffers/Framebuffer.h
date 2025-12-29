@@ -21,7 +21,7 @@ public:
     int32 GetHeight() const { return m_height; }
 
 protected:
-    Framebuffer() = default;
+    Framebuffer();
 
     // FBO ID
     uint32 m_fbo{ 0 };

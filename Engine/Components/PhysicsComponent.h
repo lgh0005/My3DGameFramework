@@ -18,6 +18,7 @@ public:
     void SetRotation(const glm::quat& rotation);
 
 protected:
+    PhysicsComponent();
     void SyncPhysicsToTransform(); // P -> T (Update에서 호출)
     void SyncTransformToPhysics(); // T -> P (Start나 텔레포트 시 호출)
     JPH::BodyInterface& GetBodyInterface() const;

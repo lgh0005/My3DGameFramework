@@ -5,6 +5,9 @@
 #include "Components/Transform.h"
 #include "Resources/AnimController.h"
 
+PlayerController::PlayerController() = default;
+PlayerController::~PlayerController() = default;
+
 PlayerControllerUPtr PlayerController::Create()
 {
     auto script = PlayerControllerUPtr(new PlayerController());

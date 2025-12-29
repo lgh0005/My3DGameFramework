@@ -28,6 +28,9 @@
 #include "Framebuffers/PostProcessFramebuffer.h"
 #include "Framebuffers/GBufferFramebuffer.h"
 
+UniversalRenderPipeline::UniversalRenderPipeline() = default;
+UniversalRenderPipeline::~UniversalRenderPipeline() = default;
+
 UniversalRenderPipelineUPtr UniversalRenderPipeline::Create()
 {
 	auto renderPipeline = UniversalRenderPipelineUPtr(new UniversalRenderPipeline());

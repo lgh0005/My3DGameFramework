@@ -10,6 +10,7 @@ CLASS_PTR(AnimController)
 class AnimController
 {
 public:
+	virtual ~AnimController();
 	static AnimControllerUPtr Create();
 	using AnimStateMap = std::unordered_map<std::string, AnimStatePtr>;
 	void AddState(const std::string& name, AnimationPtr clip, bool isLoop = true, float speed = 1.0f);
@@ -24,7 +25,7 @@ public:
 private:
 
 private:
-	AnimController() = default;
+	AnimController();
 	void TransitTo(std::shared_ptr<AnimState> nextState, float duration);
 	AnimStateMap m_states;
 

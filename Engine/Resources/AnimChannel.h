@@ -6,6 +6,7 @@ CLASS_PTR(AnimChannel)
 class AnimChannel
 {
 public:
+    virtual ~AnimChannel();
 	static AnimChannelUPtr Create(const std::string& name, int32 id, const aiNodeAnim* channel);
     static AnimChannelUPtr Create
     (
@@ -39,7 +40,7 @@ private:
     glm::vec3 InterpolateScaling(float animationTime) const;
 
 private:
-    AnimChannel() = default;
+    AnimChannel();
 
     bool Init
     (

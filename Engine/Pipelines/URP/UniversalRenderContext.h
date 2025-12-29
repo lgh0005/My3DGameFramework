@@ -11,7 +11,8 @@ CLASS_PTR(Texture)
 class UniversalRenderContext : public RenderContext
 {
 public:
-	UniversalRenderContext() = default;
+	UniversalRenderContext();
+	virtual ~UniversalRenderContext();
 
 	// For DeferredLightingPass : draw on Post-processing framebuffer
 	void SetTargetFramebuffer(PostProcessFramebuffer* fbo) { m_targetFramebuffer = fbo; }

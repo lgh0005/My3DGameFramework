@@ -16,6 +16,7 @@ public:
         std::function<void(VertexLayout* layout,
             uint32 instanceAttribStartIndex)>;
 
+    virtual ~InstancedMesh();
     static const ResourceType s_ResourceType = ResourceType::InstancedMesh;
     virtual ResourceType GetResourceType() const override { return ResourceType::InstancedMesh; }
     static InstancedMeshUPtr Create
@@ -25,11 +26,10 @@ public:
         int32         instanceCount,
         SetupFunc setupFunc
     );
-	virtual ~InstancedMesh() = default;
 	virtual void Draw(const Program* program) const override;
 
 private:
-    InstancedMesh() = default;
+    InstancedMesh();
     bool Init
     (
         StaticMeshPtr baseMesh,

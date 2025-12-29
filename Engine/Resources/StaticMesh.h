@@ -30,7 +30,7 @@ public:
     virtual void Draw(const Program* program) const override;
 
 private:
-    StaticMesh() = default;
+    StaticMesh();
     void Init
     (
         const std::vector<StaticVertex>& vertices,

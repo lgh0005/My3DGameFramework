@@ -2,6 +2,9 @@
 #include "AudioListener.h"
 #include "Components/Transform.h"
 
+AudioListener::AudioListener() = default;
+AudioListener::~AudioListener() = default;
+
 AudioListenerUPtr AudioListener::Create()
 {
 	return AudioListenerUPtr(new AudioListener());

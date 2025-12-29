@@ -13,6 +13,9 @@
 
 #include "Pipelines/URP/UniversalRenderContext.h"
 
+UniversalPostProcessPass::UniversalPostProcessPass() = default;
+UniversalPostProcessPass::~UniversalPostProcessPass() = default;
+
 UniversalPostProcessPassUPtr UniversalPostProcessPass::Create(int32 width, int32 height)
 {
 	auto pass = UniversalPostProcessPassUPtr(new UniversalPostProcessPass());

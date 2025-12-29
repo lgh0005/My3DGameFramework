@@ -10,6 +10,7 @@ CLASS_PTR(Texture)
 class Texture : public Resource
 {
 public:
+	virtual ~Texture();
 	static const ResourceType s_ResourceType = ResourceType::Texture;
 	virtual ResourceType GetResourceType() const override { return ResourceType::Texture; }
 	static TextureUPtr Create(int32 width, int32 height, 
@@ -22,7 +23,6 @@ public:
 	static TextureUPtr CreateFromKtxHDR(const std::string& ktxFilePath);
 
 public:
-	~Texture();
 
 	const uint32 Get() const	{ return m_texture; }
 	void Bind() const;
@@ -39,7 +39,7 @@ public:
 	uint32 GetFormat()     const	{ return m_format; }
 
 private:
-	Texture() = default;
+	Texture();
 	void CreateTexture();
 	void SetTextureFromImage(const Image* image);
 	void SetTextureFormat(int32 width, int32 height, uint32 format);

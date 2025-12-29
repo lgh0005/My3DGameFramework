@@ -9,6 +9,7 @@ CLASS_PTR(SkyLight)
 class SkyLight
 {
 public:
+	~SkyLight();
 	static SkyLightUPtr Create();
 	static SkyLightUPtr CreateStandardSky(const CubeTexturePtr skybox);
 	static SkyLightUPtr CreateUniversalSky
@@ -16,7 +17,6 @@ public:
 		CubeTexturePtr skybox,    CubeTexturePtr irradiance,
 		CubeTexturePtr prefilter, TexturePtr	 brdf
 	);
-	~SkyLight();
 
 public:
 	void SetSkybox(CubeTexturePtr texture) { m_skybox = texture; }

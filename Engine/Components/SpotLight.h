@@ -12,6 +12,7 @@ CLASS_PTR(SpotLight)
 class SpotLight : public Light
 {
 public:
+	virtual ~SpotLight();
 	static SpotLightUPtr Create();
 	static const ComponentType s_ComponentType = ComponentType::SpotLight;
 	virtual ComponentType GetComponentType() const override { return ComponentType::SpotLight; }
@@ -26,7 +27,7 @@ public:
 	void SetDirection(const glm::vec3& direction) { m_direction = direction; }
 
 private:
-	SpotLight() = default;
+	SpotLight();
 
 	glm::vec2 m_cutoff		{ 20.0f, 5.0f };
 	float m_distance		{ 32.0f };

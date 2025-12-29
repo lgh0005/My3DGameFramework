@@ -12,6 +12,7 @@ CLASS_PTR(InstancedRenderPass)
 class InstancedRenderPass : public GeneralRenderPass
 {
 public:
+    virtual ~InstancedRenderPass();
     static InstancedRenderPassUPtr Create(ProgramUPtr program);
     virtual void Render(Scene* scene, Camera* camera) override;
 
@@ -19,7 +20,7 @@ public:
     void AddRenderer(InstancedMeshRenderer* meshRenderer);
 
 private:
-    InstancedRenderPass() = default;
+    InstancedRenderPass();
     bool Init(ProgramUPtr program);
     ProgramUPtr m_instanceProgram;
 

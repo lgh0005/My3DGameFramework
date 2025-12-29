@@ -11,12 +11,11 @@ public:
     void Resolve() const;
 
 private:
-    MSAAFramebuffer() = default;
+    MSAAFramebuffer();
     bool Init(int32 width, int32 height, int32 samples);
 
-    // MSAA 전용 멤버들 (부모는 모름)
-    uint32 m_msaaFbo{ 0 };
-    uint32 m_msaaDepthStencilBuffer{ 0 };
-    uint32 m_samples{ 0 };
+    uint32 m_msaaFbo                        { 0 };
+    uint32 m_msaaDepthStencilBuffer         { 0 };
+    uint32 m_samples                        { 0 };
     std::vector<uint32> m_msaaColorBuffers;
 };

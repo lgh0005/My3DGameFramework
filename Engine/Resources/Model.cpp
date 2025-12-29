@@ -18,6 +18,9 @@
 #include "Misc/AssetFormat.h"
 #include "Misc/AssetUtils.h"
 
+Model::Model() = default;
+Model::~Model() = default;
+
 SkinnedMeshPtr Model::GetSkinnedMesh(int index) const
 {
     return std::static_pointer_cast<SkinnedMesh>(m_meshes[index]);

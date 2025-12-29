@@ -9,6 +9,6 @@ public:
 	static GBufferFramebufferUPtr Create(int32 width, int32 height);
 
 private:
-	bool Init(int32 width, int32 height);
 	GBufferFramebuffer();
+	bool Init(int32 width, int32 height);
 };

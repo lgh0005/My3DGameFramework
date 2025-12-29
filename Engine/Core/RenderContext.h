@@ -43,6 +43,7 @@ public:
 //   default render context members   //
 //====================================*/
 protected:
+	RenderContext();
 
 	// 씬과 카메라
 	Scene* m_currentScene{ nullptr };

@@ -1,19 +1,17 @@
 #include "EnginePch.h"
 #include "VertexLayout.h"
 
+VertexLayout::VertexLayout() = default;
+VertexLayout::~VertexLayout()
+{
+    if (m_vertexArrayObject) glDeleteVertexArrays(1, &m_vertexArrayObject);
+}
+
 VertexLayoutUPtr VertexLayout::Create()
 {
     auto vertexLayout = VertexLayoutUPtr(new VertexLayout());
     vertexLayout->Init();
     return move(vertexLayout);
-}
-
-VertexLayout::~VertexLayout()
-{
-    if (m_vertexArrayObject)
-    {
-        glDeleteVertexArrays(1, &m_vertexArrayObject);
-    }
 }
 
 void VertexLayout::Bind() const

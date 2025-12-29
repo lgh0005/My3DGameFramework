@@ -7,9 +7,9 @@ CLASS_PTR(RenderContext)
 class GlobalUniforms
 {
 public:
-	virtual ~GlobalUniforms() = default;
+	virtual ~GlobalUniforms();
 	virtual void PreRender(RenderContext* context) = 0;
 
 protected:
-	GlobalUniforms() = default;
+	GlobalUniforms();
 };

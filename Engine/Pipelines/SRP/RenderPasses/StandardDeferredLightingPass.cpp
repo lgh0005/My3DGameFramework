@@ -19,6 +19,9 @@
 
 #include "Pipelines/SRP/StandardRenderContext.h"
 
+StandardDeferredLightingPass::StandardDeferredLightingPass() = default;
+StandardDeferredLightingPass::~StandardDeferredLightingPass() = default;
+
 StandardDeferredLightingPassUPtr StandardDeferredLightingPass::Create()
 {
 	auto pass = StandardDeferredLightingPassUPtr(new StandardDeferredLightingPass());

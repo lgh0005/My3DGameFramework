@@ -13,6 +13,7 @@ CLASS_PTR(EnvironmentRenderPass)
 class EnvironmentRenderPass : public GeneralRenderPass
 {
 public:
+    virtual ~EnvironmentRenderPass();
     static EnvironmentRenderPassUPtr Create
     (
         ProgramUPtr program,     
@@ -25,7 +26,7 @@ public:
     void AddRenderer(StaticMeshRenderer* meshRenderer);
 
 private:
-    EnvironmentRenderPass() = default;
+    EnvironmentRenderPass();
     bool Init
     (
         ProgramUPtr program,

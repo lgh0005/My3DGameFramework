@@ -11,6 +11,7 @@
 #pragma endregion
 
 My3DGameFramework::My3DGameFramework() = default;
+My3DGameFramework::~My3DGameFramework() = default;
 
 My3DGameFrameworkUPtr My3DGameFramework::Create(int32 width, int32 height, const std::string& title)
 {

@@ -89,7 +89,7 @@ void InputManager::ClearListeners()
 {
     for (auto& actionPair : m_actions)
     {
-        for (int i = 0; i < (int32)EInputEvent::MAX; ++i)
+        for (int i = 0; i < (int32)InputEvent::MAX; ++i)
             actionPair.second.Callbacks[i].clear();
     }
 }
@@ -121,14 +121,14 @@ void InputManager::OnKey(int32 key, int32 scancode, int32 action, int32 mods)
     {
         case GLFW_PRESS:
         {
-            for (const auto& func : actionPtr->Callbacks[(int32)EInputEvent::Pressed])
+            for (const auto& func : actionPtr->Callbacks[(int32)InputEvent::Pressed])
                 if (func) func();
             break;
         }
 
         case GLFW_RELEASE:
         {
-            for (const auto& func : actionPtr->Callbacks[(int32)EInputEvent::Released])
+            for (const auto& func : actionPtr->Callbacks[(int32)InputEvent::Released])
                 if (func) func();
             break;
         }
@@ -150,14 +150,14 @@ void InputManager::OnMouse(int32 button, int32 action, int32 mods)
     {
         case GLFW_PRESS:
         {
-            for (const auto& func : actionPtr->Callbacks[(int32)EInputEvent::Pressed])
+            for (const auto& func : actionPtr->Callbacks[(int32)InputEvent::Pressed])
                 if (func) func();
             break;
         }
 
         case GLFW_RELEASE:
         {
-            for (const auto& func : actionPtr->Callbacks[(int32)EInputEvent::Released])
+            for (const auto& func : actionPtr->Callbacks[(int32)InputEvent::Released])
                 if (func) func();
             break;
         }

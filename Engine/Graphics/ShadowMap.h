@@ -16,7 +16,7 @@ public:
 	const TexturePtr GetShadowMap() const { return m_shadowMap; }
 
 private:
-	ShadowMap() = default;
+	ShadowMap();
 	bool Init(int32 width, int32 height);
 
 	uint32 m_framebuffer{ 0 };

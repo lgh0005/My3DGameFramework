@@ -14,7 +14,8 @@ CLASS_PTR(StaticMesh)
 class CullingPlane
 {
 public:
-	CullingPlane() = default;
+	CullingPlane();
+	~CullingPlane();
 	static CullingPlane Create(const glm::vec4& eq);
 
 	void Normalize();
@@ -25,9 +26,6 @@ public:
 	float NormalY() const { return m_normal.y; }
 	float NormalZ() const { return m_normal.z; }
 	float Distance() const { return m_distance; }
-
-	// [DEBUG]
-	void Flip();
 
 private:
 	CullingPlane(const glm::vec3& normal, float dist);
@@ -41,8 +39,8 @@ private:
 class RenderBounds
 {
 public:
-	RenderBounds();
-
+	~RenderBounds();
+	static RenderBounds Empty();
 	static RenderBounds Create(const glm::vec3& center, const glm::vec3& extents);
 	static RenderBounds CreateFromMinMax(const glm::vec3& min, const glm::vec3& max);
 	
@@ -52,8 +50,9 @@ public:
 	const glm::vec3& GetExtents() const { return m_extents; }
 
 private:
-	glm::vec3 m_center;
-	glm::vec3 m_extents;
+	RenderBounds();
+	glm::vec3 m_center	{ 0.0f };
+	glm::vec3 m_extents { 0.0f };
 };
 
 /*=========================//

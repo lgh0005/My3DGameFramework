@@ -19,12 +19,13 @@ CLASS_PTR(StandardRenderPipeline)
 class StandardRenderPipeline : public RenderPipeline
 {
 public:
+	virtual ~StandardRenderPipeline();
 	static StandardRenderPipelineUPtr Create();
 	virtual void Render(Scene* scene)			     override;
 	virtual void OnResize(int32 width, int32 height) override;
 
 private:
-	StandardRenderPipeline() = default;
+	StandardRenderPipeline();
 	bool Init();
 	void BlitCopyDepth
 	(

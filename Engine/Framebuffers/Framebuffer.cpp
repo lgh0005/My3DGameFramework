@@ -2,6 +2,7 @@
 #include "Framebuffer.h"
 #include "Resources/Texture.h"
 
+Framebuffer::Framebuffer() = default;
 Framebuffer::~Framebuffer()
 {
     if (m_fbo) glDeleteFramebuffers(1, &m_fbo);

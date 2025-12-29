@@ -11,6 +11,9 @@
 #include "Components/SpotLight.h"
 #include "Core/GameObject.h"
 
+SimpleRenderPass::SimpleRenderPass() = default;
+SimpleRenderPass::~SimpleRenderPass() = default;
+
 SimpleRenderPassUPtr SimpleRenderPass::Create(ProgramUPtr program)
 {
     auto pass = SimpleRenderPassUPtr(new SimpleRenderPass());

@@ -25,7 +25,7 @@ public:
 	void Set3DAttributes(float minDist, float maxDist);
 
 private:
-	AudioSource() = default;
+	AudioSource();
 	bool Init(const AudioClipPtr& audioClip);
 	void Reset();
 

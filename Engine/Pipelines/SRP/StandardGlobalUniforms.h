@@ -10,9 +10,9 @@ CLASS_PTR(StandardGlobalUniforms)
 class StandardGlobalUniforms : public GlobalUniforms
 {
 public:
+	virtual ~StandardGlobalUniforms();
 	static StandardGlobalUniformsUPtr Create();
 	virtual void PreRender(RenderContext* context) override;
-	virtual ~StandardGlobalUniforms();
 
 /*==============================//
 //   UBO update helper methods  //

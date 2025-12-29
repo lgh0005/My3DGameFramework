@@ -5,6 +5,7 @@ CLASS_PTR(Image)
 class Image : public Resource
 {
 public:
+	virtual ~Image();
 	static const ResourceType s_ResourceType = ResourceType::Image;
 	virtual ResourceType GetResourceType() const override { return ResourceType::Image; }
 	static ImageUPtr Load(const std::string& filepath, bool flipVertical = true);
@@ -12,7 +13,6 @@ public:
 	static ImageUPtr Create(int32 width, int32 height, int32 channelCount = 4, int32 bytePerChannel = 1);
 	static ImageUPtr CreateSingleColorImage(int32 width,
 		int32 height, const glm::vec4& color);
-	~Image();
 
 	const uint8* GetData() const	{ return m_data; }
 	int32 GetWidth() const			{ return m_width; }
@@ -21,7 +21,7 @@ public:
 	int32 GetBytePerChannel() const { return m_bytePerChannel; }
 
 private:
-	Image() = default;
+	Image();
 	bool LoadWithStb(const std::string& filepath, bool flipVertical);
 	bool LoadWithStbFloat(const std::string& filepath, bool flipVertical);
 	bool Allocate(int32 width, int32 height, int32 channelCount, int32 bytePerChannel);

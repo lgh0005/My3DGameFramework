@@ -5,6 +5,7 @@ CLASS_PTR(AudioClip)
 class AudioClip : public Resource
 {
 public:
+	virtual ~AudioClip();
 	static const ResourceType s_ResourceType = ResourceType::AudilClip;
 	static AudioClipUPtr LoadSFX(const std::string& filepath);
 	static AudioClipUPtr LoadBGM(const std::string& filepath);
@@ -15,7 +16,7 @@ public:
 	const std::string& GetPath() const { return m_path; }
 
 private:
-	AudioClip() = default;
+	AudioClip();
 	bool InitSFX(const std::string& filepath);
 	bool InitBGM(const std::string& filepath);
 	

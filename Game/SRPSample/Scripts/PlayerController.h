@@ -10,6 +10,7 @@ CLASS_PTR(PlayerController)
 class PlayerController : public Script
 {
 public:
+    virtual ~PlayerController();
     static PlayerControllerUPtr Create();
 
 public:
@@ -21,7 +22,7 @@ private:
     void UpdateFiniteStateMachine();
 
 private:
-    PlayerController() = default;
+    PlayerController();
 
     bool m_isMoving = false;
     float m_moveSpeed = 2.0f;

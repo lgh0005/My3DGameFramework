@@ -5,6 +5,7 @@ CLASS_PTR(Script)
 class Script : public Component
 {
 public:
+	virtual ~Script();
 	static const ComponentType s_ComponentType = ComponentType::Script;
 	virtual ComponentType GetComponentType() const override { return ComponentType::Script; }
 
@@ -15,4 +16,6 @@ public:
 	// TODO :
 	// 0. OnEnable, OnDisable, OnDestroy
 	// 1. 충돌 시 발생할 이벤트 메서드 : OnTrigger, OnCollision
+protected:
+	Script();
 };

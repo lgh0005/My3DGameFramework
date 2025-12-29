@@ -10,6 +10,7 @@ CLASS_PTR(GameObject)
 class GameObject 
 {
 public:
+	~GameObject();
 	static GameObjectUPtr Create();
 
 	// 컴포넌트 메서드들
@@ -54,7 +55,7 @@ private:
 	// 8. OnDisable
 
 private:
-	GameObject() = default;
+	GameObject();
 	bool Init();
 
 	// 게임 오브젝트 기준 필요 멤버들
@@ -100,5 +101,6 @@ inline T* GameObject::GetComponentInParent() const
 		// 계속 위로 올라감
 		current = current->GetParent();
 	}
+	return nullptr;
 }
 #pragma endregion

@@ -17,6 +17,7 @@ CLASS_PTR(MeshRenderer)
 class MeshRenderer : public Component
 {
 public:
+	virtual ~MeshRenderer();
 	virtual RenderBounds GetWorldBounds() const;
 
 	void SetMesh(MeshPtr mesh) { m_mesh = mesh; }
@@ -27,7 +28,7 @@ public:
 	RenderStage GetRenderStage() const { return m_renderStage; }
 
 protected:
-	MeshRenderer() = default;
+	MeshRenderer();
 	MeshPtr m_mesh;
 	MaterialPtr m_material;
 	RenderStage m_renderStage	{ RenderStage::Deferred };

@@ -5,6 +5,7 @@ CLASS_PTR(CameraController)
 class CameraController : public Script
 {
 public:
+    virtual ~CameraController();
     static CameraControllerUPtr Create();
 
 public:
@@ -16,7 +17,7 @@ private:
 	void HandleRotation(float dt);
 
 private:
-    CameraController() = default;
+    CameraController();
 
     float m_moveSpeed = 5.0f;
     float m_rotSpeed = 0.1f;

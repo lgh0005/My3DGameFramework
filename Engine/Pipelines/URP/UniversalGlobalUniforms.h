@@ -10,8 +10,8 @@ CLASS_PTR(UniversalGlobalUniforms)
 class UniversalGlobalUniforms : public GlobalUniforms
 {
 public:
-	static UniversalGlobalUniformsUPtr Create();
 	virtual ~UniversalGlobalUniforms();
+	static UniversalGlobalUniformsUPtr Create();
 	virtual void PreRender(RenderContext* context) override;
 
 /*==============================//

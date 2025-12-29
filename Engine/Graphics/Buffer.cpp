@@ -1,19 +1,20 @@
 #include "EnginePch.h"
 #include "Buffer.h"
 
+Buffer::Buffer() = default;
+Buffer::~Buffer()
+{
+    if (m_buffer) {
+        glDeleteBuffers(1, &m_buffer);
+    }
+}
+
 BufferUPtr Buffer::CreateWithData(uint32 bufferType, uint32 usage, 
                         const void* data, usize stride, usize count)
 {
     auto buffer = BufferUPtr(new Buffer());
     if (!buffer->Init(bufferType, usage, data, stride, count)) return nullptr;
     return std::move(buffer);
-}
-
-Buffer::~Buffer()
-{
-    if (m_buffer) {
-        glDeleteBuffers(1, &m_buffer);
-    }
 }
 
 void Buffer::Bind() const

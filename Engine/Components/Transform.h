@@ -7,6 +7,7 @@ CLASS_PTR(Transform)
 class Transform : public Component
 {
 public:
+	virtual ~Transform();
 	static TransformUPtr Create();
 	static const ComponentType s_ComponentType = ComponentType::Transform;
 	virtual ComponentType GetComponentType() const override { return ComponentType::Transform; }
@@ -78,7 +79,7 @@ private:
 	void SetTransformDirty();
 
 private:
-	Transform() = default;
+	Transform();
 	glm::vec3 m_position				{ 0.0f, 0.0f, 0.0f };
 	glm::quat m_rotation				{ 1.0f, 0.0f, 0.0f, 0.0f };
 	glm::vec3 m_scale					{ 1.0f, 1.0f, 1.0f };

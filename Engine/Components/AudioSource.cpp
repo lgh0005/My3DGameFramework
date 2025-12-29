@@ -4,6 +4,11 @@
 
 // TODO : SFX랑 BGM을 분기해서 처리하는 것을 조금 명확히 코드로 작성할
 // 필요가 있음
+AudioSource::AudioSource() = default;
+AudioSource::~AudioSource()
+{
+	Reset();
+}
 
 AudioSourceUPtr AudioSource::Create(const AudioClipPtr& audioClip)
 {
@@ -51,11 +56,6 @@ bool AudioSource::Init(const AudioClipPtr& audioClip)
 	Set3DAttributes(1.0f, 30.0f);
 
 	return true;
-}
-
-AudioSource::~AudioSource()
-{
-	Reset();
 }
 
 void AudioSource::Update()

@@ -22,6 +22,7 @@ CLASS_PTR(UniversalPostProcessPass)
 class UniversalPostProcessPass : public ContextRenderPass
 {
 public:
+	virtual ~UniversalPostProcessPass();
 	static UniversalPostProcessPassUPtr Create
 	(
 		int32 width = WINDOW_WIDTH,
@@ -40,7 +41,7 @@ private:
 	void RenderComposite(Texture* hdrTexture, Texture* bloomTexture);
 
 private:
-	UniversalPostProcessPass() = default;
+	UniversalPostProcessPass();
 	bool Init(int32 width, int32 height);
 
 	ScreenMeshPtr			  m_plane;

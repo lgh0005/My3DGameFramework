@@ -4,6 +4,9 @@
 #include "Resources/Skeleton.h"
 #include "Misc/AssetUtils.h"
 
+Animation::Animation() = default;
+Animation::~Animation() = default;
+
 AnimationUPtr Animation::Load(const std::string& filePath, Model* model)
 {
 	auto animation = AnimationUPtr(new Animation());

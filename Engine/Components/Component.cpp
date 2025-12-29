@@ -3,6 +3,9 @@
 #include "Core/GameObject.h"
 #include "Components/Transform.h"
 
+Component::Component() = default;
+Component::~Component() = default;
+
 bool Component::MatchesType(ComponentType type) const
 {
 	return GetComponentType() == type;

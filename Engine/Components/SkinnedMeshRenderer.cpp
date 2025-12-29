@@ -26,7 +26,7 @@ bool SkinnedMeshRenderer::Init(SkinnedMeshPtr mesh, MaterialPtr material, Animat
 
 RenderBounds SkinnedMeshRenderer::GetWorldBounds() const
 {
-    if (!m_mesh) return RenderBounds();
+    if (!m_mesh) return RenderBounds::Empty();
 
     // 1. 기본 AABB는 T-Pose AABB를 사용.
     RenderBounds bounds = m_mesh->GetLocalBounds();

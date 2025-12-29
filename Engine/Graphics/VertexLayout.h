@@ -4,8 +4,8 @@ CLASS_PTR(VertexLayout)
 class VertexLayout
 {
 public:
-    static VertexLayoutUPtr Create();
     ~VertexLayout();
+    static VertexLayoutUPtr Create();
 
     uint32 Get() const { return m_vertexArrayObject; }
     void Bind() const;
@@ -17,7 +17,7 @@ public:
     void DisableAttrib(uint32 attribIndex) const;
 
 private:
-    VertexLayout() = default;
+    VertexLayout();
     void Init();
     uint32 m_vertexArrayObject    { 0 };
 };

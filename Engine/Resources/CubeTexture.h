@@ -10,13 +10,13 @@ CLASS_PTR(CubeTexture)
 class CubeTexture : public Resource
 {
 public:
+    virtual ~CubeTexture();
     static const ResourceType s_ResourceType = ResourceType::CubeTexture;
     virtual ResourceType GetResourceType() const override { return ResourceType::CubeTexture; }
     static CubeTextureUPtr CreateFromImages(const std::vector<Image*> images);
     static CubeTextureUPtr CreateFromKtxImage(const std::string& ktxFilePath);
     static CubeTextureUPtr CreateFromKtxHDR(const std::string& ktxFilePath);
     static CubeTextureUPtr Create(int32 width, int32 height, uint32 format, uint32 type = GL_UNSIGNED_BYTE);
-    ~CubeTexture();
 
     const uint32 Get() const { return m_texture; }
     void Bind() const;
@@ -28,7 +28,7 @@ public:
     uint32 GetType() const { return m_type; }
 
 private:
-    CubeTexture() {}
+    CubeTexture();
     void Init(int32 width, int32 height, uint32 format, uint32 type);
     bool InitFromImages(const std::vector<Image*> images);
     static CubeTextureUPtr LoadKtx(const std::string& ktxFilePath);

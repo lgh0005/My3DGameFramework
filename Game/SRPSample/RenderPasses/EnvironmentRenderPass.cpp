@@ -13,6 +13,9 @@
 #include "Components/SpotLight.h"
 #include "Core/GameObject.h"
 
+EnvironmentRenderPass::EnvironmentRenderPass() = default;
+EnvironmentRenderPass::~EnvironmentRenderPass() = default;
+
 EnvironmentRenderPassUPtr EnvironmentRenderPass::Create(ProgramUPtr program, CubeTexturePtr cubeTexture)
 {
 	auto pass = EnvironmentRenderPassUPtr(new EnvironmentRenderPass());

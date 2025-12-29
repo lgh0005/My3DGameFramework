@@ -13,7 +13,7 @@ public:
 	static PBRSceneUPtr Create();
 
 protected:
-	PBRScene() = default;
+	PBRScene();
 	virtual bool LoadNessesaryResources()	   override;
 	virtual bool CreateNessesaryRenderPasses() override;
 	virtual bool CreateSceneContext()		   override;

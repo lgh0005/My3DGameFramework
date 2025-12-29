@@ -21,6 +21,7 @@ add_library(Engine STATIC
    "Core/RenderPass.h"              "Core/RenderPass.cpp"
    "Core/RenderPipeline.h"          "Core/RenderPipeline.cpp"
    "Core/RenderContext.h"           "Core/RenderContext.cpp"
+   "Core/GlobalUniforms.h"          "Core/GlobalUniforms.cpp"
 
    # Common Render Passes
    "Pipelines/Common/CullingPass.h" "Pipelines/Common/CullingPass.cpp"
@@ -96,7 +97,7 @@ add_library(Engine STATIC
    "Resources/ScreenMesh.h"         "Resources/ScreenMesh.cpp"
    "Resources/Material.h"           "Resources/Material.cpp"
    "Resources/CubeTexture.h"        "Resources/CubeTexture.cpp"
-   "Resources/AnimController.h"    "Resources/AnimController.cpp"
+   "Resources/AnimController.h"     "Resources/AnimController.cpp"
    "Resources/AnimState.h"          "Resources/AnimState.cpp"
 
    # Components

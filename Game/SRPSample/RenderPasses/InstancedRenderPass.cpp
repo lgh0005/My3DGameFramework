@@ -11,6 +11,9 @@
 #include "Components/SpotLight.h"
 #include "Core/GameObject.h"
 
+InstancedRenderPass::InstancedRenderPass() = default;
+InstancedRenderPass::~InstancedRenderPass() = default;
+
 InstancedRenderPassUPtr InstancedRenderPass::Create(ProgramUPtr program)
 {
     auto pass = InstancedRenderPassUPtr(new InstancedRenderPass());

@@ -119,7 +119,6 @@ void Application::Shutdown()
 
 	SPDLOG_INFO("Engine Shutdown Started...");
 
-	// 역순 정리
 	SCENE.Clear();      // 씬/게임 오브젝트 정리
 	PHYSICS.Clear();    // 물리 엔진 정리
 	RENDER.Clear();     // 렌더 리소스/셰이더 정리

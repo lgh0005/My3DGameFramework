@@ -8,6 +8,7 @@
 #include "Resources/CubeTexture.h"
 #include "Resources/Texture.h"
 
+RenderContext::RenderContext() = default;
 RenderContext::~RenderContext() = default;
 
 /*====================================//

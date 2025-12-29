@@ -12,7 +12,8 @@ CLASS_PTR(StandardRenderContext)
 class StandardRenderContext : public RenderContext
 {
 public:
-	StandardRenderContext() = default;
+	StandardRenderContext();
+	virtual ~StandardRenderContext();
 
 	// For DeferredLightingPass : draw on Post-processing framebuffer
 	void SetTargetFramebuffer(PostProcessFramebuffer* fbo) { m_targetFramebuffer = fbo; }

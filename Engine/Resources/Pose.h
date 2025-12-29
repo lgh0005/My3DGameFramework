@@ -8,9 +8,10 @@ public:
     glm::quat rotation  { 1.0f, 0.0f, 0.0f, 0.0f }; // Identity
     glm::vec3 scale     { 1.0f };
 
-    // 기본 생성자
+    // 기본 생성자 / 소멸자
     Pose();
     Pose(const glm::vec3& p, const glm::quat& r, const glm::vec3& s);
+    ~Pose();
 
     // 행렬 변환 (최종 단계에서만 호출)
     glm::mat4 ToMat4() const;

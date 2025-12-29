@@ -2,6 +2,9 @@
 #include "DirectionalLight.h"
 #include "Components/Transform.h"
 
+DirectionalLight::DirectionalLight() = default;
+DirectionalLight::~DirectionalLight() = default;
+
 DirectionalLightUPtr DirectionalLight::Create()
 {
 	auto pointLight = DirectionalLightUPtr(new DirectionalLight());

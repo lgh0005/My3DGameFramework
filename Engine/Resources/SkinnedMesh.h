@@ -25,7 +25,7 @@ public:
     virtual void Draw(const Program* program) const override;
 
 private:
-    SkinnedMesh() = default;
+    SkinnedMesh();
     void Init
     (
         const std::vector<SkinnedVertex>& vertices,

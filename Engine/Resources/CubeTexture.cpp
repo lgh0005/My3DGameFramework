@@ -2,6 +2,12 @@
 #include "CubeTexture.h"
 #include "Resources/Image.h"
 
+CubeTexture::CubeTexture() = default;
+CubeTexture::~CubeTexture()
+{
+    if (m_texture) glDeleteTextures(1, &m_texture);
+}
+
 /*=========================================//
 //   default cube texture create methods   //
 //=========================================*/
@@ -32,12 +38,6 @@ CubeTextureUPtr CubeTexture::Create(int32 width, int32 height, uint32 format, ui
 /*==================================//
 //   default cube texture setters   //
 //==================================*/
-CubeTexture::~CubeTexture() 
-{
-    if (m_texture) 
-        glDeleteTextures(1, &m_texture);
-}
-
 void CubeTexture::Bind() const 
 {
     glBindTexture(GL_TEXTURE_CUBE_MAP, m_texture);

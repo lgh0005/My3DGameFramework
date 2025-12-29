@@ -3,7 +3,7 @@
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
 
-enum class EInputEvent
+enum class InputEvent
 {
 	Pressed = 0,
 	Released = 1,
@@ -15,7 +15,7 @@ struct InputAction
 	std::string Name;
 	std::vector<int32> MappedKeys;
 	std::vector<int32> MappedMouseButtons;
-	std::vector<std::function<void()>> Callbacks[(int32)EInputEvent::MAX];
+	std::vector<std::function<void()>> Callbacks[(int32)InputEvent::MAX];
 };
 
 class InputManager
@@ -61,7 +61,9 @@ private:
 	InputAction* m_mouseMap[GLFW_MOUSE_BUTTON_LAST + 1] = { nullptr };
 	glm::vec2 m_mousePos							   { 0.0f, 0.0f };
 
-// TEMP : ImGUI로 디버그를 할 때 쓰이는 메서드.
+/*========================//
+//   ingui debug metohds  //
+//========================*/
 // TODO : 이거 스택 오버플로우 일어나는데 관련 문제 해결 필요
 #pragma region FOR_IMGUI_DEBUG
 private:

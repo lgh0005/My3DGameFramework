@@ -2,6 +2,9 @@
 #include "EnginePch.h"
 #include "Core/GameObject.h"
 
+Transform::Transform() = default;
+Transform::~Transform() = default;
+
 TransformUPtr Transform::Create()
 {
 	auto transform = TransformUPtr(new Transform());

@@ -6,6 +6,7 @@
 #include "Graphics/VertexLayout.h"
 #include "Graphics/Program.h"
 
+ScreenMesh::ScreenMesh() = default;
 ScreenMesh::~ScreenMesh() = default;
 
 ScreenMeshUPtr ScreenMesh::Create()

@@ -2,6 +2,7 @@
 #include "PhysicsComponent.h"
 #include "Components/Transform.h"
 
+PhysicsComponent::PhysicsComponent() = default;
 PhysicsComponent::~PhysicsComponent() = default;
 
 void PhysicsComponent::SetPosition(const glm::vec3& position)

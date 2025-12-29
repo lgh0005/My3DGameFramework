@@ -1,17 +1,18 @@
 #include "EnginePch.h"
 #include "Shader.h"
 
+Shader::Shader() = default;
+Shader::~Shader()
+{
+    if (m_shader) glDeleteShader(m_shader);
+}
+
 ShaderUPtr Shader::CreateFromFile(const std::string& filename,
 	GLenum shaderType)
 {
 	auto shader = std::unique_ptr<Shader>(new Shader());
 	if (!shader->LoadFile(filename, shaderType)) return nullptr;
 	return shader;
-}
-
-Shader::~Shader()
-{
-	if (m_shader) glDeleteShader(m_shader);
 }
 
 bool Shader::LoadFile(const std::string& filename, GLenum shaderType)

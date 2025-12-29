@@ -2,6 +2,12 @@
 #include "Texture.h"
 #include "Resources/Image.h"
 
+Texture::Texture() = default;
+Texture::~Texture()
+{
+    if (m_texture) glDeleteTextures(1, &m_texture);
+}
+
 /*====================================//
 //   default texture create methods   //
 //====================================*/
@@ -90,12 +96,6 @@ TextureUPtr Texture::CreateFromKtxHDR(const std::string& ktxFilePath)
 /*=============================//
 //   default texture setters   //
 //=============================*/
-Texture::~Texture()
-{
-    if (m_texture)
-        glDeleteTextures(1, &m_texture);
-}
-
 void Texture::Bind() const
 {
     glBindTexture(m_target, m_texture);

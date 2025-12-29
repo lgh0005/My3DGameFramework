@@ -22,6 +22,9 @@
 
 #include "Pipelines/URP/UniversalRenderContext.h"
 
+UniversalDeferredLightingPass::UniversalDeferredLightingPass() = default;
+UniversalDeferredLightingPass::~UniversalDeferredLightingPass() = default;
+
 UniversalDeferredLightingPassUPtr UniversalDeferredLightingPass::Create()
 {
 	auto pass = UniversalDeferredLightingPassUPtr(new UniversalDeferredLightingPass());

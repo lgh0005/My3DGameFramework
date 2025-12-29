@@ -6,6 +6,7 @@ CLASS_PTR(Skeleton)
 class Skeleton
 {
 public:
+	~Skeleton();
 	static SkeletonUPtr Create();
 	static void InitializeVertexBoneData(SkinnedVertex& vertex);
 	static void AddBoneWeightToVertex(SkinnedVertex& vertex, int32 boneID, float weight);
@@ -19,7 +20,7 @@ public:
 	const glm::mat4& GetBoneOffset(int32 boneID) const;
 
 private:
-	Skeleton() = default;
+	Skeleton();
 	BoneMap m_boneInfoMap;
 	int32 m_boneCounter	{ 0 };
 	std::vector<glm::mat4> m_boneOffsets;

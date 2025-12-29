@@ -5,4 +5,5 @@
 #include "Graphics/VertexLayout.h"
 #include "Graphics/Program.h"
 
+Mesh::Mesh() = default;
 Mesh::~Mesh() = default;

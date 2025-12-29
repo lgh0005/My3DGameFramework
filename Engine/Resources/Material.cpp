@@ -3,6 +3,9 @@
 #include "Graphics/Program.h"
 #include "Resources/Texture.h"
 
+Material::Material() = default;
+Material::~Material() = default;
+
 MaterialUPtr Material::Create()
 {
     return MaterialUPtr(new Material());

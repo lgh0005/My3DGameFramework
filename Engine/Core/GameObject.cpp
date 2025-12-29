@@ -4,6 +4,9 @@
 #include "Components/Component.h"
 #include "Components/Transform.h"
 
+GameObject::GameObject() = default;
+GameObject::~GameObject() = default;
+
 GameObjectUPtr GameObject::Create()
 {
 	auto gameObject = std::unique_ptr<GameObject>(new GameObject());

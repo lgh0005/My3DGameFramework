@@ -5,6 +5,7 @@
 Pose::Pose() = default;
 Pose::Pose(const glm::vec3& p, const glm::quat& r, const glm::vec3& s)
 	: position(p), rotation(r), scale(s) {}
+Pose::~Pose() = default;
 
 glm::mat4 Pose::ToMat4() const
 {

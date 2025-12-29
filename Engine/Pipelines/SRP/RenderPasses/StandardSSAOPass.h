@@ -18,6 +18,7 @@ CLASS_PTR(StandardSSAOPass)
 class StandardSSAOPass : public ContextRenderPass
 {
 public:
+	virtual ~StandardSSAOPass();
 	static StandardSSAOPassUPtr Create
 	(
 		int32 width = WINDOW_WIDTH, 
@@ -36,7 +37,7 @@ private:
 	void GenerateNoiseTexture();
 
 private:
-	StandardSSAOPass() = default;
+	StandardSSAOPass();
 	bool Init(int32 width, int32 height);
 
 	ScreenMeshUPtr		   m_screenQuad{ nullptr };

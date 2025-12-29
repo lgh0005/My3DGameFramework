@@ -2,6 +2,12 @@
 #include "Graphics/Shader.h"
 #include "Graphics/Program.h"
 
+Program::Program() = default;
+Program::~Program()
+{
+    if (m_program) glDeleteProgram(m_program);
+}
+
 ProgramUPtr Program::Create(const std::vector<ShaderPtr>& shaders)
 {
     auto program = ProgramUPtr(new Program());
@@ -20,12 +26,6 @@ ProgramUPtr Program::Create(const std::string& vertShaderFilename, const std::st
 void Program::Use() const
 {
     glUseProgram(m_program);
-}
-
-Program::~Program()
-{
-    if (m_program)
-        glDeleteProgram(m_program);
 }
 
 bool Program::Link(const std::vector<ShaderPtr>& shaders)

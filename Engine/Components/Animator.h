@@ -13,6 +13,7 @@ CLASS_PTR(Animator)
 class Animator : public Component
 {
 public:
+	virtual ~Animator();
 	static AnimatorUPtr Create(ModelPtr model, AnimControllerUPtr controller);
 	static const ComponentType s_ComponentType = ComponentType::Animator;
 	virtual ComponentType GetComponentType() const override { return ComponentType::Animator; }
@@ -38,7 +39,7 @@ private:
 	void UpdateCurrentPoseLocalBounds();
 
 private:
-	Animator() = default;
+	Animator();
 	bool Init(ModelPtr model, AnimControllerUPtr controller);
 
 	ModelPtr m_currentModel;
@@ -48,5 +49,5 @@ private:
 	std::unordered_map<std::string, Transform*> m_boneTransformMap;
 	std::vector<Transform*> m_skinningTransforms;
 
-	RenderBounds m_currentLocalAABB;
+	RenderBounds m_currentLocalAABB		{ RenderBounds::Empty() };
 };

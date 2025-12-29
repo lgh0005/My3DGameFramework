@@ -5,6 +5,9 @@
 #include "Resources/StaticMesh.h"
 #include "Graphics/Buffer.h"
 
+InstancedMesh::InstancedMesh() = default;
+InstancedMesh::~InstancedMesh() = default;
+
 InstancedMeshUPtr InstancedMesh::Create(StaticMeshPtr baseMesh, BufferPtr instanceBuffer, 
                                         int32 instanceCount, SetupFunc setupFunc)
 {

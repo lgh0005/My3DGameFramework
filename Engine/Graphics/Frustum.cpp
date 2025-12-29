@@ -2,6 +2,7 @@
 #include "Frustum.h"
 
 Frustum::Frustum() = default;
+Frustum::~Frustum() = default;
 
 FrustumUPtr Frustum::Create()
 {

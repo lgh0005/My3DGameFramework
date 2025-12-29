@@ -12,6 +12,7 @@ CLASS_PTR(DirectionalLight)
 class DirectionalLight : public Light
 {
 public:
+	virtual ~DirectionalLight();
 	static DirectionalLightUPtr Create();
 	static const ComponentType s_ComponentType = ComponentType::DirectionalLight;
 	virtual ComponentType GetComponentType() const override { return ComponentType::DirectionalLight; }
@@ -20,6 +21,6 @@ public:
 	void SetDirection(const glm::vec3& direction)   { m_direction = direction; }
 
 private:
-	DirectionalLight() = default;
+	DirectionalLight();
 	glm::vec3 m_direction	{ glm::vec3(-0.2f, -1.0f, 0.3f) };
 };

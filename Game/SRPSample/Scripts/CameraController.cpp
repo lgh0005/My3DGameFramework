@@ -3,6 +3,9 @@
 #include "Components/Transform.h"
 #include "PlayerController.h"
 
+CameraController::CameraController() = default;
+CameraController::~CameraController() = default;
+
 CameraControllerUPtr CameraController::Create()
 {
     auto script = CameraControllerUPtr(new CameraController());

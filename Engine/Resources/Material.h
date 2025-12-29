@@ -27,6 +27,7 @@ CLASS_PTR(Material);
 class Material : public Resource
 {
 public:
+    virtual ~Material();
     static const ResourceType s_ResourceType = ResourceType::Material;
     virtual ResourceType GetResourceType() const override { return ResourceType::Material; }
     static MaterialUPtr Create();
@@ -61,5 +62,5 @@ public:
     void SetToProgram(const Program* program) const;
 
 protected:
-    Material() = default;
+    Material();
 };

@@ -12,6 +12,7 @@ CLASS_PTR(SimpleRenderPass)
 class SimpleRenderPass : public GeneralRenderPass
 {
 public:
+    virtual ~SimpleRenderPass();
     static SimpleRenderPassUPtr Create(ProgramUPtr program);
     virtual void Render(Scene* scene, Camera* camera) override;
 
@@ -19,7 +20,7 @@ public:
     void AddRenderer(StaticMeshRenderer* meshRenderer);
 
 private:
-    SimpleRenderPass() = default;
+    SimpleRenderPass();
     bool Init(ProgramUPtr program);
     ProgramUPtr m_simpleProgram;
     std::vector<StaticMeshRenderer*> m_renderers;

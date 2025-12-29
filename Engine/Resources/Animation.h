@@ -12,6 +12,7 @@ CLASS_PTR(Animation)
 class Animation : public Resource
 {
 public:
+    virtual ~Animation();
     static const ResourceType s_ResourceType = ResourceType::Animation;
     virtual ResourceType GetResourceType() const override { return ResourceType::Animation; }
 
@@ -32,7 +33,7 @@ private:
     void ParseAssimpChannels(const aiAnimation* animation);
 
 private:
-    Animation() = default;
+    Animation();
 
     std::string m_name;
     float m_duration            { 0.0f };

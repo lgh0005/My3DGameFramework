@@ -8,6 +8,9 @@
 #include "Resources/AnimController.h"
 #include "Resources/Pose.h"
 
+Animator::Animator() = default;
+Animator::~Animator() = default;
+
 AnimatorUPtr Animator::Create(ModelPtr model, AnimControllerUPtr controller)
 {
 	auto animator = AnimatorUPtr(new Animator());

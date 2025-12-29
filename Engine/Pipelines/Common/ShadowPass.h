@@ -15,6 +15,7 @@ CLASS_PTR(ShadowPass)
 class ShadowPass : public ContextRenderPass
 {
 public:
+	virtual ~ShadowPass();
 	static ShadowPassUPtr Create(int32 resolution = 1024);
 	virtual void Render(RenderContext* context) override;
 	ShadowMap* GetShadowMap(int32 index) { return m_shadowMaps[index].get(); }
@@ -24,7 +25,7 @@ public:
 //   shadow casting helper methods  //
 //==================================*/
 private:
-	ShadowPass() = default;
+	ShadowPass();
 	bool Init(int32 resolution);
 
 	glm::mat4 CalculateLightSpaceMatrix(Light* light);

@@ -12,6 +12,7 @@ CLASS_PTR(Light)
 class Light : public Component
 {
 public:
+    virtual ~Light();
     const glm::vec3& GetAmbient() const { return m_ambient; }
     const glm::vec3& GetDiffuse() const { return m_diffuse; }
     const glm::vec3& GetSpecular() const { return m_specular; }
@@ -29,7 +30,7 @@ public:
     void SetLightSpaceMatrix(const glm::mat4& matrix) { m_lightSpaceMatrix = matrix; }
 
 protected:
-    Light() = default;
+    Light();
     glm::vec3 m_ambient         { glm::vec3(0.1f, 0.1f, 0.1f) };
     glm::vec3 m_diffuse         { glm::vec3(0.5f, 0.5f, 0.5f) };
     glm::vec3 m_specular        { glm::vec3(1.0f, 1.0f, 1.0f) };

@@ -2,6 +2,9 @@
 #include "AudioClip.h"
 #include <fstream>
 
+AudioClip::AudioClip() = default;
+AudioClip::~AudioClip() = default;
+
 AudioClipUPtr AudioClip::LoadSFX(const std::string& filepath)
 {
 	auto sfx = AudioClipUPtr(new AudioClip());

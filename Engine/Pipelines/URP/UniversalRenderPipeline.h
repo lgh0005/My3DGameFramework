@@ -18,12 +18,13 @@ CLASS_PTR(UniversalRenderPipeline)
 class UniversalRenderPipeline : public RenderPipeline
 {
 public:
+	virtual ~UniversalRenderPipeline();
 	static UniversalRenderPipelineUPtr Create();
 	virtual void Render(Scene* scene) override;
 	virtual void OnResize(int32 width, int32 height) override;
 
 private:
-	UniversalRenderPipeline() = default;
+	UniversalRenderPipeline();
 	bool Init();
 	void BlitCopyDepth
 	(

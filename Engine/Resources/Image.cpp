@@ -3,6 +3,12 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image/stb_image.h"
 
+Image::Image() = default;
+Image::~Image()
+{
+    if (m_data)  stbi_image_free(m_data);
+}
+
 /*==================================//
 //  default image creation methods  //
 //==================================*/
@@ -45,14 +51,6 @@ ImageUPtr Image::CreateSingleColorImage(int32 width, int32 height, const glm::ve
 /*==============================//
 //  default image load methods  //
 //==============================*/
-Image::~Image()
-{
-    if (m_data)
-    {
-        stbi_image_free(m_data);
-    }
-}
-
 bool Image::LoadWithStb(const std::string& filepath, bool flipVertical)
 {
     stbi_set_flip_vertically_on_load(flipVertical);

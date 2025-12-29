@@ -10,6 +10,7 @@ CLASS_PTR(Renderer)
 class Renderer
 {
 public:
+    ~Renderer();
     static RendererUPtr Create();
 
     void Render(Scene* scene);
@@ -18,7 +19,7 @@ public:
     RenderPipeline* GetPipeline() const { return m_pipeline.get(); }
 
 protected:
-	Renderer() = default;
+	Renderer();
     void Init();
     RenderPipelineUPtr m_pipeline;
 };

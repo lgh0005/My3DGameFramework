@@ -11,11 +11,12 @@ CLASS_PTR(SkyboxPass)
 class SkyboxPass : public ContextRenderPass
 {
 public:
+	virtual ~SkyboxPass();
 	static SkyboxPassUPtr Create();
 	virtual void Render(RenderContext* context) override;
 
 private:
-	SkyboxPass() = default;
+	SkyboxPass();
 	bool Init();
 
 	ProgramUPtr m_skyboxProgram;

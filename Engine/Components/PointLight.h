@@ -12,6 +12,7 @@ CLASS_PTR(PointLight)
 class PointLight : public Light
 {
 public:
+	virtual ~PointLight();
 	static PointLightUPtr Create();
 	static const ComponentType s_ComponentType = ComponentType::PointLight;
 	virtual ComponentType GetComponentType() const override { return ComponentType::PointLight; }
@@ -22,6 +23,6 @@ public:
 	void SetDistance(float distance)			{ m_distance = distance; }
 
 private:
-	PointLight() = default;
+	PointLight();
 	float     m_distance	{ 32.0f };
 };

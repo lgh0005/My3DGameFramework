@@ -13,7 +13,7 @@ public:
 	static DevSceneUPtr Create();
 
 protected:
-	DevScene() = default;
+	DevScene();
 	virtual bool LoadNessesaryResources()	   override;
 	virtual bool CreateNessesaryRenderPasses() override;
 	virtual bool CreateSceneContext()		   override;

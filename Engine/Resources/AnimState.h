@@ -8,6 +8,7 @@ CLASS_PTR(AnimState)
 class AnimState
 {
 public:
+	virtual ~AnimState();
 	static AnimStateUPtr Create(const std::string& name, AnimationPtr clip);
 	using TransitionMap = std::unordered_map<std::string, float>;
 	void AddTransition(const std::string& targetStateName, float duration);
