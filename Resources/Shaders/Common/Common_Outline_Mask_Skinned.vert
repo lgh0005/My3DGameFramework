@@ -19,10 +19,11 @@ uniform mat4 finalBoneMatrices[MAX_BONES];
 
 void main()
 {
+    gl_Position = projection * view * model * vec4(aPos, 1.0);
     vec4 totalPosition = vec4(0.0);
 
     bool hasBone = false;
-    for(int i = 0 ; i < MAX_BONE_INFLUENCE ; i++)
+    for (int i = 0 ; i < MAX_BONE_INFLUENCE ; i++)
     {
         if(aBoneIDs[i] == -1) continue;
         if(aBoneIDs[i] >= MAX_BONES) break;

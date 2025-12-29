@@ -173,13 +173,10 @@ void Scene::Update()
 	// [Phase 1] Behaviors (Input)
 	UpdateBehaviours();
 
-	// [Phase 2] Transforms (Calculation)
-	// UpdateTransforms();
-
-	// [Phase 3] Systems (Output)
+	// [Phase 2] Systems (Output)
 	UpdateSceneSystems();
 
-	// [Phase 4] Cleanup (Destroy)
+	// [Phase 3] Cleanup (Destroy)
 	FlushDestroyQueue();
 }
 

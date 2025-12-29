@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 #include "Components/Component.h"
 
 CLASS_PTR(MeshOutline)
@@ -8,8 +8,8 @@ public:
 	virtual ~MeshOutline();
 	static MeshOutlineUPtr Create
 	(
-		const glm::vec3& color = { 1.0f, 1.0f, 0.0f }, // ±âº» ³ë¶õ»ö
-		float thickness = 0.03f						   // ±âº» µÎ²² : 0.03
+		const glm::vec3& color = { 1.0f, 1.0f, 0.5f }, // ê¸°ë³¸ ë…¸ë€ìƒ‰
+		float thickness = 0.03f						   // ê¸°ë³¸ ë‘ê»˜ : 0.03
 	);
 	static const ComponentType s_ComponentType = ComponentType::MeshOutline;
 	virtual ComponentType GetComponentType() const override { return s_ComponentType;}

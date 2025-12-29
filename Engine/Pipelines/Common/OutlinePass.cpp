@@ -22,15 +22,25 @@
 OutlinePass::OutlinePass() = default;
 OutlinePass::~OutlinePass() = default;
 
-OutlinePassUPtr OutlinePass::Create(int32 width, int32 height, float thickness)
+OutlinePassUPtr OutlinePass::Create
+(
+	int32 width, int32 height, 
+	const glm::vec3& color,
+	float thickness)
 {
 	auto pass = OutlinePassUPtr(new OutlinePass());
-	if (!pass->Init(width, height, thickness)) return nullptr;
+	if (!pass->Init(width, height, color, thickness)) return nullptr;
 	return std::move(pass);
 }
 
-bool OutlinePass::Init(int32 width, int32 height, float thickness)
+bool OutlinePass::Init
+(
+	int32 width, int32 height, 
+	const glm::vec3& color,
+	float thickness
+)
 {
+	m_color = color;
 	m_thickness = thickness;
 
 	// 1. Static Mask Program
@@ -62,9 +72,10 @@ bool OutlinePass::Init(int32 width, int32 height, float thickness)
 	return (m_maskFBO && m_screenMesh);
 }
 
+// TODO : 이후 SRP, URP를 분리해야 할 필요가 있다
 void OutlinePass::Render(RenderContext* context)
 {
-	// 0.
+	// 0. 자신의 렌더 패스에 활용되고 있는 RenderContext로 캐스팅
 	auto stdCtx = (StandardRenderContext*)context;
 
 	// 1. 그릴 대상이 없으면 빠른 리턴
@@ -99,6 +110,7 @@ void OutlinePass::Render(RenderContext* context)
 	}
 	else
 	{
+		// TODO : 뷰포트 바꾸는 로직 수정 필요
 		Framebuffer::BindToDefault();
 		glViewport(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
 	}
@@ -121,12 +133,12 @@ void OutlinePass::Render(RenderContext* context)
 	// 해상도 및 두께 전달
 	m_postProgram->SetUniform("canvasSize", glm::vec2(m_maskFBO->GetWidth(), m_maskFBO->GetHeight()));
 	m_postProgram->SetUniform("outlineSize", m_thickness);
-	m_postProgram->SetUniform("outlineColor", glm::vec4(1.0f, 1.0f, 0.5f, 1.0f)); // 노란색 고정
+	m_postProgram->SetUniform("outlineColor", glm::vec4(m_color, 1.0f)); 
 
-	// [활용!] ScreenMesh로 화면 꽉 차게 그리기
+	// ScreenMesh로 화면 꽉 차게 그리기
 	m_screenMesh->Draw();
 
-	// [Cleanup] 상태 복구
+	// 상태 복구
 	glDisable(GL_BLEND);
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);

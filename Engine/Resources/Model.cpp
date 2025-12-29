@@ -6,6 +6,7 @@
 #include "Components/Animator.h"
 #include "Components/StaticMeshRenderer.h"
 #include "Components/SkinnedMeshRenderer.h"
+#include "Components/MeshOutline.h"
 #include "Resources/Mesh.h"
 #include "Resources/StaticMesh.h"
 #include "Resources/SkinnedMesh.h"
@@ -65,6 +66,7 @@ GameObjectUPtr Model::Instantiate(Scene* scene, Animator* animator)
     return std::move(root);
 }
 
+// TODO : 이 메서드 조금 정리할 필요가 있음
 GameObjectUPtr Model::CreateGameObjectFromNode
 (
     Scene* scene,
@@ -73,11 +75,11 @@ GameObjectUPtr Model::CreateGameObjectFromNode
     Animator* animator
 )
 {
-    // 1. GameObject 생성
+    // 1. 현재 노드(컨테이너) GameObject 생성
     auto goUPtr = GameObject::Create();
     GameObject* currentGO = goUPtr.get();
 
-    // 2. 기본 정보 설정 (이름, Transform)
+    // 2. 기본 정보 설정
     currentGO->SetName(node.name);
     currentGO->GetTransform().SetLocalMatrix(node.localTransform);
 
@@ -85,10 +87,15 @@ GameObjectUPtr Model::CreateGameObjectFromNode
     if (parent) currentGO->SetParent(parent);
 
     // 4. Mesh Renderer 부착
-    for (uint32 meshIndex : node.meshIndices)
+    // 메쉬가 여러 개면 자식 오브젝트를 만들어서 각각 붙여줍니다.
+    usize meshCount = node.meshIndices.size();
+    bool useSubObject = (meshCount > 1); // 2개 이상일 때만 자식 분리
+
+    for (usize i = 0; i < meshCount; ++i)
     {
-        // 유효성 검사
+        uint32 meshIndex = node.meshIndices[i];
         if (meshIndex >= m_meshes.size()) continue;
+
         auto meshRes = m_meshes[meshIndex];
 
         // 머티리얼 찾기
@@ -99,28 +106,57 @@ GameObjectUPtr Model::CreateGameObjectFromNode
         MaterialPtr material = nullptr;
         if (matIdx < m_materials.size()) material = m_materials[matIdx];
 
-        // [Renderer 생성] 리소스 타입에 따라 분기
+        // 1. 렌더러를 붙일 대상(Target) 결정 및 임시 저장
+        GameObject* targetGO = currentGO;
+        GameObjectUPtr subGOPtr = nullptr; // 자식 오브젝트를 잠시 보관할 변수
+
+        if (useSubObject)
+        {
+            // 자식 오브젝트 생성
+            auto subGO = GameObject::Create();
+            subGO->SetName(node.name + "_Sub_" + std::to_string(i));
+            subGO->SetParent(currentGO);
+
+            // 타겟을 자식으로 변경
+            targetGO = subGO.get();
+
+            // 씬에 바로 넣지 말고, 일단 지역 변수에 홀딩해둡니다.
+            subGOPtr = std::move(subGO);
+        }
+
+        // 2. 컴포넌트를 먼저 다 붙입니다!
+        
+        // 2-1. 렌더러 부착
         switch (meshRes->GetResourceType())
         {
             case ResourceType::StaticMesh:
             {
                 auto staticMesh = std::static_pointer_cast<StaticMesh>(meshRes);
                 auto renderer = StaticMeshRenderer::Create(staticMesh, material);
-                currentGO->AddComponent(std::move(renderer));
+                targetGO->AddComponent(std::move(renderer));
                 break;
             }
-
             case ResourceType::SkinnedMesh:
             {
                 auto skinnedMesh = std::static_pointer_cast<SkinnedMesh>(meshRes);
                 auto renderer = SkinnedMeshRenderer::Create(skinnedMesh, material, animator);
-                currentGO->AddComponent(std::move(renderer));
+                targetGO->AddComponent(std::move(renderer));
                 break;
             }
         }
+
+        // 2-2. [TEMP] 아웃라인 부착
+        {
+            auto outline = MeshOutline::Create(glm::vec3(1.0f, 1.0f, 0.0f), 3.0f);
+            targetGO->AddComponent(std::move(outline));
+        }
+
+        // 컴포넌트 부착이 끝난 후, 씬에 등록합니다.
+        if (useSubObject && subGOPtr)
+            scene->AddGameObject(std::move(subGOPtr));
     }
 
-    // 5. 자식 노드 재귀 호출 (Hierarchy 구성)
+    // 5. 자식 노드 재귀 호출 (기존 코드 유지)
     for (int32 childIndex : node.children)
     {
         if (childIndex >= 0 && childIndex < m_nodes.size())
