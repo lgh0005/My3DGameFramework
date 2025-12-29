@@ -79,6 +79,7 @@ add_library(Engine STATIC
    "Framebuffers/MSAAFramebuffer.h"         "Framebuffers/MSAAFramebuffer.cpp"
    "Framebuffers/PostProcessFramebuffer.h"  "Framebuffers/PostProcessFramebuffer.cpp"
    "Framebuffers/SSAOFramebuffer.h"         "Framebuffers/SSAOFramebuffer.cpp"
+   "Framebuffers/OutlineFramebuffer.h"      "Framebuffers/OutlineFramebuffer.cpp" 
 
    # Resources
    "Resources/Resource.h"           "Resources/Resource.cpp"

@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 
 #pragma region FORWARD_DECLARATION
 CLASS_PTR(Texture)
@@ -26,13 +26,13 @@ protected:
     // FBO ID
     uint32 m_fbo{ 0 };
 
-    // °øÅë ¼Ó¼º
+    // ê³µí†µ ì†ì„±
     int32 m_width{ 0 };
     int32 m_height{ 0 };
 
-    // ÅØ½ºÃ³ °ü¸®¿ë ÄÁÅ×ÀÌ³Ê
+    // í…ìŠ¤ì²˜ ê´€ë¦¬ìš© ì»¨í…Œì´ë„ˆ
     std::vector<TexturePtr> m_textures;
 
-    // ±íÀÌ ¹öÆÛ
+    // ê¹Šì´ ë²„í¼
     uint32 m_depthBuffer{ 0 };
 };

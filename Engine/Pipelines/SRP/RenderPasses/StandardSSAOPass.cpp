@@ -11,7 +11,6 @@
 #include "Graphics/Program.h"
 #include "Framebuffers/SSAOFramebuffer.h"
 
-#include "Pipelines/SRP/StandardRenderPipeline.h"
 #include "Pipelines/SRP/StandardRenderContext.h"
 
 StandardSSAOPass::StandardSSAOPass() = default;

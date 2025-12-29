@@ -32,6 +32,7 @@
 #include "Components/Animator.h"
 #include "Components/AudioSource.h"
 #include "Components/AudioListener.h"
+#include "Components/MeshOutline.h"
 
 #include "SRPSample/RenderPasses/InstancedRenderPass.h"
 #include "SRPSample/RenderPasses/SimpleRenderPass.h"
@@ -390,9 +391,13 @@ bool DevScene::CreateSceneContext()
 		auto cubeObj = GameObject::Create();
 		cubeObj->SetName("Box2");
 		auto& cubeTransform = cubeObj->GetTransform();
-		cubeTransform.SetPosition(glm::vec3(-1.0f, 0.75f, -4.0f));
+		cubeTransform.SetPosition(glm::vec3(-1.0f, 1.75f, -4.0f));
 		cubeTransform.SetRotation(glm::vec3(0.0f, 30.0f, 0.0f));
 		cubeTransform.SetScale(glm::vec3(1.5f, 1.5f, 1.5f));
+
+		// Outline Component
+		auto outline = MeshOutline::Create(glm::vec3(1.0f, 1.0f, 0.5f), 1.0f);
+		cubeObj->AddComponent(std::move(outline));
 
 		auto meshRenderer = StaticMeshRenderer::Create
 		(RESOURCE.GetResource<StaticMesh>("Cube"), RESOURCE.GetResource<Material>("boxMat4"));
