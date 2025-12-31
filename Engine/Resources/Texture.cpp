@@ -121,6 +121,12 @@ void Texture::SetBorderColor(const glm::vec4& color) const
     glTexParameterfv(m_target, GL_TEXTURE_BORDER_COLOR, glm::value_ptr(color));
 }
 
+void Texture::SetSubData(int32 x, int32 y, int32 width, int32 height, const void* data)
+{
+    Bind();
+    glTexSubImage2D(m_target, 0, x, y, width, height, m_format, m_type, data);
+}
+
 void Texture::SetData(const void* data, uint32 size)
 {
     // size는 검증용으로 쓸 수 있지만 여기선 단순하게 전체 업로드라고 가정

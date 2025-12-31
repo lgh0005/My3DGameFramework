@@ -102,6 +102,7 @@ add_library(Engine STATIC
    "Resources/CubeTexture.h"        "Resources/CubeTexture.cpp"
    "Resources/AnimController.h"     "Resources/AnimController.cpp"
    "Resources/AnimState.h"          "Resources/AnimState.cpp"
+   "Resources/Font.h"               "Resources/Font.cpp"
 
    # Components
    "Components/Component.h"         "Components/Component.cpp"
@@ -127,6 +128,7 @@ add_library(Engine STATIC
    "UIs/UIRenderer.h"               "UIs/UIRenderer.cpp"
    "UIs/UICanvas.h"                 "UIs/UICanvas.cpp"
    "UIs/UIImage.h"                  "UIs/UIImage.cpp"
+   "UIs/UIText.h"                   "UIs/UIText.cpp"
 
    # Managers
    "Managers/TimeManager.h"         "Managers/TimeManager.cpp"

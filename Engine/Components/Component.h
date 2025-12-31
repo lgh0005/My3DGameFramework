@@ -23,7 +23,8 @@ enum class ComponentType
 
 	// UI Components
 	UICanvas,
-	UIImage
+	UIImage,
+	UIText
 };
 
 CLASS_PTR(Component)

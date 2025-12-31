@@ -7,6 +7,13 @@ struct ScreenVertex
     glm::vec2 texCoord;
 };
 
+struct UIVertex
+{
+    glm::vec3 position;
+    glm::vec4 color;   
+    glm::vec2 texCoord;
+};
+
 struct StaticVertex
 {
     glm::vec3 position;

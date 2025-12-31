@@ -9,6 +9,7 @@ enum class ResourceType
 	Material,
 	Model,
 	Texture,
+	Font,
 	StaticMesh,
 	SkinnedMesh,
 	ScreenMesh,

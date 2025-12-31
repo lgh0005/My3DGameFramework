@@ -31,6 +31,7 @@ public:
 	void SetTextureFormat(int32 width, int32 height, uint32 internalFormat,
 						  uint32 format, uint32 type);
 	void SetBorderColor(const glm::vec4& color) const;
+	void SetSubData(int32 x, int32 y, int32 width, int32 height, const void* data);
 	void SetData(const void* data, uint32 size = 0);
 
 	int32  GetWidth()	   const	{ return m_width; }

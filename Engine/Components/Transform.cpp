@@ -1,4 +1,4 @@
-#include "Transform.h"
+ï»¿#include "Transform.h"
 #include "EnginePch.h"
 #include "Core/GameObject.h"
 
@@ -16,17 +16,17 @@ TransformUPtr Transform::Create()
 //====================================================*/
 void Transform::UpdateTransform() const
 {
-	// 1. ºÎ¸ð°¡ ÀÖ´Ù¸é ºÎ¸ðºÎÅÍ ÃÖ½Å »óÅÂÀÎÁö È®ÀÎ
+	// 1. ë¶€ëª¨ê°€ ìžˆë‹¤ë©´ ë¶€ëª¨ë¶€í„° ìµœì‹  ìƒíƒœì¸ì§€ í™•ì¸
 	if (m_parent) m_parent->GetWorldMatrix();
 
-	// 2. ·ÎÄÃ Çà·Ä °è»ê (SRT)
+	// 2. ë¡œì»¬ í–‰ë ¬ ê³„ì‚° (SRT)
 	glm::mat4 localMat = GetLocalMatrix();
 
-	// 3. ¿ùµå Çà·Ä °è»ê
+	// 3. ì›”ë“œ í–‰ë ¬ ê³„ì‚°
 	if (m_parent) m_worldMatrix = m_parent->GetWorldMatrix() * localMat;
 	else m_worldMatrix = localMat;
 
-	// 4. ¿ùµå ¼Ó¼º Ä³½Ì (Position, Rotation, Scale ºÐÇØ)
+	// 4. ì›”ë“œ ì†ì„± ìºì‹± (Position, Rotation, Scale ë¶„í•´)
 	m_worldPosition = glm::vec3(m_worldMatrix[3]);
 	m_worldScale.x = glm::length(glm::vec3(m_worldMatrix[0]));
 	m_worldScale.y = glm::length(glm::vec3(m_worldMatrix[1]));
@@ -47,7 +47,7 @@ void Transform::UpdateTransform() const
 		m_worldRotation = glm::quat_cast(rotationMat);
 	}
 
-	// 5. °»½Å ¿Ï·á -> Dirty ÇØÁ¦
+	// 5. ê°±ì‹  ì™„ë£Œ -> Dirty í•´ì œ
 	m_isTransformDirty = false;
 }
 
@@ -59,13 +59,13 @@ void Transform::UpdateWorldInverseTransform() const
 
 void Transform::SetTransformDirty()
 {
-	// ÀÌ¹Ì Dirty¶ó¸é ÀÚ½Äµéµµ ÀÌ¹Ì DirtyÀÏ °ÍÀÌ¹Ç·Î ÆÐ½º (Áßº¹ È£Ãâ ¹æÁö)
+	// ì´ë¯¸ Dirtyë¼ë©´ ìžì‹ë“¤ë„ ì´ë¯¸ Dirtyì¼ ê²ƒì´ë¯€ë¡œ íŒ¨ìŠ¤ (ì¤‘ë³µ í˜¸ì¶œ ë°©ì§€)
 	if (m_isTransformDirty) return;
 
 	m_isTransformDirty = true;
 	m_isWorldInverseDirty = true;
 
-	// ÀÚ½Äµéµµ ´Ù Dirty·Î ¸¸µê (ºÎ¸ð°¡ ¿òÁ÷ÀÌ¸é ÀÚ½Äµµ ¿ùµå ÁÂÇ¥°¡ ¹Ù²î´Ï±î)
+	// ìžì‹ë“¤ë„ ë‹¤ Dirtyë¡œ ë§Œë“¦ (ë¶€ëª¨ê°€ ì›€ì§ì´ë©´ ìžì‹ë„ ì›”ë“œ ì¢Œí‘œê°€ ë°”ë€Œë‹ˆê¹Œ)
 	for (Transform* child : m_children) child->SetTransformDirty();
 }
 
@@ -205,19 +205,19 @@ glm::mat4 Transform::GetLocalMatrix() const
 //====================================================*/
 void Transform::SetParent(Transform* parent)
 {
-	// 1. ÀÚ±â ÀÚ½ÅÀÌ³ª, ÀÌ¹Ì °°Àº ºÎ¸ð¶ó¸é ¹«½Ã
+	// 1. ìžê¸° ìžì‹ ì´ë‚˜, ì´ë¯¸ ê°™ì€ ë¶€ëª¨ë¼ë©´ ë¬´ì‹œ
 	if (this == parent || m_parent == parent) return;
 
-	// 2. ±âÁ¸ ºÎ¸ð¿ÍÀÇ ¿¬°á ²÷±â
+	// 2. ê¸°ì¡´ ë¶€ëª¨ì™€ì˜ ì—°ê²° ëŠê¸°
 	if (m_parent) m_parent->RemoveChild(this);
 
-	// 3. »õ ºÎ¸ð ¼³Á¤
+	// 3. ìƒˆ ë¶€ëª¨ ì„¤ì •
 	m_parent = parent;
 
-	// 4. »õ ºÎ¸ðÀÇ ÀÚ½Ä ¸®½ºÆ®¿¡ µî·Ï
+	// 4. ìƒˆ ë¶€ëª¨ì˜ ìžì‹ ë¦¬ìŠ¤íŠ¸ì— ë“±ë¡
 	if (m_parent) m_parent->AddChild(this);
 
-	// 5. ºÎ¸ð°¡ ¹Ù²î¾úÀ¸¹Ç·Î ¿ùµå Çà·ÄÀ» ´Ù½Ã °è»êÇØ¾ß ÇÔ (Dirty ¸¶Å·)
+	// 5. ë¶€ëª¨ê°€ ë°”ë€Œì—ˆìœ¼ë¯€ë¡œ ì›”ë“œ í–‰ë ¬ì„ ë‹¤ì‹œ ê³„ì‚°í•´ì•¼ í•¨ (Dirty ë§ˆí‚¹)
 	SetTransformDirty();
 }
 
