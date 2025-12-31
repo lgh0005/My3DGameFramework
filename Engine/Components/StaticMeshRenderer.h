@@ -17,7 +17,7 @@ public:
 	static StaticMeshRendererUPtr Create(StaticMeshPtr mesh, MaterialPtr material);
 	static const ComponentType s_ComponentType = ComponentType::StaticMeshRenderer;
 	virtual ComponentType GetComponentType() const override { return s_ComponentType; }
-	virtual RenderBounds GetWorldBounds() const override;
+	virtual RenderBounds GetWorldBounds() const override { return Super::GetWorldBounds(); }
 	virtual void Render(Program* program) const;
 
 private:

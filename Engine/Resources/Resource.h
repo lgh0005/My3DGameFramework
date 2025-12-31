@@ -13,6 +13,7 @@ enum class ResourceType
 	SkinnedMesh,
 	ScreenMesh,
 	InstancedMesh,
+	UIMesh
 };
 
 CLASS_PTR(Resource)

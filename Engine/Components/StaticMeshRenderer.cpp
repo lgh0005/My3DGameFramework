@@ -24,11 +24,6 @@ bool StaticMeshRenderer::Init(StaticMeshPtr mesh, MaterialPtr material)
 	return true;
 }
 
-RenderBounds StaticMeshRenderer::GetWorldBounds() const
-{
-	return Super::GetWorldBounds();
-}
-
 void StaticMeshRenderer::Render(Program* program) const
 {
 	if (m_material) m_material->SetToProgram(program);

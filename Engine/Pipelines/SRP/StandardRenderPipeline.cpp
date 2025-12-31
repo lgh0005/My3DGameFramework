@@ -144,6 +144,13 @@ void StandardRenderPipeline::Render(Scene* scene)
 	for (const auto& [name, pass] : scene->GetCustomRenderPasses())
 		pass->Render(scene, camera);
 
+	// ====================================================
+	// [패스 5.5] World Space UI 패스 (3D 공간 UI)
+	// ====================================================
+	// 위치: 후처리(Pass 8) 전이어야 함! 그래야 Bloom도 먹고 톤맵핑도 먹음.
+	// 설정: Depth Test 켜야 함 (벽 뒤에 숨어야 하니까)
+	// m_uiPass->Render(&context, UIRenderMode::WorldSpace);
+
 	// [패스 6] 스카이박스 패스: m_frameBuffer에 스카이박스 덧그리기
 	m_skyboxPass->Render(&context);
 
@@ -152,6 +159,11 @@ void StandardRenderPipeline::Render(Scene* scene)
 
 	// [패스 8] 후처리 패스: m_frameBuffer의 결과를 화면에 Resolve
 	m_postProcessPass->Render(&context);
+
+	// ====================================================
+	// [패스 9] UI 패스 : 최종 화면 위에 UI 덧그리기 (Overlay)
+	// ====================================================
+	// 이 시점에서는 Depth Test를 끄고(Screen UI), Alpha Blending을 켜야 함
 
 	/*=========================//
 	//   imgui debug context   //

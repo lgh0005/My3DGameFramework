@@ -1,9 +1,9 @@
-#include "EnginePch.h"
+ï»¿#include "EnginePch.h"
 #include "AudioSource.h"
 #include "Components/Transform.h"
 
-// TODO : SFX¶û BGMÀ» ºĞ±âÇØ¼­ Ã³¸®ÇÏ´Â °ÍÀ» Á¶±İ ¸íÈ®È÷ ÄÚµå·Î ÀÛ¼ºÇÒ
-// ÇÊ¿ä°¡ ÀÖÀ½
+// TODO : SFXë‘ BGMì„ ë¶„ê¸°í•´ì„œ ì²˜ë¦¬í•˜ëŠ” ê²ƒì„ ì¡°ê¸ˆ ëª…í™•íˆ ì½”ë“œë¡œ ì‘ì„±í• 
+// í•„ìš”ê°€ ìˆìŒ
 AudioSource::AudioSource() = default;
 AudioSource::~AudioSource()
 {
@@ -60,19 +60,19 @@ bool AudioSource::Init(const AudioClipPtr& audioClip)
 
 void AudioSource::Update()
 {
-	// ·Îµå ¾ÈµÆ°Å³ª Àç»ı Áß ¾Æ´Ï¸é ±»ÀÌ ¿¬»ê X
+	// ë¡œë“œ ì•ˆëê±°ë‚˜ ì¬ìƒ ì¤‘ ì•„ë‹ˆë©´ êµ³ì´ ì—°ì‚° X
 	if (m_clip == nullptr) return;
 	if (!ma_sound_is_playing(&m_sound)) return;
 
-	// 1. À§Ä¡ µ¿±âÈ­
+	// 1. ìœ„ì¹˜ ë™ê¸°í™”
 	auto transform = GetTransform();
 
-	// TODO: ÃßÈÄ Transform °èÃş ±¸Á¶(Parent-Child) ±¸Çö ½Ã
-	// GetWorldPosition()À¸·Î ±³Ã¼ ÇÊ¿ä
+	// TODO: ì¶”í›„ Transform ê³„ì¸µ êµ¬ì¡°(Parent-Child) êµ¬í˜„ ì‹œ
+	// GetWorldPosition()ìœ¼ë¡œ êµì²´ í•„ìš”
 	auto pos = transform.GetWorldPosition();
 	ma_sound_set_position(&m_sound, pos.x, pos.y, pos.z);
 
-	// 2. ¹æÇâ µ¿±âÈ­
+	// 2. ë°©í–¥ ë™ê¸°í™”
 	glm::vec3 fwd = transform.GetForwardVector();
 	ma_sound_set_direction(&m_sound, fwd.x, fwd.y, fwd.z);
 }
@@ -81,7 +81,7 @@ void AudioSource::Play()
 {
 	if (m_clip == nullptr) return;
 
-	// ¸¸¾à SFX¶ó¸é, ½ò ¶§¸¶´Ù Ã³À½ºÎÅÍ ´Ù½Ã Àç»ıÇÏ´Â °Ô ÀÚ¿¬½º·¯¿ò
+	// ë§Œì•½ SFXë¼ë©´, ì  ë•Œë§ˆë‹¤ ì²˜ìŒë¶€í„° ë‹¤ì‹œ ì¬ìƒí•˜ëŠ” ê²Œ ìì—°ìŠ¤ëŸ¬ì›€
 	if (m_clip->GetType() == AudioType::SFX)
 	{
 		ma_sound_seek_to_pcm_frame(&m_sound, 0);
@@ -119,7 +119,7 @@ void AudioSource::Reset()
 {
 	if (m_clip == nullptr) return;
 
-	// »ç¿îµå ÇØÁ¦
+	// ì‚¬ìš´ë“œ í•´ì œ
 	ma_sound_uninit(&m_sound);
 	if (m_clip->GetType() == AudioType::SFX)
 	{
@@ -134,32 +134,32 @@ bool AudioSource::CreateSFX(ma_engine* engine, ma_sound_group* group, const Audi
 	const auto& buffer = clip->GetBuffer();
 	if (buffer.empty()) return false;
 
-	// 1. µğÄÚ´õ ÃÊ±âÈ­
+	// 1. ë””ì½”ë” ì´ˆê¸°í™”
 	ma_decoder_config config = ma_decoder_config_init_default();
 	ma_result result = ma_decoder_init_memory(buffer.data(), buffer.size(), &config, &m_decoder);
 
 	if (result != MA_SUCCESS) return false;
 
-	// 2. »ç¿îµå »ı¼º (Data Source)
+	// 2. ì‚¬ìš´ë“œ ìƒì„± (Data Source)
 	result = ma_sound_init_from_data_source(engine, &m_decoder, 0, group, &m_sound);
 
 	if (result != MA_SUCCESS)
 	{
-		// »ç¿îµå »ı¼º ½ÇÆĞ ½Ã, ¾Õ¿¡¼­ ¸¸µç µğÄÚ´õµµ ÇØÁ¦ÇØ¾ß ÇÔ
+		// ì‚¬ìš´ë“œ ìƒì„± ì‹¤íŒ¨ ì‹œ, ì•ì—ì„œ ë§Œë“  ë””ì½”ë”ë„ í•´ì œí•´ì•¼ í•¨
 		ma_decoder_uninit(&m_decoder);
 		return false;
 	}
 
-	// 3. SFX ¼³Á¤ (3D ÄÑ±â + °Å¸® ¼³Á¤)
+	// 3. SFX ì„¤ì • (3D ì¼œê¸° + ê±°ë¦¬ ì„¤ì •)
 	ma_sound_set_spatialization_enabled(&m_sound, MA_TRUE);
-	Set3DAttributes(1.0f, 30.0f); // ±âº» °Å¸® ¼³Á¤
+	Set3DAttributes(1.0f, 30.0f); // ê¸°ë³¸ ê±°ë¦¬ ì„¤ì •
 
 	return true;
 }
 
 bool AudioSource::CreateBGM(ma_engine* engine, ma_sound_group* group, const AudioClipPtr& clip)
 {
-	// 1. »ç¿îµå »ı¼º (File Stream)
+	// 1. ì‚¬ìš´ë“œ ìƒì„± (File Stream)
 	ma_result result = ma_sound_init_from_file
 	(
 		engine,
@@ -172,7 +172,7 @@ bool AudioSource::CreateBGM(ma_engine* engine, ma_sound_group* group, const Audi
 
 	if (result != MA_SUCCESS) return false;
 
-	// 2. BGM ¼³Á¤ (2D + Loop)
+	// 2. BGM ì„¤ì • (2D + Loop)
 	ma_sound_set_spatialization_enabled(&m_sound, MA_TRUE);
 	ma_sound_set_looping(&m_sound, true);
 

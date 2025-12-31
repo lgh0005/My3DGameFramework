@@ -30,6 +30,7 @@ void ScreenMesh::Init()
 		ScreenVertex { { 1.0f, -1.0f, 0.0f}, {1.0f, 0.0f} }  // 3: Bottom-Right
 	};
 
+	// 인덱스 설정
 	std::vector<uint32> indices = 
 	{
 		0, 1, 2, // 첫 번째 삼각형

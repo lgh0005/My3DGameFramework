@@ -19,7 +19,11 @@ enum class ComponentType
 	MeshOutline,
 	SkinnedMeshRenderer,
 	StaticMeshRenderer,
-	InstancedMeshRenderer
+	InstancedMeshRenderer,
+
+	// UI Components
+	UICanvas,
+	UIImage
 };
 
 CLASS_PTR(Component)

@@ -97,6 +97,7 @@ add_library(Engine STATIC
    "Resources/SkinnedMesh.h"        "Resources/SkinnedMesh.cpp"
    "Resources/InstancedMesh.h"      "Resources/InstancedMesh.cpp"
    "Resources/ScreenMesh.h"         "Resources/ScreenMesh.cpp"
+   "Resources/UIMesh.h"             "Resources/UIMesh.cpp"
    "Resources/Material.h"           "Resources/Material.cpp"
    "Resources/CubeTexture.h"        "Resources/CubeTexture.cpp"
    "Resources/AnimController.h"     "Resources/AnimController.cpp"
@@ -122,6 +123,11 @@ add_library(Engine STATIC
    "Components/SkinnedMeshRenderer.h"  "Components/SkinnedMeshRenderer.cpp"
    "Components/InstancedMeshRenderer.h" "Components/InstancedMeshRenderer.cpp"
 
+   # UIs
+   "UIs/UIRenderer.h"               "UIs/UIRenderer.cpp"
+   "UIs/UICanvas.h"                 "UIs/UICanvas.cpp"
+   "UIs/UIImage.h"                  "UIs/UIImage.cpp"
+
    # Managers
    "Managers/TimeManager.h"         "Managers/TimeManager.cpp"
    "Managers/WindowManager.h"       "Managers/WindowManager.cpp"
@@ -131,6 +137,7 @@ add_library(Engine STATIC
    "Managers/RenderManager.h"       "Managers/RenderManager.cpp"
    "Managers/AudioManager.h"        "Managers/AudioManager.cpp"
    "Managers/PhysicsManager.h"      "Managers/PhysicsManager.cpp"
+   "Managers/UIManager.h"           "Managers/UIManager.cpp"
 
 )
 

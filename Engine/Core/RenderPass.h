@@ -19,6 +19,8 @@ protected:
 	const std::vector<glm::mat4>& GetIdentityBones() const;
 
 private:
+	// TODO : 이걸 굳이 멤버로 두는 것이 올바르지 않는 방법일 수 있음.
+	// 오히려 Utils에다가 빼는 게 더 맞는 방향일 수 있음.
 	static std::vector<glm::mat4> s_identityBones;
 };
 

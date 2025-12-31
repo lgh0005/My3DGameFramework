@@ -10,7 +10,7 @@ bool Application::Init(int32 width, int32 height, const std::string& title)
 {
 	// 0. Logger 초기화
 	LOGGER.Init();
-
+	LOG_INFO("Application Started [Start]");
 	LOG_INFO("Engine Initialization Started...");
 
 	// 1. 윈도우 생성 (가장 먼저 되어야 함)
