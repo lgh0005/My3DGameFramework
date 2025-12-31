@@ -1,4 +1,4 @@
-#include "EnginePch.h"
+ï»¿#include "EnginePch.h"
 #include "Scene.h"
 
 #include "Core/GameObject.h"
@@ -19,6 +19,7 @@
 #include "Components/Transform.h"
 #include "Components/AudioSource.h"
 #include "Components/AudioListener.h"
+#include "UIs/UICanvas.h"
 
 Scene::Scene() = default;
 Scene::~Scene() = default;
@@ -39,7 +40,7 @@ void Scene::RegisterComponent(Component* component)
 {
 	if (!component) return;
 
-	// TODO : ÀÌÈÄ¿¡ ´Ù¸¥ °ÔÀÓ ÄÄÆ÷³ÍÆ®µéµµ ³ª¿­ÇØ¾ßÇÔ
+	// TODO : ì´í›„ì— ë‹¤ë¥¸ ê²Œì„ ì»´í¬ë„ŒíŠ¸ë“¤ë„ ë‚˜ì—´í•´ì•¼í•¨
 	switch (component->GetComponentType())
 	{
 		case ComponentType::Camera:
@@ -100,12 +101,17 @@ void Scene::RegisterComponent(Component* component)
 			m_outlines.push_back(static_cast<MeshOutline*>(component));
 			break;
 		}
+		case ComponentType::UICanvas:
+		{
+			m_uiCanvases.push_back(static_cast<UICanvas*>(component));
+			break;
+		}
 	}
 }
 
 void Scene::OnScreenResize(int32 width, int32 height)
 {
-	// TODO : ÀÌÈÄ¿¡´Â ´ÙÁß Ä«¸Ş¶ó¿¡ ´ëÇØ¼­ ¸ğµç Ä«¸Ş¶ó°¡ ¸®»çÀÌÂ¡ µÇ¾î¾ßÇÔ
+	// TODO : ì´í›„ì—ëŠ” ë‹¤ì¤‘ ì¹´ë©”ë¼ì— ëŒ€í•´ì„œ ëª¨ë“  ì¹´ë©”ë¼ê°€ ë¦¬ì‚¬ì´ì§• ë˜ì–´ì•¼í•¨
 	auto* camera = GetMainCamera();
 	if (camera) camera->SetAspectRatio((float)width / (float)height);
 }
@@ -158,10 +164,10 @@ bool Scene::Init()
 
 void Scene::Start()
 {
-	// TODO : ÀÌÈÄ¿¡ ÄÄÆ÷³ÍÆ®°¡ ÇÊ¿¬ÀûÀ¸·Î Start°¡ ÇÊ¿äÇÏ°Ô µÈ´Ù¸é
-	// ÄÄÆ÷³ÍÆ®¿¡ Ãß°¡ÀûÀÎ °¡»ó ÇÔ¼ö¸¦ µÑ ÇÊ¿ä°¡ ÀÖ´ÂÁö °í·Á ÇÊ¿ä.
-	// Æ¯È÷ Awake, LateUpdate, FixedUpdate µî
-	// 2. ½ºÅ©¸³Æ® ÄÄÆ÷³ÍÆ® Start
+	// TODO : ì´í›„ì— ì»´í¬ë„ŒíŠ¸ê°€ í•„ì—°ì ìœ¼ë¡œ Startê°€ í•„ìš”í•˜ê²Œ ëœë‹¤ë©´
+	// ì»´í¬ë„ŒíŠ¸ì— ì¶”ê°€ì ì¸ ê°€ìƒ í•¨ìˆ˜ë¥¼ ë‘˜ í•„ìš”ê°€ ìˆëŠ”ì§€ ê³ ë ¤ í•„ìš”.
+	// íŠ¹íˆ Awake, LateUpdate, FixedUpdate ë“±
+	// 2. ìŠ¤í¬ë¦½íŠ¸ ì»´í¬ë„ŒíŠ¸ Start
 	for (auto* script : m_scripts)
 	{
 		script->Start();
@@ -185,22 +191,22 @@ void Scene::Update()
 //================================*/
 void Scene::UpdateBehaviours()
 {
-	// 1. ½ºÅ©¸³Æ® Update
+	// 1. ìŠ¤í¬ë¦½íŠ¸ Update
 	for (auto* script : m_scripts) script->Update();
 
-	// 2. ¾Ö´Ï¸ŞÀÌÅÍ Update
+	// 2. ì• ë‹ˆë©”ì´í„° Update
 	for (auto* animator : m_animators) animator->Update();
 }
 
 void Scene::UpdateSceneSystems()
 {
-	// ¿Àµğ¿À
+	// ì˜¤ë””ì˜¤
 	for (auto* source : m_audioSources) source->Update();
 	for (auto* listener : m_audioListeners) listener->Update();
 }
 
 void Scene::FlushDestroyQueue()
 {
-	// TODO : ¾À¿¡ Destroy¸¦ È£ÃâÇÑ ¿ÀºêÁ§Æ®¸¦ Á¤¸®
+	// TODO : ì”¬ì— Destroyë¥¼ í˜¸ì¶œí•œ ì˜¤ë¸Œì íŠ¸ë¥¼ ì •ë¦¬
 }
 

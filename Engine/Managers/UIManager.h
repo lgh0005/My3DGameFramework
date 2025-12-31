@@ -1,28 +1,12 @@
 ﻿#pragma once
 
 #pragma region FORWARD_DECLARATION
-CLASS_PTR(UIRenderer)
+CLASS_PTR(UICanvas)
 #pragma endregion
-
-// TEMP : 임시로 일단 적어본 UI 정렬 레이어
-enum class SortLayer
-{
-	Background, // 배경 이미지
-	Default,    // 일반 UI
-	HUD,        // 체력바 등
-	Popup,      // 팝업 창 (가장 위)
-	Cursor,     // 커서
-	MAX
-};
-
-enum
-{
-
-};
 
 struct UIAction
 {
-	// TODO
+	// TODO : UI 상호작용 시 수행해야 할 일감
 };
 
 class UIManager
@@ -30,23 +14,20 @@ class UIManager
 	DECLARE_SINGLE(UIManager)
 
 public:
-	using UILayerList = std::vector<UIRenderer*>;
-	using UILayerContainer = std::array<UIRenderer*, (usize)SortLayer::MAX>;
-
-public:
+	void Init();
 	void Update();
 	void Clear();
 
-	void RegisterRenderer(UIRenderer* renderer);
-	void UnregisterRenderer(UIRenderer* renderer);
+	void RegisterCanvas(UICanvas* canvas);
+	void UnregisterCanvas(UICanvas* canvas);
 
-	const UILayerContainer& GetScreenSpaceLayers();
-	const UILayerList& GetWorldSpaceRenderers();
+	const std::vector<UICanvas*>& GetScreenSpaceLayers() { return m_screenSpaceCanvases; }
+	const std::vector<UICanvas*>& GetWorldSpaceRenderers() { return m_worldSpaceCanvases; }
 
 private:
-	void SortRenderers();
+	void SortCanvases();
 
-	UILayerList m_worldSpaceRenderers;
-	UILayerContainer m_screenSpaceRenderers;
-	bool m_isUIOrderDirty = true;
+	std::vector<UICanvas*> m_worldSpaceCanvases;
+	std::vector<UICanvas*> m_screenSpaceCanvases;
+	bool m_isUICanvasOrderDirty = true;
 };

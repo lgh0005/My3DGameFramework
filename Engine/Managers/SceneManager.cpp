@@ -19,6 +19,7 @@ void SceneManager::LoadScene
 	RENDER.SetPipeline(pipeline);
 
 	// 3. 기존 씬 정리
+	UI.Clear();
 	m_activeScene.reset();
 
 	// 4. 새 씬 생성 (Factory 호출)

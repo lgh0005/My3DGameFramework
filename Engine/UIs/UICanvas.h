@@ -3,6 +3,7 @@
 
 #pragma region FORWARD_DECLARATION
 CLASS_PTR(Program)
+CLASS_PTR(UIRenderer)
 #pragma endregion
 
 enum class UIRenderMode
@@ -36,5 +37,5 @@ private:
     UIRenderMode m_renderMode { UIRenderMode::ScreenSpace };
     std::vector<UIRenderer*> m_uiElements;
     int32 m_canvasSortingOrder    { 0 };
-    bool m_isDirtyOrder           { true };
+    bool m_isUIElementDirtyOrder  { true };
 };

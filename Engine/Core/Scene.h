@@ -9,6 +9,7 @@ CLASS_PTR(StaticMeshRenderer)
 CLASS_PTR(SkinnedMeshRenderer)
 CLASS_PTR(InstancedMeshRenderer)
 CLASS_PTR(MeshOutline)
+CLASS_PTR(UICanvas)
 CLASS_PTR(Light)
 CLASS_PTR(Camera)
 CLASS_PTR(Animator)
@@ -98,6 +99,7 @@ protected:
 	std::vector<SkinnedMeshRenderer*>  m_skinnedMeshRenderers;
 	std::vector<InstancedMeshRenderer*> m_instancedMeshRenderers;
 	std::vector<MeshOutline*>   m_outlines;
+	std::vector<UICanvas*>		m_uiCanvases;
 
 	// 하늘 텍스쳐
 	SkyLightUPtr				m_sky;
