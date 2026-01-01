@@ -34,6 +34,8 @@ private:
     UICanvas();
     void Init(UIRenderMode mode, int32 sortOrder);
 
+    // TODO : m_width, m_height 필요
+
     UIRenderMode m_renderMode { UIRenderMode::ScreenSpace };
     std::vector<UIRenderer*> m_uiElements;
     int32 m_canvasSortingOrder    { 0 };

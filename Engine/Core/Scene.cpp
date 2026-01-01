@@ -113,7 +113,8 @@ void Scene::OnScreenResize(int32 width, int32 height)
 {
 	// TODO : 이후에는 다중 카메라에 대해서 모든 카메라가 리사이징 되어야함
 	auto* camera = GetMainCamera();
-	if (camera) camera->SetAspectRatio((float)width / (float)height);
+	if (camera) camera->SetViewportSize((float)width, (float)height);
+	// if (camera) camera->SetAspectRatio((float)width / (float)height);
 }
 
 void Scene::SetSkyLight(SkyLightUPtr skyLight)

@@ -90,7 +90,7 @@ void CullingPass::CullMeshOutlines(Scene* scene, RenderContext* context)
         if (!renderer) continue;
 
         // 3. 렌더러의 바운딩 박스를 이용해 절두체 검사
-        // TODO :엄밀히 따지면 아웃라인 두께만큼 Bounds를 확장해야 할 수 있음.
+        // TODO : 엄밀히 따지면 아웃라인 두께만큼 Bounds를 확장해야 할 수 있음.
         if (m_frustum->CheckBounds(renderer->GetWorldBounds()))
             context->AddMeshOutline(outline);
     }

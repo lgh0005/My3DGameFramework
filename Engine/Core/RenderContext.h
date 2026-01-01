@@ -55,7 +55,7 @@ protected:
 	// Source (Scene 원본 참조)
 	StaticMeshVectorRawPtr		   m_staticMeshRenderers;
 	SkinnedMeshVectorRawPtr		   m_skinnedMeshRenderers;
-	LightVectorRawPtr		   m_lights;
+	LightVectorRawPtr			   m_lights;
 
 	// Result (실제 렌더링 목록)
 	std::vector<MeshOutline*>  m_culledMeshOutlines;

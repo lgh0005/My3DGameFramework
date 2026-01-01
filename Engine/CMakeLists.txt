@@ -27,6 +27,9 @@ add_library(Engine STATIC
    "Pipelines/Common/CullingPass.h" "Pipelines/Common/CullingPass.cpp"
    "Pipelines/Common/ShadowPass.h"  "Pipelines/Common/ShadowPass.cpp"
    "Pipelines/Common/SkyboxPass.h"  "Pipelines/Common/SkyboxPass.cpp"
+   "Pipelines/Common/UIScreenSpacePass.h"  "Pipelines/Common/UIScreenSpacePass.cpp"
+   "Pipelines/Common/UIWorldSpacePass.h"  "Pipelines/Common/UIWorldSpacePass.cpp"
+   "Pipelines/Common/UIScreenSpacePass.h" "Pipelines/Common/UIScreenSpacePass.cpp"
 
    # Standard Render Pipeline
    "Pipelines/SRP/RenderPasses/StandardPostProcessPass.h" "Pipelines/SRP/RenderPasses/StandardPostProcessPass.cpp"
@@ -72,6 +75,9 @@ add_library(Engine STATIC
    "Graphics/CubeFramebuffer.h"     "Graphics/CubeFramebuffer.cpp"
    "Graphics/SkyLight.h"            "Graphics/SkyLight.cpp"
    "Graphics/ShadowMap.h"           "Graphics/ShadowMap.cpp"
+   "Graphics/Ray.h"                 "Graphics/Ray.cpp"
+              
+   "Graphics/RaycastHit.h"        "Graphics/RaycastHit.cpp"
 
    # Framebuffers
    "Framebuffers/Framebuffer.h"             "Framebuffers/Framebuffer.cpp"

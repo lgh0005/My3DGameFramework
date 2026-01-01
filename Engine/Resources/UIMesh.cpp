@@ -109,8 +109,6 @@ void UIMesh::SetVertices(const std::vector<UIVertex>& vertices)
     m_vertexLayout->SetAttrib(0, 3, GL_FLOAT, false, sizeof(UIVertex), offsetof(UIVertex, position));
     m_vertexLayout->SetAttrib(1, 4, GL_FLOAT, false, sizeof(UIVertex), offsetof(UIVertex, color));
     m_vertexLayout->SetAttrib(2, 2, GL_FLOAT, false, sizeof(UIVertex), offsetof(UIVertex, texCoord));
-
-
 }
 
 void UIMesh::SetIndices(const std::vector<uint32>& indices)

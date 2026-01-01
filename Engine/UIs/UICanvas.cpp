@@ -7,10 +7,7 @@
 #include "UIs/UIRenderer.h"
 
 UICanvas::UICanvas() = default;
-UICanvas::~UICanvas()
-{
-	UI.UnregisterCanvas(this);
-}
+UICanvas::~UICanvas() = default;
 
 UICanvasUPtr UICanvas::Create(UIRenderMode mode, int32 sortOrder)
 {
@@ -23,7 +20,6 @@ void UICanvas::Init(UIRenderMode mode, int32 sortOrder)
 {
 	m_renderMode = mode;
 	m_canvasSortingOrder = sortOrder;
-	UI.RegisterCanvas(this);
 }
 
 void UICanvas::Render(Program* program)

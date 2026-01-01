@@ -22,7 +22,6 @@ bool Application::Init(int32 width, int32 height, const std::string& title)
 
 	// 2. 핵심 코어 시스템 초기화
 	if (!RENDER.Init()) return false;    // OpenGL 컨텍스트 등 로드
-	UI.Init();							 // UI 벡터 메모리 미리 할당
 	INPUT_MGR.Init();					 // 입력 시스템
 	TIME.Init();						 // 타이머
 	PHYSICS.Init();						 // 물리
@@ -71,9 +70,6 @@ void Application::Run(const std::string& startLevelName)
 		{
 			// 게임 로직 업데이트
 			scene->Update();
-
-			// UI 정렬 로직 업데이트
-			UI.Update();
 
 			// 렌더링 수행 (RenderManager에게 위임)
 			RENDER.Render(scene);
