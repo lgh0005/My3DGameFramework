@@ -1,5 +1,17 @@
 ﻿#pragma once
 
+/*==========================//
+//   declare static class   //
+//==========================*/
+#define DECLARE_STATIC_CLASS(classType)                                         \
+private:                                                                        \
+    classType() = delete;                                                       \
+    ~classType() = delete;                                                      \
+    classType(const classType&) = delete;                                       \
+    classType& operator=(const classType&) = delete;                            \
+    classType(classType&&) = delete;                                            \
+    classType& operator=(classType&&) = delete;
+
 /*======================//
 //   declare singleton  //
 //======================*/

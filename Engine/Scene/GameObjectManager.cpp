@@ -1,6 +1,7 @@
 ﻿#include "EnginePch.h"
 #include "GameObjectManager.h"
 #include "Scene/GameObject.h"
+#include "Components/Transform.h"
 
 GameObjectManager::GameObjectManager() = default;
 GameObjectManager::~GameObjectManager() = default;
@@ -27,6 +28,39 @@ void GameObjectManager::DestroyGameObject(GameObject* go)
 	go->SetDestroy();
 
 	// 삭제 대기열에 등록 (Scene이 참조할 수 있도록)
+	m_pendingDestroyQueue.push_back(go);
+
+	// 자식들도 같이 순장
+	Transform& transform = go->GetTransform();
+	const auto& children = transform.GetChildren();
+	for (Transform* child : children) DestroyGameObject(child->GetOwner());
+}
+
+GameObject* GameObjectManager::FindGameObject(const std::string& name)
+{
+	// 1. 방금 생성되어 대기 중인 녀석들 먼저 검색 (우선순위 높음)
+	for (const auto& obj : m_pendingCreateQueue)
+	{
+		if (obj->GetName() == name) 
+			return obj.get();
+	}
+
+	// 2. 이미 활동 중인 녀석들 검색
+	for (const auto& ptr : m_gameObjects)
+	{
+		if (ptr->GetName() == name) 
+			return ptr.get();
+	}
+
+	return nullptr;
+}
+
+void GameObjectManager::PushToDestroyQueue(GameObject* go)
+{
+	// 이미 죽을 예정인 녀석을 또 죽이면 안 됨 (중복 방지)
+	if (std::find(m_pendingDestroyQueue.begin(), m_pendingDestroyQueue.end(), go)
+		!= m_pendingDestroyQueue.end()) return;
+
 	m_pendingDestroyQueue.push_back(go);
 }
 

@@ -3,6 +3,8 @@
 
 class AssetUtils
 {
+	DECLARE_STATIC_CLASS(AssetUtils)
+
 /*=============================//
 //  File writing util methods  //
 //=============================*/

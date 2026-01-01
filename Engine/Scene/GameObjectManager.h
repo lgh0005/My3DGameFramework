@@ -13,6 +13,9 @@ public:
 	void AddGameObject(GameObjectUPtr go);
 	void DestroyGameObject(GameObject* go);
 
+	GameObject* FindGameObject(const std::string& name);
+	void PushToDestroyQueue(GameObject* go);
+
 	const std::vector<GameObjectUPtr>& GetGameObjects() const;
 	const std::vector<GameObjectUPtr>& GetPendingCreateQueue() const;
 	const std::vector<GameObject*>& GetPendingDestroyQueue() const;

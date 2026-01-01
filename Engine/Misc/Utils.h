@@ -10,9 +10,7 @@
 
 class Utils
 {
-public:
-	Utils() = delete;
-	~Utils() = delete;
+	DECLARE_STATIC_CLASS(Utils)
 
 public:
 

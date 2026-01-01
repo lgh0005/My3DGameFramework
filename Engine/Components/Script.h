@@ -1,5 +1,6 @@
 ﻿#pragma once
 #include "Component.h"
+#include "Scene/SceneUtils.h"
 
 CLASS_PTR(Script)
 class Script : public Component
@@ -9,13 +10,25 @@ public:
 	static const ComponentType s_ComponentType = ComponentType::Script;
 	virtual ComponentType GetComponentType() const override { return ComponentType::Script; }
 
-	// TODO : Awake, FixedUpdate, LateUpdate 등의 분기 필요할 수 있음
-	virtual void Start()   {}
-	virtual void Update()  {}
+/*============================================//
+//  event methods for script : active state   //
+//============================================*/
+public:
+	virtual void OnEnable();
+	virtual void OnDisable();
 
-	// TODO :
-	// 0. OnEnable, OnDisable, OnDestroy
-	// 1. 충돌 시 발생할 이벤트 메서드 : OnTrigger, OnCollision
+/*=======================================//
+//  event methods for script : physics   //
+//=======================================*/
+public:
+	virtual void OnTriggerEnter();
+	virtual void OnTriggerStay();
+	virtual void OnTriggerExit();
+
+	virtual void OnCollisionEnter();
+	virtual void OnCollisionStay();
+	virtual void OnCollisionExit();
+
 protected:
 	Script();
 };

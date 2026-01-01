@@ -7,6 +7,7 @@
 #include "Graphics/RenderPass.h"
 #include "Graphics/SkyLight.h"
 #include "Components/Camera.h"
+#include "Components/Transform.h"
 
 Scene::Scene()
 {
@@ -86,10 +87,6 @@ void Scene::Update()
 	{
 		if (go->IsActiveInHierarchy()) go->Update();
 	}
-
-	// [Phase 4] 삭제 대기열 처리 (Destruction)
-	// 이번 프레임에 죽은 객체들을 정리
-	ProcessPendingKills();
 }
 
 void Scene::LateUpdate()
@@ -142,9 +139,11 @@ void Scene::ProcessPendingKills()
 
 		// 1-2. [Registry] 컴포넌트 말소 (Dangling Pointer 방지)
 		for (const auto& comp : deadObj->GetAllComponents())
-		{
 			m_registry->UnregisterComponent(comp.get());
-		}
+
+		// 1-3. 부모를 nullptr로 설정하면, Transform 내부에서 알아서
+		// 기존 부모의 자식 리스트에서 나를 빼는(RemoveChild) 작업이 수행
+		deadObj->GetTransform().SetParent(nullptr);
 	}
 
 	// 2. [Manager] 승인 (메모리 해제)
@@ -156,8 +155,17 @@ void Scene::ProcessPendingKills()
 //============================*/
 void Scene::AddGameObject(GameObjectUPtr gameObject)
 {
-	// 씬은 중계만 하고, 실제 소유권은 매니저에게 전달
 	m_objectManager->AddGameObject(std::move(gameObject));
+}
+
+GameObject* Scene::FindGameObject(const std::string& name)
+{
+	return m_objectManager->FindGameObject(name);
+}
+
+void Scene::Destroy(GameObject* obj)
+{
+	m_objectManager->DestroyGameObject(obj);
 }
 
 void Scene::OnScreenResize(int32 width, int32 height)
@@ -185,3 +193,4 @@ void Scene::SetSkyLight(SkyLightUPtr skyLight)
 {
 	m_registry->SetSkyLight(std::move(skyLight));
 }
+

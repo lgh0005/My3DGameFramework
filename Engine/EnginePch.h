@@ -32,8 +32,11 @@
 #include "Misc/ImguiManager.h"
 #define IMGUI     ImGuiManager::Instance()
 
+// Logger
+#include "Core/Logger.h"
+#define LOGGER	  Logger::Instance()
+
 // Managers
-#include "Managers/Logger.h"
 #include "Managers/TimeManager.h"
 #include "Managers/WindowManager.h"
 #include "Managers/InputManager.h"
@@ -46,7 +49,6 @@
 
 // TODO : 일부 외부 헤더 때문에 네이밍 컨벤션이
 // 충돌하는 모양. 이름을 조금 수정해볼 필요가 있음.
-#define LOGGER	  Logger::Instance()
 #define TIME	  TimeManager::Instance()
 #define WINDOW	  WindowManager::Instance()
 #define INPUT_MGR	  InputManager::Instance()

@@ -15,12 +15,13 @@ add_library(Engine STATIC
 
    # Core
    "Core/Application.h"             "Core/Application.cpp"
+   "Core/Logger.h"                  "Core/Logger.cpp"
 
    # Scene
    "Scene/Scene.h"                   "Scene/Scene.cpp"
    "Scene/GameObjectManager.h"       "Scene/GameObjectManager.cpp"
    "Scene/SceneRegistry.h"           "Scene/SceneRegistry.cpp"
-   "Scene/SceneScriptAPI.h"          "Scene/SceneScriptAPI.cpp"
+   "Scene/SceneUtils.h"              "Scene/SceneUtils.cpp"
    "Scene/GameObject.h"              "Scene/GameObject.cpp"
    "Scene/Prefab.h"                  "Scene/Prefab.cpp"
 
@@ -61,7 +62,6 @@ add_library(Engine STATIC
    "Misc/AssetFormat.h"             "Misc/AssetFormat.cpp"
    "Misc/AssetUtils.h"              "Misc/AssetUtils.cpp"
    "Misc/PhysicsHelper.h"           "Misc/PhysicsHelper.cpp"
-   "Managers/Logger.h"              "Managers/Logger.cpp"
 
    # Graphics
    "Graphics/Shader.h"              "Graphics/Shader.cpp"

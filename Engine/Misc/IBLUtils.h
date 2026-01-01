@@ -9,6 +9,8 @@ CLASS_PTR(CubeTexture)
 
 class IBLUtils
 {
+    DECLARE_STATIC_CLASS(IBLUtils)
+
 public:
 
     // 1. Spherical Map을 큐브맵으로 변환

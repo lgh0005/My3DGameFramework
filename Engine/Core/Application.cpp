@@ -70,9 +70,13 @@ void Application::Run(const std::string& startLevelName)
 		{
 			// 게임 로직 업데이트
 			scene->Update();
+			scene->LateUpdate();
 
 			// 렌더링 수행 (RenderManager에게 위임)
 			RENDER.Render(scene);
+
+			// 파괴 예약 오브젝트를 파괴
+			scene->ProcessPendingKills();
 		}
 		else
 		{
