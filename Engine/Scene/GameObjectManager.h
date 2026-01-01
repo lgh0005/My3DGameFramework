@@ -1,7 +1,29 @@
 ﻿#pragma once
 
+#pragma region FORWARD_DECLARATION
+CLASS_PTR(GameObject)
+#pragma endregion
+
 CLASS_PTR(GameObjectManager)
 class GameObjectManager
 {
+public:
+	~GameObjectManager();
+	static GameObjectManagerUPtr Create();
+	void AddGameObject(GameObjectUPtr go);
+	void DestroyGameObject(GameObject* go);
 
+	const std::vector<GameObjectUPtr>& GetGameObjects() const;
+	const std::vector<GameObjectUPtr>& GetPendingCreateQueue() const;
+	const std::vector<GameObject*>& GetPendingDestroyQueue() const;
+
+	void FlushCreateQueue();
+	void FlushDestroyQueue();
+
+private:
+	GameObjectManager();
+
+	std::vector<GameObjectUPtr> m_gameObjects;
+	std::vector<GameObjectUPtr> m_pendingCreateQueue;
+	std::vector<GameObject*>	m_pendingDestroyQueue;
 };

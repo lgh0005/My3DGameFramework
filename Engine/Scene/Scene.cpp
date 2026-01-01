@@ -20,6 +20,7 @@
 #include "Components/AudioSource.h"
 #include "Components/AudioListener.h"
 #include "UIs/UICanvas.h"
+#include "GameObjectManager.h"
 
 Scene::Scene() = default;
 Scene::~Scene() = default;
