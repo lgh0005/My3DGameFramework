@@ -6,7 +6,8 @@
 #include "Pipelines/SRP/RenderPasses/StandardGeometryPass.h"
 #include "Pipelines/SRP/RenderPasses/StandardPostProcessPass.h"
 
-#include "Scene/Scene.h"
+#include "Scene/SceneRegistry.h"
+#include "Scene/GameObject.h"
 #include "Graphics/Geometry.h"
 #include "Graphics/Program.h"
 #include "Resources/ScreenMesh.h"
@@ -149,15 +150,23 @@ void StandardDeferredLightingPass::BindShadowMaps(StandardRenderContext* context
 void StandardDeferredLightingPass::GetLightMatricesFromContext(StandardRenderContext* context)
 {
 	// 6. Light Matrices 전송(Context의 Culled List 사용)
+
 	// Scene 전체 조명이 아니라, Context에 담긴 조명만 처리
-	const auto& lights = context->GetScene()->GetLights();
+	// TODO : 이 부분은 SetUniform(const std::string& name, const std::vector<glm::mat4>& value)
+	// 을 이용한다.
+
+	std::vector<glm::mat4> lightSpaceMatrices(MAX_SHADOW_CASTER, glm::mat4(1.0f));
+
+	const auto& lights = context->GetSceneRegistry()->GetLights();
 	for (auto* light : lights)
 	{
+		if (!light->IsEnabled()) continue;
+		if (!light->GetOwner()->IsActiveInHierarchy()) continue;
+
 		int32 idx = light->GetShadowMapIndex();
 		if (idx >= 0 && idx < MAX_SHADOW_CASTER)
-		{
-			std::string uName = "lightSpaceMatrices[" + std::to_string(idx) + "]";
-			m_deferredLightProgram->SetUniform(uName, light->GetLightSpaceMatrix());
-		}
+			lightSpaceMatrices[idx] = light->GetLightSpaceMatrix();
 	}
+
+	m_deferredLightProgram->SetUniform("lightSpaceMatrices", lightSpaceMatrices);
 }

@@ -20,6 +20,7 @@ public:
 private:
     void HandleMovement(float dt);
     void UpdateFiniteStateMachine();
+    void ActiveSelfTest();
 
 private:
     PlayerController();

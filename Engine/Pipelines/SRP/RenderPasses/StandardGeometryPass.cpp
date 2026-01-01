@@ -84,6 +84,9 @@ void StandardGeometryPass::RenderStaticGeometry(const std::vector<StaticMeshRend
 	m_staticGeometryProgram->Use();
 	for (const auto* renderer : meshes)
 	{
+		if (!renderer->IsEnabled()) continue;
+		if (!renderer->GetOwner()->IsActiveInHierarchy()) continue;
+
 		auto model = renderer->GetTransform().GetWorldMatrix();
 		m_staticGeometryProgram->SetUniform("model", model);
 		renderer->Render(m_staticGeometryProgram.get());
@@ -97,6 +100,9 @@ void StandardGeometryPass::RenderSkinnedGeometry(const std::vector<SkinnedMeshRe
 	m_skinnedGeometryProgram->Use();
 	for (const auto* renderer : meshes)
 	{
+		if (!renderer->IsEnabled()) continue;
+		if (!renderer->GetOwner()->IsActiveInHierarchy()) continue;
+
 		auto model = renderer->GetTransform().GetWorldMatrix();
 		m_skinnedGeometryProgram->SetUniform("model", model);
 

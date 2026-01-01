@@ -14,6 +14,7 @@
 
 #include "Scene/Scene.h"
 #include "Scene/GameObject.h"
+#include "Scene/SceneRegistry.h"
 #include "Graphics/RenderPass.h"
 #include "Graphics/Program.h"
 #include "Graphics/ShadowMap.h"
@@ -95,7 +96,8 @@ void UniversalRenderPipeline::Render(Scene* scene)
 	//   get essential scene properties   //
 	//====================================*/
 	// 메인 카메라 속성 가져오기
-	auto* camera = scene->GetMainCamera();
+	auto* registry = scene->GetRegistry();
+	auto* camera = registry->GetCamera(0);
 	if (!camera) return;
 
 	// 0. 스택 영역에 StandardRenderContext 생성
@@ -131,7 +133,7 @@ void UniversalRenderPipeline::Render(Scene* scene)
 	BlitCopyDepth(gBuffer, postFBO, gBuffer->GetWidth(), gBuffer->GetHeight());
 
 	// [패스 5] 포워드 셰이딩
-	for (const auto& [name, pass] : scene->GetCustomRenderPasses())
+	for (const auto& [name, pass] : registry->GetCustomRenderPasses())
 		pass->Render(scene, camera);
 
 	// [패스 6] 스카이박스 패스

@@ -3,7 +3,7 @@
 #include "Graphics/Frustum.h"
 
 #pragma region FORWARD_DECLARATION
-CLASS_PTR(Scene)
+CLASS_PTR(SceneRegistry)
 CLASS_PTR(RenderContext)
 #pragma endregion
 
@@ -19,10 +19,10 @@ public:
 //   culling methods   //
 //=====================*/
 private:
-	void CullStaticMeshRenderers(Scene* scene, RenderContext* context);
-	void CullSkinnedMeshRenderers(Scene* scene, RenderContext* context);
-	void CullMeshOutlines(Scene* scene, RenderContext* context);
-	void CullSceneLights(Scene* scene, RenderContext* context);
+	void CullStaticMeshRenderers(SceneRegistry* registry, RenderContext* context);
+	void CullSkinnedMeshRenderers(SceneRegistry* registry, RenderContext* context);
+	void CullMeshOutlines(SceneRegistry* registry, RenderContext* context);
+	void CullSceneLights(SceneRegistry* registry, RenderContext* context);
 
 private:
 	CullingPass();

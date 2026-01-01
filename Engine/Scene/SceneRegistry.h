@@ -31,7 +31,7 @@ public:
 private:
 	SceneRegistry();
 
-	template<typename T>
+	template<typename T> 
 	void RemoveFromVector(std::vector<T*>& vec, Component* comp);
 
 /*=======================================//
@@ -41,6 +41,7 @@ public:
 	Camera* GetCamera(uint32 idx) const;
 	void AddCustomRenderPass(const std::string& name, GeneralRenderPassUPtr pass);
 	GeneralRenderPass* GetCustomRenderPass(const std::string& name);
+	auto& GetCustomRenderPasses() const { return m_customPasses; }
 	void SetSkyLight(SkyLightUPtr skyLight);
 	SkyLight* GetSkyLight() const;
 
@@ -82,7 +83,7 @@ private:
 //====================================*/
 #pragma region SCENE_REGISTRY_TEMPLATE_INLINES
 template<typename T>
-inline void RemoveFromVector(std::vector<T*>& vec, Component* comp)
+inline void SceneRegistry::RemoveFromVector(std::vector<T*>& vec, Component* comp)
 {
 	// 삭제는 빈번하므로 Swap & Pop 패턴 적용 (순서 중요치 않음)
 	T* target = static_cast<T*>(comp);

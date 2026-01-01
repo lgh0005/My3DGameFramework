@@ -158,12 +158,14 @@ void UniversalOutlinePass::MaskStaticMeshes(const std::vector<MeshOutline*>& out
 
 	for (auto* outline : outlines)
 	{
+		if (!outline->IsEnabled()) continue;
+
 		auto* owner = outline->GetOwner();
-		if (!owner) continue;
+		if (!owner || !owner->IsActiveInHierarchy()) continue;
 
 		// StaticMeshRenderer만 골라냄
 		auto* renderer = owner->GetComponent<StaticMeshRenderer>();
-		if (!renderer) continue;
+		if (!renderer || !renderer->IsEnabled()) continue;
 
 		// Static용 유니폼 설정 (Bone 필요 없음)
 		m_maskStaticProgram->SetUniform("model", renderer->GetTransform().GetWorldMatrix());
@@ -178,12 +180,14 @@ void UniversalOutlinePass::MaskSkinnedMeshes(const std::vector<MeshOutline*>& ou
 	m_maskSkinnedProgram->Use();
 	for (auto* outline : outlines)
 	{
+		if (!outline->IsEnabled()) continue;
+
 		auto* owner = outline->GetOwner();
-		if (!owner) continue;
+		if (!owner || !owner->IsActiveInHierarchy()) continue;
 
 		// SkinnedMeshRenderer만 골라냄
 		auto* renderer = owner->GetComponent<SkinnedMeshRenderer>();
-		if (!renderer) continue;
+		if (!renderer || !renderer->IsEnabled()) continue;
 
 		// Skinned용 유니폼 설정
 		m_maskSkinnedProgram->SetUniform("model", renderer->GetTransform().GetWorldMatrix());
@@ -191,7 +195,8 @@ void UniversalOutlinePass::MaskSkinnedMeshes(const std::vector<MeshOutline*>& ou
 
 		// Bone 행렬 전달
 		Animator* animator = renderer->GetAnimator();
-		if (animator) m_maskSkinnedProgram->SetUniform("finalBoneMatrices", animator->GetFinalBoneMatrices());
+		if (animator && animator->IsEnabled() && animator->GetOwner()->IsActiveInHierarchy())
+			m_maskSkinnedProgram->SetUniform("finalBoneMatrices", animator->GetFinalBoneMatrices());
 		else m_maskSkinnedProgram->SetUniform("finalBoneMatrices", GetIdentityBones());
 		renderer->Render(m_maskSkinnedProgram.get());
 	}

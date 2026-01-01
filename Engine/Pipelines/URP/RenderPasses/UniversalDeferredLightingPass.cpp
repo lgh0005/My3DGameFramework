@@ -7,6 +7,7 @@
 #include "Pipelines/SRP/RenderPasses/StandardPostProcessPass.h"
 
 #include "Scene/Scene.h"
+#include "Scene/SceneRegistry.h"
 #include "Graphics/Geometry.h"
 #include "Graphics/Program.h"
 #include "Resources/ScreenMesh.h"
@@ -194,7 +195,8 @@ void UniversalDeferredLightingPass::GetLightMatricesFromContext(UniversalRenderC
 {
 	// 6. Light Matrices 전송(Context의 Culled List 사용)
 	// Scene 전체 조명이 아니라, Context에 담긴 조명만 처리
-	const auto& lights = context->GetScene()->GetLights();
+	// TODO : 배열 쨰로 넘기게 수정 필요
+	const auto& lights = context->GetSceneRegistry()->GetLights();
 	for (auto* light : lights)
 	{
 		int32 idx = light->GetShadowMapIndex();

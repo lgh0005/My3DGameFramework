@@ -14,9 +14,11 @@ public:
 
 protected:
 	PBRScene();
-	virtual bool LoadNessesaryResources()	   override;
-	virtual bool CreateNessesaryRenderPasses() override;
-	virtual bool CreateSceneContext()		   override;
+	virtual bool LoadSceneResources()	    override;
+	virtual bool CreateCustomRenderPasses() override;
+	virtual bool SetupSceneEnvironment()	override;
+	virtual bool OnPlaceActors()			override;
+	virtual bool OnBeginPlay()				override;
 
 /*==============//
 //   for test   //

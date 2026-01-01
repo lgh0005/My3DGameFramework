@@ -14,6 +14,7 @@
 
 #include "Scene/Scene.h"
 #include "Scene/GameObject.h"
+#include "Scene/SceneRegistry.h"
 #include "Graphics/Program.h"
 #include "Resources/Mesh.h"
 #include "Resources/StaticMesh.h" 
@@ -105,7 +106,10 @@ void StandardRenderPipeline::Render(Scene* scene)
 	//   get essential scene properties   //
 	//====================================*/
 	// 메인 카메라 속성 가져오기
-	auto* camera = scene->GetMainCamera();
+	// TODO : 이후에는 여러 카메라를 지원할 것이라면 카메라 개수 만큼
+	// 반복해야 할 수도 있음.
+	auto* registry = scene->GetRegistry();
+	auto* camera = registry->GetCamera(0);
 	if (!camera) return;
 
 	// 0. 스택 영역에 StandardRenderContext 생성
@@ -141,7 +145,7 @@ void StandardRenderPipeline::Render(Scene* scene)
 	BlitCopyDepth(gBuffer, postFBO, gBuffer->GetWidth(), gBuffer->GetHeight());
 
 	// [패스 5] 포워드 셰이딩
-	for (const auto& [name, pass] : scene->GetCustomRenderPasses())
+	for (const auto& [name, pass] : registry->GetCustomRenderPasses())
 		pass->Render(scene, camera);
 
 	// ====================================================

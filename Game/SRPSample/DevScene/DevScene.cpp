@@ -51,10 +51,8 @@ DevSceneUPtr DevScene::Create()
 	return std::move(devScene);
 }
 
-bool DevScene::LoadNessesaryResources()
+bool DevScene::LoadSceneResources()
 {
-	// TODO : 이젠 웬만하면 이미지는 ktx를 쓰는 것을 권장
-
 	// 0-1. 큐브 메쉬
 	auto boxMesh = GeometryGenerator::CreateBox();
 	RESOURCE.AddResource<StaticMesh>(std::move(boxMesh), "Cube");
@@ -88,11 +86,7 @@ bool DevScene::LoadNessesaryResources()
 
 	// 0-4. 머티리얼 2
 	{
-		/*TextureUPtr diffuseTexture = Texture::CreateFromImage
-		(Image::Load("./Resources/Images/container.jpg").get());*/
 		TextureUPtr diffuseTexture = Texture::CreateFromKtxImage("./Resources/Images/baked/container.ktx");
-		/*TextureUPtr emissionTexture = Texture::CreateFromImage
-		(Image::Load("./Resources/Images/matrix.jpg").get());*/
 		TextureUPtr emissionTexture = Texture::CreateFromKtxImage("./Resources/Images/baked/matrix.ktx");
 
 		auto box1Mat = Material::Create();
@@ -106,14 +100,8 @@ bool DevScene::LoadNessesaryResources()
 
 	// 0-5. 머티리얼 3
 	{
-		/*TextureUPtr diffuseTexture = Texture::CreateFromImage
-		(Image::Load("./Resources/Images/container2.png").get());*/
 		TextureUPtr diffuseTexture = Texture::CreateFromKtxImage("./Resources/Images/baked/container2.ktx");
 		TextureUPtr specularTexture = Texture::CreateFromKtxImage("./Resources/Images/baked/container2_specular.ktx");
-		/*TextureUPtr specularTexture = Texture::CreateFromImage
-		(Image::Load("./Resources/Images/container2_specular.png").get());*/
-		/*TextureUPtr emissionTexture = Texture::CreateFromImage
-		(Image::Load("./Resources/Images/matrix.jpg").get());*/
 		TextureUPtr emissionTexture = Texture::CreateFromKtxImage("./Resources/Images/baked/matrix.ktx");
 
 		auto box2Mat = Material::Create();
@@ -128,7 +116,6 @@ bool DevScene::LoadNessesaryResources()
 
 	// 0-6. 머티리얼 4
 	{
-		/*TextureUPtr diffuseTexture = Texture::CreateFromImage(Image::Load("./Resources/Images/marble.jpg").get());*/
 		TextureUPtr diffuseTexture = Texture::CreateFromKtxImage("./Resources/Images/baked/marble.ktx");
 
 		auto box4Mat = Material::Create();
@@ -192,21 +179,7 @@ bool DevScene::LoadNessesaryResources()
 
 	// 8. 하늘 큐브맵
 	{
-		/*auto cubeRight = Image::Load("./Resources/Images/Skybox/right.jpg", false);
-		auto cubeLeft = Image::Load("./Resources/Images/Skybox/left.jpg", false);
-		auto cubeTop = Image::Load("./Resources/Images/Skybox/top.jpg", false);
-		auto cubeBottom = Image::Load("./Resources/Images/Skybox/bottom.jpg", false);
-		auto cubeFront = Image::Load("./Resources/Images/Skybox/front.jpg", false);
-		auto cubeBack = Image::Load("./Resources/Images/Skybox/back.jpg", false);*/
-
 		auto cubeSky = CubeTexture::CreateFromKtxImage("./Resources/Images/baked/sky.ktx");
-
-		/*auto cubeTexture = CubeTexture::CreateFromImages({
-		  cubeRight.get(),cubeLeft.get(),
-		  cubeTop.get(), cubeBottom.get(),
-		  cubeFront.get(), cubeBack.get() });
-		if (!cubeTexture) return false;*/
-
 		RESOURCE.AddResource<CubeTexture>(std::move(cubeSky), "SkyboxTexture");
 	}
 
@@ -225,7 +198,7 @@ bool DevScene::LoadNessesaryResources()
 	return true;
 }
 
-bool DevScene::CreateNessesaryRenderPasses()
+bool DevScene::CreateCustomRenderPasses()
 {
 	auto pipeline = RENDER.GetRenderer()->GetPipeline();
 
@@ -235,7 +208,7 @@ bool DevScene::CreateNessesaryRenderPasses()
 			"./Resources/Shaders/grass.vert",
 			"./Resources/Shaders/grass.frag");
 		if (!prog) return false;
-		AddCustomRenderPass("Instanced", InstancedRenderPass::Create(std::move(prog)));
+		AddRenderPass("Instanced", InstancedRenderPass::Create(std::move(prog)));
 	}
 
 	// 2. Simple 셰이더 (조명 기즈모)
@@ -244,7 +217,7 @@ bool DevScene::CreateNessesaryRenderPasses()
 			"./Resources/Shaders/simple.vert",
 			"./Resources/Shaders/simple.frag");
 		if (!prog) return false;
-		AddCustomRenderPass("LightGizmo", SimpleRenderPass::Create(std::move(prog)));
+		AddRenderPass("LightGizmo", SimpleRenderPass::Create(std::move(prog)));
 	}
 
 	// 3. 환경맵
@@ -257,25 +230,28 @@ bool DevScene::CreateNessesaryRenderPasses()
 		if (!prog) return false;
 		CubeTexturePtr cubeTex = RESOURCE.GetResource<CubeTexture>("SkyboxTexture");
 		if (!cubeTex) return false;
-		AddCustomRenderPass("EnvMap", EnvironmentRenderPass::Create(std::move(prog), cubeTex));
+		AddRenderPass("EnvMap", EnvironmentRenderPass::Create(std::move(prog), cubeTex));
 	}
 
 	return true;
 }
 
-bool DevScene::CreateSceneContext()
+bool DevScene::SetupSceneEnvironment()
 {
-	// 0. 하늘 설정
 	auto sky = SkyLight::CreateStandardSky(RESOURCE.GetResource<CubeTexture>("SkyboxTexture"));
+	if (!sky) return false;
 	SetSkyLight(std::move(sky));
+	return true;
+}
 
-	SimpleRenderPass* lightPass = (SimpleRenderPass*)GetCustomRenderPass("LightGizmo");
-	InstancedRenderPass* grassPass = (InstancedRenderPass*)GetCustomRenderPass("Instanced");
-	EnvironmentRenderPass* envMapPass = (EnvironmentRenderPass*)GetCustomRenderPass("EnvMap");
+bool DevScene::OnPlaceActors()
+{
+	SimpleRenderPass* lightPass = (SimpleRenderPass*)GetRenderPass("LightGizmo");
+	InstancedRenderPass* grassPass = (InstancedRenderPass*)GetRenderPass("Instanced");
+	EnvironmentRenderPass* envMapPass = (EnvironmentRenderPass*)GetRenderPass("EnvMap");
 
-	// 3. 카메라 GameObject 생성
+	// 1. 카메라 GameObject 생성
 	{
-		// GameObject 생성 및 씬에 등록
 		auto cameraObj = GameObject::Create(); if (!cameraObj) return false;
 		auto camera = Camera::Create();		   if (!camera)	   return false;
 		auto* cameraPtr = camera.get();
@@ -293,15 +269,14 @@ bool DevScene::CreateSceneContext()
 		auto audioListener = AudioListener::Create();
 		cameraObj->AddComponent(std::move(audioListener));
 
-		SetMainCamera(cameraPtr); // 메인 카메라로 설정
-
 		AddGameObject(std::move(cameraObj));
 	}
 
-	// 조명 큐브 #2
+	// 조명 큐브 #1
 	{
 		auto lightGo = GameObject::Create();
 		lightGo->SetName("SpotLight");
+
 		auto lightComp = SpotLight::Create();
 		lightComp->SetCastShadow(true);
 		lightGo->GetTransform().SetPosition(glm::vec3(1.0f, 4.0f, 4.0f));
@@ -309,43 +284,31 @@ bool DevScene::CreateSceneContext()
 		lightComp->SetCutoff(glm::vec2(60.0, 5.0f));
 		lightComp->SetDistance(128.0f);
 		lightGo->AddComponent(std::move(lightComp));
+
 		auto renderer = StaticMeshRenderer::Create
 		(RESOURCE.GetResource<StaticMesh>("Cube"), RESOURCE.GetResource<Material>("LightMat"));
 		renderer->SetRenderStage(RenderStage::Forward);
 		lightPass->AddRenderer(renderer.get());
+
 		lightGo->AddComponent(std::move(renderer));
 		AddGameObject(std::move(lightGo));
 	}
 
-	//// 조명 큐브 #1
-	//{
-	//	auto lightGo = GameObject::Create();
-	//	lightGo->SetName("DirectionalLight");
-	//	auto lightComp = DirectionalLight::Create();
-	//	SetMainLight(lightComp.get());
-	//	lightGo->GetTransform().SetPosition(glm::vec3(-1.0f, 3.0f, 7.0f));
-	//	lightGo->GetTransform().SetRotation(glm::vec3(-128.0f, 0.0f, 0.0f));
-	//	lightGo->GetTransform().SetScale(glm::vec3(0.2f));
-	//	lightGo->AddComponent(std::move(lightComp));
-	//	auto renderer = MeshRenderer::Create
-	//	(RESOURCE.GetResource<Mesh>("Cube"), RESOURCE.GetResource<Material>("LightMat"));
-	//	lightPass->AddRenderer(renderer.get());
-	//	lightGo->AddComponent(std::move(renderer));
-	//	AddGameObject(std::move(lightGo));
-	//}
-
-	// 조명 큐브 #3
+	// 조명 큐브 #2
 	{
 		auto lightGo = GameObject::Create();
 		lightGo->SetName("PointLight");
+
 		auto lightComp = PointLight::Create();
 		lightGo->GetTransform().SetPosition(glm::vec3(5.0f, 3.0f, 7.0f));
 		lightGo->GetTransform().SetScale(glm::vec3(0.2f));
 		lightGo->AddComponent(std::move(lightComp));
+
 		auto renderer = StaticMeshRenderer::Create
 		(RESOURCE.GetResource<StaticMesh>("Cube"), RESOURCE.GetResource<Material>("LightMat"));
 		renderer->SetRenderStage(RenderStage::Forward);
 		lightPass->AddRenderer(renderer.get());
+
 		lightGo->AddComponent(std::move(renderer));
 		AddGameObject(std::move(lightGo));
 	}
@@ -379,6 +342,7 @@ bool DevScene::CreateSceneContext()
 		cubeObj->AddComponent(std::move(meshRenderer));
 
 		// TEMP : BGM 재생
+		// TODO : 이걸 OnBeginPlay에서 실행시킬 방안을 찾아야 함
 		auto audiSourc = AudioSource::Create(RESOURCE.GetResource<AudioClip>("MyBGM"));
 		audiSourc->Play();
 		cubeObj->AddComponent(std::move(audiSourc));
@@ -453,64 +417,6 @@ bool DevScene::CreateSceneContext()
 		AddGameObject(std::move(cubeObj));
 	}
 
-	//// 7. 모델
-	//{
-	//	// 1. 리소스 먼저 확보 (Model과 Animation)
-	//	auto model = RESOURCE.GetResource<Model>("aliensoldier");
-	//	auto anim1 = RESOURCE.GetResource<Animation>("Idle");
-	//	auto anim2 = RESOURCE.GetResource<Animation>("Walk");
-	//	auto animCtrl = AnimController::Create();
-	//	animCtrl->AddState("Idle", anim1);
-	//	animCtrl->AddState("Walk", anim2);
-	//	animCtrl->SetTransitionDuration("Idle", "Walk", 0.2f);
-	//	animCtrl->SetTransitionDuration("Walk", "Idle", 0.2f);
-	//	animCtrl->SetStartState("Idle");
-
-	//	// 2. GameObject 생성
-	//	auto modelGo = GameObject::Create();
-	//	modelGo->SetName("Soldier");
-	//	modelGo->GetTransform().SetPosition(glm::vec3(2.0f, 0.0f, -2.0f));
-	//	modelGo->GetTransform().SetScale(glm::vec3(0.025f));
-
-	//	// 3. 애니메이터 생성
-	//	auto animator = Animator::Create(model, std::move(animCtrl));
-
-	//	// 4. Model 안의 모든 Mesh 조각을 MeshRenderer 컴포넌트로 추가
-	//	for (uint32 i = 0; i < model->GetMeshCount(); ++i)
-	//	{
-	//		// TEMP : 우선은 메쉬를 욱여넣기
-	//		SkinnedMeshPtr mesh = model->GetSkinnedMesh(i);
-	//		auto renderer = SkinnedMeshRenderer::Create(mesh, mesh->GetMaterial(), animator.get());
-	//		modelGo->AddComponent(std::move(renderer));
-	//	}
-	//	if (animator) modelGo->AddComponent(std::move(animator));
-
-	//	// 5. PlayerController
-	//	auto script = PlayerController::Create();
-	//	modelGo->AddComponent(std::move(script));
-
-	//	// 5. 씬에 GameObject 등록
-	//	AddGameObject(std::move(modelGo));
-	//}
-
-	//// 가방
-	//{
-	//	auto modelGo = GameObject::Create();
-	//	modelGo->SetName("Backpack");
-	//	modelGo->GetTransform().SetPosition(glm::vec3(6.0f, 1.0f, -6.0f));
-	//	modelGo->GetTransform().SetScale(glm::vec3(1.5f));
-
-	//	auto model = RESOURCE.GetResource<Model>("backpack");
-	//	for (uint32 i = 0; i < model->GetMeshCount(); ++i)
-	//	{
-	//		StaticMeshPtr mesh = model->GetStaticMesh(i);
-	//		auto renderer = StaticMeshRenderer::Create(mesh, mesh->GetMaterial());
-	//		modelGo->AddComponent((std::move(renderer)));
-	//	}
-
-	//	AddGameObject(std::move(modelGo));
-	//}
-
 	// 7. 모델 (Alien Soldier - Skinned Mesh)
 	{
 		// 1. 리소스 확보
@@ -534,7 +440,6 @@ bool DevScene::CreateSceneContext()
 		// 4. Instantiate (이제 한 줄로 끝!)
 		// 내부에서 노드 계층 구조 생성 + 자식들 Scene 등록 + 렌더러 부착까지 다 해줍니다.
 		GameObjectUPtr rootUPtr = model->Instantiate(this, animatorPtr);
-
 		if (rootUPtr)
 		{
 			GameObject* rootGO = rootUPtr.get();
@@ -580,6 +485,12 @@ bool DevScene::CreateSceneContext()
 	// 잔디밭
 	// PlantTenThousandGrass(grassPass);
 
+	return true;
+}
+
+bool DevScene::OnBeginPlay()
+{
+	// TODO : 노래 재생
 	return true;
 }
 

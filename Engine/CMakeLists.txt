@@ -151,8 +151,7 @@ add_library(Engine STATIC
    "Managers/AudioManager.h"        "Managers/AudioManager.cpp"
    "Managers/PhysicsManager.h"      "Managers/PhysicsManager.cpp"
    "Managers/UIManager.h"           "Managers/UIManager.cpp"
-
- "Scene/GameObjectManager.h" "Scene/SceneRegistry.h")
+)
 
 # 2. [PCH 설정] EnginePCH.h를 PCH로 사용합니다.
 target_precompile_headers(Engine  PUBLIC EnginePCH.h)

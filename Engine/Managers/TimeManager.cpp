@@ -13,14 +13,11 @@ void TimeManager::Update()
     m_currentTime = glfwGetTime();
     m_deltaTime = static_cast<float>(m_currentTime - m_lastTime);
 
-    // [중요] 나선형 죽음(Spiral of Death) 방지
-    // 게임이 너무 느려져서 한 프레임에 1초가 걸렸다고 칩시다.
-    // 이걸 그대로 물리 엔진에 넣으면 물리 업데이트를 60번 돌려야 하고,
-    // 그러면 다음 프레임은 더 느려져서 영원히 멈춥니다.
-    // 그래서 DeltaTime에 상한선(0.25초)을 둡니다.
+    // [Spiral of Death 방지]
     if (m_deltaTime > 0.25f) m_deltaTime = 0.25f;
 
     m_lastTime = m_currentTime;
+    m_accumulator += m_deltaTime;
     CalculateFPS();
 }
 

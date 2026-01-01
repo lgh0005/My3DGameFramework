@@ -2,6 +2,7 @@
 
 #pragma region FORWARD_DECLARATION
 CLASS_PTR(Scene)
+CLASS_PTR(SceneRegistry)
 CLASS_PTR(Camera)
 CLASS_PTR(StaticMeshRenderer)
 CLASS_PTR(SkinnedMeshRenderer)
@@ -31,7 +32,7 @@ public:
 //   default render context getters   //
 //====================================*/
 public:
-	Scene* GetScene() const;
+	SceneRegistry* GetSceneRegistry() const;
 	Camera* GetCamera() const;
 	SkyLight* GetSkyLight() const;
 	const std::vector<StaticMeshRenderer*>& GetStaticMeshRenderers() const;
@@ -46,7 +47,7 @@ protected:
 	RenderContext();
 
 	// 씬과 카메라
-	Scene* m_currentScene{ nullptr };
+	SceneRegistry* m_currentSceneRegistry{ nullptr };
 	Camera* m_currentCamera{ nullptr };
 
 	// 하늘

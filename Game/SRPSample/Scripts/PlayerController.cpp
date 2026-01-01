@@ -20,6 +20,8 @@ void PlayerController::Start()
     INPUT_MGR.MapAction("Player_Down", GLFW_KEY_DOWN);
     INPUT_MGR.MapAction("Player_Left", GLFW_KEY_LEFT);
     INPUT_MGR.MapAction("Player_Right", GLFW_KEY_RIGHT);
+    INPUT_MGR.MapAction("Disable_Self", GLFW_KEY_Q);
+    // INPUT_MGR.MapAction("Enable_Self", GLFW_KEY_E);
 
     m_animator = GetOwner()->GetComponent<Animator>();
     m_animController = m_animator->GetController();
@@ -28,6 +30,7 @@ void PlayerController::Start()
 
 void PlayerController::Update()
 {
+    ActiveSelfTest();
     HandleMovement(TIME.GetDeltaTime());
     UpdateFiniteStateMachine();
 }
@@ -67,4 +70,13 @@ void PlayerController::UpdateFiniteStateMachine()
 {
     if (m_isMoving) m_animController->CrossFade("Walk");
     else m_animController->CrossFade("Idle");
+}
+
+void PlayerController::ActiveSelfTest()
+{
+    if (INPUT_MGR.GetButton("Disable_Self"))
+    {
+        GetOwner()->SetActive(false);
+        return;
+    }
 }

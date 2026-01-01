@@ -7,6 +7,8 @@
 #include "Components/MeshOutline.h"
 #include "Resources/CubeTexture.h"
 #include "Resources/Texture.h"
+#include "Scene/Scene.h"
+#include "Scene/SceneRegistry.h"
 
 RenderContext::RenderContext() = default;
 RenderContext::~RenderContext() = default;
@@ -17,16 +19,16 @@ RenderContext::~RenderContext() = default;
 void RenderContext::Reset(Scene* scene, Camera* camera)
 {
 	// 1. 기본 정보 갱신
-	m_currentScene  = scene;
+	m_currentSceneRegistry = scene->GetRegistry();
 	m_currentCamera = camera;
 
 	// 2. 씬의 원본 데이터 연결
-	if (m_currentScene)
+	if (m_currentSceneRegistry)
 	{
-		m_staticMeshRenderers  = &scene->GetStaticMeshRenderers();
-		m_skinnedMeshRenderers = &scene->GetSkinnedMeshRenderers();
-		m_lights			   = &scene->GetLights();
-		m_skyLight			   = m_currentScene->GetSkyLight();
+		m_staticMeshRenderers  = &m_currentSceneRegistry->GetStaticMeshRenderers();
+		m_skinnedMeshRenderers = &m_currentSceneRegistry->GetSkinnedMeshRenderers();
+		m_lights			   = &m_currentSceneRegistry->GetLights();
+		m_skyLight			   = m_currentSceneRegistry->GetSkyLight();
 	}
 	else
 	{
@@ -37,6 +39,7 @@ void RenderContext::Reset(Scene* scene, Camera* camera)
 	}
 
 	// 3. 결과 벡터 초기화
+	m_culledMeshOutlines.clear();
 	m_culledStaticMeshRenderers.clear();
 	m_culledSkinnedMeshRenderers.clear();
 	m_culledLights.clear();
@@ -65,9 +68,9 @@ void RenderContext::AddLight(Light* light)
 /*====================================//
 //   default render context getters   //
 //====================================*/
-Scene* RenderContext::GetScene() const
+SceneRegistry* RenderContext::GetSceneRegistry() const
 {
-	return m_currentScene;
+	return m_currentSceneRegistry;
 }
 
 Camera* RenderContext::GetCamera() const

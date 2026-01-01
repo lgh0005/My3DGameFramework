@@ -2,6 +2,7 @@
 #include "HDRRenderPass.h"
 
 #include "Scene/Scene.h"
+#include "Scene/SceneRegistry.h"
 #include "Graphics/Program.h"
 #include "Resources/Mesh.h"
 #include "Resources/Material.h"
@@ -45,7 +46,7 @@ void HDRRenderPass::Render(Scene* scene, Camera* camera)
 {
     m_simpleProgram->Use();
 
-    auto sky = scene->GetSkyLight();
+    auto sky = scene->GetRegistry()->GetSkyLight();
     {
         // Irradiance 적용
         auto* irradianceMap = sky->GetIrradianceMap();

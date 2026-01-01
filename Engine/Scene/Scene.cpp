@@ -2,215 +2,186 @@
 #include "Scene.h"
 
 #include "Scene/GameObject.h"
+#include "Scene/SceneRegistry.h"
+#include "Scene/GameObjectManager.h"
 #include "Graphics/RenderPass.h"
-#include "Resources/Mesh.h"
 #include "Graphics/SkyLight.h"
-#include "Components/Component.h"
-#include "Components/Light.h"
-#include "Components/PointLight.h"
-#include "Components/DirectionalLight.h"
-#include "Components/StaticMeshRenderer.h"
-#include "Components/SkinnedMeshRenderer.h"
-#include "Components/InstancedMeshRenderer.h"
-#include "Components/MeshOutline.h"
 #include "Components/Camera.h"
-#include "Components/Animator.h"
-#include "Components/Script.h"
-#include "Components/Transform.h"
-#include "Components/AudioSource.h"
-#include "Components/AudioListener.h"
-#include "UIs/UICanvas.h"
-#include "GameObjectManager.h"
 
-Scene::Scene() = default;
+Scene::Scene()
+{
+	m_registry = SceneRegistry::Create();
+	m_objectManager = GameObjectManager::Create();
+}
 Scene::~Scene() = default;
 
-/*==============================================//
-//   default scene context management methods   //
-//==============================================*/
-void Scene::AddGameObject(GameObjectUPtr gameObject)
-{
-	auto* go = gameObject.get();
-	for (const auto& comp : go->GetAllComponents())
-		RegisterComponent(comp.get());
-
-	m_gameObjects.push_back(std::move(gameObject));
-}
-
-void Scene::OnScreenResize(int32 width, int32 height)
-{
-	// TODO : 이후에는 다중 카메라에 대해서 모든 카메라가 리사이징 되어야함
-	auto* camera = GetMainCamera();
-	if (camera) camera->SetViewportSize((float)width, (float)height);
-}
-
-/*===================================================================//
-//   object, component and custom render passes management methods   //
-//===================================================================*/
-void Scene::RegisterComponent(Component* component)
-{
-	if (!component) return;
-
-	// TODO : 이후에 다른 게임 컴포넌트들도 나열해야함
-	switch (component->GetComponentType())
-	{
-		case ComponentType::Camera:
-		{
-			m_cameras.push_back(static_cast<Camera*>(component));
-			break;
-		}
-		case ComponentType::DirectionalLight:
-		case ComponentType::PointLight:
-		case ComponentType::SpotLight:
-		{
-			m_lights.push_back(static_cast<Light*>(component));
-			break;
-		}
-		case ComponentType::Animator:
-		{
-			m_animators.push_back(static_cast<Animator*>(component));
-			break;
-		}
-		case ComponentType::Script:
-		{
-			m_scripts.push_back(static_cast<Script*>(component));
-			break;
-		}
-		case ComponentType::AudioSource:
-		{
-			m_audioSources.push_back(static_cast<AudioSource*>(component));
-			break;
-		}
-		case ComponentType::AudioListener:
-		{
-			m_audioListeners.push_back(static_cast<AudioListener*>(component));
-			break;
-		}
-		case ComponentType::StaticMeshRenderer:
-		{
-			auto mr = static_cast<StaticMeshRenderer*>(component);
-			if (mr->GetRenderStage() == RenderStage::Forward) return;
-			m_staticMeshRenderers.push_back(mr);
-			break;
-		}
-		case ComponentType::SkinnedMeshRenderer:
-		{
-			auto mr = static_cast<SkinnedMeshRenderer*>(component);
-			if (mr->GetRenderStage() == RenderStage::Forward) return;
-			m_skinnedMeshRenderers.push_back(mr);
-			break;
-		}
-		case ComponentType::InstancedMeshRenderer:
-		{
-			auto mr = static_cast<InstancedMeshRenderer*>(component);
-			if (mr->GetRenderStage() == RenderStage::Forward) return;
-			m_instancedMeshRenderers.push_back(mr);
-			break;
-		}
-		case ComponentType::MeshOutline:
-		{
-			m_outlines.push_back(static_cast<MeshOutline*>(component));
-			break;
-		}
-		case ComponentType::UICanvas:
-		{
-			m_uiCanvases.push_back(static_cast<UICanvas*>(component));
-			break;
-		}
-	}
-}
-
-GeneralRenderPass* Scene::GetCustomRenderPass(const std::string& name)
-{
-	auto it = m_customPasses.find(name);
-	if (it != m_customPasses.end()) return it->second.get();
-	return nullptr;
-}
-
-void Scene::AddCustomRenderPass(const std::string& name, GeneralRenderPassUPtr pass)
-{
-	if (m_customPasses.find(name) != m_customPasses.end())
-		LOG_WARN("Custom random pass '{}' already exists. Overwriting.", name);
-
-	m_customPasses[name] = std::move(pass);
-}
-
-void Scene::SetSkyLight(SkyLightUPtr skyLight)
-{
-	m_sky = std::move(skyLight);
-}
-
-/*=====================================//
-//   default scene lifecycle methods   //
-//=====================================*/
+/*===================================================//
+//    Scene Lifecycle Flow (System Initialization)   //
+//===================================================*/
 bool Scene::Init()
 {
-	if (!LoadNessesaryResources())
-	{
-		LOG_ERROR("failed to load resources.");
-		return false;
-	}
+	// 1. 엔진 레벨 리소스 로드
+	if (!LoadSceneResources()) return false;
 
-	if (!CreateNessesaryRenderPasses())
-	{
-		LOG_ERROR("failed to create render passes.");
-		return false;
-	}
+	// 2. 렌더 패스 설정
+	if (!CreateCustomRenderPasses()) return false;
 
-	if (!CreateSceneContext())
-	{
-		LOG_ERROR("failed to create scene context.");
-		return false;
-	}
+	// 3. 씬 컨텍스트 설정 (환경 변수 등)
+	if (!SetupSceneEnvironment()) return false;
 
 	return true;
 }
 
+void Scene::Awake()
+{
+	if (m_isAwake) return;
+
+	// 1. 사용자 정의 Awake 실행 (여기서 GameObject들이 Add됨)
+	OnPlaceActors();
+
+	// 2. 대기열에 있는 객체들을 즉시 깨움
+	ProcessPendingAdds();
+
+	m_isAwake = true;
+}
+
 void Scene::Start()
 {
-	// TODO : 이후에 컴포넌트가 필연적으로 Start가 필요하게 된다면
-	// 컴포넌트에 추가적인 가상 함수를 둘 필요가 있는지 고려 필요.
-	// 특히 Awake, LateUpdate, FixedUpdate 등
-	// 2. 스크립트 컴포넌트 Start
-	for (auto* script : m_scripts)
+	if (m_isStarted) return;
+
+	// 1. 사용자 정의 Start 실행
+	OnBeginPlay();
+
+	// 2. 혹시 OnStart 중에 추가된 객체가 있다면 처리
+	ProcessPendingAdds();
+
+	// 3. 기존에 Awake된 객체들 중, 아직 Start 안 된 녀석들을 Start 시킴
+	const auto& gameObjects = m_objectManager->GetGameObjects();
+	for (const auto& go : gameObjects)
 	{
-		script->Start();
+		if (go->IsActiveInHierarchy()) go->Start();
 	}
+
+	m_isStarted = true;
 }
 
 void Scene::Update()
 {
-	// [Phase 1] Behaviors (Input)
-	UpdateBehaviours();
+	// [Phase 1] 생성 대기열 처리 (Creation)
+	// 지난 프레임 이후 혹은 방금 막 추가된 객체들을 초기화하고 무대에 올림
+	ProcessPendingAdds();
+	const auto& gameObjects = m_objectManager->GetGameObjects();
 
-	// [Phase 2] Systems (Output)
-	UpdateSceneSystems();
+	// [Phase 2] 물리 업데이트 (FixedUpdate)
+	while (TIME.CheckFixedUpdate())
+	{
+		for (const auto& go : gameObjects)
+		{
+			if (go->IsActiveInHierarchy()) go->FixedUpdate();
+		}
+	}
 
-	// [Phase 3] Cleanup (Destroy)
-	FlushDestroyQueue();
+	// [Phase 3] 게임 로직 업데이트 (Update)
+	for (const auto& go : gameObjects)
+	{
+		if (go->IsActiveInHierarchy()) go->Update();
+	}
+
+	// [Phase 4] 삭제 대기열 처리 (Destruction)
+	// 이번 프레임에 죽은 객체들을 정리
+	ProcessPendingKills();
 }
 
-/*================================//
-//   scene update cycle methods   //
-//================================*/
-void Scene::UpdateBehaviours()
+void Scene::LateUpdate()
 {
-	// 1. 스크립트 Update
-	for (auto* script : m_scripts) script->Update();
-
-	// 2. 애니메이터 Update
-	for (auto* animator : m_animators) animator->Update();
+	// [Phase 5] 후처리 업데이트 (LateUpdate)
+	// 카메라 추적 등 로직 이후에 처리되어야 하는 작업들
+	const auto& gameObjects = m_objectManager->GetGameObjects();
+	for (const auto& go : gameObjects)
+	{
+		if (go->IsActiveInHierarchy()) go->LateUpdate();
+	}
 }
 
-void Scene::UpdateSceneSystems()
+void Scene::ProcessPendingAdds()
 {
-	// 오디오
-	for (auto* source : m_audioSources) source->Update();
-	for (auto* listener : m_audioListeners) listener->Update();
+	// 1. 매니저에게 "새 친구들 명단" 요청
+	const auto& pendingAdds = m_objectManager->GetPendingCreateQueue();
+	if (pendingAdds.empty()) return;
+
+	for (const auto& go : pendingAdds)
+	{
+		// 1-1. [Registry] 컴포넌트 등록 (렌더링, 시스템 등을 위해 필수)
+		for (const auto& comp : go->GetAllComponents())
+		{
+			m_registry->RegisterComponent(comp.get());
+		}
+
+		// 1-2. [Lifecycle] 생명주기 따라잡기 (Catch-up)
+		// 씬이 이미 Awake 상태라면 -> 객체도 Awake
+		if (m_isAwake) go->Awake();
+
+		// 씬이 이미 Start 상태라면 -> 객체도 Start (활성화된 경우만)
+		if (m_isStarted && go->IsActiveInHierarchy()) go->Start();
+	}
+
+	// 2. [Manager] 승인 (이제 진짜 리스트로 이동)
+	m_objectManager->FlushCreateQueue();
 }
 
-void Scene::FlushDestroyQueue()
+void Scene::ProcessPendingKills()
 {
-	// TODO : 씬에 Destroy를 호출한 오브젝트를 정리
+	// 1. 매니저에게 "죽을 친구들 명단" 요청
+	const auto& pendingKills = m_objectManager->GetPendingDestroyQueue();
+	if (pendingKills.empty()) return;
+
+	for (GameObject* deadObj : pendingKills)
+	{
+		// 1-1. [Lifecycle] 최후의 유언 (OnDestroy)
+		deadObj->OnDestroy();
+
+		// 1-2. [Registry] 컴포넌트 말소 (Dangling Pointer 방지)
+		for (const auto& comp : deadObj->GetAllComponents())
+		{
+			m_registry->UnregisterComponent(comp.get());
+		}
+	}
+
+	// 2. [Manager] 승인 (메모리 해제)
+	m_objectManager->FlushDestroyQueue();
 }
 
+/*============================//
+//    scene context methods   //
+//============================*/
+void Scene::AddGameObject(GameObjectUPtr gameObject)
+{
+	// 씬은 중계만 하고, 실제 소유권은 매니저에게 전달
+	m_objectManager->AddGameObject(std::move(gameObject));
+}
+
+void Scene::OnScreenResize(int32 width, int32 height)
+{
+	// Registry에 있는 모든 카메라의 비율을 갱신
+	// (이제 MainCamera 변수가 없어도 Registry 덕분에 모든 카메라 제어 가능)
+	const auto& cameras = m_registry->GetCameras();
+	for (Camera* cam : cameras)
+	{
+		cam->SetViewportSize((float)width, (float)height);
+	}
+}
+
+void Scene::AddRenderPass(const std::string& name, GeneralRenderPassUPtr renderPass)
+{
+	m_registry->AddCustomRenderPass(name, std::move(renderPass));
+}
+
+GeneralRenderPass* Scene::GetRenderPass(const std::string& name)
+{
+	return m_registry->GetCustomRenderPass(name);
+}
+
+void Scene::SetSkyLight(SkyLightUPtr skyLight)
+{
+	m_registry->SetSkyLight(std::move(skyLight));
+}

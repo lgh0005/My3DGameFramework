@@ -77,6 +77,11 @@ void ShadowPass::Render(RenderContext* context)
 	// 2. 전체 조명 리스트 순회
 	for (auto* light : lights)
 	{
+		// 2-0. 조명 자체가 꺼져있거나, 조명의 주인이 비활성 상태면 패스
+		// (꺼진 조명은 그림자도 만들지 않아야 함)
+		if (!light->IsEnabled()) continue;
+		if (!light->GetOwner()->IsActiveInHierarchy()) continue;
+
 		// 2-1. 그림자 캐스팅이 필요한 조명인지 검사
 		if (!light->IsCastShadow()) continue;
 
@@ -155,6 +160,9 @@ void ShadowPass::RenderStaticMeshes
 
 	for (const auto* renderer : meshes)
 	{
+		if (!renderer->IsEnabled()) continue;
+		if (!renderer->GetOwner()->IsActiveInHierarchy()) continue;
+
 		auto model = renderer->GetTransform().GetWorldMatrix();
 		m_staticDepthProgram->SetUniform("model", model);
 		renderer->Render(m_staticDepthProgram.get());
@@ -174,6 +182,9 @@ void ShadowPass::RenderSkinnedMeshes
 
 	for (const auto* renderer : meshes)
 	{
+		if (!renderer->IsEnabled()) continue;
+		if (!renderer->GetOwner()->IsActiveInHierarchy()) continue;
+
 		auto model = renderer->GetTransform().GetWorldMatrix();
 		m_skinnedDepthProgram->SetUniform("model", model);
 

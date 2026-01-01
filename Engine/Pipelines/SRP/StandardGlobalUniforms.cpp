@@ -1,4 +1,5 @@
 ﻿#include "EnginePch.h"
+#include "Scene/GameObject.h"
 #include "StandardGlobalUniforms.h"
 #include "Graphics/UniformBuffer.h"
 #include "Graphics/RenderContext.h"
@@ -75,6 +76,9 @@ void StandardGlobalUniforms::UpdateLightUBO
 	for (auto* light : lights)
 	{
 		if (lightCount >= MAX_LIGHTS) break;
+
+		if (!light->IsEnabled()) continue;
+		if (!light->GetOwner()->IsActiveInHierarchy()) continue;
 
 		auto& info = lightData.lights[lightCount];
 		auto& transform = light->GetTransform();

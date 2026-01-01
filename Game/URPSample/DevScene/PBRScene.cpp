@@ -43,11 +43,11 @@ PBRScene::~PBRScene() = default;
 PBRSceneUPtr PBRScene::Create()
 {
 	auto pbrScene = PBRSceneUPtr(new PBRScene());
-	if (!pbrScene->Init()) return nullptr;
+	if (!pbrScene->Init()) return nullptr; // TODO : 이제 Init도 필요 없을 듯.
 	return std::move(pbrScene);
 }
 
-bool PBRScene::LoadNessesaryResources()
+bool PBRScene::LoadSceneResources()
 {
 	// 큐브 메쉬
 	{
@@ -119,18 +119,15 @@ bool PBRScene::LoadNessesaryResources()
 	{
 		auto hdrImage = Image::LoadHDR("./Resources/Images/IBL/mirrored_hall_4k.hdr");
 		auto hdrTex = Texture::CreateFromHDR(hdrImage.get());
-
 		CubeTexturePtr bakedCubemap = IBLUtils::CreateCubemapFromHDR(hdrTex.get());
 		CubeTexturePtr bakedDiffuse = IBLUtils::CreateIrradianceMap(bakedCubemap.get());
-		CubeTexturePtr prefiltered  = IBLUtils::CreatePrefilteredMap(bakedCubemap.get());
-		TexturePtr	   brdf			= IBLUtils::CreateBRDFLUT();
-
-		auto sky = SkyLight::CreateUniversalSky
-		(
-			std::move(bakedCubemap), std::move(bakedDiffuse), 
-			std::move(prefiltered),  std::move(brdf)
-		);
-		SetSkyLight(std::move(sky));
+		CubeTexturePtr prefiltered = IBLUtils::CreatePrefilteredMap(bakedCubemap.get());
+		TexturePtr	   brdf = IBLUtils::CreateBRDFLUT();
+		RESOURCE.AddResource<CubeTexture>(std::move(bakedDiffuse), "bakedDiffuse");
+		RESOURCE.AddResource<CubeTexture>(std::move(prefiltered), "prefiltered");
+		RESOURCE.AddResource<Texture>(std::move(brdf), "brdf");
+		RESOURCE.AddResource<CubeTexture>(std::move(bakedCubemap), "bakedCubemap");
+		RESOURCE.AddResource<Texture>(std::move(hdrTex), "hdrImage");
 	}
 
 	// 0-4. 머티리얼 2
@@ -152,7 +149,7 @@ bool PBRScene::LoadNessesaryResources()
 	return true;
 }
 
-bool PBRScene::CreateNessesaryRenderPasses()
+bool PBRScene::CreateCustomRenderPasses()
 {
 	// 간단한 머티리얼 포워드 렌더 패스
 	{
@@ -161,16 +158,29 @@ bool PBRScene::CreateNessesaryRenderPasses()
 			"./Resources/Shaders/Forward_PBR.vert",
 			"./Resources/Shaders/Forward_PBR.frag"
 		); if (!prog) return false;
-		AddCustomRenderPass("simpleHDR", HDRRenderPass::Create(std::move(prog)));
+		AddRenderPass("simpleHDR", HDRRenderPass::Create(std::move(prog)));
 	}
 
 	return true;
 }
 
-bool PBRScene::CreateSceneContext()
+bool PBRScene::SetupSceneEnvironment()
+{
+	auto sky = SkyLight::CreateUniversalSky
+	(
+		// TODO : 세팅 필요
+		RESOURCE.GetResource<CubeTexture>("bakedCubemap"), RESOURCE.GetResource<CubeTexture>("bakedDiffuse"),
+		RESOURCE.GetResource<CubeTexture>("prefiltered"), RESOURCE.GetResource<Texture>("brdf")
+	);
+	if (!sky) return false;
+	SetSkyLight(std::move(sky));
+	return true;
+}
+
+bool PBRScene::OnPlaceActors()
 {
 	// 0. 추가한 렌더패스 가져오기
-	HDRRenderPass* hdrPass = (HDRRenderPass*)GetCustomRenderPass("simpleHDR");
+	HDRRenderPass* hdrPass = (HDRRenderPass*)GetRenderPass("simpleHDR");
 
 	// 1. 카메라 오브젝트 추가
 	{
@@ -188,7 +198,6 @@ bool PBRScene::CreateSceneContext()
 		auto cameraCtrl = CameraController::Create();
 		cameraObj->AddComponent(std::move(cameraCtrl));
 
-		SetMainCamera(cameraPtr); // 메인 카메라로 설정
 		AddGameObject(std::move(cameraObj));
 	}
 
@@ -238,7 +247,7 @@ bool PBRScene::CreateSceneContext()
 			AddGameObject(std::move(lightGo));
 		}
 	}
-	
+
 	// 3. 그림자가 있는 조명 추가
 	{
 		auto lightGo = GameObject::Create();
@@ -273,7 +282,7 @@ bool PBRScene::CreateSceneContext()
 		AddGameObject(std::move(cubeObj));
 	}
 
-	// 7. 모델 (TEST)
+	// 7. 모델
 	{
 		// 1. 리소스 확보
 		auto model = RESOURCE.GetResource<Model>("aliensoldier");
@@ -319,11 +328,16 @@ bool PBRScene::CreateSceneContext()
 		}
 	}
 
-	// 3. 구 49개 (ORM 텍스쳐 테스트)
+		// 3. 구 49개 (ORM 텍스쳐 테스트)
 	// TestSpheresForORMTexture(hdrPass);
 	// TestSpheresForPBRChart(hdrPass);
 	TestSpheresForPBRChartDeferred();
 
+	return true;
+}
+
+bool PBRScene::OnBeginPlay()
+{
 	return true;
 }
 
