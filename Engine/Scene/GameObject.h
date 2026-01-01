@@ -6,6 +6,15 @@ CLASS_PTR(Transform)
 CLASS_PTR(Component)
 #pragma endregion
 
+enum class GameObjectState
+{
+	Uninitialized, // 생성 직후
+	Awake,         // Awake 호출 완료
+	Active,        // Start 호출 완료 + 활성화 상태
+	Inactive,      // 비활성화 상태 (SetActive(false))
+	Dead           // Destroy 예약됨 (다음 프레임 삭제)
+};
+
 CLASS_PTR(GameObject)
 class GameObject 
 {
@@ -13,45 +22,46 @@ public:
 	~GameObject();
 	static GameObjectUPtr Create();
 
-	// 컴포넌트 메서드들
-	void AddComponent(ComponentUPtr component);
-	template<typename T>
-	T* GetComponent() const;
-	template<typename T>
-	T* GetComponentInParent() const;
-	const std::vector<ComponentUPtr>& GetAllComponents() const { return m_components; }
-
-	// 필요 멤버들의 getter와 setter들
 	Transform& GetTransform()    const	     { return *m_transform; }
 	const std::string& GetName() const		 { return m_name; }
 	void SetName(const std::string& name)	 { m_name = name; }
 
-	// 계층 구조 메서드들
-	void SetParent(GameObject* parent);
-	void AddChild(GameObject* child);
-	GameObject* GetChildByIndex(usize index);
-	GameObject* GetChildByName(const std::string& name);
-
-	// 게임 오브젝트가 가져야 할 기본 메서드들
-	// TODO : 추가해야 할 메서드
-	// 0. Find
-	// 3. DontDestroyOnLoad
-	// 4. Instantiate
-
 /*==========================================//
 //   game object life-cycle state methods   //
 //==========================================*/
-private:
-	// TODO : 추가해야 할 메서드
-	// 0. Awake
-	// 1. Start
-	// 2. FixedUpdate
-	// 3. Update
-	// 4. LateUpdate
-	// 5. Destroy
-	// 6. SetActive
-	// 7. OnEnable
-	// 8. OnDisable
+public:
+	// 상태 확인
+	bool IsActive() const { return m_active; } // 로컬 활성화 상태
+	bool IsActiveInHierarchy() const;          // 부모까지 포함한 실제 활성화 상태
+	bool IsDead() const { return m_state == GameObjectState::Dead; }
+
+	// 생명 주기 메서드
+	void Awake();
+	void Start();
+	void SetActive(bool active);
+	void FixedUpdate();
+	void Update();
+	void LateUpdate();
+	void SetDestroy();
+	void OnDestroy();
+	void DontDestroyOnLoad(bool enable) { m_dontDestroyOnLoad = enable; }
+	bool IsDontDestroyOnLoad() const { return m_dontDestroyOnLoad; }
+
+/*=======================//
+//   component methods   //
+//=======================*/
+public:
+	void AddComponent(ComponentUPtr component);
+	template<typename T> T* GetComponent() const;
+	const std::vector<ComponentUPtr>& GetAllComponents() const { return m_components; }
+
+/*=======================//
+//   hierarchy methods   //
+//=======================*/
+public:
+	void SetParent(GameObject* parent);
+	void AddChild(GameObject* child);
+	void SetActiveStateHierarchy(bool active);
 
 private:
 	GameObject();
@@ -61,6 +71,8 @@ private:
 	Transform*		m_transform					 { nullptr };
 	std::string		m_name						 { "GameObject" };
 	bool			m_active					 { true };
+	bool            m_dontDestroyOnLoad			 { false };
+	GameObjectState m_state						 { GameObjectState::Uninitialized };
 	std::vector<ComponentUPtr> m_components;
 };
 
@@ -71,34 +83,12 @@ private:
 template<typename T>
 inline T* GameObject::GetComponent() const
 {
+	// INFO : 중복된 컴포넌트 존재 시 먼저 발견한 컴포넌트를 반환
 	ComponentType type = T::s_ComponentType;
 	for (const auto& comp : m_components)
 	{
 		if (comp->MatchesType(type))
 			return static_cast<T*>(comp.get());
-	}
-	return nullptr;
-}
-
-template<typename T>
-inline T* GameObject::GetComponentInParent() const
-{
-	// 1. 나 자신에게 있는지 먼저 확인
-	T* comp = GetComponent<T>();
-	if (comp) return comp;
-
-	// 2. 부모 탐색 시작
-	Transform* current = m_transform->GetParent();
-	while (current != nullptr)
-	{
-		GameObject* parentGO = current->GetOwner();
-		if (parentGO)
-		{
-			comp = parentGO->GetComponent<T>();
-			if (comp) return comp;
-		}
-		// 계속 위로 올라감
-		current = current->GetParent();
 	}
 	return nullptr;
 }

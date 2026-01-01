@@ -7,56 +7,70 @@ CLASS_PTR(Transform)
 
 enum class ComponentType
 {
-    Animator,
+	// Core
+	Transform,
+	Script,
+	Animator,
+
+	// Rendering
 	Camera,
 	DirectionalLight,
 	SpotLight,
 	PointLight,
-	Transform,
-	Script,
-	AudioSource,
-	AudioListener,
 	MeshOutline,
 	SkinnedMeshRenderer,
 	StaticMeshRenderer,
 	InstancedMeshRenderer,
 
-	// UI Components
+	// Audio
+	AudioSource,
+	AudioListener,
+
+	// UI
 	UICanvas,
 	UIImage,
-	UIText
+	UIText,
+
+	Unknown
 };
 
 CLASS_PTR(Component)
 class Component
 {
+	friend class GameObject;
+
 public:
 	virtual ~Component();
 	virtual ComponentType GetComponentType() const = 0;
 	bool MatchesType(ComponentType type) const;
 
-	void SetOwner(GameObject* gameObject);
 	GameObject* GetOwner() const;
 	Transform& GetTransform();
 	const Transform& GetTransform() const;
 
 /*========================================//
 //   component life-cycle state methods   //
-//=========================================*/
+//========================================*/
 public:
-	// TODO : 추가해야 할 메서드
-	// 0. Awake
-	// 1. Start
-	// 2. FixedUpdate
-	// 3. Update
-	// 4. LateUpdate
-	
-	// TODO : 자신을 소유하는 게임 오브젝트 상태를
-	// 추적해서 상태를 추적하는 메서드를 작성
-	// 1. Destroy
-	// 2. SetActive
+	bool IsActive() const;
+	void SetEnable(bool enable);
+	bool IsEnabled() const;
+
+protected:
+	virtual void Awake();			// 변수 초기화
+	virtual void OnEnable();		// 활성화 될 때
+	virtual void Start();			// 타 객체 참조
+
+	virtual void FixedUpdate();	// 물리 연산
+	virtual void Update();		// 게임 로직
+	virtual void LateUpdate();	// 카메라/후처리
+
+	virtual void OnDisable();		// 비활성화 될 때
+	virtual void OnDestroy();		// 삭제 될 때
 
 protected:
 	Component();
+	void SetOwner(GameObject* gameObject) { m_owner = gameObject; }
 	GameObject* m_owner	   { nullptr };
+	bool		m_enabled  { true };
 };
