@@ -1,8 +1,8 @@
 ﻿#include "EnginePch.h"
 #include "Scene.h"
 
-#include "Core/GameObject.h"
-#include "Core/RenderPass.h"
+#include "Scene/GameObject.h"
+#include "Graphics/RenderPass.h"
 #include "Resources/Mesh.h"
 #include "Graphics/SkyLight.h"
 #include "Components/Component.h"
@@ -24,9 +24,9 @@
 Scene::Scene() = default;
 Scene::~Scene() = default;
 
-/*===================================================================//
-//   object, component and custom render passes management methods   //
-//===================================================================*/
+/*==============================================//
+//   default scene context management methods   //
+//==============================================*/
 void Scene::AddGameObject(GameObjectUPtr gameObject)
 {
 	auto* go = gameObject.get();
@@ -36,6 +36,16 @@ void Scene::AddGameObject(GameObjectUPtr gameObject)
 	m_gameObjects.push_back(std::move(gameObject));
 }
 
+void Scene::OnScreenResize(int32 width, int32 height)
+{
+	// TODO : 이후에는 다중 카메라에 대해서 모든 카메라가 리사이징 되어야함
+	auto* camera = GetMainCamera();
+	if (camera) camera->SetViewportSize((float)width, (float)height);
+}
+
+/*===================================================================//
+//   object, component and custom render passes management methods   //
+//===================================================================*/
 void Scene::RegisterComponent(Component* component)
 {
 	if (!component) return;
@@ -109,19 +119,6 @@ void Scene::RegisterComponent(Component* component)
 	}
 }
 
-void Scene::OnScreenResize(int32 width, int32 height)
-{
-	// TODO : 이후에는 다중 카메라에 대해서 모든 카메라가 리사이징 되어야함
-	auto* camera = GetMainCamera();
-	if (camera) camera->SetViewportSize((float)width, (float)height);
-	// if (camera) camera->SetAspectRatio((float)width / (float)height);
-}
-
-void Scene::SetSkyLight(SkyLightUPtr skyLight)
-{
-	m_sky = std::move(skyLight);
-}
-
 GeneralRenderPass* Scene::GetCustomRenderPass(const std::string& name)
 {
 	auto it = m_customPasses.find(name);
@@ -135,6 +132,11 @@ void Scene::AddCustomRenderPass(const std::string& name, GeneralRenderPassUPtr p
 		LOG_WARN("Custom random pass '{}' already exists. Overwriting.", name);
 
 	m_customPasses[name] = std::move(pass);
+}
+
+void Scene::SetSkyLight(SkyLightUPtr skyLight)
+{
+	m_sky = std::move(skyLight);
 }
 
 /*=====================================//

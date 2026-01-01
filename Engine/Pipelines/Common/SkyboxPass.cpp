@@ -1,8 +1,8 @@
 ﻿#include "EnginePch.h"
 #include "SkyboxPass.h"
 
-#include "Core/Scene.h"
-#include "Core/RenderContext.h"
+#include "Scene/Scene.h"
+#include "Graphics/RenderContext.h"
 #include "Resources/CubeTexture.h"
 #include "Resources/Mesh.h"
 #include "Resources/StaticMesh.h"

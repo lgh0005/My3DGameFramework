@@ -1,6 +1,6 @@
 ﻿#include "Transform.h"
 #include "EnginePch.h"
-#include "Core/GameObject.h"
+#include "Scene/GameObject.h"
 
 Transform::Transform() = default;
 Transform::~Transform() = default;

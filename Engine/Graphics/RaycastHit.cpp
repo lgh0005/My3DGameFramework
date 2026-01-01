@@ -1,6 +1,6 @@
 ﻿#include "EnginePch.h"
 #include "RaycastHit.h"
-#include "Core/GameObject.h"
+#include "Scene/GameObject.h"
 
 RaycastHit::RaycastHit()
 {

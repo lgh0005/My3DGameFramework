@@ -1,7 +1,7 @@
 ﻿#include "EnginePch.h"
 #include "Renderer.h"
-#include "Core/Scene.h"
-#include "Core/RenderPipeline.h"
+#include "Scene/Scene.h"
+#include "Graphics/RenderPipeline.h"
 
 Renderer::Renderer() = default;
 Renderer::~Renderer() = default;

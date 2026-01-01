@@ -1,8 +1,8 @@
 ﻿#include "EnginePch.h"
 #include "PBRScene.h"
 
-#include "Core/GameObject.h"
-#include "Core/Renderer.h"
+#include "Scene/GameObject.h"
+#include "Graphics/Renderer.h"
 #include "Graphics/Program.h"
 #include "Resources/Mesh.h"
 #include "Resources/StaticMesh.h"

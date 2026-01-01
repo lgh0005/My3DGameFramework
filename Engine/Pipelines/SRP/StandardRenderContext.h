@@ -1,5 +1,5 @@
 ﻿#pragma once
-#include "Core/RenderContext.h"
+#include "Graphics/RenderContext.h"
 
 #pragma region FORWARD_DECLARATION
 CLASS_PTR(Framebuffer)

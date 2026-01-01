@@ -1,6 +1,6 @@
 ﻿#include "EnginePch.h"
 #include "UICanvas.h"
-#include "Core/GameObject.h"
+#include "Scene/GameObject.h"
 #include "Components/Camera.h"
 #include "Components/Transform.h"
 #include "Graphics/Program.h"

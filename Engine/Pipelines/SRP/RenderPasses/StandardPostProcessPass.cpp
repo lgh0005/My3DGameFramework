@@ -1,8 +1,8 @@
 ﻿#include "EnginePch.h"
 #include "StandardPostProcessPass.h"
 
-#include "Core/Scene.h"
-#include "Core/RenderContext.h"
+#include "Scene/Scene.h"
+#include "Graphics/RenderContext.h"
 #include "Graphics/Program.h"
 #include "Graphics/Geometry.h"
 #include "Resources/ScreenMesh.h"

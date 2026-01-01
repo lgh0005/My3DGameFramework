@@ -1,6 +1,6 @@
 ﻿#include "EnginePch.h"
 #include "Ray.h"
-#include "Core/GameObject.h"
+#include "Scene/GameObject.h"
 #include "Components/Camera.h"
 
 Ray::Ray() : m_origin(0.f), m_direction(0.f, 0.f, -1.f) {}

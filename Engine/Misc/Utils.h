@@ -11,6 +11,10 @@
 class Utils
 {
 public:
+	Utils() = delete;
+	~Utils() = delete;
+
+public:
 
 	// 조명 연산 전용 유틸 함수
 	static glm::vec3 GetAttenuationCoeff(float distance);

@@ -1,7 +1,7 @@
 ﻿#include "pch.h"
 #include "HDRRenderPass.h"
 
-#include "Core/Scene.h"
+#include "Scene/Scene.h"
 #include "Graphics/Program.h"
 #include "Resources/Mesh.h"
 #include "Resources/Material.h"
@@ -12,7 +12,7 @@
 #include "Components/MeshRenderer.h"
 #include "Components/StaticMeshRenderer.h"
 #include "Components/Transform.h"
-#include "Core/GameObject.h"
+#include "Scene/GameObject.h"
 
 HDRRenderPass::HDRRenderPass() = default;
 HDRRenderPass::~HDRRenderPass() = default;

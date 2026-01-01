@@ -1,7 +1,7 @@
 ﻿#include "pch.h"
 #include "InstancedRenderPass.h"
 
-#include "Core/Scene.h"
+#include "Scene/Scene.h"
 #include "Graphics/Program.h"
 #include "Resources/Mesh.h"
 #include "Resources/Material.h"
@@ -9,7 +9,7 @@
 #include "Components/InstancedMeshRenderer.h"
 #include "Components/Transform.h"
 #include "Components/SpotLight.h"
-#include "Core/GameObject.h"
+#include "Scene/GameObject.h"
 
 InstancedRenderPass::InstancedRenderPass() = default;
 InstancedRenderPass::~InstancedRenderPass() = default;

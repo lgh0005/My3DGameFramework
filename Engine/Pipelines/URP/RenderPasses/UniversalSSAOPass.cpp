@@ -1,8 +1,8 @@
 ﻿#include "EnginePch.h"
 #include "UniversalSSAOPass.h"
 
-#include "Core/Scene.h"
-#include "Core/RenderContext.h"
+#include "Scene/Scene.h"
+#include "Graphics/RenderContext.h"
 #include "Components/Camera.h"
 #include "Resources/Texture.h"
 #include "Resources/ScreenMesh.h"

@@ -1,5 +1,5 @@
 ﻿#pragma once
-#include "Core/RenderPass.h"
+#include "Graphics/RenderPass.h"
 #include "Graphics/Program.h"
 
 #pragma region FORWARD_DECLARATION

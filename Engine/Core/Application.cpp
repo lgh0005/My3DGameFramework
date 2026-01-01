@@ -1,7 +1,7 @@
 ﻿#include "EnginePch.h"
 #include "Application.h"
-#include "Core/Scene.h"
-#include "Core/RenderPipeline.h"
+#include "Scene/Scene.h"
+#include "Graphics/RenderPipeline.h"
 
 Application::Application() = default;
 Application::~Application() { Shutdown(); }

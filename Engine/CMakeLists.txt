@@ -15,13 +15,14 @@ add_library(Engine STATIC
 
    # Core
    "Core/Application.h"             "Core/Application.cpp"
-   "Core/GameObject.h"              "Core/GameObject.cpp"
-   "Core/Scene.h"                   "Core/Scene.cpp"
-   "Core/Renderer.h"                "Core/Renderer.cpp"
-   "Core/RenderPass.h"              "Core/RenderPass.cpp"
-   "Core/RenderPipeline.h"          "Core/RenderPipeline.cpp"
-   "Core/RenderContext.h"           "Core/RenderContext.cpp"
-   "Core/GlobalUniforms.h"          "Core/GlobalUniforms.cpp"
+
+   # Scene
+   "Scene/Scene.h"                   "Scene/Scene.cpp"
+   "Scene/GameObjectManager.h"       "Scene/GameObjectManager.cpp"
+   "Scene/SceneRegistry.h"           "Scene/SceneRegistry.cpp"
+   "Scene/SceneScriptAPI.h"          "Scene/SceneScriptAPI.cpp"
+   "Scene/GameObject.h"              "Scene/GameObject.cpp"
+   "Scene/Prefab.h"                  "Scene/Prefab.cpp"
 
    # Common Render Passes
    "Pipelines/Common/CullingPass.h" "Pipelines/Common/CullingPass.cpp"
@@ -60,7 +61,7 @@ add_library(Engine STATIC
    "Misc/AssetFormat.h"             "Misc/AssetFormat.cpp"
    "Misc/AssetUtils.h"              "Misc/AssetUtils.cpp"
    "Misc/PhysicsHelper.h"           "Misc/PhysicsHelper.cpp"
-   "Managers/Logger.h"                  "Managers/Logger.cpp"
+   "Managers/Logger.h"              "Managers/Logger.cpp"
 
    # Graphics
    "Graphics/Shader.h"              "Graphics/Shader.cpp"
@@ -76,8 +77,12 @@ add_library(Engine STATIC
    "Graphics/SkyLight.h"            "Graphics/SkyLight.cpp"
    "Graphics/ShadowMap.h"           "Graphics/ShadowMap.cpp"
    "Graphics/Ray.h"                 "Graphics/Ray.cpp"
-              
-   "Graphics/RaycastHit.h"        "Graphics/RaycastHit.cpp"
+   "Graphics/RaycastHit.h"          "Graphics/RaycastHit.cpp"
+   "Graphics/Renderer.h"                "Graphics/Renderer.cpp"
+   "Graphics/RenderPass.h"              "Graphics/RenderPass.cpp"
+   "Graphics/RenderPipeline.h"          "Graphics/RenderPipeline.cpp"
+   "Graphics/RenderContext.h"           "Graphics/RenderContext.cpp"
+   "Graphics/GlobalUniforms.h"          "Graphics/GlobalUniforms.cpp"
 
    # Framebuffers
    "Framebuffers/Framebuffer.h"             "Framebuffers/Framebuffer.cpp"
@@ -147,7 +152,7 @@ add_library(Engine STATIC
    "Managers/PhysicsManager.h"      "Managers/PhysicsManager.cpp"
    "Managers/UIManager.h"           "Managers/UIManager.cpp"
 
-)
+ "Scene/GameObjectManager.h" "Scene/SceneRegistry.h")
 
 # 2. [PCH 설정] EnginePCH.h를 PCH로 사용합니다.
 target_precompile_headers(Engine  PUBLIC EnginePCH.h)

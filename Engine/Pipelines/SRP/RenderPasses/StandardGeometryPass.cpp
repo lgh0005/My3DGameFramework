@@ -1,9 +1,9 @@
 ﻿#include "EnginePch.h"
 #include "StandardGeometryPass.h"
 
-#include "Core/Scene.h"
-#include "Core/GameObject.h"
-#include "Core/RenderContext.h"
+#include "Scene/Scene.h"
+#include "Scene/GameObject.h"
+#include "Graphics/RenderContext.h"
 #include "Graphics/Program.h"
 #include "Resources/Mesh.h"
 #include "Resources/Material.h"

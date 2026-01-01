@@ -1,5 +1,5 @@
 ﻿#pragma once
-#include "Core/Scene.h"
+#include "Scene/Scene.h"
 
 #pragma region FORWARD_DECLARATION
 CLASS_PTR(HDRRenderPass)

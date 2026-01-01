@@ -1,8 +1,8 @@
 ﻿#include "EnginePch.h"
 #include "ShadowPass.h"
 
-#include "Core/Scene.h"
-#include "Core/GameObject.h"
+#include "Scene/Scene.h"
+#include "Scene/GameObject.h"
 #include "Graphics/Program.h" 
 #include "Graphics/ShadowMap.h"
 #include "Resources/Mesh.h"

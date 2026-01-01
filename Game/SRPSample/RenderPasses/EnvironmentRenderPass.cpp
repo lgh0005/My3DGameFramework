@@ -1,7 +1,7 @@
 ﻿#include "pch.h"
 #include "EnvironmentRenderPass.h"
 
-#include "Core/Scene.h"
+#include "Scene/Scene.h"
 #include "Graphics/Program.h"
 #include "Resources/Mesh.h"
 #include "Resources/Material.h"
@@ -11,7 +11,7 @@
 #include "Components/StaticMeshRenderer.h"
 #include "Components/Transform.h"
 #include "Components/SpotLight.h"
-#include "Core/GameObject.h"
+#include "Scene/GameObject.h"
 
 EnvironmentRenderPass::EnvironmentRenderPass() = default;
 EnvironmentRenderPass::~EnvironmentRenderPass() = default;

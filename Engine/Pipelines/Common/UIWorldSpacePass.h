@@ -1,5 +1,5 @@
 ﻿#pragma once
-#include "Core/RenderPass.h"
+#include "Graphics/RenderPass.h"
 
 #pragma region FORWARD_DECLARATION
 CLASS_PTR(RenderContext) // TODO : 어차피 UIManager가 있음.

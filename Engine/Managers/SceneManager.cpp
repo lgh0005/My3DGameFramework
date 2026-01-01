@@ -26,6 +26,7 @@ void SceneManager::LoadScene
 	m_activeScene = it->second();
 	if (m_activeScene)
 	{
+		// TODO : 생명주기에 맞는 호출 필요
 		m_activeScene->Start();
 		
 		int32 width, height;
@@ -47,8 +48,7 @@ Scene* SceneManager::GetActiveScene() const
 
 void SceneManager::OnScreenResize(int32 width, int32 height)
 {
-	if (m_activeScene)
-		m_activeScene->OnScreenResize(width, height);
+	if (m_activeScene) m_activeScene->OnScreenResize(width, height);
 }
 
 void SceneManager::Clear()

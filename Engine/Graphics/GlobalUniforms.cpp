@@ -1,6 +1,6 @@
 ﻿#include "EnginePch.h"
 #include "GlobalUniforms.h"
-#include "Core/RenderContext.h"
+#include "Graphics/RenderContext.h"
 
 GlobalUniforms::GlobalUniforms() = default;
 GlobalUniforms::~GlobalUniforms() = default;

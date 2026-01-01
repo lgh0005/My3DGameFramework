@@ -1,7 +1,6 @@
 ﻿#pragma once
-#include <functional>
-#include "Core/Renderer.h"
-#include "Core/RenderPipeline.h"
+#include "Graphics/Renderer.h"
+#include "Graphics/RenderPipeline.h"
 
 #pragma region FORWARD_DECLARATION
 CLASS_PTR(Renderer)

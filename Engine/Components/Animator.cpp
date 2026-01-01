@@ -1,6 +1,6 @@
 ﻿#include "EnginePch.h"
 #include "Animator.h"
-#include "Core/GameObject.h"
+#include "Scene/GameObject.h"
 #include "Components/Transform.h"
 #include "Resources/AnimChannel.h"
 #include "Resources/Model.h"

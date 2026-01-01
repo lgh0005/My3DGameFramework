@@ -1,7 +1,7 @@
 ﻿#include "EnginePch.h"
 #include "RenderPass.h"
-#include "Core/Scene.h"
-#include "Core/RenderContext.h"
+#include "Scene/Scene.h"
+#include "Graphics/RenderContext.h"
 #include "Components/Camera.h"
 
 /*====================================================//

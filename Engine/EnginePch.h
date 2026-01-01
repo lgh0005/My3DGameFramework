@@ -11,6 +11,7 @@
 #include <sstream>
 #include <random>
 #include <optional>
+#include <functional>
 
 // OpenGL
 #define GLM_ENABLE_EXPERIMENTAL

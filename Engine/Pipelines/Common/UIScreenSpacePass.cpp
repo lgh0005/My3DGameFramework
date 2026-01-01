@@ -1,6 +1,6 @@
 ﻿#include "EnginePch.h"
 #include "UIScreenSpacePass.h"
-#include "Core/RenderContext.h"
+#include "Graphics/RenderContext.h"
 
 UIScreenSpacePass::UIScreenSpacePass() = default;
 UIScreenSpacePass::~UIScreenSpacePass() = default;

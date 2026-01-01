@@ -12,9 +12,9 @@
 #include "Pipelines/URP/UniversalGlobalUniforms.h"
 #include "Pipelines/URP/UniversalRenderContext.h"
 
-#include "Core/Scene.h"
-#include "Core/GameObject.h"
-#include "Core/RenderPass.h"
+#include "Scene/Scene.h"
+#include "Scene/GameObject.h"
+#include "Graphics/RenderPass.h"
 #include "Graphics/Program.h"
 #include "Graphics/ShadowMap.h"
 #include "Resources/Texture.h"

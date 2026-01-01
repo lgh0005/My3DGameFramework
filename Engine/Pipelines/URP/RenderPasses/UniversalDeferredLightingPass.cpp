@@ -6,7 +6,7 @@
 #include "Pipelines/SRP/RenderPasses/StandardGeometryPass.h"
 #include "Pipelines/SRP/RenderPasses/StandardPostProcessPass.h"
 
-#include "Core/Scene.h"
+#include "Scene/Scene.h"
 #include "Graphics/Geometry.h"
 #include "Graphics/Program.h"
 #include "Resources/ScreenMesh.h"

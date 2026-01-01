@@ -3,6 +3,7 @@
 
 // TODO:
 // 1. 부모-자식의 컴포넌트들의 Active 순회는 Transform을 통해서.
+// 2. transform을 통해서 계층적 게임 오브젝트에 대해서 root를 찾는 방식 추가 필요.
 CLASS_PTR(Transform)
 class Transform : public Component
 {
