@@ -16,6 +16,7 @@ add_library(Engine STATIC
    # Core
    "Core/Application.h"             "Core/Application.cpp"
    "Core/Logger.h"                  "Core/Logger.cpp"
+   "Core/ResourceLoader.h"          "Core/ResourceLoader.cpp"
 
    # Scene
    "Scene/Scene.h"                   "Scene/Scene.cpp"

@@ -180,6 +180,7 @@ void StandardRenderPipeline::OnResize(int32 width, int32 height)
 	m_geometryPass->Resize(width, height);
 	m_postProcessPass->Resize(width, height);
 	m_ssaoPass->Resize(width, height);
+	m_outlinePass->Resize(width, height);
 }
 
 /*======================//

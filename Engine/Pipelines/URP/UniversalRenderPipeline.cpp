@@ -153,7 +153,10 @@ void UniversalRenderPipeline::Render(Scene* scene)
 
 void UniversalRenderPipeline::OnResize(int32 width, int32 height)
 {
-	// TODO
+	m_geometryPass->Resize(width, height);
+	m_postProcessPass->Resize(width, height);
+	m_ssaoPass->Resize(width, height);
+	m_outlinePass->Resize(width, height);
 }
 
 /*======================//

@@ -20,6 +20,7 @@ public:
 		float thickness = 2.0f
 	);
 	virtual void Render(RenderContext* context) override;
+	void Resize(int32 width, int32 height);
 
 /*==============================//
 //   outlining helper methods   //

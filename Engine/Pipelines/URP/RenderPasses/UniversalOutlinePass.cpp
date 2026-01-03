@@ -143,6 +143,11 @@ void UniversalOutlinePass::Render(RenderContext* context)
 	glCullFace(GL_BACK);
 }
 
+void UniversalOutlinePass::Resize(int32 width, int32 height)
+{
+	m_maskFBO = OutlineFramebuffer::Create(width, height);
+}
+
 /*==============================//
 //   outlining helper methods   //
 //==============================*/
