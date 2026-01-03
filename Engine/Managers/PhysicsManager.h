@@ -1,15 +1,24 @@
 ﻿#pragma once
-#include <Jolt/Jolt.h>
-#include <Jolt/Physics/PhysicsSystem.h>
-#include <Jolt/Core/TempAllocator.h>
-#include <Jolt/Core/JobSystemThreadPool.h>
+#include "Physics/PhysicsConfig.h"
 
 #pragma region FORWARD_DECLARATION
-class BPLayerInterfaceImpl;
-class ObjectVsBroadPhaseLayerFilterImpl;
-class ObjectLayerPairFilterImpl;
-class MyBodyActivationListener;
-class MyContactListener;
+CLASS_PTR(BPLayerInterfaceImpl)
+CLASS_PTR(ObjectVsBroadPhaseLayerFilterImpl)
+CLASS_PTR(ObjectLayerPairFilterImpl)
+CLASS_PTR(PhysicsBodyActivationListener)
+CLASS_PTR(PhysicsContactListener)
+
+namespace JPH
+{
+	class PhysicsSystem;
+	class TempAllocatorImpl;
+	class JobSystemThreadPool;
+	class BodyInterface;
+}
+
+using PhysicsSystemUPtr = std::unique_ptr<JPH::PhysicsSystem>;
+using TempAllocatorImplUPtr = std::unique_ptr<JPH::TempAllocatorImpl>;
+using JobSystemThreadPoolUPtr = std::unique_ptr<JPH::JobSystemThreadPool>;
 #pragma endregion
 
 class PhysicsManager
@@ -21,36 +30,31 @@ public:
 	void Update();
 	void Clear();
 
+	// Jolt 인터페이스 접근
 	JPH::BodyInterface& GetBodyInterface() const;
 	const JPH::PhysicsSystem& GetPhysicsSystem() const { return *m_PhysicsSystem; }
 
 private:
+	PhysicsManager();
+	~PhysicsManager();
 
 	/*=======================//
 	//   Jolt Core Objects   //
 	//=======================*/
-	JPH::PhysicsSystem* m_PhysicsSystem			{ nullptr };
-	JPH::TempAllocatorImpl* m_TempAllocator		{ nullptr }; // 메모리 할당기
-	JPH::JobSystemThreadPool* m_JobSystem		{ nullptr };     // 멀티스레딩 잡 시스템
+	PhysicsSystemUPtr			m_PhysicsSystem;
+	TempAllocatorImplUPtr		m_TempAllocator;
+	JobSystemThreadPoolUPtr		m_JobSystem;
 
 	/*================================//
 	//   Jolt Configuration Objects   //
 	//================================*/
-	BPLayerInterfaceImpl* m_BPLayerInterface						    { nullptr };
-	ObjectVsBroadPhaseLayerFilterImpl* m_ObjectVsBroadPhaseLayerFilter  { nullptr };
-	ObjectLayerPairFilterImpl* m_ObjectLayerPairFilter					{ nullptr };
+	BPLayerInterfaceImplUPtr				m_BPLayerInterface;
+	ObjectVsBroadPhaseLayerFilterImplUPtr	m_ObjectVsBroadPhaseLayerFilter;
+	ObjectLayerPairFilterImplUPtr			m_ObjectLayerPairFilter;
 
 	/*==========================//
 	//   Jolt event listeners   //
 	//==========================*/
-	MyBodyActivationListener* m_BodyActivationListener		{ nullptr };
-	MyContactListener* m_ContactListener					{ nullptr };
-
-/*=======================//
-//   Raycaster members   //
-//=======================*/
-public:
-
-private:
-
+	PhysicsBodyActivationListenerUPtr	m_BodyActivationListener;
+	PhysicsContactListenerUPtr			m_ContactListener;
 };

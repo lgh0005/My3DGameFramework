@@ -6,6 +6,7 @@
 class ImGuiManager
 {
 	DECLARE_SINGLE(ImGuiManager)
+	DECLARE_NONINSTANTIABLE(ImGuiManager)
 
 public:
 	void Init(bool enable);

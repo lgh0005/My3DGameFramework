@@ -5,6 +5,7 @@
 class SceneManager
 {
 	DECLARE_SINGLE(SceneManager)
+	DECLARE_NONINSTANTIABLE(SceneManager)
 	using SceneFactory = std::function<SceneUPtr()>;
 
 public:

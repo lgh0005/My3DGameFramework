@@ -3,6 +3,7 @@
 class TimeManager
 {
 	DECLARE_SINGLE(TimeManager)
+	DECLARE_NONINSTANTIABLE(TimeManager)
 
 public:
 	void Init();

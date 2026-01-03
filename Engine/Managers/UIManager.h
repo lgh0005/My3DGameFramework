@@ -15,6 +15,7 @@ struct UIAction
 class UIManager
 {
 	DECLARE_SINGLE(UIManager)
+	DECLARE_NONINSTANTIABLE(UIManager)
 
 public:
 	void Init();

@@ -1,39 +1,56 @@
 ﻿#include "EnginePch.h"
 #include "PhysicsManager.h"
-#include "Misc/PhysicsHelper.h"
+
+#include "Physics/PhysicsConfig.h"
+#include "Physics/PhysicsCallbacks.h"
+#include "Physics/BPLayerInterface.h"
+#include "Physics/PhysicsFilters.h"
+#include "Physics/PhysicsBodyActivationListener.h"
+#include "Physics/PhysicsContactListener.h"
+
 #include <Jolt/RegisterTypes.h>
+#include <Jolt/Core/Factory.h>
+#include <Jolt/Core/TempAllocator.h>
+#include <Jolt/Core/JobSystemThreadPool.h>
+#include <Jolt/Physics/PhysicsSystem.h>
 using namespace JPH;
+
+PhysicsManager::PhysicsManager() {}
+PhysicsManager::~PhysicsManager() = default;
 
 void PhysicsManager::Init()
 {
-	// 1. Jolt 기본 할당기 및 팩토리 등록
+	// 1. Jolt 기본 할당기 및 팩토리 등록 및 정적 콜백 연결
 	RegisterDefaultAllocator();
-	Factory::sInstance = new Factory();
-	RegisterTypes();
-
-	// 2. 정적 콜백 연결 : PhysicsHelper에 있는 PhysicsCallbacks을 이용
 	Trace = PhysicsCallbacks::TraceImpl;
 #ifdef JPH_ENABLE_ASSERTS
 	AssertFailed = PhysicsCallbacks::AssertFailedImpl;
 #endif
+	Factory::sInstance = new Factory();
+	RegisterTypes();
 
-	// 3. 메모리 할당기 생성
-	m_TempAllocator = new TempAllocatorImpl(MAX_PHYSICS_MEMORY_ALLOC_VALUE);
+	// 3. 메모리 할당기 생성 (10MB)
+	m_TempAllocator = std::make_unique<TempAllocatorImpl>(MAX_PHYSICS_MEMORY_ALLOC_VALUE);
 
-	// 4. JobSystem 생성 (멀티스레딩)
-	m_JobSystem = new JobSystemThreadPool(cMaxPhysicsJobs, cMaxPhysicsBarriers, thread::hardware_concurrency() - 1);
+	// 4. JobSystem 생성 (스레드 풀)
+	m_JobSystem = std::make_unique<JobSystemThreadPool>
+	(
+		JoltConfig::cMaxPhysicsJobs,
+		JoltConfig::cMaxPhysicsBarriers,
+		std::thread::hardware_concurrency() - 1
+	);
 
 	// 5. 설정 객체(레이어, 필터) 생성
-	m_BPLayerInterface = new BPLayerInterfaceImpl();
-	m_ObjectVsBroadPhaseLayerFilter = new ObjectVsBroadPhaseLayerFilterImpl();
-	m_ObjectLayerPairFilter = new ObjectLayerPairFilterImpl();
+	m_BPLayerInterface = std::make_unique<BPLayerInterfaceImpl>();
+	m_ObjectVsBroadPhaseLayerFilter = std::make_unique<ObjectVsBroadPhaseLayerFilterImpl>();
+	m_ObjectLayerPairFilter = std::make_unique<ObjectLayerPairFilterImpl>();
 
 	// 6. 리스너 생성
-	m_BodyActivationListener = new MyBodyActivationListener();
-	m_ContactListener = new MyContactListener();
+	m_BodyActivationListener = std::make_unique<PhysicsBodyActivationListener>();
+	m_ContactListener = std::make_unique<PhysicsContactListener>();
 
 	// 7. PhysicsSystem 생성 및 초기화
-	m_PhysicsSystem = new PhysicsSystem();
+	m_PhysicsSystem = std::make_unique<PhysicsSystem>();
 	m_PhysicsSystem->Init
 	(
 		JoltConfig::cMaxBodies,
@@ -46,8 +63,8 @@ void PhysicsManager::Init()
 	);
 
 	// 8. 리스너 등록
-	m_PhysicsSystem->SetBodyActivationListener(m_BodyActivationListener);
-	m_PhysicsSystem->SetContactListener(m_ContactListener);
+	m_PhysicsSystem->SetBodyActivationListener(m_BodyActivationListener.get());
+	m_PhysicsSystem->SetContactListener(m_ContactListener.get());
 
 	LOG_INFO("Jolt Physics Initialized Successfully.");
 }
@@ -59,33 +76,28 @@ void PhysicsManager::Update()
 	(
 		TIME.GetFixedDeltaTime(),
 		1, // 충돌 단계 수 (1이면 보통 충분)
-		m_TempAllocator, 
-		m_JobSystem
+		m_TempAllocator.get(),
+		m_JobSystem.get()
 	);
 }
 
 void PhysicsManager::Clear()
 {
-	// 1. Physics System 해제
-	if (m_PhysicsSystem)
-	{
-		delete m_PhysicsSystem;
-		m_PhysicsSystem = nullptr;
-	}
+	// 1. 의존성 역순으로 안전하게 해제 (reset 호출)
+	m_PhysicsSystem.reset();
 
-	// 2. 리스너 및 필터 해제
-	if (m_BodyActivationListener) { delete m_BodyActivationListener; m_BodyActivationListener = nullptr; }
-	if (m_ContactListener) { delete m_ContactListener; m_ContactListener = nullptr; }
+	// 리스너 및 헬퍼들 정리
+	m_BodyActivationListener.reset();
+	m_ContactListener.reset();
+	m_ObjectLayerPairFilter.reset();
+	m_ObjectVsBroadPhaseLayerFilter.reset();
+	m_BPLayerInterface.reset();
 
-	if (m_ObjectLayerPairFilter) { delete m_ObjectLayerPairFilter; m_ObjectLayerPairFilter = nullptr; }
-	if (m_ObjectVsBroadPhaseLayerFilter) { delete m_ObjectVsBroadPhaseLayerFilter; m_ObjectVsBroadPhaseLayerFilter = nullptr; }
-	if (m_BPLayerInterface) { delete m_BPLayerInterface; m_BPLayerInterface = nullptr; }
+	// Core 시스템 정리
+	m_JobSystem.reset();
+	m_TempAllocator.reset();
 
-	// 3. Core Objects 해제
-	if (m_JobSystem) { delete m_JobSystem; m_JobSystem = nullptr; }
-	if (m_TempAllocator) { delete m_TempAllocator; m_TempAllocator = nullptr; }
-
-	// 4. Jolt 전역 해제
+	// Jolt 전역 해제
 	UnregisterTypes();
 	if (Factory::sInstance)
 	{

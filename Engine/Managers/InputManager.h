@@ -21,6 +21,7 @@ struct InputAction
 class InputManager
 {
 	DECLARE_SINGLE(InputManager)
+	DECLARE_NONINSTANTIABLE(InputManager)
 
 public:
 	bool Init();

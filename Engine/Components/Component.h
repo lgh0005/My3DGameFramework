@@ -58,13 +58,13 @@ public:
 
 protected:
 	virtual void Awake();			// 변수 초기화
-	virtual void OnEnable();		// 활성화 될 때
 	virtual void Start();			// 타 객체 참조
 
 	virtual void FixedUpdate();	// 물리 연산
 	virtual void Update();		// 게임 로직
 	virtual void LateUpdate();	// 카메라/후처리
 
+	virtual void OnEnable();		// 활성화 될 때
 	virtual void OnDisable();		// 비활성화 될 때
 	virtual void OnDestroy();		// 삭제 될 때
 

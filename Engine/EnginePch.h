@@ -12,6 +12,7 @@
 #include <random>
 #include <optional>
 #include <functional>
+#include <cstdarg>
 
 // OpenGL
 #define GLM_ENABLE_EXPERIMENTAL
@@ -24,6 +25,11 @@
 #include <glm/gtx/euler_angles.hpp>
 #include <glm/gtx/matrix_decompose.hpp>
 #include <glm/gtc/matrix_inverse.hpp>
+
+// Jolt
+#include <Jolt/Jolt.h>
+#include <Jolt/Core/Reference.h>
+#include <Jolt/Physics/Body/BodyID.h>
 
 // Misc
 #include "Misc/Defines.h"

@@ -11,6 +11,7 @@ enum class AudioType
 class AudioManager
 {
 	DECLARE_SINGLE(AudioManager)
+	DECLARE_NONINSTANTIABLE(AudioManager)
 
 public:
 	bool Init();

@@ -17,9 +17,6 @@ private:                                                                        
 //======================*/
 #define DECLARE_SINGLE(classType)                                               \
 private:                                                                        \
-    classType() = default;                                                      \
-    ~classType() = default;                                                     \
-                                                                                \
     classType(const classType&) = delete;                                       \
     classType& operator=(const classType&) = delete;                            \
     classType(classType&&) = delete;                                            \
@@ -31,6 +28,14 @@ public:                                                                         
         static classType s_instance;                                            \
         return s_instance;                                                      \
     }
+
+/*=============================//
+//   declare non-instantiable  //
+//=============================*/
+#define DECLARE_NONINSTANTIABLE(classType)                                      \
+private:                                                                        \
+    classType() = default;                                                      \
+    ~classType() = default;                                                     
 
 /*===========================//
 //   declare smart pointers  //
@@ -55,6 +60,13 @@ using className ## WPtr = std::weak_ptr<className>;
 // max bone influence value
 #define MAX_BONES 100
 #define MAX_BONE_INFLUENCE 4
+
+/*==================================//
+//   declare Jolt physics pointers  //
+//==================================*/
+#define JOLT_PTR(className)                                                     \
+using className ## Ref = JPH::Ref<className>;                                   \
+using className ## ConstRef = JPH::RefConst<className>;
 
 /*===============================//
 //   Jolt physics const macros   //

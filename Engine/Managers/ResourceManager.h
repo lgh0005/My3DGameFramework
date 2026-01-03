@@ -4,6 +4,7 @@
 class ResourceManager
 {
 	DECLARE_SINGLE(ResourceManager)
+	DECLARE_NONINSTANTIABLE(ResourceManager)
 
 public:
 	template<typename T>

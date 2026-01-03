@@ -1,6 +1,5 @@
 ﻿#pragma once
 #include "Component.h"
-#include <Jolt/Jolt.h>
 
 #pragma region FORWARD_DECLARATION
 namespace JPH { class BodyInterface; }
@@ -18,10 +17,19 @@ public:
     void SetRotation(const glm::quat& rotation);
 
 protected:
-    PhysicsComponent();
-    void SyncPhysicsToTransform(); // P -> T (Update에서 호출)
-    void SyncTransformToPhysics(); // T -> P (Start나 텔레포트 시 호출)
+    virtual void OnEnable() override;   // 켜질 때 -> 바디 생성
+    virtual void OnDisable() override;  // 꺼질 때 -> 바디 제거
+    virtual void OnDestroy() override;  // 삭제될 때 -> 바디 제거 (안전장치)
+    virtual void Update() override;     // 매 프레임 -> 위치 동기화 (P -> T)
+
+    virtual void CreateBody();
+    void DestroyBody();
+
+    void SyncPhysicsToTransform();      // P -> T (Update에서 호출)
+    void SyncTransformToPhysics();      // T -> P (Start나 텔레포트 시 호출)
     JPH::BodyInterface& GetBodyInterface() const;
 
+protected:
+    PhysicsComponent();
     JPH::BodyID m_bodyID;
 };

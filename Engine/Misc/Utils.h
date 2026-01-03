@@ -3,7 +3,6 @@
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
-#include <Jolt/Jolt.h>
 #include <Jolt/Math/Real.h>
 #include <Jolt/Math/Quat.h>
 #include <Jolt/Math/Vec3.h>

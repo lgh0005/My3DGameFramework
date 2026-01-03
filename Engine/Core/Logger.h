@@ -4,6 +4,7 @@
 class Logger
 {
 	DECLARE_SINGLE(Logger)
+	DECLARE_NONINSTANTIABLE(Logger)
 	using SPDLoggerPtr = std::shared_ptr<spdlog::logger>;
 
 public:

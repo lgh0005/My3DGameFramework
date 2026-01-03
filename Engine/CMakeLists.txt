@@ -62,7 +62,14 @@ add_library(Engine STATIC
    "Misc/IBLUtils.h"                "Misc/IBLUtils.cpp"
    "Misc/AssetFormat.h"             "Misc/AssetFormat.cpp"
    "Misc/AssetUtils.h"              "Misc/AssetUtils.cpp"
-   "Misc/PhysicsHelper.h"           "Misc/PhysicsHelper.cpp"
+
+   # Physics
+   "Physics/BPLayerInterface.h"         "Physics/BPLayerInterface.cpp"
+   "Physics/PhysicsConfig.h"            "Physics/PhysicsConfig.cpp"
+   "Physics/PhysicsFilters.h"           "Physics/PhysicsFilters.cpp"
+   "Physics/PhysicsCallbacks.h"         "Physics/PhysicsCallbacks.cpp"
+   "Physics/PhysicsContactListener.h"    "Physics/PhysicsContactListener.cpp"
+   "Physics/PhysicsBodyActivationListener.h"    "Physics/PhysicsBodyActivationListener.cpp"
 
    # Graphics
    "Graphics/Shader.h"              "Graphics/Shader.cpp"
@@ -92,7 +99,7 @@ add_library(Engine STATIC
    "Framebuffers/MSAAFramebuffer.h"         "Framebuffers/MSAAFramebuffer.cpp"
    "Framebuffers/PostProcessFramebuffer.h"  "Framebuffers/PostProcessFramebuffer.cpp"
    "Framebuffers/SSAOFramebuffer.h"         "Framebuffers/SSAOFramebuffer.cpp"
-   "Framebuffers/OutlineFramebuffer.h"      "Framebuffers/OutlineFramebuffer.cpp" 
+   "Framebuffers/OutlineFramebuffer.h"      "Framebuffers/OutlineFramebuffer.cpp"
 
    # Resources
    "Resources/Resource.h"           "Resources/Resource.cpp"

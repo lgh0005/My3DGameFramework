@@ -3,6 +3,7 @@
 class WindowManager
 {
 	DECLARE_SINGLE(WindowManager)
+	DECLARE_NONINSTANTIABLE(WindowManager)
 
 public:
 	bool Init(int32 width, int32 height, const std::string& title);

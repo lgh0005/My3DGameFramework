@@ -10,6 +10,7 @@ CLASS_PTR(RenderPipeline)
 class RenderManager
 {
 	DECLARE_SINGLE(RenderManager)
+	DECLARE_NONINSTANTIABLE(RenderManager)
 	using PipelineFactory = std::function<RenderPipelineUPtr()>;
 
 public:

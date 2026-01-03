@@ -1,0 +1,38 @@
+﻿#pragma once
+#include <Jolt/Physics/Collision/ContactListener.h>
+
+CLASS_PTR(PhysicsContactListener)
+class PhysicsContactListener final : public JPH::ContactListener
+{
+public:
+
+	// 1. 충돌 검증 (여기서 false 리턴 시 충돌 무시)
+	virtual JPH::ValidateResult OnContactValidate
+	(
+		const JPH::Body& inBody1,
+		const JPH::Body& inBody2,
+		JPH::RVec3Arg inBaseOffset,
+		const JPH::CollideShapeResult& inCollisionResult
+	) override;
+
+	// 2. 충돌 시작 (Enter)
+	virtual void OnContactAdded
+	(
+		const JPH::Body& inBody1,
+		const JPH::Body& inBody2,
+		const JPH::ContactManifold& inManifold,
+		JPH::ContactSettings& ioSettings
+	) override;
+
+	// 3. 충돌 유지 (Stay)
+	virtual void OnContactPersisted
+	(
+		const JPH::Body& inBody1,
+		const JPH::Body& inBody2,
+		const JPH::ContactManifold& inManifold,
+		JPH::ContactSettings& ioSettings
+	) override;
+
+	// 4. 충돌 종료 (Exit)
+	virtual void OnContactRemoved(const JPH::SubShapeIDPair& inSubShapePair) override;
+};
