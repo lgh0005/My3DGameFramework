@@ -8,6 +8,12 @@ namespace ResourceJsonFmt
 		std::string path;
 	};
 
+	struct CubeMapData
+	{
+		std::string key;
+		std::vector<std::string> paths;
+	};
+
 	struct ShaderData
 	{
 		std::string key;
@@ -17,12 +23,13 @@ namespace ResourceJsonFmt
 
 	struct ResourceManifest
 	{
-		std::vector<ResourceData> textures;
-		std::vector<ResourceData> cubeTextures;
-		std::vector<ResourceData> models;
-		std::vector<ResourceData> animations;
 		std::vector<ResourceData> bgm;
 		std::vector<ResourceData> sfx;
+		std::vector<ResourceData> textures;
+		std::vector<CubeMapData>  cubemaps;
+		std::vector<ResourceData> models;
+		std::vector<ResourceData> animations;
 		std::vector<ShaderData>   shaders;
+		// TODO : fonts 추가 필요
 	};
 }

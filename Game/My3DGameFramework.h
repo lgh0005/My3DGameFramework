@@ -4,6 +4,8 @@
 CLASS_PTR(My3DGameFramework)
 class My3DGameFramework : public Application
 {
+	using Super = Application;
+
 public:
 	virtual ~My3DGameFramework();
 	static My3DGameFrameworkUPtr Create

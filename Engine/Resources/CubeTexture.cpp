@@ -23,11 +23,6 @@ CubeTextureUPtr CubeTexture::CreateFromKtxImage(const std::string& ktxFilePath)
     return LoadKtx(ktxFilePath);
 }
 
-CubeTextureUPtr CubeTexture::CreateFromKtxHDR(const std::string& ktxFilePath)
-{
-    return LoadKtx(ktxFilePath);
-}
-
 CubeTextureUPtr CubeTexture::Create(int32 width, int32 height, uint32 format, uint32 type)
 {
     auto texture = CubeTextureUPtr(new CubeTexture());
@@ -104,11 +99,11 @@ bool CubeTexture::InitFromImages(const std::vector<Image*> images)
         (
             GL_TEXTURE_CUBE_MAP_POSITIVE_X + i,
             0,
-            internalFormat, // Helper에서 구해옴
+            internalFormat, 
             m_width, m_height,
             0,
-            format,         // Helper에서 구해옴
-            type,           // Helper에서 구해옴
+            format,
+            type,
             images[i]->GetData()
         );
     }

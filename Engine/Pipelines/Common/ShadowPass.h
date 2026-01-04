@@ -45,6 +45,9 @@ private:
 
 	int32	    m_resolution;
 	std::vector<ShadowMapUPtr> m_shadowMaps;
-	ProgramUPtr m_staticDepthProgram;
-	ProgramUPtr m_skinnedDepthProgram;
+	/*ProgramUPtr m_staticDepthProgram;
+	ProgramUPtr m_skinnedDepthProgram;*/
+
+	ProgramPtr m_staticDepthProgram;
+	ProgramPtr m_skinnedDepthProgram;
 };

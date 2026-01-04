@@ -13,23 +13,18 @@ public:
 	virtual ~Texture();
 	static const ResourceType s_ResourceType = ResourceType::Texture;
 	virtual ResourceType GetResourceType() const override { return ResourceType::Texture; }
-	static TextureUPtr Create(int32 width, int32 height, 
-							  uint32 format, uint32 type = GL_UNSIGNED_BYTE);
-	static TextureUPtr Create(int32 width, int32 height,
-							  uint32 internalFormat, uint32 format, uint32 type);
+	static TextureUPtr Create(int32 width, int32 height, uint32 internalFormat, uint32 format, uint32 type);
 	static TextureUPtr CreateFromImage(const Image* image);
 	static TextureUPtr CreateFromHDR(const Image* image);
 	static TextureUPtr CreateFromKtxImage(const std::string& ktxFilePath);
 	static TextureUPtr CreateFromKtxHDR(const std::string& ktxFilePath);
 
 public:
-
 	const uint32 Get() const	{ return m_texture; }
 	void Bind() const;
 	void SetFilter(uint32 minFilter, uint32 magFilter) const;
 	void SetWrap(uint32 sWrap, uint32 tWrap) const;
-	void SetTextureFormat(int32 width, int32 height, uint32 internalFormat,
-						  uint32 format, uint32 type);
+	void SetTextureFormat(int32 width, int32 height, uint32 internalFormat, uint32 format, uint32 type);
 	void SetBorderColor(const glm::vec4& color) const;
 	void SetSubData(int32 x, int32 y, int32 width, int32 height, const void* data);
 	void SetData(const void* data, uint32 size = 0);
@@ -43,7 +38,6 @@ private:
 	Texture();
 	void CreateTexture();
 	void SetTextureFromImage(const Image* image);
-	void SetTextureFormat(int32 width, int32 height, uint32 format);
 	static TextureUPtr LoadKtx(const std::string& ktxFilePath);
 	static TexturePtr Create4x4Texture(const std::vector<uint8>& colorData);
 

@@ -11,11 +11,6 @@ Texture::~Texture()
 /*====================================//
 //   default texture create methods   //
 //====================================*/
-TextureUPtr Texture::Create(int32 width, int32 height, uint32 format, uint32 type)
-{
-    return Create(width, height, GL_RGBA16F, format, GL_FLOAT);
-}
-
 TextureUPtr Texture::Create(int32 width, int32 height, uint32 internalFormat, uint32 format, uint32 type)
 {
     auto texture = TextureUPtr(new Texture());
@@ -42,20 +37,25 @@ TextureUPtr Texture::CreateFromHDR(const Image* image)
     GLenum format = GL_RGB;
 
     // 채널 수에 따른 포맷 결정
-    if (image->GetChannelCount() == 4)
+    switch (image->GetChannelCount())
     {
-        internalFormat = GL_RGBA16F;
-        format = GL_RGBA;
-    }
-    else if (image->GetChannelCount() == 3)
-    {
-        internalFormat = GL_RGB16F;
-        format = GL_RGB;
+        case 4:
+            internalFormat = GL_RGBA16F;
+            format = GL_RGBA;
+            break;
+
+        case 3:
+            internalFormat = GL_RGBA16F;
+            format = GL_RGB;
+            break;
     }
 
     // HDR 데이터는 float 타입이므로 GL_FLOAT 명시
-    texture->SetTextureFormat(image->GetWidth(), image->GetHeight(),
-        internalFormat, format, GL_FLOAT);
+    texture->SetTextureFormat
+    (
+        image->GetWidth(), image->GetHeight(),
+        internalFormat, format, GL_FLOAT
+    );
 
     // 데이터 업로드
     texture->SetData(image->GetData());

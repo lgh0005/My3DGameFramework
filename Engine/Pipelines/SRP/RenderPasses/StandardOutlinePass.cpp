@@ -41,31 +41,11 @@ bool StandardOutlinePass::Init
 	m_color = color;
 	m_thickness = thickness;
 
-	// 1. Static Mask Program
-	m_maskStaticProgram = Program::Create
-	(
-		"./Resources/Shaders/Common/Common_Outline_Mask_Static.vert",
-		"./Resources/Shaders/Common/Common_Outline_Mask.frag"
-	);
-
-	// 2. Skinned Mask Program
-	m_maskSkinnedProgram = Program::Create
-	(
-		"./Resources/Shaders/Common/Common_Outline_Mask_Skinned.vert",
-		"./Resources/Shaders/Common/Common_Outline_Mask.frag"
-	);
-
-	// 3. Post Process Program
-	m_postProgram = Program::Create
-	(
-		"./Resources/Shaders/Common/Common_Outline_Post.vert",
-		"./Resources/Shaders/Common/Common_Outline_Post.frag"
-	);
-	if (!m_maskStaticProgram || !m_maskSkinnedProgram || !m_postProgram)
-		return false;
-
+	m_maskStaticProgram = RESOURCE.GetResource<Program>("common_outline_static");
+	m_maskSkinnedProgram = RESOURCE.GetResource<Program>("common_outline_skinned");
+	m_postProgram = RESOURCE.GetResource<Program>("common_outline_postprocess");
+	m_screenMesh = RESOURCE.GetResource<ScreenMesh>("Screen");
 	m_maskFBO = OutlineFramebuffer::Create(width, height);
-	m_screenMesh = ScreenMesh::Create();
 
 	return (m_maskFBO && m_screenMesh);
 }

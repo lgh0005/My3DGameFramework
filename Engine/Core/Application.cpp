@@ -26,6 +26,7 @@ bool Application::Init(int32 width, int32 height, const std::string& title)
 	TIME.Init();						 // 타이머
 	PHYSICS.Init();						 // 물리
 	AUDIO.Init();						 // 오디오 시스템
+	RESOURCE.Init();					 // 전역 리소스 로드
 	IMGUI.Init(true);					 // 디버그 UI (Window가 있어야 가능)
 
 	// 3. 레벨들을 등록

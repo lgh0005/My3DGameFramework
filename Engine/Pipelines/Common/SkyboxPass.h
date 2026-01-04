@@ -19,6 +19,6 @@ private:
 	SkyboxPass();
 	bool Init();
 
-	ProgramUPtr m_skyboxProgram;
-	MeshUPtr m_cubeMesh;
+	ProgramPtr m_skyboxProgram;
+	MeshPtr m_cubeMesh;
 };

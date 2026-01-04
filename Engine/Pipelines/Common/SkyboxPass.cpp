@@ -22,16 +22,8 @@ SkyboxPassUPtr SkyboxPass::Create()
 
 bool SkyboxPass::Init()
 {
-	m_skyboxProgram = Program::Create
-	(
-		"./Resources/Shaders/Common/Common_Sky_Skybox.vert",
-		"./Resources/Shaders/Common/Common_Sky_Skybox.frag"
-	);
-	if (!m_skyboxProgram) return false;
-
-	m_cubeMesh = GeometryGenerator::CreateBox();
-	if (!m_cubeMesh) return false;
-
+	m_skyboxProgram = RESOURCE.GetResource<Program>("common_skybox");
+	m_cubeMesh = RESOURCE.GetResource<StaticMesh>("Cube");
 	return true;
 };
 

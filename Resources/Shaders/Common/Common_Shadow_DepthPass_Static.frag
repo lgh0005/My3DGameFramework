@@ -1,10 +1,10 @@
-#version 460 core
+ï»¿#version 460 core
 
 // DEBUG
 out vec4 FragColor;
 
 void main()
 {
-    // ±íÀÌ °ªÀº GPU¿¡ ÀÇÇØ ÀÚµ¿À¸·Î ±íÀÌ ¹öÆÛ¿¡ ±â·ÏµË´Ï´Ù.
+    // ê¹Šì´ ê°’ì€ GPUì— ì˜í•´ ìë™ìœ¼ë¡œ ê¹Šì´ ë²„í¼ì— ê¸°ë¡ë©ë‹ˆë‹¤.
     FragColor = vec4(vec3(gl_FragCoord.z), 1.0);
 }

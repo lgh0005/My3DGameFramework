@@ -15,13 +15,11 @@ public:
     virtual ResourceType GetResourceType() const override { return ResourceType::CubeTexture; }
     static CubeTextureUPtr CreateFromImages(const std::vector<Image*> images);
     static CubeTextureUPtr CreateFromKtxImage(const std::string& ktxFilePath);
-    static CubeTextureUPtr CreateFromKtxHDR(const std::string& ktxFilePath);
     static CubeTextureUPtr Create(int32 width, int32 height, uint32 format, uint32 type = GL_UNSIGNED_BYTE);
 
     const uint32 Get() const { return m_texture; }
     void Bind() const;
     void GenerateMipmap() const;
-
     int32 GetWidth() const { return m_width; }
     int32 GetHeight() const { return m_height; }
     uint32 GetFormat() const { return m_format; }

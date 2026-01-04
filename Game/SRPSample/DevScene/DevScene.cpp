@@ -46,35 +46,11 @@ DECLARE_DEFAULTS_IMPL(DevScene)
 
 DevSceneUPtr DevScene::Create()
 {
-	auto devScene = DevSceneUPtr(new DevScene());
-	if (!devScene->Init()) return nullptr;
-	return std::move(devScene);
+	return DevSceneUPtr(new DevScene());
 }
 
 bool DevScene::LoadSceneResources()
 {
-	// 0-1. 큐브 메쉬
-	auto boxMesh = GeometryGenerator::CreateBox();
-	RESOURCE.AddResource<StaticMesh>(std::move(boxMesh), "Cube");
-
-	// 0-1. 평면 메쉬
-	auto planeMesh = GeometryGenerator::CreatePlane();
-	RESOURCE.AddResource<StaticMesh>(std::move(planeMesh), "Plane");
-
-	// 0-2. 모델과 애니메이션 #1
-	{
-		auto model = Model::Load("./Resources/Models/spacesoldier/aliensoldier.mymodel");
-		auto anim1 = Animation::Load("./Resources/Models/spacesoldier/Idle.myanim");
-		auto anim2 = Animation::Load("./Resources/Models/spacesoldier/Walking.myanim");
-		RESOURCE.AddResource<Model>(std::move(model), "aliensoldier");
-		RESOURCE.AddResource<Animation>(std::move(anim1), "Idle");
-		RESOURCE.AddResource<Animation>(std::move(anim2), "Walk");
-	}
-
-	// 가방 모델
-	auto backpack = Model::Load("./Resources/Models/backpack/backpack.mymodel");
-	RESOURCE.AddResource<Model>(std::move(backpack), "backpack");
-
 	// 0-3. 머티리얼 1
 	{
 		auto lightMat = Material::Create();
@@ -86,12 +62,9 @@ bool DevScene::LoadSceneResources()
 
 	// 0-4. 머티리얼 2
 	{
-		TextureUPtr diffuseTexture = Texture::CreateFromKtxImage("./Resources/Images/baked/container.ktx");
-		TextureUPtr emissionTexture = Texture::CreateFromKtxImage("./Resources/Images/baked/matrix.ktx");
-
 		auto box1Mat = Material::Create();
-		box1Mat->diffuse = std::move(diffuseTexture);
-		box1Mat->emission = std::move(emissionTexture);
+		box1Mat->diffuse = RESOURCE.GetResource<Texture>("container");
+		box1Mat->emission = RESOURCE.GetResource<Texture>("matrix");
 		box1Mat->shininess = 16.0f;
 		box1Mat->emissionStrength = 5.0f;
 		box1Mat->heightScale = 0.0f;
@@ -100,14 +73,10 @@ bool DevScene::LoadSceneResources()
 
 	// 0-5. 머티리얼 3
 	{
-		TextureUPtr diffuseTexture = Texture::CreateFromKtxImage("./Resources/Images/baked/container2.ktx");
-		TextureUPtr specularTexture = Texture::CreateFromKtxImage("./Resources/Images/baked/container2_specular.ktx");
-		TextureUPtr emissionTexture = Texture::CreateFromKtxImage("./Resources/Images/baked/matrix.ktx");
-
 		auto box2Mat = Material::Create();
-		box2Mat->diffuse = std::move(diffuseTexture);
-		box2Mat->specular = std::move(specularTexture);
-		box2Mat->emission = std::move(emissionTexture);
+		box2Mat->diffuse = RESOURCE.GetResource<Texture>("container2");
+		box2Mat->specular = RESOURCE.GetResource<Texture>("container2_specular");
+		box2Mat->emission = RESOURCE.GetResource<Texture>("matrix");
 		box2Mat->shininess = 16.0f;
 		box2Mat->emissionStrength = 2.0f;
 		box2Mat->heightScale = 0.0f;
@@ -116,10 +85,8 @@ bool DevScene::LoadSceneResources()
 
 	// 0-6. 머티리얼 4
 	{
-		TextureUPtr diffuseTexture = Texture::CreateFromKtxImage("./Resources/Images/baked/marble.ktx");
-
 		auto box4Mat = Material::Create();
-		box4Mat->diffuse = std::move(diffuseTexture);
+		box4Mat->diffuse = RESOURCE.GetResource<Texture>("marble");
 		box4Mat->shininess = 20.0f;
 		box4Mat->emissionStrength = 0.0f;
 		box4Mat->heightScale = 0.0f;
@@ -128,14 +95,9 @@ bool DevScene::LoadSceneResources()
 
 	// 머티리얼 5
 	{
-		TextureUPtr diffuseTexture = Texture::CreateFromImage
-		(Image::Load("./Resources/Images/brickwall.jpg").get());
-		TextureUPtr normalTexture = Texture::CreateFromImage
-		(Image::Load("./Resources/Images/brickwall_normal.jpg").get());
-
 		auto box5Mat = Material::Create();
-		box5Mat->diffuse = std::move(diffuseTexture);
-		box5Mat->normal = std::move(normalTexture);
+		box5Mat->diffuse = RESOURCE.GetResource<Texture>("brickwall");
+		box5Mat->normal = RESOURCE.GetResource<Texture>("brickwall_normal");
 		box5Mat->shininess = 64.0f;
 		box5Mat->emissionStrength = 0.0f;
 		box5Mat->heightScale = 0.0f;
@@ -144,17 +106,10 @@ bool DevScene::LoadSceneResources()
 
 	// 머티리얼 6
 	{
-		TextureUPtr diffuseTexture = Texture::CreateFromImage
-		(Image::Load("./Resources/Images/toy_box_diffuse.png").get());
-		TextureUPtr normalTexture = Texture::CreateFromImage
-		(Image::Load("./Resources/Images/toy_box_normal.png").get());
-		TextureUPtr heightTexture = Texture::CreateFromImage
-		(Image::Load("./Resources/Images/toy_box_disp.png").get());
-
 		auto box6Mat = Material::Create();
-		box6Mat->diffuse = std::move(diffuseTexture);
-		box6Mat->normal = std::move(normalTexture);
-		box6Mat->height = std::move(heightTexture);
+		box6Mat->diffuse = RESOURCE.GetResource<Texture>("toybox_diffuse");
+		box6Mat->normal = RESOURCE.GetResource<Texture>("toybox_normal");
+		box6Mat->height = RESOURCE.GetResource<Texture>("toybox_disp");
 		box6Mat->shininess = 14.0f;
 		box6Mat->emissionStrength = 0.0f;
 		box6Mat->heightScale = 0.065f;
@@ -163,39 +118,20 @@ bool DevScene::LoadSceneResources()
 
 	// 0-7. 풀떼기
 	{
-		auto grassTexture = Texture::CreateFromImage
-		(Image::Load("./Resources/Images/grass.png").get());
-		if (!grassTexture) return false;
-
 		auto grassMat = Material::Create();
-		grassMat->diffuse = std::move(grassTexture);
+		grassMat->diffuse = RESOURCE.GetResource<Texture>("grass");
 		grassMat->emission = nullptr;
 		grassMat->emissionStrength = 0.0f;
 		RESOURCE.AddResource<Material>(std::move(grassMat), "grassMat");
-
-		auto bladeMesh = GeometryGenerator::CreatePlane();
-		RESOURCE.AddResource<StaticMesh>(std::move(bladeMesh), "grassBlade");
 	}
 
 	// 8. 하늘 환경맵
 	{
-		auto cubeSky = CubeTexture::CreateFromKtxImage("./Resources/Images/baked/sky.ktx");
-		RESOURCE.AddResource<CubeTexture>(std::move(cubeSky), "SkyboxTexture");
-
-		auto env = EnvironmentMap::Create(RESOURCE.GetResource<CubeTexture>("SkyboxTexture"));
-		RESOURCE.AddResource<EnvironmentMap>(std::move(env), "StandardSkybox");
-	}
-
-	// 9. sfx
-	{
-		auto sfx = AudioClip::LoadSFX("./Resources/Audios/gunshot.mp3");
-		RESOURCE.AddResource<AudioClip>(std::move(sfx), "MySFX");
-	}
-
-	// 10. bgm
-	{
-		auto bgm = AudioClip::LoadBGM("./Resources/Audios/anubis.wav");
-		RESOURCE.AddResource<AudioClip>(std::move(bgm), "MyBGM");
+		RESOURCE.AddResource<EnvironmentMap>
+		(
+			EnvironmentMap::Create(RESOURCE.GetResource<CubeTexture>("SkyboxTexture")), 
+			"StandardSkybox"
+		);
 	}
 
 	return true;
@@ -486,7 +422,7 @@ bool DevScene::OnPlaceActors()
 	}
 
 	// 잔디밭
-	// PlantTenThousandGrass(grassPass);
+	PlantTenThousandGrass(grassPass);
 
 	return true;
 }
@@ -504,7 +440,7 @@ void DevScene::PlantTenThousandGrass(InstancedRenderPass* pass)
 {
 	const int32 grassCount = 10000;
 	auto bladeMesh = std::static_pointer_cast<StaticMesh>
-		(RESOURCE.GetResource<StaticMesh>("grassBlade"));
+		(RESOURCE.GetResource<StaticMesh>("Plane"));
 	auto grassMat = RESOURCE.GetResource<Material>("grassMat");
 	if (!bladeMesh || !grassMat) return;
 

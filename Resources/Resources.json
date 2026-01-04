@@ -1,31 +1,48 @@
 ﻿{
-    "audios" : 
+    "bgm" : 
     [
-        { "key" : "", "path": "" },
-        { "key" : "", "path": "" }
+        { "key": "MyBGM", "path": "./Resources/Audios/anubis.wav" }
     ],
 
-    "images": 
+    "sfx" : 
     [
-        { "key" : "", "path": "" },
-        { "key" : "", "path": "" }
+        { "key": "MySFX", "path": "./Resources/Audios/gunshot.mp3" }
+    ],
+
+    "textures": 
+    [
+        { "key": "container", "path": "./Resources/Images/baked/container.ktx" },
+        { "key": "matrix", "path": "./Resources/Images/baked/matrix.ktx" },
+        { "key": "container2", "path": "./Resources/Images/baked/container2.ktx" },
+        { "key": "container2_specular", "path": "./Resources/Images/baked/container2_specular.ktx" },
+        { "key": "marble", "path": "./Resources/Images/baked/marble.ktx" },
+        { "key": "brickwall", "path": "./Resources/Images/brickwall.jpg" },
+        { "key": "brickwall_normal", "path": "./Resources/Images/brickwall_normal.jpg" },
+        { "key": "toybox_diffuse", "path": "./Resources/Images/toy_box_diffuse.png" },
+        { "key": "toybox_normal", "path": "./Resources/Images/toy_box_normal.png" },
+        { "key": "toybox_disp", "path": "./Resources/Images/toy_box_disp.png" },
+        { "key": "grass", "path": "./Resources/Images/grass.png" }
+    ],
+
+    "cubemaps": 
+    [
+        { "key": "SkyboxTexture", "path": "./Resources/Images/baked/sky.ktx" }
     ],
 
     "models" : 
     [
-        { "key" : "", "path": "" },
-        { "key" : "", "path": "" }
+        { "key": "aliensoldier", "path": "./Resources/Models/spacesoldier/aliensoldier.mymodel"},
+        { "key" : "backpack", "path": "./Resources/Models/backpack/backpack.mymodel" }
     ],
 
     "animations" :
     [
-        { "key" : "", "path": "" },
-        { "key" : "", "path": "" }
+        { "key" : "Idle", "path": "./Resources/Models/spacesoldier/Idle.myanim" },
+        { "key" : "Walk", "path": "./Resources/Models/spacesoldier/Walking.myanim" }
     ],
 
     "shaders": 
     [
-        { "key" : "", "vs": "", "fs": "" },
-        { "key" : "", "vs": "", "fs": "" }
+
     ]
 }

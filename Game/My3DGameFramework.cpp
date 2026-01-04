@@ -21,7 +21,7 @@ My3DGameFrameworkUPtr My3DGameFramework::Create(int32 width, int32 height, const
 
 bool My3DGameFramework::Init(int32 width, int32 height, const std::string& title)
 {
-    if (!Application::Init(width, height, title)) return false;
+    if (!Super::Init(width, height, title)) return false;
     return true;
 }
 
@@ -35,7 +35,7 @@ void My3DGameFramework::OnInit()
         "Standard"      // Pipeline Key
     );
 
-    // 1. TODO : URP 전용 씬을 만들어서 추가해야 함.
+    // 1. URP 전용 씬
     RegisterLevel<PBRScene, UniversalRenderPipeline>
     (
         "PBRLevel",

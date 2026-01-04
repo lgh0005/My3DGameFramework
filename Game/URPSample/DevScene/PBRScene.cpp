@@ -42,27 +42,11 @@ DECLARE_DEFAULTS_IMPL(PBRScene)
 
 PBRSceneUPtr PBRScene::Create()
 {
-	auto pbrScene = PBRSceneUPtr(new PBRScene());
-	if (!pbrScene->Init()) return nullptr; // TODO : 이제 Init도 필요 없을 듯.
-	return std::move(pbrScene);
+	return PBRSceneUPtr(new PBRScene());
 }
 
 bool PBRScene::LoadSceneResources()
 {
-	// 큐브 메쉬
-	{
-		auto cubeMesh = GeometryGenerator::CreateBox();
-		if (!cubeMesh) return false;
-		RESOURCE.AddResource<StaticMesh>(std::move(cubeMesh), "Cube");
-	}
-
-	// 구 메쉬
-	{
-		auto sphereMesh = GeometryGenerator::CreateSphere();
-		if (!sphereMesh) return false;
-		RESOURCE.AddResource<StaticMesh>(std::move(sphereMesh), "Sphere");
-	}
-
 	// 단색 머티리얼
 	{
 		auto solidColorMat = Material::Create();
@@ -131,16 +115,6 @@ bool PBRScene::LoadSceneResources()
 		RESOURCE.AddResource<Material>(std::move(box1Mat), "GroundMat");
 	}
 	
-	// 0-2. 모델과 애니메이션 #1
-	{
-		auto model = Model::Load("./Resources/Models/spacesoldier/aliensoldier.mymodel");
-		auto anim1 = Animation::Load("./Resources/Models/spacesoldier/Idle.myanim");
-		auto anim2 = Animation::Load("./Resources/Models/spacesoldier/Walking.myanim");
-		RESOURCE.AddResource<Model>(std::move(model), "aliensoldier");
-		RESOURCE.AddResource<Animation>(std::move(anim1), "Idle");
-		RESOURCE.AddResource<Animation>(std::move(anim2), "Walk");
-	}
-
 	return true;
 }
 
