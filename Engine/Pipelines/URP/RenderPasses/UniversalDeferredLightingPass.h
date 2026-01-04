@@ -35,6 +35,6 @@ private:
 	bool Init();
 
 	ScreenMeshPtr m_plane;
-	ProgramUPtr m_deferredLightProgram;
+	ProgramPtr m_deferredLightProgram;
 	Texture* m_ssaoTexture{ nullptr };
 };

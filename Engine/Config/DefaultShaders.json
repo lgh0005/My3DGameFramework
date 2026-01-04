@@ -6,35 +6,111 @@
             "vs":  "./Resources/Shaders/Common/Common_Outline_Mask_Static.vert",
             "fs":  "./Resources/Shaders/Common/Common_Outline_Mask.frag"
         },
-
         { 
             "key": "common_outline_skinned", 
             "vs":  "./Resources/Shaders/Common/Common_Outline_Mask_Skinned.vert",
             "fs":  "./Resources/Shaders/Common/Common_Outline_Mask.frag"
         },
-
         {
             "key": "common_outline_postprocess",
             "vs":  "./Resources/Shaders/Common/Common_Outline_Post.vert",
             "fs":  "./Resources/Shaders/Common/Common_Outline_Post.frag" 
         },
-
         {
             "key": "common_shadow_depth_static",
             "vs":  "./Resources/Shaders/Common/Common_Shadow_DepthPass_Static.vert",
             "fs":  "./Resources/Shaders/Common/Common_Shadow_DepthPass.frag" 
         },
-
         {
             "key": "common_shadow_depth_skinned",
             "vs":  "./Resources/Shaders/Common/Common_Shadow_DepthPass_Skinned.vert",
             "fs":  "./Resources/Shaders/Common/Common_Shadow_DepthPass.frag" 
         },
-        
         {
             "key": "common_skybox",
             "vs":  "./Resources/Shaders/Common/Common_Sky_Skybox.vert",
             "fs":  "./Resources/Shaders/Common/Common_Sky_Skybox.frag" 
+        },
+
+
+
+        {
+            "key": "standard_deferred_geometry_static",
+            "vs":  "./Resources/Shaders/Standard/Standard_Deferred_GeometryPass_Static.vert",
+            "fs":  "./Resources/Shaders/Standard/Standard_Deferred_GeometryPass.frag"
+        },
+        {
+            "key": "standard_deferred_geometry_skinned",
+            "vs":  "./Resources/Shaders/Standard/Standard_Deferred_GeometryPass_Skinned.vert",
+            "fs":  "./Resources/Shaders/Standard/Standard_Deferred_GeometryPass.frag"
+        },
+        {
+            "key": "standard_deferred_lighting",
+            "vs":  "./Resources/Shaders/Standard/Standard_Deferred_LightPass.vert",
+            "fs":  "./Resources/Shaders/Standard/Standard_Deferred_LightPass.frag"
+        },
+        {
+            "key": "standard_ssao",
+            "vs":  "./Resources/Shaders/Standard/Standard_SSAO.vert",
+            "fs":  "./Resources/Shaders/Standard/Standard_SSAO_pass.frag"
+        },
+        {
+            "key": "standard_ssao_blur",
+            "vs":  "./Resources/Shaders/Standard/Standard_SSAO.vert",
+            "fs":  "./Resources/Shaders/Standard/Standard_SSAO_blur.frag"
+        },
+        {
+            "key": "standard_postprocess_threshold",
+            "vs":  "./Resources/Shaders/Standard/Standard_Post_Threshold.vert",
+            "fs":  "./Resources/Shaders/Standard/Standard_Post_Threshold.frag"
+        },
+        {
+            "key": "standard_postprocess_postprocess",
+            "vs":  "./Resources/Shaders/Standard/Standard_Post_PostProcess.vert",
+            "fs":  "./Resources/Shaders/Standard/Standard_Post_PostProcess.frag"
+        },
+        {
+            "key": "standard_postprocess_blur",
+            "vs":  "./Resources/Shaders/Standard/Standard_Post_Blur.vert",
+            "fs":  "./Resources/Shaders/Standard/Standard_Post_Blur.frag"
+        },
+
+
+
+        {
+            "key": "universal_deferred_geometry_static",
+            "vs":  "./Resources/Shaders/Universal/Universal_Deferred_GeometryPass_Static.vert",
+            "fs":  "./Resources/Shaders/Universal/Universal_Deferred_GeometryPass.frag"
+        },
+        {
+            "key": "universal_deferred_geometry_skinned",
+            "vs":  "./Resources/Shaders/Universal/Universal_Deferred_GeometryPass_Skinned.vert",
+            "fs":  "./Resources/Shaders/Universal/Universal_Deferred_GeometryPass.frag"
+        },
+        {
+            "key": "universal_deferred_lighting",
+            "vs":  "./Resources/Shaders/Universal/Universal_Deferred_LightPass.vert",
+            "fs":  "./Resources/Shaders/Universal/Universal_Deferred_LightPass.frag"
+        },
+        {
+            "key": "universal_ssao",
+            "vs":  "./Resources/Shaders/Universal/Universal_SSAO.vert",
+            "fs":  "./Resources/Shaders/Universal/Universal_SSAO_pass.frag"
+        },
+        {
+            "key": "universal_ssao_blur",
+            "vs":  "./Resources/Shaders/Universal/Universal_SSAO.vert",
+            "fs":  "./Resources/Shaders/Universal/Universal_SSAO_blur.frag"
+        },
+        {
+            "key": "universal_postprocess_blur",
+            "vs":  "./Resources/Shaders/Universal/Universal_Post_Blur.vert",
+            "fs":  "./Resources/Shaders/Universal/Universal_Post_Blur.frag"
+        },
+        {
+            "key": "universal_postprocess_postprocess",
+            "vs":  "./Resources/Shaders/Universal/Universal_Post_PostProcess.vert",
+            "fs":  "./Resources/Shaders/Universal/Universal_Post_PostProcess.frag"
         }
     ]
 }

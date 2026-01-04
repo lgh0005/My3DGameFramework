@@ -25,12 +25,7 @@ UniversalPostProcessPassUPtr UniversalPostProcessPass::Create(int32 width, int32
 bool UniversalPostProcessPass::Init(int32 width, int32 height)
 {
 	// 1. Kawase Bloom
-	m_bloomProgram = Program::Create
-	(
-		"./Resources/Shaders/Universal/Universal_Post_Blur.vert",
-		"./Resources/Shaders/Universal/Universal_Post_Blur.frag"
-	);
-	if (!m_bloomProgram) return false;
+	m_bloomProgram = RESOURCE.GetResource<Program>("universal_postprocess_blur");
 
 	// Bloom용 FBO 및 텍스처 생성 (추가됨)
 	m_bloomFBO = PostProcessFramebuffer::Create(1, 1, false); // 크기는 매번 바꿀거라 임시 생성
@@ -57,16 +52,10 @@ bool UniversalPostProcessPass::Init(int32 width, int32 height)
 	}
 
 	// 2. FXAA, 톤 매핑 그리고 감마 코렉션 
-	m_compositeProgram = Program::Create
-	(
-		"./Resources/Shaders/Universal/Universal_Post_PostProcess.vert",
-		"./Resources/Shaders/Universal/Universal_Post_PostProcess.frag"
-	);
-	if (!m_compositeProgram) return false;
+	m_compositeProgram = RESOURCE.GetResource<Program>("universal_postprocess_postprocess");
 
 	// 2. 스크린 메쉬 생성
-	m_plane = ScreenMesh::Create();
-	if (!m_plane) return false;
+	m_plane = RESOURCE.GetResource<ScreenMesh>("Screen");
 
 	// 3. 프레임 버퍼 생성
 	m_frameBuffer = PostProcessFramebuffer::Create(width, height, true);

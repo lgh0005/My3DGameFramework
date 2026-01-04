@@ -40,14 +40,13 @@ private:
 	UniversalSSAOPass();
 	bool Init(int32 width, int32 height);
 
-	ScreenMeshUPtr		   m_screenQuad{ nullptr };
+	ScreenMeshPtr		   m_screenQuad{ nullptr };
+	ProgramPtr            m_ssaoProgram{ nullptr };
+	ProgramPtr            m_ssaoBlurProgram{ nullptr };
 
 	std::vector<glm::vec3> m_ssaoKernel;
 	TextureUPtr            m_noiseTexture{ nullptr };
 
 	SSAOFramebufferUPtr        m_ssaoFBO{ nullptr };	 // Raw SSAO
 	SSAOFramebufferUPtr        m_ssaoBlurFBO{ nullptr }; // Blurred SSAO
-
-	ProgramUPtr            m_ssaoProgram{ nullptr };
-	ProgramUPtr            m_ssaoBlurProgram{ nullptr };
 };

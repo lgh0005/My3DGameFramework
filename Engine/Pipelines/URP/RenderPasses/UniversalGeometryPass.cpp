@@ -31,21 +31,10 @@ UniversalGeometryPassUPtr UniversalGeometryPass::Create(int32 width, int32 heigh
 
 bool UniversalGeometryPass::Init(int32 width, int32 height)
 {
-	m_staticGeometryProgram = Program::Create
-	(
-		"./Resources/Shaders/Universal/Universal_Deferred_GeometryPass_Static.vert",
-		"./Resources/Shaders/Universal/Universal_Deferred_GeometryPass.frag"
-	);
-	m_skinnedGeometryProgram = Program::Create
-	(
-		"./Resources/Shaders/Universal/Universal_Deferred_GeometryPass_Skinned.vert",
-		"./Resources/Shaders/Universal/Universal_Deferred_GeometryPass.frag"
-	);
-	if (!m_staticGeometryProgram || !m_skinnedGeometryProgram) return false;
-
+	m_staticGeometryProgram = RESOURCE.GetResource<Program>("universal_deferred_geometry_static");
+	m_skinnedGeometryProgram = RESOURCE.GetResource<Program>("universal_deferred_geometry_skinned");
 	m_gBuffer = GBufferFramebuffer::Create(width, height);
 	if (!m_gBuffer) return false;
-
 	return true;
 }
 

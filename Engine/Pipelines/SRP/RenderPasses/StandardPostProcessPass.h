@@ -39,9 +39,9 @@ private:
 	bool Init(int32 width, int32 height);
 
 	ScreenMeshPtr						  m_plane;
-	ProgramUPtr							  m_blurProgram;
-	ProgramUPtr							  m_compositeProgram;
-	ProgramUPtr							  m_thresholdProgram;
+	ProgramPtr							  m_blurProgram;
+	ProgramPtr							  m_compositeProgram;
+	ProgramPtr							  m_thresholdProgram;
 	PostProcessFramebufferUPtr			  m_frameBuffer;
 	PostProcessFramebufferUPtr			  m_pingPongFBOs[2];
 	float m_gamma						  { 2.2f };

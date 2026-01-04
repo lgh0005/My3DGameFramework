@@ -25,17 +25,8 @@ UniversalSSAOPassUPtr UniversalSSAOPass::Create(int32 width, int32 height)
 
 bool UniversalSSAOPass::Init(int32 width, int32 height)
 {
-    m_ssaoProgram = Program::Create
-    (
-        "./Resources/Shaders/Universal/Universal_SSAO.vert",
-        "./Resources/Shaders/Universal/Universal_SSAO_pass.frag"
-    );
-    m_ssaoBlurProgram = Program::Create
-    (
-        "./Resources/Shaders/Universal/Universal_SSAO.vert",
-        "./Resources/Shaders/Universal/Universal_SSAO_blur.frag"
-    );
-    if (!m_ssaoProgram || !m_ssaoBlurProgram) return false;
+    m_ssaoProgram = RESOURCE.GetResource<Program>("universal_ssao");
+    m_ssaoBlurProgram = RESOURCE.GetResource<Program>("universal_ssao_blur");
 
     // FBO 생성 (우리가 추가한 CreateSSAO 사용)
     m_ssaoFBO = SSAOFramebuffer::Create(width, height);
@@ -43,8 +34,7 @@ bool UniversalSSAOPass::Init(int32 width, int32 height)
     if (!m_ssaoFBO || !m_ssaoBlurFBO) return false;
 
     // 화면 전체를 덮는 Quad 생성
-    m_screenQuad = ScreenMesh::Create();
-    if (!m_screenQuad) return false;
+    m_screenQuad = RESOURCE.GetResource<ScreenMesh>("Screen");
 
     GenerateKernel();
     GenerateNoiseTexture();

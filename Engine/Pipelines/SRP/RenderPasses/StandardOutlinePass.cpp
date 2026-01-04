@@ -46,8 +46,7 @@ bool StandardOutlinePass::Init
 	m_postProgram = RESOURCE.GetResource<Program>("common_outline_postprocess");
 	m_screenMesh = RESOURCE.GetResource<ScreenMesh>("Screen");
 	m_maskFBO = OutlineFramebuffer::Create(width, height);
-
-	return (m_maskFBO && m_screenMesh);
+	return true;
 }
 
 void StandardOutlinePass::Render(RenderContext* context)

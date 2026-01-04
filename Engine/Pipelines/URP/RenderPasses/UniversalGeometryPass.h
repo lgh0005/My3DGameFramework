@@ -39,8 +39,8 @@ private:
 	void RenderSkinnedGeometry(const std::vector<SkinnedMeshRenderer*>& meshes);
 
 	GBufferFramebufferUPtr m_gBuffer;
-	ProgramUPtr m_staticGeometryProgram;
-	ProgramUPtr m_skinnedGeometryProgram;
+	ProgramPtr m_staticGeometryProgram;
+	ProgramPtr m_skinnedGeometryProgram;
 	std::vector<StaticMeshRenderer*> m_staticMeshRenderers;
 	std::vector<SkinnedMeshRenderer*> m_skinnedMeshRenderers;
 };

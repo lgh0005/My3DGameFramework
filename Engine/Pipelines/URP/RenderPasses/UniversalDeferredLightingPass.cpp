@@ -34,16 +34,8 @@ UniversalDeferredLightingPassUPtr UniversalDeferredLightingPass::Create()
 
 bool UniversalDeferredLightingPass::Init()
 {
-	m_deferredLightProgram = Program::Create
-	(
-		"./Resources/Shaders/Universal/Universal_Deferred_LightPass.vert",
-		"./Resources/Shaders/Universal/Universal_Deferred_LightPass.frag"
-	);
-	if (!m_deferredLightProgram) return false;
-
-	m_plane = ScreenMesh::Create();
-	if (!m_plane) return false;
-
+	m_deferredLightProgram = RESOURCE.GetResource<Program>("universal_deferred_lighting");
+	m_plane = RESOURCE.GetResource<ScreenMesh>("Screen");
 	return true;
 }
 

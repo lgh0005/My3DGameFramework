@@ -31,16 +31,8 @@ StandardDeferredLightingPassUPtr StandardDeferredLightingPass::Create()
 
 bool StandardDeferredLightingPass::Init()
 {
-	m_deferredLightProgram = Program::Create
-	(
-		"./Resources/Shaders/Standard/Standard_Deferred_LightPass.vert",
-		"./Resources/Shaders/Standard/Standard_Deferred_LightPass.frag"
-	);
-	if (!m_deferredLightProgram) return false;
-
-	m_plane = ScreenMesh::Create();
-	if (!m_plane) return false;
-
+	m_deferredLightProgram = RESOURCE.GetResource<Program>("standard_deferred_lighting");
+	m_plane = RESOURCE.GetResource<ScreenMesh>("Screen");
 	return true;
 }
 

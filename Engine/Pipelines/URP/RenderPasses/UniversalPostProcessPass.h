@@ -45,9 +45,9 @@ private:
 	bool Init(int32 width, int32 height);
 
 	ScreenMeshPtr			  m_plane;
+	ProgramPtr				  m_bloomProgram;
+	ProgramPtr			      m_compositeProgram;
 	PostProcessFramebufferUPtr			  m_frameBuffer;
-	ProgramUPtr				  m_bloomProgram;
-	ProgramUPtr			      m_compositeProgram;
 	float m_gamma			  { 2.2f };
 	float m_exposure		  { 0.7f };
 	float m_threshold		  { 1.0f };

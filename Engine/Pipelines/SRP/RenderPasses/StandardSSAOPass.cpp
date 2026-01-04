@@ -24,16 +24,8 @@ StandardSSAOPassUPtr StandardSSAOPass::Create(int32 width, int32 height)
 
 bool StandardSSAOPass::Init(int32 width, int32 height)
 {
-    m_ssaoProgram = Program::Create
-    (
-        "./Resources/Shaders/Standard/Standard_SSAO.vert",
-        "./Resources/Shaders/Standard/Standard_SSAO_pass.frag"
-    );
-    m_ssaoBlurProgram = Program::Create
-    (
-        "./Resources/Shaders/Standard/Standard_SSAO.vert",
-        "./Resources/Shaders/Standard/Standard_SSAO_blur.frag"
-    );
+    m_ssaoProgram = RESOURCE.GetResource<Program>("standard_ssao");
+    m_ssaoBlurProgram = RESOURCE.GetResource<Program>("standard_ssao_blur");
     if (!m_ssaoProgram || !m_ssaoBlurProgram) return false;
 
     // FBO 생성 (우리가 추가한 CreateSSAO 사용)
@@ -42,13 +34,15 @@ bool StandardSSAOPass::Init(int32 width, int32 height)
     if (!m_ssaoFBO || !m_ssaoBlurFBO) return false;
 
     // 화면 전체를 덮는 Quad 생성
-    m_screenQuad = ScreenMesh::Create();
+    m_screenQuad = RESOURCE.GetResource<ScreenMesh>("Screen");
     if (!m_screenQuad) return false;
 
     GenerateKernel();
     GenerateNoiseTexture();
 
     // 커널은 초기화할 때 한 번 만 전송
+    // TODO : 배열로 한 번에 넘기는 걸 고려해볼 필요가 있음
+    // TODO : 64란 숫자는 define으로 적어둘 것
     m_ssaoProgram->Use();
     for (uint32 i = 0; i < 64; ++i)
         m_ssaoProgram->SetUniform("samples[" + std::to_string(i) + "]", m_ssaoKernel[i]);
@@ -58,7 +52,6 @@ bool StandardSSAOPass::Init(int32 width, int32 height)
 
 void StandardSSAOPass::Resize(int32 width, int32 height)
 {
-    // FBO 재생성 (단순하게 새로 만듦)
     m_ssaoFBO = SSAOFramebuffer::Create(width, height);
     m_ssaoBlurFBO = SSAOFramebuffer::Create(width, height);
 }

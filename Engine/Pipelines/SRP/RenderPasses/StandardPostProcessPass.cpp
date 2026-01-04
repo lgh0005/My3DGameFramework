@@ -24,24 +24,10 @@ StandardPostProcessPassUPtr StandardPostProcessPass::Create(int32 width, int32 h
 
 bool StandardPostProcessPass::Init(int32 width, int32 height)
 {
-	m_thresholdProgram = Program::Create
-	(
-		"./Resources/Shaders/Standard/Standard_Post_Threshold.vert",
-		"./Resources/Shaders/Standard/Standard_Post_Threshold.frag"
-	);
-	m_compositeProgram = Program::Create
-	(
-		"./Resources/Shaders/Standard/Standard_Post_PostProcess.vert",
-		"./Resources/Shaders/Standard/Standard_Post_PostProcess.frag"
-	);
-	m_blurProgram = Program::Create
-	(
-		"./Resources/Shaders/Standard/Standard_Post_Blur.vert",
-		"./Resources/Shaders/Standard/Standard_Post_Blur.frag"
-	);
-	if (!m_compositeProgram || !m_blurProgram || !m_thresholdProgram) return false;
-
-	m_plane = ScreenMesh::Create();
+	m_thresholdProgram = RESOURCE.GetResource<Program>("standard_postprocess_threshold");
+	m_compositeProgram = RESOURCE.GetResource<Program>("standard_postprocess_postprocess");
+	m_blurProgram = RESOURCE.GetResource<Program>("standard_postprocess_blur");
+	m_plane = RESOURCE.GetResource<ScreenMesh>("Screen");
 	if (!m_plane) return false;
 
 	m_frameBuffer	  = PostProcessFramebuffer::Create(width, height, true);
