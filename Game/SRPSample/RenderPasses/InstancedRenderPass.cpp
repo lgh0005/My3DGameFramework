@@ -2,7 +2,7 @@
 #include "InstancedRenderPass.h"
 
 #include "Scene/Scene.h"
-#include "Graphics/Program.h"
+#include "Resources/Program.h"
 #include "Resources/Mesh.h"
 #include "Resources/Material.h"
 #include "Components/Camera.h"

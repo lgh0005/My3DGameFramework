@@ -1,10 +1,9 @@
 ﻿#include "EnginePch.h"
 #include "StandardOutlinePass.h"
 
-// 필수 헤더 포함
 #include "Graphics/RenderContext.h"
 #include "Scene/GameObject.h"
-#include "Graphics/Program.h"
+#include "Resources/Program.h"
 #include "Framebuffers/OutlineFramebuffer.h"
 #include "Framebuffers/PostProcessFramebuffer.h"
 #include "Resources/Mesh.h"

@@ -5,7 +5,7 @@
 #include "Components/Transform.h"
 #include "Resources/SkinnedMesh.h"
 #include "Resources/Material.h"
-#include "Graphics/Program.h"
+#include "Resources/Program.h"
 #include "Graphics/VertexLayout.h"
 
 DECLARE_DEFAULTS_IMPL(SkinnedMeshRenderer)

@@ -9,7 +9,7 @@
 #include "Scene/SceneRegistry.h"
 #include "Scene/GameObject.h"
 #include "Graphics/Geometry.h"
-#include "Graphics/Program.h"
+#include "Resources/Program.h"
 #include "Resources/ScreenMesh.h"
 #include "Resources/StaticMesh.h" 
 #include "Resources/Texture.h" 

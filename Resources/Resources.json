@@ -1,0 +1,31 @@
+﻿{
+    "audios" : 
+    [
+        { "key" : "", "path": "" },
+        { "key" : "", "path": "" }
+    ],
+
+    "images": 
+    [
+        { "key" : "", "path": "" },
+        { "key" : "", "path": "" }
+    ],
+
+    "models" : 
+    [
+        { "key" : "", "path": "" },
+        { "key" : "", "path": "" }
+    ],
+
+    "animations" :
+    [
+        { "key" : "", "path": "" },
+        { "key" : "", "path": "" }
+    ],
+
+    "shaders": 
+    [
+        { "key" : "", "vs": "", "fs": "" },
+        { "key" : "", "vs": "", "fs": "" }
+    ]
+}

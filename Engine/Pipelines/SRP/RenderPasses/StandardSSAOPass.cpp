@@ -8,7 +8,7 @@
 #include "Resources/ScreenMesh.h"
 #include "Resources/StaticMesh.h"
 #include "Graphics/Geometry.h"
-#include "Graphics/Program.h"
+#include "Resources/Program.h"
 #include "Framebuffers/SSAOFramebuffer.h"
 
 #include "Pipelines/SRP/StandardRenderContext.h"

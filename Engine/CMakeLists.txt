@@ -7,6 +7,7 @@ find_package(assimp CONFIG REQUIRED)
 find_package(KTX CONFIG REQUIRED)
 find_package(freetype REQUIRED)
 find_package(Jolt CONFIG REQUIRED)
+find_package(nlohmann_json CONFIG REQUIRED)
 
 add_library(Engine STATIC
 
@@ -73,7 +74,6 @@ add_library(Engine STATIC
 
    # Graphics
    "Graphics/Shader.h"              "Graphics/Shader.cpp"
-   "Graphics/Program.h"             "Graphics/Program.cpp"
    "Graphics/Buffer.h"              "Graphics/Buffer.cpp" 
    "Graphics/VertexLayout.h"        "Graphics/VertexLayout.cpp"
    "Graphics/Vertex.h"              "Graphics/Vertex.cpp"
@@ -103,6 +103,7 @@ add_library(Engine STATIC
 
    # Resources
    "Resources/Resource.h"           "Resources/Resource.cpp"
+   "Resources/Program.h"            "Resources/Program.cpp"
    "Resources/AudioClip.h"          "Resources/AudioClip.cpp"
    "Resources/Image.h"              "Resources/Image.cpp"
    "Resources/Model.h"              "Resources/Model.cpp"
@@ -159,7 +160,7 @@ add_library(Engine STATIC
    "Managers/AudioManager.h"        "Managers/AudioManager.cpp"
    "Managers/PhysicsManager.h"      "Managers/PhysicsManager.cpp"
    "Managers/UIManager.h"           "Managers/UIManager.cpp"
-)
+ "Core/ResourceParser.h")
 
 # 2. [PCH 설정] EnginePCH.h를 PCH로 사용합니다.
 target_precompile_headers(Engine  PUBLIC EnginePCH.h)
@@ -182,6 +183,7 @@ target_link_libraries(Engine PUBLIC
     KTX::ktx
     freetype  
     Jolt::Jolt
+    nlohmann_json::nlohmann_json
 )
 
 # 5. [컴파일 정의] Engine 타겟에 C++ 매크로를 정의합니다.

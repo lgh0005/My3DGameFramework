@@ -3,7 +3,7 @@
 
 #include "Scene/Scene.h"
 #include "Graphics/RenderContext.h"
-#include "Graphics/Program.h"
+#include "Resources/Program.h"
 #include "Graphics/Geometry.h"
 #include "Resources/ScreenMesh.h"
 #include "Resources/StaticMesh.h"

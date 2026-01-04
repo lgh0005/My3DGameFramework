@@ -1,4 +1,4 @@
-{
+﻿{
     "$schema": "https://raw.githubusercontent.com/microsoft/vcpkg/master/scripts/vcpkg.schema.json",
     "name": "my-3d-game-framework",
     "version": "0.1.0",
@@ -13,6 +13,7 @@
       },
       "assimp",
       "joltphysics",
-      "freetype"
+      "freetype",
+      "nlohmann-json"
     ]
 }

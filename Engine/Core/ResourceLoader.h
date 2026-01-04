@@ -3,7 +3,11 @@
 CLASS_PTR(ResourceLoader)
 class ResourceLoader
 {
+	DECLARE_STATIC_CLASS(ResourceLoader)
+
 public:
-	virtual bool LoadResources() = 0;
+	static void LoadFromManifest(const std::string& manifestPath);
+
+private:
 
 };

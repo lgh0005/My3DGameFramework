@@ -6,7 +6,7 @@
 #include "Resources/CubeTexture.h"
 #include "Resources/Mesh.h"
 #include "Resources/StaticMesh.h"
-#include "Graphics/Program.h"
+#include "Resources/Program.h"
 #include "Graphics/Geometry.h"
 #include "Graphics/SkyLight.h"
 #include "Components/Camera.h"

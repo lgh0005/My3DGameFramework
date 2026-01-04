@@ -16,7 +16,7 @@
 #include "Scene/GameObject.h"
 #include "Scene/SceneRegistry.h"
 #include "Graphics/RenderPass.h"
-#include "Graphics/Program.h"
+#include "Resources/Program.h"
 #include "Graphics/ShadowMap.h"
 #include "Resources/Texture.h"
 #include "Resources/CubeTexture.h"

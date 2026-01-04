@@ -4,7 +4,7 @@
 #include "Resources/UIMesh.h"    // UIMesh 구현체
 #include "Resources/Material.h"
 #include "Resources/Font.h"
-#include "Graphics/Program.h"
+#include "Resources/Program.h"
 #include "Graphics/Vertex.h"
 
 DECLARE_DEFAULTS_IMPL(UIText)

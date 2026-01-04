@@ -3,7 +3,7 @@
 
 #include "Scene/Scene.h"
 #include "Scene/GameObject.h"
-#include "Graphics/Program.h" 
+#include "Resources/Program.h" 
 #include "Graphics/ShadowMap.h"
 #include "Resources/Mesh.h"
 #include "Resources/StaticMesh.h"

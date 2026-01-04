@@ -1,6 +1,6 @@
 ﻿#include "EnginePch.h"
 #include "Material.h"
-#include "Graphics/Program.h"
+#include "Resources/Program.h"
 #include "Resources/Texture.h"
 
 DECLARE_DEFAULTS_IMPL(Material)
@@ -10,6 +10,9 @@ MaterialUPtr Material::Create()
     return MaterialUPtr(new Material());
 }
 
+// INFO : 현재 이 SetToProgram은 머티리얼 관련 유니폼 변수를 확정적으로 강제하는
+// 것임. 이는 엔진 외부 단에서도 반드시 지켜야 하는 유니폼 작성 포멧임을 유념해야 함.
+// 포멧은 여타 다른 내부 엔진용 셰이더 파일에서 머티리얼 부분을 어떻게 선언하고 있는지 참고 바람.
 void Material::SetToProgram(const Program* program) const 
 {
     // 1. Albedo (Diffuse) - [Slot 0]

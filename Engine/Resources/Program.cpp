@@ -1,6 +1,6 @@
 ﻿#include "EnginePch.h"
+#include "Program.h"
 #include "Graphics/Shader.h"
-#include "Graphics/Program.h"
 
 Program::Program() = default;
 Program::~Program()

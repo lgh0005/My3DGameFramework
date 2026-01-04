@@ -3,7 +3,7 @@
 #include "Resources/Material.h"
 #include "Graphics/Buffer.h"
 #include "Graphics/VertexLayout.h"
-#include "Graphics/Program.h"
+#include "Resources/Program.h"
 
 DECLARE_DEFAULTS_IMPL(SkinnedMesh)
 

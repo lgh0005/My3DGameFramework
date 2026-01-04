@@ -3,7 +3,7 @@
 #include "Scene/GameObject.h"
 #include "Components/Camera.h"
 #include "Components/Transform.h"
-#include "Graphics/Program.h"
+#include "Resources/Program.h"
 #include "UIs/UIRenderer.h"
 
 DECLARE_DEFAULTS_IMPL(UICanvas)

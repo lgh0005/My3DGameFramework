@@ -1,6 +1,6 @@
 ﻿#pragma once
 #include "Graphics/RenderPass.h"
-#include "Graphics/Program.h"
+#include "Resources/Program.h"
 
 #pragma region FORWARD_DECLARATION
 CLASS_PTR(Program)
