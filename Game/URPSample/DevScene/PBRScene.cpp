@@ -2,7 +2,6 @@
 #include "PBRScene.h"
 
 #include "Scene/GameObject.h"
-#include "Graphics/Renderer.h"
 #include "Resources/Program.h"
 #include "Resources/Mesh.h"
 #include "Resources/StaticMesh.h"
@@ -13,15 +12,12 @@
 #include "Resources/Image.h"
 #include "Resources/Animation.h"
 #include "Resources/Model.h"
-#include "Graphics/Buffer.h"
 #include "Resources/InstancedMesh.h"
 #include "Graphics/Geometry.h"
 #include "Graphics/SkyLight.h"
 #include "Resources/AudioClip.h"
 #include "Resources/AnimController.h"
 #include "Resources/EnvironmentMap.h"
-
-#include "Misc/IBLUtils.h"
 
 #include "Components/Camera.h"
 #include "Components/Transform.h"

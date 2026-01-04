@@ -89,7 +89,7 @@ const GlyphInfo& Font::GetOrLoadGlyph(uint32 codePoint)
 	// 4. 텍스처 부분 업데이트 (SetSubData)
 	if (width > 0 && height > 0)
 	{
-		// [중요] 폰트 비트맵은 1바이트 정렬이므로 GL 언팩 정렬 변경
+		// 폰트 비트맵은 1바이트 정렬이므로 GL 언팩 정렬 변경
 		glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 
 		m_atlasTexture->SetSubData(m_cursorX, m_cursorY, width, height, bitmap.buffer);

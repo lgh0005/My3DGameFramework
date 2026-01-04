@@ -1,0 +1,6 @@
+﻿{
+    "resource_root": "./Resources",
+    "config_root": "./Config",
+    "shader_config": "DefaultShaders.json",
+    "game_config": "Resources.json"
+}

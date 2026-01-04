@@ -3,7 +3,7 @@
 #include "Resources/Image.h"
 #include "Resources/Texture.h"
 #include "Resources/CubeTexture.h"
-#include "Misc/IBLUtils.h"
+#include "Graphics/IBLUtils.h"
 
 DECLARE_DEFAULTS_IMPL(EnvironmentMap)
 

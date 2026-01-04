@@ -18,6 +18,7 @@ add_library(Engine STATIC
    "Core/Application.h"             "Core/Application.cpp"
    "Core/Logger.h"                  "Core/Logger.cpp"
    "Core/ResourceLoader.h"          "Core/ResourceLoader.cpp"
+   "Core/EngineConfigurator.h"    "Core/EngineConfigurator.cpp"
 
    # Scene
    "Scene/Scene.h"                   "Scene/Scene.cpp"
@@ -60,7 +61,6 @@ add_library(Engine STATIC
    "Misc/Defines.h"                 "Misc/Types.h"
    "Misc/ImguiManager.h"            "Misc/ImguiManager.cpp"
    "Misc/Utils.h"                   "Misc/Utils.cpp"       
-   "Misc/IBLUtils.h"                "Misc/IBLUtils.cpp"
    "Misc/AssetFormat.h"             "Misc/AssetFormat.cpp"
    "Misc/AssetUtils.h"              "Misc/AssetUtils.cpp"
    "Misc/ResourceJsonFormat.h"      "Misc/ResourceJsonFormat.cpp"
@@ -80,6 +80,7 @@ add_library(Engine STATIC
    "Graphics/Vertex.h"              "Graphics/Vertex.cpp"
    "Graphics/UniformBuffer.h"       "Graphics/UniformBuffer.cpp"
    "Graphics/Uniform.h"             "Graphics/Uniform.cpp"
+   "Graphics/IBLUtils.h"            "Graphics/IBLUtils.cpp"
    "Graphics/Frustum.h"             "Graphics/Frustum.cpp"
    "Graphics/Geometry.h"            "Graphics/Geometry.cpp"
    "Graphics/CubeFramebuffer.h"     "Graphics/CubeFramebuffer.cpp"

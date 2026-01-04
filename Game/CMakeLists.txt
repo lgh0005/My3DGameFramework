@@ -33,17 +33,50 @@ target_include_directories(Game PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 # 3. [링크 설정] Game 타겟은 Engine 라이브러리가 필요합니다.
 target_link_libraries(Game PRIVATE Engine)
 
-# 4. Resource 폴더를 빌드 폴더에 덮어쓰기
-set(RESOURCE_SRC_DIR "${CMAKE_SOURCE_DIR}/Resources")
-set(RESOURCE_DEST_DIR "${CMAKE_CURRENT_BINARY_DIR}/Resources")
+# 4. 리소스 및 설정 병합 (순서 중요: Engine -> Game)
+add_custom_command(TARGET Game POST_BUILD
+    # [Step 1] 목적지 폴더 생성 (없으면 에러나니까 안전장치)
+    COMMAND ${CMAKE_COMMAND} -E make_directory "$<TARGET_FILE_DIR:Game>/Config"
+    COMMAND ${CMAKE_COMMAND} -E make_directory "$<TARGET_FILE_DIR:Game>/Resources"
+    COMMAND ${CMAKE_COMMAND} -E make_directory "$<TARGET_FILE_DIR:Game>/Resources/Shaders"
 
-file(GLOB_RECURSE RESOURCE_FILES "${RESOURCE_SRC_DIR}/*")
+    # -----------------------------------------------------------------
+    # [Step 2] 셰이더 병합 (Engine 기본값 -> Game 커스텀)
+    # -----------------------------------------------------------------
+    
+    # 2-1. 엔진 필수 셰이더 복사 (Base)
+    # Engine/Shaders 내용을 -> Bin/Resources/Shaders 로 복사
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+    "${CMAKE_SOURCE_DIR}/Engine/Shaders"
+    "$<TARGET_FILE_DIR:Game>/Resources/Shaders"
 
-add_custom_target(
-    CopyResources ALL
-    COMMAND ${CMAKE_COMMAND} -E copy_directory "${RESOURCE_SRC_DIR}" "${RESOURCE_DEST_DIR}"
-    DEPENDS ${RESOURCE_FILES}
-    COMMENT "Copying resources..."
+    # -----------------------------------------------------------------
+    # [Step 3] 일반 리소스 병합 (Engine 리소스 -> Game 리소스)
+    # -----------------------------------------------------------------
+
+    # 3-1. 게임 리소스 전체 복사 (Override)
+    # Root/Resources 내용을 -> Bin/Resources 로 복사
+    # (만약 사용자가 커스텀 셰이더를 Resources/Shaders에 넣었다면 여기서 덮어씌워짐)
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+    "${CMAKE_SOURCE_DIR}/Resources"
+    "$<TARGET_FILE_DIR:Game>/Resources"
+
+    # -----------------------------------------------------------------
+    # [Step 4] 설정(Config) 병합 (Engine 기본값 -> Game 커스텀)
+    # -----------------------------------------------------------------
+
+    # 4-1. 엔진 기본 설정 복사 (Base)
+    # Engine/Config -> Bin/Config
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+    "${CMAKE_SOURCE_DIR}/Engine/Config"
+    "$<TARGET_FILE_DIR:Game>/Config"
+
+    # 4-2. 게임 전용 설정 복사 (Override)
+    # Game/Config -> Bin/Config
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+    "${CMAKE_CURRENT_SOURCE_DIR}/Config"
+    "$<TARGET_FILE_DIR:Game>/Config"
+
+    # 로그 출력
+    COMMENT "Deploying Assets: Merging Engine defaults with Game overrides..."
 )
-
-add_dependencies(Game CopyResources)

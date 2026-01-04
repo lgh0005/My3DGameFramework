@@ -15,6 +15,11 @@
 #include <cstdarg>
 namespace fs = std::filesystem;
 
+// nlohmann-json
+#include <nlohmann/json_fwd.hpp>
+#include <nlohmann/json.hpp> 
+using json = nlohmann::json;
+
 // OpenGL
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glad/glad.h>

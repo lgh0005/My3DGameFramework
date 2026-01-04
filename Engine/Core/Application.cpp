@@ -1,5 +1,6 @@
 ﻿#include "EnginePch.h"
 #include "Application.h"
+#include "Core/EngineConfigurator.h"
 #include "Scene/Scene.h"
 #include "Graphics/RenderPipeline.h"
 
@@ -8,10 +9,11 @@ Application::~Application() { Shutdown(); }
 
 bool Application::Init(int32 width, int32 height, const std::string& title)
 {
-	// 0. Logger 초기화
+	// 0. Logger 초기화 및 Config 설정
 	LOGGER.Init();
 	LOG_INFO("Application Started [Start]");
 	LOG_INFO("Engine Initialization Started...");
+	if (!EngineConfigurator::Init()) return false;
 
 	// 1. 윈도우 생성 (가장 먼저 되어야 함)
 	if (!WINDOW.Init(width, height, title))

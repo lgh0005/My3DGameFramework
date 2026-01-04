@@ -14,9 +14,6 @@
 #include "Resources/StaticMesh.h"
 #include "Resources/Material.h"
 
-#include <nlohmann/json.hpp> 
-using json = nlohmann::json;
-
 /*======================//
 //  main entry method   //
 //======================*/

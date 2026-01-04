@@ -1,23 +1,22 @@
 ﻿#include "EnginePch.h"
 #include "ResourceManager.h"
 #include "Core/ResourceLoader.h"
+#include "Core/EngineConfigurator.h"
 
 bool ResourceManager::Init()
 {
     bool success = true;
-
-    // TODO : 경로 하드코딩 처리 필요
 
     // 1. 빌트인 리소스(Cube, Plane, Material 등) 생성
     if (!ResourceLoader::Init()) 
         return false;
 
     // 2. 기본 엔진 셰이더 로드
-    if (!ResourceLoader::Load("./Resources/Shaders/DefaultShaders.json"))
+    if (!ResourceLoader::Load(EngineConfigurator::GetShaderConfigPath().string()))
         return false;
 
     // 3. 게임 리소스 로드
-    if (!ResourceLoader::Load("./Resources/Resources.json"))
+    if (!ResourceLoader::Load(EngineConfigurator::GetGameConfigPath().string()))
         return false;
 
     return success;
