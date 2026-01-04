@@ -2,6 +2,9 @@
 #include "Physics/PhysicsConfig.h"
 
 #pragma region FORWARD_DECLARATION
+CLASS_PTR(Ray)
+CLASS_PTR(RaycastHit)
+
 CLASS_PTR(BPLayerInterfaceImpl)
 CLASS_PTR(ObjectVsBroadPhaseLayerFilterImpl)
 CLASS_PTR(ObjectLayerPairFilterImpl)
@@ -33,6 +36,20 @@ public:
 	// Jolt 인터페이스 접근
 	JPH::BodyInterface& GetBodyInterface() const;
 	const JPH::PhysicsSystem& GetPhysicsSystem() const { return *m_PhysicsSystem; }
+
+/*========================//
+//   raycasting methods   //
+//========================*/
+public:
+	bool Raycast
+	(
+		const glm::vec3& origin, 
+		const glm::vec3& direction, 
+		float maxDistance, 
+		RaycastHit& outHit
+	);
+
+private:
 
 private:
 	PhysicsManager();

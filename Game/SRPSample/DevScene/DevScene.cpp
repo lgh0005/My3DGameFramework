@@ -41,8 +41,7 @@
 #include "SRPSample/Scripts/CameraController.h"
 #include "SRPSample/Scripts/PlayerController.h"
 
-DevScene::DevScene() = default;
-DevScene::~DevScene() = default;
+DECLARE_DEFAULTS_IMPL(DevScene)
 
 DevSceneUPtr DevScene::Create()
 {

@@ -19,8 +19,7 @@
 #include "Misc/AssetFormat.h"
 #include "Misc/AssetUtils.h"
 
-Model::Model() = default;
-Model::~Model() = default;
+DECLARE_DEFAULTS_IMPL(Model)
 
 SkinnedMeshPtr Model::GetSkinnedMesh(int index) const
 {

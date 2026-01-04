@@ -20,8 +20,7 @@
 
 #include "Pipelines/SRP/StandardRenderContext.h"
 
-StandardDeferredLightingPass::StandardDeferredLightingPass() = default;
-StandardDeferredLightingPass::~StandardDeferredLightingPass() = default;
+DECLARE_DEFAULTS_IMPL(StandardDeferredLightingPass)
 
 StandardDeferredLightingPassUPtr StandardDeferredLightingPass::Create()
 {

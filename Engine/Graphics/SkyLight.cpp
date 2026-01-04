@@ -3,8 +3,7 @@
 #include "Resources/Texture.h"
 #include "Resources/CubeTexture.h"
 
-SkyLight::~SkyLight() = default;
-SkyLight::SkyLight() = default;
+DECLARE_DEFAULTS_IMPL(SkyLight)
 
 SkyLightUPtr SkyLight::Create()
 {

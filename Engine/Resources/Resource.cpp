@@ -1,8 +1,7 @@
 ﻿#include "EnginePch.h"
 #include "Resource.h"
 
-Resource::Resource() = default;
-Resource::~Resource() = default;
+DECLARE_DEFAULTS_IMPL(Resource)
 
 bool Resource::MatchesType(ResourceType type) const
 {

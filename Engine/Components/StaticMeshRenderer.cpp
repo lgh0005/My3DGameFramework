@@ -6,8 +6,7 @@
 #include "Graphics/VertexLayout.h"
 #include "Components/Transform.h"
 
-StaticMeshRenderer::StaticMeshRenderer() = default;
-StaticMeshRenderer::~StaticMeshRenderer() = default;
+DECLARE_DEFAULTS_IMPL(StaticMeshRenderer)
 
 StaticMeshRendererUPtr StaticMeshRenderer::Create(StaticMeshPtr mesh, MaterialPtr material)
 {

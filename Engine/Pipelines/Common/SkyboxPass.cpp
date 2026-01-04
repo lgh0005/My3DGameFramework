@@ -11,8 +11,7 @@
 #include "Graphics/SkyLight.h"
 #include "Components/Camera.h"
 
-SkyboxPass::SkyboxPass() = default;
-SkyboxPass::~SkyboxPass() = default;
+DECLARE_DEFAULTS_IMPL(SkyboxPass)
 
 SkyboxPassUPtr SkyboxPass::Create()
 {

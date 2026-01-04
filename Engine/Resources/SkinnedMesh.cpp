@@ -5,8 +5,7 @@
 #include "Graphics/VertexLayout.h"
 #include "Graphics/Program.h"
 
-SkinnedMesh::SkinnedMesh() = default;
-SkinnedMesh::~SkinnedMesh() = default;
+DECLARE_DEFAULTS_IMPL(SkinnedMesh)
 
 SkinnedMeshUPtr SkinnedMesh::Create(const std::vector<SkinnedVertex>& vertices,
                                     const std::vector<uint32>& indices,

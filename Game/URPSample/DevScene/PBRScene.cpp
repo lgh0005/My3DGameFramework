@@ -37,8 +37,7 @@
 #include "SRPSample/Scripts/CameraController.h"
 #include "SRPSample/Scripts/PlayerController.h"
 
-PBRScene::PBRScene() = default;
-PBRScene::~PBRScene() = default;
+DECLARE_DEFAULTS_IMPL(PBRScene)
 
 PBRSceneUPtr PBRScene::Create()
 {

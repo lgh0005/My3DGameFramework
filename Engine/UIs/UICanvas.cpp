@@ -6,8 +6,7 @@
 #include "Graphics/Program.h"
 #include "UIs/UIRenderer.h"
 
-UICanvas::UICanvas() = default;
-UICanvas::~UICanvas() = default;
+DECLARE_DEFAULTS_IMPL(UICanvas)
 
 UICanvasUPtr UICanvas::Create(UIRenderMode mode, int32 sortOrder)
 {

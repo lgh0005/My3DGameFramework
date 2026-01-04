@@ -1,5 +1,4 @@
 ﻿#include "EnginePch.h"
 #include "Light.h"
 
-Light::Light() = default;
-Light::~Light() = default;
+DECLARE_DEFAULTS_IMPL(Light)

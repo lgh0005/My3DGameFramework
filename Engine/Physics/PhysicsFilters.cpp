@@ -5,6 +5,8 @@ using namespace JPH;
 /*===============================//
 //   BroadPhase Filter Methods   //
 //===============================*/
+DECLARE_DEFAULTS_IMPL(ObjectVsBroadPhaseLayerFilterImpl)
+
 bool ObjectVsBroadPhaseLayerFilterImpl::ShouldCollide
 (
 	ObjectLayer inLayer1, 
@@ -22,6 +24,8 @@ bool ObjectVsBroadPhaseLayerFilterImpl::ShouldCollide
 /*==============================//
 //  ObjectLayer Filter Methods  //
 //==============================*/
+DECLARE_DEFAULTS_IMPL(ObjectLayerPairFilterImpl)
+
 bool ObjectLayerPairFilterImpl::ShouldCollide
 (
 	ObjectLayer inObject1, 

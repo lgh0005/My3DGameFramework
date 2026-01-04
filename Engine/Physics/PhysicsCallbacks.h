@@ -2,6 +2,8 @@
 
 class PhysicsCallbacks
 {
+	DECLARE_STATIC_CLASS(PhysicsCallbacks)
+
 public:
 	static void TraceImpl(const char* inFMT, ...);
 

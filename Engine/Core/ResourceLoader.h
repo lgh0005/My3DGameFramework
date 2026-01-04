@@ -4,8 +4,6 @@ CLASS_PTR(ResourceLoader)
 class ResourceLoader
 {
 public:
-
-
-private:
+	virtual bool LoadResources() = 0;
 
 };

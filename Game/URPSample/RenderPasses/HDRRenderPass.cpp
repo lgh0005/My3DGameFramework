@@ -15,8 +15,7 @@
 #include "Components/Transform.h"
 #include "Scene/GameObject.h"
 
-HDRRenderPass::HDRRenderPass() = default;
-HDRRenderPass::~HDRRenderPass() = default;
+DECLARE_DEFAULTS_IMPL(HDRRenderPass)
 
 HDRRenderPassUPtr HDRRenderPass::Create(ProgramUPtr program)
 {

@@ -3,8 +3,7 @@
 #include "Graphics/Program.h"
 #include "Resources/Texture.h"
 
-Material::Material() = default;
-Material::~Material() = default;
+DECLARE_DEFAULTS_IMPL(Material)
 
 MaterialUPtr Material::Create()
 {

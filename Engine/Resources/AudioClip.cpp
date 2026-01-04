@@ -1,9 +1,7 @@
 ﻿#include "EnginePch.h"
 #include "AudioClip.h"
-#include <fstream>
 
-AudioClip::AudioClip() = default;
-AudioClip::~AudioClip() = default;
+DECLARE_DEFAULTS_IMPL(AudioClip)
 
 AudioClipUPtr AudioClip::LoadSFX(const std::string& filepath)
 {

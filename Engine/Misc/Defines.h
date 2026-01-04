@@ -37,6 +37,13 @@ private:                                                                        
     classType() = default;                                                      \
     ~classType() = default;                                                     
 
+/*=============================================//
+//   declare non-instantiable implementation   //
+//=============================================*/
+#define DECLARE_DEFAULTS_IMPL(classType)                                        \
+classType::classType() = default;                                               \
+classType::~classType() = default;
+
 /*===========================//
 //   declare smart pointers  //
 //===========================*/

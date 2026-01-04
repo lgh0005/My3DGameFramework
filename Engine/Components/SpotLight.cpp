@@ -2,8 +2,7 @@
 #include "SpotLight.h"
 #include "Components/Transform.h"
 
-SpotLight::SpotLight() = default;
-SpotLight::~SpotLight() = default;
+DECLARE_DEFAULTS_IMPL(SpotLight)
 
 SpotLightUPtr SpotLight::Create()
 {

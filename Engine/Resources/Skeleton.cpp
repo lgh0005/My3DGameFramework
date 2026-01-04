@@ -1,8 +1,7 @@
 ﻿#include "EnginePch.h"
 #include "Skeleton.h"
 
-Skeleton::Skeleton() = default;
-Skeleton::~Skeleton() = default;
+DECLARE_DEFAULTS_IMPL(Skeleton)
 
 SkeletonUPtr Skeleton::Create()
 {

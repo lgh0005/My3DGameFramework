@@ -2,8 +2,7 @@
 #include "BRDFLookUpFramebuffer.h"
 #include "Resources/Texture.h"
 
-BRDFLookUpFramebuffer::BRDFLookUpFramebuffer() = default;
-BRDFLookUpFramebuffer::~BRDFLookUpFramebuffer() = default;
+DECLARE_DEFAULTS_IMPL(BRDFLookUpFramebuffer)
 
 BRDFLookUpFramebufferUPtr BRDFLookUpFramebuffer::Create(int32 width, int32 height)
 {

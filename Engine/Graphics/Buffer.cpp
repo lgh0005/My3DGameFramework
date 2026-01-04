@@ -4,9 +4,7 @@
 Buffer::Buffer() = default;
 Buffer::~Buffer()
 {
-    if (m_buffer) {
-        glDeleteBuffers(1, &m_buffer);
-    }
+    if (m_buffer) glDeleteBuffers(1, &m_buffer);
 }
 
 BufferUPtr Buffer::CreateWithData(uint32 bufferType, uint32 usage, 

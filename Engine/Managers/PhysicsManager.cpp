@@ -1,6 +1,9 @@
 ﻿#include "EnginePch.h"
 #include "PhysicsManager.h"
 
+#include "Graphics/Ray.h"
+#include "Graphics/RaycastHit.h"
+
 #include "Physics/PhysicsConfig.h"
 #include "Physics/PhysicsCallbacks.h"
 #include "Physics/BPLayerInterface.h"
@@ -13,6 +16,10 @@
 #include <Jolt/Core/TempAllocator.h>
 #include <Jolt/Core/JobSystemThreadPool.h>
 #include <Jolt/Physics/PhysicsSystem.h>
+
+#include <Jolt/Physics/Collision/RayCast.h>
+#include <Jolt/Physics/Collision/CastResult.h>
+#include <Jolt/Physics/Collision/CollisionCollectorImpl.h>
 using namespace JPH;
 
 PhysicsManager::PhysicsManager() {}
@@ -113,4 +120,53 @@ BodyInterface& PhysicsManager::GetBodyInterface() const
 	// PhysicsSystem이 초기화되지 않았을 때 호출하면 크래시가 나므로 주의
 	JPH_ASSERT(m_PhysicsSystem != nullptr);
 	return m_PhysicsSystem->GetBodyInterface();
+}
+
+/*========================//
+//   raycasting methods   //
+//========================*/
+bool PhysicsManager::Raycast(const glm::vec3& origin, const glm::vec3& direction, float maxDistance, RaycastHit& outHit)
+{
+	// 1. 초기화 (실패 시 데이터 초기화)
+	outHit.Reset();
+
+	if (!m_PhysicsSystem) return false;
+
+	// 2. Jolt 데이터 변환
+	JPH::RVec3 start = Utils::ToJoltVec3(origin);
+	JPH::Vec3 dir = Utils::ToJoltVec3(direction * maxDistance);
+	JPH::RRayCast ray(start, dir);
+
+	// 3. 레이 발사
+	JPH::RayCastResult hit;
+	const JPH::NarrowPhaseQuery& query = m_PhysicsSystem->GetNarrowPhaseQuery();
+
+	if (query.CastRay(ray, hit))
+	{
+		// 4. 결과 추출
+		// 4-1. 거리 및 충돌 지점
+		float hitDistance = hit.mFraction * maxDistance;
+		JPH::RVec3 hitPoint = ray.GetPointOnRay(hit.mFraction);
+
+		// 4-2. 법선 벡터 (Jolt BodyInterface 필요)
+		JPH::BodyInterface& bodyInterface = GetBodyInterface();
+		JPH::Vec3 normal = bodyInterface.GetShape(hit.mBodyID)->GetSurfaceNormal(hit.mSubShapeID2, hitPoint);
+
+		// 4-3. GameObject 찾기 (UserData)
+		uint64 userData = bodyInterface.GetUserData(hit.mBodyID);
+		GameObject* hitObj = reinterpret_cast<GameObject*>(userData);
+
+		// 5. 님의 RaycastHit 클래스에 데이터 채우기
+		outHit.SetHitResult
+		(
+			hitObj,
+			Utils::ToGlmVec3(hitPoint),
+			Utils::ToGlmVec3(normal),
+			hitDistance
+		);
+
+		return true;
+	}
+
+	return false;
 }

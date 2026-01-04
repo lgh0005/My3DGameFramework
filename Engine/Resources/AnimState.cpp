@@ -2,8 +2,7 @@
 #include "AnimState.h"
 #include "Resources/Animation.h"
 
-AnimState::~AnimState() = default;
-AnimState::AnimState() = default;
+DECLARE_DEFAULTS_IMPL(AnimState)
 
 AnimStateUPtr AnimState::Create(const std::string& name, AnimationPtr clip)
 {

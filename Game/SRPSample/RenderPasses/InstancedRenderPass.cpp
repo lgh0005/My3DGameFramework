@@ -11,8 +11,7 @@
 #include "Components/SpotLight.h"
 #include "Scene/GameObject.h"
 
-InstancedRenderPass::InstancedRenderPass() = default;
-InstancedRenderPass::~InstancedRenderPass() = default;
+DECLARE_DEFAULTS_IMPL(InstancedRenderPass)
 
 InstancedRenderPassUPtr InstancedRenderPass::Create(ProgramUPtr program)
 {

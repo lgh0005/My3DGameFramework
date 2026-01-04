@@ -2,6 +2,8 @@
 #include "Physics/PhysicsContactListener.h"
 using namespace JPH;
 
+DECLARE_DEFAULTS_IMPL(PhysicsContactListener)
+
 ValidateResult PhysicsContactListener::OnContactValidate(const Body& inBody1, const Body& inBody2, RVec3Arg inBaseOffset, const CollideShapeResult& inCollisionResult)
 {
 	// 모든 충돌 허용 (특정 조건에서 무시하려면 여기서 처리)

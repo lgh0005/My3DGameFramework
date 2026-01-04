@@ -4,8 +4,7 @@
 #include "Components/Component.h"
 #include "Components/Transform.h"
 
-GameObject::GameObject() = default;
-GameObject::~GameObject() = default;
+DECLARE_DEFAULTS_IMPL(GameObject)
 
 GameObjectUPtr GameObject::Create()
 {

@@ -1,8 +1,7 @@
 ﻿#include "EnginePch.h"
 #include "Script.h"
 
-Script::Script() = default;
-Script::~Script() = default;
+DECLARE_DEFAULTS_IMPL(Script)
 
 /*=======================================//
 //  additional event methods for script  //

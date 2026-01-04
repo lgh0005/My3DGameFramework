@@ -19,8 +19,7 @@
 #include "Pipelines/SRP/StandardRenderContext.h"
 #include "Pipelines/SRP/RenderPasses/StandardPostProcessPass.h"
 
-StandardOutlinePass::StandardOutlinePass() = default;
-StandardOutlinePass::~StandardOutlinePass() = default;
+DECLARE_DEFAULTS_IMPL(StandardOutlinePass)
 
 StandardOutlinePassUPtr StandardOutlinePass::Create
 (

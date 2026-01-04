@@ -10,8 +10,7 @@
 #include "Components/SpotLight.h"
 #include "Components/PointLight.h"
 
-UniversalGlobalUniforms::UniversalGlobalUniforms() = default;
-UniversalGlobalUniforms::~UniversalGlobalUniforms() = default;
+DECLARE_DEFAULTS_IMPL(UniversalGlobalUniforms)
 
 UniversalGlobalUniformsUPtr UniversalGlobalUniforms::Create()
 {

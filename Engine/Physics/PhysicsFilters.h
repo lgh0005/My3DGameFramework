@@ -9,6 +9,9 @@ class ObjectVsBroadPhaseLayerFilterImpl final
 	: public JPH::ObjectVsBroadPhaseLayerFilter
 {
 public:
+	ObjectVsBroadPhaseLayerFilterImpl();
+	virtual ~ObjectVsBroadPhaseLayerFilterImpl();
+
 	virtual bool ShouldCollide
 	(
 		JPH::ObjectLayer inLayer1, 
@@ -24,6 +27,9 @@ class ObjectLayerPairFilterImpl final
 	: public JPH::ObjectLayerPairFilter
 {
 public:
+	ObjectLayerPairFilterImpl();
+	virtual ~ObjectLayerPairFilterImpl();
+
 	virtual bool ShouldCollide
 	(
 		JPH::ObjectLayer inObject1, 

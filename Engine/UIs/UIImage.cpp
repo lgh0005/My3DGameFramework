@@ -4,8 +4,7 @@
 #include "Resources/UIMesh.h"
 #include "Resources/Material.h"
 
-UIImage::UIImage() = default;
-UIImage::~UIImage() = default;
+DECLARE_DEFAULTS_IMPL(UIImage)
 
 UIImageUPtr UIImage::Create(UIMeshPtr mesh, MaterialPtr material)
 {

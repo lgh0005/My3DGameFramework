@@ -2,8 +2,7 @@
 #include "PointLight.h"
 #include "Components/Transform.h"
 
-PointLight::PointLight() = default;
-PointLight::~PointLight() = default;
+DECLARE_DEFAULTS_IMPL(PointLight)
 
 PointLightUPtr PointLight::Create()
 {

@@ -30,8 +30,7 @@
 #include "Framebuffers/PostProcessFramebuffer.h"
 #include "Framebuffers/GBufferFramebuffer.h"
 
-UniversalRenderPipeline::UniversalRenderPipeline() = default;
-UniversalRenderPipeline::~UniversalRenderPipeline() = default;
+DECLARE_DEFAULTS_IMPL(UniversalRenderPipeline)
 
 UniversalRenderPipelineUPtr UniversalRenderPipeline::Create()
 {

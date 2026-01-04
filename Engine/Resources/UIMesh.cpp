@@ -5,8 +5,7 @@
 #include "Graphics/VertexLayout.h"
 #include "Graphics/Program.h"
 
-UIMesh::UIMesh() = default;
-UIMesh::~UIMesh() = default;
+DECLARE_DEFAULTS_IMPL(UIMesh)
 
 UIMeshUPtr UIMesh::Create()
 {

@@ -5,6 +5,8 @@ CLASS_PTR(PhysicsContactListener)
 class PhysicsContactListener final : public JPH::ContactListener
 {
 public:
+	PhysicsContactListener();
+	virtual ~PhysicsContactListener();
 
 	// 1. 충돌 검증 (여기서 false 리턴 시 충돌 무시)
 	virtual JPH::ValidateResult OnContactValidate

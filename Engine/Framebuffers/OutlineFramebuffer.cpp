@@ -2,8 +2,7 @@
 #include "OutlineFramebuffer.h"
 #include "Resources/Texture.h"
 
-OutlineFramebuffer::OutlineFramebuffer() = default;
-OutlineFramebuffer::~OutlineFramebuffer() = default;
+DECLARE_DEFAULTS_IMPL(OutlineFramebuffer)
 
 OutlineFramebufferUPtr OutlineFramebuffer::Create(int32 width, int32 height)
 {

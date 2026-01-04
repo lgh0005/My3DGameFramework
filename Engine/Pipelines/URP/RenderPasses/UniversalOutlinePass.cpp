@@ -18,8 +18,7 @@
 #include "Pipelines/URP/UniversalRenderContext.h"
 #include "Pipelines/URP/RenderPasses/UniversalPostProcessPass.h"
 
-UniversalOutlinePass::UniversalOutlinePass() = default;
-UniversalOutlinePass::~UniversalOutlinePass() = default;
+DECLARE_DEFAULTS_IMPL(UniversalOutlinePass)
 
 UniversalOutlinePassUPtr UniversalOutlinePass::Create
 (

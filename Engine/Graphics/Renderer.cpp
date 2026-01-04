@@ -3,8 +3,7 @@
 #include "Scene/Scene.h"
 #include "Graphics/RenderPipeline.h"
 
-Renderer::Renderer() = default;
-Renderer::~Renderer() = default;
+DECLARE_DEFAULTS_IMPL(Renderer)
 
 RendererUPtr Renderer::Create()
 {

@@ -2,8 +2,7 @@
 #include "PostProcessFrameBuffer.h"
 #include "Resources/Texture.h"
 
-PostProcessFramebuffer::PostProcessFramebuffer() = default;
-PostProcessFramebuffer::~PostProcessFramebuffer() = default;
+DECLARE_DEFAULTS_IMPL(PostProcessFramebuffer)
 
 PostProcessFramebufferUPtr PostProcessFramebuffer::Create(int32 width, int32 height, bool useDepth)
 {

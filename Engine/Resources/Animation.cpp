@@ -4,8 +4,7 @@
 #include "Resources/Skeleton.h"
 #include "Misc/AssetUtils.h"
 
-Animation::Animation() = default;
-Animation::~Animation() = default;
+DECLARE_DEFAULTS_IMPL(Animation)
 
 AnimationUPtr Animation::Load(const std::string& filePath, Model* model)
 {

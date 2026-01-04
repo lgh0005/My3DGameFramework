@@ -1,9 +1,8 @@
-#include "EnginePch.h"
+ï»¿#include "EnginePch.h"
 #include "SSAOFramebuffer.h"
 #include "Resources/Texture.h"
 
-SSAOFramebuffer::SSAOFramebuffer() = default;
-SSAOFramebuffer::~SSAOFramebuffer() = default;
+DECLARE_DEFAULTS_IMPL(SSAOFramebuffer)
 
 SSAOFramebufferUPtr SSAOFramebuffer::Create(int32 width, int32 height)
 {
@@ -17,20 +16,20 @@ bool SSAOFramebuffer::Init(int32 width, int32 height)
     m_width = width;
     m_height = height;
 
-    // 1. ºÎ¸ğÀÇ m_fbo »ç¿ë
+    // 1. ë¶€ëª¨ì˜ m_fbo ì‚¬ìš©
     glGenFramebuffers(1, &m_fbo);
     glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
 
-    // 2. ÅØ½ºÃ³ »ı¼º (R16F)
+    // 2. í…ìŠ¤ì²˜ ìƒì„± (R16F)
     auto texture = Texture::Create(width, height, GL_R16F, GL_RED, GL_FLOAT);
     texture->SetFilter(GL_NEAREST, GL_NEAREST);
     texture->SetWrap(GL_CLAMP_TO_EDGE, GL_CLAMP_TO_EDGE);
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, texture->Get(), 0);
 
-    // 3. ºÎ¸ğÀÇ ÅØ½ºÃ³ ÄÁÅ×ÀÌ³Ê¿¡ µî·Ï
+    // 3. ë¶€ëª¨ì˜ í…ìŠ¤ì²˜ ì»¨í…Œì´ë„ˆì— ë“±ë¡
     m_textures.push_back(std::move(texture));
 
-    // 4. Draw Buffer ¼³Á¤
+    // 4. Draw Buffer ì„¤ì •
     uint32 attachments[1] = { GL_COLOR_ATTACHMENT0 };
     glDrawBuffers(1, attachments);
 

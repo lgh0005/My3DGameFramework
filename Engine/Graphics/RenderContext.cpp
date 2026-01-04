@@ -10,8 +10,7 @@
 #include "Scene/Scene.h"
 #include "Scene/SceneRegistry.h"
 
-RenderContext::RenderContext() = default;
-RenderContext::~RenderContext() = default;
+DECLARE_DEFAULTS_IMPL(RenderContext)
 
 /*====================================//
 //   default render context methods   //

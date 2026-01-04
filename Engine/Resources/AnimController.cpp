@@ -5,8 +5,7 @@
 #include "Resources/AnimChannel.h"
 #include "Resources/Pose.h"
 
-AnimController::AnimController() = default;
-AnimController::~AnimController() = default;
+DECLARE_DEFAULTS_IMPL(AnimController)
 
 AnimControllerUPtr AnimController::Create()
 {

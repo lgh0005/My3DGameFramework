@@ -14,8 +14,7 @@
 #include "Pipelines/URP/UniversalRenderPipeline.h"
 #include "Pipelines/URP/UniversalRenderContext.h"
 
-UniversalSSAOPass::~UniversalSSAOPass() = default;
-UniversalSSAOPass::UniversalSSAOPass() = default;
+DECLARE_DEFAULTS_IMPL(UniversalSSAOPass)
 
 UniversalSSAOPassUPtr UniversalSSAOPass::Create(int32 width, int32 height)
 {

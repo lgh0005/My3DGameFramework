@@ -3,8 +3,7 @@
 #include "Components/Transform.h"
 #include "PlayerController.h"
 
-CameraController::CameraController() = default;
-CameraController::~CameraController() = default;
+DECLARE_DEFAULTS_IMPL(CameraController)
 
 CameraControllerUPtr CameraController::Create()
 {

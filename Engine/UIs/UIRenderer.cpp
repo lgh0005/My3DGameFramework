@@ -1,5 +1,4 @@
 ﻿#include "EnginePch.h"
 #include "UIRenderer.h"
 
-UIRenderer::UIRenderer() = default;
-UIRenderer::~UIRenderer() = default;
+DECLARE_DEFAULTS_IMPL(UIRenderer)

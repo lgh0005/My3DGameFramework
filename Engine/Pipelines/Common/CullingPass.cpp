@@ -9,8 +9,7 @@
 #include "Components/Camera.h"
 #include "Components/Light.h"
 
-CullingPass::CullingPass() = default;
-CullingPass::~CullingPass() = default;
+DECLARE_DEFAULTS_IMPL(CullingPass)
 
 CullingPassUPtr CullingPass::Create()
 {

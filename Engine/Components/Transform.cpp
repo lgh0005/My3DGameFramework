@@ -2,8 +2,7 @@
 #include "EnginePch.h"
 #include "Scene/GameObject.h"
 
-Transform::Transform() = default;
-Transform::~Transform() = default;
+DECLARE_DEFAULTS_IMPL(Transform)
 
 TransformUPtr Transform::Create()
 {

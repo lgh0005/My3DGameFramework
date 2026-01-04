@@ -29,8 +29,7 @@
 #include "Framebuffers/PostProcessFramebuffer.h"
 #include "Framebuffers/GBufferFramebuffer.h"
 
-StandardRenderPipeline::StandardRenderPipeline() = default;
-StandardRenderPipeline::~StandardRenderPipeline() = default;
+DECLARE_DEFAULTS_IMPL(StandardRenderPipeline)
 
 StandardRenderPipelineUPtr StandardRenderPipeline::Create()
 {

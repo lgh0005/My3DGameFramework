@@ -3,8 +3,7 @@
 #include "Scene/GameObject.h"
 #include "Components/Transform.h"
 
-GameObjectManager::GameObjectManager() = default;
-GameObjectManager::~GameObjectManager() = default;
+DECLARE_DEFAULTS_IMPL(GameObjectManager)
 
 GameObjectManagerUPtr GameObjectManager::Create()
 {

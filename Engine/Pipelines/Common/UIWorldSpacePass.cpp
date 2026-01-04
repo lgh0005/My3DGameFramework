@@ -1,8 +1,7 @@
 ﻿#include "EnginePch.h"
 #include "UIWorldSpacePass.h"
 
-UIWorldSpacePass::UIWorldSpacePass() = default;
-UIWorldSpacePass::~UIWorldSpacePass() = default;
+DECLARE_DEFAULTS_IMPL(UIWorldSpacePass)
 
 void UIWorldSpacePass::Render(RenderContext* context)
 {

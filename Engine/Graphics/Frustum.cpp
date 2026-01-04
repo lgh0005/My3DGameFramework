@@ -1,8 +1,7 @@
 ﻿#include "EnginePch.h"
 #include "Frustum.h"
 
-Frustum::Frustum() = default;
-Frustum::~Frustum() = default;
+DECLARE_DEFAULTS_IMPL(Frustum)
 
 FrustumUPtr Frustum::Create()
 {

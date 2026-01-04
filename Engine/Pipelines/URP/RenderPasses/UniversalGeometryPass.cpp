@@ -20,8 +20,7 @@
 #include "Pipelines/URP/UniversalRenderPipeline.h"
 #include "Pipelines/URP/UniversalRenderContext.h"
 
-UniversalGeometryPass::~UniversalGeometryPass() = default;
-UniversalGeometryPass::UniversalGeometryPass() = default;
+DECLARE_DEFAULTS_IMPL(UniversalGeometryPass)
 
 UniversalGeometryPassUPtr UniversalGeometryPass::Create(int32 width, int32 height)
 {

@@ -18,8 +18,7 @@
 #include "Pipelines/SRP/StandardRenderPipeline.h"
 #include "Pipelines/SRP/RenderPasses/StandardGeometryPass.h"
 
-ShadowPass::ShadowPass() = default;
-ShadowPass::~ShadowPass() = default;
+DECLARE_DEFAULTS_IMPL(ShadowPass)
 
 ShadowPassUPtr ShadowPass::Create(int32 resolution)
 {

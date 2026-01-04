@@ -4,8 +4,7 @@
 #include "Framebuffers/GBufferFramebuffer.h"
 #include "Resources/Texture.h"
 
-UniversalRenderContext::UniversalRenderContext() = default;
-UniversalRenderContext::~UniversalRenderContext() = default;
+DECLARE_DEFAULTS_IMPL(UniversalRenderContext)
 
 void UniversalRenderContext::SetGBuffer(GBufferFramebuffer* gBuffer)
 {

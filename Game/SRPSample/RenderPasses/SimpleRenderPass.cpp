@@ -11,8 +11,7 @@
 #include "Components/SpotLight.h"
 #include "Scene/GameObject.h"
 
-SimpleRenderPass::SimpleRenderPass() = default;
-SimpleRenderPass::~SimpleRenderPass() = default;
+DECLARE_DEFAULTS_IMPL(SimpleRenderPass)
 
 SimpleRenderPassUPtr SimpleRenderPass::Create(ProgramUPtr program)
 {

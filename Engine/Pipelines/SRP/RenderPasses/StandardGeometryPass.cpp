@@ -19,8 +19,7 @@
 #include "Pipelines/SRP/StandardRenderPipeline.h"
 #include "Pipelines/SRP/StandardRenderContext.h"
 
-StandardGeometryPass::StandardGeometryPass() = default;
-StandardGeometryPass::~StandardGeometryPass() = default;
+DECLARE_DEFAULTS_IMPL(StandardGeometryPass)
 
 StandardGeometryPassUPtr StandardGeometryPass::Create(int32 width, int32 height)
 {

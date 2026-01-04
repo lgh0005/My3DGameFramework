@@ -7,8 +7,7 @@
 #include "Graphics/Program.h"
 #include "Graphics/Vertex.h"
 
-UIText::UIText() = default;
-UIText::~UIText() = default;
+DECLARE_DEFAULTS_IMPL(UIText)
 
 UITextUPtr UIText::Create(FontPtr font, MaterialPtr material, const std::wstring& text, int32 sortingOrder)
 {

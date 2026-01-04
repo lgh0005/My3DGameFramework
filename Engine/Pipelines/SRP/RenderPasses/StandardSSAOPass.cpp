@@ -13,8 +13,7 @@
 
 #include "Pipelines/SRP/StandardRenderContext.h"
 
-StandardSSAOPass::StandardSSAOPass() = default;
-StandardSSAOPass::~StandardSSAOPass() = default;
+DECLARE_DEFAULTS_IMPL(StandardSSAOPass)
 
 StandardSSAOPassUPtr StandardSSAOPass::Create(int32 width, int32 height)
 {

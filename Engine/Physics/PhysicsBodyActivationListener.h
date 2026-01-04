@@ -6,6 +6,9 @@ class PhysicsBodyActivationListener final
 	: public JPH::BodyActivationListener
 {
 public:
+	PhysicsBodyActivationListener();
+	virtual ~PhysicsBodyActivationListener();
+
 	virtual void OnBodyActivated
 	(
 		const JPH::BodyID& inBodyID, 

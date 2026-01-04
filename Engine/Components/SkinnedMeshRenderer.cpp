@@ -8,8 +8,7 @@
 #include "Graphics/Program.h"
 #include "Graphics/VertexLayout.h"
 
-SkinnedMeshRenderer::~SkinnedMeshRenderer() = default;
-SkinnedMeshRenderer::SkinnedMeshRenderer() = default;
+DECLARE_DEFAULTS_IMPL(SkinnedMeshRenderer)
 
 SkinnedMeshRendererUPtr SkinnedMeshRenderer::Create(SkinnedMeshPtr mesh, MaterialPtr material, Animator* animator)
 {

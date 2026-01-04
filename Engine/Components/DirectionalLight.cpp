@@ -2,8 +2,7 @@
 #include "DirectionalLight.h"
 #include "Components/Transform.h"
 
-DirectionalLight::DirectionalLight() = default;
-DirectionalLight::~DirectionalLight() = default;
+DECLARE_DEFAULTS_IMPL(DirectionalLight)
 
 DirectionalLightUPtr DirectionalLight::Create()
 {

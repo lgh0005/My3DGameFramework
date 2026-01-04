@@ -7,6 +7,7 @@ class BPLayerInterfaceImpl final
 {
 public:
 	BPLayerInterfaceImpl();
+	virtual ~BPLayerInterfaceImpl();
 	virtual JPH::uint GetNumBroadPhaseLayers() const override;
 	virtual JPH::BroadPhaseLayer GetBroadPhaseLayer(JPH::ObjectLayer inLayer) const override;
 

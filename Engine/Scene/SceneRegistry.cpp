@@ -21,8 +21,7 @@
 #include "Components/AudioListener.h"
 #include "UIs/UICanvas.h"
 
-SceneRegistry::SceneRegistry() = default;
-SceneRegistry::~SceneRegistry() = default;
+DECLARE_DEFAULTS_IMPL(SceneRegistry)
 
 SceneRegistryUPtr SceneRegistry::Create()
 {

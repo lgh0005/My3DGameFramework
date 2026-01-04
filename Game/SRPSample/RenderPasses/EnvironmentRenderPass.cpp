@@ -13,8 +13,7 @@
 #include "Components/SpotLight.h"
 #include "Scene/GameObject.h"
 
-EnvironmentRenderPass::EnvironmentRenderPass() = default;
-EnvironmentRenderPass::~EnvironmentRenderPass() = default;
+DECLARE_DEFAULTS_IMPL(EnvironmentRenderPass)
 
 EnvironmentRenderPassUPtr EnvironmentRenderPass::Create(ProgramUPtr program, CubeTexturePtr cubeTexture)
 {

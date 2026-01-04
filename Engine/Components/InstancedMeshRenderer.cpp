@@ -5,8 +5,7 @@
 #include "Graphics/Program.h"
 #include "Graphics/VertexLayout.h"
 
-InstancedMeshRenderer::InstancedMeshRenderer() = default;
-InstancedMeshRenderer::~InstancedMeshRenderer() = default;
+DECLARE_DEFAULTS_IMPL(InstancedMeshRenderer)
 
 InstancedMeshRendererUPtr InstancedMeshRenderer::Create(InstancedMeshPtr mesh, MaterialPtr material)
 {

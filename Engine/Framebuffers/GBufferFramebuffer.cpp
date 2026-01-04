@@ -2,8 +2,7 @@
 #include "GBufferFramebuffer.h"
 #include "Resources/Texture.h"
 
-GBufferFramebuffer::GBufferFramebuffer() = default;
-GBufferFramebuffer::~GBufferFramebuffer() = default;
+DECLARE_DEFAULTS_IMPL(GBufferFramebuffer)
 
 GBufferFramebufferUPtr GBufferFramebuffer::Create(int32 width, int32 height)
 {

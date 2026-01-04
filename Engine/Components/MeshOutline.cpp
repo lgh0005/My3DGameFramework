@@ -1,8 +1,7 @@
 ﻿#include "EnginePch.h"
 #include "MeshOutline.h"
 
-MeshOutline::MeshOutline() = default;
-MeshOutline::~MeshOutline() = default;
+DECLARE_DEFAULTS_IMPL(MeshOutline)
 
 MeshOutlineUPtr MeshOutline::Create(const glm::vec3& color, float thickness)
 {

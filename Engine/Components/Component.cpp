@@ -3,8 +3,7 @@
 #include "Scene/GameObject.h"
 #include "Components/Transform.h"
 
-Component::Component() = default;
-Component::~Component() = default;
+DECLARE_DEFAULTS_IMPL(Component)
 
 bool Component::MatchesType(ComponentType type) const
 {

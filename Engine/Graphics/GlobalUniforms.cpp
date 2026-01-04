@@ -2,5 +2,4 @@
 #include "GlobalUniforms.h"
 #include "Graphics/RenderContext.h"
 
-GlobalUniforms::GlobalUniforms() = default;
-GlobalUniforms::~GlobalUniforms() = default;
+DECLARE_DEFAULTS_IMPL(GlobalUniforms)

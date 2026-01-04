@@ -1,5 +1,4 @@
 ﻿#include "EnginePch.h"
 #include "RenderPipeline.h"
 
-RenderPipeline::RenderPipeline() = default;
-RenderPipeline::~RenderPipeline() = default;
+DECLARE_DEFAULTS_IMPL(RenderPipeline)

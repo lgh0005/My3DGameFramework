@@ -2,6 +2,8 @@
 #include "Physics/PhysicsBodyActivationListener.h"
 using namespace JPH;
 
+DECLARE_DEFAULTS_IMPL(PhysicsBodyActivationListener)
+
 void PhysicsBodyActivationListener::OnBodyActivated(const BodyID& inBodyID, uint64 inBodyUserData)
 {
 	// TODO : 물체가 정지해서 엔진이 계산을 멈출 때 호출됩니다.

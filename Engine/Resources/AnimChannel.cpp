@@ -2,8 +2,7 @@
 #include "Resources/AnimChannel.h"
 #include "Resources/Pose.h"
 
-AnimChannel::AnimChannel() = default;
-AnimChannel::~AnimChannel() = default;
+DECLARE_DEFAULTS_IMPL(AnimChannel)
 
 AnimChannelUPtr AnimChannel::Create(const std::string& name, int32 id, const aiNodeAnim* channel)
 {

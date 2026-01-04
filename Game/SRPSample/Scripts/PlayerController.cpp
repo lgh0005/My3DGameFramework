@@ -5,8 +5,7 @@
 #include "Components/Transform.h"
 #include "Resources/AnimController.h"
 
-PlayerController::PlayerController() = default;
-PlayerController::~PlayerController() = default;
+DECLARE_DEFAULTS_IMPL(PlayerController)
 
 PlayerControllerUPtr PlayerController::Create()
 {

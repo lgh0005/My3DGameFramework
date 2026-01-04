@@ -35,8 +35,7 @@ float CullingPlane::GetDistanceToPoint(const glm::vec3& point) const
 /*==========================//
 //   RenderBounds methods   //
 //==========================*/
-RenderBounds::~RenderBounds() = default;
-RenderBounds::RenderBounds() = default;
+DECLARE_DEFAULTS_IMPL(RenderBounds)
 
 RenderBounds RenderBounds::Empty()
 {

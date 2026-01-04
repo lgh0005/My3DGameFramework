@@ -6,8 +6,7 @@
 #include "Resources/Mesh.h"
 #include "Resources/Material.h"
 
-MeshRenderer::MeshRenderer() = default;
-MeshRenderer::~MeshRenderer() = default;
+DECLARE_DEFAULTS_IMPL(MeshRenderer)
 
 RenderBounds MeshRenderer::GetWorldBounds() const
 {

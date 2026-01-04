@@ -3,8 +3,7 @@
 #include "Components/Transform.h"
 #include "Graphics/Ray.h"
 
-Camera::Camera() = default;
-Camera::~Camera() = default;
+DECLARE_DEFAULTS_IMPL(Camera)
 
 CameraUPtr Camera::Create()
 {
