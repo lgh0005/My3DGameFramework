@@ -19,6 +19,7 @@
 #include "Graphics/SkyLight.h"
 #include "Resources/AudioClip.h"
 #include "Resources/AnimController.h"
+#include "Resources/EnvironmentMap.h"
 
 #include "Misc/IBLUtils.h"
 
@@ -118,15 +119,10 @@ bool PBRScene::LoadSceneResources()
 	{
 		auto hdrImage = Image::LoadHDR("./Resources/Images/IBL/mirrored_hall_4k.hdr");
 		auto hdrTex = Texture::CreateFromHDR(hdrImage.get());
-		CubeTexturePtr bakedCubemap = IBLUtils::CreateCubemapFromHDR(hdrTex.get());
-		CubeTexturePtr bakedDiffuse = IBLUtils::CreateIrradianceMap(bakedCubemap.get());
-		CubeTexturePtr prefiltered = IBLUtils::CreatePrefilteredMap(bakedCubemap.get());
-		TexturePtr	   brdf = IBLUtils::CreateBRDFLUT();
-		RESOURCE.AddResource<CubeTexture>(std::move(bakedDiffuse), "bakedDiffuse");
-		RESOURCE.AddResource<CubeTexture>(std::move(prefiltered), "prefiltered");
-		RESOURCE.AddResource<Texture>(std::move(brdf), "brdf");
-		RESOURCE.AddResource<CubeTexture>(std::move(bakedCubemap), "bakedCubemap");
 		RESOURCE.AddResource<Texture>(std::move(hdrTex), "hdrImage");
+
+		auto envMap = EnvironmentMap::CreateIBL(RESOURCE.GetResource<Texture>("hdrImage"));
+		RESOURCE.AddResource<EnvironmentMap>(std::move(envMap), "UnviersalSky");
 	}
 
 	// 0-4. 머티리얼 2
@@ -165,12 +161,7 @@ bool PBRScene::CreateCustomRenderPasses()
 
 bool PBRScene::SetupSceneEnvironment()
 {
-	auto sky = SkyLight::CreateUniversalSky
-	(
-		// TODO : 세팅 필요
-		RESOURCE.GetResource<CubeTexture>("bakedCubemap"), RESOURCE.GetResource<CubeTexture>("bakedDiffuse"),
-		RESOURCE.GetResource<CubeTexture>("prefiltered"), RESOURCE.GetResource<Texture>("brdf")
-	);
+	auto sky = SkyLight::Create(RESOURCE.GetResource<EnvironmentMap>("UnviersalSky"));
 	if (!sky) return false;
 	SetSkyLight(std::move(sky));
 	return true;

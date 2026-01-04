@@ -15,7 +15,8 @@ enum class ResourceType
 	ScreenMesh,
 	InstancedMesh,
 	UIMesh,
-	Shader
+	Shader,
+	EnvironmentMap
 };
 
 CLASS_PTR(Resource)

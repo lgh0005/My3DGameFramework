@@ -1,4 +1,7 @@
 ﻿#pragma once
+#include <nlohmann/json_fwd.hpp>
+#include "Misc/ResourceJsonFormat.h"
+using namespace ResourceJsonFmt;
 
 CLASS_PTR(ResourceLoader)
 class ResourceLoader
@@ -6,8 +9,36 @@ class ResourceLoader
 	DECLARE_STATIC_CLASS(ResourceLoader)
 
 public:
-	static void LoadFromManifest(const std::string& manifestPath);
+	static bool Load(const std::string& manifestPath);
 
+/*==============================//
+//   resource loading methods   //
+//==============================*/
 private:
+	static bool LoadResourcesFromManifest(const ResourceManifest& manifest);
+	static bool LoadBuiltInResources();
+	static bool LoadShaders(const std::vector<ShaderData>& dataList);
+	static bool LoadTextures(const std::vector<ResourceData>& dataList);
+	static bool LoadCubeTextures(const std::vector<ResourceData>& dataList);
+	static bool LoadModels(const std::vector<ResourceData>& dataList);
+	static bool LoadAnimations(const std::vector<ResourceData>& dataList);
+	static bool LoadAudios(const std::vector<ResourceData>& dataList);
 
+/*===================================//
+//   json menifest parsing methods   //
+//===================================*/
+private:
+	static std::optional<ResourceManifest> ParseManifest(const std::string& manifestPath);
+	static void ParseGeneralResources
+	(
+		const nlohmann::json& jsonContext,
+		const std::string& categoryKey,
+		std::vector<ResourceData>& outList
+	);
+	static void ParseShaderResources
+	(
+		const nlohmann::json& jsonContext,
+		const std::string& categoryKey,
+		std::vector<ShaderData>& outList
+	);
 };

@@ -7,6 +7,8 @@ class ResourceManager
 	DECLARE_NONINSTANTIABLE(ResourceManager)
 
 public:
+	bool Init();
+
 	template<typename T>
 	std::shared_ptr<T> GetResource(const std::string& name) const;
 

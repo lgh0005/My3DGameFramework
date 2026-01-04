@@ -13,6 +13,7 @@
 #include <optional>
 #include <functional>
 #include <cstdarg>
+namespace fs = std::filesystem;
 
 // OpenGL
 #define GLM_ENABLE_EXPERIMENTAL

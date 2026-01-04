@@ -63,6 +63,7 @@ add_library(Engine STATIC
    "Misc/IBLUtils.h"                "Misc/IBLUtils.cpp"
    "Misc/AssetFormat.h"             "Misc/AssetFormat.cpp"
    "Misc/AssetUtils.h"              "Misc/AssetUtils.cpp"
+   "Misc/ResourceJsonFormat.h"      "Misc/ResourceJsonFormat.cpp"
 
    # Physics
    "Physics/BPLayerInterface.h"         "Physics/BPLayerInterface.cpp"
@@ -123,6 +124,7 @@ add_library(Engine STATIC
    "Resources/AnimController.h"     "Resources/AnimController.cpp"
    "Resources/AnimState.h"          "Resources/AnimState.cpp"
    "Resources/Font.h"               "Resources/Font.cpp"
+    "Resources/EnvironmentMap.h"    "Resources/EnvironmentMap.cpp"
 
    # Components
    "Components/Component.h"         "Components/Component.cpp"
@@ -160,7 +162,7 @@ add_library(Engine STATIC
    "Managers/AudioManager.h"        "Managers/AudioManager.cpp"
    "Managers/PhysicsManager.h"      "Managers/PhysicsManager.cpp"
    "Managers/UIManager.h"           "Managers/UIManager.cpp"
- "Core/ResourceParser.h")
+)
 
 # 2. [PCH 설정] EnginePCH.h를 PCH로 사용합니다.
 target_precompile_headers(Engine  PUBLIC EnginePCH.h)

@@ -19,6 +19,7 @@
 #include "Graphics/SkyLight.h"
 #include "Resources/AudioClip.h"
 #include "Resources/AnimController.h"
+#include "Resources/EnvironmentMap.h"
 
 #include "Components/Camera.h"
 #include "Components/Transform.h"
@@ -176,10 +177,13 @@ bool DevScene::LoadSceneResources()
 		RESOURCE.AddResource<StaticMesh>(std::move(bladeMesh), "grassBlade");
 	}
 
-	// 8. 하늘 큐브맵
+	// 8. 하늘 환경맵
 	{
 		auto cubeSky = CubeTexture::CreateFromKtxImage("./Resources/Images/baked/sky.ktx");
 		RESOURCE.AddResource<CubeTexture>(std::move(cubeSky), "SkyboxTexture");
+
+		auto env = EnvironmentMap::Create(RESOURCE.GetResource<CubeTexture>("SkyboxTexture"));
+		RESOURCE.AddResource<EnvironmentMap>(std::move(env), "StandardSkybox");
 	}
 
 	// 9. sfx
@@ -237,7 +241,7 @@ bool DevScene::CreateCustomRenderPasses()
 
 bool DevScene::SetupSceneEnvironment()
 {
-	auto sky = SkyLight::CreateStandardSky(RESOURCE.GetResource<CubeTexture>("SkyboxTexture"));
+	auto sky = SkyLight::Create(RESOURCE.GetResource<EnvironmentMap>("StandardSkybox"));
 	if (!sky) return false;
 	SetSkyLight(std::move(sky));
 	return true;
