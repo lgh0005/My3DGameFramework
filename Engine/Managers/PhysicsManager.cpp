@@ -10,6 +10,8 @@
 #include "Physics/PhysicsFilters.h"
 #include "Physics/PhysicsBodyActivationListener.h"
 #include "Physics/PhysicsContactListener.h"
+#include "Physics/JoltDebugRenderer.h"
+#include "Physics/JoltGizmo.h"
 
 #include <Jolt/RegisterTypes.h>
 #include <Jolt/Core/Factory.h>
@@ -22,8 +24,7 @@
 #include <Jolt/Physics/Collision/CollisionCollectorImpl.h>
 using namespace JPH;
 
-PhysicsManager::PhysicsManager() {}
-PhysicsManager::~PhysicsManager() = default;
+DECLARE_DEFAULTS_IMPL(PhysicsManager)
 
 void PhysicsManager::Init()
 {
@@ -73,6 +74,10 @@ void PhysicsManager::Init()
 	m_PhysicsSystem->SetBodyActivationListener(m_BodyActivationListener.get());
 	m_PhysicsSystem->SetContactListener(m_ContactListener.get());
 
+	// 9. 디버깅 멤버 초기화
+	m_gizmo = JoltGizmo::Create();
+	m_debugRenderer = JoltDebugRenderer::Create(m_gizmo.get());
+
 	LOG_INFO("Jolt Physics Initialized Successfully.");
 }
 
@@ -99,6 +104,10 @@ void PhysicsManager::Clear()
 	m_ObjectLayerPairFilter.reset();
 	m_ObjectVsBroadPhaseLayerFilter.reset();
 	m_BPLayerInterface.reset();
+
+	// 디버그 객체들 정리
+	m_debugRenderer.reset();
+	m_gizmo.reset();
 
 	// Core 시스템 정리
 	m_JobSystem.reset();
@@ -170,3 +179,31 @@ bool PhysicsManager::Raycast(const glm::vec3& origin, const glm::vec3& direction
 
 	return false;
 }
+
+
+/*=======================//
+//   debugging methods   //
+//=======================*/
+void PhysicsManager::DrawDebugData()
+{
+#ifdef defined(DEBUG) || defined(_DEBUG)
+	if (!m_PhysicsSystem || !m_debugRenderer) return;
+
+	// 그리기 옵션 설정
+	JPH::BodyManager::DrawSettings settings;
+	settings.mDrawShape = true;          // 충돌체 외형 (Mesh/Box/Sphere 등)
+	settings.mDrawBoundingBox = false;   // AABB 박스 (필요하면 true)
+	settings.mDrawVelocity = false;      // 속도 벡터
+	settings.mDrawCenterOfMassTransform = false; // 무게 중심 좌표계
+
+	// ★ Jolt 시스템이 내부의 모든 바디를 순회하며 
+	// m_debugRenderer->DrawLine() 등을 호출하게 만듦
+	m_PhysicsSystem->DrawBodies(settings, m_debugRenderer.get());
+#endif
+}
+
+JoltGizmo* PhysicsManager::GetGizmo()
+{
+	return m_gizmo.get();
+}
+

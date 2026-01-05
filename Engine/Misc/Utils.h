@@ -6,6 +6,7 @@
 #include <Jolt/Math/Real.h>
 #include <Jolt/Math/Quat.h>
 #include <Jolt/Math/Vec3.h>
+#include <Jolt/Core/Color.h>
 
 class Utils
 {
@@ -27,6 +28,7 @@ public:
 	// Jolt to glm 유틸 함수
 	static glm::vec3 ToGlmVec3(const JPH::Vec3& v);
 	static glm::quat ToGlmQuat(const JPH::Quat& q);
+	static glm::vec4 ToGlmColor(const JPH::ColorArg color);
 
 	// glm to Jolt 유틸 함수
 	static JPH::Vec3 ToJoltVec3(const glm::vec3& v);

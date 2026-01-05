@@ -31,6 +31,10 @@ enum class ComponentType
 	UIImage,
 	UIText,
 
+	// Collider
+	BoxCollider,
+	SphereCollider,
+
 	Unknown
 };
 

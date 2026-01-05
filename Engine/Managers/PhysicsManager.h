@@ -11,6 +11,9 @@ CLASS_PTR(ObjectLayerPairFilterImpl)
 CLASS_PTR(PhysicsBodyActivationListener)
 CLASS_PTR(PhysicsContactListener)
 
+CLASS_PTR(JoltDebugRenderer)
+CLASS_PTR(JoltGizmo)
+
 namespace JPH
 {
 	class PhysicsSystem;
@@ -51,27 +54,36 @@ public:
 
 private:
 
+
+/*=======================//
+//   debugging methods   //
+//=======================*/
+public:
+	void DrawDebugData();
+	JoltGizmo* GetGizmo();
+
+private:
+	JoltGizmoUPtr m_gizmo;
+	JoltDebugRendererUPtr m_debugRenderer;
+
+/*=======================//
+//   Jolt core members   //
+//=======================*/
 private:
 	PhysicsManager();
 	~PhysicsManager();
 
-	/*=======================//
-	//   Jolt Core Objects   //
-	//=======================*/
+	// Jolt Core Objects
 	PhysicsSystemUPtr			m_PhysicsSystem;
 	TempAllocatorImplUPtr		m_TempAllocator;
 	JobSystemThreadPoolUPtr		m_JobSystem;
 
-	/*================================//
-	//   Jolt Configuration Objects   //
-	//================================*/
+	// Jolt Configuration Objects
 	BPLayerInterfaceImplUPtr				m_BPLayerInterface;
 	ObjectVsBroadPhaseLayerFilterImplUPtr	m_ObjectVsBroadPhaseLayerFilter;
 	ObjectLayerPairFilterImplUPtr			m_ObjectLayerPairFilter;
 
-	/*==========================//
-	//   Jolt event listeners   //
-	//==========================*/
+	// Jolt event listeners
 	PhysicsBodyActivationListenerUPtr	m_BodyActivationListener;
 	PhysicsContactListenerUPtr			m_ContactListener;
 };

@@ -11,8 +11,11 @@
         "name": "imgui",
         "features": [ "glfw-binding", "opengl3-binding" ]
       },
+      {
+        "name": "joltphysics",
+        "features": [ "debugrenderer", "profiler" ]
+      },
       "assimp",
-      "joltphysics",
       "freetype",
       "nlohmann-json"
     ]

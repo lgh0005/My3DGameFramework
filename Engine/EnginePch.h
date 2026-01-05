@@ -13,6 +13,7 @@
 #include <optional>
 #include <functional>
 #include <cstdarg>
+#include <atomic>
 namespace fs = std::filesystem;
 
 // nlohmann-json

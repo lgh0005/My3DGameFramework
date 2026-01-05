@@ -72,6 +72,9 @@ add_library(Engine STATIC
    "Physics/PhysicsCallbacks.h"         "Physics/PhysicsCallbacks.cpp"
    "Physics/PhysicsContactListener.h"    "Physics/PhysicsContactListener.cpp"
    "Physics/PhysicsBodyActivationListener.h"    "Physics/PhysicsBodyActivationListener.cpp"
+   "Physics/JoltDebugRenderer.h"        "Physics/JoltDebugRenderer.cpp"
+   "Physics/JoltGizmo.h"                "Physics/JoltGizmo.cpp"
+   "Physics/GizmoCommand.h"         "Physics/GizmoCommand.cpp"
 
    # Graphics
    "Graphics/Shader.h"              "Graphics/Shader.cpp"
@@ -133,6 +136,7 @@ add_library(Engine STATIC
    "Components/Script.h"            "Components/Script.cpp"
    "Components/PhysicsComponent.h"  "Components/PhysicsComponent.cpp"
    "Components/MeshRenderer.h"      "Components/MeshRenderer.cpp"
+   "Components/Collider.h"          "Components/Collider.cpp"
 
    "Components/Camera.h"            "Components/Camera.cpp"
    "Components/Transform.h"         "Components/Transform.cpp"
@@ -146,6 +150,8 @@ add_library(Engine STATIC
    "Components/StaticMeshRenderer.h"   "Components/StaticMeshRenderer.cpp"
    "Components/SkinnedMeshRenderer.h"  "Components/SkinnedMeshRenderer.cpp"
    "Components/InstancedMeshRenderer.h" "Components/InstancedMeshRenderer.cpp"
+   "Components/BoxCollider.h"           "Components/BoxCollider.cpp"
+   "Components/SphereCollider.h"        "Components/SphereCollider.cpp"
 
    # UIs
    "UIs/UIRenderer.h"               "UIs/UIRenderer.cpp"

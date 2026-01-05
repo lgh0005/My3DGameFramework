@@ -80,6 +80,11 @@ glm::quat Utils::ToGlmQuat(const JPH::Quat& q)
 	return glm::quat(q.GetW(), q.GetX(), q.GetY(), q.GetZ());
 }
 
+glm::vec4 Utils::ToGlmColor(const JPH::ColorArg color)
+{
+	return glm::vec4(color.r / 255.0f, color.g / 255.0f, color.b / 255.0f, color.a / 255.0f);
+}
+
 /*==========================//
 //   glm to Jolt 유틸 함수   //
 //==========================*/
