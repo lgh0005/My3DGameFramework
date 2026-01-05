@@ -152,6 +152,7 @@ add_library(Engine STATIC
    "Components/InstancedMeshRenderer.h" "Components/InstancedMeshRenderer.cpp"
    "Components/BoxCollider.h"           "Components/BoxCollider.cpp"
    "Components/SphereCollider.h"        "Components/SphereCollider.cpp"
+   "Components/Rigidbody.h"             "Components/Rigidbody.cpp"
 
    # UIs
    "UIs/UIRenderer.h"               "UIs/UIRenderer.cpp"

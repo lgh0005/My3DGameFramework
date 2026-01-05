@@ -11,6 +11,7 @@ enum class ComponentType
 	Transform,
 	Script,
 	Animator,
+	Rigidbody,
 
 	// Rendering
 	Camera,

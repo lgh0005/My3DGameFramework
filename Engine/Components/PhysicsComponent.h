@@ -22,7 +22,7 @@ protected:
     virtual void OnDestroy() override;  // 삭제될 때 -> 바디 제거 (안전장치)
     virtual void Update() override;     // 매 프레임 -> 위치 동기화 (P -> T)
 
-    virtual void CreateBody();
+    virtual bool CreateBody() = 0;
     void DestroyBody();
 
     void SyncPhysicsToTransform();      // P -> T (Update에서 호출)

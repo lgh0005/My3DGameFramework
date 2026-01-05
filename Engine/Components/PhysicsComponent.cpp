@@ -45,40 +45,6 @@ void PhysicsComponent::Update()
 /*============================//
 //   internal logic methods   //
 //============================*/
-void PhysicsComponent::CreateBody()
-{
-	if (!m_bodyID.IsInvalid()) return;
-
-	// 1. 임시 쉐이프 (나중에 Collider 연동 필요)
-	BoxShapeSettings shapeSettings(Vec3(0.5f, 0.5f, 0.5f));
-	ShapeSettings::ShapeResult result = shapeSettings.Create();
-	if (result.HasError()) return;
-
-	ShapeRefC shape = result.Get();
-
-	// 2. 초기 위치/회전 설정 (Transform 기준)
-	// 주의: GetOwner()는 Component가 GameObject에 붙은 후 유효함.
-	// OnEnable 시점에는 이미 owner가 설정되어 있으므로 안전.
-	RVec3 initialPos = Utils::ToJoltVec3(GetTransform().GetWorldPosition());
-	Quat initialRot = Utils::ToJoltQuat(GetTransform().GetWorldRotation());
-
-	BodyCreationSettings bodySettings
-	(
-		shape,
-		initialPos,
-		initialRot,
-		EMotionType::Dynamic,
-		Layers::MOVING
-	);
-
-	// 충돌 리스너를 위해 UserData에 GameObject 포인터 저장
-	// INFO : GameObject의 주소를 세팅 데이터로 삼는다.
-	bodySettings.mUserData = reinterpret_cast<uint64>(GetOwner());
-
-	// 3. 생성 및 등록
-	m_bodyID = GetBodyInterface().CreateAndAddBody(bodySettings, EActivation::Activate);
-}
-
 void PhysicsComponent::DestroyBody()
 {
 	if (m_bodyID.IsInvalid()) return;
