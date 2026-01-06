@@ -34,6 +34,8 @@
 #include "Components/AudioSource.h"
 #include "Components/AudioListener.h"
 #include "Components/MeshOutline.h"
+#include "Components/Rigidbody.h"
+#include "Components/BoxCollider.h"
 
 #include "SRPSample/RenderPasses/InstancedRenderPass.h"
 #include "SRPSample/RenderPasses/SimpleRenderPass.h"
@@ -331,10 +333,96 @@ bool DevScene::OnPlaceActors()
 		cubeTransform.SetPosition(glm::vec3(0.0f, -0.5f, 0.0f));
 		cubeTransform.SetScale(glm::vec3(100.0f, 1.0f, 100.0f));
 
+		auto collider = BoxCollider::Create();
+		cubeObj->AddComponent(std::move(collider));
+
+		auto rb = Rigidbody::Create();
+		rb->SetMotionType(JPH::EMotionType::Static); // <--- 핵심! 절대 움직이지 않음 (질량 무한대 취급)
+		rb->SetRestitution(0.5f);					 // 약간 튕기게 설정 (선택)
+		rb->SetFriction(0.5f);
+		cubeObj->AddComponent(std::move(rb));
+
 		auto meshRenderer = StaticMeshRenderer::Create
 		(RESOURCE.GetResource<StaticMesh>("Cube"), RESOURCE.GetResource<Material>("boxMat3"));
 		cubeObj->AddComponent(std::move(meshRenderer));
 		AddGameObject(std::move(cubeObj));
+	}
+
+	// 6. 큐브 생성 #3
+	{
+		auto cubeObj = GameObject::Create();
+		cubeObj->SetName("FallingBox");
+		auto& cubeTransform = cubeObj->GetTransform();
+		cubeTransform.SetPosition(glm::vec3(0.0f, 6.0f, 0.0f));
+		cubeTransform.SetRotation(glm::vec3(30.0f, 60.0f, 75.0f));
+		cubeTransform.SetScale(glm::vec3(0.75f));
+
+		// 3. [물리] 콜라이더
+		auto collider = BoxCollider::Create();
+		cubeObj->AddComponent(std::move(collider));
+
+		// 4. [물리] 리지드바디 추가 (DYNAMIC)
+		auto rb = Rigidbody::Create();
+		rb->SetMotionType(JPH::EMotionType::Dynamic); // <--- 움직이는 물체
+		rb->SetUseGravity(true); // 중력 켜기
+		rb->SetMass(10.0f);      // 질량 10kg
+		rb->SetRestitution(0.3f); // 튕김 계수
+		cubeObj->AddComponent(std::move(rb));
+
+		auto meshRenderer = StaticMeshRenderer::Create
+		(RESOURCE.GetResource<StaticMesh>("Cube"), RESOURCE.GetResource<Material>("material_SRP"));
+		cubeObj->AddComponent(std::move(meshRenderer));
+		AddGameObject(std::move(cubeObj));
+	}
+
+	// 7. 랜덤 큐브 20개 드랍!
+	{
+		// 랜덤 엔진 초기화
+		std::random_device rd;
+		std::mt19937 gen(rd());
+
+		// 랜덤 범위 설정
+		std::uniform_real_distribution<float> distPosX(-25.0f, 25.0f); // X축 범위 (폭 50)
+		std::uniform_real_distribution<float> distPosZ(-25.0f, 25.0f); // Z축 범위 (폭 50)
+		std::uniform_real_distribution<float> distPosY(10.0f, 30.0f);  // Y축 높이 (10 ~ 30m 상공)
+		std::uniform_real_distribution<float> distRot(0.0f, 360.0f);   // 회전 각도 (0 ~ 360도)
+
+		for (int i = 0; i < 20; i++)
+		{
+			auto cubeObj = GameObject::Create();
+			cubeObj->SetName("FallingBox_" + std::to_string(i)); // 이름 구분: FallingBox_0, FallingBox_1...
+
+			auto& cubeTransform = cubeObj->GetTransform();
+
+			// 1. 위치 및 회전 랜덤 설정
+			cubeTransform.SetPosition(glm::vec3(distPosX(gen), distPosY(gen), distPosZ(gen)));
+			cubeTransform.SetRotation(glm::vec3(distRot(gen), distRot(gen), distRot(gen)));
+			cubeTransform.SetScale(glm::vec3(0.75f));
+
+			// 2. [물리] 콜라이더
+			auto collider = BoxCollider::Create();
+			cubeObj->AddComponent(std::move(collider));
+
+			// 3. [물리] 리지드바디 (Dynamic)
+			auto rb = Rigidbody::Create();
+			rb->SetMotionType(JPH::EMotionType::Dynamic);
+			rb->SetUseGravity(true);
+			rb->SetMass(10.0f);
+			rb->SetRestitution(0.5f); // 0.5 정도 주면 바닥에 닿을 때 통통 튀어서 더 재밌습니다.
+			rb->SetFriction(0.6f);    // 마찰력도 적당히
+			cubeObj->AddComponent(std::move(rb));
+
+			// 4. 렌더러
+			auto meshRenderer = StaticMeshRenderer::Create
+			(
+				RESOURCE.GetResource<StaticMesh>("Cube"),
+				RESOURCE.GetResource<Material>("material_SRP")
+			);
+			cubeObj->AddComponent(std::move(meshRenderer));
+
+			// 씬에 등록
+			AddGameObject(std::move(cubeObj));
+		}
 	}
 
 	// 7. 임시 환경맵 큐브

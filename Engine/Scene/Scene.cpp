@@ -66,24 +66,19 @@ void Scene::Start()
 	m_isStarted = true;
 }
 
+void Scene::FixedUpdate()
+{
+	// [Phase 2] 물리 업데이트 (FixedUpdate)
+	for (const auto& go : m_objectManager->GetGameObjects())
+	{
+		if (go->IsActiveInHierarchy()) go->FixedUpdate();
+	}
+}
+
 void Scene::Update()
 {
-	// [Phase 1] 생성 대기열 처리 (Creation)
-	// 지난 프레임 이후 혹은 방금 막 추가된 객체들을 초기화하고 무대에 올림
-	ProcessPendingAdds();
-	const auto& gameObjects = m_objectManager->GetGameObjects();
-
-	// [Phase 2] 물리 업데이트 (FixedUpdate)
-	while (TIME.CheckFixedUpdate())
-	{
-		for (const auto& go : gameObjects)
-		{
-			if (go->IsActiveInHierarchy()) go->FixedUpdate();
-		}
-	}
-
 	// [Phase 3] 게임 로직 업데이트 (Update)
-	for (const auto& go : gameObjects)
+	for (const auto& go : m_objectManager->GetGameObjects())
 	{
 		if (go->IsActiveInHierarchy()) go->Update();
 	}

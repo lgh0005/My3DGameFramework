@@ -65,11 +65,20 @@ void Application::Run(const std::string& startLevelName)
 		// 타이머 업데이트
 		TIME.Update();
 
+		auto scene = SCENE.GetActiveScene();
+
+		// 예약된 오브젝트 추가
+		if (scene) scene->ProcessPendingAdds();
+
 		// 물리 시뮬레이션 (고정 시간 업데이트)
-		while (TIME.CheckFixedUpdate()) PHYSICS.Update();
+		while (TIME.CheckFixedUpdate())
+		{
+			PHYSICS.Update();
+			scene->FixedUpdate();
+		}
 
 		// 컨텍스트 업데이트
-		if (auto scene = SCENE.GetActiveScene())
+		if (scene)
 		{
 			// 게임 로직 업데이트
 			scene->Update();
