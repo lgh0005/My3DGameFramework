@@ -1,6 +1,21 @@
 ﻿#pragma once
 #include <Jolt/Physics/Collision/ContactListener.h>
 
+enum class CollisionType : uint8
+{
+	Enter,
+	Stay,
+	Exit
+};
+
+struct CollisionEvent
+{
+	CollisionType type;
+	uint64 body1UserData;
+	uint64 body2UserData;
+};
+
+
 CLASS_PTR(PhysicsContactListener)
 class PhysicsContactListener final : public JPH::ContactListener
 {
@@ -8,6 +23,10 @@ public:
 	PhysicsContactListener();
 	virtual ~PhysicsContactListener();
 
+	// 0.. 이벤트 디스패쳐
+	void DispatchEvents();
+
+private:
 	// 1. 충돌 검증 (여기서 false 리턴 시 충돌 무시)
 	virtual JPH::ValidateResult OnContactValidate
 	(
@@ -37,4 +56,8 @@ public:
 
 	// 4. 충돌 종료 (Exit)
 	virtual void OnContactRemoved(const JPH::SubShapeIDPair& inSubShapePair) override;
+
+private:
+	ThreadMutex m_mutex;
+	std::vector<CollisionEvent> m_eventQueue;
 };

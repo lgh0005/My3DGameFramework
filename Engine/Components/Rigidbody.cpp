@@ -144,6 +144,7 @@ void Rigidbody::Start()
 
 void Rigidbody::Update()
 {
+	// fallback of dependency of collider
 	if (m_bodyID.IsInvalid()) CreateBody();
 	if (IsValid()) Super::Update();
 }

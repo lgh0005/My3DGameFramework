@@ -83,7 +83,7 @@ void PhysicsManager::Init()
 
 void PhysicsManager::Update()
 {
-	// 물리 시뮬레이션 업데이트
+	// 1. 물리 시뮬레이션 업데이트
 	m_PhysicsSystem->Update
 	(
 		TIME.GetFixedDeltaTime(),
@@ -91,6 +91,9 @@ void PhysicsManager::Update()
 		m_TempAllocator.get(),
 		m_JobSystem.get()
 	);
+
+	// 2. 충돌 이벤트 처리
+	if (m_ContactListener) m_ContactListener->DispatchEvents();
 }
 
 void PhysicsManager::Clear()
