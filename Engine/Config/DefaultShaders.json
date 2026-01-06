@@ -35,6 +35,14 @@
 
 
         {
+            "key": "debug_gizmos",
+            "vs":  "./Resources/Shaders/Debug/Debug_Jolt_Physics_Gizmo.vert",
+            "fs":  "./Resources/Shaders/Debug/Debug_Jolt_Physics_Gizmo.frag" 
+        },
+
+
+
+        {
             "key": "standard_deferred_geometry_static",
             "vs":  "./Resources/Shaders/Standard/Standard_Deferred_GeometryPass_Static.vert",
             "fs":  "./Resources/Shaders/Standard/Standard_Deferred_GeometryPass.frag"

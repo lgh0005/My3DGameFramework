@@ -5,6 +5,7 @@
 CLASS_PTR(CullingPass)
 CLASS_PTR(ShadowPass)
 CLASS_PTR(SkyboxPass)
+CLASS_PTR(JoltDebugGizmoPass)
 CLASS_PTR(StandardDeferredLightingPass)
 CLASS_PTR(StandardGeometryPass)
 CLASS_PTR(StandardSSAOPass)
@@ -38,6 +39,7 @@ private:
 	CullingPassUPtr					  m_cullingPass		  { nullptr };
 	ShadowPassUPtr					  m_shadowPass		  { nullptr };
 	SkyboxPassUPtr                    m_skyboxPass		  { nullptr };
+	JoltDebugGizmoPassUPtr			  m_debugGizmoPass	  { nullptr };
 
 	// SRP 필수 렌더 패스
 	StandardPostProcessPassUPtr		  m_postProcessPass	  { nullptr };

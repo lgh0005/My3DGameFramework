@@ -43,12 +43,11 @@ void JoltDebugRenderer::DrawTriangle(JPH::RVec3Arg inV1, JPH::RVec3Arg inV2, JPH
 	glm::vec3 v3 = Utils::ToGlmVec3(inV3);
 	glm::vec4 color = Utils::ToGlmColor(inColor);
 
-	m_gizmo->DrawLine(v1, v2, color);
-	m_gizmo->DrawLine(v2, v3, color);
-	m_gizmo->DrawLine(v3, v1, color);
+	m_gizmo->DrawTriangle(v1, v2, v3, color);
 }
 
 void JoltDebugRenderer::DrawText3D(JPH::RVec3Arg inPos, const std::string_view& inString, JPH::ColorArg inColor, float inHeight)
 {
+	// 3D 텍스트는 아직 구현 안 함 (필요시 ImGui 등으로 구현 가능)
 	return;
 }

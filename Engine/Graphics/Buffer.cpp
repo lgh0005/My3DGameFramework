@@ -15,6 +15,12 @@ BufferUPtr Buffer::CreateWithData(uint32 bufferType, uint32 usage,
     return std::move(buffer);
 }
 
+void Buffer::SetData(const void* data, usize size)
+{
+    Bind();
+    glBufferSubData(m_bufferType, 0, size, data);
+}
+
 void Buffer::Bind() const
 {
     glBindBuffer(m_bufferType, m_buffer);

@@ -15,6 +15,7 @@ enum class ResourceType
 	ScreenMesh,
 	InstancedMesh,
 	UIMesh,
+	DebugMesh,
 	Shader,
 	EnvironmentMap
 };

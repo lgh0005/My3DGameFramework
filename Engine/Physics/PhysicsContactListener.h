@@ -15,7 +15,6 @@ struct CollisionEvent
 	uint64 body2UserData;
 };
 
-
 CLASS_PTR(PhysicsContactListener)
 class PhysicsContactListener final : public JPH::ContactListener
 {

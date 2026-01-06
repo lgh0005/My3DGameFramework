@@ -4,6 +4,7 @@
 #include "Pipelines/Common/CullingPass.h"
 #include "Pipelines/Common/ShadowPass.h"
 #include "Pipelines/Common/SkyboxPass.h"
+#include "Pipelines/Common/JoltDebugGizmoPass.h"
 #include "Pipelines/SRP/RenderPasses/StandardOutlinePass.h"
 #include "Pipelines/SRP/RenderPasses/StandardPostProcessPass.h"
 #include "Pipelines/SRP/RenderPasses/StandardGeometryPass.h"
@@ -59,6 +60,10 @@ bool StandardRenderPipeline::Init()
 	// 스카이박스 패스 생성
 	m_skyboxPass = SkyboxPass::Create();
 	if (!m_skyboxPass) return false;
+
+	// 디버그 패스 생성
+	m_debugGizmoPass = JoltDebugGizmoPass::Create();
+	if (!m_debugGizmoPass) return false;
 
 	// SSAO 패스 생성
 	m_ssaoPass = StandardSSAOPass::Create();
@@ -159,6 +164,9 @@ void StandardRenderPipeline::Render(Scene* scene)
 
 	// [패스 7] 아웃라인 패스
 	m_outlinePass->Render(&context);
+
+	// [패스 7.5] 디버그 패스
+	m_debugGizmoPass->Render(&context);
 
 	// [패스 8] 후처리 패스: m_frameBuffer의 결과를 화면에 Resolve
 	m_postProcessPass->Render(&context);

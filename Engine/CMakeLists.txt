@@ -35,6 +35,7 @@ add_library(Engine STATIC
    "Pipelines/Common/UIScreenSpacePass.h"  "Pipelines/Common/UIScreenSpacePass.cpp"
    "Pipelines/Common/UIWorldSpacePass.h"  "Pipelines/Common/UIWorldSpacePass.cpp"
    "Pipelines/Common/UIScreenSpacePass.h" "Pipelines/Common/UIScreenSpacePass.cpp"
+   "Pipelines/Common/JoltDebugGizmoPass.h"  "Pipelines/Common/JoltDebugGizmoPass.cpp"
 
    # Standard Render Pipeline
    "Pipelines/SRP/RenderPasses/StandardPostProcessPass.h" "Pipelines/SRP/RenderPasses/StandardPostProcessPass.cpp"
@@ -122,6 +123,7 @@ add_library(Engine STATIC
    "Resources/SkinnedMesh.h"        "Resources/SkinnedMesh.cpp"
    "Resources/InstancedMesh.h"      "Resources/InstancedMesh.cpp"
    "Resources/ScreenMesh.h"         "Resources/ScreenMesh.cpp"
+   "Resources/DebugMesh.h"          "Resources/DebugMesh.cpp"
    "Resources/UIMesh.h"             "Resources/UIMesh.cpp"
    "Resources/Material.h"           "Resources/Material.cpp"
    "Resources/CubeTexture.h"        "Resources/CubeTexture.cpp"

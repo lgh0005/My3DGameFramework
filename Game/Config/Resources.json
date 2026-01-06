@@ -21,7 +21,9 @@
         { "key": "toybox_diffuse", "path": "./Resources/Images/baked/toy_box_diffuse.ktx" },
         { "key": "toybox_normal", "path": "./Resources/Images/baked/toy_box_normal.ktx" },
         { "key": "toybox_disp", "path": "./Resources/Images/baked/toy_box_disp.ktx" },
-        { "key": "grass", "path": "./Resources/Images/grass.png" }
+        { "key": "grass", "path": "./Resources/Images/grass.png" },
+
+        { "key": "mirrorhall", "path": "./Resources/Images/IBL/mirrored_hall_4k.hdr" }
     ],
 
     "cubemaps": 

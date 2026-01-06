@@ -129,7 +129,6 @@ void PhysicsManager::Clear()
 
 BodyInterface& PhysicsManager::GetBodyInterface() const
 {
-	// PhysicsSystem이 초기화되지 않았을 때 호출하면 크래시가 나므로 주의
 	JPH_ASSERT(m_PhysicsSystem != nullptr);
 	return m_PhysicsSystem->GetBodyInterface();
 }
@@ -189,7 +188,6 @@ bool PhysicsManager::Raycast(const glm::vec3& origin, const glm::vec3& direction
 //=======================*/
 void PhysicsManager::DrawDebugData()
 {
-#ifdef defined(DEBUG) || defined(_DEBUG)
 	if (!m_PhysicsSystem || !m_debugRenderer) return;
 
 	// 그리기 옵션 설정
@@ -199,10 +197,9 @@ void PhysicsManager::DrawDebugData()
 	settings.mDrawVelocity = false;      // 속도 벡터
 	settings.mDrawCenterOfMassTransform = false; // 무게 중심 좌표계
 
-	// ★ Jolt 시스템이 내부의 모든 바디를 순회하며 
+	// Jolt 시스템이 내부의 모든 바디를 순회하며 
 	// m_debugRenderer->DrawLine() 등을 호출하게 만듦
 	m_PhysicsSystem->DrawBodies(settings, m_debugRenderer.get());
-#endif
 }
 
 JoltGizmo* PhysicsManager::GetGizmo()

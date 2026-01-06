@@ -13,21 +13,19 @@ public:
     ~JoltGizmo();
     static JoltGizmoUPtr Create();
 
-    void DrawCube(const glm::vec3& center, const glm::vec3& size, const glm::vec4& color);
-    void DrawSphere(const glm::vec3& center, float radius, const glm::vec4& color);
     void DrawLine(const glm::vec3& start, const glm::vec3& end, const glm::vec4& color);
+    void DrawTriangle(const glm::vec3& v1, const glm::vec3& v2, const glm::vec3& v3, const glm::vec4& color);
 
-    const std::vector<GizmoMeshCommand>& GetMeshCommands() const { return m_meshCommands; }
     const std::vector<GizmoLineCommand>& GetLineCommands() const { return m_lineCommands; }
+    const std::vector<GizmoTriangleCommand>& GetTriangleCommands() const { return m_triangleCommands; }
 
     void Clear();
 
 private:
     JoltGizmo();
-    bool Init();
 
-    std::vector<GizmoMeshCommand> m_meshCommands;
     std::vector<GizmoLineCommand> m_lineCommands;
+    std::vector<GizmoTriangleCommand> m_triangleCommands;
     MeshPtr     m_cubeMesh;
     MeshPtr     m_sphereMesh;
 };

@@ -17,3 +17,9 @@ struct GizmoLineCommand
     glm::vec3 end;
     glm::vec4 color;
 };
+
+struct GizmoTriangleCommand
+{
+    glm::vec3 v1, v2, v3;
+    glm::vec4 color;
+};

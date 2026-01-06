@@ -31,3 +31,9 @@ struct SkinnedVertex
     int32     boneIDs[MAX_BONE_INFLUENCE];
     float     weights[MAX_BONE_INFLUENCE];
 };
+
+struct GizmoVertex
+{
+    glm::vec3 position;
+    glm::vec4 color;
+};
