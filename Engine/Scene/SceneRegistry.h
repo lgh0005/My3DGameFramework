@@ -14,6 +14,8 @@ CLASS_PTR(Animator)
 CLASS_PTR(Script)
 CLASS_PTR(AudioSource)
 CLASS_PTR(AudioListener)
+CLASS_PTR(Collider)
+CLASS_PTR(Rigidbody)
 CLASS_PTR(GeneralRenderPass)
 CLASS_PTR(SkyLight)
 #pragma endregion
@@ -56,6 +58,8 @@ public:
 	const auto& GetSkinnedMeshRenderers() const { return m_skinnedMeshRenderers; }
 	const auto& GetInstancedMeshRenderers() const { return m_instancedMeshRenderers; }
 	const auto& GetMeshOutlines() const { return m_outlines; }
+	const auto& GetRigidbodies() const { return m_rigidBodies; }
+	const auto& GetColliders() const { return m_colliders; }
 	const auto& GetUICanvases() const { return m_uiCanvases; }
 
 private:
@@ -65,6 +69,8 @@ private:
 	std::vector<Script*>                m_scripts;
 	std::vector<AudioSource*>           m_audioSources;
 	std::vector<AudioListener*>         m_audioListeners;
+	std::vector<Rigidbody*>				m_rigidBodies;
+	std::vector<Collider*>				m_colliders;
 
 	// 렌더링 관련
 	std::vector<StaticMeshRenderer*>    m_staticMeshRenderers;

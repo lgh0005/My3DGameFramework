@@ -61,8 +61,7 @@ void GameObject::Start()
 
 	for (auto& comp : m_components)
 	{
-		if (comp->IsEnabled())
-			comp->Start();
+		if (comp->IsEnabled()) comp->Start();
 	}
 }
 
@@ -120,7 +119,6 @@ void GameObject::SetDestroy()
 {
 	// 이미 죽었으면 무시
 	if (m_state == GameObjectState::Dead) return;
-
 	m_state = GameObjectState::Dead;
 }
 

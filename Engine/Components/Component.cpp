@@ -58,12 +58,12 @@ bool Component::IsActive() const
 //   component life-cycle state methods   //
 //========================================*/
 void Component::Awake()		  { }
-void Component::OnEnable()	  { }
 void Component::Start()       { }
 
 void Component::FixedUpdate() { }
 void Component::Update()	  { }
 void Component::LateUpdate()  { }
 
+void Component::OnEnable()    { }
 void Component::OnDisable()   { }
 void Component::OnDestroy()   { }

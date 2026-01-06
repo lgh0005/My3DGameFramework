@@ -5,8 +5,12 @@
 CLASS_PTR(Collider)
 class Collider : public Component
 {
+	using Super = Component;
+
 public:
 	virtual ~Collider();
+	static const ComponentType s_ComponentType = ComponentType::Collider;
+	virtual bool MatchesType(ComponentType type) const override;
 	virtual JPH::ShapeRefC CreateShape() = 0;
 
 	void SetTrigger(bool isTrigger) { m_isTrigger = isTrigger; }

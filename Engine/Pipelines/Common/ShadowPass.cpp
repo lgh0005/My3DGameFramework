@@ -33,18 +33,6 @@ bool ShadowPass::Init(int32 resolution)
 	m_resolution = resolution;
 
 	// 1. 그림자 셰이더 프로그램 생성
-	/*m_staticDepthProgram = Program::Create
-	(
-		"./Resources/Shaders/Common/Common_Shadow_DepthPass_Static.vert",
-		"./Resources/Shaders/Common/Common_Shadow_DepthPass_Static.frag"
-	);
-	m_skinnedDepthProgram = Program::Create
-	(
-		"./Resources/Shaders/Common/Common_Shadow_DepthPass_Skinned.vert",
-		"./Resources/Shaders/Common/Common_Shadow_DepthPass_Skinned.frag"
-	);
-	if (!m_staticDepthProgram || !m_skinnedDepthProgram) return false;*/
-
 	m_staticDepthProgram = RESOURCE.GetResource<Program>("common_shadow_depth_static");
 	m_skinnedDepthProgram = RESOURCE.GetResource<Program>("common_shadow_depth_skinned");
 

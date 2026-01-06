@@ -12,16 +12,19 @@ enum class ComponentType
 	Script,
 	Animator,
 	Rigidbody,
+	Camera,
 
 	// Rendering
-	Camera,
-	DirectionalLight,
-	SpotLight,
-	PointLight,
 	MeshOutline,
 	SkinnedMeshRenderer,
 	StaticMeshRenderer,
 	InstancedMeshRenderer,
+
+	// Light
+	Light,
+	DirectionalLight,
+	SpotLight,
+	PointLight,
 
 	// Audio
 	AudioSource,
@@ -33,9 +36,11 @@ enum class ComponentType
 	UIText,
 
 	// Collider
+	Collider,
 	BoxCollider,
 	SphereCollider,
 
+	// Misc
 	Unknown
 };
 
@@ -47,7 +52,7 @@ class Component
 public:
 	virtual ~Component();
 	virtual ComponentType GetComponentType() const = 0;
-	bool MatchesType(ComponentType type) const;
+	virtual bool MatchesType(ComponentType type) const;
 
 	GameObject* GetOwner() const;
 	Transform& GetTransform();

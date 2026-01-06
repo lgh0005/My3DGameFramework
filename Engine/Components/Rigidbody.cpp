@@ -26,7 +26,11 @@ bool Rigidbody::CreateBody()
 	Collider* collider = GetOwner()->GetComponent<Collider>();
 	if (collider == nullptr)
 	{
-		LOG_WARN("Rigidbody requires a Collider component!");
+		LOG_WARN
+		(
+			"Rigidbody creation deferred on GameObject '{}'. No Collider found yet.", 
+			GetOwner()->GetName()
+		);
 		return false;
 	}
 
@@ -131,4 +135,15 @@ void Rigidbody::SetUseGravity(bool useGravity)
 {
 	m_useGravity = useGravity;
 	if (IsValid()) GetBodyInterface().SetGravityFactor(m_bodyID, useGravity ? 1.0f : 0.0f);
+}
+
+void Rigidbody::Start()
+{
+	CreateBody();
+}
+
+void Rigidbody::Update()
+{
+	if (m_bodyID.IsInvalid()) CreateBody();
+	if (IsValid()) Super::Update();
 }

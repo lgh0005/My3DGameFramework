@@ -5,7 +5,6 @@
 #include "Graphics/RenderPass.h"
 #include "Resources/Mesh.h"
 #include "Graphics/SkyLight.h"
-#include "Components/Component.h"
 #include "Components/Light.h"
 #include "Components/PointLight.h"
 #include "Components/DirectionalLight.h"
@@ -19,6 +18,10 @@
 #include "Components/Transform.h"
 #include "Components/AudioSource.h"
 #include "Components/AudioListener.h"
+#include "Components/Collider.h"
+#include "Components/BoxCollider.h"
+#include "Components/SphereCollider.h"
+#include "Components/Rigidbody.h"
 #include "UIs/UICanvas.h"
 
 DECLARE_DEFAULTS_IMPL(SceneRegistry)
@@ -40,6 +43,7 @@ void SceneRegistry::RegisterComponent(Component* component)
 			m_cameras.push_back(static_cast<Camera*>(component));
 			break;
 		}
+		case ComponentType::Light:
 		case ComponentType::DirectionalLight:
 		case ComponentType::PointLight:
 		case ComponentType::SpotLight:
@@ -98,6 +102,19 @@ void SceneRegistry::RegisterComponent(Component* component)
 			m_uiCanvases.push_back(static_cast<UICanvas*>(component));
 			break;
 		}
+		case ComponentType::Collider:
+		case ComponentType::BoxCollider:
+		case ComponentType::SphereCollider:
+		{
+			m_colliders.push_back(static_cast<Collider*>(component));
+			break;
+		}
+
+		case ComponentType::Rigidbody:
+		{
+			m_rigidBodies.push_back(static_cast<Rigidbody*>(component));
+			break;
+		}
 	}
 }
 
@@ -110,9 +127,7 @@ void SceneRegistry::UnregisterComponent(Component* component)
 	{
 		case ComponentType::Camera:
 			RemoveFromVector(m_cameras, component); break;
-		case ComponentType::DirectionalLight:
-		case ComponentType::PointLight:
-		case ComponentType::SpotLight:
+		case ComponentType::Light:
 			RemoveFromVector(m_lights, component); break;
 		case ComponentType::Animator:
 			RemoveFromVector(m_animators, component); break;
@@ -132,6 +147,10 @@ void SceneRegistry::UnregisterComponent(Component* component)
 			RemoveFromVector(m_outlines, component); break;
 		case ComponentType::UICanvas:
 			RemoveFromVector(m_uiCanvases, component); break;
+		case ComponentType::Collider:
+			RemoveFromVector(m_colliders, component); break;
+		case ComponentType::Rigidbody:
+			RemoveFromVector(m_rigidBodies, component); break;
 	}
 }
 
