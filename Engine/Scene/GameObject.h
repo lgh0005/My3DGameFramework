@@ -53,12 +53,14 @@ public:
 public:
 	void AddComponent(ComponentUPtr component);
 	template<typename T> T* GetComponent() const;
+	template<typename T> void GetComponentsInChildren(std::vector<T*>& outComponents);
 	const std::vector<ComponentUPtr>& GetAllComponents() const { return m_components; }
 
 /*=======================//
 //   hierarchy methods   //
 //=======================*/
 public:
+	GameObject* GetRoot();
 	void SetParent(GameObject* parent);
 	void AddChild(GameObject* child);
 	void SetActiveStateHierarchy(bool active);
@@ -91,5 +93,20 @@ inline T* GameObject::GetComponent() const
 			return static_cast<T*>(comp.get());
 	}
 	return nullptr;
+}
+
+template<typename T>
+inline void GameObject::GetComponentsInChildren(std::vector<T*>& outComponents)
+{
+	// 1. 나 자신에게 있는지 확인
+	T* comp = GetComponent<T>();
+	if (comp) outComponents.push_back(comp);
+
+	// 2. 자식들에게 재귀 호출
+	for (Transform* child : GetTransform().GetChildren())
+	{
+		if (GameObject* childGO = child->GetOwner())
+			childGO->GetComponentsInChildren<T>(outComponents);
+	}
 }
 #pragma endregion

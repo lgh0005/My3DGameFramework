@@ -534,6 +534,9 @@ bool DevScene::OnPlaceActors()
 		auto collider = BoxCollider::Create(glm::vec3(10.0f, 20.0f, 2.5f));
 		cubeObj->AddComponent(std::move(collider));
 
+		auto outline = MeshOutline::Create();
+		cubeObj->AddComponent(std::move(outline));
+
 		auto rb = Rigidbody::Create();
 		rb->SetMotionType(JPH::EMotionType::Static); // 절대 움직이지 않음 (질량 무한대 취급)
 		rb->SetRestitution(0.5f);					 // 약간 튕기게 설정 (선택)

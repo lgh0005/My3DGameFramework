@@ -28,9 +28,15 @@ bool WindowManager::Init(int32 width, int32 height, const std::string& title)
         glfwTerminate();
         return false;
     }
+
+    // 윈도우 너비와 높이 캐싱
+    m_width = width;
+    m_height = height;
+
+    // 윈도우 컨텍스트 설정
     glfwMakeContextCurrent(m_window);
     glfwSetWindowUserPointer(m_window, this);
-    glfwSwapInterval(0); // TEMP : v-sync 잠시 끄기
+    glfwSwapInterval(0); // v-sync 잠시 끄기
 
     // glad를 활용한 OpenGL 함수 로딩
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
@@ -84,6 +90,13 @@ void WindowManager::HandleFramebufferSizeChange(GLFWwindow* window, int32 width,
     // 높이나 너비가 0이라면 프레임 버퍼의 크기 변환을 건너 뛴다.
     if (width <= 0 || height <= 0) return;
 
+    // TODO : 내부적으로 glfw 유저 포인터를 얻을 방안을 모색해야 함.
+    WindowManager* instance = static_cast<WindowManager*>(glfwGetWindowUserPointer(window));
+    if (instance)
+    {
+        instance->m_width = width;
+        instance->m_height = height;
+    }
     LOG_INFO("framebuffer size changed: ({} x {})", width, height);
     
     // 1. 렌더러 (FBO 재생성, Viewport 설정)

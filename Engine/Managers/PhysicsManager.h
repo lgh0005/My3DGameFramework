@@ -52,6 +52,8 @@ public:
 		RaycastHit& outHit
 	);
 
+	bool Raycast(const Ray& ray, float maxDistance, RaycastHit& outHit);
+
 private:
 
 

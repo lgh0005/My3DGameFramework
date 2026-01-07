@@ -232,6 +232,14 @@ void Transform::RemoveChild(Transform* child)
 	if (it != m_children.end()) m_children.erase(it);
 }
 
+GameObject* Transform::GetRoot() const
+{
+	// 2. 부모를 타고 올라감
+	const Transform* current = this;
+	while (current->GetParent() != nullptr) current = current->GetParent();
+	return current->GetOwner();
+}
+
 GameObject* Transform::GetChildGameObjectByIndex(usize index) const
 {
 	if (index >= m_children.size()) return nullptr;

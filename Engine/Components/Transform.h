@@ -65,10 +65,13 @@ public:
 //                 Hierarchy System                   //
 //====================================================*/
 public:
-	// 계층 구조
 	void SetParent(Transform* parent);
 	Transform* GetParent() const { return m_parent; }
 	const std::vector<Transform*>& GetChildren() const { return m_children; }
+	
+	// TODO : 이게 역할을 생각하자면 GameObject를 반환하는 것 보다는
+	// Transform을 반환하는게 더 맞을 수도 있음.
+	GameObject* GetRoot() const;
 	GameObject* GetChildGameObjectByIndex(usize index) const;
 	GameObject* GetChildGameObjectByName(const std::string& name) const;
 

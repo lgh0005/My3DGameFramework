@@ -22,7 +22,7 @@ add_executable(Game
     #"URPSample/RenderPasses/SphericalToCubePass.h"   "URPSample/RenderPasses/SphericalToCubePass.cpp"
     #"URPSample/RenderPasses/HDRSkyboxPass.h"    "URPSample/RenderPasses/HDRSkyboxPass.cpp"
 
- )
+  )
 
 # 2. [PCH 설정] Game/pch.h를 Game 타겟 전용(PRIVATE) PCH로 사용합니다.
 target_precompile_headers(Game PRIVATE pch.h)

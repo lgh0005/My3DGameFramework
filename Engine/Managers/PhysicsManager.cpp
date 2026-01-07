@@ -182,6 +182,10 @@ bool PhysicsManager::Raycast(const glm::vec3& origin, const glm::vec3& direction
 	return false;
 }
 
+bool PhysicsManager::Raycast(const Ray& ray, float maxDistance, RaycastHit& outHit)
+{
+	return Raycast(ray.GetOrigin(), ray.GetDirection(), maxDistance, outHit);
+}
 
 /*=======================//
 //   debugging methods   //

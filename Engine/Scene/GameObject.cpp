@@ -162,6 +162,11 @@ void GameObject::AddComponent(ComponentUPtr component)
 /*=====================//
 //  hierarchy methods  //
 //=====================*/
+GameObject* GameObject::GetRoot()
+{
+	return GetTransform().GetRoot();
+}
+
 void GameObject::SetParent(GameObject* parent)
 {
 	// 부모가 바뀌면 계층 활성화 상태가 바뀔 수 있음 (예: 꺼진 부모 -> 켜진 부모)
