@@ -8,6 +8,7 @@
 #include <Jolt/Physics/Body/BodyCreationSettings.h>
 #include <Jolt/Physics/Body/BodyInterface.h>
 #include <Jolt/Physics/PhysicsSystem.h>
+#include <Jolt/Physics/Body/MotionProperties.h>
 using namespace JPH;
 
 DECLARE_DEFAULTS_IMPL(Rigidbody)
@@ -62,6 +63,10 @@ bool Rigidbody::CreateBody()
 	{
 		bodySettings.mOverrideMassProperties = EOverrideMassProperties::CalculateInertia;
 		bodySettings.mMassPropertiesOverride.mMass = m_mass;
+		if (m_rotationLocked)
+			bodySettings.mAllowedDOFs = JPH::EAllowedDOFs::TranslationX | 
+										JPH::EAllowedDOFs::TranslationY | 
+										JPH::EAllowedDOFs::TranslationZ;
 	}
 
 	// 6. [중요] Trigger(Sensor) 여부 설정
@@ -135,6 +140,59 @@ void Rigidbody::SetUseGravity(bool useGravity)
 {
 	m_useGravity = useGravity;
 	if (IsValid()) GetBodyInterface().SetGravityFactor(m_bodyID, useGravity ? 1.0f : 0.0f);
+}
+
+void Rigidbody::SetRotationLock(bool locked)
+{
+	m_rotationLocked = locked;
+	if (!IsValid()) return;
+
+	JPH::BodyInterface& bodyInterface = GetBodyInterface();
+	JPH::BodyLockWrite lock(PHYSICS.GetPhysicsSystem().GetBodyLockInterface(), m_bodyID);
+	if (lock.Succeeded())
+	{
+		JPH::Body& body = lock.GetBody();
+		 
+		// 1. Static 바디나 Kinematic 바디는 MotionProperties가 없거나 설정할 필요 없음
+		if (!body.IsRigidBody() || body.GetMotionType() != JPH::EMotionType::Dynamic)
+			return;
+
+		// 2. MotionProperties 가져오기 (없으면 리턴)
+		JPH::MotionProperties* motionProps = body.GetMotionProperties();
+		if (!motionProps) return;
+
+		// 3. 현재 쉐이프에서 질량 특성 다시 계산 (SetMass 때와 동일 로직)
+		// 관성(Inertia)을 DOF에 맞춰 다시 세팅해야 하기 때문에 필요함
+		const JPH::Shape* shape = body.GetShape();
+		JPH::MassProperties massProps = shape->GetMassProperties();
+		massProps.ScaleToMass(m_mass); // 우리가 설정해둔 질량 적용
+
+		// 4. 자유도(DOF) 결정 
+		JPH::EAllowedDOFs allowedDOFs = JPH::EAllowedDOFs::All;
+		if (m_rotationLocked)
+		{
+			// 이동(Translation) XYZ만 허용하고, 회전(Rotation)은 잠금
+			allowedDOFs = JPH::EAllowedDOFs::TranslationX |
+				JPH::EAllowedDOFs::TranslationY |
+				JPH::EAllowedDOFs::TranslationZ;
+		}
+
+		// 5. ★ 핵심: 질량 특성과 자유도를 한 번에 설정
+		// 이렇게 하면 Jolt가 "아, 이 축은 회전하면 안 되니까 관성을 무한대로 설정해야겠구나"라고 처리함
+		motionProps->SetMassProperties(allowedDOFs, massProps);
+	}
+}
+
+glm::vec3 Rigidbody::GetLinearVelocity() const
+{
+	if (!IsValid()) return glm::vec3(0.0f);
+	return Utils::ToGlmVec3(GetBodyInterface().GetLinearVelocity(m_bodyID));
+}
+
+void Rigidbody::SetLinearVelocity(const glm::vec3& velocity)
+{
+	if (!IsValid()) return;
+	GetBodyInterface().SetLinearVelocity(m_bodyID, Utils::ToJoltVec3(velocity));
 }
 
 void Rigidbody::Start()

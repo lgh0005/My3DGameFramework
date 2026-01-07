@@ -26,6 +26,7 @@ void PhysicsContactListener::OnContactAdded(const Body& inBody1, const Body& inB
 
 void PhysicsContactListener::OnContactPersisted(const Body& inBody1, const Body& inBody2, const ContactManifold& inManifold, ContactSettings& ioSettings)
 {
+	if (inBody1.IsStatic() || inBody2.IsStatic()) return;
 	ScopedLock lock(m_mutex);
 	m_eventQueue.push_back({ CollisionType::Stay, inBody1.GetUserData(), inBody2.GetUserData() });
 }
@@ -65,11 +66,11 @@ void PhysicsContactListener::DispatchEvents()
 
 		// TODO : 이쪽은 GameObject가 아니라 이제 Script 단에서 구현할
 		// 충돌과 관련된 메서드들을 여기서 이제 처리할 예정
-		switch (evt.type)
+		/*switch (evt.type)
 		{
 		case CollisionType::Enter: LOG_INFO("This event is Enter {}", (int)evt.type); break;
 		case CollisionType::Stay: LOG_INFO("This event is Stay {}", (int)evt.type); break;
 		case CollisionType::Exit: LOG_INFO("This event is Exit {}", (int)evt.type); break;
-		}
+		}*/
 	}
 }

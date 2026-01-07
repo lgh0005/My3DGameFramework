@@ -21,6 +21,12 @@ public:
 	void SetMotionType(JPH::EMotionType motionType);
 	void SetUseGravity(bool useGravity);
 
+	// TODO : 유니티에 Constraint처럼 위치, 스케일, 회전에 대해서 제한을 걸어둘 수단
+	// 구현 필요
+	void SetRotationLock(bool locked);
+	glm::vec3 GetLinearVelocity() const;
+	void SetLinearVelocity(const glm::vec3& velocity);
+
 private:
 	Rigidbody();
 	virtual bool CreateBody() override;
@@ -31,4 +37,6 @@ private:
 	float m_restitution = 0.0f;
 	bool m_useGravity = true;
 	JPH::EMotionType m_motionType = JPH::EMotionType::Dynamic;
+
+	bool m_rotationLocked = false;
 };

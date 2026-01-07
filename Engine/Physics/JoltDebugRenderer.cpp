@@ -29,7 +29,7 @@ void JoltDebugRenderer::DrawLine(JPH::RVec3Arg inFrom, JPH::RVec3Arg inTo, JPH::
 
 	glm::vec3 start = Utils::ToGlmVec3(inFrom);
 	glm::vec3 end = Utils::ToGlmVec3(inTo);
-	glm::vec4 color = Utils::ToGlmColor(inColor);
+	glm::vec4 color = glm::vec4(0.0f, 1.0f, 0.0f, 1.0f);  // Utils::ToGlmColor(inColor);
 
 	m_gizmo->DrawLine(start, end, color);
 }
@@ -41,7 +41,7 @@ void JoltDebugRenderer::DrawTriangle(JPH::RVec3Arg inV1, JPH::RVec3Arg inV2, JPH
 	glm::vec3 v1 = Utils::ToGlmVec3(inV1);
 	glm::vec3 v2 = Utils::ToGlmVec3(inV2);
 	glm::vec3 v3 = Utils::ToGlmVec3(inV3);
-	glm::vec4 color = Utils::ToGlmColor(inColor);
+	glm::vec4 color = glm::vec4(0.0f, 1.0f, 0.0f, 1.0f);  // Utils::ToGlmColor(inColor);
 
 	m_gizmo->DrawTriangle(v1, v2, v3, color);
 }

@@ -1,6 +1,7 @@
 ﻿#include "EnginePch.h"
 #include "PlayerController.h"
 #include "Scene/GameObject.h"
+#include "Components/Rigidbody.h"
 #include "Components/Animator.h"
 #include "Components/Transform.h"
 #include "Resources/AnimController.h"
@@ -21,9 +22,10 @@ void PlayerController::Start()
     INPUT_MGR.MapAction("Player_Right", GLFW_KEY_RIGHT);
     INPUT_MGR.MapAction("Disable_Self", GLFW_KEY_F);
 
+    m_rigidbody = GetOwner()->GetComponent<Rigidbody>();
     m_animator = GetOwner()->GetComponent<Animator>();
     m_animController = m_animator->GetController();
-    if (!m_animator || !m_animController) return;
+    if (!m_rigidbody || !m_animator || !m_animController) return;
 }
 
 void PlayerController::Update()
@@ -36,32 +38,33 @@ void PlayerController::Update()
 void PlayerController::HandleMovement(float dt)
 {
     auto& transform = GetTransform();
-    float speed = m_moveSpeed * dt;
+    m_moveDir = glm::vec3(0.0f);
     m_isMoving = false;
 
-    // 1. 화살표 입력 처리
-    if (INPUT_MGR.GetButton("Player_Up"))
+    // 1. 화살표 입력 처리 : 입력에 따른 이동 방향 벡터 계산
+    if (INPUT_MGR.GetButton("Player_Up"))    m_moveDir += transform.GetForwardVector();
+    if (INPUT_MGR.GetButton("Player_Down"))  m_moveDir -= transform.GetForwardVector();
+    if (INPUT_MGR.GetButton("Player_Right")) m_moveDir += transform.GetRightVector();
+    if (INPUT_MGR.GetButton("Player_Left"))  m_moveDir -= transform.GetRightVector();
+
+    // 2. 입력이 있으면 정규화
+    if (glm::length(m_moveDir) > 0.1f)
     {
-        // 모델 기준 앞(Forward)으로 이동
-        transform.Translate(transform.GetForwardVector() * speed);
+        m_moveDir = glm::normalize(m_moveDir);
         m_isMoving = true;
     }
-    if (INPUT_MGR.GetButton("Player_Down"))
-    {
-        transform.Translate(transform.GetForwardVector() * -speed);
-        m_isMoving = true;
-    }
-    // 좌우 이동 시 모델이 회전하지 않는다면 그냥 옆으로 이동 (게걸음)
-    if (INPUT_MGR.GetButton("Player_Right"))
-    {
-        transform.Translate(transform.GetRightVector() * speed);
-        m_isMoving = true;
-    }
-    if (INPUT_MGR.GetButton("Player_Left"))
-    {
-        transform.Translate(transform.GetRightVector() * -speed);
-        m_isMoving = true;
-    }
+}
+
+void PlayerController::FixedUpdate()
+{
+    // 3. 물리 엔진에 속도 적용
+    glm::vec3 currentVel = m_rigidbody->GetLinearVelocity();
+    glm::vec3 targetVel = m_moveDir * m_moveSpeed;
+
+    // 점프 구현 시 targetVel.y를 건드리면 됨. 지금은 중력 유지.
+    targetVel.y = currentVel.y;
+
+    m_rigidbody->SetLinearVelocity(targetVel);
 }
 
 void PlayerController::UpdateFiniteStateMachine()

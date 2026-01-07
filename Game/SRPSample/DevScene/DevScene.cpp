@@ -333,11 +333,11 @@ bool DevScene::OnPlaceActors()
 		cubeTransform.SetPosition(glm::vec3(0.0f, -0.5f, 0.0f));
 		cubeTransform.SetScale(glm::vec3(100.0f, 1.0f, 100.0f));
 
-		auto collider = BoxCollider::Create();
+		auto collider = BoxCollider::Create(glm::vec3(100.0f, 1.0f, 100.0f));
 		cubeObj->AddComponent(std::move(collider));
 
 		auto rb = Rigidbody::Create();
-		rb->SetMotionType(JPH::EMotionType::Static); // <--- 핵심! 절대 움직이지 않음 (질량 무한대 취급)
+		rb->SetMotionType(JPH::EMotionType::Static); // 절대 움직이지 않음 (질량 무한대 취급)
 		rb->SetRestitution(0.5f);					 // 약간 튕기게 설정 (선택)
 		rb->SetFriction(0.5f);
 		cubeObj->AddComponent(std::move(rb));
@@ -358,7 +358,7 @@ bool DevScene::OnPlaceActors()
 		cubeTransform.SetScale(glm::vec3(0.75f));
 
 		// 3. [물리] 콜라이더
-		auto collider = BoxCollider::Create();
+		auto collider = BoxCollider::Create(glm::vec3(0.75f));
 		cubeObj->AddComponent(std::move(collider));
 
 		// 4. [물리] 리지드바디 추가 (DYNAMIC)
@@ -375,55 +375,55 @@ bool DevScene::OnPlaceActors()
 		AddGameObject(std::move(cubeObj));
 	}
 
-	// 7. 랜덤 큐브 20개 드랍!
-	{
-		// 랜덤 엔진 초기화
-		std::random_device rd;
-		std::mt19937 gen(rd());
+	//// 7. 랜덤 큐브 20개 드랍!
+	//{
+	//	// 랜덤 엔진 초기화
+	//	std::random_device rd;
+	//	std::mt19937 gen(rd());
 
-		// 랜덤 범위 설정
-		std::uniform_real_distribution<float> distPosX(-25.0f, 25.0f); // X축 범위 (폭 50)
-		std::uniform_real_distribution<float> distPosZ(-25.0f, 25.0f); // Z축 범위 (폭 50)
-		std::uniform_real_distribution<float> distPosY(10.0f, 30.0f);  // Y축 높이 (10 ~ 30m 상공)
-		std::uniform_real_distribution<float> distRot(0.0f, 360.0f);   // 회전 각도 (0 ~ 360도)
+	//	// 랜덤 범위 설정
+	//	std::uniform_real_distribution<float> distPosX(-25.0f, 25.0f); // X축 범위 (폭 50)
+	//	std::uniform_real_distribution<float> distPosZ(-25.0f, 25.0f); // Z축 범위 (폭 50)
+	//	std::uniform_real_distribution<float> distPosY(10.0f, 30.0f);  // Y축 높이 (10 ~ 30m 상공)
+	//	std::uniform_real_distribution<float> distRot(0.0f, 360.0f);   // 회전 각도 (0 ~ 360도)
 
-		for (int i = 0; i < 20; i++)
-		{
-			auto cubeObj = GameObject::Create();
-			cubeObj->SetName("FallingBox_" + std::to_string(i)); // 이름 구분: FallingBox_0, FallingBox_1...
+	//	for (int i = 0; i < 20; i++)
+	//	{
+	//		auto cubeObj = GameObject::Create();
+	//		cubeObj->SetName("FallingBox_" + std::to_string(i)); // 이름 구분: FallingBox_0, FallingBox_1...
 
-			auto& cubeTransform = cubeObj->GetTransform();
+	//		auto& cubeTransform = cubeObj->GetTransform();
 
-			// 1. 위치 및 회전 랜덤 설정
-			cubeTransform.SetPosition(glm::vec3(distPosX(gen), distPosY(gen), distPosZ(gen)));
-			cubeTransform.SetRotation(glm::vec3(distRot(gen), distRot(gen), distRot(gen)));
-			cubeTransform.SetScale(glm::vec3(0.75f));
+	//		// 1. 위치 및 회전 랜덤 설정
+	//		cubeTransform.SetPosition(glm::vec3(distPosX(gen), distPosY(gen), distPosZ(gen)));
+	//		cubeTransform.SetRotation(glm::vec3(distRot(gen), distRot(gen), distRot(gen)));
+	//		cubeTransform.SetScale(glm::vec3(0.75f));
 
-			// 2. [물리] 콜라이더
-			auto collider = BoxCollider::Create();
-			cubeObj->AddComponent(std::move(collider));
+	//		// 2. [물리] 콜라이더
+	//		auto collider = BoxCollider::Create(glm::vec3(0.75f));
+	//		cubeObj->AddComponent(std::move(collider));
 
-			// 3. [물리] 리지드바디 (Dynamic)
-			auto rb = Rigidbody::Create();
-			rb->SetMotionType(JPH::EMotionType::Dynamic);
-			rb->SetUseGravity(true);
-			rb->SetMass(10.0f);
-			rb->SetRestitution(0.5f); // 0.5 정도 주면 바닥에 닿을 때 통통 튀어서 더 재밌습니다.
-			rb->SetFriction(0.6f);    // 마찰력도 적당히
-			cubeObj->AddComponent(std::move(rb));
+	//		// 3. [물리] 리지드바디 (Dynamic)
+	//		auto rb = Rigidbody::Create();
+	//		rb->SetMotionType(JPH::EMotionType::Dynamic);
+	//		rb->SetUseGravity(true);
+	//		rb->SetMass(10.0f);
+	//		rb->SetRestitution(0.5f); // 0.5 정도 주면 바닥에 닿을 때 통통 튀어서 더 재밌습니다.
+	//		rb->SetFriction(0.6f);    // 마찰력도 적당히
+	//		cubeObj->AddComponent(std::move(rb));
 
-			// 4. 렌더러
-			auto meshRenderer = StaticMeshRenderer::Create
-			(
-				RESOURCE.GetResource<StaticMesh>("Cube"),
-				RESOURCE.GetResource<Material>("material_SRP")
-			);
-			cubeObj->AddComponent(std::move(meshRenderer));
+	//		// 4. 렌더러
+	//		auto meshRenderer = StaticMeshRenderer::Create
+	//		(
+	//			RESOURCE.GetResource<StaticMesh>("Cube"),
+	//			RESOURCE.GetResource<Material>("material_SRP")
+	//		);
+	//		cubeObj->AddComponent(std::move(meshRenderer));
 
-			// 씬에 등록
-			AddGameObject(std::move(cubeObj));
-		}
-	}
+	//		// 씬에 등록
+	//		AddGameObject(std::move(cubeObj));
+	//	}
+	//}
 
 	// 7. 임시 환경맵 큐브
 	{
@@ -462,15 +462,28 @@ bool DevScene::OnPlaceActors()
 		// 3. Animator 컴포넌트 미리 생성
 		// (Instantiate 내부에서 SkinnedMeshRenderer들이 바인딩할 때 필요하므로 포인터 따기)
 		auto animator = Animator::Create(model, std::move(animCtrl));
-		Animator* animatorPtr = animator.get();
+
+		// 4. 콜라이더
+		auto boxCollider = BoxCollider::Create(glm::vec3(0.75f, 4.5f, 0.75f));
+		boxCollider->SetCenter(glm::vec3(0.0f, 2.25f, 0.0f));
+
+		// 5. 리지드 바디
+		auto rigidBody = Rigidbody::Create();
+		rigidBody->SetMotionType(JPH::EMotionType::Dynamic);
+		rigidBody->SetUseGravity(true);
+		rigidBody->SetMass(76.0f);
+		rigidBody->SetRotationLock(true);
+		rigidBody->SetFriction(0.5f);
+
+		// 6. PlayerController
+		auto playerctrl = PlayerController::Create();
 
 		// 4. Instantiate (이제 한 줄로 끝!)
 		// 내부에서 노드 계층 구조 생성 + 자식들 Scene 등록 + 렌더러 부착까지 다 해줍니다.
-		GameObjectUPtr rootUPtr = model->Instantiate(this, animatorPtr);
+		GameObjectUPtr rootUPtr = model->Instantiate(this, animator.get());
+		GameObject* rootGO = rootUPtr.get();
 		if (rootUPtr)
 		{
-			GameObject* rootGO = rootUPtr.get();
-
 			// 5. Root 설정 (이름, Transform)
 			rootGO->SetName("Soldier");
 			rootGO->GetTransform().SetPosition(glm::vec3(2.0f, 0.0f, -2.0f));
@@ -478,13 +491,13 @@ bool DevScene::OnPlaceActors()
 			rootGO->GetTransform().SetRotation(glm::vec3(0.0f, 45.0f, 0.0f));
 
 			// 6. 핵심 컴포넌트 부착
-			// (GameObject::AddComponent 수정 덕분에 Scene에 자동 등록됨)
 			rootGO->AddComponent(std::move(animator));
-			rootGO->AddComponent(PlayerController::Create());
-
-			// 7. 마지막으로 Root를 씬에 입주 신고
-			AddGameObject(std::move(rootUPtr));
+			rootGO->AddComponent(std::move(playerctrl));
+			rootGO->AddComponent(std::move(boxCollider));
+			rootGO->AddComponent(std::move(rigidBody));
 		}
+
+		AddGameObject(std::move(rootUPtr));
 	}
 
 	// 가방 (Backpack - Static Mesh)
@@ -509,8 +522,32 @@ bool DevScene::OnPlaceActors()
 		}
 	}
 
+	// 8. 벽
+	{
+		auto cubeObj = GameObject::Create();
+		cubeObj->SetName("StaticWallBox");
+		auto& cubeTransform = cubeObj->GetTransform();
+		cubeTransform.SetPosition(glm::vec3(20.0f, 0.0f, 20.0f));
+		cubeTransform.SetRotation(glm::vec3(0.0f, 45.0f, 0.0f));
+		cubeTransform.SetScale(glm::vec3(10.0f, 20.0f, 2.5f));
+
+		auto collider = BoxCollider::Create(glm::vec3(10.0f, 20.0f, 2.5f));
+		cubeObj->AddComponent(std::move(collider));
+
+		auto rb = Rigidbody::Create();
+		rb->SetMotionType(JPH::EMotionType::Static); // 절대 움직이지 않음 (질량 무한대 취급)
+		rb->SetRestitution(0.5f);					 // 약간 튕기게 설정 (선택)
+		rb->SetFriction(0.5f);
+		cubeObj->AddComponent(std::move(rb));
+
+		auto meshRenderer = StaticMeshRenderer::Create
+		(RESOURCE.GetResource<StaticMesh>("Cube"), RESOURCE.GetResource<Material>("boxMat4"));
+		cubeObj->AddComponent(std::move(meshRenderer));
+		AddGameObject(std::move(cubeObj));
+	}
+
 	// 잔디밭
-	PlantTenThousandGrass(grassPass);
+	// PlantTenThousandGrass(grassPass);
 
 	return true;
 }

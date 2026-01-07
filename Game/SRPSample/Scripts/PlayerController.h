@@ -4,6 +4,7 @@
 #pragma region FORWARD_DECLARATION
 CLASS_PTR(Animator)
 CLASS_PTR(AnimController)
+CLASS_PTR(Rigidbody)
 #pragma endregion
 
 CLASS_PTR(PlayerController)
@@ -16,6 +17,7 @@ public:
 public:
     virtual void Start()  override;
     virtual void Update() override;
+    virtual void FixedUpdate() override;
 
 private:
     void HandleMovement(float dt);
@@ -27,6 +29,10 @@ private:
 
     bool m_isMoving = false;
     float m_moveSpeed = 2.0f;
+    glm::vec3 m_moveDir = glm::vec3(1.0f);
+
+    Rigidbody* m_rigidbody;
+
     Animator* m_animator;
     AnimController* m_animController;
 };
