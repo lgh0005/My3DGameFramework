@@ -1,6 +1,7 @@
 ﻿#include "EnginePch.h"
 #include "Physics/PhysicsContactListener.h"
 #include "Scene/GameObject.h"
+#include "Components/Collider.h"
 #include <Jolt/Physics/Body/Body.h>
 #include <Jolt/Physics/Body/BodyLock.h>
 #include <Jolt/Physics/PhysicsSystem.h>
@@ -64,13 +65,46 @@ void PhysicsContactListener::DispatchEvents()
 		GameObject* obj2 = reinterpret_cast<GameObject*>(evt.body2UserData);
 		if (!obj1 || !obj2) continue;
 
-		// TODO : 이쪽은 GameObject가 아니라 이제 Script 단에서 구현할
-		// 충돌과 관련된 메서드들을 여기서 이제 처리할 예정
-		/*switch (evt.type)
+		// 3. Trigger(Sensor) 여부 판별
+		Collider* col1 = obj1->GetComponent<Collider>();
+		Collider* col2 = obj2->GetComponent<Collider>();
+
+		bool isTrigger = false;
+		if (col1 && col1->IsTrigger()) isTrigger = true;
+		if (col2 && col2->IsTrigger()) isTrigger = true;
+
+		// 4. 로그 출력 (동작 확인용)
+		if (isTrigger)
 		{
-		case CollisionType::Enter: LOG_INFO("This event is Enter {}", (int)evt.type); break;
-		case CollisionType::Stay: LOG_INFO("This event is Stay {}", (int)evt.type); break;
-		case CollisionType::Exit: LOG_INFO("This event is Exit {}", (int)evt.type); break;
-		}*/
+			switch (evt.type)
+			{
+			case CollisionType::Enter:
+				LOG_INFO("[TRIGGER ENTER] {} <-> {}", obj1->GetName(), obj2->GetName());
+				break;
+			case CollisionType::Stay:
+				// Stay는 로그가 너무 많이 남을 수 있으니 필요하면 주석 해제
+				// LOG_INFO("[TRIGGER STAY] {} <-> {}", obj1->GetName(), obj2->GetName()); 
+				break;
+			case CollisionType::Exit:
+				LOG_INFO("[TRIGGER EXIT] {} <-> {}", obj1->GetName(), obj2->GetName());
+				break;
+			}
+		}
+		else
+		{
+			switch (evt.type)
+			{
+			case CollisionType::Enter:
+				LOG_INFO("[COLLISION ENTER] {} <-> {}", obj1->GetName(), obj2->GetName());
+				break;
+			case CollisionType::Stay:
+				// LOG_INFO("[COLLISION STAY] {} <-> {}", obj1->GetName(), obj2->GetName()); 
+				break;
+			case CollisionType::Exit:
+				LOG_INFO("[COLLISION EXIT] {} <-> {}", obj1->GetName(), obj2->GetName());
+				break;
+			}
+		}
+
 	}
 }

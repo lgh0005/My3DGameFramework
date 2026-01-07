@@ -36,7 +36,7 @@ bool Rigidbody::CreateBody()
 	}
 
 	// 2. Collider에게 Jolt Shape 생성 요청
-	ShapeRefC shape = collider->CreateShape();
+	ShapeRefC shape = collider->GetShape();
 	if (shape == nullptr)
 	{
 		LOG_ERROR("Failed to create shape from Collider.");

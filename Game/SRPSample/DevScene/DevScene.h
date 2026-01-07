@@ -26,4 +26,5 @@ protected:
 private:
 	void PlantTenThousandGrass(InstancedRenderPass* pass);
 	void ManyCubesForStressTest();
+	void FallRandomCubes();
 };

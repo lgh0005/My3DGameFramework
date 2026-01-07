@@ -128,6 +128,9 @@ void SceneRegistry::UnregisterComponent(Component* component)
 		case ComponentType::Camera:
 			RemoveFromVector(m_cameras, component); break;
 		case ComponentType::Light:
+		case ComponentType::DirectionalLight:
+		case ComponentType::PointLight:
+		case ComponentType::SpotLight:
 			RemoveFromVector(m_lights, component); break;
 		case ComponentType::Animator:
 			RemoveFromVector(m_animators, component); break;
@@ -148,6 +151,8 @@ void SceneRegistry::UnregisterComponent(Component* component)
 		case ComponentType::UICanvas:
 			RemoveFromVector(m_uiCanvases, component); break;
 		case ComponentType::Collider:
+		case ComponentType::BoxCollider:
+		case ComponentType::SphereCollider:
 			RemoveFromVector(m_colliders, component); break;
 		case ComponentType::Rigidbody:
 			RemoveFromVector(m_rigidBodies, component); break;

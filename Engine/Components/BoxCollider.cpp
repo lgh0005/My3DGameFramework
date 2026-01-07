@@ -18,8 +18,8 @@ bool BoxCollider::Init(const glm::vec3& size, const glm::vec3& center)
 {
 	m_size = size;
 	m_center = center;
-	auto shape = CreateShape();
-	if (!shape) return false;
+	m_shape = CreateShape();
+	if (!m_shape) return false;
 	return true;
 }
 
@@ -57,4 +57,11 @@ JPH::ShapeRefC BoxCollider::CreateShape()
 	}
 
 	return finalShape;
+}
+
+void BoxCollider::SetCenter(const glm::vec3& center)
+{
+	if (m_center == center) return;
+	m_center = center;
+	m_shape = CreateShape();
 }

@@ -66,6 +66,10 @@ void DebugMesh::UpdateGeometry(const std::vector<GizmoVertex>& vertices)
 			sizeof(GizmoVertex),
 			count
 		);
+
+		m_vertexLayout->SetAttrib(0, 3, GL_FLOAT, false, sizeof(GizmoVertex), offsetof(GizmoVertex, position));
+		m_vertexLayout->SetAttrib(1, 4, GL_FLOAT, false, sizeof(GizmoVertex), offsetof(GizmoVertex, color));
+
 		m_vertexBuffer->SetData(vertices.data(), dataSize);
 	}
 	else

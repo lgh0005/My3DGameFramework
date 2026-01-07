@@ -16,7 +16,7 @@ public:
 	virtual JPH::ShapeRefC CreateShape() override;
 
 	void SetSize(const glm::vec3& size) { m_size = size; }
-	void SetCenter(const glm::vec3& center) { m_center = center; }
+	void SetCenter(const glm::vec3& center);
 
 private:
 	BoxCollider();

@@ -36,6 +36,7 @@
 #include "Components/MeshOutline.h"
 #include "Components/Rigidbody.h"
 #include "Components/BoxCollider.h"
+#include "Components/SphereCollider.h"
 
 #include "SRPSample/RenderPasses/InstancedRenderPass.h"
 #include "SRPSample/RenderPasses/SimpleRenderPass.h"
@@ -348,7 +349,7 @@ bool DevScene::OnPlaceActors()
 		AddGameObject(std::move(cubeObj));
 	}
 
-	// 6. 큐브 생성 #3
+	// 6. 떨어지는 큐브
 	{
 		auto cubeObj = GameObject::Create();
 		cubeObj->SetName("FallingBox");
@@ -357,13 +358,13 @@ bool DevScene::OnPlaceActors()
 		cubeTransform.SetRotation(glm::vec3(30.0f, 60.0f, 75.0f));
 		cubeTransform.SetScale(glm::vec3(0.75f));
 
-		// 3. [물리] 콜라이더
+		// 3. 콜라이더
 		auto collider = BoxCollider::Create(glm::vec3(0.75f));
 		cubeObj->AddComponent(std::move(collider));
 
-		// 4. [물리] 리지드바디 추가 (DYNAMIC)
+		// 4. 리지드바디 추가 (DYNAMIC)
 		auto rb = Rigidbody::Create();
-		rb->SetMotionType(JPH::EMotionType::Dynamic); // <--- 움직이는 물체
+		rb->SetMotionType(JPH::EMotionType::Dynamic);
 		rb->SetUseGravity(true); // 중력 켜기
 		rb->SetMass(10.0f);      // 질량 10kg
 		rb->SetRestitution(0.3f); // 튕김 계수
@@ -375,55 +376,32 @@ bool DevScene::OnPlaceActors()
 		AddGameObject(std::move(cubeObj));
 	}
 
-	//// 7. 랜덤 큐브 20개 드랍!
-	//{
-	//	// 랜덤 엔진 초기화
-	//	std::random_device rd;
-	//	std::mt19937 gen(rd());
+	// 7. 떨어지는 구체
+	{
+		auto sphereObj = GameObject::Create();
+		sphereObj->SetName("FallingBall");
+		auto& sphereTransform = sphereObj->GetTransform();
+		sphereTransform.SetPosition(glm::vec3(3.0f, 3.0f, 3.0f));
+		sphereTransform.SetRotation(glm::vec3(30.0f, 60.0f, 75.0f));
+		sphereTransform.SetScale(glm::vec3(0.75f));
 
-	//	// 랜덤 범위 설정
-	//	std::uniform_real_distribution<float> distPosX(-25.0f, 25.0f); // X축 범위 (폭 50)
-	//	std::uniform_real_distribution<float> distPosZ(-25.0f, 25.0f); // Z축 범위 (폭 50)
-	//	std::uniform_real_distribution<float> distPosY(10.0f, 30.0f);  // Y축 높이 (10 ~ 30m 상공)
-	//	std::uniform_real_distribution<float> distRot(0.0f, 360.0f);   // 회전 각도 (0 ~ 360도)
+		// 3. 콜라이더
+		auto collider = SphereCollider::Create(0.75f);
+		sphereObj->AddComponent(std::move(collider));
 
-	//	for (int i = 0; i < 20; i++)
-	//	{
-	//		auto cubeObj = GameObject::Create();
-	//		cubeObj->SetName("FallingBox_" + std::to_string(i)); // 이름 구분: FallingBox_0, FallingBox_1...
+		// 4. 리지드바디 추가 (DYNAMIC)
+		auto rb = Rigidbody::Create();
+		rb->SetMotionType(JPH::EMotionType::Dynamic);
+		rb->SetUseGravity(true); // 중력 켜기
+		rb->SetMass(10.0f);      // 질량 10kg
+		rb->SetRestitution(0.3f); // 튕김 계수
+		sphereObj->AddComponent(std::move(rb));
 
-	//		auto& cubeTransform = cubeObj->GetTransform();
-
-	//		// 1. 위치 및 회전 랜덤 설정
-	//		cubeTransform.SetPosition(glm::vec3(distPosX(gen), distPosY(gen), distPosZ(gen)));
-	//		cubeTransform.SetRotation(glm::vec3(distRot(gen), distRot(gen), distRot(gen)));
-	//		cubeTransform.SetScale(glm::vec3(0.75f));
-
-	//		// 2. [물리] 콜라이더
-	//		auto collider = BoxCollider::Create(glm::vec3(0.75f));
-	//		cubeObj->AddComponent(std::move(collider));
-
-	//		// 3. [물리] 리지드바디 (Dynamic)
-	//		auto rb = Rigidbody::Create();
-	//		rb->SetMotionType(JPH::EMotionType::Dynamic);
-	//		rb->SetUseGravity(true);
-	//		rb->SetMass(10.0f);
-	//		rb->SetRestitution(0.5f); // 0.5 정도 주면 바닥에 닿을 때 통통 튀어서 더 재밌습니다.
-	//		rb->SetFriction(0.6f);    // 마찰력도 적당히
-	//		cubeObj->AddComponent(std::move(rb));
-
-	//		// 4. 렌더러
-	//		auto meshRenderer = StaticMeshRenderer::Create
-	//		(
-	//			RESOURCE.GetResource<StaticMesh>("Cube"),
-	//			RESOURCE.GetResource<Material>("material_SRP")
-	//		);
-	//		cubeObj->AddComponent(std::move(meshRenderer));
-
-	//		// 씬에 등록
-	//		AddGameObject(std::move(cubeObj));
-	//	}
-	//}
+		auto meshRenderer = StaticMeshRenderer::Create
+		(RESOURCE.GetResource<StaticMesh>("Sphere"), RESOURCE.GetResource<Material>("material_SRP"));
+		sphereObj->AddComponent(std::move(meshRenderer));
+		AddGameObject(std::move(sphereObj));
+	}
 
 	// 7. 임시 환경맵 큐브
 	{
@@ -465,6 +443,7 @@ bool DevScene::OnPlaceActors()
 
 		// 4. 콜라이더
 		auto boxCollider = BoxCollider::Create(glm::vec3(0.75f, 4.5f, 0.75f));
+		boxCollider->SetTrigger(false); // INFO : true 시 Trigger 역할을 하게 된다.
 		boxCollider->SetCenter(glm::vec3(0.0f, 2.25f, 0.0f));
 
 		// 5. 리지드 바디
@@ -654,6 +633,59 @@ void DevScene::ManyCubesForStressTest()
 			cubeObj->AddComponent(std::move(meshRenderer));
 
 			// 3. 씬에 등록
+			AddGameObject(std::move(cubeObj));
+		}
+	}
+}
+
+void DevScene::FallRandomCubes()
+{
+	// 7. 랜덤 큐브 20개 드랍!
+	{
+		// 랜덤 엔진 초기화
+		std::random_device rd;
+		std::mt19937 gen(rd());
+
+		// 랜덤 범위 설정
+		std::uniform_real_distribution<float> distPosX(-25.0f, 25.0f); // X축 범위 (폭 50)
+		std::uniform_real_distribution<float> distPosZ(-25.0f, 25.0f); // Z축 범위 (폭 50)
+		std::uniform_real_distribution<float> distPosY(10.0f, 30.0f);  // Y축 높이 (10 ~ 30m 상공)
+		std::uniform_real_distribution<float> distRot(0.0f, 360.0f);   // 회전 각도 (0 ~ 360도)
+
+		for (int i = 0; i < 20; i++)
+		{
+			auto cubeObj = GameObject::Create();
+			cubeObj->SetName("FallingBox_" + std::to_string(i)); // 이름 구분: FallingBox_0, FallingBox_1...
+
+			auto& cubeTransform = cubeObj->GetTransform();
+
+			// 1. 위치 및 회전 랜덤 설정
+			cubeTransform.SetPosition(glm::vec3(distPosX(gen), distPosY(gen), distPosZ(gen)));
+			cubeTransform.SetRotation(glm::vec3(distRot(gen), distRot(gen), distRot(gen)));
+			cubeTransform.SetScale(glm::vec3(0.75f));
+
+			// 2. [물리] 콜라이더
+			auto collider = BoxCollider::Create(glm::vec3(0.75f));
+			cubeObj->AddComponent(std::move(collider));
+
+			// 3. [물리] 리지드바디 (Dynamic)
+			auto rb = Rigidbody::Create();
+			rb->SetMotionType(JPH::EMotionType::Dynamic);
+			rb->SetUseGravity(true);
+			rb->SetMass(10.0f);
+			rb->SetRestitution(0.5f); // 0.5 정도 주면 바닥에 닿을 때 통통 튀어서 더 재밌습니다.
+			rb->SetFriction(0.6f);    // 마찰력도 적당히
+			cubeObj->AddComponent(std::move(rb));
+
+			// 4. 렌더러
+			auto meshRenderer = StaticMeshRenderer::Create
+			(
+				RESOURCE.GetResource<StaticMesh>("Cube"),
+				RESOURCE.GetResource<Material>("material_SRP")
+			);
+			cubeObj->AddComponent(std::move(meshRenderer));
+
+			// 씬에 등록
 			AddGameObject(std::move(cubeObj));
 		}
 	}

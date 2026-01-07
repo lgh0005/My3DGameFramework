@@ -13,11 +13,13 @@ public:
 	virtual bool MatchesType(ComponentType type) const override;
 	virtual JPH::ShapeRefC CreateShape() = 0;
 
+	JPH::ShapeRefC GetShape() const { return m_shape; }
 	void SetTrigger(bool isTrigger) { m_isTrigger = isTrigger; }
 	bool IsTrigger() const { return m_isTrigger; }
 
 protected:
 	Collider();
 
-	bool m_isTrigger = false;
+	bool m_isTrigger		{ false };
+	JPH::ShapeRefC m_shape	{ nullptr };
 };
