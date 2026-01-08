@@ -1,6 +1,7 @@
 ﻿#include "EnginePch.h"
 #include "SphereCollider.h"
 #include <Jolt/Physics/Collision/Shape/SphereShape.h>
+#include "CapsuleCollider.h"
 
 DECLARE_DEFAULTS_IMPL(SphereCollider)
 
@@ -19,23 +20,10 @@ bool SphereCollider::Init(float radius)
 	return true;
 }
 
-JPH::ShapeRefC SphereCollider::CreateShape()
+JPH::ShapeRefC SphereCollider::CreateRawShape()
 {
-	// 1. SphereShapeSettings 생성 (인자로 반지름 전달)
-	JPH::SphereShapeSettings settings(m_radius * 0.5f);
-
-	// 2. Shape 생성 시도 (결과는 Result로 나옴)
-	JPH::ShapeSettings::ShapeResult result = settings.Create();
-
-	// 3. 에러 체크 및 반환
-	if (result.HasError())
-	{
-		LOG_ERROR("Failed to create Sphere Shape: {}", result.GetError().c_str());
-		return nullptr;
-	}
-
-	// 4. 성공 시 ShapeRefC 반환
-	return result.Get();
+	float safeRadius = glm::max<float>(m_radius * 0.5f, 0.001f);
+	return new JPH::SphereShape(safeRadius);
 }
 
 void SphereCollider::SetRadius(float radius)
@@ -44,3 +32,4 @@ void SphereCollider::SetRadius(float radius)
 	m_radius = radius;
 	m_shape = CreateShape();
 }
+

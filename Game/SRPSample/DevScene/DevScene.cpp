@@ -37,6 +37,7 @@
 #include "Components/Rigidbody.h"
 #include "Components/BoxCollider.h"
 #include "Components/SphereCollider.h"
+#include "Components/CapsuleCollider.h"
 
 #include "SRPSample/RenderPasses/InstancedRenderPass.h"
 #include "SRPSample/RenderPasses/SimpleRenderPass.h"
@@ -442,9 +443,10 @@ bool DevScene::OnPlaceActors()
 		auto animator = Animator::Create(model, std::move(animCtrl));
 
 		// 4. 콜라이더
-		auto boxCollider = BoxCollider::Create(glm::vec3(0.75f, 4.5f, 0.75f));
+		// 0.75f, 4.5f, 0.75f
+		auto boxCollider = CapsuleCollider::Create(0.35f, 4.5f);
 		boxCollider->SetTrigger(false); // INFO : true 시 Trigger 역할을 하게 된다.
-		boxCollider->SetCenter(glm::vec3(0.0f, 2.25f, 0.0f));
+		boxCollider->SetOffset(glm::vec3(0.0f, 2.25f, 0.0f));
 
 		// 5. 리지드 바디
 		auto rigidBody = Rigidbody::Create();

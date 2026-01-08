@@ -5,6 +5,5 @@ DECLARE_DEFAULTS_IMPL(Light)
 
 bool Light::MatchesType(ComponentType type) const
 {
-	if (type == ComponentType::Light) return true;
-	return Super::MatchesType(type);
+	return type == ComponentType::Light || Super::MatchesType(type);
 }

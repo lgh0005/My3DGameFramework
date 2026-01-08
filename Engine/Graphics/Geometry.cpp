@@ -19,10 +19,14 @@ CullingPlane CullingPlane::Create(const glm::vec4& eq)
 
 void CullingPlane::Normalize()
 {
-    float length = glm::length(m_normal);
-    if (length < glm::epsilon<float>()) return;
+    // 1. 유효성 체크
+    if (!Utils::HasLength(m_normal)) return;
 
-    float invLength = 1.0f / length;
+    // 2. 정규화 계수 계산
+    float len2 = glm::length2(m_normal);
+    float invLength = glm::inversesqrt(len2);
+
+    // 3. 평면 방정식(Ax + By + Cz + D = 0) 전체에 역수 곱하기
     m_normal *= invLength;
     m_distance *= invLength;
 }

@@ -106,9 +106,9 @@ float Utils::Lerp(float a, float b, float f)
 	return a + f * (b - a);
 }
 
-/*==================================//
-//   AABB 좌표를 얻어오는 유틸 함수   //
-//==================================*/
+/*=======================================//
+//   최적화된 수치 연산 및 비교 유틸 함수   //
+//=======================================*/
 glm::vec3 Utils::Min(const glm::vec3& a, const glm::vec3& b)
 {
 	// 각 성분별로 최솟값을 취하여 새로운 vec3를 생성
@@ -129,5 +129,17 @@ glm::vec3 Utils::Max(const glm::vec3& a, const glm::vec3& b)
 		std::max<float>(a.y, b.y),
 		std::max<float>(a.z, b.z)
 	);
+}
+
+bool Utils::HasLength(const glm::vec3& v)
+{
+	return glm::length2(v) > epsilon2;
+}
+
+glm::vec3 Utils::SafeNormalize(const glm::vec3& v)
+{
+	float len2 = glm::length2(v);
+	if (len2 < epsilon2) return glm::vec3(0.0f);
+	return v * glm::inversesqrt(len2);
 }
 

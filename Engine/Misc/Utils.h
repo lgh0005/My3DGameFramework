@@ -37,10 +37,11 @@ public:
 	// SSAO 연산을 위한 Lerp 함수
 	static float Lerp(float a, float b, float f);
 
-	// AABB 좌표를 얻어오는 유틸 함수
+	// 최적화된 수치 연산 및 비교 유틸 함수
 	static glm::vec3 Min(const glm::vec3& a, const glm::vec3& b);
 	static glm::vec3 Max(const glm::vec3& a, const glm::vec3& b);
-
+	static bool HasLength(const glm::vec3& v);
+	static glm::vec3 SafeNormalize(const glm::vec3& v);
 
 /*==================================//
 //   Common Constants (공용 상수)    //

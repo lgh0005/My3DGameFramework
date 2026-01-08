@@ -7,61 +7,31 @@
 
 DECLARE_DEFAULTS_IMPL(BoxCollider)
 
-BoxColliderUPtr BoxCollider::Create(const glm::vec3& size, const glm::vec3& center)
+BoxColliderUPtr BoxCollider::Create(const glm::vec3& size)
 {
 	auto collider = BoxColliderUPtr(new BoxCollider());
-	if (!collider->Init(size, center)) return nullptr;
+	if (!collider->Init(size)) return nullptr;
 	return std::move(collider);
 }
 
-bool BoxCollider::Init(const glm::vec3& size, const glm::vec3& center)
+bool BoxCollider::Init(const glm::vec3& size)
 {
 	m_size = size;
-	m_center = center;
 	m_shape = CreateShape();
 	if (!m_shape) return false;
 	return true;
 }
 
-JPH::ShapeRefC BoxCollider::CreateShape()
-{	
-	// 1. BoxShapeSettings 생성 (Half Extent 주의)
-	JPH::BoxShapeSettings settings(Utils::ToJoltVec3(m_size * 0.5f));
-
-	// 2. Shape 생성 시도 (결과는 Result로 나옴)
-	JPH::ShapeSettings::ShapeResult result = settings.Create();
-	if (result.HasError())
-	{
-		LOG_ERROR("Failed to create Box Shape: {}", result.GetError().c_str());
-		return nullptr;
-	}
-
-	JPH::ShapeRefC finalShape = result.Get();
-	if (m_center != glm::vec3(0.0f))
-	{
-		JPH::RotatedTranslatedShapeSettings offsetSettings
-		(
-			Utils::ToJoltVec3(m_center),    // 이동할 위치 (Offset)
-			JPH::Quat::sIdentity(),         // 회전은 그대로
-			finalShape                      // 알맹이 (박스)
-		);
-
-		JPH::ShapeSettings::ShapeResult offsetResult = offsetSettings.Create();
-		if (offsetResult.HasError())
-		{
-			LOG_ERROR("Failed to create Offset Shape: {}", offsetResult.GetError().c_str());
-			return nullptr;
-		}
-
-		finalShape = offsetResult.Get();
-	}
-
-	return finalShape;
-}
-
-void BoxCollider::SetCenter(const glm::vec3& center)
+JPH::ShapeRefC BoxCollider::CreateRawShape()
 {
-	if (m_center == center) return;
-	m_center = center;
-	m_shape = CreateShape();
+	// 1. Half Extents 계산
+	glm::vec3 halfExtent = m_size * 0.5f;
+
+	// 2. 최소 크기 보정 (Utils 사용)
+	// 길이 비교가 아니라, X, Y, Z 각각 최소 0.001f는 되도록 강제함
+	halfExtent = Utils::Max(halfExtent, glm::vec3(0.001f));
+
+	// 3. Jolt BoxShape 생성
+	return new JPH::BoxShape(JPH::Vec3(halfExtent.x, halfExtent.y, halfExtent.z));
 }
+

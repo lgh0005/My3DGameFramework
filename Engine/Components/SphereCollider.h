@@ -9,7 +9,6 @@ public:
 	static SphereColliderUPtr Create(float radius = 1.0f);
 	static const ComponentType s_ComponentType = ComponentType::SphereCollider;
 	virtual ComponentType GetComponentType() const override { return ComponentType::SphereCollider; }
-	virtual JPH::ShapeRefC CreateShape() override;
 	
 	void SetRadius(float radius);
 	float GetRadius() const { return m_radius; }
@@ -17,5 +16,7 @@ public:
 private:
 	SphereCollider();
 	bool Init(float radius);
+	virtual JPH::ShapeRefC CreateRawShape() override;
+
 	float m_radius	{ 1.0f };
 };

@@ -34,6 +34,7 @@ using json = nlohmann::json;
 #include <glm/gtx/euler_angles.hpp>
 #include <glm/gtx/matrix_decompose.hpp>
 #include <glm/gtc/matrix_inverse.hpp>
+#include <glm/gtc/constants.hpp>
 
 // Jolt
 #include <Jolt/Jolt.h>

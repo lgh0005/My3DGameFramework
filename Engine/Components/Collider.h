@@ -9,17 +9,22 @@ class Collider : public Component
 
 public:
 	virtual ~Collider();
-	static const ComponentType s_ComponentType = ComponentType::Collider;
 	virtual bool MatchesType(ComponentType type) const override;
-	virtual JPH::ShapeRefC CreateShape() = 0;
+	static const ComponentType s_ComponentType = ComponentType::Collider;
+	JPH::ShapeRefC CreateShape();
 
 	JPH::ShapeRefC GetShape() const { return m_shape; }
-	void SetTrigger(bool isTrigger) { m_isTrigger = isTrigger; }
 	bool IsTrigger() const { return m_isTrigger; }
+	const glm::vec3& GetOffset() const { return m_offset; }
+
+	void SetTrigger(bool isTrigger) { m_isTrigger = isTrigger; }
+	void SetOffset(const glm::vec3& offset);
 
 protected:
 	Collider();
+	virtual JPH::ShapeRefC CreateRawShape() = 0;
 
 	bool m_isTrigger		{ false };
+	glm::vec3 m_offset = glm::vec3(0.0f);
 	JPH::ShapeRefC m_shape	{ nullptr };
 };

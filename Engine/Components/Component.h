@@ -39,6 +39,7 @@ enum class ComponentType
 	Collider,
 	BoxCollider,
 	SphereCollider,
+	CapsuleCollider,
 
 	// Misc
 	Unknown

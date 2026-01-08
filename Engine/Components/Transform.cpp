@@ -27,23 +27,31 @@ void Transform::UpdateTransform() const
 
 	// 4. 월드 속성 캐싱 (Position, Rotation, Scale 분해)
 	m_worldPosition = glm::vec3(m_worldMatrix[3]);
+
+	// 위치
+	glm::vec3 axisX = glm::vec3(m_worldMatrix[0]);
+	glm::vec3 axisY = glm::vec3(m_worldMatrix[1]);
+	glm::vec3 axisZ = glm::vec3(m_worldMatrix[2]);
+
+	// 스케일
 	m_worldScale.x = glm::length(glm::vec3(m_worldMatrix[0]));
 	m_worldScale.y = glm::length(glm::vec3(m_worldMatrix[1]));
 	m_worldScale.z = glm::length(glm::vec3(m_worldMatrix[2]));
 
-	if (m_worldScale.x <= glm::epsilon<float>() ||
-		m_worldScale.y <= glm::epsilon<float>() ||
-		m_worldScale.z <= glm::epsilon<float>())
-	{
-		m_worldRotation = glm::quat(1.0f, 0.0f, 0.0f, 0.0f);
-	}
-	else
+	// 회전
+	if (Utils::HasLength(axisX) && 
+		Utils::HasLength(axisY) && 
+		Utils::HasLength(axisZ))
 	{
 		glm::mat3 rotationMat;
 		rotationMat[0] = glm::vec3(m_worldMatrix[0]) / m_worldScale.x;
 		rotationMat[1] = glm::vec3(m_worldMatrix[1]) / m_worldScale.y;
 		rotationMat[2] = glm::vec3(m_worldMatrix[2]) / m_worldScale.z;
 		m_worldRotation = glm::normalize(glm::quat_cast(rotationMat));
+	}
+	else
+	{
+		m_worldRotation = glm::quat(1.0f, 0.0f, 0.0f, 0.0f);
 	}
 
 	// 5. 갱신 완료 -> Dirty 해제
