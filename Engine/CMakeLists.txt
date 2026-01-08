@@ -8,6 +8,7 @@ find_package(KTX CONFIG REQUIRED)
 find_package(freetype REQUIRED)
 find_package(Jolt CONFIG REQUIRED)
 find_package(nlohmann_json CONFIG REQUIRED)
+find_package(recastnavigation CONFIG REQUIRED)
 
 add_library(Engine STATIC
 
@@ -136,7 +137,7 @@ add_library(Engine STATIC
    "Resources/AnimController.h"     "Resources/AnimController.cpp"
    "Resources/AnimState.h"          "Resources/AnimState.cpp"
    "Resources/Font.h"               "Resources/Font.cpp"
-    "Resources/EnvironmentMap.h"    "Resources/EnvironmentMap.cpp"
+   "Resources/EnvironmentMap.h"    "Resources/EnvironmentMap.cpp"
 
    # Components
    "Components/Component.h"         "Components/Component.cpp"
@@ -162,6 +163,11 @@ add_library(Engine STATIC
    "Components/SphereCollider.h"        "Components/SphereCollider.cpp"
    "Components/CapsuleCollider.h"       "Components/CapsuleCollider.cpp"
    "Components/Rigidbody.h"             "Components/Rigidbody.cpp"
+   "Components/Terrain.h"               "Components/Terrain.cpp"
+
+   # Navigation Mesh
+   "NavMesh/NavigationManager.h"        "NavMesh/NavigationManager.cpp"
+   "NavMesh/NavMeshFunctors.h"          "NavMesh/NavMeshFunctors.cpp"
 
    # UIs
    "UIs/UIRenderer.h"               "UIs/UIRenderer.cpp"
@@ -203,6 +209,11 @@ target_link_libraries(Engine PUBLIC
     freetype  
     Jolt::Jolt
     nlohmann_json::nlohmann_json
+    RecastNavigation::Recast
+    RecastNavigation::Detour
+    RecastNavigation::DetourCrowd
+    RecastNavigation::DebugUtils
+    RecastNavigation::DetourTileCache
 )
 
 # 5. [컴파일 정의] Engine 타겟에 C++ 매크로를 정의합니다.

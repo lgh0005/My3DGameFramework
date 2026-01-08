@@ -43,6 +43,7 @@ enum class ComponentType
 	CapsuleCollider,
 
 	// Misc
+	Terrain,
 	Unknown
 };
 

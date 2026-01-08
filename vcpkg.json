@@ -2,21 +2,22 @@
     "$schema": "https://raw.githubusercontent.com/microsoft/vcpkg/master/scripts/vcpkg.schema.json",
     "name": "my-3d-game-framework",
     "version": "0.1.0",
-    "dependencies": [
-      "glad",
-      "glfw3",
-      "glm",
-      "spdlog",
-      {
-        "name": "imgui",
-        "features": [ "glfw-binding", "opengl3-binding" ]
-      },
-      {
-        "name": "joltphysics",
-        "features": [ "debugrenderer", "profiler" ]
-      },
-      "assimp",
-      "freetype",
-      "nlohmann-json"
-    ]
+  "dependencies": [
+    "glad",
+    "glfw3",
+    "glm",
+    "spdlog",
+    {
+      "name": "imgui",
+      "features": [ "glfw-binding", "opengl3-binding" ]
+    },
+    {
+      "name": "joltphysics",
+      "features": [ "debugrenderer", "profiler" ]
+    },
+    "assimp",
+    "recastnavigation",
+    "freetype",
+    "nlohmann-json"
+  ]
 }
