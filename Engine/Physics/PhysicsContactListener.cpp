@@ -2,6 +2,7 @@
 #include "Physics/PhysicsContactListener.h"
 #include "Scene/GameObject.h"
 #include "Components/Collider.h"
+#include "Components/Script.h"
 #include <Jolt/Physics/Body/Body.h>
 #include <Jolt/Physics/Body/BodyLock.h>
 #include <Jolt/Physics/PhysicsSystem.h>
@@ -87,33 +88,64 @@ void PhysicsContactListener::DispatchEvents()
 
 void PhysicsContactListener::DispatchTriggerEvents(const CollisionEvent& evt, const GameObject* obj1, const GameObject* obj2)
 {
-	switch (evt.type)
+	Collider* col1 = obj1->GetComponent<Collider>();
+	Collider* col2 = obj2->GetComponent<Collider>();
+	if (!col1 || !col1->IsActive() || !col2 || !col2->IsActive()) return;
+
+	Script* script1 = obj1->GetComponent<Script>();
+	Script* script2 = obj2->GetComponent<Script>();
+	if (!script1 && !script2) return;
+
+	// obj1 상호작용
+	if (script1 && script1->IsActive())
 	{
-	case CollisionType::Enter:
-		LOG_INFO("[TRIGGER ENTER] {} <-> {}", obj1->GetName(), obj2->GetName());
-		break;
-	case CollisionType::Stay:
-		// Stay는 로그가 너무 많이 남을 수 있으니 필요하면 주석 해제
-		// LOG_INFO("[TRIGGER STAY] {} <-> {}", obj1->GetName(), obj2->GetName()); 
-		break;
-	case CollisionType::Exit:
-		LOG_INFO("[TRIGGER EXIT] {} <-> {}", obj1->GetName(), obj2->GetName());
-		break;
+		switch (evt.type)
+		{
+		case CollisionType::Enter: script1->OnTriggerEnter(col2); break;
+		case CollisionType::Stay:  script1->OnTriggerStay(col2);  break;
+		case CollisionType::Exit:  script1->OnTriggerExit(col2);  break;
+		}
+	}
+
+	// obj2 상호작용
+	if (script2 && script2->IsActive())
+	{
+		switch (evt.type)
+		{
+		case CollisionType::Enter: script2->OnTriggerEnter(col1); break;
+		case CollisionType::Stay:  script2->OnTriggerStay(col1);  break;
+		case CollisionType::Exit:  script2->OnTriggerExit(col1);  break;
+		}
 	}
 }
 
 void PhysicsContactListener::DispatchCollideEvents(const CollisionEvent& evt, const GameObject* obj1, const GameObject* obj2)
 {
-	switch (evt.type)
+	Collider* col1 = obj1->GetComponent<Collider>();
+	Collider* col2 = obj2->GetComponent<Collider>();
+	if (!col1 || !col1->IsActive() || !col2 || !col2->IsActive()) return;
+
+	Script* script1 = obj1->GetComponent<Script>();
+	Script* script2 = obj2->GetComponent<Script>();
+	if (!script1 && !script2) return;
+
+	if (script1 && script1->IsActive())
 	{
-	case CollisionType::Enter:
-		LOG_INFO("[COLLISION ENTER] {} <-> {}", obj1->GetName(), obj2->GetName());
-		break;
-	case CollisionType::Stay:
-		// LOG_INFO("[COLLISION STAY] {} <-> {}", obj1->GetName(), obj2->GetName()); 
-		break;
-	case CollisionType::Exit:
-		LOG_INFO("[COLLISION EXIT] {} <-> {}", obj1->GetName(), obj2->GetName());
-		break;
+		switch (evt.type)
+		{
+		case CollisionType::Enter: script1->OnCollisionEnter(col2); break;
+		case CollisionType::Stay:  script1->OnCollisionStay(col2);  break;
+		case CollisionType::Exit:  script1->OnCollisionExit(col2);  break;
+		}
+	}
+
+	if (script2 && script2->IsActive())
+	{
+		switch (evt.type)
+		{
+		case CollisionType::Enter: script2->OnCollisionEnter(col1); break;
+		case CollisionType::Stay:  script2->OnCollisionStay(col1);  break;
+		case CollisionType::Exit:  script2->OnCollisionExit(col1);  break;
+		}
 	}
 }

@@ -75,6 +75,9 @@ private:
 	bool			m_active					 { true };
 	bool            m_dontDestroyOnLoad			 { false };
 	GameObjectState m_state						 { GameObjectState::Uninitialized };
+	
+	// TODO : 개인적으로는 성능을 위해서라면 이것 또한
+	// Registry를 따로 만드는 편이 더 좋아보이긴 한다.
 	std::vector<ComponentUPtr> m_components;
 };
 

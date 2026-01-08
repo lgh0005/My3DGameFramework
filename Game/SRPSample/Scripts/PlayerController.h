@@ -5,6 +5,7 @@
 CLASS_PTR(Animator)
 CLASS_PTR(AnimController)
 CLASS_PTR(Rigidbody)
+CLASS_PTR(Collider)
 #pragma endregion
 
 CLASS_PTR(PlayerController)
@@ -18,6 +19,9 @@ public:
     virtual void Start()  override;
     virtual void Update() override;
     virtual void FixedUpdate() override;
+
+public:
+    virtual void OnCollisionEnter(Collider* other) override;
 
 private:
     void HandleMovement(float dt);

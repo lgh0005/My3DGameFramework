@@ -1,5 +1,6 @@
 ﻿#include "EnginePch.h"
 #include "Script.h"
+#include "Components/Collider.h"
 
 DECLARE_DEFAULTS_IMPL(Script)
 
@@ -12,10 +13,10 @@ void Script::OnDisable() {}
 /*=======================================//
 //  event methods for script : physics   //
 //=======================================*/
-void Script::OnTriggerEnter() {}
-void Script::OnTriggerStay() {}
-void Script::OnTriggerExit() {}
+void Script::OnTriggerEnter(Collider* other) {}
+void Script::OnTriggerStay(Collider* other) {}
+void Script::OnTriggerExit(Collider* other) {}
 
-void Script::OnCollisionEnter() {}
-void Script::OnCollisionStay() {}
-void Script::OnCollisionExit() {}
+void Script::OnCollisionEnter(Collider* other) {}
+void Script::OnCollisionStay(Collider* other) {}
+void Script::OnCollisionExit(Collider* other) {}

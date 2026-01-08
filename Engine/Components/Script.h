@@ -2,6 +2,10 @@
 #include "Component.h"
 #include "Scene/SceneUtils.h"
 
+#pragma region FORWARD_DECLARATION
+CLASS_PTR(Collider)
+#pragma endregion
+
 CLASS_PTR(Script)
 class Script : public Component
 {
@@ -21,13 +25,13 @@ public:
 //  event methods for script : physics   //
 //=======================================*/
 public:
-	virtual void OnTriggerEnter();
-	virtual void OnTriggerStay();
-	virtual void OnTriggerExit();
+	virtual void OnTriggerEnter(Collider* other);
+	virtual void OnTriggerStay(Collider* other);
+	virtual void OnTriggerExit(Collider* other);
 
-	virtual void OnCollisionEnter();
-	virtual void OnCollisionStay();
-	virtual void OnCollisionExit();
+	virtual void OnCollisionEnter(Collider* other);
+	virtual void OnCollisionStay(Collider* other);
+	virtual void OnCollisionExit(Collider* other);
 
 protected:
 	Script();

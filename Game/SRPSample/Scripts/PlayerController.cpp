@@ -4,6 +4,7 @@
 #include "Components/Rigidbody.h"
 #include "Components/Animator.h"
 #include "Components/Transform.h"
+#include "Components/Collider.h"
 #include "Resources/AnimController.h"
 
 DECLARE_DEFAULTS_IMPL(PlayerController)
@@ -80,4 +81,13 @@ void PlayerController::ActiveSelfTest()
         SceneUtils::Destroy(GetOwner());
         return;
     }
+}
+
+void PlayerController::OnCollisionEnter(Collider* other)
+{
+    LOG_INFO
+    (
+        "[Script : PlayerController] Collision Occured with {}", 
+        other->GetOwner()->GetName()
+    );
 }
