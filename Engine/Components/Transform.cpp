@@ -43,7 +43,7 @@ void Transform::UpdateTransform() const
 		rotationMat[0] = glm::vec3(m_worldMatrix[0]) / m_worldScale.x;
 		rotationMat[1] = glm::vec3(m_worldMatrix[1]) / m_worldScale.y;
 		rotationMat[2] = glm::vec3(m_worldMatrix[2]) / m_worldScale.z;
-		m_worldRotation = glm::quat_cast(rotationMat);
+		m_worldRotation = glm::normalize(glm::quat_cast(rotationMat));
 	}
 
 	// 5. 갱신 완료 -> Dirty 해제
@@ -118,8 +118,78 @@ glm::vec3 Transform::GetRotationEuler() const
 }
 
 /*====================================================//
-//                 World Properties (Getter)          //
+//                 Transformation (World)             //
 //====================================================*/
+void Transform::SetWorldPosition(const glm::vec3& position)
+{
+	// 1. 부모가 없다면 월드 좌표 == 로컬 좌표
+	if (m_parent == nullptr)
+	{
+		SetPosition(position);
+		return;
+	}
+
+	// 2. 부모의 월드 역행렬을 구함
+	const glm::mat4& parentInverseMat = m_parent->GetWorldInverseMatrix();
+
+	// 3. 월드 좌표를 부모 공간(Local)으로 변환
+	glm::vec4 localPos4 = parentInverseMat * glm::vec4(position, 1.0f);
+
+	// 4. 로컬 좌표 설정 (이 안에서 SetTransformDirty가 호출됨)
+	SetPosition(glm::vec3(localPos4));
+}
+
+void Transform::SetWorldRotation(const glm::quat& rotation)
+{
+	// 1. 부모가 없다면 월드 회전 == 로컬 회전
+	if (m_parent == nullptr)
+	{
+		SetRotation(rotation);
+		return;
+	}
+
+	// 2. 부모의 월드 회전을 가져옴
+	glm::quat parentRotation = m_parent->GetWorldRotation();
+
+	// 3. 로컬 회전 계산: (부모회전^-1 * 월드회전)
+	glm::quat localRotation = glm::conjugate(parentRotation) * rotation;
+
+	// 4. 로컬 회전 설정
+	SetRotation(glm::normalize(localRotation));
+}
+
+void Transform::SetWorldRotation(const glm::vec3& eulerAnglesDegrees)
+{
+	SetWorldRotation(glm::quat(glm::radians(eulerAnglesDegrees)));
+}
+
+void Transform::SetWorldScale(const glm::vec3& scale)
+{
+	// 1. 부모가 없다면 월드 스케일 == 로컬 스케일
+	if (m_parent == nullptr)
+	{
+		SetScale(scale);
+		return;
+	}
+
+	// 2. 부모의 월드 스케일을 가져옴
+	glm::vec3 parentScale = m_parent->GetWorldScale();
+	glm::vec3 localScale = scale;
+
+	// 3. 부모 스케일로 나누어 로컬 스케일 역산
+	if (glm::abs(parentScale.x) > glm::epsilon<float>()) localScale.x /= parentScale.x;
+	else localScale.x = 0.0f;
+
+	if (glm::abs(parentScale.y) > glm::epsilon<float>()) localScale.y /= parentScale.y;
+	else localScale.y = 0.0f;
+
+	if (glm::abs(parentScale.z) > glm::epsilon<float>()) localScale.z /= parentScale.z;
+	else localScale.z = 0.0f;
+
+	// 4. 로컬 스케일 설정
+	SetScale(localScale);
+}
+
 glm::mat4 Transform::GetWorldMatrix() const
 {
 	if (m_isTransformDirty) UpdateTransform();

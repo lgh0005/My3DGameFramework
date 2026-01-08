@@ -23,7 +23,8 @@ public:
 private:
 	DebugMesh();
 	void Init(uint32 primitiveType);
+	void AllocateVertexBuffer(usize vertexCount);
 
 	uint32 m_vertexCount = 0;
-	usize m_bufferCapacity = 0;
+	usize m_vertexCapacity = 0;
 };

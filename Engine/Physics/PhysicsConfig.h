@@ -23,7 +23,7 @@ namespace Layers
 	static constexpr JPH::ObjectLayer NON_MOVING = 0;
 	static constexpr JPH::ObjectLayer MOVING	 = 1;
 	static constexpr JPH::ObjectLayer NUM_LAYERS = 2;
-};
+}
 
 // 3. 브로드페이즈 레이어 (물리 엔진 내부 최적화용)
 // INFO : 충돌 검사를 할 때 크게 "움직이는 대상"과 "정적인 대상" 이 두 기준으로 나눠서
@@ -35,4 +35,4 @@ namespace BroadPhaseLayers
 	static constexpr JPH::BroadPhaseLayer NON_MOVING(0);
 	static constexpr JPH::BroadPhaseLayer MOVING(1);
 	static constexpr JPH::uint			  NUM_LAYERS(2);
-};
+}

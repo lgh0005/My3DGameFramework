@@ -451,7 +451,7 @@ bool DevScene::OnPlaceActors()
 		rigidBody->SetMotionType(JPH::EMotionType::Dynamic);
 		rigidBody->SetUseGravity(true);
 		rigidBody->SetMass(76.0f);
-		rigidBody->SetRotationLock(true);
+		rigidBody->FreezeRotation(true, true, true);
 		rigidBody->SetFriction(0.5f);
 
 		// 6. PlayerController

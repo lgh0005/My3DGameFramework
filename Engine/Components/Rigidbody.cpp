@@ -13,9 +13,28 @@ using namespace JPH;
 
 DECLARE_DEFAULTS_IMPL(Rigidbody)
 
+/*==============================//
+//   default rigidbody methods  //
+//==============================*/
 RigidbodyUPtr Rigidbody::Create()
 {
 	return RigidbodyUPtr(new Rigidbody());
+}
+
+void Rigidbody::Start()
+{
+	CreateBody();
+}
+
+void Rigidbody::Update()
+{
+	if (m_isMotionPropsDirty)
+	{
+		ApplyMotionProperties();
+		m_isMotionPropsDirty = false;
+	}
+
+	Super::Update();
 }
 
 bool Rigidbody::CreateBody()
@@ -25,30 +44,18 @@ bool Rigidbody::CreateBody()
 
 	// 1. 내 게임 오브젝트에 붙은 Collider 컴포넌트 찾기
 	Collider* collider = GetOwner()->GetComponent<Collider>();
-	if (collider == nullptr)
-	{
-		LOG_WARN
-		(
-			"Rigidbody creation deferred on GameObject '{}'. No Collider found yet.", 
-			GetOwner()->GetName()
-		);
-		return false;
-	}
+	if (collider == nullptr) return false;
 
 	// 2. Collider에게 Jolt Shape 생성 요청
 	ShapeRefC shape = collider->GetShape();
-	if (shape == nullptr)
-	{
-		LOG_ERROR("Failed to create shape from Collider.");
-		return false;
-	}
+	if (shape == nullptr) return false;
 
 	// 3. 초기 위치/회전 설정
 	RVec3 initialPos = Utils::ToJoltVec3(GetTransform().GetWorldPosition());
 	Quat initialRot = Utils::ToJoltQuat(GetTransform().GetWorldRotation());
 
 	// 4. 바디 설정 구조체 채우기
-	//    - Static이면 NON_MOVING 레이어, Dynamic이면 MOVING 레이어로 설정
+	// Static이면 NON_MOVING 레이어, Dynamic이면 MOVING 레이어로 설정
 	ObjectLayer layer = (m_motionType == EMotionType::Static) ? Layers::NON_MOVING : Layers::MOVING;
 
 	BodyCreationSettings bodySettings(shape, initialPos, initialRot, m_motionType, layer);
@@ -57,64 +64,77 @@ bool Rigidbody::CreateBody()
 	bodySettings.mFriction = m_friction;
 	bodySettings.mRestitution = m_restitution;
 	bodySettings.mGravityFactor = m_useGravity ? 1.0f : 0.0f;
+	bodySettings.mIsSensor = collider->IsTrigger();
+	bodySettings.mUserData = reinterpret_cast<uint64>(GetOwner());
 
-	// 질량 재정의 (Dynamic일 때만 유효)
+	// 4. 질량 설정 (Dynamic일 때만 유효)
 	if (m_motionType == EMotionType::Dynamic)
 	{
 		bodySettings.mOverrideMassProperties = EOverrideMassProperties::CalculateInertia;
 		bodySettings.mMassPropertiesOverride.mMass = m_mass;
-		if (m_rotationLocked)
-			bodySettings.mAllowedDOFs = JPH::EAllowedDOFs::TranslationX | 
-										JPH::EAllowedDOFs::TranslationY | 
-										JPH::EAllowedDOFs::TranslationZ;
 	}
-
-	// 6. [중요] Trigger(Sensor) 여부 설정
-	//    Collider가 "나 트리거야!"라고 하면 Jolt에게 "이건 센서다"라고 알려줌
-	bodySettings.mIsSensor = collider->IsTrigger();
-
-	// 7. [핵심] UserData에 GameObject 포인터 저장 (충돌 콜백용)
-	bodySettings.mUserData = reinterpret_cast<uint64>(GetOwner());
 
 	// 8. 실제 바디 생성 및 등록
 	m_bodyID = GetBodyInterface().CreateAndAddBody(bodySettings, EActivation::Activate);
 
+	// 6. [중요] 생성 직후 제약 조건(Constraints) 적용
+	if (m_motionType == EMotionType::Dynamic) ApplyMotionProperties();
+	
+	m_isMotionPropsDirty = false;
+
 	return true;
 }
 
-void Rigidbody::SetMass(float mass)
+void Rigidbody::ApplyMotionProperties()
 {
-	m_mass = mass;
-	
-	// 바디가 아직 생성되지 않았다면, 나중에 CreateBody 할 때 m_mass를 쓸 테니 리턴
-	if (!IsValid()) return;
-
-	// Jolt 시스템 가져오기 (PHYSICS 매크로 활용)
+	// 1. 시스템 가져오기
 	const JPH::PhysicsSystem& physicsSystem = PHYSICS.GetPhysicsSystem();
 	JPH::BodyInterface& bodyInterface = GetBodyInterface();
 
-	// 1. 바디를 수정하기 위해 쓰기 권한(Write Lock)을 얻음
+	// 2. 쓰기 락
 	JPH::BodyLockWrite lock(physicsSystem.GetBodyLockInterface(), m_bodyID);
+	if (!lock.Succeeded()) return;
 
-	if (lock.Succeeded())
+	JPH::Body& body = lock.GetBody();
+
+	// 3. Dynamic이 아니면 질량/관성 설정 불가 -> 리턴
+	if (!body.IsRigidBody() || body.GetMotionType() != JPH::EMotionType::Dynamic)
+		return;
+
+	// 4. 질량 특성 계산
+	const JPH::Shape* shape = body.GetShape();
+	JPH::MassProperties massProps = shape->GetMassProperties();
+	massProps.ScaleToMass(m_mass);
+
+	// 5. 자유도(DOF) 결정 (회전 잠금 여부 반영)
+	JPH::EAllowedDOFs allowedDOFs = JPH::EAllowedDOFs::All;
+	if (m_constraints.IsSet(RigidbodyConstraint::FreezePositionX))
+		allowedDOFs &= ~EAllowedDOFs::TranslationX;
+	if (m_constraints.IsSet(RigidbodyConstraint::FreezePositionY))
+		allowedDOFs &= ~EAllowedDOFs::TranslationY;
+	if (m_constraints.IsSet(RigidbodyConstraint::FreezePositionZ))
+		allowedDOFs &= ~EAllowedDOFs::TranslationZ;
+
+	if (m_constraints.IsSet(RigidbodyConstraint::FreezeRotationX))
+		allowedDOFs &= ~EAllowedDOFs::RotationX;
+	if (m_constraints.IsSet(RigidbodyConstraint::FreezeRotationY))
+		allowedDOFs &= ~EAllowedDOFs::RotationY;
+	if (m_constraints.IsSet(RigidbodyConstraint::FreezeRotationZ))
+		allowedDOFs &= ~EAllowedDOFs::RotationZ;
+
+	// 6. 최종 적용 (질량 + 자유도)
+	body.GetMotionProperties()->SetMassProperties(allowedDOFs, massProps);
+}
+
+/*==================================//
+//   default rigidbody properties   //
+//==================================*/
+void Rigidbody::SetMass(float mass)
+{
+	if (m_mass != mass) // 값이 다를 때만 더티 마킹
 	{
-		JPH::Body& body = lock.GetBody();
-
-		// 2. Dynamic 바디가 아니면 질량이 의미가 없으므로 패스
-		if (!body.IsRigidBody() || body.GetMotionType() != JPH::EMotionType::Dynamic)
-			return;
-
-		// 3. 현재 쉐이프(Shape)에서 기본 질량 특성(MassProperties)을 계산
-		const JPH::Shape* shape = body.GetShape();
-		JPH::MassProperties massProps = shape->GetMassProperties();
-
-		// 4. 우리가 원하는 질량(m_mass)에 맞춰 관성(Inertia)을 스케일링
-		// (예: 질량이 2배 되면, 회전 저항력도 2배가 되어야 자연스러움)
-		massProps.ScaleToMass(m_mass);
-
-		// 5. 재계산된 질량 특성을 바디에 적용
-		// EAllowedDOFs::All -> 모든 축의 회전/이동 허용 상태 유지
-		body.GetMotionProperties()->SetMassProperties(JPH::EAllowedDOFs::All, massProps);
+		m_mass = mass;
+		m_isMotionPropsDirty = true;
 	}
 }
 
@@ -132,8 +152,15 @@ void Rigidbody::SetRestitution(float restitution)
 
 void Rigidbody::SetMotionType(JPH::EMotionType motionType)
 {
-	m_motionType = motionType;
-	if (IsValid()) GetBodyInterface().SetMotionType(m_bodyID, motionType, EActivation::Activate);
+	if (m_motionType != motionType)
+	{
+		m_motionType = motionType;
+		if (IsValid())
+		{
+			GetBodyInterface().SetMotionType(m_bodyID, motionType, EActivation::Activate);
+			if (motionType == EMotionType::Dynamic) m_isMotionPropsDirty = true;
+		}
+	}
 }
 
 void Rigidbody::SetUseGravity(bool useGravity)
@@ -142,45 +169,71 @@ void Rigidbody::SetUseGravity(bool useGravity)
 	if (IsValid()) GetBodyInterface().SetGravityFactor(m_bodyID, useGravity ? 1.0f : 0.0f);
 }
 
-void Rigidbody::SetRotationLock(bool locked)
+/*===========================//
+//   rigidbody constraints   //
+//===========================*/
+void Rigidbody::SetConstraints(const RigidbodyConstraint& constraints)
 {
-	m_rotationLocked = locked;
+	if (m_constraints != constraints)
+	{
+		m_constraints = constraints;
+		m_isMotionPropsDirty = true;
+	}
+}
+
+void Rigidbody::FreezePosition(bool x, bool y, bool z)
+{
+	RigidbodyConstraint old = m_constraints;
+
+	if (x) m_constraints.Set(RigidbodyConstraint::FreezePositionX);
+	else   m_constraints.Unset(RigidbodyConstraint::FreezePositionX);
+
+	if (y) m_constraints.Set(RigidbodyConstraint::FreezePositionY);
+	else   m_constraints.Unset(RigidbodyConstraint::FreezePositionY);
+
+	if (z) m_constraints.Set(RigidbodyConstraint::FreezePositionZ);
+	else   m_constraints.Unset(RigidbodyConstraint::FreezePositionZ);
+
+	// 값이 바뀌었을 때만 마킹
+	if (m_constraints != old) m_isMotionPropsDirty = true;
+}
+
+void Rigidbody::FreezeRotation(bool x, bool y, bool z)
+{
+	RigidbodyConstraint old = m_constraints;
+
+	if (x) m_constraints.Set(RigidbodyConstraint::FreezeRotationX);
+	else   m_constraints.Unset(RigidbodyConstraint::FreezeRotationX);
+
+	if (y) m_constraints.Set(RigidbodyConstraint::FreezeRotationY);
+	else   m_constraints.Unset(RigidbodyConstraint::FreezeRotationY);
+
+	if (z) m_constraints.Set(RigidbodyConstraint::FreezeRotationZ);
+	else   m_constraints.Unset(RigidbodyConstraint::FreezeRotationZ);
+
+	if (m_constraints != old) m_isMotionPropsDirty = true;
+}
+
+/*===========================//
+//   force & velocity        //
+//===========================*/
+void Rigidbody::AddForce(const glm::vec3& force)
+{
+	if (!IsValid()) return;
+	// [중요] 힘은 "지속적인 가속"을 줄 때 사용 (예: 로켓 추진, 바람, 중력장)
+	// F = ma에 따라 가속도가 붙음.
+	// Jolt는 AddForce 호출 시 자동으로 바디를 깨웁니다 (Activate).
+	GetBodyInterface().AddForce(m_bodyID, Utils::ToJoltVec3(force));
+}
+
+void Rigidbody::AddImpulse(const glm::vec3& impulse)
+{
+	// 바디가 없으면 무시
 	if (!IsValid()) return;
 
-	JPH::BodyInterface& bodyInterface = GetBodyInterface();
-	JPH::BodyLockWrite lock(PHYSICS.GetPhysicsSystem().GetBodyLockInterface(), m_bodyID);
-	if (lock.Succeeded())
-	{
-		JPH::Body& body = lock.GetBody();
-		 
-		// 1. Static 바디나 Kinematic 바디는 MotionProperties가 없거나 설정할 필요 없음
-		if (!body.IsRigidBody() || body.GetMotionType() != JPH::EMotionType::Dynamic)
-			return;
-
-		// 2. MotionProperties 가져오기 (없으면 리턴)
-		JPH::MotionProperties* motionProps = body.GetMotionProperties();
-		if (!motionProps) return;
-
-		// 3. 현재 쉐이프에서 질량 특성 다시 계산 (SetMass 때와 동일 로직)
-		// 관성(Inertia)을 DOF에 맞춰 다시 세팅해야 하기 때문에 필요함
-		const JPH::Shape* shape = body.GetShape();
-		JPH::MassProperties massProps = shape->GetMassProperties();
-		massProps.ScaleToMass(m_mass); // 우리가 설정해둔 질량 적용
-
-		// 4. 자유도(DOF) 결정 
-		JPH::EAllowedDOFs allowedDOFs = JPH::EAllowedDOFs::All;
-		if (m_rotationLocked)
-		{
-			// 이동(Translation) XYZ만 허용하고, 회전(Rotation)은 잠금
-			allowedDOFs = JPH::EAllowedDOFs::TranslationX |
-				JPH::EAllowedDOFs::TranslationY |
-				JPH::EAllowedDOFs::TranslationZ;
-		}
-
-		// 5. ★ 핵심: 질량 특성과 자유도를 한 번에 설정
-		// 이렇게 하면 Jolt가 "아, 이 축은 회전하면 안 되니까 관성을 무한대로 설정해야겠구나"라고 처리함
-		motionProps->SetMassProperties(allowedDOFs, massProps);
-	}
+	// [중요] 임펄스는 "순간적인 충격"을 줄 때 사용 (예: 점프, 총알 피격, 폭발)
+	// 속도가 순간적으로 변함 (Velocity += Impulse / Mass)
+	GetBodyInterface().AddImpulse(m_bodyID, Utils::ToJoltVec3(impulse));
 }
 
 glm::vec3 Rigidbody::GetLinearVelocity() const
@@ -195,14 +248,14 @@ void Rigidbody::SetLinearVelocity(const glm::vec3& velocity)
 	GetBodyInterface().SetLinearVelocity(m_bodyID, Utils::ToJoltVec3(velocity));
 }
 
-void Rigidbody::Start()
+glm::vec3 Rigidbody::GetAngularVelocity() const
 {
-	CreateBody();
+	if (!IsValid()) return glm::vec3(0.0f);
+	return Utils::ToGlmVec3(GetBodyInterface().GetAngularVelocity(m_bodyID));
 }
 
-void Rigidbody::Update()
+void Rigidbody::SetAngularVelocity(const glm::vec3& velocity)
 {
-	// fallback of dependency of collider
-	if (m_bodyID.IsInvalid()) CreateBody();
-	if (IsValid()) Super::Update();
+	if (!IsValid()) return;
+	GetBodyInterface().SetAngularVelocity(m_bodyID, Utils::ToJoltVec3(velocity));
 }

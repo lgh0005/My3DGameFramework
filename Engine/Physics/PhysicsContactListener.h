@@ -22,9 +22,21 @@ public:
 	PhysicsContactListener();
 	virtual ~PhysicsContactListener();
 
-	// 0.. 이벤트 디스패쳐
+	// 이벤트 디스패쳐
 	void DispatchEvents();
 
+/*==========================//
+//  event dispatch methods  //
+//==========================*/
+private:
+	ThreadMutex m_mutex;
+	std::vector<CollisionEvent> m_collisionEventQueue;
+	void DispatchTriggerEvents(const CollisionEvent& evt, const GameObject* obj1, const GameObject* obj2);
+	void DispatchCollideEvents(const CollisionEvent& evt, const GameObject* obj1, const GameObject* obj2);
+
+/*===========================//
+//  collision check methods  //
+//===========================*/
 private:
 	// 1. 충돌 검증 (여기서 false 리턴 시 충돌 무시)
 	virtual JPH::ValidateResult OnContactValidate
@@ -55,8 +67,4 @@ private:
 
 	// 4. 충돌 종료 (Exit)
 	virtual void OnContactRemoved(const JPH::SubShapeIDPair& inSubShapePair) override;
-
-private:
-	ThreadMutex m_mutex;
-	std::vector<CollisionEvent> m_eventQueue;
 };

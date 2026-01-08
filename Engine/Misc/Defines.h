@@ -68,6 +68,9 @@ using className ## WPtr = std::weak_ptr<className>;
 #define MAX_BONES 100
 #define MAX_BONE_INFLUENCE 4
 
+// initial 
+#define INITIAL_DEBUG_VERTEX_CAPACITY 32768
+
 /*==================================//
 //   declare Jolt physics pointers  //
 //==================================*/

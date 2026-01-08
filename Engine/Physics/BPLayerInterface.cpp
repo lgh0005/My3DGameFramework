@@ -17,10 +17,10 @@ uint32 BPLayerInterfaceImpl::GetNumBroadPhaseLayers() const
 BroadPhaseLayer BPLayerInterfaceImpl::GetBroadPhaseLayer(ObjectLayer inLayer) const
 {
 	JPH_ASSERT(inLayer < Layers::NUM_LAYERS);
+	if (inLayer >= Layers::NUM_LAYERS) return BroadPhaseLayers::NON_MOVING;
 	return m_objectToBroadPhase[inLayer];
 }
 
-#if defined(JPH_EXTERNAL_PROFILE) || defined(JPH_PROFILE_ENABLED)
 const char* BPLayerInterfaceImpl::GetBroadPhaseLayerName(BroadPhaseLayer inLayer) const
 {
 	switch ((BroadPhaseLayer::Type)inLayer)
@@ -30,4 +30,3 @@ const char* BPLayerInterfaceImpl::GetBroadPhaseLayerName(BroadPhaseLayer inLayer
 	default:                                                  return "INVALID";
 	}
 }
-#endif

@@ -20,20 +20,8 @@ void DebugMesh::Init(uint32 primitiveType)
 	m_vertexLayout = VertexLayout::Create();
 	m_vertexLayout->Bind();
 
-	// 2. 초기 빈 버퍼 생성
-	m_vertexBuffer = Buffer::CreateWithData
-	(
-		GL_ARRAY_BUFFER,      // bufferType
-		GL_DYNAMIC_DRAW,      // usage
-		nullptr,              // data (빈 공간만 확보)
-		sizeof(GizmoVertex),  // stride
-		1000                  // count
-	);
-	m_bufferCapacity = 1000 * sizeof(GizmoVertex);
-
-	// 3. 속성 설정 (GizmoVertex 전용)
-	m_vertexLayout->SetAttrib(0, 3, GL_FLOAT, false, sizeof(GizmoVertex), offsetof(GizmoVertex, position));
-	m_vertexLayout->SetAttrib(1, 4, GL_FLOAT, false, sizeof(GizmoVertex), offsetof(GizmoVertex, color));
+	// 2. 초기 빈 버퍼 생성 및 속성 설정
+	AllocateVertexBuffer(INITIAL_DEBUG_VERTEX_CAPACITY);
 }
 
 void DebugMesh::Draw() const
@@ -54,26 +42,27 @@ void DebugMesh::UpdateGeometry(const std::vector<GizmoVertex>& vertices)
 	if (m_vertexLayout) m_vertexLayout->Bind();
 
 	// 1. 용량 부족 시 재할당
-	if (!m_vertexBuffer || m_bufferCapacity < dataSize)
+	if (!m_vertexBuffer || m_vertexCapacity < dataSize)
 	{
-		m_bufferCapacity = dataSize * 2;
-		usize count = m_bufferCapacity / sizeof(GizmoVertex);
-		m_vertexBuffer = Buffer::CreateWithData
-		(
-			GL_ARRAY_BUFFER,
-			GL_DYNAMIC_DRAW,
-			nullptr,
-			sizeof(GizmoVertex),
-			count
-		);
-
-		m_vertexLayout->SetAttrib(0, 3, GL_FLOAT, false, sizeof(GizmoVertex), offsetof(GizmoVertex, position));
-		m_vertexLayout->SetAttrib(1, 4, GL_FLOAT, false, sizeof(GizmoVertex), offsetof(GizmoVertex, color));
-
+		usize count = m_vertexCapacity / sizeof(GizmoVertex);
+		AllocateVertexBuffer(count);
 		m_vertexBuffer->SetData(vertices.data(), dataSize);
 	}
 	else
 	{
 		m_vertexBuffer->SetData(vertices.data(), dataSize);
 	}
+}
+
+void DebugMesh::AllocateVertexBuffer(usize vertexCount)
+{
+	// 용량 계산
+	m_vertexCapacity = vertexCount * sizeof(GizmoVertex);
+
+	// 버퍼 생성
+	m_vertexBuffer = Buffer::CreateWithData(GL_ARRAY_BUFFER, GL_DYNAMIC_DRAW, nullptr, sizeof(GizmoVertex), vertexCount);
+
+	// 레이아웃(속성) 연결
+	m_vertexLayout->SetAttrib(0, 3, GL_FLOAT, false, sizeof(GizmoVertex), offsetof(GizmoVertex, position));
+	m_vertexLayout->SetAttrib(1, 4, GL_FLOAT, false, sizeof(GizmoVertex), offsetof(GizmoVertex, color));
 }

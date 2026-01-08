@@ -76,6 +76,7 @@ add_library(Engine STATIC
    "Physics/JoltDebugRenderer.h"        "Physics/JoltDebugRenderer.cpp"
    "Physics/JoltGizmo.h"                "Physics/JoltGizmo.cpp"
    "Physics/GizmoCommand.h"         "Physics/GizmoCommand.cpp"
+   "Physics/RigidbodyConstraint.h"      "Physics/RigidbodyConstraint.cpp"
 
    # Graphics
    "Graphics/Shader.h"              "Graphics/Shader.cpp"

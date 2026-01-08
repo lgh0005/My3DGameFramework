@@ -6,15 +6,16 @@ void PhysicsCallbacks::TraceImpl(const char* inFMT, ...)
 	// 가변 인자 처리
 	va_list list;
 	va_start(list, inFMT);
+
 	char buffer[1024];
 	vsnprintf(buffer, sizeof(buffer), inFMT, list);
+
 	va_end(list);
 
-	// 우리 엔진 로그로 출력
+	// 2. 완성된 문자열을 엔진 로거로 출력
 	LOG_INFO("Jolt: {}", buffer);
 }
 
-#ifdef JPH_ENABLE_ASSERTS
 bool PhysicsCallbacks::AssertFailedImpl
 (
 	const char* inExpression, 
@@ -33,4 +34,3 @@ bool PhysicsCallbacks::AssertFailedImpl
 	);
 	return true;
 }
-#endif

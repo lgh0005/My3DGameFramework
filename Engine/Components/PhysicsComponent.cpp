@@ -75,14 +75,21 @@ void PhysicsComponent::SyncPhysicsToTransform()
 	if (m_bodyID.IsInvalid()) return;
 	JPH::BodyInterface& bodyInterface = GetBodyInterface();
 
+	// [최적화 & 버그 방지]
+	// Dynamic(물리 힘을 받는 애)이 아니면 굳이 물리 엔진 위치를 가져올 필요가 없음.
+	// Static: 움직이지 않음.
+	// Kinematic: Transform이 주도권을 가짐 (T -> P 방향이어야 함).
+	if (!bodyInterface.IsActive(m_bodyID) || bodyInterface.GetMotionType(m_bodyID) != JPH::EMotionType::Dynamic)
+		return;
+
 	// 1. 물리 엔진 좌표 가져오기
 	JPH::RVec3 position = bodyInterface.GetPosition(m_bodyID);
 	JPH::Quat rotation = bodyInterface.GetRotation(m_bodyID);
 
 	// 2. 내 Transform에 적용
 	Transform& transform = GetTransform();
-	transform.SetPosition(Utils::ToGlmVec3(position));
-	transform.SetRotation(Utils::ToGlmQuat(rotation));
+	transform.SetWorldPosition(Utils::ToGlmVec3(position));
+	transform.SetWorldRotation(Utils::ToGlmQuat(rotation));
 }
 
 void PhysicsComponent::SyncTransformToPhysics()

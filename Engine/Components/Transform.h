@@ -38,10 +38,15 @@ public:
 	const glm::vec3& GetLocalScale() const { return m_scale; }
 
 /*====================================================//
-//                 World Properties (Getter)          //
+//                 Transformation (World)             //
 //====================================================*/
 public:
 	// 월드 좌표계
+	void SetWorldPosition(const glm::vec3& position);
+	void SetWorldRotation(const glm::quat& rotation);
+	void SetWorldRotation(const glm::vec3& eulerAnglesDegrees);
+	void SetWorldScale(const glm::vec3& scale);
+
 	glm::vec3 Transform::GetWorldPosition() const;
 	glm::vec3 Transform::GetWorldScale()	const;
 	glm::quat Transform::GetWorldRotation() const;
