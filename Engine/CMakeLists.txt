@@ -25,8 +25,13 @@ add_library(Engine STATIC
    "Scene/GameObjectManager.h"       "Scene/GameObjectManager.cpp"
    "Scene/SceneRegistry.h"           "Scene/SceneRegistry.cpp"
    "Scene/SceneUtils.h"              "Scene/SceneUtils.cpp"
-   "Scene/GameObject.h"              "Scene/GameObject.cpp"
-   "Scene/Prefab.h"                  "Scene/Prefab.cpp"
+
+   # GameObject
+   "GameObject/GameObject.h"              "GameObject/GameObject.cpp"
+   "GameObject/ComponentManager.h"        "GameObject/ComponentManager.cpp"
+   "GameObject/Prefab.h"                  "GameObject/Prefab.cpp"
+   "GameObject/GameObjectRegistry.h"      "GameObject/GameObjectRegistry.cpp"
+   "GameObject/ObjectValidator.h"         "GameObject/ObjectValidator.cpp"
 
    # Common Render Passes
    "Pipelines/Common/CullingPass.h" "Pipelines/Common/CullingPass.cpp"

@@ -3,7 +3,7 @@
 #include "Components/Transform.h"
 #include "Components/Camera.h"
 #include "Components/MeshOutline.h"
-#include "Scene/GameObject.h"
+#include "GameObject/GameObject.h"
 #include "PlayerController.h"
 #include "Graphics/Ray.h"
 #include "Graphics/RaycastHit.h"

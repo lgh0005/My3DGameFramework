@@ -13,7 +13,7 @@
 #include "Pipelines/URP/UniversalRenderContext.h"
 
 #include "Scene/Scene.h"
-#include "Scene/GameObject.h"
+#include "GameObject/GameObject.h"
 #include "Scene/SceneRegistry.h"
 #include "Graphics/RenderPass.h"
 #include "Resources/Program.h"

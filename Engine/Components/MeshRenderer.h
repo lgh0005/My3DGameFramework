@@ -17,8 +17,12 @@ enum class RenderStage
 CLASS_PTR(MeshRenderer)
 class MeshRenderer : public Component
 {
+	using Super = Component;
+
 public:
 	virtual ~MeshRenderer();
+	static const ComponentType s_ComponentType = ComponentType::MeshRenderer;
+	virtual bool MatchesType(ComponentType type) const override;
 	virtual RenderBounds GetWorldBounds() const;
 	virtual void Render(Program* program) const = 0;
 

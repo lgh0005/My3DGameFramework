@@ -8,6 +8,11 @@
 
 DECLARE_DEFAULTS_IMPL(MeshRenderer)
 
+bool MeshRenderer::MatchesType(ComponentType type) const
+{
+    return type == ComponentType::MeshRenderer || Super::MatchesType(type);
+}
+
 RenderBounds MeshRenderer::GetWorldBounds() const
 {
     if (!m_mesh) return RenderBounds::Empty();

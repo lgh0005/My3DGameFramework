@@ -1,6 +1,6 @@
 ﻿#include "EnginePch.h"
 #include "GameObjectManager.h"
-#include "Scene/GameObject.h"
+#include "GameObject/GameObject.h"
 #include "Components/Transform.h"
 
 DECLARE_DEFAULTS_IMPL(GameObjectManager)

@@ -1,6 +1,7 @@
 ﻿#include "EnginePch.h"
 #include "Component.h"
-#include "Scene/GameObject.h"
+#include "GameObject/GameObject.h"
+#include "GameObject/ObjectValidator.h"
 #include "Components/Transform.h"
 
 DECLARE_DEFAULTS_IMPL(Component)
@@ -48,9 +49,7 @@ bool Component::IsEnabled() const
 
 bool Component::IsActive() const
 {
-    // 1. 나 자신이 켜져 있고 (IsEnabled)
-    // 2. 주인(GameObject)이 존재하며
-    // 3. 주인도 계층구조상 켜져 있어야 함 (IsActiveInHierarchy)
+    // return ObjectValidator::IsActiveInHierarchy(this);
     return m_enabled && m_owner && m_owner->IsActiveInHierarchy();
 }
 

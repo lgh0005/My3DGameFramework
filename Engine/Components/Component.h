@@ -15,10 +15,11 @@ enum class ComponentType
 	Camera,
 
 	// Rendering
-	MeshOutline,
+	MeshRenderer,
 	SkinnedMeshRenderer,
 	StaticMeshRenderer,
 	InstancedMeshRenderer,
+	MeshOutline,
 
 	// Light
 	Light,
@@ -45,6 +46,14 @@ enum class ComponentType
 	Unknown
 };
 
+enum class ComponentState
+{
+	Uninitialized,  // 생성자 호출 직후 (아직 Awake/Start 안 함)
+	Initialized,    // Awake 완료 (데이터 세팅 완료)
+	Running,        // Start 완료 (이제부터 정상적으로 Update 돔) -> 기존의 Active 대체
+	Dead            // 사망 선고 (메모리 해제 대기)
+};
+
 CLASS_PTR(Component)
 class Component
 {
@@ -63,6 +72,7 @@ public:
 //   component life-cycle state methods   //
 //========================================*/
 public:
+	ComponentState GetState() const { return m_state; }
 	bool IsActive() const;
 	void SetEnable(bool enable);
 	bool IsEnabled() const;
@@ -84,4 +94,5 @@ protected:
 	void SetOwner(GameObject* gameObject) { m_owner = gameObject; }
 	GameObject* m_owner	   { nullptr };
 	bool		m_enabled  { true };
+	ComponentState m_state{ ComponentState::Uninitialized };
 };

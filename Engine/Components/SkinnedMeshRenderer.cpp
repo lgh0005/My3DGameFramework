@@ -1,6 +1,6 @@
 ﻿#include "EnginePch.h"
 #include "SkinnedMeshRenderer.h"
-#include "Scene/GameObject.h"
+#include "GameObject/GameObject.h"
 #include "Components/Animator.h"
 #include "Components/Transform.h"
 #include "Resources/SkinnedMesh.h"

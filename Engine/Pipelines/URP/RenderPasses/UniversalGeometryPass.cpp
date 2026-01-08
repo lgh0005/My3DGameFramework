@@ -2,7 +2,7 @@
 #include "UniversalGeometryPass.h"
 
 #include "Scene/Scene.h"
-#include "Scene/GameObject.h"
+#include "GameObject/GameObject.h"
 #include "Graphics/RenderContext.h"
 #include "Resources/Program.h"
 #include "Resources/Mesh.h"

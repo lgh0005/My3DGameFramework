@@ -1,7 +1,7 @@
 ﻿#include "EnginePch.h"
 #include "CullingPass.h"
 #include "Pipelines/SRP/StandardRenderContext.h"
-#include "Scene/GameObject.h"
+#include "GameObject/GameObject.h"
 #include "Scene/SceneRegistry.h"
 #include "Components/StaticMeshRenderer.h"
 #include "Components/SkinnedMeshRenderer.h"

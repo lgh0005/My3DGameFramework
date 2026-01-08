@@ -1,6 +1,6 @@
 ﻿#include "EnginePch.h"
 #include "PlayerController.h"
-#include "Scene/GameObject.h"
+#include "GameObject/GameObject.h"
 #include "Components/Rigidbody.h"
 #include "Components/Animator.h"
 #include "Components/Transform.h"

@@ -13,7 +13,7 @@
 #include "Components/MeshRenderer.h"
 #include "Components/StaticMeshRenderer.h"
 #include "Components/Transform.h"
-#include "Scene/GameObject.h"
+#include "GameObject/GameObject.h"
 
 DECLARE_DEFAULTS_IMPL(HDRRenderPass)
 

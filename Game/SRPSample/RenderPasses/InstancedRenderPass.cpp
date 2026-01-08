@@ -9,7 +9,7 @@
 #include "Components/InstancedMeshRenderer.h"
 #include "Components/Transform.h"
 #include "Components/SpotLight.h"
-#include "Scene/GameObject.h"
+#include "GameObject/GameObject.h"
 
 DECLARE_DEFAULTS_IMPL(InstancedRenderPass)
 

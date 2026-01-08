@@ -14,7 +14,7 @@
 #include "Pipelines/SRP/StandardRenderContext.h"
 
 #include "Scene/Scene.h"
-#include "Scene/GameObject.h"
+#include "GameObject/GameObject.h"
 #include "Scene/SceneRegistry.h"
 #include "Resources/Program.h"
 #include "Resources/Mesh.h"
