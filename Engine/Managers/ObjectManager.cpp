@@ -1,5 +1,8 @@
 ﻿#include "EnginePch.h"
 #include "ObjectManager.h"
+#include "Object/Component.h"
+#include "Object/GameObject.h"
+#include "Components/Script.h"
 
 void ObjectManager::Init()
 {

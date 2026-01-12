@@ -24,6 +24,12 @@ public:
 	virtual void LateUpdate();
 	virtual void OnDestroy();
 
+/*=========================//
+//   find object methods   //
+//=========================*/
+public:
+	// TODO : 찾는 계열 메서드들을 적을 필요가 있다.
+
 protected:
 	Object();
 	std::string m_name;

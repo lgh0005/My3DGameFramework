@@ -28,7 +28,7 @@ add_library(Engine STATIC
    "Scene/SceneUtils.h"              "Scene/SceneUtils.cpp"
 
    # Object
-   "Object/Object.h"                  "Object/Object.cpp"
+   "Object/Object.h"                  "Object/Object.cpp"       "Object/GameObject.inl"
    "Object/GameObject.h"              "Object/GameObject.cpp"
    "Object/Component.h"               "Object/Component.cpp"
    "Object/Prefab.h"                  "Object/Prefab.cpp"
@@ -65,7 +65,10 @@ add_library(Engine STATIC
    "Pipelines/URP/RenderPasses/UniversalOutlinePass.h"   "Pipelines/URP/RenderPasses/UniversalOutlinePass.cpp"
 
    # Misc
-   "Misc/Defines.h"                 "Misc/Types.h"
+   "Misc/Defines.h"                 
+   "Misc/Types.h"
+   "Misc/Enums.h"
+
    "Misc/ImguiManager.h"            "Misc/ImguiManager.cpp"
    "Misc/Utils.h"                   "Misc/Utils.cpp"       
    "Misc/AssetFormat.h"             "Misc/AssetFormat.cpp"

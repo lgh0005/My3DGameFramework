@@ -155,7 +155,8 @@ void Scene::AddGameObject(GameObjectUPtr gameObject)
 
 GameObject* Scene::FindGameObject(const std::string& name)
 {
-	return m_objectManager->FindGameObject(name);
+	//return OBJECT.GetGameObject();
+	return nullptr;
 }
 
 void Scene::Destroy(GameObject* obj)

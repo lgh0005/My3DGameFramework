@@ -1,7 +1,10 @@
 ﻿#pragma once
-#include "Object/Component.h"
-#include "Object/GameObject.h"
-#include "Components/Script.h"
+
+#pragma region FORWARD_DECLARATION
+CLASS_PTR(GameObject)
+CLASS_PTR(Component)
+CLASS_PTR(Script)
+#pragma endregion
 
 class ObjectManager
 {

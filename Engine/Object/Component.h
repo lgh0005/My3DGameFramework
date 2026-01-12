@@ -1,4 +1,5 @@
 ﻿#pragma once
+#include "Misc/Enums.h"
 #include "Object.h"
 #include "Managers/ObjectManager.h"
 
@@ -7,60 +8,13 @@ CLASS_PTR(GameObject)
 CLASS_PTR(Transform)
 #pragma endregion
 
-enum class ComponentType
-{
-	// Core
-	Transform,
-	Script,
-	Animator,
-	Rigidbody,
-	Camera,
-
-	// Rendering
-	MeshRenderer,
-	SkinnedMeshRenderer,
-	StaticMeshRenderer,
-	InstancedMeshRenderer,
-	MeshOutline,
-
-	// Light
-	Light,
-	DirectionalLight,
-	SpotLight,
-	PointLight,
-
-	// Audio
-	AudioSource,
-	AudioListener,
-
-	// UI
-	UICanvas,
-	UIImage,
-	UIText,
-
-	// Collider
-	Collider,
-	BoxCollider,
-	SphereCollider,
-	CapsuleCollider,
-
-	// Misc
-	Terrain,
-	MAX
-};
-
-enum class ComponentState
-{
-	Uninitialized,  // 생성자 호출 직후 (아직 Awake/Start 안 함)
-	Initialized,    // Awake 완료 (데이터 세팅 완료)
-	Running,        // Start 완료 (이제부터 정상적으로 Update 돔) -> 기존의 Active 대체
-	Dead            // 사망 선고 (메모리 해제 대기)
-};
-
 CLASS_PTR(Component)
 class Component : public Object
 {
 	friend class GameObject;
+
+public:
+	static constexpr usize INVALID_REGISTRY_IDX = static_cast<RegistryIndex>(-1);
 
 public:
 	virtual ~Component();
@@ -97,8 +51,8 @@ protected:
 protected:
 	Component();
 	void SetOwner(GameObject* gameObject) { m_owner = gameObject; }
-	GameObject* m_owner	   { nullptr };
-	bool		m_enabled  { true };
-	ComponentState m_state { ComponentState::Uninitialized };
-	RegistryIndex  m_registryIndex	{ static_cast<usize>(-1) };
+	GameObject* m_owner					  { nullptr };
+	bool		m_enabled				  { true };
+	ComponentState m_state				  { ComponentState::Uninitialized };
+	RegistryIndex  m_registryIndex		  { INVALID_REGISTRY_IDX };
 };

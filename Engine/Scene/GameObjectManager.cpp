@@ -7,7 +7,16 @@ DECLARE_DEFAULTS_IMPL(GameObjectManager)
 
 GameObjectManagerUPtr GameObjectManager::Create()
 {
-	return GameObjectManagerUPtr(new GameObjectManager());
+	auto goMgr = GameObjectManagerUPtr(new GameObjectManager());
+	goMgr->Init();
+	return std::move(goMgr);
+}
+
+void GameObjectManager::Init()
+{
+	m_gameObjects.reserve(4096);
+	m_pendingCreateQueue.reserve(1024);
+	m_pendingDestroyQueue.reserve(1024);
 }
 
 void GameObjectManager::AddGameObject(GameObjectUPtr go)
@@ -35,57 +44,32 @@ void GameObjectManager::DestroyGameObject(GameObject* go)
 	for (Transform* child : children) DestroyGameObject(child->GetOwner());
 }
 
-GameObject* GameObjectManager::FindGameObject(const std::string& name)
-{
-	// 1. 방금 생성되어 대기 중인 녀석들 먼저 검색 (우선순위 높음)
-	for (const auto& obj : m_pendingCreateQueue)
-	{
-		if (obj->GetName() == name) 
-			return obj.get();
-	}
-
-	// 2. 이미 활동 중인 녀석들 검색
-	for (const auto& ptr : m_gameObjects)
-	{
-		if (ptr->GetName() == name) 
-			return ptr.get();
-	}
-
-	return nullptr;
-}
-
 void GameObjectManager::PushToDestroyQueue(GameObject* go)
 {
-	// 이미 죽을 예정인 녀석을 또 죽이면 안 됨 (중복 방지)
-	if (std::find(m_pendingDestroyQueue.begin(), m_pendingDestroyQueue.end(), go)
-		!= m_pendingDestroyQueue.end()) return;
-
+	if (!go) return;
+	if (go->IsDead()) return;
+	go->SetDestroy();
 	m_pendingDestroyQueue.push_back(go);
-}
-
-const std::vector<GameObjectUPtr>& GameObjectManager::GetGameObjects() const
-{
-	return m_gameObjects;
-}
-
-const std::vector<GameObjectUPtr>& GameObjectManager::GetPendingCreateQueue() const
-{
-	return m_pendingCreateQueue;
-}
-
-const std::vector<GameObject*>& GameObjectManager::GetPendingDestroyQueue() const
-{
-	return m_pendingDestroyQueue;
 }
 
 void GameObjectManager::FlushCreateQueue()
 {
 	if (m_pendingCreateQueue.empty()) return;
 
-	// [최적화 1] 벡터 재할당 비용 최소화를 위한 예약
-	m_gameObjects.reserve(m_gameObjects.size() + m_pendingCreateQueue.size());
+	// 1. 현재 기존 데이터의 끝 위치 기억 및 벡터 크기 할당
+	usize currentSize = m_gameObjects.size();
+	usize addCount = m_pendingCreateQueue.size();
+	usize requiredSize = currentSize + addCount;
+	if (m_gameObjects.capacity() < requiredSize)
+	{
+		// TODO : Utils에 대해서 Max부분은 GLMVec3Max, GLMVec3Min으로 수정하고
+		// 두 수 비교에 대해서는 Min, Max로 만들어야 할 필요가 있을 듯.
+		usize doubledCapacity = m_gameObjects.capacity() * 2;
+		m_gameObjects.reserve((requiredSize > doubledCapacity ? requiredSize : doubledCapacity));
+	}
 
-	// [최적화 2] Move Iterator를 사용하여 소유권을 한 번에 이전
+	// 2. 소유권 일괄 이동
+	// INFO : 평균 O(k), 최악의 경우 벡터 메모리 재할당으로 인한 O(n + k)
 	m_gameObjects.insert
 	(
 		m_gameObjects.end(),
@@ -93,7 +77,11 @@ void GameObjectManager::FlushCreateQueue()
 		std::make_move_iterator(m_pendingCreateQueue.end())
 	);
 
-	// 대기열 비우기 (이미 move 되었으므로 껍데기만 남음)
+	// 3. 게임 오브젝트 메모리 위치를 위한 인덱스 갱신 O(k)
+	for (usize i = 0; i < addCount; ++i)
+		m_gameObjects[currentSize + i]->SetSceneIndex(currentSize + i);
+
+	// 4. 대기열 비우기 (이미 move 되었으므로 껍데기만 남음)
 	m_pendingCreateQueue.clear();
 }
 
@@ -101,22 +89,39 @@ void GameObjectManager::FlushDestroyQueue()
 {
 	if (m_pendingDestroyQueue.empty()) return;
 
-	// [최적화 3] std::partition을 이용한 일괄 삭제
-	// 죽은 객체들을 배열 끝으로 몰아넣고 한 번에 잘라냄 (Swap & Pop과 유사 효과)
-	auto firstDead = std::partition
-	(
-		m_gameObjects.begin(),
-		m_gameObjects.end(),
-		[](const GameObjectUPtr& go) 
+	// 1. SceneIndex를 이용한 Swap & Pop : O(k)
+	for (GameObject* deadObj : m_pendingDestroyQueue)
+	{
+		usize index = deadObj->GetSceneIndex();
+
+		if (index >= m_gameObjects.size() || m_gameObjects[index].get() != deadObj)
+			continue;
+
+		// 1-1. Swap (맨 뒤 객체를 삭제된 자리로 가져오기)
+		usize lastIndex = m_gameObjects.size() - 1;
+		if (index != lastIndex)
 		{
-			// 살아있는(!IsDead) 오브젝트가 앞쪽(true)으로 옴
-			return !go->IsDead();
+			std::swap(m_gameObjects[index], m_gameObjects[lastIndex]);
+			m_gameObjects[index]->SetSceneIndex(index);
 		}
-	);
 
-	// 뒤쪽에 모인 죽은 오브젝트들 일괄 삭제 (메모리 해제 발생)
-	m_gameObjects.erase(firstDead, m_gameObjects.end());
+		// 1-2. 맨 뒤로 이동된 죽은 객체를 제거
+		m_gameObjects.pop_back();
+	}
 
-	// 삭제 대기열 초기화
+	// 2. 삭제 대기열 초기화
 	m_pendingDestroyQueue.clear();
+}
+
+const std::vector<GameObjectUPtr>& GameObjectManager::GetGameObjects() const
+{
+	return m_gameObjects;
+}
+const std::vector<GameObjectUPtr>& GameObjectManager::GetPendingCreateQueue() const
+{
+	return m_pendingCreateQueue;
+}
+const std::vector<GameObject*>& GameObjectManager::GetPendingDestroyQueue() const
+{
+	return m_pendingDestroyQueue;
 }

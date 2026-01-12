@@ -1,24 +1,5 @@
 ﻿#pragma once
-
-enum class ResourceType
-{
-	Animation,
-	AudilClip,
-	CubeTexture,
-	Image,
-	Material,
-	Model,
-	Texture,
-	Font,
-	StaticMesh,
-	SkinnedMesh,
-	ScreenMesh,
-	InstancedMesh,
-	UIMesh,
-	DebugMesh,
-	Shader,
-	EnvironmentMap
-};
+#include "Misc/Enums.h"
 
 CLASS_PTR(Resource)
 class Resource

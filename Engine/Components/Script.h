@@ -12,6 +12,7 @@ class Script : public Component
 {
 public:
 	virtual ~Script();
+	using ScriptID = uint64;
 	static const ComponentType s_ComponentType = ComponentType::Script;
 	virtual ComponentType GetComponentType() const override { return ComponentType::Script; }
 	virtual ScriptID GetScriptID() const = 0;

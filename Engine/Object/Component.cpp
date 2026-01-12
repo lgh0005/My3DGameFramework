@@ -48,7 +48,6 @@ bool Component::IsEnabled() const
 
 bool Component::IsActive() const
 {
-    // return ObjectValidator::IsActiveInHierarchy(this);
     return m_enabled && m_owner && m_owner->IsActiveInHierarchy();
 }
 

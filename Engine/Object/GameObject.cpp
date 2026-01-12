@@ -3,6 +3,7 @@
 #include "Scene/Scene.h"
 #include "Object/Component.h"
 #include "Components/Transform.h"
+#include "Components/Script.h"
 
 GameObject::GameObject() = default;
 GameObject::~GameObject()
@@ -28,14 +29,18 @@ GameObjectUPtr GameObject::Create()
 bool GameObject::Init()
 {
 	// ObjectManager에 자신을 등록
+	m_componentCache.fill(nullptr);
 	m_instanceID = OBJECT.RegisterGameObject(this);
 
 	// 기본적으로 Transform을 소유
 	auto transform = Transform::Create();
-	m_transform = transform.get();
-	if (!m_transform) return false;
 	AddComponent(std::move(transform));
 	return true;
+}
+
+Transform& GameObject::GetTransform() const
+{
+	return *static_cast<Transform*>(m_componentCache[(usize)ComponentType::Transform]);
 }
 
 /*==========================================//
@@ -47,7 +52,10 @@ bool GameObject::IsActiveInHierarchy() const
 	if (!m_active) return false;
 
 	// 2. 부모가 있다면 부모에게 물어봄 (재귀)
-	Transform* parentTransform = m_transform->GetParent();
+	Component* transform = m_componentCache[(usize)ComponentType::Transform];
+	if (!transform) return true;
+
+	Transform* parentTransform = static_cast<Transform*>(transform)->GetParent();
 	if (parentTransform) return parentTransform->GetOwner()->IsActiveInHierarchy();
 
 	// 3. 부모가 없다면(루트) true
@@ -144,41 +152,6 @@ void GameObject::OnDestroy()
 }
 
 /*=====================//
-//  component methods  //
-//=====================*/
-void GameObject::AddComponent(ComponentUPtr component)
-{
-	if (!component) return;
-
-	// 1. 주인 설정 및 먼저 벡터에 등록 (소유권 이동)
-	component->SetOwner(this);
-	m_components.push_back(std::move(component));
-
-	// 2. 방금 넣은 컴포넌트 포인터 가져오기 (move 되었으므로 back()으로 접근)
-	Component* newComp = m_components.back().get();
-
-	// 3. ObjectManager에 등록
-	OBJECT.RegisterComponent(newComp);
-
-	// 3. 런타임 초기화 진행 (안전하게 GetComponent 가능)
-	// TODO : 이 부분이 런타임 초기화 로직 부분임.
-	// 따로 메서드로 작성할 필요가 있을 수 있음.
-	if (m_state >= GameObjectState::Awake)
-	{
-		newComp->Awake();
-	}
-
-	if (m_state >= GameObjectState::Active && IsActiveInHierarchy())
-	{
-		if (newComp->IsEnabled())
-		{
-			newComp->OnEnable();
-			newComp->Start();
-		}
-	}
-}
-
-/*=====================//
 //  hierarchy methods  //
 //=====================*/
 GameObject* GameObject::GetRoot()
@@ -190,15 +163,12 @@ void GameObject::SetParent(GameObject* parent)
 {
 	// 부모가 바뀌면 계층 활성화 상태가 바뀔 수 있음 (예: 꺼진 부모 -> 켜진 부모)
 	bool wasActive = IsActiveInHierarchy();
-
-	// parent가 nullptr이면 부모를 없애고(Root로 만든다는 의미) 부모 설정
 	Transform* parentTransform = (parent != nullptr) ? &parent->GetTransform() : nullptr;
-	m_transform->SetParent(parentTransform);
+	
+	GetTransform().SetParent(parentTransform);
 
 	bool nowActive = IsActiveInHierarchy();
-
-	if (wasActive != nowActive) 
-		SetActiveStateHierarchy(nowActive);
+	if (wasActive != nowActive) SetActiveStateHierarchy(nowActive);
 }
 
 void GameObject::AddChild(GameObject* child)
@@ -224,7 +194,7 @@ void GameObject::SetActiveStateHierarchy(bool active)
 	// 주의: 자식 자체가 SetActive(false)로 꺼져있다면, 
 	// 부모가 켜지든 말든 걔는 계속 꺼져있어야 하므로 전파하면 안 됨.
 	// 즉, 자식의 로컬 m_active가 true인 경우에만 계층 변화의 영향을 받음.
-	const auto& children = m_transform->GetChildren();
+	const auto& children = GetTransform().GetChildren();
 	for (Transform* childTransform : children)
 	{
 		GameObject* childGO = childTransform->GetOwner();

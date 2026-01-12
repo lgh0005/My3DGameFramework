@@ -4,7 +4,7 @@
 CLASS_PTR(GameObject)
 #pragma endregion
 
-CLASS_PTR(GameObjectManager)
+CLASS_PTR(GameObjectManager) // GameObjectRegistry
 class GameObjectManager
 {
 public:
@@ -13,18 +13,17 @@ public:
 	void AddGameObject(GameObjectUPtr go);
 	void DestroyGameObject(GameObject* go);
 
-	GameObject* FindGameObject(const std::string& name);
+	void FlushCreateQueue();
+	void FlushDestroyQueue();
 	void PushToDestroyQueue(GameObject* go);
 
 	const std::vector<GameObjectUPtr>& GetGameObjects() const;
 	const std::vector<GameObjectUPtr>& GetPendingCreateQueue() const;
 	const std::vector<GameObject*>& GetPendingDestroyQueue() const;
 
-	void FlushCreateQueue();
-	void FlushDestroyQueue();
-
 private:
 	GameObjectManager();
+	void Init();
 
 	std::vector<GameObjectUPtr> m_gameObjects;
 	std::vector<GameObjectUPtr> m_pendingCreateQueue;
