@@ -20,3 +20,5 @@ constexpr float halfPi = pi / 2.0f;
 constexpr float twoPi = pi * 2.0f;
 constexpr float degToRad = pi / 180.0f;           
 constexpr float radToDeg = 180.0f / pi;
+
+using ScriptID = uint64;

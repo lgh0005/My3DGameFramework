@@ -33,6 +33,7 @@ add_library(Engine STATIC
    "GameObject/Prefab.h"                  "GameObject/Prefab.cpp"
    "GameObject/GameObjectRegistry.h"      "GameObject/GameObjectRegistry.cpp"
    "GameObject/ObjectValidator.h"         "GameObject/ObjectValidator.cpp"
+   "GameObject/ScriptRegistry.h"          "GameObject/ScriptRegistry.cpp"
 
    # Common Render Passes
    "Pipelines/Common/CullingPass.h" "Pipelines/Common/CullingPass.cpp"

@@ -22,12 +22,14 @@ bool NavigationManager::Init()
 
 bool NavigationManager::BuildNavMesh(const std::vector<float>& vertices, const std::vector<int>& indices)
 {
-
+	// TODO
+	return true;
 }
 
 bool NavigationManager::FindPath(const glm::vec3& startPos, const glm::vec3& endPos, std::vector<glm::vec3>& outPath)
 {
-
+	// TODO
+	return true;
 }
 
 void NavigationManager::Clean()

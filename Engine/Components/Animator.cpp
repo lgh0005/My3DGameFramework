@@ -77,7 +77,10 @@ void Animator::BindBoneTransforms()
                 {
                     // BoneID 위치에 Transform 포인터 저장
                     if (info.id < m_skinningTransforms.size())
+                    {
                         m_skinningTransforms[info.id] = m_boneTransformMap[name];
+                        mappedCount++;
+                    }
                 }
             }
             LOG_INFO("Animator Binding: Mapped {} / {} bones.", mappedCount, skeleton->GetBoneCount());

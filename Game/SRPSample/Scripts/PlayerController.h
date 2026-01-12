@@ -11,6 +11,8 @@ CLASS_PTR(Collider)
 CLASS_PTR(PlayerController)
 class PlayerController : public Script
 {
+    DEFINE_SCRIPT(PlayerController)
+
 public:
     virtual ~PlayerController();
     static PlayerControllerUPtr Create();

@@ -1,6 +1,7 @@
 ﻿#pragma once
 #include "Component.h"
 #include "Scene/SceneUtils.h"
+#include "GameObject/ScriptRegistry.h"
 
 #pragma region FORWARD_DECLARATION
 CLASS_PTR(Collider)
@@ -13,6 +14,7 @@ public:
 	virtual ~Script();
 	static const ComponentType s_ComponentType = ComponentType::Script;
 	virtual ComponentType GetComponentType() const override { return ComponentType::Script; }
+	virtual ScriptID GetScriptID() const = 0;
 
 /*============================================//
 //  event methods for script : active state   //

@@ -83,3 +83,11 @@ using className ## ConstRef = JPH::RefConst<className>;
 //===============================*/
 // max memory allocation value
 #define MAX_PHYSICS_MEMORY_ALLOC_VALUE 10 * 1024 * 1024 // 10MB
+
+/*================================//
+//   Script id generation macro   //
+//================================*/
+#define DEFINE_SCRIPT(scriptName)                                                         \
+public:                                                                                   \
+    static ScriptID GetStaticScriptID() { return ScriptRegistry::GetID<scriptName>(); }   \
+    virtual ScriptID GetScriptID() const override { return GetStaticScriptID(); }

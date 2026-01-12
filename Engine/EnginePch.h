@@ -3,6 +3,7 @@
 // C++
 #include <cstdarg>
 #include <cstdint>
+#include <limits>
 #include <string>
 #include <vector>
 #include <array>
@@ -14,6 +15,9 @@
 #include <random>
 #include <optional>
 #include <functional>
+#include <type_traits>
+#include <memory_resource>
+#include <atomic>
 #include <thread>
 #include <mutex>
 namespace fs = std::filesystem;

@@ -8,6 +8,8 @@ CLASS_PTR(MeshOutline)
 CLASS_PTR(CameraController)
 class CameraController : public Script
 {
+    DEFINE_SCRIPT(CameraController)
+
 public:
     virtual ~CameraController();
     static CameraControllerUPtr Create();
