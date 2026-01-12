@@ -21,4 +21,6 @@ constexpr float twoPi = pi * 2.0f;
 constexpr float degToRad = pi / 180.0f;           
 constexpr float radToDeg = 180.0f / pi;
 
+using InstanceID = uint64;
 using ScriptID = uint64;
+using RegistryIndex = usize;

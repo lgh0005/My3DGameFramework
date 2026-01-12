@@ -2,7 +2,7 @@
 #include "StandardOutlinePass.h"
 
 #include "Graphics/RenderContext.h"
-#include "GameObject/GameObject.h"
+#include "Object/GameObject.h"
 #include "Resources/Program.h"
 #include "Framebuffers/OutlineFramebuffer.h"
 #include "Framebuffers/PostProcessFramebuffer.h"

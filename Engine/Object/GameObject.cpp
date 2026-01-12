@@ -1,10 +1,22 @@
 ﻿#include "EnginePch.h"
 #include "GameObject.h"
 #include "Scene/Scene.h"
-#include "Components/Component.h"
+#include "Object/Component.h"
 #include "Components/Transform.h"
 
-DECLARE_DEFAULTS_IMPL(GameObject)
+GameObject::GameObject() = default;
+GameObject::~GameObject()
+{
+	// 1. 내가 가진 모든 컴포넌트를 ObjectManager 캐시에서 제거
+	for (auto& comp : m_components)
+	{
+		if (comp) OBJECT.UnregisterComponent(comp.get());
+	}
+
+	// 2. this(GameObject)을 ObjectManager 관리 대장에서 말소
+	if (OBJECT.IsGameObjectAlive(m_instanceID))
+		OBJECT.UnregisterGameObject(m_instanceID);
+}
 
 GameObjectUPtr GameObject::Create()
 {
@@ -15,6 +27,9 @@ GameObjectUPtr GameObject::Create()
 
 bool GameObject::Init()
 {
+	// ObjectManager에 자신을 등록
+	m_instanceID = OBJECT.RegisterGameObject(this);
+
 	// 기본적으로 Transform을 소유
 	auto transform = Transform::Create();
 	m_transform = transform.get();
@@ -133,13 +148,17 @@ void GameObject::OnDestroy()
 //=====================*/
 void GameObject::AddComponent(ComponentUPtr component)
 {
-	component->SetOwner(this);
+	if (!component) return;
 
-	// 1. 먼저 벡터에 등록 (소유권 이동)
+	// 1. 주인 설정 및 먼저 벡터에 등록 (소유권 이동)
+	component->SetOwner(this);
 	m_components.push_back(std::move(component));
 
 	// 2. 방금 넣은 컴포넌트 포인터 가져오기 (move 되었으므로 back()으로 접근)
 	Component* newComp = m_components.back().get();
+
+	// 3. ObjectManager에 등록
+	OBJECT.RegisterComponent(newComp);
 
 	// 3. 런타임 초기화 진행 (안전하게 GetComponent 가능)
 	// TODO : 이 부분이 런타임 초기화 로직 부분임.

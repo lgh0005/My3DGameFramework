@@ -27,13 +27,12 @@ add_library(Engine STATIC
    "Scene/SceneRegistry.h"           "Scene/SceneRegistry.cpp"
    "Scene/SceneUtils.h"              "Scene/SceneUtils.cpp"
 
-   # GameObject
-   "GameObject/GameObject.h"              "GameObject/GameObject.cpp"
-   "GameObject/ComponentManager.h"        "GameObject/ComponentManager.cpp"
-   "GameObject/Prefab.h"                  "GameObject/Prefab.cpp"
-   "GameObject/GameObjectRegistry.h"      "GameObject/GameObjectRegistry.cpp"
-   "GameObject/ObjectValidator.h"         "GameObject/ObjectValidator.cpp"
-   "GameObject/ScriptRegistry.h"          "GameObject/ScriptRegistry.cpp"
+   # Object
+   "Object/Object.h"                  "Object/Object.cpp"
+   "Object/GameObject.h"              "Object/GameObject.cpp"
+   "Object/Component.h"               "Object/Component.cpp"
+   "Object/Prefab.h"                  "Object/Prefab.cpp"
+   "Object/ScriptRegistry.h"          "Object/ScriptRegistry.cpp"
 
    # Common Render Passes
    "Pipelines/Common/CullingPass.h" "Pipelines/Common/CullingPass.cpp"
@@ -141,7 +140,6 @@ add_library(Engine STATIC
    "Resources/EnvironmentMap.h"    "Resources/EnvironmentMap.cpp"
 
    # Components
-   "Components/Component.h"         "Components/Component.cpp"
    "Components/Light.h"             "Components/Light.cpp"
    "Components/Script.h"            "Components/Script.cpp"
    "Components/PhysicsComponent.h"  "Components/PhysicsComponent.cpp"
@@ -186,6 +184,7 @@ add_library(Engine STATIC
    "Managers/AudioManager.h"        "Managers/AudioManager.cpp"
    "Managers/PhysicsManager.h"      "Managers/PhysicsManager.cpp"
    "Managers/UIManager.h"           "Managers/UIManager.cpp"
+   "Managers/ObjectManager.h"       "Managers/ObjectManager.cpp"
 )
 
 # 2. [PCH 설정] EnginePCH.h를 PCH로 사용합니다.

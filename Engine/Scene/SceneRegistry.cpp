@@ -1,7 +1,7 @@
 ﻿#include "EnginePch.h"
 #include "SceneRegistry.h"
 
-#include "GameObject/GameObject.h"
+#include "Object/GameObject.h"
 #include "Graphics/RenderPass.h"
 #include "Resources/Mesh.h"
 #include "Graphics/SkyLight.h"

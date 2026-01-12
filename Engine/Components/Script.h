@@ -1,7 +1,7 @@
 ﻿#pragma once
-#include "Component.h"
+#include "Object/Component.h"
 #include "Scene/SceneUtils.h"
-#include "GameObject/ScriptRegistry.h"
+#include "Object/ScriptRegistry.h"
 
 #pragma region FORWARD_DECLARATION
 CLASS_PTR(Collider)

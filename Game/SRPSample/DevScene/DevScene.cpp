@@ -1,7 +1,7 @@
 ﻿#include "pch.h"
 #include "DevScene.h"
 
-#include "GameObject/GameObject.h"
+#include "Object/GameObject.h"
 #include "Graphics/Renderer.h"
 #include "Resources/Program.h"
 #include "Resources/Mesh.h"

@@ -1,6 +1,6 @@
 ﻿#include "EnginePch.h"
 #include "Rigidbody.h"
-#include "GameObject/GameObject.h"
+#include "Object/GameObject.h"
 #include "Components/Collider.h"
 #include "Components/Transform.h"
 #include <Jolt/Physics/Body/Body.h>

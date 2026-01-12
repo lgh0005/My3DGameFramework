@@ -1,5 +1,5 @@
 ﻿#pragma once
-#include "Components/Component.h"
+#include "Object/Component.h"
 
 CLASS_PTR(MeshOutline)
 class MeshOutline : public Component

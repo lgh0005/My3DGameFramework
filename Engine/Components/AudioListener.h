@@ -1,5 +1,5 @@
 ﻿#pragma once
-#include "Components/Component.h"
+#include "Object/Component.h"
 
 CLASS_PTR(AudioListener)
 class AudioListener : public Component

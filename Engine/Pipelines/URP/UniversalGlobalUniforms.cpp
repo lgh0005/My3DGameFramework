@@ -1,5 +1,5 @@
 ﻿#include "EnginePch.h"
-#include "GameObject/GameObject.h"
+#include "Object/GameObject.h"
 #include "UniversalGlobalUniforms.h"
 #include "Graphics/UniformBuffer.h"
 #include "Graphics/RenderContext.h"

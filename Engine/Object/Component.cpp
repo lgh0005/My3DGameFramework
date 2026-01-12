@@ -1,7 +1,6 @@
 ﻿#include "EnginePch.h"
 #include "Component.h"
-#include "GameObject/GameObject.h"
-#include "GameObject/ObjectValidator.h"
+#include "Object/GameObject.h"
 #include "Components/Transform.h"
 
 DECLARE_DEFAULTS_IMPL(Component)

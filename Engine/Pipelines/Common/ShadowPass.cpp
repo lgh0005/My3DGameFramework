@@ -2,7 +2,7 @@
 #include "ShadowPass.h"
 
 #include "Scene/Scene.h"
-#include "GameObject/GameObject.h"
+#include "Object/GameObject.h"
 #include "Resources/Program.h" 
 #include "Graphics/ShadowMap.h"
 #include "Resources/Mesh.h"

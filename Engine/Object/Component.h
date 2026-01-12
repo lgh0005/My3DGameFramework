@@ -1,4 +1,6 @@
 ﻿#pragma once
+#include "Object.h"
+#include "Managers/ObjectManager.h"
 
 #pragma region FORWARD_DECLARATION
 CLASS_PTR(GameObject)
@@ -44,7 +46,7 @@ enum class ComponentType
 
 	// Misc
 	Terrain,
-	Unknown
+	MAX
 };
 
 enum class ComponentState
@@ -56,7 +58,7 @@ enum class ComponentState
 };
 
 CLASS_PTR(Component)
-class Component
+class Component : public Object
 {
 	friend class GameObject;
 
@@ -64,6 +66,9 @@ public:
 	virtual ~Component();
 	virtual ComponentType GetComponentType() const = 0;
 	virtual bool MatchesType(ComponentType type) const;
+
+	void SetRegistryIndex(usize idx) { m_registryIndex = idx; }
+	usize GetRegistryIndex() const { return m_registryIndex; }
 
 	GameObject* GetOwner() const;
 	Transform& GetTransform();
@@ -79,21 +84,21 @@ public:
 	bool IsEnabled() const;
 
 protected:
-	virtual void Awake();			// 변수 초기화
-	virtual void Start();			// 타 객체 참조
+	virtual void Awake()		override;			// 변수 초기화
+	virtual void Start()		override;			// 타 객체 참조
+	virtual void FixedUpdate()	override;			// 물리 연산
+	virtual void Update()		override;			// 게임 로직
+	virtual void LateUpdate()	override;			// 카메라/후처리
+	virtual void OnDestroy()	override;			// 삭제 될 때
 
-	virtual void FixedUpdate();	// 물리 연산
-	virtual void Update();		// 게임 로직
-	virtual void LateUpdate();	// 카메라/후처리
-
-	virtual void OnEnable();		// 활성화 될 때
-	virtual void OnDisable();		// 비활성화 될 때
-	virtual void OnDestroy();		// 삭제 될 때
+	virtual void OnEnable();						// 활성화 될 때
+	virtual void OnDisable();						// 비활성화 될 때
 
 protected:
 	Component();
 	void SetOwner(GameObject* gameObject) { m_owner = gameObject; }
 	GameObject* m_owner	   { nullptr };
 	bool		m_enabled  { true };
-	ComponentState m_state{ ComponentState::Uninitialized };
+	ComponentState m_state { ComponentState::Uninitialized };
+	RegistryIndex  m_registryIndex	{ static_cast<usize>(-1) };
 };

@@ -1,7 +1,7 @@
 ﻿#include "EnginePch.h"
 #include "Model.h"
 #include "Scene/Scene.h"
-#include "GameObject/GameObject.h"
+#include "Object/GameObject.h"
 #include "Components/Transform.h"
 #include "Components/Animator.h"
 #include "Components/StaticMeshRenderer.h"

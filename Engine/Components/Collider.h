@@ -1,5 +1,5 @@
 ﻿#pragma once
-#include "Component.h"
+#include "Object/Component.h"
 #include <Jolt/Physics/Collision/Shape/Shape.h>
 
 CLASS_PTR(Collider)

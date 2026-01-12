@@ -1,4 +1,5 @@
 ﻿#pragma once
+#include "Object.h"
 
 #pragma region FORWARD_DECLARATION
 CLASS_PTR(Scene)
@@ -16,11 +17,13 @@ enum class GameObjectState
 };
 
 CLASS_PTR(GameObject)
-class GameObject 
+class GameObject : public Object
 {
 public:
-	~GameObject();
+	virtual ~GameObject();
 	static GameObjectUPtr Create();
+	InstanceID GetInstanceID() const { return m_instanceID; }
+	void SetInstanceID(InstanceID id) { m_instanceID = id; }
 
 	Transform& GetTransform()    const	     { return *m_transform; }
 	const std::string& GetName() const		 { return m_name; }
@@ -34,16 +37,17 @@ public:
 	bool IsActive() const { return m_active; } // 로컬 활성화 상태
 	bool IsActiveInHierarchy() const;          // 부모까지 포함한 실제 활성화 상태
 	bool IsDead() const { return m_state == GameObjectState::Dead; }
+	void SetActive(bool active);
 
 	// 생명 주기 메서드
-	void Awake();
-	void Start();
-	void SetActive(bool active);
-	void FixedUpdate();
-	void Update();
-	void LateUpdate();
+	void Awake()		override;
+	void Start()		override;
+	void FixedUpdate()  override;
+	void Update()		override;
+	void LateUpdate()   override;
+	void OnDestroy()	override;
+
 	void SetDestroy();
-	void OnDestroy();
 	void DontDestroyOnLoad(bool enable) { m_dontDestroyOnLoad = enable; }
 	bool IsDontDestroyOnLoad() const { return m_dontDestroyOnLoad; }
 
@@ -69,16 +73,17 @@ private:
 	GameObject();
 	bool Init();
 
-	// 게임 오브젝트 기준 필요 멤버들
-	Transform*		m_transform					 { nullptr };
-	std::string		m_name						 { "GameObject" };
+	// 상태
 	bool			m_active					 { true };
 	bool            m_dontDestroyOnLoad			 { false };
 	GameObjectState m_state						 { GameObjectState::Uninitialized };
 	
-	// TODO : 개인적으로는 성능을 위해서라면 이것 또한
-	// Registry를 따로 만드는 편이 더 좋아보이긴 한다.
+	// 컴포넌트
+	Transform* m_transform{ nullptr };
 	std::vector<ComponentUPtr> m_components;
+
+	// ObjectManager 상태 기록 캐시
+	InstanceID m_instanceID						 { static_cast<usize>(-1) };
 };
 
 /*=================================//

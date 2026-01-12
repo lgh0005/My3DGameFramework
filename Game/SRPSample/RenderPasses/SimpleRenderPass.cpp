@@ -9,7 +9,7 @@
 #include "Components/StaticMeshRenderer.h"
 #include "Components/Transform.h"
 #include "Components/SpotLight.h"
-#include "GameObject/GameObject.h"
+#include "Object/GameObject.h"
 
 DECLARE_DEFAULTS_IMPL(SimpleRenderPass)
 

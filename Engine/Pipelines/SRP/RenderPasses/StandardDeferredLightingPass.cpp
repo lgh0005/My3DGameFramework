@@ -7,7 +7,7 @@
 #include "Pipelines/SRP/RenderPasses/StandardPostProcessPass.h"
 
 #include "Scene/SceneRegistry.h"
-#include "GameObject/GameObject.h"
+#include "Object/GameObject.h"
 #include "Graphics/Geometry.h"
 #include "Resources/Program.h"
 #include "Resources/ScreenMesh.h"

@@ -1,7 +1,7 @@
 ﻿#include "EnginePch.h"
 #include "PBRScene.h"
 
-#include "GameObject/GameObject.h"
+#include "Object/GameObject.h"
 #include "Resources/Program.h"
 #include "Resources/Mesh.h"
 #include "Resources/StaticMesh.h"

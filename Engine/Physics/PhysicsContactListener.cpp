@@ -1,6 +1,6 @@
 ﻿#include "EnginePch.h"
 #include "Physics/PhysicsContactListener.h"
-#include "GameObject/GameObject.h"
+#include "Object/GameObject.h"
 #include "Components/Collider.h"
 #include "Components/Script.h"
 #include <Jolt/Physics/Body/Body.h>

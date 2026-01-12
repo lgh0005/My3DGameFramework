@@ -1,5 +1,5 @@
 ﻿#pragma once
-#include "Component.h"
+#include "Object/Component.h"
 
 // TODO:
 // 1. 부모-자식의 컴포넌트들의 Active 순회는 Transform을 통해서.

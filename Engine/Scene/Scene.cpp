@@ -1,7 +1,7 @@
 ﻿#include "EnginePch.h"
 #include "Scene.h"
 
-#include "GameObject/GameObject.h"
+#include "Object/GameObject.h"
 #include "Scene/SceneRegistry.h"
 #include "Scene/GameObjectManager.h"
 #include "Graphics/RenderPass.h"
@@ -188,4 +188,3 @@ void Scene::SetSkyLight(SkyLightUPtr skyLight)
 {
 	m_registry->SetSkyLight(std::move(skyLight));
 }
-

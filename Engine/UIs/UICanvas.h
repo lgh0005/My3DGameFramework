@@ -1,5 +1,5 @@
 ﻿#pragma once
-#include "Components/Component.h"
+#include "Object/Component.h"
 
 #pragma region FORWARD_DECLARATION
 CLASS_PTR(Program)
