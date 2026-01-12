@@ -33,8 +33,8 @@ void UIMesh::Init()
     glm::vec3 maxBound(-FLT_MAX); // 아주 작은 값으로 초기화
     for (const auto& v : vertices)
     {
-        minBound = Utils::Min(minBound, v.position);
-        maxBound = Utils::Max(maxBound, v.position);
+        minBound = Utils::GlmVec3Min(minBound, v.position);
+        maxBound = Utils::GlmVec3Max(maxBound, v.position);
     }
     // UI의 기본 피벗은 좌측 하단이기에 중앙을 맞춘다.
     m_localBounds = RenderBounds::Create
@@ -84,8 +84,8 @@ void UIMesh::SetVertices(const std::vector<UIVertex>& vertices)
     glm::vec3 maxBound(-FLT_MAX);
     for (const auto& v : vertices)
     {
-        minBound = Utils::Min(minBound, v.position);
-        maxBound = Utils::Max(maxBound, v.position);
+        minBound = Utils::GlmVec3Min(minBound, v.position);
+        maxBound = Utils::GlmVec3Max(maxBound, v.position);
     }
     m_localBounds = RenderBounds::Create
     (

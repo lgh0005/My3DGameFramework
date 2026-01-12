@@ -2,11 +2,6 @@
 #include "Graphics/Renderer.h"
 #include "Graphics/RenderPipeline.h"
 
-#pragma region FORWARD_DECLARATION
-CLASS_PTR(Renderer)
-CLASS_PTR(RenderPipeline)
-#pragma endregion
-
 class RenderManager
 {
 	DECLARE_SINGLE(RenderManager)
@@ -32,14 +27,4 @@ private:
 	RendererUPtr m_renderer;
 };
 
-/*====================================//
-//   RenderManager template inlines   //
-//====================================*/
-template<typename T>
-inline void RenderManager::RegisterPipeline(const std::string& name)
-{
-	m_pipelines[name] = []() -> RenderPipelineUPtr
-	{
-		return T::Create();
-	};
-}
+#include "Managers/RenderManager.inl"

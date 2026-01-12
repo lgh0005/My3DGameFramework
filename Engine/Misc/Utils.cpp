@@ -109,25 +109,25 @@ float Utils::Lerp(float a, float b, float f)
 /*=======================================//
 //   최적화된 수치 연산 및 비교 유틸 함수   //
 //=======================================*/
-glm::vec3 Utils::Min(const glm::vec3& a, const glm::vec3& b)
+glm::vec3 Utils::GlmVec3Min(const glm::vec3& a, const glm::vec3& b)
 {
 	// 각 성분별로 최솟값을 취하여 새로운 vec3를 생성
 	return glm::vec3
 	(
-		std::min<float>(a.x, b.x),
-		std::min<float>(a.y, b.y),
-		std::min<float>(a.z, b.z)
+		Min<float>(a.x, b.x),
+		Min<float>(a.y, b.y),
+		Min<float>(a.z, b.z)
 	);
 }
 
-glm::vec3 Utils::Max(const glm::vec3& a, const glm::vec3& b)
+glm::vec3 Utils::GlmVec3Max(const glm::vec3& a, const glm::vec3& b)
 {
 	// 각 성분별로 최댓값을 취하여 새로운 vec3를 생성
 	return glm::vec3
 	(
-		glm::max<float>(a.x, b.x),
-		std::max<float>(a.y, b.y),
-		std::max<float>(a.z, b.z)
+		Max<float>(a.x, b.x),
+		Max<float>(a.y, b.y),
+		Max<float>(a.z, b.z)
 	);
 }
 

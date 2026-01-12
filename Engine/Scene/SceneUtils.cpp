@@ -8,13 +8,13 @@ Scene* SceneUtils::GetCurrentScene()
 	return SCENE.GetActiveScene();
 }
 
-GameObject* SceneUtils::FindObject(const std::string& name)
-{
-	Scene* scene = GetCurrentScene();
-	if (!scene) return nullptr;
-
-	return scene->FindGameObject(name);
-}
+//GameObject* SceneUtils::FindObject(const std::string& name)
+//{
+//	Scene* scene = GetCurrentScene();
+//	if (!scene) return nullptr;
+//
+//	return scene->FindGameObject(name);
+//}
 
 void SceneUtils::Destroy(GameObject* obj)
 {

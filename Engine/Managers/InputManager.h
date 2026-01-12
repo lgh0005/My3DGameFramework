@@ -60,7 +60,7 @@ private:
 	std::unordered_map<std::string, bool> m_prevActionStates;
 	InputAction* m_keyMap[GLFW_KEY_LAST + 1]			= { nullptr };
 	InputAction* m_mouseMap[GLFW_MOUSE_BUTTON_LAST + 1] = { nullptr };
-	glm::vec2 m_mousePos							   { 0.0f, 0.0f };
+	glm::vec2 m_mousePos							      { 0.0f, 0.0f };
 
 /*========================//
 //   ingui debug metohds  //
@@ -73,14 +73,4 @@ private:
 #pragma endregion
 };
 
-/*===================================//
-//   input manager template inlines  //
-//===================================*/
-#pragma region INPUT_MANAGER_INLINES
-template<typename T>
-inline void InputManager::BindAction(const std::string& actionName, T* instance, void(T::* func)())
-{
-	auto boundFunc = [instance, func]() { (instance->*func)(); };
-	GetOrCreateAction(actionName)->Callbacks[(int32)eventType].push_back(boundFunc);
-}
-#pragma endregion
+#include "Managers/InputManager.inl"

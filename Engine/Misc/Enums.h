@@ -78,3 +78,13 @@ enum class GameObjectState
 	Inactive,      // 비활성화 상태 (SetActive(false))
 	Dead           // Destroy 예약됨 (다음 프레임 삭제)
 };
+
+enum class SceneState
+{
+	Uninitialized,  // 생성 직후, 리소스 로드 전
+	Loading,        // (옵션) LoadSceneResources 진행 중
+	Awake,          // 객체 배치(OnPlaceActors) 완료, 씬 내부 Awake 완료
+	Running,        // Start 완료, 메인 루프(Update) 돌아가는 중
+	Paused,         // (옵션) 일시 정지
+	Unloading       // 씬 종료/전환 중
+};

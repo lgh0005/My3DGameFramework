@@ -188,8 +188,8 @@ void Animator::UpdateCurrentPoseLocalBounds()
             glm::vec3 worldPos = transform->GetWorldPosition();
             glm::vec3 localPos = glm::vec3(rootInverse * glm::vec4(worldPos, 1.0f));
 
-            minPos = Utils::Min(minPos, localPos);
-            maxPos = Utils::Max(maxPos, localPos);
+            minPos = Utils::GlmVec3Min(minPos, localPos);
+            maxPos = Utils::GlmVec3Max(maxPos, localPos);
         }
     }
 

@@ -330,8 +330,8 @@ void Model::ProcessAssimpSkinnedMesh(aiMesh* mesh, const aiScene* scene)
         if (mesh->mTangents) v.tangent = { mesh->mTangents[i].x, mesh->mTangents[i].y, mesh->mTangents[i].z };
         else v.tangent = { 0.0f, 0.0f, 0.0f };
 
-        minBound = Utils::Min(minBound, v.position);
-        maxBound = Utils::Max(maxBound, v.position);
+        minBound = Utils::GlmVec3Min(minBound, v.position);
+        maxBound = Utils::GlmVec3Max(maxBound, v.position);
     }
 
     // 2. Bone Weights (Assimp only)
@@ -377,8 +377,8 @@ void Model::ProcessAssimpStaticMesh(aiMesh* mesh, const aiScene* scene)
         if (mesh->mTangents) v.tangent = { mesh->mTangents[i].x, mesh->mTangents[i].y, mesh->mTangents[i].z };
         else v.tangent = { 0.0f, 0.0f, 0.0f };
 
-        minBound = Utils::Min(minBound, v.position);
-        maxBound = Utils::Max(maxBound, v.position);
+        minBound = Utils::GlmVec3Min(minBound, v.position);
+        maxBound = Utils::GlmVec3Max(maxBound, v.position);
     }
 
     // 2. Indices

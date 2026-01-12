@@ -29,7 +29,7 @@ JPH::ShapeRefC BoxCollider::CreateRawShape()
 
 	// 2. 최소 크기 보정 (Utils 사용)
 	// 길이 비교가 아니라, X, Y, Z 각각 최소 0.001f는 되도록 강제함
-	halfExtent = Utils::Max(halfExtent, glm::vec3(0.001f));
+	halfExtent = Utils::GlmVec3Max(halfExtent, glm::vec3(0.001f));
 
 	// 3. Jolt BoxShape 생성
 	return new JPH::BoxShape(JPH::Vec3(halfExtent.x, halfExtent.y, halfExtent.z));

@@ -65,7 +65,7 @@ void GameObjectManager::FlushCreateQueue()
 		// TODO : Utils에 대해서 Max부분은 GLMVec3Max, GLMVec3Min으로 수정하고
 		// 두 수 비교에 대해서는 Min, Max로 만들어야 할 필요가 있을 듯.
 		usize doubledCapacity = m_gameObjects.capacity() * 2;
-		m_gameObjects.reserve((requiredSize > doubledCapacity ? requiredSize : doubledCapacity));
+		m_gameObjects.reserve(Utils::Max<usize>(requiredSize, doubledCapacity));
 	}
 
 	// 2. 소유권 일괄 이동

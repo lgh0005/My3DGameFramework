@@ -10,7 +10,7 @@ class SceneUtils
     DECLARE_STATIC_CLASS(SceneUtils)
 
 public:
-    static GameObject* FindObject(const std::string& name);
+    // static GameObject* FindObject(const std::string& name);
     static void Destroy(GameObject* obj);
     // TODO : static GameObject* Instantiate();
 

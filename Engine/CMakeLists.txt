@@ -28,8 +28,8 @@ add_library(Engine STATIC
    "Scene/SceneUtils.h"              "Scene/SceneUtils.cpp"
 
    # Object
-   "Object/Object.h"                  "Object/Object.cpp"       "Object/GameObject.inl"
-   "Object/GameObject.h"              "Object/GameObject.cpp"
+   "Object/Object.h"                  "Object/Object.cpp"       
+   "Object/GameObject.h"              "Object/GameObject.cpp"    "Object/GameObject.inl"
    "Object/Component.h"               "Object/Component.cpp"
    "Object/Prefab.h"                  "Object/Prefab.cpp"
    "Object/ScriptRegistry.h"          "Object/ScriptRegistry.cpp"
@@ -180,14 +180,14 @@ add_library(Engine STATIC
    # Managers
    "Managers/TimeManager.h"         "Managers/TimeManager.cpp"
    "Managers/WindowManager.h"       "Managers/WindowManager.cpp"
-   "Managers/InputManager.h"        "Managers/InputManager.cpp"           
-   "Managers/ResourceManager.h"     "Managers/ResourceManager.cpp"
-   "Managers/SceneManager.h"        "Managers/SceneManager.cpp"
-   "Managers/RenderManager.h"       "Managers/RenderManager.cpp"
+   "Managers/InputManager.h"        "Managers/InputManager.cpp"          "Managers/InputManager.inl"     
+   "Managers/ResourceManager.h"     "Managers/ResourceManager.cpp"       "Managers/ResourceManager.inl"
+   "Managers/SceneManager.h"        "Managers/SceneManager.cpp"           "Managers/SceneManager.inl"
+   "Managers/RenderManager.h"       "Managers/RenderManager.cpp"         "Managers/RenderManager.inl"
    "Managers/AudioManager.h"        "Managers/AudioManager.cpp"
    "Managers/PhysicsManager.h"      "Managers/PhysicsManager.cpp"
    "Managers/UIManager.h"           "Managers/UIManager.cpp"
-   "Managers/ObjectManager.h"       "Managers/ObjectManager.cpp"
+   "Managers/ObjectManager.h"       "Managers/ObjectManager.cpp"         "Managers/ObjectManager.inl"
 )
 
 # 2. [PCH 설정] EnginePCH.h를 PCH로 사용합니다.

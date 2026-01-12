@@ -86,8 +86,8 @@ RenderBounds RenderBounds::Union(const RenderBounds& other) const
     glm::vec3 maxB = other.m_center + other.m_extents;
 
     // 3. 두 Min/Max를 합쳐서 새로운 최종 Min/Max 계산 (Union)
-    glm::vec3 newMin = Utils::Min(minA, minB);
-    glm::vec3 newMax = Utils::Max(maxA, maxB);
+    glm::vec3 newMin = Utils::GlmVec3Min(minA, minB);
+    glm::vec3 newMax = Utils::GlmVec3Max(maxA, maxB);
 
     return RenderBounds::CreateFromMinMax(newMin, newMax);
 }
@@ -144,8 +144,8 @@ StaticMeshUPtr GeometryGenerator::CreateBox()
     glm::vec3 maxBound(-FLT_MAX);
     for (const auto& v : vertices)
     {
-        minBound = Utils::Min(minBound, v.position);
-        maxBound = Utils::Max(maxBound, v.position);
+        minBound = Utils::GlmVec3Min(minBound, v.position);
+        maxBound = Utils::GlmVec3Max(maxBound, v.position);
     }
 
     auto mesh = StaticMesh::Create(vertices, indices, GL_TRIANGLES);
@@ -171,8 +171,8 @@ StaticMeshUPtr GeometryGenerator::CreatePlane()
     glm::vec3 maxBound(-FLT_MAX);
     for (const auto& v : vertices)
     {
-        minBound = Utils::Min(minBound, v.position);
-        maxBound = Utils::Max(maxBound, v.position);
+        minBound = Utils::GlmVec3Min(minBound, v.position);
+        maxBound = Utils::GlmVec3Max(maxBound, v.position);
     }
 
     auto mesh = StaticMesh::Create(vertices, indices, GL_TRIANGLES);
@@ -238,8 +238,8 @@ StaticMeshUPtr GeometryGenerator::CreateSphere
     glm::vec3 maxBound(-FLT_MAX);
     for (const auto& v : vertices)
     {
-        minBound = Utils::Min(minBound, v.position);
-        maxBound = Utils::Max(maxBound, v.position);
+        minBound = Utils::GlmVec3Min(minBound, v.position);
+        maxBound = Utils::GlmVec3Max(maxBound, v.position);
     }
 
     auto mesh = StaticMesh::Create(vertices, indices, GL_TRIANGLES);

@@ -1,11 +1,11 @@
 ﻿#include "EnginePch.h"
 #include "SceneManager.h"
+#include "Scene/Scene.h"
 
-void SceneManager::LoadScene
-(
-	const std::string& scene,
-	const std::string& pipeline
-)
+/*===================================//
+//   default scene manager methods   //
+//===================================*/
+void SceneManager::LoadScene(const std::string& scene, const std::string& pipeline)
 {
 	// 1. 등록된 씬을 먼저 찾기
 	auto it = m_scenes.find(scene);
@@ -19,9 +19,9 @@ void SceneManager::LoadScene
 	RENDER.SetPipeline(pipeline);
 
 	// 3. 기존 씬 정리 (소멸자 호출 -> 리소스 해제)
-	// UI도 씬에 종속적이므로 정리
 	UI.Clear();
 	m_activeScene.reset();
+	OBJECT.Clear();
 	LOG_INFO("Loading Scene: {} ...", scene);
 
 	// 4. 새 씬 메모리 할당 (Factory 호출)
@@ -73,5 +73,9 @@ void SceneManager::Clear()
 {
 	m_activeScene.reset();
 	m_scenes.clear();
-	LOG_INFO("RenderManager Cleared.");
+	LOG_INFO("SceneManager Cleared.");
 }
+
+/*=========================================//
+//   active scene state checking methods   //
+//=========================================*/

@@ -58,7 +58,7 @@ public:
 public:
 	template<typename T> T* GetComponent() const;
 	template<typename T> void GetComponentsInChildren(std::vector<T*>& outComponents);
-	const std::vector<ComponentUPtr>& GetAllComponents() const { return m_components; }
+	const std::vector<ComponentUPtr>& GetComponents() const { return m_components; }
 
 public:
 	template<typename T, typename... Args> T* AddComponent(Args&&... args);

@@ -1,5 +1,4 @@
 ﻿#pragma once
-#include <glm/glm.hpp>
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
@@ -38,8 +37,10 @@ public:
 	static float Lerp(float a, float b, float f);
 
 	// 최적화된 수치 연산 및 비교 유틸 함수
-	static glm::vec3 Min(const glm::vec3& a, const glm::vec3& b);
-	static glm::vec3 Max(const glm::vec3& a, const glm::vec3& b);
+	template<typename T> static constexpr T Min(T a, T b) noexcept;
+	template<typename T> static constexpr T Max(T a, T b) noexcept;
+	static glm::vec3 GlmVec3Min(const glm::vec3& a, const glm::vec3& b);
+	static glm::vec3 GlmVec3Max(const glm::vec3& a, const glm::vec3& b);
 	static bool HasLength(const glm::vec3& v);
 	static glm::vec3 SafeNormalize(const glm::vec3& v);
 
@@ -49,3 +50,5 @@ public:
 public:
 	inline static const glm::mat4 IdentityMat4 = glm::mat4(1.0f);
 };
+
+#include "Misc/Utils.inl"
