@@ -14,8 +14,7 @@ public:
 	static AudioSourceUPtr Create(const AudioClipPtr& audioClip);
 	static const ComponentType s_ComponentType = ComponentType::AudioSource;
 	virtual ComponentType GetComponentType() const override { return ComponentType::AudioSource; }
-
-	void Update();
+	virtual void OnUpdate() override;
 
 	void Play();
 	void Stop();

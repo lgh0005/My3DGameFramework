@@ -17,7 +17,7 @@ public:
 	static AnimatorUPtr Create(ModelPtr model, AnimControllerUPtr controller);
 	static const ComponentType s_ComponentType = ComponentType::Animator;
 	virtual ComponentType GetComponentType() const override { return ComponentType::Animator; }
-	void Update();
+	virtual void OnUpdate() override;
 
 	AnimController* GetController() const { return m_controller.get(); }
 	const std::vector<glm::mat4>& GetFinalBoneMatrices() const { return m_finalBoneMatrices; }

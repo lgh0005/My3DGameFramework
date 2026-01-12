@@ -18,9 +18,9 @@ public:
     static PlayerControllerUPtr Create();
 
 public:
-    virtual void Start()  override;
-    virtual void Update() override;
-    virtual void FixedUpdate() override;
+    virtual void OnStart()  override;
+    virtual void OnUpdate() override;
+    virtual void OnFixedUpdate() override;
 
 public:
     virtual void OnCollisionEnter(Collider* other) override;

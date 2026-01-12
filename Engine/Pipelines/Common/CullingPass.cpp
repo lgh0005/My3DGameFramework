@@ -56,7 +56,7 @@ void CullingPass::CullStaticMeshRenderers(SceneRegistry* registry, RenderContext
     for (auto* renderer : registry->GetStaticMeshRenderers())
     {
         if (!renderer->IsEnabled()) continue;
-        if (!renderer->GetOwner()->IsActiveInHierarchy()) continue;
+        if (!renderer->GetOwner()->IsActive()) continue;
 
         // O(N) 선형 검사: CheckBounds가 성공하면 (화면에 보이거나 걸쳐 있으면)
         if (m_frustum->CheckBounds(renderer->GetWorldBounds()))
@@ -70,7 +70,7 @@ void CullingPass::CullSkinnedMeshRenderers(SceneRegistry* registry, RenderContex
     for (auto* renderer : registry->GetSkinnedMeshRenderers())
     {
         if (!renderer->IsEnabled()) continue;
-        if (!renderer->GetOwner()->IsActiveInHierarchy()) continue;
+        if (!renderer->GetOwner()->IsActive()) continue;
 
         // Skinned Mesh는 GetWorldBounds() 내부에 Animator/Transform 로직이 포함되어 있습니다.
         if (m_frustum->CheckBounds(renderer->GetWorldBounds()))
@@ -113,7 +113,7 @@ void CullingPass::CullSceneLights(SceneRegistry* registry, RenderContext* contex
     for (auto* light : lightSource)
     {
         if (!light->IsEnabled()) continue;
-        if (!light->GetOwner()->IsActiveInHierarchy()) continue;
+        if (!light->GetOwner()->IsActive()) continue;
         context->AddLight(light);
     }
 }

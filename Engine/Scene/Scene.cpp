@@ -18,17 +18,23 @@ Scene::~Scene() = default;
 
 bool Scene::Init()
 {
-	if (m_state != SceneState::Uninitialized) return false;
-	m_state = SceneState::Loading;
+	// 0. 이미 초기화 된 것이라면 false
+	if (!SCENE.IsUninitialized()) return false;
 
-	// 1. 엔진 레벨 리소스 로드
+	// 1. 씬 상태를 Loading으로 전이
+	SCENE.SetSceneState(SceneState::Loading);
+
+	// 2. 엔진 레벨 리소스 로드
 	if (!LoadSceneResources()) return false;
 
-	// 2. 렌더 패스 설정
+	// 3. 렌더 패스 설정
 	if (!CreateCustomRenderPasses()) return false;
 
-	// 3. Skybox과 같은 환경 설정
+	// 4. Skybox과 같은 환경 설정
 	if (!SetupSceneEnvironment()) return false;
+
+	// 5. Actor들을 배치
+	if (!OnPlaceActors()) return false;
 
 	return true;
 }
@@ -36,12 +42,9 @@ bool Scene::Init()
 void Scene::OnScreenResize(int32 width, int32 height)
 {
 	// Registry에 있는 모든 카메라의 비율을 갱신
-	// (이제 MainCamera 변수가 없어도 Registry 덕분에 모든 카메라 제어 가능)
 	const auto& cameras = m_registry->GetCameras();
 	for (Camera* cam : cameras)
-	{
 		cam->SetViewportSize((float)width, (float)height);
-	}
 }
 
 /*======================================//
@@ -49,13 +52,10 @@ void Scene::OnScreenResize(int32 width, int32 height)
 //======================================*/
 void Scene::Awake()
 {
-	if (m_state >= SceneState::Awake) return;
-
-	// 1. 사용자 정의 Awake 실행 (여기서 GameObject들이 Add됨)
-	OnPlaceActors();
+	if (SCENE.IsSceneAwake()) return;
 
 	// 2. 상태를 Awake로 전이
-	m_state = SceneState::Awake;
+	SCENE.SetSceneState(SceneState::Awake);
 
 	// 3. 대기열에 있는 객체들을 즉시 깨움
 	ProcessPendingAdds();
@@ -63,13 +63,13 @@ void Scene::Awake()
 
 void Scene::Start()
 {
-	if (m_state >= SceneState::Running) return;
+	if (SCENE.IsSceneRunning()) return;
 
 	// 1. 사용자 정의 Start 실행
 	OnBeginPlay();
 
 	// 2. 상태를 Start로 전이
-	m_state = SceneState::Running;
+	SCENE.SetSceneState(SceneState::Running);
 
 	// 3. 혹시 OnStart 중에 추가된 객체가 있다면 처리
 	ProcessPendingAdds();
@@ -78,24 +78,24 @@ void Scene::Start()
 	const auto& gameObjects = m_objectManager->GetGameObjects();
 	for (const auto& go : gameObjects)
 	{
-		if (go->IsActiveInHierarchy()) go->Start();
+		if (go->IsActive()) go->Start();
 	}
 }
 
 void Scene::FixedUpdate()
 {
-	if (m_state != SceneState::Running) return;
+	if (!SCENE.IsSceneRunning()) return;
 
 	// [Phase 2] 물리 업데이트 (FixedUpdate)
 	for (const auto& go : m_objectManager->GetGameObjects())
 	{
-		if (go->IsActiveInHierarchy()) go->FixedUpdate();
+		if (go->IsActive()) go->FixedUpdate();
 	}
 }
 
 void Scene::Update()
 {
-	if (m_state != SceneState::Running) return;
+	if (!SCENE.IsSceneRunning()) return;
 
 	// [중요] 매 프레임 초입에 신규 생성 객체 처리 (Catch-up)
 	ProcessPendingAdds();
@@ -103,7 +103,7 @@ void Scene::Update()
 	// [Phase 3] 게임 로직 업데이트 (Update)
 	for (const auto& go : m_objectManager->GetGameObjects())
 	{
-		if (go->IsActiveInHierarchy()) go->Update();
+		if (go->IsActive()) go->Update();
 	}
 
 	// [Phase 4] 삭제 대기열 처리 (보통 Update 끝난 후)
@@ -113,14 +113,14 @@ void Scene::Update()
 void Scene::LateUpdate()
 {
 	// [Phase 5] 후처리 업데이트
-	if (m_state != SceneState::Running) return;
+	if (!SCENE.IsSceneRunning()) return;
 
 	// [Phase 5] 후처리 업데이트 (LateUpdate)
 	// 카메라 추적 등 로직 이후에 처리되어야 하는 작업들
 	const auto& gameObjects = m_objectManager->GetGameObjects();
 	for (const auto& go : gameObjects)
 	{
-		if (go->IsActiveInHierarchy()) go->LateUpdate();
+		if (go->IsActive()) go->LateUpdate();
 	}
 }
 
@@ -156,10 +156,10 @@ void Scene::ProcessPendingAdds()
 
 		// 1-2. [Lifecycle] 생명주기 따라잡기 (Catch-up)
 		// 씬이 이미 Awake 상태라면 -> 객체도 Awake
-		if (m_state >= SceneState::Awake) go->Awake();
+		if (SCENE.IsSceneAwake()) go->Awake();
 
 		// 씬이 이미 Start 상태라면 -> 객체도 Start (활성화된 경우만)
-		if (m_state == SceneState::Running && go->IsActiveInHierarchy()) go->Start();
+		if (SCENE.IsSceneRunning() && go->IsActive()) go->Start();
 	}
 
 	// 2. [Manager] 승인 (이제 진짜 리스트로 이동)

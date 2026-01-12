@@ -21,12 +21,12 @@ RigidbodyUPtr Rigidbody::Create()
 	return RigidbodyUPtr(new Rigidbody());
 }
 
-void Rigidbody::Start()
+void Rigidbody::OnStart()
 {
 	CreateBody();
 }
 
-void Rigidbody::Update()
+void Rigidbody::OnUpdate()
 {
 	if (m_isMotionPropsDirty)
 	{
@@ -34,7 +34,7 @@ void Rigidbody::Update()
 		m_isMotionPropsDirty = false;
 	}
 
-	Super::Update();
+	Super::OnUpdate();
 }
 
 bool Rigidbody::CreateBody()

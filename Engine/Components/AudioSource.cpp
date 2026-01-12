@@ -58,7 +58,7 @@ bool AudioSource::Init(const AudioClipPtr& audioClip)
 	return true;
 }
 
-void AudioSource::Update()
+void AudioSource::OnUpdate()
 {
 	// 로드 안됐거나 재생 중 아니면 굳이 연산 X
 	if (m_clip == nullptr) return;

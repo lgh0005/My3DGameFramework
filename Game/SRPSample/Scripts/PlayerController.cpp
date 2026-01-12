@@ -15,7 +15,7 @@ PlayerControllerUPtr PlayerController::Create()
     return std::move(script);
 }
 
-void PlayerController::Start()
+void PlayerController::OnStart()
 {
     INPUT_MGR.MapAction("Player_Up", GLFW_KEY_UP);
     INPUT_MGR.MapAction("Player_Down", GLFW_KEY_DOWN);
@@ -29,11 +29,23 @@ void PlayerController::Start()
     if (!m_rigidbody || !m_animator || !m_animController) return;
 }
 
-void PlayerController::Update()
+void PlayerController::OnUpdate()
 {
     ActiveSelfTest();
     HandleMovement(TIME.GetDeltaTime());
     UpdateFiniteStateMachine();
+}
+
+void PlayerController::OnFixedUpdate()
+{
+    // 3. 물리 엔진에 속도 적용
+    glm::vec3 currentVel = m_rigidbody->GetLinearVelocity();
+    glm::vec3 targetVel = m_moveDir * m_moveSpeed;
+
+    // 점프 구현 시 targetVel.y를 건드리면 됨. 지금은 중력 유지.
+    targetVel.y = currentVel.y;
+
+    m_rigidbody->SetLinearVelocity(targetVel);
 }
 
 void PlayerController::HandleMovement(float dt)
@@ -54,18 +66,6 @@ void PlayerController::HandleMovement(float dt)
         m_moveDir = glm::normalize(m_moveDir);
         m_isMoving = true;
     }
-}
-
-void PlayerController::FixedUpdate()
-{
-    // 3. 물리 엔진에 속도 적용
-    glm::vec3 currentVel = m_rigidbody->GetLinearVelocity();
-    glm::vec3 targetVel = m_moveDir * m_moveSpeed;
-
-    // 점프 구현 시 targetVel.y를 건드리면 됨. 지금은 중력 유지.
-    targetVel.y = currentVel.y;
-
-    m_rigidbody->SetLinearVelocity(targetVel);
 }
 
 void PlayerController::UpdateFiniteStateMachine()

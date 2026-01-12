@@ -15,8 +15,8 @@ public:
     static CameraControllerUPtr Create();
 
 public:
-	virtual void Start()  override;
-	virtual void Update() override;
+	virtual void OnStart()  override;
+	virtual void OnUpdate() override;
 
 private:
 	void HandleMovement(float dt);

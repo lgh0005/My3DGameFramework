@@ -9,7 +9,7 @@ AudioListenerUPtr AudioListener::Create()
 	return AudioListenerUPtr(new AudioListener());
 }
 
-void AudioListener::Update()
+void AudioListener::OnUpdate()
 {
 	// 1. 트랜스폼 가져오기
 	auto transform = GetTransform();

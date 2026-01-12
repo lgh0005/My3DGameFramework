@@ -79,3 +79,36 @@ void SceneManager::Clear()
 /*=========================================//
 //   active scene state checking methods   //
 //=========================================*/
+void SceneManager::SetSceneState(SceneState state)
+{
+	if (m_activeScene) m_activeScene->SetSceneState(state);
+}
+
+bool SceneManager::HasActiveScene() const
+{
+	return m_activeScene != nullptr;
+}
+
+bool SceneManager::IsUninitialized() const
+{
+	if (!m_activeScene) return false;
+	return m_activeScene->GetSceneState() == SceneState::Uninitialized;
+}
+
+bool SceneManager::IsSceneAwake() const
+{
+	if (!m_activeScene) return false;
+	return m_activeScene->GetSceneState() >= SceneState::Awake;
+}
+
+bool SceneManager::IsSceneRunning() const
+{
+	if (!m_activeScene) return false;
+	return m_activeScene->GetSceneState() == SceneState::Running;
+}
+
+bool SceneManager::IsSceneLoading() const
+{
+	if (!m_activeScene) return false;
+	return m_activeScene->GetSceneState() == SceneState::Loading;
+}

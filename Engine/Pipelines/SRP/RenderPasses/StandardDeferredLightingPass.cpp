@@ -152,7 +152,7 @@ void StandardDeferredLightingPass::GetLightMatricesFromContext(StandardRenderCon
 	for (auto* light : lights)
 	{
 		if (!light->IsEnabled()) continue;
-		if (!light->GetOwner()->IsActiveInHierarchy()) continue;
+		if (!light->GetOwner()->IsActive()) continue;
 
 		int32 idx = light->GetShadowMapIndex();
 		if (idx >= 0 && idx < MAX_SHADOW_CASTER)

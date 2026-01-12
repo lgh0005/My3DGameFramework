@@ -9,7 +9,7 @@ template<typename T, typename... Args>
 inline T* GameObject::AddComponent(Args&&... args)
 {
 	auto compUPtr = T::Create(std::forward<Args>(args)...);
-	if (!compUPtr) nullptr;
+	if (!compUPtr) return nullptr;
 	return AddComponent(std::move(compUPtr));
 }
 
@@ -56,20 +56,17 @@ inline T* GameObject::AddComponent(std::unique_ptr<T> component)
 	// 4. ObjectManager 등록
 	OBJECT.RegisterComponent(basePtr);
 
-	// 5. 런타임 초기화 (Awake/Start)
-	// TODO : 이쪽은 보다 정교한 상태 판별을 바탕으로 좀 더 상태에 맞는
-	// 동작을 작성할 필요가 있음
-	if (m_state >= GameObjectState::Awake)
-		basePtr->Awake();
+	// 5. 런타임 상태 동기화 (Catch-up)
+	// 컴포넌트가 추가되는 시점의 GameObject 상태에 맞춰, 컴포넌트의 생명주기를 따라잡습니다.
 
-	if (m_state >= GameObjectState::Active && IsActiveInHierarchy())
-	{
-		if (basePtr->IsEnabled())
-		{
-			basePtr->OnEnable();
-			basePtr->Start();
-		}
-	}
+	// 5-1. 게임오브젝트가 이미 깨어난 상태라면 컴포넌트도 Awake
+	if (IsAwake()) basePtr->Awake();
+
+	// 5-2. 게임오브젝트가 이미 시작된 상태라면 컴포넌트도 Start
+	if (IsStarted()) basePtr->Start();
+
+	// 5-2. 게임오브젝트가 활성화 상태이고, 컴포넌트도 켜져있다면 OnEnable
+	if (IsActive() && basePtr->IsEnabled()) basePtr->OnEnable();
 
 	return compPtr;
 }
@@ -99,7 +96,7 @@ inline T* GameObject::GetComponent() const
 		if (cached != nullptr) return static_cast<T*>(cached);
 
 		// [2차 시도 - 해결책] 캐시에 없다면? (예: Collider 요청했는데 BoxCollider만 있는 경우)
-		// 기존의 O(N) 방식으로 전체를 뒤져서 찾습니다.
+		// 기존의 O(N) 방식으로 전체를 뒤져서 찾습니다. TODO : 이에 대한 최적화 필요
 		ComponentType type = T::s_ComponentType;
 		for (const auto& comp : m_components)
 		{
@@ -119,6 +116,7 @@ inline void GameObject::GetComponentsInChildren(std::vector<T*>& outComponents)
 	if (comp) outComponents.push_back(comp);
 
 	// 2. 자식들에게 재귀 호출
+	// TODO : 이후에 flat한 호출로 로직 수정 필요
 	for (Transform* child : GetTransform().GetChildren())
 	{
 		if (GameObject* childGO = child->GetOwner())

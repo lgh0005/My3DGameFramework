@@ -77,7 +77,7 @@ void StandardGlobalUniforms::UpdateLightUBO
 		if (lightCount >= MAX_LIGHTS) break;
 
 		if (!light->IsEnabled()) continue;
-		if (!light->GetOwner()->IsActiveInHierarchy()) continue;
+		if (!light->GetOwner()->IsActive()) continue;
 
 		auto& info = lightData.lights[lightCount];
 		auto& transform = light->GetTransform();

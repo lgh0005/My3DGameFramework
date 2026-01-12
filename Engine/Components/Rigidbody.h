@@ -13,8 +13,8 @@ public:
 	static RigidbodyUPtr Create();
 	static const ComponentType s_ComponentType = ComponentType::Rigidbody;
 	virtual ComponentType GetComponentType() const override { return ComponentType::Rigidbody; }
-	virtual void Start() override;
-	virtual void Update() override;
+	virtual void OnStart() override;
+	virtual void OnUpdate() override;
 
 private:
 	virtual bool CreateBody() override;

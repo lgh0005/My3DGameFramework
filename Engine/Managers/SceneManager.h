@@ -21,8 +21,12 @@ public:
 //   active scene state checking methods   //
 //=========================================*/
 public:
-	// TODO : 복잡하게 상태 기반으로 부등식 if문을 쓰지 말고 
-	// 여기에 있는 API를 이용할 것.
+	void SetSceneState(SceneState state);
+	bool HasActiveScene() const;
+	bool IsUninitialized() const;
+	bool IsSceneAwake() const;
+	bool IsSceneRunning() const;
+	bool IsSceneLoading() const;
 
 private:
 	std::unordered_map<std::string, SceneFactory> m_scenes;

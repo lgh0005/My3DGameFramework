@@ -103,7 +103,7 @@ void Animator::RecursiveBindBoneTransforms(Transform* nodeTransform)
 /*====================================//
 //   animation update logic methods   //
 //====================================*/
-void Animator::Update()
+void Animator::OnUpdate()
 {
     if (!m_currentModel) return;
 

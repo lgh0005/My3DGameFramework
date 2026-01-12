@@ -17,13 +17,6 @@ public:
 	virtual ComponentType GetComponentType() const override { return ComponentType::Script; }
 	virtual ScriptID GetScriptID() const = 0;
 
-/*============================================//
-//  event methods for script : active state   //
-//============================================*/
-public:
-	virtual void OnEnable();
-	virtual void OnDisable();
-
 /*=======================================//
 //  event methods for script : physics   //
 //=======================================*/
@@ -35,6 +28,9 @@ public:
 	virtual void OnCollisionEnter(Collider* other);
 	virtual void OnCollisionStay(Collider* other);
 	virtual void OnCollisionExit(Collider* other);
+
+// TODO : UI와 관련된 상호작용 메서드가 추가될 수 있음
+public:
 
 protected:
 	Script();

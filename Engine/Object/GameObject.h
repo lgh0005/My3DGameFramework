@@ -30,39 +30,51 @@ public:
 	const std::string& GetName() const		 { return m_name; }
 	void SetName(const std::string& name)	 { m_name = name; }
 
-/*==========================================//
-//   game object life-cycle state methods   //
-//==========================================*/
+/*=============================================//
+//   GameObject life-cycle methods by engine   //
+//=============================================*/
 public:
-	// 상태 확인
-	bool IsActive() const { return m_active; } // 로컬 활성화 상태
-	bool IsActiveInHierarchy() const;          // 부모까지 포함한 실제 활성화 상태
-	bool IsDead() const { return m_state == GameObjectState::Dead; }
-	void SetActive(bool active);
+	void Awake()		override final;
+	void Start()		override final;
+	void FixedUpdate()  override final;
+	void Update()		override final;
+	void LateUpdate()   override final;
+	void OnDestroy()	override final;
 
-	// 생명 주기 메서드
-	void Awake()		override;
-	void Start()		override;
-	void FixedUpdate()  override;
-	void Update()		override;
-	void LateUpdate()   override;
-	void OnDestroy()	override;
+/*===================================//
+//   GameObject activation methods   //
+//===================================*/
+public:
+	bool GetLocalActive() const;  // 로컬 활성화 상태
+	bool IsActive() const;        // 부모까지 포함한 모델 트리의 실제 활성화 상태
+	void SetActive(bool active);  // 재귀 전파 포함하는 활성화/비활성화 설정
 
+/*====================================//
+//   GameObject destruction methods   //
+//====================================*/
+public:
 	void SetDestroy();
 	void DontDestroyOnLoad(bool enable) { m_dontDestroyOnLoad = enable; }
 	bool IsDontDestroyOnLoad() const { return m_dontDestroyOnLoad; }
+
+/*===================================//
+//   GameObject state checking API   //
+//===================================*/
+public:
+	void SetGameObjectState(GameObjectState state) { m_state = state; }
+	bool IsAwake() const { return m_state >= GameObjectState::Awake; }
+	bool IsStarted() const { return m_state >= GameObjectState::Started; }
+	bool IsDead() const { return m_state == GameObjectState::Dead; }
 
 /*=======================//
 //   component methods   //
 //=======================*/
 public:
+	template<typename T, typename... Args> T* AddComponent(Args&&... args);
+	template <typename T> T* AddComponent(std::unique_ptr<T> component);
 	template<typename T> T* GetComponent() const;
 	template<typename T> void GetComponentsInChildren(std::vector<T*>& outComponents);
 	const std::vector<ComponentUPtr>& GetComponents() const { return m_components; }
-
-public:
-	template<typename T, typename... Args> T* AddComponent(Args&&... args);
-	template <typename T> T* AddComponent(std::unique_ptr<T> component);
 
 /*=======================//
 //   hierarchy methods   //
@@ -71,23 +83,24 @@ public:
 	GameObject* GetRoot();
 	void SetParent(GameObject* parent);
 	void AddChild(GameObject* child);
-	void SetActiveStateHierarchy(bool active);
 
 private:
 	GameObject();
 	bool Init();
+	void SetActiveState(bool active); // 실제로 켜지거나 꺼졌을 때 자식들과 컴포넌트에게 알림
+	void EnsureInitialized(); // 상태 무결성 보장 메서드 : Awake나 Start가 누락된 경우 강제로 수행
 
-	// 상태
+	// 게임 오브젝트의 상태
 	bool			m_active					 { true };
 	bool            m_dontDestroyOnLoad			 { false };
 	GameObjectState m_state						 { GameObjectState::Uninitialized };
 	
-	// 컴포넌트
+	// 게임 오브젝트가 소유하는 컴포넌트 캐시들
 	std::vector<ComponentUPtr> m_components;
 	std::array<Component*, (usize)ComponentType::MAX> m_componentCache;
 	std::vector<Script*> m_scripts;
 
-	// ObjectManager 상태 기록 캐시
+	// ObjectManager상에서의 게임 오브젝트 상태 기록 캐시
 	InstanceID m_instanceID						 { INVALID_INSTANCE_ID };
 	SceneIndex m_sceneIndex						 { INVALID_SCENE_INDEX };
 };

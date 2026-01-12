@@ -28,13 +28,13 @@ void PhysicsComponent::OnDisable()
 	DestroyBody();
 }
 
-void PhysicsComponent::OnDestroy()
+void PhysicsComponent::OnDestroyed()
 {
 	// 컴포넌트가 완전히 삭제될 때 실행
 	DestroyBody();
 }
 
-void PhysicsComponent::Update()
+void PhysicsComponent::OnUpdate()
 {
 	// 매 프레임 실행 (렌더링 직전 위치 동기화)
 	// 만약 물리 연산이 튀는 게 싫다면 FixedUpdate()가 아니라 Update()에서 

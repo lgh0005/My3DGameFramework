@@ -52,6 +52,13 @@ public:
 	void UnregisterComponent(Component* comp);
 	template<typename T> const ComponentVector* GetComponents();
 
+/*=========================================//
+//   active scene state checking methods   //
+//=========================================*/
+public:
+
+
+
 private:
 	std::array<ComponentVector, MAX_ENGINE_COMPONENTS> m_componentCache;
 	std::vector<ComponentVector> m_userScriptComponentCache;

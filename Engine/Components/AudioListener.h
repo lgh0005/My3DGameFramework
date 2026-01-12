@@ -9,7 +9,7 @@ public:
 	static AudioListenerUPtr Create();
 	static const ComponentType s_ComponentType = ComponentType::AudioListener;
 	virtual ComponentType GetComponentType() const override { return ComponentType::AudioListener; }
-	void Update();
+	virtual void OnUpdate() override;
 
 private:
 	AudioListener();;

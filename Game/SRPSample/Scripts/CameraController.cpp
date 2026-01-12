@@ -16,7 +16,7 @@ CameraControllerUPtr CameraController::Create()
     return std::move(script);
 }
 
-void CameraController::Start()
+void CameraController::OnStart()
 {
     m_camera = GetOwner()->GetComponent<Camera>();
 
@@ -37,7 +37,7 @@ void CameraController::Start()
     INPUT_MGR.MapMouseAction("PickObject", GLFW_MOUSE_BUTTON_LEFT);
 }
 
-void CameraController::Update()
+void CameraController::OnUpdate()
 {
     auto deltaTime = TIME.GetDeltaTime();
     HandleMovement(deltaTime);
