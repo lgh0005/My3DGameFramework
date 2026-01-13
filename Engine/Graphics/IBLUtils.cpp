@@ -201,7 +201,8 @@ TexturePtr IBLUtils::CreateBRDFLUT()
 	glGetIntegerv(GL_VIEWPORT, prevViewport);
 	glViewport(0, 0, resolution, resolution);
 
-	auto brdfProgram = Program::Create(
+	auto brdfProgram = Program::Create
+	(
 		"./Resources/Shaders/IBLUtils/IBLUtils_BRDF_Lookup.vert",
 		"./Resources/Shaders/IBLUtils/IBLUtils_BRDF_Lookup.frag"
 	);
@@ -212,9 +213,6 @@ TexturePtr IBLUtils::CreateBRDFLUT()
 
 	lookupFramebuffer->Bind();
 
-	// TEMP : brdfLookUpTexture를 만들기 위한 하드코드
-	// TODO : 이후에 이를 따로 ScreenMesh로 빼야함.
-	// TODO : 이후 ScreenMesh가 가져야할 로직
 	glDisable(GL_DEPTH_TEST);
 	glDisable(GL_CULL_FACE);
 	glDisable(GL_BLEND);
@@ -223,7 +221,7 @@ TexturePtr IBLUtils::CreateBRDFLUT()
 	brdfProgram->Use();
 
 	// 스크린 메쉬
-	auto screen = ScreenMesh::Create();
+	auto screen = RESOURCE.GetResource<ScreenMesh>("Screen");
 	screen->Draw();
 
 	// 복구

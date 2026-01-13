@@ -109,6 +109,7 @@ void Animator::OnUpdate()
 
     // 0. 바인딩이 안 되어 있다면 수행 (Lazy Init)
     // TODO : 이 또한 Component 의 생명주기에 맞춰서 코드를 적을 필요가 있음
+    // 아마 Start와 같은 곳에서?
     if (m_boneTransformMap.empty()) BindBoneTransforms();
 
     // 1. 시간 업데이트

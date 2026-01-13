@@ -40,7 +40,6 @@ void Renderer::Render(Scene* scene)
 	}
 }
 
-// TODO : 리사이징 로직 검토 필요
 void Renderer::OnResize(int32 width, int32 height)
 {
 	m_pipeline->OnResize(width, height);

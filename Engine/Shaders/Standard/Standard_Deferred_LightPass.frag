@@ -1,6 +1,6 @@
-#version 460 core
+ï»¿#version 460 core
 
-// Ãâ·Â
+// ì¶œë ¥
 layout (location = 0) out vec4 FragColor;
 // layout (location = 1) out vec4 BrightColor;
 
@@ -43,14 +43,14 @@ layout (std140, binding = 1) uniform LightData
     int lightCount;
 };
 
-// [±×¸²ÀÚ °è»ê ÇÙ½É ·ÎÁ÷] 
-// ÅØ½ºÃ³¸¦ ÀÎÀÚ·Î ¹Þ¾Æ¼­ Ã³¸®ÇÏµµ·Ï ºÐ¸®
+// [ê·¸ë¦¼ìž ê³„ì‚° í•µì‹¬ ë¡œì§] 
+// í…ìŠ¤ì²˜ë¥¼ ì¸ìžë¡œ ë°›ì•„ì„œ ì²˜ë¦¬í•˜ë„ë¡ ë¶„ë¦¬
 float CalculateShadow(sampler2D shadowMap, vec4 fragPosLightSpace, vec3 normal, vec3 lightDir)
 {
     vec3 projCoords = fragPosLightSpace.xyz / fragPosLightSpace.w;
     projCoords = projCoords * 0.5 + 0.5;
     
-    // ±×¸²ÀÚ ¸Ê ¹üÀ§ ¹ÛÀÌ¸é ±×¸²ÀÚ ¾øÀ½
+    // ê·¸ë¦¼ìž ë§µ ë²”ìœ„ ë°–ì´ë©´ ê·¸ë¦¼ìž ì—†ìŒ
     if(projCoords.z > 1.0) return 0.0;
 
     float currentDepth = projCoords.z;
@@ -72,11 +72,11 @@ float CalculateShadow(sampler2D shadowMap, vec4 fragPosLightSpace, vec3 normal, 
     return shadow;
 }
 
-// [±×¸²ÀÚ ¸Ê ¼±ÅÃ±â]
-// Sampler Array Indexing ¹®Á¦ ¹æÁö¸¦ À§ÇÑ ¾ÈÀüÇÑ Switch¹®
+// [ê·¸ë¦¼ìž ë§µ ì„ íƒê¸°]
+// Sampler Array Indexing ë¬¸ì œ ë°©ì§€ë¥¼ ìœ„í•œ ì•ˆì „í•œ Switchë¬¸
 float GetShadowFactor(int index, vec4 fragPosLightSpace, vec3 normal, vec3 lightDir)
 {
-    // ÀÎµ¦½º¿¡ µû¶ó ¿Ã¹Ù¸¥ ÅØ½ºÃ³¸¦ ³Ñ°ÜÁÜ
+    // ì¸ë±ìŠ¤ì— ë”°ë¼ ì˜¬ë°”ë¥¸ í…ìŠ¤ì²˜ë¥¼ ë„˜ê²¨ì¤Œ
     if (index == 0) return CalculateShadow(shadowMaps[0], fragPosLightSpace, normal, lightDir);
     if (index == 1) return CalculateShadow(shadowMaps[1], fragPosLightSpace, normal, lightDir);
     if (index == 2) return CalculateShadow(shadowMaps[2], fragPosLightSpace, normal, lightDir);
@@ -88,26 +88,26 @@ float GetShadowFactor(int index, vec4 fragPosLightSpace, vec3 normal, vec3 light
     return 0.0;
 }
 
-// [Á¶¸í °è»ê ÇÔ¼ö]
-// TODO : Á¶¸í Å¸ÀÔ¿¡ ¸ÂÃç¼­ ÄÚµå¸¦ Á» ´õ ¸íÈ®È÷ ½á¼­ 
-// Å¸ÀÔº°·Î ¾î¶»°Ô ¿¬»êÀÌ µÇ´Â °ÍÀÎÁö Á¶±ÝÀº ¸íÈ®È÷ ÀÛ¼º ÇÊ¿ä
+// [ì¡°ëª… ê³„ì‚° í•¨ìˆ˜]
+// TODO : ì¡°ëª… íƒ€ìž…ì— ë§žì¶°ì„œ ì½”ë“œë¥¼ ì¢€ ë” ëª…í™•ížˆ ì¨ì„œ 
+// íƒ€ìž…ë³„ë¡œ ì–´ë–»ê²Œ ì—°ì‚°ì´ ë˜ëŠ” ê²ƒì¸ì§€ ì¡°ê¸ˆì€ ëª…í™•ížˆ ìž‘ì„± í•„ìš”
 vec3 LightCalculation(int index, vec3 normal, vec3 fragPos, vec3 viewDir, vec3 albedo, float specInt, float shininess, float ao)
 {
     LightInfo light = lights[index];
 
-    // 1. ¹æÇâ º¤ÅÍ °è»ê
+    // 1. ë°©í–¥ ë²¡í„° ê³„ì‚°
     vec3 lightDir;
     if (light.type == 0) // Directional
         lightDir = normalize(-light.direction);
     else 
         lightDir = normalize(light.position - fragPos);
 
-    // 2. Diffuse & Specular ±âº»°ª
+    // 2. Diffuse & Specular ê¸°ë³¸ê°’
     float diff = max(dot(normal, lightDir), 0.0);
     vec3 halfDir = normalize(lightDir + viewDir);
     float spec = pow(max(dot(normal, halfDir), 0.0), shininess);
 
-    // 3. Attenuation (°¨¼è)
+    // 3. Attenuation (ê°ì‡ )
     float attenuation = 1.0;
     if (light.type != 0) // Point or Spot
     {
@@ -115,7 +115,7 @@ vec3 LightCalculation(int index, vec3 normal, vec3 fragPos, vec3 viewDir, vec3 a
         attenuation = 1.0 / (light.attenuation.x + light.attenuation.y * dist + light.attenuation.z * dist * dist);
     }
 
-    // 4. Spot Factor (ÀÌ¸§ º¯°æ ÁÖÀÇ: intensity -> spotFactor)
+    // 4. Spot Factor (ì´ë¦„ ë³€ê²½ ì£¼ì˜: intensity -> spotFactor)
     float spotFactor = 1.0;
     if (light.type == 2) // Spot
     {
@@ -124,17 +124,17 @@ vec3 LightCalculation(int index, vec3 normal, vec3 fragPos, vec3 viewDir, vec3 a
         spotFactor = clamp((theta - light.cutoff.y) / epsilon, 0.0, 1.0);
     }
 
-    // 5. ±×¸²ÀÚ °è»ê (ÇÙ½É ¼öÁ¤)
+    // 5. ê·¸ë¦¼ìž ê³„ì‚° (í•µì‹¬ ìˆ˜ì •)
     float shadow = 0.0;
     int shadowIdx = light.shadowMapIndex;
 
-    // ÀÎµ¦½º°¡ À¯È¿ÇÒ ¶§¸¸ °è»ê
+    // ì¸ë±ìŠ¤ê°€ ìœ íš¨í•  ë•Œë§Œ ê³„ì‚°
     if (shadowIdx >= 0 && shadowIdx < 8) 
     {
-        // Çà·Ä ¹è¿­¿¡¼­ °¡Á®¿È
+        // í–‰ë ¬ ë°°ì—´ì—ì„œ ê°€ì ¸ì˜´
         vec4 lightSpacePos = lightSpaceMatrices[shadowIdx] * vec4(fragPos, 1.0);
         
-        // ÅØ½ºÃ³ ¼±ÅÃ±â¸¦ ÅëÇØ ±×¸²ÀÚ °ª °è»ê
+        // í…ìŠ¤ì²˜ ì„ íƒê¸°ë¥¼ í†µí•´ ê·¸ë¦¼ìž ê°’ ê³„ì‚°
         shadow = GetShadowFactor(shadowIdx, lightSpacePos, normal, lightDir);
     }
    
@@ -142,7 +142,7 @@ vec3 LightCalculation(int index, vec3 normal, vec3 fragPos, vec3 viewDir, vec3 a
     vec3 diffuse = light.diffuse * diff * albedo;
     vec3 specular = light.specular * spec * specInt;
 
-    // light.intensity °öÇØÁÖ´Â °Í ÀØÁö ¸»±â!
+    // light.intensity ê³±í•´ì£¼ëŠ” ê²ƒ ìžŠì§€ ë§ê¸°!
     return (ambient + (1.0 - shadow) * (diffuse + specular)) * attenuation * spotFactor * light.intensity;
 }
 
@@ -158,10 +158,10 @@ void main()
     vec3 Emission = texture(gEmission, TexCoords).rgb;
     float Shininess = texture(gNormal, TexCoords).a; 
 
-    float SSAO = 1.0; // ±âº»°ª: Â÷Æó ¾øÀ½
+    float SSAO = 1.0; // ê¸°ë³¸ê°’: ì°¨í ì—†ìŒ
     if (useSSAO)
     {
-        // ÅØ½ºÃ³ÀÇ r Ã¤³Î¿¡ occlusion °ªÀÌ µé¾îÀÖÀ½ (1.0 = Èò»ö = ¿­¸², 0.0 = °ËÀº»ö = ¸·Èû)
+        // í…ìŠ¤ì²˜ì˜ r ì±„ë„ì— occlusion ê°’ì´ ë“¤ì–´ìžˆìŒ (1.0 = í°ìƒ‰ = ì—´ë¦¼, 0.0 = ê²€ì€ìƒ‰ = ë§‰íž˜)
         SSAO = texture(ssaoTexture, TexCoords).r;
     }
     float FinalAO = MaterialAO * SSAO;
@@ -176,14 +176,14 @@ void main()
     
     result += Emission;
     // =====================================================================
-    // [DEBUG] SSAO Àû¿ë °á°ú È®ÀÎ¿ë ÄÚµå
+    // [DEBUG] SSAO ì ìš© ê²°ê³¼ í™•ì¸ìš© ì½”ë“œ
     // =====================================================================
-    // ¿ø·¡ÀÇ ÃÖÁ¾ °á°ú Ãâ·Â ÄÚµå¸¦ ÁÖ¼® Ã³¸®ÇÕ´Ï´Ù.
+    // ì›ëž˜ì˜ ìµœì¢… ê²°ê³¼ ì¶œë ¥ ì½”ë“œë¥¼ ì£¼ì„ ì²˜ë¦¬í•©ë‹ˆë‹¤.
     FragColor = vec4(result, 1.0);
     
-    // ´ë½Å ao °ªÀ» R, G, B Ã¤³Î¿¡ ¸ðµÎ ³Ö¾î¼­ Èæ¹éÀ¸·Î Ãâ·ÂÇÕ´Ï´Ù.
-    // useSSAO°¡ trueÀÏ ¶§: ±¸¼®Áø °÷Àº °ËÀº»ö(0.0), Æ®ÀÎ °÷Àº Èò»ö(1.0)À¸·Î ³ª¿Í¾ß ¼º°øÀÔ´Ï´Ù.
-    // useSSAO°¡ falseÀÏ ¶§: ÀüÃ¼°¡ Èò»ö(1.0)À¸·Î ³ª¿Í¾ß ÇÕ´Ï´Ù.
+    // ëŒ€ì‹  ao ê°’ì„ R, G, B ì±„ë„ì— ëª¨ë‘ ë„£ì–´ì„œ í‘ë°±ìœ¼ë¡œ ì¶œë ¥í•©ë‹ˆë‹¤.
+    // useSSAOê°€ trueì¼ ë•Œ: êµ¬ì„ì§„ ê³³ì€ ê²€ì€ìƒ‰(0.0), íŠ¸ì¸ ê³³ì€ í°ìƒ‰(1.0)ìœ¼ë¡œ ë‚˜ì™€ì•¼ ì„±ê³µìž…ë‹ˆë‹¤.
+    // useSSAOê°€ falseì¼ ë•Œ: ì „ì²´ê°€ í°ìƒ‰(1.0)ìœ¼ë¡œ ë‚˜ì™€ì•¼ í•©ë‹ˆë‹¤.
     // FragColor = vec4(vec3(FinalAO), 1.0); 
     // =====================================================================
 }

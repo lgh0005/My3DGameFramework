@@ -4,7 +4,7 @@
 CLASS_PTR(GameObject)
 #pragma endregion
 
-CLASS_PTR(GameObjectManager) // GameObjectRegistry
+CLASS_PTR(GameObjectManager)
 class GameObjectManager
 {
 public:

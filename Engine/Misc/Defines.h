@@ -64,12 +64,16 @@ using className ## WPtr = std::weak_ptr<className>;
 #define MAX_LIGHTS 32
 #define MAX_SHADOW_CASTER 8
 
-// max bone influence value
+// max bone influence values
 #define MAX_BONES 100
 #define MAX_BONE_INFLUENCE 4
 
-// initial 
+// for jolt debug gizmo rendering
 #define INITIAL_DEBUG_VERTEX_CAPACITY 32768
+
+// default ssao values
+#define SSAO_KERNEL_SIZE 64
+#define SSAO_NOISE_DIM 4
 
 /*==================================//
 //   declare Jolt physics pointers  //

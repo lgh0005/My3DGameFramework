@@ -30,5 +30,5 @@ public:
 private:
 	SkinnedMeshRenderer();
 	bool Init(SkinnedMeshPtr mesh, MaterialPtr material, Animator* animator);
-	Animator* m_referenceAnimator{ nullptr };
+	mutable Animator* m_referenceAnimator{ nullptr };
 };

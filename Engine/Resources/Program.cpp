@@ -47,9 +47,9 @@ bool Program::Link(const std::vector<ShaderPtr>& shaders)
     return true;
 }
 
-/*=============================//
-//   uniform variable setters  //
-//=============================*/
+/*==============================================//
+//   default arithmetic value uniform setters   //
+//==============================================*/
 void Program::SetUniform(const std::string& name, bool value) const
 {
     auto loc = glGetUniformLocation(m_program, name.c_str());
@@ -92,8 +92,23 @@ void Program::SetUniform(const std::string& name, const glm::mat4& value) const
     glUniformMatrix4fv(loc, 1, GL_FALSE, glm::value_ptr(value));
 }
 
+/*==============================================//
+//   default arithmetic array uniform setters   //
+//==============================================*/
+void Program::SetUniform(const std::string& name, const std::vector<int>& value) const
+{
+    auto loc = glGetUniformLocation(m_program, name.c_str());
+    glUniform1iv(loc, (GLsizei)value.size(), value.data());
+}
+
 void Program::SetUniform(const std::string& name, const std::vector<glm::mat4>& value) const
 {
     auto loc = glGetUniformLocation(m_program, name.c_str());
     glUniformMatrix4fv(loc, (GLsizei)value.size(), GL_FALSE, glm::value_ptr(value[0]));
+}
+
+void Program::SetUniform(const std::string& name, const std::vector<glm::vec3>& values) const
+{
+    auto loc = glGetUniformLocation(m_program, name.c_str());
+    glUniform3fv(loc, (GLsizei)values.size(), glm::value_ptr(values[0]));
 }

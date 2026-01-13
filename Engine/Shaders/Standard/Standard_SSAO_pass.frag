@@ -1,29 +1,29 @@
-#version 460 core
+ï»¿#version 460 core
 out float FragColor;
 
 in vec2 TexCoords;
 
-// C++¿¡¼­ ¹ÙÀÎµùÇÑ ÅØ½ºÃ³µé
-uniform sampler2D gPosition; // World Position (ÇÊ¼ö)
-uniform sampler2D gNormal;   // World Normal (ÇÊ¼ö)
+// C++ì—ì„œ ë°”ì¸ë”©í•œ í…ìŠ¤ì²˜ë“¤
+uniform sampler2D gPosition; // World Position (í•„ìˆ˜)
+uniform sampler2D gNormal;   // World Normal (í•„ìˆ˜)
 uniform sampler2D texNoise;  // 4x4 Noise Texture
 
 uniform vec3 samples[64];    // Kernel Samples
 uniform mat4 projection;     // Projection Matrix
 uniform mat4 view;           // Projection view
 
-// SSAO ÆÄ¶ó¹ÌÅÍ (ÇÊ¿äÇÏ¸é UniformÀ¸·Î »©¼­ ·±Å¸ÀÓ Á¶Àı °¡´É)
+// SSAO íŒŒë¼ë¯¸í„° (í•„ìš”í•˜ë©´ Uniformìœ¼ë¡œ ë¹¼ì„œ ëŸ°íƒ€ì„ ì¡°ì ˆ ê°€ëŠ¥)
 const int kernelSize = 64;
-const float radius = 0.5;    // Â÷Æó °Ë»ç ¹İ°æ
-const float bias = 0.025;    // ±íÀÌ Á¤¹Ğµµ ¹®Á¦ ÇØ°áÀ» À§ÇÑ ¹ÙÀÌ¾î½º
+const float radius = 0.5;    // ì°¨í ê²€ì‚¬ ë°˜ê²½
+const float bias = 0.025;    // ê¹Šì´ ì •ë°€ë„ ë¬¸ì œ í•´ê²°ì„ ìœ„í•œ ë°”ì´ì–´ìŠ¤
 
 void main()
 {
-    // 1. È­¸é ÇØ»óµµ¿¡ µû¸¥ ³ëÀÌÁî Å¸ÀÏ¸µ Å©±â °è»ê
-    // texNoise°¡ 4x4 Å©±âÀÌ¹Ç·Î È­¸é Å©±â¸¦ 4·Î ³ª´¯´Ï´Ù.
+    // 1. í™”ë©´ í•´ìƒë„ì— ë”°ë¥¸ ë…¸ì´ì¦ˆ íƒ€ì¼ë§ í¬ê¸° ê³„ì‚°
+    // texNoiseê°€ 4x4 í¬ê¸°ì´ë¯€ë¡œ í™”ë©´ í¬ê¸°ë¥¼ 4ë¡œ ë‚˜ëˆ•ë‹ˆë‹¤.
     vec2 noiseScale = textureSize(gPosition, 0) / 4.0;
 
-    // 2. G-Buffer Á¤º¸ ÀĞ±â
+    // 2. G-Buffer ì •ë³´ ì½ê¸°
     vec3 WorldPos = texture(gPosition, TexCoords).xyz;
     if (length(WorldPos) < 0.0001) 
     {
@@ -38,37 +38,37 @@ void main()
 
     vec3 randomVec = texture(texNoise, TexCoords * noiseScale).xyz;
 
-    // 3. TBN Çà·Ä »ı¼º (Tangent-Bitangent-Normal)
-    // ±×¶÷-½´¹ÌÆ® °úÁ¤À» ÅëÇØ normal°ú randomVecÀ» Á÷±³È­ÇÕ´Ï´Ù.
+    // 3. TBN í–‰ë ¬ ìƒì„± (Tangent-Bitangent-Normal)
+    // ê·¸ëŒ-ìŠˆë¯¸íŠ¸ ê³¼ì •ì„ í†µí•´ normalê³¼ randomVecì„ ì§êµí™”í•©ë‹ˆë‹¤.
     vec3 tangent = normalize(randomVec - normal * dot(randomVec, normal));
     vec3 bitangent = cross(normal, tangent);
     mat3 TBN = mat3(tangent, bitangent, normal);
 
     float occlusion = 0.0;
     
-    // 4. Ä¿³Î »ùÇÃ¸µ ·çÇÁ
+    // 4. ì»¤ë„ ìƒ˜í”Œë§ ë£¨í”„
     for(int i = 0; i < kernelSize; ++i)
     {
-        // »ùÇÃ À§Ä¡¸¦ TBNÀ» ÀÌ¿ëÇØ View Space·Î º¯È¯
+        // ìƒ˜í”Œ ìœ„ì¹˜ë¥¼ TBNì„ ì´ìš©í•´ View Spaceë¡œ ë³€í™˜
         vec3 samplePos = TBN * samples[i]; 
         samplePos = fragPos + samplePos * radius; 
         
-        // 5. »ùÇÃ À§Ä¡¸¦ Screen Space(UV)·Î Åõ¿µ
+        // 5. ìƒ˜í”Œ ìœ„ì¹˜ë¥¼ Screen Space(UV)ë¡œ íˆ¬ì˜
         vec4 offset = vec4(samplePos, 1.0);
         offset = projection * offset;    // View -> Clip
         offset.xyz /= offset.w;          // Perspective Divide -> NDC
         offset.xyz = offset.xyz * 0.5 + 0.5; // NDC(-1~1) -> UV(0~1)
         
-        // 6. ½ÇÁ¦ ±íÀÌ°ª °¡Á®¿À±â (ÇØ´ç À§Ä¡¿¡ ½ÇÁ¦ ±×·ÁÁø ¹°Ã¼ÀÇ ±íÀÌ)
+        // 6. ì‹¤ì œ ê¹Šì´ê°’ ê°€ì ¸ì˜¤ê¸° (í•´ë‹¹ ìœ„ì¹˜ì— ì‹¤ì œ ê·¸ë ¤ì§„ ë¬¼ì²´ì˜ ê¹Šì´)
         // float sampleDepth = texture(gPosition, offset.xy).z;
         vec3 neighborWorldPos = texture(gPosition, offset.xy).xyz;
         if (length(neighborWorldPos) < 0.0001) continue;
         vec3 neighborViewPos = (view * vec4(neighborWorldPos, 1.0)).xyz;
         float sampleDepth = neighborViewPos.z;
         
-        // 7. Â÷Æó °Ë»ç
-        // sampleDepth(½ÇÁ¦ ¹°Ã¼)°¡ samplePos(°¡»ó »ùÇÃ)º¸´Ù ¾Õ¿¡ ÀÖÀ¸¸é(z°ªÀÌ Å©¸é) Â÷ÆóµÊ
-        // ¹üÀ§ °Ë»ç (Range Check): ³Ê¹« ¸Õ ¹°Ã¼°¡ Â÷ÆóÇÏ´Â Çö»ó ¹æÁö
+        // 7. ì°¨í ê²€ì‚¬
+        // sampleDepth(ì‹¤ì œ ë¬¼ì²´)ê°€ samplePos(ê°€ìƒ ìƒ˜í”Œ)ë³´ë‹¤ ì•ì— ìˆìœ¼ë©´(zê°’ì´ í¬ë©´) ì°¨íë¨
+        // ë²”ìœ„ ê²€ì‚¬ (Range Check): ë„ˆë¬´ ë¨¼ ë¬¼ì²´ê°€ ì°¨íí•˜ëŠ” í˜„ìƒ ë°©ì§€
         float rangeCheck = smoothstep(0.0, 1.0, radius / abs(fragPos.z - sampleDepth));
         if (sampleDepth >= samplePos.z + bias)
             occlusion += 1.0 * rangeCheck;

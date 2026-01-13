@@ -95,6 +95,7 @@ inline void SceneRegistry::RemoveFromVector(std::vector<T*>& vec, Component* com
 	T* target = static_cast<T*>(comp);
 
 	// 1. target 찾기
+	// TODO : O(N) 로직 개선하기
 	auto it = std::find(vec.begin(), vec.end(), target);
 
 	// 2. 대상을 찾았다면 Swap & Pop 진행

@@ -21,6 +21,7 @@
 #include <thread>
 #include <mutex>
 namespace fs = std::filesystem;
+namespace pmr = std::pmr;
 
 // nlohmann-json
 #include <nlohmann/json_fwd.hpp>

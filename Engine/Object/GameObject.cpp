@@ -181,6 +181,47 @@ void GameObject::SetActive(bool active)
 
 void GameObject::SetActiveState(bool active)
 {
+	//// 1. 작업 목록(Worklist) 생성 - 명시적 스택 역할
+	//// 재귀 호출 대신 이 벡터에 담아서 처리함.
+	//std::vector<GameObject*> workList;
+	//workList.reserve(16); // 적당한 크기 예약
+	//workList.push_back(this);
+
+	//// 2. 반복문으로 트러 순회 (Iterative Traversal)
+	//while (!workList.empty())
+	//{
+	//	// 스택에서 하나 꺼냄
+	//	GameObject* currentGO = workList.back();
+	//	workList.pop_back();
+
+	//	// A. 컴포넌트 처리 (Catch-up & Event)
+	//	for (auto& comp : currentGO->GetComponents())
+	//	{
+	//		if (comp->IsEnabled())
+	//		{
+	//			if (active)
+	//			{
+	//				comp->EnsureInitialized(); // Catch-up
+	//				comp->OnEnable();
+	//			}
+	//			else
+	//			{
+	//				comp->OnDisable();
+	//			}
+	//		}
+	//	}
+
+	//	// B. 자식들 스택에 추가 (재귀 호출 대체)
+	//	// 주의: 자식의 '로컬 스위치'가 켜져 있는 경우에만 전파 대상임
+	//	const auto& children = currentGO->GetTransform().GetChildren();
+	//	for (Transform* childTransform : children)
+	//	{
+	//		GameObject* childGO = childTransform->GetOwner();
+	//		if (childGO && childGO->GetLocalActive())
+	//			workList.push_back(childGO);
+	//	}
+	//}
+
 	// 1. 내 컴포넌트들에게 알림 (여기서 SetEnable이 호출됨 -> Catch-up 발생!)
 	// 주의: SetEnable은 m_enabled 값을 바꾸는 게 아니라, 
 	// m_enabled가 true인 놈들에게 OnEnable/OnDisable을 유발시키는 역할을 해야 함.

@@ -49,6 +49,28 @@ RenderBounds SkinnedMeshRenderer::GetWorldBounds() const
 Animator* SkinnedMeshRenderer::GetAnimator() const
 {
     return m_referenceAnimator;
+
+    // TODO : 안정성을 위해서 폴백 로직 추가 고려
+    
+    //// 1. 이미 캐싱된 게 있으면 즉시 리턴 (Fast Path)
+    //if (m_referenceAnimator) return m_referenceAnimator;
+
+    //// 2. 캐싱된 게 없다면? 계층 구조를 뒤져서 찾아본다. (Slow Path - 최초 1회만 발생)
+
+    //// A. 내 게임 오브젝트(Owner)에 Animator가 있는지 확인
+    //GameObject* owner = GetOwner();
+    //if (!owner) return nullptr;
+
+    //m_referenceAnimator = owner->GetComponent<Animator>();
+    //if (m_referenceAnimator) return m_referenceAnimator;
+
+    //// B. 내 부모들을 타고 올라가면서 확인 (보통 루트에 있음)
+    //// 간단하게 GetRoot()를 사용해서 루트의 Animator를 확인
+    //// (모델 구조상 보통 루트에 Animator가 붙기 때문)
+    //GameObject* root = const_cast<GameObject*>(owner->GetRoot());
+    //if (root) m_referenceAnimator = root->GetComponent<Animator>();
+
+    //return m_referenceAnimator;
 }
 
 void SkinnedMeshRenderer::Render(Program* program) const

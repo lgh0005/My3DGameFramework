@@ -32,7 +32,6 @@ private:
 	bool CreateBGM(ma_engine* engine, ma_sound_group* group, const AudioClipPtr& clip);
 
 	AudioClipPtr	m_clip		  { nullptr };
-
-	ma_sound		m_sound 	  {  };// 사운드 객체
-	ma_decoder		m_decoder	  {  };// 메모리 디코딩용 (SFX일 때만 사용)
+	ma_sound		m_sound 	  {  };		  // 사운드 객체
+	ma_decoder		m_decoder	  {  };		  // 메모리 디코딩용 (SFX일 때만 사용)
 };

@@ -88,6 +88,8 @@ void StandardGeometryPass::RenderSkinnedGeometry(const std::vector<SkinnedMeshRe
 	m_skinnedGeometryProgram->Use();
 	for (const auto* renderer : meshes)
 	{
+		// TODO : 이후에 CullingPass와 파티셔닝을 통한 O(N) 렌더링에서 O(k) 렌더링으로
+		// 최적화가 가능하며 순수하게 이러한 파티셔닝 정렬은 멀티스레딩을 이용할 수도 있다.
 		if (!renderer->IsEnabled()) continue;
 		if (!renderer->GetOwner()->IsActive()) continue;
 

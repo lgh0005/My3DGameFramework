@@ -33,6 +33,25 @@ bool StandardDeferredLightingPass::Init()
 {
 	m_deferredLightProgram = RESOURCE.GetResource<Program>("standard_deferred_lighting");
 	m_plane = RESOURCE.GetResource<ScreenMesh>("Screen");
+	if (!m_deferredLightProgram || !m_plane) return false;
+
+	// 1. 변하지 않는 샘플러 인덱스는 초기화 시점에 한 번만 전송
+	m_deferredLightProgram->Use();
+
+	// 1-1. G-Buffer 텍스쳐 유니폼 설정
+	m_deferredLightProgram->SetUniform("gPosition", 0);
+	m_deferredLightProgram->SetUniform("gNormal", 1);
+	m_deferredLightProgram->SetUniform("gAlbedoSpec", 2);
+	m_deferredLightProgram->SetUniform("gEmission", 3);
+
+	// 1-2. 그림자 맵 유니폼 설정
+	std::vector<int> shadowIndices(MAX_SHADOW_CASTER);
+	for (int i = 0; i < MAX_SHADOW_CASTER; ++i) shadowIndices[i] = 4 + i;
+	m_deferredLightProgram->SetUniform("shadowMaps", shadowIndices);
+
+	// 1-3. SSAO 텍스쳐 유니폼 설정
+	m_deferredLightProgram->SetUniform("ssaoTexture", 12);
+
 	return true;
 }
 
@@ -94,16 +113,9 @@ void StandardDeferredLightingPass::BeginDrawOnPostProcessFBO(StandardRenderConte
 
 	// 3. G-Buffer 텍스처 바인딩 (Context 데이터 사용)
 	glActiveTexture(GL_TEXTURE0); tPos->Bind();
-	m_deferredLightProgram->SetUniform("gPosition", 0);
-
 	glActiveTexture(GL_TEXTURE1); tNormal->Bind();
-	m_deferredLightProgram->SetUniform("gNormal", 1);
-
 	glActiveTexture(GL_TEXTURE2); tAlbedo->Bind();
-	m_deferredLightProgram->SetUniform("gAlbedoSpec", 2);
-
 	glActiveTexture(GL_TEXTURE3); tEmission->Bind();
-	m_deferredLightProgram->SetUniform("gEmission", 3);
 }
 
 void StandardDeferredLightingPass::BindSSAOTexture(StandardRenderContext* context)
@@ -114,11 +126,12 @@ void StandardDeferredLightingPass::BindSSAOTexture(StandardRenderContext* contex
 	{
 		glActiveTexture(GL_TEXTURE12);
 		tSSAO->Bind();
-		m_deferredLightProgram->SetUniform("ssaoTexture", 12);
 		m_deferredLightProgram->SetUniform("useSSAO", true);
 	}
 	else
 	{
+		glActiveTexture(GL_TEXTURE12);
+		glBindTexture(GL_TEXTURE_2D, 0);
 		m_deferredLightProgram->SetUniform("useSSAO", false);
 	}
 }
@@ -132,22 +145,21 @@ void StandardDeferredLightingPass::BindShadowMaps(StandardRenderContext* context
 
 		Texture* shadowMap = context->GetShadowMap(i);
 		if (shadowMap) shadowMap->Bind();
-
-		std::string uniformName = "shadowMaps[" + std::to_string(i) + "]";
-		m_deferredLightProgram->SetUniform(uniformName, 4 + i);
+		else glBindTexture(GL_TEXTURE_2D, 0);
 	}
 }
 
 void StandardDeferredLightingPass::GetLightMatricesFromContext(StandardRenderContext* context)
 {
-	// 6. Light Matrices 전송(Context의 Culled List 사용)
+	// 6. Light Matrices 전송
+	static std::vector<glm::mat4> lightSpaceMatrices;
+	if (lightSpaceMatrices.size() != MAX_SHADOW_CASTER)
+		lightSpaceMatrices.resize(MAX_SHADOW_CASTER);
 
-	// Scene 전체 조명이 아니라, Context에 담긴 조명만 처리
-	// TODO : 이 부분은 SetUniform(const std::string& name, const std::vector<glm::mat4>& value)
-	// 을 이용한다.
+	// 7. 항등 행렬로 fill
+	std::fill(lightSpaceMatrices.begin(), lightSpaceMatrices.end(), glm::mat4(1.0f));
 
-	std::vector<glm::mat4> lightSpaceMatrices(MAX_SHADOW_CASTER, glm::mat4(1.0f));
-
+	// 8. 유효한 조명 가져오기
 	const auto& lights = context->GetSceneRegistry()->GetLights();
 	for (auto* light : lights)
 	{

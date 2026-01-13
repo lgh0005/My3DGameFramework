@@ -1,6 +1,10 @@
 ﻿#pragma once
 #include "Object/Component.h"
 
+#pragma region FORWARD_DECLARATION
+CLASS_PTR(MeshRenderer)
+#pragma endregion
+
 CLASS_PTR(MeshOutline)
 class MeshOutline : public Component
 {
@@ -13,6 +17,7 @@ public:
 	);
 	static const ComponentType s_ComponentType = ComponentType::MeshOutline;
 	virtual ComponentType GetComponentType() const override { return s_ComponentType;}
+	virtual void OnStart() override;
 
 	void SetColor(const glm::vec3& color) { m_color = color; }
 	const glm::vec3& GetColor() const { return m_color; }
@@ -20,10 +25,14 @@ public:
 	void SetThickness(float thickness) { m_thickness = thickness; }
 	float GetThickness() const { return m_thickness; }
 
+	MeshRenderer* GetMeshRenderer() const { return m_targetRenderer; }
+
 private:
 	MeshOutline();
 	void Init(const glm::vec3& color, float thickness);
 
 	glm::vec3 m_color	{ 1.0f, 1.0f, 0.0f };
 	float m_thickness	{ 0.03f };
+
+	MeshRenderer* m_targetRenderer	{ nullptr };
 };

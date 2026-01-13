@@ -41,11 +41,8 @@ bool StandardSSAOPass::Init(int32 width, int32 height)
     GenerateNoiseTexture();
 
     // 커널은 초기화할 때 한 번 만 전송
-    // TODO : 배열로 한 번에 넘기는 걸 고려해볼 필요가 있음
-    // TODO : 64란 숫자는 define으로 적어둘 것
     m_ssaoProgram->Use();
-    for (uint32 i = 0; i < 64; ++i)
-        m_ssaoProgram->SetUniform("samples[" + std::to_string(i) + "]", m_ssaoKernel[i]);
+    m_ssaoProgram->SetUniform("samples", m_ssaoKernel);
 
     return true;
 }
@@ -82,7 +79,7 @@ void StandardSSAOPass::GenerateKernel()
     std::uniform_real_distribution<float> randomFloats(0.0, 1.0);
     std::default_random_engine generator;
 
-    for (uint32 i = 0; i < 64; ++i)
+    for (uint32 i = 0; i < SSAO_KERNEL_SIZE; ++i)
     {
         glm::vec3 sample
         (
@@ -93,7 +90,7 @@ void StandardSSAOPass::GenerateKernel()
         sample = glm::normalize(sample);
         sample *= randomFloats(generator);
 
-        float scale = float(i) / 64.0;
+        float scale = float(i) / (float)SSAO_KERNEL_SIZE;
         scale = Utils::Lerp(0.1f, 1.0f, scale * scale);
         sample *= scale;
 
@@ -107,7 +104,8 @@ void StandardSSAOPass::GenerateNoiseTexture()
     std::default_random_engine generator;
     std::vector<glm::vec3> ssaoNoise;
 
-    for (uint32 i = 0; i < 16; i++)
+    const uint32 noiseCount = SSAO_NOISE_DIM * SSAO_NOISE_DIM;
+    for (uint32 i = 0; i < noiseCount; i++)
     {
         glm::vec3 noise(
             randomFloats(generator) * 2.0 - 1.0,
@@ -119,7 +117,7 @@ void StandardSSAOPass::GenerateNoiseTexture()
 
     // Texture::Create를 사용하여 포맷 지정 (GL_RGB16F or GL_RGB32F)
     // 4x4 크기, 노이즈는 반복되어야 하므로 GL_REPEAT 필수
-    m_noiseTexture = Texture::Create(4, 4, GL_RGB16F, GL_RGB, GL_FLOAT);
+    m_noiseTexture = Texture::Create(SSAO_NOISE_DIM, SSAO_NOISE_DIM, GL_RGB16F, GL_RGB, GL_FLOAT);
     m_noiseTexture->SetFilter(GL_NEAREST, GL_NEAREST);
     m_noiseTexture->SetWrap(GL_REPEAT, GL_REPEAT);
 

@@ -66,9 +66,6 @@ void AudioSource::OnUpdate()
 
 	// 1. 위치 동기화
 	auto transform = GetTransform();
-
-	// TODO: 추후 Transform 계층 구조(Parent-Child) 구현 시
-	// GetWorldPosition()으로 교체 필요
 	auto pos = transform.GetWorldPosition();
 	ma_sound_set_position(&m_sound, pos.x, pos.y, pos.z);
 
@@ -83,9 +80,7 @@ void AudioSource::Play()
 
 	// 만약 SFX라면, 쏠 때마다 처음부터 다시 재생하는 게 자연스러움
 	if (m_clip->GetType() == AudioType::SFX)
-	{
 		ma_sound_seek_to_pcm_frame(&m_sound, 0);
-	}
 
 	ma_sound_start(&m_sound);
 }
