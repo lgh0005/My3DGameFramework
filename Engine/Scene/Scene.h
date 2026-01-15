@@ -4,11 +4,12 @@
 #include "Scene/SceneUtils.h"
 
 #pragma region FORWARD_DECLARATION
-CLASS_PTR(SceneRegistry)
-CLASS_PTR(GameObjectManager)
+CLASS_PTR(SkyLight)
 CLASS_PTR(GameObject)
 CLASS_PTR(GeneralRenderPass)
-CLASS_PTR(SkyLight)
+CLASS_PTR(ComponentRegistry)
+CLASS_PTR(GameObjectRegistry)
+CLASS_PTR(SceneRegistry)
 #pragma endregion
 
 CLASS_PTR(Scene)
@@ -55,8 +56,8 @@ public:
 //=================================*/
 public:
 	// 3. SceneRegistry에 있는 컴포넌트, 렌더 패스, 스카이 박스 접근
-	SceneRegistry* GetRegistry() { return m_registry.get(); }
-	const SceneRegistry* GetRegistry() const { return m_registry.get(); }
+	ComponentRegistry* GetRegistry() { return m_registry.get(); }
+	const ComponentRegistry* GetRegistry() const { return m_registry.get(); }
 	void SetSkyLight(SkyLightUPtr skyLight);
 	void AddRenderPass(const std::string& name, GeneralRenderPassUPtr renderPass);
 	GeneralRenderPass* GetRenderPass(const std::string& name);
@@ -78,7 +79,9 @@ protected:
 //   abstract methods for user context   //
 //=======================================*/
 protected:
-	SceneRegistryUPtr     m_registry;			// 데이터 저장소 (Component Ptrs)
-	GameObjectManagerUPtr m_objectManager;		// 수명 관리자 (GameObject Ptrs)
-	SceneState			  m_state{ SceneState::Uninitialized };
+	ComponentRegistryUPtr     m_registry;			// 데이터 저장소 (Component Ptrs)
+	GameObjectRegistryUPtr    m_objectManager;		// 수명 관리자 (GameObject Ptrs)
+
+	SceneRegistryUPtr		  m_sceneRegistry;
+	SceneState			      m_state{ SceneState::Uninitialized };
 };

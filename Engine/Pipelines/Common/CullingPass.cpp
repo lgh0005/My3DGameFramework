@@ -2,7 +2,7 @@
 #include "CullingPass.h"
 #include "Pipelines/SRP/StandardRenderContext.h"
 #include "Object/GameObject.h"
-#include "Scene/SceneRegistry.h"
+#include "Scene/ComponentRegistry.h"
 #include "Components/StaticMeshRenderer.h"
 #include "Components/SkinnedMeshRenderer.h"
 #include "Components/MeshOutline.h"
@@ -27,7 +27,7 @@ bool CullingPass::Init()
 
 void CullingPass::Render(RenderContext* context)
 {
-    SceneRegistry* scene = context->GetSceneRegistry();
+    ComponentRegistry* scene = context->GetSceneRegistry();
     Camera* camera = context->GetCamera();
 
     // 1. Frustum 업데이트 (카메라의 View-Projection 행렬 사용)
@@ -49,7 +49,7 @@ void CullingPass::Render(RenderContext* context)
 /*=====================//
 //   culling methods   //
 //=====================*/
-void CullingPass::CullStaticMeshRenderers(SceneRegistry* registry, RenderContext* context)
+void CullingPass::CullStaticMeshRenderers(ComponentRegistry* registry, RenderContext* context)
 {
     const auto* sourceVec = context->GetSourceStaticMeshes();
     if (!sourceVec) return;
@@ -69,7 +69,7 @@ void CullingPass::CullStaticMeshRenderers(SceneRegistry* registry, RenderContext
     }
 }
 
-void CullingPass::CullSkinnedMeshRenderers(SceneRegistry* registry, RenderContext* context)
+void CullingPass::CullSkinnedMeshRenderers(ComponentRegistry* registry, RenderContext* context)
 {
     const auto* sourceVec = context->GetSourceSkinnedMeshes();
     if (!sourceVec) return;
@@ -88,7 +88,7 @@ void CullingPass::CullSkinnedMeshRenderers(SceneRegistry* registry, RenderContex
     }
 }
 
-void CullingPass::CullMeshOutlines(SceneRegistry* registry, RenderContext* context)
+void CullingPass::CullMeshOutlines(ComponentRegistry* registry, RenderContext* context)
 {
     // Scene이 가지고 있는 전체 아웃라인 리스트 순회
     const auto& outlines = registry->GetComponents<MeshOutline>();
@@ -117,7 +117,7 @@ void CullingPass::CullMeshOutlines(SceneRegistry* registry, RenderContext* conte
     }
 }
 
-void CullingPass::CullSceneLights(SceneRegistry* registry, RenderContext* context)
+void CullingPass::CullSceneLights(ComponentRegistry* registry, RenderContext* context)
 {
     const auto* sourceVec = context->GetSourceLights();
     if (!sourceVec) return;

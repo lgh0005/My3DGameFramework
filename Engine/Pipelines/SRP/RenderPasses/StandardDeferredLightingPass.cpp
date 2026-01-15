@@ -6,7 +6,7 @@
 #include "Pipelines/SRP/RenderPasses/StandardGeometryPass.h"
 #include "Pipelines/SRP/RenderPasses/StandardPostProcessPass.h"
 
-#include "Scene/SceneRegistry.h"
+#include "Scene/ComponentRegistry.h"
 #include "Object/GameObject.h"
 #include "Graphics/Geometry.h"
 #include "Resources/Program.h"

@@ -15,7 +15,7 @@
 
 #include "Scene/Scene.h"
 #include "Object/GameObject.h"
-#include "Scene/SceneRegistry.h"
+#include "Scene/ComponentRegistry.h"
 #include "Resources/Program.h"
 #include "Resources/Mesh.h"
 #include "Resources/StaticMesh.h" 

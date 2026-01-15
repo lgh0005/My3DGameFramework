@@ -1,31 +1,31 @@
 ﻿#include "EnginePch.h"
-#include "GameObjectManager.h"
+#include "GameObjectRegistry.h"
 #include "Object/GameObject.h"
 #include "Components/Transform.h"
 
-DECLARE_DEFAULTS_IMPL(GameObjectManager)
+DECLARE_DEFAULTS_IMPL(GameObjectRegistry)
 
-GameObjectManagerUPtr GameObjectManager::Create()
+GameObjectRegistryUPtr GameObjectRegistry::Create()
 {
-	auto goMgr = GameObjectManagerUPtr(new GameObjectManager());
+	auto goMgr = GameObjectRegistryUPtr(new GameObjectRegistry());
 	goMgr->Init();
 	return std::move(goMgr);
 }
 
-void GameObjectManager::Init()
+void GameObjectRegistry::Init()
 {
 	m_gameObjects.reserve(4096);
 	m_pendingCreateQueue.reserve(1024);
 	m_pendingDestroyQueue.reserve(1024);
 }
 
-void GameObjectManager::AddGameObject(GameObjectUPtr go)
+void GameObjectRegistry::AddGameObject(GameObjectUPtr go)
 {
 	if (!go) return;
 	m_pendingCreateQueue.push_back(std::move(go));
 }
 
-void GameObjectManager::DestroyGameObject(GameObject* go)
+void GameObjectRegistry::DestroyGameObject(GameObject* go)
 {
 	if (!go) return;
 
@@ -44,7 +44,7 @@ void GameObjectManager::DestroyGameObject(GameObject* go)
 	for (Transform* child : children) DestroyGameObject(child->GetOwner());
 }
 
-void GameObjectManager::PushToDestroyQueue(GameObject* go)
+void GameObjectRegistry::PushToDestroyQueue(GameObject* go)
 {
 	if (!go) return;
 	if (go->IsDead()) return;
@@ -52,7 +52,7 @@ void GameObjectManager::PushToDestroyQueue(GameObject* go)
 	m_pendingDestroyQueue.push_back(go);
 }
 
-void GameObjectManager::FlushCreateQueue()
+void GameObjectRegistry::FlushCreateQueue()
 {
 	if (m_pendingCreateQueue.empty()) return;
 
@@ -83,7 +83,7 @@ void GameObjectManager::FlushCreateQueue()
 	m_pendingCreateQueue.clear();
 }
 
-void GameObjectManager::FlushDestroyQueue()
+void GameObjectRegistry::FlushDestroyQueue()
 {
 	if (m_pendingDestroyQueue.empty()) return;
 
@@ -111,15 +111,15 @@ void GameObjectManager::FlushDestroyQueue()
 	m_pendingDestroyQueue.clear();
 }
 
-const std::vector<GameObjectUPtr>& GameObjectManager::GetGameObjects() const
+const std::vector<GameObjectUPtr>& GameObjectRegistry::GetGameObjects() const
 {
 	return m_gameObjects;
 }
-const std::vector<GameObjectUPtr>& GameObjectManager::GetPendingCreateQueue() const
+const std::vector<GameObjectUPtr>& GameObjectRegistry::GetPendingCreateQueue() const
 {
 	return m_pendingCreateQueue;
 }
-const std::vector<GameObject*>& GameObjectManager::GetPendingDestroyQueue() const
+const std::vector<GameObject*>& GameObjectRegistry::GetPendingDestroyQueue() const
 {
 	return m_pendingDestroyQueue;
 }

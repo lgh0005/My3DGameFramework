@@ -8,7 +8,7 @@
 #include "Resources/CubeTexture.h"
 #include "Resources/Texture.h"
 #include "Scene/Scene.h"
-#include "Scene/SceneRegistry.h"
+#include "Scene/ComponentRegistry.h"
 #include "Object/Component.h"
 
 DECLARE_DEFAULTS_IMPL(RenderContext)
@@ -68,7 +68,7 @@ void RenderContext::AddLight(Light* light)
 /*====================================//
 //   default render context getters   //
 //====================================*/
-SceneRegistry* RenderContext::GetSceneRegistry() const
+ComponentRegistry* RenderContext::GetSceneRegistry() const
 {
 	return m_currentSceneRegistry;
 }

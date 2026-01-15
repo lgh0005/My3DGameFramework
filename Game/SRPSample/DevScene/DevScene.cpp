@@ -39,8 +39,6 @@
 #include "Components/SphereCollider.h"
 #include "Components/CapsuleCollider.h"
 
-#include "Scene/GameObjectManager.h"
-
 #include "SRPSample/RenderPasses/InstancedRenderPass.h"
 #include "SRPSample/RenderPasses/SimpleRenderPass.h"
 #include "SRPSample/RenderPasses/EnvironmentRenderPass.h"

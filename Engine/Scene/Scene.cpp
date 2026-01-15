@@ -2,8 +2,9 @@
 #include "Scene.h"
 
 #include "Object/GameObject.h"
+#include "Scene/ComponentRegistry.h"
+#include "Scene/GameObjectRegistry.h"
 #include "Scene/SceneRegistry.h"
-#include "Scene/GameObjectManager.h"
 #include "Graphics/RenderPass.h"
 #include "Graphics/SkyLight.h"
 #include "Components/Camera.h"
@@ -11,8 +12,8 @@
 
 Scene::Scene()
 {
-	m_registry = SceneRegistry::Create();
-	m_objectManager = GameObjectManager::Create();
+	m_registry = ComponentRegistry::Create();
+	m_objectManager = GameObjectRegistry::Create();
 }
 Scene::~Scene() = default;
 
@@ -22,6 +23,8 @@ bool Scene::Init()
 	if (!SCENE.IsUninitialized()) return false;
 
 	// 1. 씬 상태를 Loading으로 전이
+	m_sceneRegistry = SceneRegistry::Create();
+	if (!m_sceneRegistry) return false;
 	SCENE.SetSceneState(SceneState::Loading);
 
 	// 2. 엔진 레벨 리소스 로드
