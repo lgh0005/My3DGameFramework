@@ -9,8 +9,6 @@ class BoxCollider : public Collider
 public:
 	virtual ~BoxCollider();
 	static BoxColliderUPtr Create(const glm::vec3& size = glm::vec3(1.0f));
-	static const ComponentType s_ComponentType = ComponentType::BoxCollider;
-	virtual ComponentType GetComponentType() const override { return ComponentType::BoxCollider; }
 
 	void SetSize(const glm::vec3& size) { m_size = size; }
 	const glm::vec3& GetSize() const { return m_size; }

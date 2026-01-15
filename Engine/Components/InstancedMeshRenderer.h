@@ -10,14 +10,12 @@ CLASS_PTR(Program)
 CLASS_PTR(InstancedMeshRenderer)
 class InstancedMeshRenderer : public MeshRenderer
 {
-	DEFINE_COMPONENT_TYPE(ComponentType::InstancedMeshRenderer)
 	using Super = MeshRenderer;
+	DEFINE_COMPONENT_TYPE(ComponentType::InstancedMeshRenderer)
 
 public:
 	virtual ~InstancedMeshRenderer();
 	static InstancedMeshRendererUPtr Create(InstancedMeshPtr mesh, MaterialPtr material);
-	static const ComponentType s_ComponentType = ComponentType::InstancedMeshRenderer;
-	virtual ComponentType GetComponentType() const override { return s_ComponentType; }
 	virtual RenderBounds GetWorldBounds() const override;
 	virtual void Render(Program* program) const;
 

@@ -5,13 +5,12 @@
 CLASS_PTR(Collider)
 class Collider : public Component
 {
-	DEFINE_COMPONENT_TYPE(ComponentType::Collider)
 	using Super = Component;
+	DEFINE_COMPONENT_TYPE(ComponentType::Collider)
 
 public:
 	virtual ~Collider();
 	virtual bool MatchesType(ComponentType type) const override;
-	static const ComponentType s_ComponentType = ComponentType::Collider;
 	JPH::ShapeRefC CreateShape();
 
 	JPH::ShapeRefC GetShape() const { return m_shape; }

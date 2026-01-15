@@ -11,8 +11,8 @@ CLASS_PTR(Program)
 CLASS_PTR(SkinnedMeshRenderer)
 class SkinnedMeshRenderer : public MeshRenderer
 {
-	DEFINE_COMPONENT_TYPE(ComponentType::SkinnedMeshRenderer)
 	using Super = MeshRenderer;
+	DEFINE_COMPONENT_TYPE(ComponentType::SkinnedMeshRenderer)
 
 public:
 	virtual ~SkinnedMeshRenderer();
@@ -22,8 +22,6 @@ public:
 		MaterialPtr material, 
 		Animator* animator
 	);
-	static const ComponentType s_ComponentType = ComponentType::SkinnedMeshRenderer;
-	virtual ComponentType GetComponentType() const override { return s_ComponentType; }
 	virtual RenderBounds GetWorldBounds() const override;
 	Animator* GetAnimator() const;
 	virtual void Render(Program* program) const override;

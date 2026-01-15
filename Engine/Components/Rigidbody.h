@@ -6,14 +6,12 @@
 CLASS_PTR(Rigidbody)
 class Rigidbody : public PhysicsComponent
 {
-	DEFINE_COMPONENT_TYPE(ComponentType::Rigidbody)
 	using Super = PhysicsComponent;
+	DEFINE_COMPONENT_TYPE(ComponentType::Rigidbody)
 
 public:
 	virtual ~Rigidbody();
 	static RigidbodyUPtr Create();
-	static const ComponentType s_ComponentType = ComponentType::Rigidbody;
-	virtual ComponentType GetComponentType() const override { return ComponentType::Rigidbody; }
 	virtual void OnStart() override;
 	virtual void OnUpdate() override;
 

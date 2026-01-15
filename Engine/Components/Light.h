@@ -11,12 +11,11 @@ enum class LightType
 CLASS_PTR(Light)
 class Light : public Component
 {
-    DEFINE_COMPONENT_TYPE(ComponentType::Light)
     using Super = Component;
+    DEFINE_COMPONENT_TYPE(ComponentType::Light)
 
 public:
     virtual ~Light();
-    static const ComponentType s_ComponentType = ComponentType::Light;
     virtual bool MatchesType(ComponentType type) const override;
 
     const glm::vec3& GetAmbient() const { return m_ambient; }

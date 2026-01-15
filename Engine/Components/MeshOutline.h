@@ -17,8 +17,6 @@ public:
 		const glm::vec3& color = { 1.0f, 1.0f, 0.5f }, // 기본 노란색
 		float thickness = 0.03f						   // 기본 두께 : 0.03
 	);
-	static const ComponentType s_ComponentType = ComponentType::MeshOutline;
-	virtual ComponentType GetComponentType() const override { return s_ComponentType;}
 	virtual void OnStart() override;
 
 	void SetColor(const glm::vec3& color) { m_color = color; }

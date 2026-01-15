@@ -12,8 +12,6 @@ class Transform : public Component
 public:
 	virtual ~Transform();
 	static TransformUPtr Create();
-	static const ComponentType s_ComponentType = ComponentType::Transform;
-	virtual ComponentType GetComponentType() const override { return ComponentType::Transform; }
 
 /*====================================================//
 //                 Transformation (Local)             //

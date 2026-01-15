@@ -9,8 +9,6 @@ class CapsuleCollider : public Collider
 public:
 	virtual ~CapsuleCollider();
 	static CapsuleColliderUPtr Create(float radius = 0.5f, float height = 2.0f);
-	static const ComponentType s_ComponentType = ComponentType::CapsuleCollider;
-	virtual ComponentType GetComponentType() const override { return ComponentType::CapsuleCollider; }
 
 	void SetRadius(float radius);
 	float GetRadius() const { return m_radius; }

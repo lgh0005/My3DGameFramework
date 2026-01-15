@@ -16,8 +16,6 @@ class DirectionalLight : public Light
 public:
 	virtual ~DirectionalLight();
 	static DirectionalLightUPtr Create();
-	static const ComponentType s_ComponentType = ComponentType::DirectionalLight;
-	virtual ComponentType GetComponentType() const override { return ComponentType::DirectionalLight; }
 	
 	const glm::vec3& GetDirection()  const		    { return m_direction; }
 	void SetDirection(const glm::vec3& direction)   { m_direction = direction; }

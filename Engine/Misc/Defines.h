@@ -96,6 +96,11 @@ public:                                                                         
     static ScriptID GetStaticScriptID() { return ScriptRegistry::GetID<scriptName>(); }   \
     virtual ScriptID GetScriptID() const override { return GetStaticScriptID(); }
 
+/*==================================================//
+//   compile-time component type definition macro   //
+//==================================================*/
 #define DEFINE_COMPONENT_TYPE(TypeEnum)                                                   \
 public:                                                                                   \
-	static constexpr ComponentType GetStaticComponentType() { return TypeEnum; }          
+	static constexpr ComponentType GetStaticComponentType() { return TypeEnum; }          \
+    static const ComponentType s_ComponentType = TypeEnum;                                \
+    virtual ComponentType GetComponentType() const override { return GetStaticComponentType(); }
