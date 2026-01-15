@@ -42,6 +42,7 @@ public:
 
 	const ComponentVectorRawPtr GetSourceStaticMeshes() const;
 	const ComponentVectorRawPtr GetSourceSkinnedMeshes() const;
+	const ComponentVectorRawPtr GetSourceMeshOutlines() const;
 	const ComponentVectorRawPtr GetSourceLights() const;
 
 /*====================================//
@@ -51,21 +52,22 @@ protected:
 	RenderContext();
 
 	// 씬과 카메라
-	ComponentRegistry* m_currentSceneRegistry{ nullptr };
-	Camera* m_currentCamera{ nullptr };
+	ComponentRegistry* m_componentRegistry			      { nullptr };
+	Camera* m_currentCamera								  { nullptr };
 
 	// 하늘
-	SkyLight* m_skyLight{ nullptr };
+	SkyLight* m_skyLight								  { nullptr };
 
 	// Source (Scene 원본 참조)
-	ComponentVectorRawPtr		m_staticMeshRenderersSrc{ nullptr };
-	ComponentVectorRawPtr		m_skinnedMeshRenderersSrc{ nullptr };
-	ComponentVectorRawPtr		m_lightsSrc{ nullptr };
+	ComponentVectorRawPtr		m_staticMeshRenderersSrc  { nullptr };
+	ComponentVectorRawPtr		m_skinnedMeshRenderersSrc { nullptr };
+	ComponentVectorRawPtr		m_meshOutlinesSrc		  { nullptr };
+	ComponentVectorRawPtr		m_lightsSrc				  { nullptr };
 
 	// Result (실제 렌더링 목록)
-	std::vector<MeshOutline*>  m_culledMeshOutlines;
 	std::vector<StaticMeshRenderer*> m_culledStaticMeshRenderers;
 	std::vector<SkinnedMeshRenderer*> m_culledSkinnedMeshRenderers;
+	std::vector<MeshOutline*>  m_culledMeshOutlines;
 	std::vector<Light*>        m_culledLights;
 
 /*======================================================//

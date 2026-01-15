@@ -8,6 +8,7 @@
 #include "Resources/CubeTexture.h"
 #include "Resources/Texture.h"
 #include "Scene/Scene.h"
+#include "Scene/SceneRegistry.h"
 #include "Scene/ComponentRegistry.h"
 #include "Object/Component.h"
 
@@ -19,29 +20,31 @@ DECLARE_DEFAULTS_IMPL(RenderContext)
 void RenderContext::Reset(Scene* scene, Camera* camera)
 {
 	// 1. 기본 정보 갱신
-	m_currentSceneRegistry = scene->GetRegistry();
+	m_componentRegistry = scene->GetComponentRegistry();
 	m_currentCamera = camera;
 
 	// 2. 씬의 원본 데이터 연결
-	if (m_currentSceneRegistry)
+	if (m_componentRegistry)
 	{
-		m_staticMeshRenderersSrc  = &m_currentSceneRegistry->GetComponents<StaticMeshRenderer>();
-		m_skinnedMeshRenderersSrc = &m_currentSceneRegistry->GetComponents<SkinnedMeshRenderer>();
-		m_lightsSrc				  = &m_currentSceneRegistry->GetComponents<Light>();
-		m_skyLight			      = m_currentSceneRegistry->GetSkyLight();
+		m_staticMeshRenderersSrc  = &m_componentRegistry->GetComponents<StaticMeshRenderer>();
+		m_skinnedMeshRenderersSrc = &m_componentRegistry->GetComponents<SkinnedMeshRenderer>();
+		m_meshOutlinesSrc		  = &m_componentRegistry->GetComponents<MeshOutline>();
+		m_lightsSrc				  = &m_componentRegistry->GetComponents<Light>();
+		m_skyLight			      = m_componentRegistry->GetSkyLight();
 	}
 	else
 	{
-		m_staticMeshRenderersSrc = nullptr;
+		m_staticMeshRenderersSrc  = nullptr;
 		m_skinnedMeshRenderersSrc = nullptr;
-		m_lightsSrc = nullptr;
-		m_skyLight = nullptr;
+		m_meshOutlinesSrc		  = nullptr;
+		m_lightsSrc				  = nullptr;
+		m_skyLight				  = nullptr;
 	}
 
 	// 3. 결과 벡터 초기화
-	m_culledMeshOutlines.clear();
 	m_culledStaticMeshRenderers.clear();
 	m_culledSkinnedMeshRenderers.clear();
+	m_culledMeshOutlines.clear();
 	m_culledLights.clear();
 }
 
@@ -70,7 +73,7 @@ void RenderContext::AddLight(Light* light)
 //====================================*/
 ComponentRegistry* RenderContext::GetSceneRegistry() const
 {
-	return m_currentSceneRegistry;
+	return m_componentRegistry;
 }
 
 Camera* RenderContext::GetCamera() const
@@ -135,6 +138,11 @@ const RenderContext::ComponentVectorRawPtr RenderContext::GetSourceStaticMeshes(
 const RenderContext::ComponentVectorRawPtr RenderContext::GetSourceSkinnedMeshes() const
 {
 	return m_skinnedMeshRenderersSrc;
+}
+
+const RenderContext::ComponentVectorRawPtr RenderContext::GetSourceMeshOutlines() const
+{
+	return m_meshOutlinesSrc;
 }
 
 const RenderContext::ComponentVectorRawPtr RenderContext::GetSourceLights() const

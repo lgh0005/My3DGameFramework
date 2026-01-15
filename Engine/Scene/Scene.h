@@ -51,13 +51,13 @@ public:
 	void ProcessPendingAdds();  // 생성 대기열 처리
 	void ProcessPendingKills(); // 삭제 대기열 처리
 
-/*=================================//
-//   getters from SceneRegistry    //
-//=================================*/
+/*================================================//
+//   scene property getters from SceneRegistry    //
+//================================================*/
 public:
 	// 3. SceneRegistry에 있는 컴포넌트, 렌더 패스, 스카이 박스 접근
-	ComponentRegistry* GetRegistry() { return m_registry.get(); }
-	const ComponentRegistry* GetRegistry() const { return m_registry.get(); }
+	ComponentRegistry* GetComponentRegistry();
+	GameObjectRegistry* GetGameObjectRegistry();
 	void SetSkyLight(SkyLightUPtr skyLight);
 	void AddRenderPass(const std::string& name, GeneralRenderPassUPtr renderPass);
 	GeneralRenderPass* GetRenderPass(const std::string& name);
@@ -79,9 +79,6 @@ protected:
 //   abstract methods for user context   //
 //=======================================*/
 protected:
-	ComponentRegistryUPtr     m_registry;			// 데이터 저장소 (Component Ptrs)
-	GameObjectRegistryUPtr    m_objectManager;		// 수명 관리자 (GameObject Ptrs)
-
 	SceneRegistryUPtr		  m_sceneRegistry;
 	SceneState			      m_state{ SceneState::Uninitialized };
 };

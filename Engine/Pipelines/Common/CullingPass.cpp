@@ -90,9 +90,10 @@ void CullingPass::CullSkinnedMeshRenderers(ComponentRegistry* registry, RenderCo
 
 void CullingPass::CullMeshOutlines(ComponentRegistry* registry, RenderContext* context)
 {
-    // Scene이 가지고 있는 전체 아웃라인 리스트 순회
-    const auto& outlines = registry->GetComponents<MeshOutline>();
-    for (Component* comp : outlines)
+    const auto* sourceVec = context->GetSourceMeshOutlines();
+    if (!sourceVec) return;
+
+    for (Component* comp : *sourceVec)
     {
         auto* outline = static_cast<MeshOutline*>(comp);
 

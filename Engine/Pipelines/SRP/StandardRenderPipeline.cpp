@@ -14,8 +14,9 @@
 #include "Pipelines/SRP/StandardRenderContext.h"
 
 #include "Scene/Scene.h"
-#include "Object/GameObject.h"
+#include "Scene/SceneRegistry.h"
 #include "Scene/ComponentRegistry.h"
+#include "Object/GameObject.h"
 #include "Resources/Program.h"
 #include "Resources/Mesh.h"
 #include "Resources/StaticMesh.h" 
@@ -112,7 +113,7 @@ void StandardRenderPipeline::Render(Scene* scene)
 	// 메인 카메라 속성 가져오기
 	// TODO : 이후에는 여러 카메라를 지원할 것이라면 카메라 개수 만큼
 	// 반복해야 할 수도 있음.
-	auto* registry = scene->GetRegistry();
+	auto* registry = scene->GetComponentRegistry();
 	auto* camera = registry->GetCamera(0);
 	if (!camera) return;
 

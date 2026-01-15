@@ -10,12 +10,7 @@
 #include "Components/Camera.h"
 #include "Components/Transform.h"
 
-Scene::Scene()
-{
-	m_registry = ComponentRegistry::Create();
-	m_objectManager = GameObjectRegistry::Create();
-}
-Scene::~Scene() = default;
+DECLARE_DEFAULTS_IMPL(Scene)
 
 bool Scene::Init()
 {
@@ -45,7 +40,7 @@ bool Scene::Init()
 void Scene::OnScreenResize(int32 width, int32 height)
 {
 	// [변경 1] GetCameras() 삭제됨 -> GetComponents<Camera>() 사용
-	const auto& cameraComponents = m_registry->GetComponents<Camera>();
+	const auto& cameraComponents = GetComponentRegistry()->GetComponents<Camera>();
 
 	// [변경 2] Component* 벡터이므로 캐스팅 필요
 	for (Component* comp : cameraComponents)
@@ -83,7 +78,7 @@ void Scene::Start()
 	ProcessPendingAdds();
 
 	// 4. 기존에 Awake된 객체들 중, 아직 Start 안 된 녀석들을 Start 시킴
-	const auto& gameObjects = m_objectManager->GetGameObjects();
+	const auto& gameObjects = GetGameObjectRegistry()->GetGameObjects();
 	for (const auto& go : gameObjects)
 	{
 		if (go->IsActive()) go->Start();
@@ -95,7 +90,7 @@ void Scene::FixedUpdate()
 	if (!SCENE.IsSceneRunning()) return;
 
 	// [Phase 2] 물리 업데이트 (FixedUpdate)
-	for (const auto& go : m_objectManager->GetGameObjects())
+	for (const auto& go : GetGameObjectRegistry()->GetGameObjects())
 	{
 		if (go->IsActive()) go->FixedUpdate();
 	}
@@ -109,7 +104,7 @@ void Scene::Update()
 	ProcessPendingAdds();
 
 	// [Phase 3] 게임 로직 업데이트 (Update)
-	for (const auto& go : m_objectManager->GetGameObjects())
+	for (const auto& go : GetGameObjectRegistry()->GetGameObjects())
 	{
 		if (go->IsActive()) go->Update();
 	}
@@ -125,7 +120,7 @@ void Scene::LateUpdate()
 
 	// [Phase 5] 후처리 업데이트 (LateUpdate)
 	// 카메라 추적 등 로직 이후에 처리되어야 하는 작업들
-	const auto& gameObjects = m_objectManager->GetGameObjects();
+	const auto& gameObjects = GetGameObjectRegistry()->GetGameObjects();
 	for (const auto& go : gameObjects)
 	{
 		if (go->IsActive()) go->LateUpdate();
@@ -137,12 +132,12 @@ void Scene::LateUpdate()
 //================================*/
 void Scene::AddGameObject(GameObjectUPtr gameObject)
 {
-	m_objectManager->AddGameObject(std::move(gameObject));
+	GetGameObjectRegistry()->AddGameObject(std::move(gameObject));
 }
 
 void Scene::Destroy(GameObject* obj)
 {
-	m_objectManager->DestroyGameObject(obj);
+	GetGameObjectRegistry()->DestroyGameObject(obj);
 }
 
 /*==================================//
@@ -151,7 +146,7 @@ void Scene::Destroy(GameObject* obj)
 void Scene::ProcessPendingAdds()
 {
 	// 1. 매니저에게 "새 친구들 명단" 요청
-	const auto& pendingAdds = m_objectManager->GetPendingCreateQueue();
+	const auto& pendingAdds = m_sceneRegistry->GetGameObjectRegistry()->GetPendingCreateQueue();
 	if (pendingAdds.empty()) return;
 
 	for (const auto& go : pendingAdds)
@@ -159,7 +154,7 @@ void Scene::ProcessPendingAdds()
 		// 1-1. [Registry] 컴포넌트 등록 (렌더링, 시스템 등을 위해 필수)
 		for (const auto& comp : go->GetComponents())
 		{
-			m_registry->RegisterComponent(comp.get());
+			GetComponentRegistry()->RegisterComponent(comp.get());
 		}
 
 		// 1-2. [Lifecycle] 생명주기 따라잡기 (Catch-up)
@@ -171,13 +166,13 @@ void Scene::ProcessPendingAdds()
 	}
 
 	// 2. [Manager] 승인 (이제 진짜 리스트로 이동)
-	m_objectManager->FlushCreateQueue();
+	GetGameObjectRegistry()->FlushCreateQueue();
 }
 
 void Scene::ProcessPendingKills()
 {
 	// 1. 매니저에게 "죽을 친구들 명단" 요청
-	const auto& pendingKills = m_objectManager->GetPendingDestroyQueue();
+	const auto& pendingKills = GetGameObjectRegistry()->GetPendingDestroyQueue();
 	if (pendingKills.empty()) return;
 
 	for (GameObject* deadObj : pendingKills)
@@ -187,7 +182,7 @@ void Scene::ProcessPendingKills()
 
 		// 1-2. [Registry] 컴포넌트 말소 (Dangling Pointer 방지)
 		for (const auto& comp : deadObj->GetComponents())
-			m_registry->UnregisterComponent(comp.get());
+			GetComponentRegistry()->UnregisterComponent(comp.get());
 
 		// 1-3. 부모를 nullptr로 설정하면, Transform 내부에서 알아서
 		// 기존 부모의 자식 리스트에서 나를 빼는(RemoveChild) 작업이 수행
@@ -206,23 +201,33 @@ void Scene::ProcessPendingKills()
 	}
 
 	// 2. [Manager] 승인 (메모리 해제)
-	m_objectManager->FlushDestroyQueue();
+	GetGameObjectRegistry()->FlushDestroyQueue();
 }
 
-/*=================================//
-//   getters from SceneRegistry    //
-//=================================*/
+/*================================================//
+//   scene property getters from SceneRegistry    //
+//================================================*/
+ComponentRegistry* Scene::GetComponentRegistry()
+{
+	return m_sceneRegistry->GetComponentRegistry();
+}
+
+GameObjectRegistry* Scene::GetGameObjectRegistry()
+{
+	return m_sceneRegistry->GetGameObjectRegistry();
+}
+
 void Scene::AddRenderPass(const std::string& name, GeneralRenderPassUPtr renderPass)
 {
-	m_registry->AddCustomRenderPass(name, std::move(renderPass));
+	GetComponentRegistry()->AddCustomRenderPass(name, std::move(renderPass));
 }
 
 GeneralRenderPass* Scene::GetRenderPass(const std::string& name)
 {
-	return m_registry->GetCustomRenderPass(name);
+	return GetComponentRegistry()->GetCustomRenderPass(name);
 }
 
 void Scene::SetSkyLight(SkyLightUPtr skyLight)
 {
-	m_registry->SetSkyLight(std::move(skyLight));
+	GetComponentRegistry()->SetSkyLight(std::move(skyLight));
 }
