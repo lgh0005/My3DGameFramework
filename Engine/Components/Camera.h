@@ -8,6 +8,8 @@ CLASS_PTR(Ray)
 CLASS_PTR(Camera)
 class Camera : public Component
 {
+	DEFINE_COMPONENT_TYPE(ComponentType::Camera)
+
 public:
 	virtual ~Camera();
 	static CameraUPtr Create();

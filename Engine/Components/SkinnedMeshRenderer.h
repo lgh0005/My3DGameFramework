@@ -11,6 +11,7 @@ CLASS_PTR(Program)
 CLASS_PTR(SkinnedMeshRenderer)
 class SkinnedMeshRenderer : public MeshRenderer
 {
+	DEFINE_COMPONENT_TYPE(ComponentType::SkinnedMeshRenderer)
 	using Super = MeshRenderer;
 
 public:

@@ -4,6 +4,8 @@
 CLASS_PTR(SphereCollider)
 class SphereCollider : public Collider
 {
+	DEFINE_COMPONENT_TYPE(ComponentType::SphereCollider)
+
 public:
 	virtual ~SphereCollider();
 	static SphereColliderUPtr Create(float radius = 1.0f);

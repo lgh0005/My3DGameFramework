@@ -10,6 +10,7 @@ CLASS_PTR(Program)
 CLASS_PTR(StaticMeshRenderer)
 class StaticMeshRenderer : public MeshRenderer
 {
+	DEFINE_COMPONENT_TYPE(ComponentType::StaticMeshRenderer)
 	using Super = MeshRenderer;
 
 public:

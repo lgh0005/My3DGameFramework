@@ -7,6 +7,8 @@
 CLASS_PTR(Transform)
 class Transform : public Component
 {
+	DEFINE_COMPONENT_TYPE(ComponentType::Transform)
+
 public:
 	virtual ~Transform();
 	static TransformUPtr Create();

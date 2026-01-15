@@ -41,10 +41,15 @@ bool Scene::Init()
 
 void Scene::OnScreenResize(int32 width, int32 height)
 {
-	// Registry에 있는 모든 카메라의 비율을 갱신
-	const auto& cameras = m_registry->GetCameras();
-	for (Camera* cam : cameras)
+	// [변경 1] GetCameras() 삭제됨 -> GetComponents<Camera>() 사용
+	const auto& cameraComponents = m_registry->GetComponents<Camera>();
+
+	// [변경 2] Component* 벡터이므로 캐스팅 필요
+	for (Component* comp : cameraComponents)
+	{
+		auto* cam = static_cast<Camera*>(comp);
 		cam->SetViewportSize((float)width, (float)height);
+	}
 }
 
 /*======================================//

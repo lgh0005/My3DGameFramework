@@ -12,6 +12,8 @@ CLASS_PTR(Transform)
 CLASS_PTR(Animator)
 class Animator : public Component
 {
+	DEFINE_COMPONENT_TYPE(ComponentType::Animator)
+
 public:
 	virtual ~Animator();
 	static AnimatorUPtr Create(ModelPtr model, AnimControllerUPtr controller);

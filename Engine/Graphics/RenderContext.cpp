@@ -9,6 +9,7 @@
 #include "Resources/Texture.h"
 #include "Scene/Scene.h"
 #include "Scene/SceneRegistry.h"
+#include "Object/Component.h"
 
 DECLARE_DEFAULTS_IMPL(RenderContext)
 
@@ -24,16 +25,16 @@ void RenderContext::Reset(Scene* scene, Camera* camera)
 	// 2. 씬의 원본 데이터 연결
 	if (m_currentSceneRegistry)
 	{
-		m_staticMeshRenderers  = &m_currentSceneRegistry->GetStaticMeshRenderers();
-		m_skinnedMeshRenderers = &m_currentSceneRegistry->GetSkinnedMeshRenderers();
-		m_lights			   = &m_currentSceneRegistry->GetLights();
-		m_skyLight			   = m_currentSceneRegistry->GetSkyLight();
+		m_staticMeshRenderersSrc  = &m_currentSceneRegistry->GetComponents<StaticMeshRenderer>();
+		m_skinnedMeshRenderersSrc = &m_currentSceneRegistry->GetComponents<SkinnedMeshRenderer>();
+		m_lightsSrc				  = &m_currentSceneRegistry->GetComponents<Light>();
+		m_skyLight			      = m_currentSceneRegistry->GetSkyLight();
 	}
 	else
 	{
-		m_staticMeshRenderers = nullptr;
-		m_skinnedMeshRenderers = nullptr;
-		m_lights = nullptr;
+		m_staticMeshRenderersSrc = nullptr;
+		m_skinnedMeshRenderersSrc = nullptr;
+		m_lightsSrc = nullptr;
 		m_skyLight = nullptr;
 	}
 
@@ -124,4 +125,19 @@ void RenderContext::SetSkyboxTexture(CubeTexture* texture)
 CubeTexture* RenderContext::GetSkyboxTexture() const
 {
 	return m_skyboxTexture;
+}
+
+const RenderContext::ComponentVectorRawPtr RenderContext::GetSourceStaticMeshes() const
+{
+	return m_staticMeshRenderersSrc;
+}
+
+const RenderContext::ComponentVectorRawPtr RenderContext::GetSourceSkinnedMeshes() const
+{
+	return m_skinnedMeshRenderersSrc;
+}
+
+const RenderContext::ComponentVectorRawPtr RenderContext::GetSourceLights() const
+{
+	return m_lightsSrc;
 }

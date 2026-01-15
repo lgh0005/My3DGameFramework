@@ -11,6 +11,8 @@ CLASS_PTR(Transform)
 CLASS_PTR(DirectionalLight)
 class DirectionalLight : public Light
 {
+	DEFINE_COMPONENT_TYPE(ComponentType::DirectionalLight)
+
 public:
 	virtual ~DirectionalLight();
 	static DirectionalLightUPtr Create();

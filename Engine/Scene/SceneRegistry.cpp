@@ -3,11 +3,12 @@
 
 #include "Object/GameObject.h"
 #include "Graphics/RenderPass.h"
-#include "Resources/Mesh.h"
 #include "Graphics/SkyLight.h"
 #include "Components/Light.h"
 #include "Components/PointLight.h"
 #include "Components/DirectionalLight.h"
+#include "Components/SpotLight.h"
+#include "Components/MeshRenderer.h"
 #include "Components/StaticMeshRenderer.h"
 #include "Components/SkinnedMeshRenderer.h"
 #include "Components/InstancedMeshRenderer.h"
@@ -24,138 +25,149 @@
 #include "Components/Rigidbody.h"
 #include "UIs/UICanvas.h"
 
-DECLARE_DEFAULTS_IMPL(SceneRegistry)
+SceneRegistry::SceneRegistry() = default;
+SceneRegistry::~SceneRegistry()
+{
+	for (auto& vec : m_componentCache) vec.clear();
+	m_customPasses.clear();
+}
 
 SceneRegistryUPtr SceneRegistry::Create()
 {
-	return SceneRegistryUPtr(new SceneRegistry());
+	auto registry = SceneRegistryUPtr(new SceneRegistry());
+	registry->Init();
+	return std::move(registry);
+}
+
+void SceneRegistry::Init()
+{
+	for (auto& vec : m_componentCache) vec.reserve(32);
 }
 
 void SceneRegistry::RegisterComponent(Component* component)
 {
 	if (!component) return;
+	ComponentType type = component->GetComponentType();
 
-	// TODO : 이후에 다른 게임 컴포넌트들도 나열해야함
-	switch (component->GetComponentType())
+	// 1. 상속 구조에 있는 컴포넌트 이중 등록
+	switch (type)
 	{
-		case ComponentType::Camera:
-		{
-			m_cameras.push_back(static_cast<Camera*>(component));
-			break;
-		}
-		case ComponentType::Light:
+		// [Light 계열]
 		case ComponentType::DirectionalLight:
 		case ComponentType::PointLight:
 		case ComponentType::SpotLight:
 		{
-			m_lights.push_back(static_cast<Light*>(component));
-			break;
-		}
-		case ComponentType::Animator:
-		{
-			m_animators.push_back(static_cast<Animator*>(component));
-			break;
-		}
-		case ComponentType::Script:
-		{
-			m_scripts.push_back(static_cast<Script*>(component));
-			break;
-		}
-		case ComponentType::AudioSource:
-		{
-			m_audioSources.push_back(static_cast<AudioSource*>(component));
-			break;
-		}
-		case ComponentType::AudioListener:
-		{
-			m_audioListeners.push_back(static_cast<AudioListener*>(component));
-			break;
-		}
-		case ComponentType::StaticMeshRenderer:
-		{
-			auto mr = static_cast<StaticMeshRenderer*>(component);
-			if (mr->GetRenderStage() == RenderStage::Forward) return;
-			m_staticMeshRenderers.push_back(mr);
-			break;
-		}
-		case ComponentType::SkinnedMeshRenderer:
-		{
-			auto mr = static_cast<SkinnedMeshRenderer*>(component);
-			if (mr->GetRenderStage() == RenderStage::Forward) return;
-			m_skinnedMeshRenderers.push_back(mr);
-			break;
-		}
-		case ComponentType::InstancedMeshRenderer:
-		{
-			auto mr = static_cast<InstancedMeshRenderer*>(component);
-			if (mr->GetRenderStage() == RenderStage::Forward) return;
-			m_instancedMeshRenderers.push_back(mr);
-			break;
-		}
-		case ComponentType::MeshOutline:
-		{
-			m_outlines.push_back(static_cast<MeshOutline*>(component));
-			break;
-		}
-		case ComponentType::UICanvas:
-		{
-			m_uiCanvases.push_back(static_cast<UICanvas*>(component));
-			break;
-		}
-		case ComponentType::Collider:
-		case ComponentType::BoxCollider:
-		case ComponentType::SphereCollider:
-		{
-			m_colliders.push_back(static_cast<Collider*>(component));
+			usize baseIndex = (usize)ComponentType::Light;
+			m_componentCache[baseIndex].push_back(component);
 			break;
 		}
 
-		case ComponentType::Rigidbody:
+		// [MeshRenderer 계열]
+		case ComponentType::StaticMeshRenderer:
+		case ComponentType::SkinnedMeshRenderer:
+		case ComponentType::InstancedMeshRenderer:
 		{
-			m_rigidBodies.push_back(static_cast<Rigidbody*>(component));
+			// Forward 스테이지 메쉬 렌더러들은 제외
+			auto mr = static_cast<MeshRenderer*>(component);
+			if (mr->GetRenderStage() == RenderStage::Forward) return;
+
+			usize baseIndex = (usize)ComponentType::MeshRenderer;
+			m_componentCache[baseIndex].push_back(component);
+			break;
+		}
+
+		// [Collider 계열]
+		case ComponentType::BoxCollider:
+		case ComponentType::SphereCollider:
+		case ComponentType::CapsuleCollider:
+		{
+			usize baseIndex = (usize)ComponentType::Collider;
+			m_componentCache[baseIndex].push_back(component);
 			break;
 		}
 	}
+
+	// 2. 자기 자신의 구체적 타입(Leaf Class) 위치에 저장
+	usize index = (usize)type;
+	m_componentCache[index].push_back(component);
 }
 
 void SceneRegistry::UnregisterComponent(Component* component)
 {
 	if (!component) return;
+	ComponentType type = component->GetComponentType();
 
-	// 등록과 정확히 대칭되는 해제 로직
-	switch (component->GetComponentType())
+	// 1. 이중 해제 로직
+	switch (type)
 	{
-		case ComponentType::Camera:
-			RemoveFromVector(m_cameras, component); break;
-		case ComponentType::Light:
+		// [Light 계열]
 		case ComponentType::DirectionalLight:
 		case ComponentType::PointLight:
 		case ComponentType::SpotLight:
-			RemoveFromVector(m_lights, component); break;
-		case ComponentType::Animator:
-			RemoveFromVector(m_animators, component); break;
-		case ComponentType::Script:
-			RemoveFromVector(m_scripts, component); break;
-		case ComponentType::AudioSource:
-			RemoveFromVector(m_audioSources, component); break;
-		case ComponentType::AudioListener:
-			RemoveFromVector(m_audioListeners, component); break;
+		{
+			usize baseIndex = (usize)ComponentType::Light;
+			if (baseIndex < m_componentCache.size())
+			{
+				auto& vec = m_componentCache[baseIndex];
+				auto it = std::find(vec.begin(), vec.end(), component);
+				if (it != vec.end())
+				{
+					std::iter_swap(it, vec.end() - 1);
+					vec.pop_back();
+				}
+			}
+			break;
+		}
+
+		// [MeshRenderer 계열] MeshRenderer 버킷에서 제거
 		case ComponentType::StaticMeshRenderer:
-			RemoveFromVector(m_staticMeshRenderers, component); break;
 		case ComponentType::SkinnedMeshRenderer:
-			RemoveFromVector(m_skinnedMeshRenderers, component); break;
 		case ComponentType::InstancedMeshRenderer:
-			RemoveFromVector(m_instancedMeshRenderers, component); break;
-		case ComponentType::MeshOutline:
-			RemoveFromVector(m_outlines, component); break;
-		case ComponentType::UICanvas:
-			RemoveFromVector(m_uiCanvases, component); break;
-		case ComponentType::Collider:
+		{
+			usize baseIndex = (usize)ComponentType::MeshRenderer;
+			if (baseIndex < m_componentCache.size())
+			{
+				auto& vec = m_componentCache[baseIndex];
+				auto it = std::find(vec.begin(), vec.end(), component);
+				if (it != vec.end())
+				{
+					std::iter_swap(it, vec.end() - 1);
+					vec.pop_back();
+				}
+			}
+			break;
+		}
+
+		// [Collider 계열] Collider 버킷에서 제거
 		case ComponentType::BoxCollider:
 		case ComponentType::SphereCollider:
-			RemoveFromVector(m_colliders, component); break;
-		case ComponentType::Rigidbody:
-			RemoveFromVector(m_rigidBodies, component); break;
+		case ComponentType::CapsuleCollider:
+		{
+			usize baseIndex = (usize)ComponentType::Collider;
+			if (baseIndex < m_componentCache.size())
+			{
+				auto& vec = m_componentCache[baseIndex];
+				auto it = std::find(vec.begin(), vec.end(), component);
+				if (it != vec.end())
+				{
+					std::iter_swap(it, vec.end() - 1);
+					vec.pop_back();
+				}
+			}
+			break;
+		}
+	}
+
+	// 2. 자기 자신의 구체적 타입 위치에서 삭제
+	usize index = (usize)type;
+	if (index >= m_componentCache.size()) return;
+
+	auto& vec = m_componentCache[index];
+	auto it = std::find(vec.begin(), vec.end(), component);
+	if (it != vec.end())
+	{
+		std::iter_swap(it, vec.end() - 1);
+		vec.pop_back();
 	}
 }
 
@@ -164,12 +176,15 @@ void SceneRegistry::UnregisterComponent(Component* component)
 //=======================================*/
 Camera* SceneRegistry::GetCamera(uint32 idx) const
 {
-	if (idx >= m_cameras.size())
+	const auto& cameras = m_componentCache[(usize)ComponentType::Camera];
+
+	if (idx >= cameras.size())
 	{
 		LOG_ERROR("Camera index out of range: {}", idx);
 		return nullptr;
 	}
-	return m_cameras[idx];
+
+	return static_cast<Camera*>(cameras[idx]);
 }
 
 void SceneRegistry::AddCustomRenderPass(const std::string& name, GeneralRenderPassUPtr pass)
@@ -185,6 +200,11 @@ GeneralRenderPass* SceneRegistry::GetCustomRenderPass(const std::string& name)
 	auto it = m_customPasses.find(name);
 	if (it != m_customPasses.end()) return it->second.get();
 	return nullptr;
+}
+
+SceneRegistry::CustomPassMap& SceneRegistry::GetCustomRenderPasses()
+{
+	return m_customPasses;
 }
 
 void SceneRegistry::SetSkyLight(SkyLightUPtr skyLight)

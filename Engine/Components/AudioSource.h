@@ -9,6 +9,8 @@ CLASS_PTR(AudioClip)
 CLASS_PTR(AudioSource)
 class AudioSource : public Component
 {
+	DEFINE_COMPONENT_TYPE(ComponentType::AudioSource)
+
 public:
 	virtual ~AudioSource();
 	static AudioSourceUPtr Create(const AudioClipPtr& audioClip);

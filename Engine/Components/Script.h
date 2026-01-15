@@ -10,6 +10,8 @@ CLASS_PTR(Collider)
 CLASS_PTR(Script)
 class Script : public Component
 {
+	DEFINE_COMPONENT_TYPE(ComponentType::Script)
+
 public:
 	virtual ~Script();
 	using ScriptID = uint64;

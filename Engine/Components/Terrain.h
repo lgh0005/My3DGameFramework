@@ -4,6 +4,8 @@
 CLASS_PTR(Terrain)
 class Terrain : public Component
 {
+	DEFINE_COMPONENT_TYPE(ComponentType::Terrain)
+
 public:
 	virtual ~Terrain();
 	static TerrainUPtr Create();

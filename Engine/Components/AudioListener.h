@@ -4,6 +4,8 @@
 CLASS_PTR(AudioListener)
 class AudioListener : public Component
 {
+	DEFINE_COMPONENT_TYPE(ComponentType::AudioListener)
+
 public:
 	virtual ~AudioListener();
 	static AudioListenerUPtr Create();

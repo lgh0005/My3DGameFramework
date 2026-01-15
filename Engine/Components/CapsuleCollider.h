@@ -4,6 +4,8 @@
 CLASS_PTR(CapsuleCollider)
 class CapsuleCollider : public Collider
 {
+	DEFINE_COMPONENT_TYPE(ComponentType::CapsuleCollider)
+
 public:
 	virtual ~CapsuleCollider();
 	static CapsuleColliderUPtr Create(float radius = 0.5f, float height = 2.0f);

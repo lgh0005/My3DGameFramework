@@ -5,6 +5,7 @@
 CLASS_PTR(Collider)
 class Collider : public Component
 {
+	DEFINE_COMPONENT_TYPE(ComponentType::Collider)
 	using Super = Component;
 
 public:

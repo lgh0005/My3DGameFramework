@@ -6,6 +6,7 @@
 CLASS_PTR(Rigidbody)
 class Rigidbody : public PhysicsComponent
 {
+	DEFINE_COMPONENT_TYPE(ComponentType::Rigidbody)
 	using Super = PhysicsComponent;
 
 public:

@@ -10,6 +10,7 @@ CLASS_PTR(Program)
 CLASS_PTR(InstancedMeshRenderer)
 class InstancedMeshRenderer : public MeshRenderer
 {
+	DEFINE_COMPONENT_TYPE(ComponentType::InstancedMeshRenderer)
 	using Super = MeshRenderer;
 
 public:

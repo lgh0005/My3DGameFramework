@@ -160,9 +160,12 @@ void StandardDeferredLightingPass::GetLightMatricesFromContext(StandardRenderCon
 	std::fill(lightSpaceMatrices.begin(), lightSpaceMatrices.end(), glm::mat4(1.0f));
 
 	// 8. 유효한 조명 가져오기
-	const auto& lights = context->GetSceneRegistry()->GetLights();
-	for (auto* light : lights)
+	const auto& lights = context->GetSceneRegistry()->GetComponents<Light>();
+	for (Component* comp : lights)
 	{
+		// [변경 3] 사용하기 전에 Light*로 캐스팅 필수
+		auto* light = static_cast<Light*>(comp);
+
 		if (!light->IsEnabled()) continue;
 		if (!light->GetOwner()->IsActive()) continue;
 

@@ -95,3 +95,7 @@ using className ## ConstRef = JPH::RefConst<className>;
 public:                                                                                   \
     static ScriptID GetStaticScriptID() { return ScriptRegistry::GetID<scriptName>(); }   \
     virtual ScriptID GetScriptID() const override { return GetStaticScriptID(); }
+
+#define DEFINE_COMPONENT_TYPE(TypeEnum)                                                   \
+public:                                                                                   \
+	static constexpr ComponentType GetStaticComponentType() { return TypeEnum; }          

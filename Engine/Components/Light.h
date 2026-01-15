@@ -11,6 +11,7 @@ enum class LightType
 CLASS_PTR(Light)
 class Light : public Component
 {
+    DEFINE_COMPONENT_TYPE(ComponentType::Light)
     using Super = Component;
 
 public:

@@ -4,6 +4,8 @@
 CLASS_PTR(BoxCollider)
 class BoxCollider : public Collider
 {
+	DEFINE_COMPONENT_TYPE(ComponentType::BoxCollider)
+
 public:
 	virtual ~BoxCollider();
 	static BoxColliderUPtr Create(const glm::vec3& size = glm::vec3(1.0f));

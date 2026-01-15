@@ -3,6 +3,7 @@
 #pragma region FORWARD_DECLARATION
 CLASS_PTR(Scene)
 CLASS_PTR(SceneRegistry)
+CLASS_PTR(Component)
 CLASS_PTR(Camera)
 CLASS_PTR(StaticMeshRenderer)
 CLASS_PTR(SkinnedMeshRenderer)
@@ -16,9 +17,7 @@ CLASS_PTR(Texture)
 CLASS_PTR(RenderContext)
 class RenderContext
 {
-	using StaticMeshVectorRawPtr = const std::vector<StaticMeshRenderer*>*;
-	using SkinnedMeshVectorRawPtr = const std::vector<SkinnedMeshRenderer*>*;
-	using LightVectorRawPtr = const std::vector<Light*>*;
+	using ComponentVectorRawPtr = const std::vector<Component*>*;
 
 public:
 	virtual ~RenderContext();
@@ -35,10 +34,15 @@ public:
 	SceneRegistry* GetSceneRegistry() const;
 	Camera* GetCamera() const;
 	SkyLight* GetSkyLight() const;
+
 	const std::vector<StaticMeshRenderer*>& GetStaticMeshRenderers() const;
 	const std::vector<SkinnedMeshRenderer*>& GetSkinnedMeshRenderers() const;
 	const std::vector<MeshOutline*>& GetMeshOutlines() const;
 	const std::vector<Light*>& GetLights() const;
+
+	const ComponentVectorRawPtr GetSourceStaticMeshes() const;
+	const ComponentVectorRawPtr GetSourceSkinnedMeshes() const;
+	const ComponentVectorRawPtr GetSourceLights() const;
 
 /*====================================//
 //   default render context members   //
@@ -54,9 +58,9 @@ protected:
 	SkyLight* m_skyLight{ nullptr };
 
 	// Source (Scene 원본 참조)
-	StaticMeshVectorRawPtr		   m_staticMeshRenderers;
-	SkinnedMeshVectorRawPtr		   m_skinnedMeshRenderers;
-	LightVectorRawPtr			   m_lights;
+	ComponentVectorRawPtr		m_staticMeshRenderersSrc{ nullptr };
+	ComponentVectorRawPtr		m_skinnedMeshRenderersSrc{ nullptr };
+	ComponentVectorRawPtr		m_lightsSrc{ nullptr };
 
 	// Result (실제 렌더링 목록)
 	std::vector<MeshOutline*>  m_culledMeshOutlines;

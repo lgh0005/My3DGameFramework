@@ -51,10 +51,15 @@ void CullingPass::Render(RenderContext* context)
 //=====================*/
 void CullingPass::CullStaticMeshRenderers(SceneRegistry* registry, RenderContext* context)
 {
+    const auto* sourceVec = context->GetSourceStaticMeshes();
+    if (!sourceVec) return;
+
     // TODO : 최적화가 가능한 요소로 옥트트리와 같은 공간 분할로
     // 절두체 범위에 들어가는 대상들을 빠르게 탐색 가능 (O(logn))
-    for (auto* renderer : registry->GetStaticMeshRenderers())
+    for (Component* comp : *sourceVec)
     {
+        auto* renderer = static_cast<StaticMeshRenderer*>(comp);
+
         if (!renderer->IsEnabled()) continue;
         if (!renderer->GetOwner()->IsActive()) continue;
 
@@ -66,9 +71,14 @@ void CullingPass::CullStaticMeshRenderers(SceneRegistry* registry, RenderContext
 
 void CullingPass::CullSkinnedMeshRenderers(SceneRegistry* registry, RenderContext* context)
 {
+    const auto* sourceVec = context->GetSourceSkinnedMeshes();
+    if (!sourceVec) return;
+
     // 3. Skinned Mesh Renderer 컬링
-    for (auto* renderer : registry->GetSkinnedMeshRenderers())
+    for (Component* comp : *sourceVec)
     {
+        auto* renderer = static_cast<SkinnedMeshRenderer*>(comp);
+
         if (!renderer->IsEnabled()) continue;
         if (!renderer->GetOwner()->IsActive()) continue;
 
@@ -81,9 +91,11 @@ void CullingPass::CullSkinnedMeshRenderers(SceneRegistry* registry, RenderContex
 void CullingPass::CullMeshOutlines(SceneRegistry* registry, RenderContext* context)
 {
     // Scene이 가지고 있는 전체 아웃라인 리스트 순회
-    const auto& outlines = registry->GetMeshOutlines();
-    for (auto* outline : outlines)
+    const auto& outlines = registry->GetComponents<MeshOutline>();
+    for (Component* comp : outlines)
     {
+        auto* outline = static_cast<MeshOutline*>(comp);
+
         // 0. 아웃라인 컴포넌트 자체 활성화 체크
         if (!outline->IsEnabled()) continue;
 
@@ -107,11 +119,13 @@ void CullingPass::CullMeshOutlines(SceneRegistry* registry, RenderContext* conte
 
 void CullingPass::CullSceneLights(SceneRegistry* registry, RenderContext* context)
 {
-    // LightSource는 LightPass가 사용하므로 그대로 복사합니다.
-    // TODO : 이후에 Light Volume에 의한 최적화를 위해 일단 그대로 둔다.
-    const auto& lightSource = registry->GetLights();
-    for (auto* light : lightSource)
+    const auto* sourceVec = context->GetSourceLights();
+    if (!sourceVec) return;
+
+    for (Component* comp : *sourceVec)
     {
+        auto* light = static_cast<Light*>(comp);
+
         if (!light->IsEnabled()) continue;
         if (!light->GetOwner()->IsActive()) continue;
         context->AddLight(light);

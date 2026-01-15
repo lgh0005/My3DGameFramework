@@ -17,6 +17,7 @@ enum class RenderStage
 CLASS_PTR(MeshRenderer)
 class MeshRenderer : public Component
 {
+	DEFINE_COMPONENT_TYPE(ComponentType::MeshRenderer)
 	using Super = Component;
 
 public:

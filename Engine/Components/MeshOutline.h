@@ -8,6 +8,8 @@ CLASS_PTR(MeshRenderer)
 CLASS_PTR(MeshOutline)
 class MeshOutline : public Component
 {
+	DEFINE_COMPONENT_TYPE(ComponentType::MeshOutline)
+
 public:
 	virtual ~MeshOutline();
 	static MeshOutlineUPtr Create

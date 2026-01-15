@@ -11,6 +11,8 @@ CLASS_PTR(Transform)
 CLASS_PTR(PointLight)
 class PointLight : public Light
 {
+	DEFINE_COMPONENT_TYPE(ComponentType::PointLight)
+
 public:
 	virtual ~PointLight();
 	static PointLightUPtr Create();
