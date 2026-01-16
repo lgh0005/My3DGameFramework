@@ -6,7 +6,8 @@
 #include "Pipelines/SRP/RenderPasses/StandardGeometryPass.h"
 #include "Pipelines/SRP/RenderPasses/StandardPostProcessPass.h"
 
-#include "Scene/Scene.h"
+#include "Scene/ComponentRegistry.h"
+#include "Object/GameObject.h"
 #include "Scene/SceneRegistry.h"
 #include "Graphics/Geometry.h"
 #include "Resources/Program.h"
@@ -184,17 +185,28 @@ void UniversalDeferredLightingPass::BindIBLMaps(UniversalRenderContext* context)
 
 void UniversalDeferredLightingPass::GetLightMatricesFromContext(UniversalRenderContext* context)
 {
-	// 6. Light Matrices 전송(Context의 Culled List 사용)
-	// Scene 전체 조명이 아니라, Context에 담긴 조명만 처리
-	// TODO : 배열 쨰로 넘기게 수정 필요
-	const auto& lights = context->GetSceneRegistry()->GetLights();
-	for (auto* light : lights)
+	// 6. Light Matrices 전송
+	static std::vector<glm::mat4> lightSpaceMatrices;
+	if (lightSpaceMatrices.size() != MAX_SHADOW_CASTER)
+		lightSpaceMatrices.resize(MAX_SHADOW_CASTER);
+
+	// 7. 항등 행렬로 fill
+	std::fill(lightSpaceMatrices.begin(), lightSpaceMatrices.end(), glm::mat4(1.0f));
+
+	// 8. 유효한 조명 가져오기
+	const auto& lights = context->GetSceneRegistry()->GetComponents<Light>();
+	for (Component* comp : lights)
 	{
+		// [변경 3] 사용하기 전에 Light*로 캐스팅 필수
+		auto* light = static_cast<Light*>(comp);
+
+		if (!light->IsEnabled()) continue;
+		if (!light->GetOwner()->IsActive()) continue;
+
 		int32 idx = light->GetShadowMapIndex();
 		if (idx >= 0 && idx < MAX_SHADOW_CASTER)
-		{
-			std::string uName = "lightSpaceMatrices[" + std::to_string(idx) + "]";
-			m_deferredLightProgram->SetUniform(uName, light->GetLightSpaceMatrix());
-		}
+			lightSpaceMatrices[idx] = light->GetLightSpaceMatrix();
 	}
+
+	m_deferredLightProgram->SetUniform("lightSpaceMatrices", lightSpaceMatrices);
 }

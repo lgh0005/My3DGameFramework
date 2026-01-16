@@ -29,6 +29,10 @@
 #include "Components/Animator.h"
 #include "Components/AudioSource.h"
 #include "Components/AudioListener.h"
+#include "Components/Rigidbody.h"
+#include "Components/BoxCollider.h"
+#include "Components/SphereCollider.h"
+#include "Components/CapsuleCollider.h"
 
 #include "URPSample/RenderPasses/HDRRenderPass.h"
 #include "SRPSample/Scripts/CameraController.h"
@@ -236,6 +240,15 @@ bool PBRScene::OnPlaceActors()
 		cubeTransform.SetPosition(glm::vec3(0.0f, -0.5f, 0.0f));
 		cubeTransform.SetScale(glm::vec3(40.0f, 1.0f, 40.0f));
 
+		auto collider = BoxCollider::Create(glm::vec3(40.0f, 1.0f, 40.0f));
+		cubeObj->AddComponent(std::move(collider));
+
+		auto rb = Rigidbody::Create();
+		rb->SetMotionType(JPH::EMotionType::Static); // 절대 움직이지 않음 (질량 무한대 취급)
+		rb->SetRestitution(0.5f);					 // 약간 튕기게 설정 (선택)
+		rb->SetFriction(0.5f);
+		cubeObj->AddComponent(std::move(rb));
+
 		auto meshRenderer = StaticMeshRenderer::Create
 		(RESOURCE.GetResource<StaticMesh>("Cube"), RESOURCE.GetResource<Material>("GroundMat"));
 		cubeObj->AddComponent(std::move(meshRenderer));
@@ -261,31 +274,44 @@ bool PBRScene::OnPlaceActors()
 		// 주의: animator UPtr은 나중에 AddComponent로 소유권이 넘어가므로,
 		// Instantiate에 넘겨줄 Raw Pointer를 미리 따놓습니다.
 		auto animator = Animator::Create(model, std::move(animCtrl));
-		Animator* animatorPtr = animator.get();
+
+		// 4. 콜라이더
+		// 0.75f, 4.5f, 0.75f
+		auto boxCollider = CapsuleCollider::Create(0.35f, 4.5f);
+		boxCollider->SetTrigger(false); // INFO : true 시 Trigger 역할을 하게 된다.
+		boxCollider->SetOffset(glm::vec3(0.0f, 2.25f, 0.0f));
+
+		// 5. 리지드 바디
+		auto rigidBody = Rigidbody::Create();
+		rigidBody->SetMotionType(JPH::EMotionType::Dynamic);
+		rigidBody->SetUseGravity(true);
+		rigidBody->SetMass(76.0f);
+		rigidBody->FreezeRotation(true, true, true);
+		rigidBody->SetFriction(0.5f);
+
+		// 6. PlayerController
+		auto playerctrl = PlayerController::Create();
 
 		// 4. 모델 인스턴스화 (씬에 등록 + 렌더러 생성 + Animator 주입)
 		// Instantiate 내부에서 SkinnedMeshRenderer들이 animatorPtr를 참조하게 됩니다.
-		auto rootGO = model->Instantiate(this, animatorPtr);
-
+		GameObjectUPtr rootUPtr = model->Instantiate(this, animator.get());
+		GameObject* rootGO = rootUPtr.get();
 		if (rootGO)
 		{
 			// 5. Root GameObject 설정
 			rootGO->SetName("Soldier");
-
-			// 위치 및 크기 조정 (너무 크거나 작지 않게)
 			rootGO->GetTransform().SetPosition(glm::vec3(2.0f, 0.0f, -2.0f));
 			rootGO->GetTransform().SetScale(glm::vec3(0.025f)); // 모델 단위에 따라 조절 필요
 
-			// 6. 아까 만든 Animator 컴포넌트를 Root에 부착
-			// 이제 Animator는 이 GameObject(Root)의 Transform을 제어하게 됩니다.
+			// 6. 핵심 컴포넌트 부착
 			rootGO->AddComponent(std::move(animator));
-
-			// 7. PlayerController 부착 (키보드 조작용)
-			rootGO->AddComponent(PlayerController::Create());
-
-			// 이제 씬에 등록합니다!
-			AddGameObject(std::move(rootGO));
+			rootGO->AddComponent(std::move(playerctrl));
+			rootGO->AddComponent(std::move(boxCollider));
+			rootGO->AddComponent(std::move(rigidBody));
 		}
+
+		// 이제 씬에 등록합니다!
+		AddGameObject(std::move(rootUPtr));
 	}
 
 		// 3. 구 49개 (ORM 텍스쳐 테스트)

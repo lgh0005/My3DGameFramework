@@ -13,6 +13,7 @@
 #include "Pipelines/URP/UniversalRenderContext.h"
 
 #include "Scene/Scene.h"
+#include "Scene/ComponentRegistry.h"
 #include "Object/GameObject.h"
 #include "Scene/SceneRegistry.h"
 #include "Graphics/RenderPass.h"
@@ -95,7 +96,7 @@ void UniversalRenderPipeline::Render(Scene* scene)
 	//   get essential scene properties   //
 	//====================================*/
 	// 메인 카메라 속성 가져오기
-	auto* registry = scene->GetRegistry();
+	auto* registry = scene->GetComponentRegistry();
 	auto* camera = registry->GetCamera(0);
 	if (!camera) return;
 
