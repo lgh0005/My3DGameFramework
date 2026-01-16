@@ -44,6 +44,7 @@ private:
 	ProgramPtr							  m_thresholdProgram;
 	PostProcessFramebufferUPtr			  m_frameBuffer;
 	PostProcessFramebufferUPtr			  m_pingPongFBOs[2];
+	TexturePtr							  m_cameraDirtTexture;
 	float m_gamma						  { 2.2f };
 	float m_exposure					  { 1.0f };
 };

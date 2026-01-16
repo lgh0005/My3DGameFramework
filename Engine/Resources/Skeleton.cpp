@@ -93,5 +93,5 @@ int32 Skeleton::GetBoneID(const std::string& name) const
 const glm::mat4& Skeleton::GetBoneOffset(int32 boneID) const
 {
 	if (boneID >= 0 && boneID < m_boneOffsets.size()) return m_boneOffsets[boneID];
-	return glm::mat4(1.0f);
+	return glm::mat4(1.0f); // TODO : 지역 변수를 반환한다고 함. Utils에다가 static으로 박아둔 이유가 있었음.
 }

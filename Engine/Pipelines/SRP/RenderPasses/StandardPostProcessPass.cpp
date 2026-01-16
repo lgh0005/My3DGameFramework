@@ -28,6 +28,7 @@ bool StandardPostProcessPass::Init(int32 width, int32 height)
 	m_compositeProgram = RESOURCE.GetResource<Program>("standard_postprocess_postprocess");
 	m_blurProgram = RESOURCE.GetResource<Program>("standard_postprocess_blur");
 	m_plane = RESOURCE.GetResource<ScreenMesh>("Screen");
+	m_cameraDirtTexture = RESOURCE.GetResource<Texture>("camera_dirt");
 	if (!m_plane) return false;
 
 	m_frameBuffer	  = PostProcessFramebuffer::Create(width, height, true);
@@ -144,6 +145,18 @@ void StandardPostProcessPass::RenderCompositePass(Texture* sceneTexture, Texture
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	m_compositeProgram->Use();
+
+	// 1. Camera Dirt 텍스쳐 바인딩
+	if (m_cameraDirtTexture)
+	{
+		glActiveTexture(GL_TEXTURE2);
+		m_cameraDirtTexture->Bind();
+		m_compositeProgram->SetUniform("cameraDirtTex", 2);
+		m_compositeProgram->SetUniform("dirtAmbient", 0.3f);    // 먼지의 기본 색상 표시 강도 (0.0f에서 0.5f값 사이 정도)
+		m_compositeProgram->SetUniform("dirtIntensity", 15.0f); // 먼지가 bloom을 산란시키는 정도
+	}
+
+	// 2. Composite 단계 실행
 	m_compositeProgram->SetUniform("gamma", m_gamma);
 	m_compositeProgram->SetUniform("exposure", m_exposure);
 	m_compositeProgram->SetUniform("bloom", true);

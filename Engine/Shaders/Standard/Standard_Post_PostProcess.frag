@@ -1,4 +1,4 @@
-#version 460 core
+ï»¿#version 460 core
 
 layout (location = 0) in vec2 texCoord;
 
@@ -11,7 +11,11 @@ uniform sampler2D tex;
 uniform sampler2D bloomBlur;
 uniform vec2 inverseScreenSize;
 
-// FXAA ¾Ë°í¸®Áò ÇÔ¼ö
+uniform sampler2D cameraDirtTex; // ì¶”ê°€
+uniform float dirtIntensity;     // ì¶”ê°€
+uniform float dirtAmbient;
+
+// FXAA ì•Œê³ ë¦¬ì¦˜ í•¨ìˆ˜
 vec3 ApplyFXAA(sampler2D tex, vec2 coords, vec2 inverseScreenSize) 
 {
     float FXAA_SPAN_MAX = 8.0;
@@ -70,25 +74,28 @@ vec3 ApplyFXAA(sampler2D tex, vec2 coords, vec2 inverseScreenSize)
 
 void main() 
 {
-	// 1. ¿øº» HDR »ö»ó °¡Á®¿À±â
+	// 1. ì›ë³¸ HDR ìƒ‰ìƒ ê°€ì ¸ì˜¤ê¸°
     // vec3 hdrColor = texture(tex, texCoord).rgb;
     vec3 hdrColor = ApplyFXAA(tex, texCoord, inverseScreenSize);
 
-	// 2. ºí·¯µÈ ¹àÀº »ö»ó °¡Á®¿À±â
+	// 2. ë¸”ëŸ¬ëœ ë°ì€ ìƒ‰ìƒ ë° Camera Dirt í…ìŠ¤ì³ ì •ë³´ ê°€ì ¸ì˜¤ê¸°
     vec3 bloomColor = texture(bloomBlur, texCoord).rgb;
+    vec3 dirtData = texture(cameraDirtTex, texCoord).rgb;
 
-	// 3. [ÇÙ½É] ¿øº»¿¡ ºí·ë ´õÇÏ±â (Additive Blending)
+	// 3. ì›ë³¸ì— ë¸”ë£¸ê³¼ Camera Dirt ë”í•˜ê¸° (Additive Blending)
     if (bloom)
     {
-        hdrColor += bloomColor; 
+        vec3 specDirt = bloomColor * dirtData * dirtIntensity;
+        vec3 ambientDirt = dirtData * dirtAmbient;
+        hdrColor += bloomColor + specDirt + ambientDirt;
     }
 
-	// 2. Åæ ¸ÅÇÎ (Tone Mapping) - Exposure ¹æ½Ä
+	// 2. í†¤ ë§¤í•‘ (Tone Mapping) - Exposure ë°©ì‹
 	vec3 mapped = vec3(1.0) - exp(-hdrColor * exposure);
 
-	// 3. °¨¸¶ º¸Á¤ (Gamma Correction)
+	// 3. ê°ë§ˆ ë³´ì • (Gamma Correction)
 	mapped = pow(mapped, vec3(1.0 / gamma));
 
-	// 4. °á°ú
+	// 4. ê²°ê³¼
 	fragColor = vec4(mapped, 1.0);
 }

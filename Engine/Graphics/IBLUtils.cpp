@@ -129,8 +129,8 @@ CubeTexturePtr IBLUtils::CreateIrradianceMap(CubeTexture* src)
 
 CubeTexturePtr IBLUtils::CreatePrefilteredMap(CubeTexture* src)
 {
-	const uint32 maxMipLevels = 5;
-	const uint32 baseResolution = 128;
+	const uint32 maxMipLevels = 8;
+	const uint32 baseResolution = 512;
 	GLint prevViewport[4];
 	glGetIntegerv(GL_VIEWPORT, prevViewport);
 
@@ -171,8 +171,8 @@ CubeTexturePtr IBLUtils::CreatePrefilteredMap(CubeTexture* src)
 	glDisable(GL_CULL_FACE);
 	for (uint32 mip = 0; mip < maxMipLevels; mip++)
 	{
-		uint32 mipWidth = 128 >> mip;
-		uint32 mipHeight = 128 >> mip;
+		uint32 mipWidth = baseResolution >> mip;
+		uint32 mipHeight = baseResolution >> mip;
 		auto framebuffer = CubeFramebuffer::Create(preFilteredMap, mip);
 		glViewport(0, 0, mipWidth, mipHeight);
 
