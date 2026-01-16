@@ -76,6 +76,7 @@ void AnimController::TransitTo(std::shared_ptr<AnimState> nextState, float durat
     m_nextTime = 0.0f;
     m_blendDuration = duration;
     m_blendTimer = 0.0f;
+    m_finalBlendFactor = 0.0f;
     m_isBlending = (duration > 0.0f);
 
     // 즉시 교체
@@ -117,6 +118,10 @@ void AnimController::Update(float deltaTime)
         }
 
         m_blendTimer += deltaTime;
+
+        if (m_blendDuration > 0.0f) m_finalBlendFactor = glm::clamp(m_blendTimer / m_blendDuration, 0.0f, 1.0f);
+        else m_finalBlendFactor = 1.0f;
+
         if (m_blendTimer >= m_blendDuration)
         {
             m_currentState = m_nextState;
@@ -124,11 +129,12 @@ void AnimController::Update(float deltaTime)
             m_nextState = nullptr;
             m_isBlending = false;
             m_blendTimer = 0.0f;
+            m_finalBlendFactor = 0.0f;
         }
     }
 }
 
-Pose AnimController::GetPose(const std::string& nodeName, const Pose& defaultPose) const
+Pose AnimController::GetPose(uint32 nodeNameHash, const Pose& defaultPose) const
 {
     // A. 현재 포즈
     Pose poseA = defaultPose;
@@ -138,7 +144,7 @@ Pose AnimController::GetPose(const std::string& nodeName, const Pose& defaultPos
     if (m_currentState && m_currentState->GetClip())
     {
         // Animation -> AnimChannel -> GetPose
-        const AnimChannel* ch = m_currentState->GetClip()->FindChannel(nodeName);
+        const AnimChannel* ch = m_currentState->GetClip()->FindChannel(nodeNameHash);
         if (ch)
         {
             poseA = ch->GetPose(m_currentTime);
@@ -154,7 +160,7 @@ Pose AnimController::GetPose(const std::string& nodeName, const Pose& defaultPos
         Pose poseB = defaultPose;
         bool hasB = false;
 
-        const AnimChannel* chNext = m_nextState->GetClip()->FindChannel(nodeName);
+        const AnimChannel* chNext = m_nextState->GetClip()->FindChannel(nodeNameHash);
         if (chNext)
         {
             poseB = chNext->GetPose(m_nextTime);
@@ -163,10 +169,7 @@ Pose AnimController::GetPose(const std::string& nodeName, const Pose& defaultPos
 
         // 둘 중 하나라도 애니메이션이 있으면 섞는다
         if (hasA || hasB)
-        {
-            float factor = glm::clamp(m_blendTimer / m_blendDuration, 0.0f, 1.0f);
-            return Pose::Interpolate(poseA, poseB, factor);
-        }
+            return Pose::Interpolate(poseA, poseB, m_finalBlendFactor);
     }
 
     return poseA;

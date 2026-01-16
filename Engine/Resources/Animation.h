@@ -2,6 +2,7 @@
 #include "Resources/Resource.h"
 #include "Resources/AnimChannel.h"
 #include "Misc/AssetFormat.h"
+#include "Misc/Utils.h"
 
 #pragma region FORWARD_DECLARATION
 CLASS_PTR(Model)
@@ -20,6 +21,8 @@ public:
 	static AnimationUPtr Load(const std::string& filePath, Model* model = nullptr);
 
     AnimChannel* FindChannel(const std::string& name);
+    AnimChannel* FindChannel(uint32 nameHash);
+
     float GetTicksPerSecond() const { return m_ticksPerSecond; }
     float GetDuration() const { return m_duration; }
     const std::string& GetName() const { return m_name; }
@@ -39,5 +42,5 @@ private:
     float m_duration            { 0.0f };
     float m_ticksPerSecond      { 0.0f };
     std::vector<AnimChannelUPtr> m_channels;
-    std::unordered_map<std::string, AnimChannel*> m_channelMap;
+    std::unordered_map<uint32, AnimChannel*> m_channelMap;
 };

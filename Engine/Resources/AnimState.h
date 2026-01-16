@@ -10,7 +10,7 @@ class AnimState
 public:
 	virtual ~AnimState();
 	static AnimStateUPtr Create(const std::string& name, AnimationPtr clip);
-	using TransitionMap = std::unordered_map<std::string, float>;
+	using TransitionMap = std::unordered_map<uint32, float>;
 	void AddTransition(const std::string& targetStateName, float duration);
 
 	void SetLoop(bool loop)	   { m_isLoop = loop; }

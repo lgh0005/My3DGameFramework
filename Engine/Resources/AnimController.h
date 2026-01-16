@@ -20,7 +20,7 @@ public:
 
 	void SetTransitionDuration(const std::string& from, const std::string& to, float duration);
 	void SetStartState(const std::string& name);
-	Pose GetPose(const std::string& nodeName, const Pose& defaultPose) const;
+	Pose GetPose(uint32 nodeNameHash, const Pose& defaultPose) const;
 
 private:
 
@@ -41,4 +41,5 @@ private:
     bool  m_isBlending = false;
     float m_blendTimer = 0.0f;
     float m_blendDuration = 0.0f;
+	float m_finalBlendFactor = 0.0f;
 };

@@ -4,17 +4,16 @@
 
 DECLARE_DEFAULTS_IMPL(AnimChannel)
 
-AnimChannelUPtr AnimChannel::Create(const std::string& name, int32 id, const aiNodeAnim* channel)
+AnimChannelUPtr AnimChannel::Create(const std::string& name, const aiNodeAnim* channel)
 {
     auto animChannel = AnimChannelUPtr(new AnimChannel());
-    if (!animChannel->Init(name, id, channel)) return nullptr;
+    if (!animChannel->Init(name, channel)) return nullptr;
     return std::move(animChannel);
 }
 
 AnimChannelUPtr AnimChannel::Create
 (
     const std::string& name,
-    uint32 id, 
     std::vector<AssetFmt::RawKeyPosition>&& positions,
     std::vector<AssetFmt::RawKeyRotation>&& rotations,
     std::vector<AssetFmt::RawKeyScale>&& scales
@@ -23,7 +22,7 @@ AnimChannelUPtr AnimChannel::Create
     auto animChannel = AnimChannelUPtr(new AnimChannel());
     animChannel->Init
     (
-        name, id, 
+        name,
         std::move(positions), std::move(rotations), std::move(scales)
     );
     return std::move(animChannel);
@@ -37,15 +36,16 @@ Pose AnimChannel::GetPose(float time) const
     return Pose(translation, rotation, scale);
 }
 
-bool AnimChannel::Init(const std::string& name, int id, const aiNodeAnim* channel)
+bool AnimChannel::Init(const std::string& name, const aiNodeAnim* channel)
 {
     if (!channel) return false;
 
 	m_name = name;
-	m_id = id;
+    m_nameHash = Utils::StrHash(name);
 
 	m_numPositions = channel->mNumPositionKeys;
-    for (int positionIndex = 0; positionIndex < m_numPositions; ++positionIndex)
+    m_positions.reserve(m_numPositions);
+    for (uint32 positionIndex = 0; positionIndex < m_numPositions; ++positionIndex)
     {
         aiVector3D aiPosition = channel->mPositionKeys[positionIndex].mValue;
         float timeStamp = channel->mPositionKeys[positionIndex].mTime;
@@ -57,7 +57,8 @@ bool AnimChannel::Init(const std::string& name, int id, const aiNodeAnim* channe
     }
 
     m_numRotations = channel->mNumRotationKeys;
-    for (int rotationIndex = 0; rotationIndex < m_numRotations; ++rotationIndex)
+    m_rotations.reserve(m_numRotations);
+    for (uint32 rotationIndex = 0; rotationIndex < m_numRotations; ++rotationIndex)
     {
         aiQuaternion aiOrientation = channel->mRotationKeys[rotationIndex].mValue;
         float timeStamp = channel->mRotationKeys[rotationIndex].mTime;
@@ -69,7 +70,8 @@ bool AnimChannel::Init(const std::string& name, int id, const aiNodeAnim* channe
     }
 
     m_numScalings = channel->mNumScalingKeys;
-    for (int keyIndex = 0; keyIndex < m_numScalings; ++keyIndex)
+    m_scales.reserve(m_numScalings);
+    for (uint32 keyIndex = 0; keyIndex < m_numScalings; ++keyIndex)
     {
         aiVector3D scale = channel->mScalingKeys[keyIndex].mValue;
         float timeStamp = channel->mScalingKeys[keyIndex].mTime;
@@ -86,14 +88,13 @@ bool AnimChannel::Init(const std::string& name, int id, const aiNodeAnim* channe
 void AnimChannel::Init
 (
     const std::string& name,
-    uint32 id, 
     std::vector<AssetFmt::RawKeyPosition>&& positions,
     std::vector<AssetFmt::RawKeyRotation>&& rotations,
     std::vector<AssetFmt::RawKeyScale>&& scales
 )
 {
     m_name = name;
-    m_id = id;
+    m_nameHash = Utils::StrHash(name);
 
     m_positions = std::move(positions);
     m_rotations = std::move(rotations);
@@ -107,7 +108,7 @@ void AnimChannel::Init
 /*==============================================//
 //   animation channel default getter methods   //
 //==============================================*/
-uint32 AnimChannel::GetBoneID() const { return m_id; }
+uint32 AnimChannel::GetNameHash() const { return m_nameHash; }
 
 std::string AnimChannel::GetBoneName() const { return m_name; }
 

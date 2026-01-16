@@ -1,6 +1,7 @@
 ﻿#include "EnginePch.h"
 #include "AnimState.h"
 #include "Resources/Animation.h"
+#include "Misc/Utils.h"
 
 DECLARE_DEFAULTS_IMPL(AnimState)
 
@@ -19,12 +20,14 @@ void AnimState::Init(const std::string& name, AnimationPtr clip)
 
 void AnimState::AddTransition(const std::string& targetStateName, float duration)
 {
-	m_transitions[targetStateName] = duration;
+	uint32 hash = Utils::StrHash(targetStateName);
+	m_transitions[hash] = duration;
 }
 
 float AnimState::GetTransitionDuration(const std::string& targetStateName) const
 {
-	auto it = m_transitions.find(targetStateName);
+	uint32 hash = Utils::StrHash(targetStateName);
+	auto it = m_transitions.find(hash);
 	if (it != m_transitions.end()) return it->second;
 	return -1.0f;
 }

@@ -14,9 +14,18 @@ class Animator : public Component
 {
 	DEFINE_COMPONENT_TYPE(ComponentType::Animator)
 
+private:
+	using AnimBinding = struct AnimationBinding
+	{
+		uint32 nodeNameHash;       // 해싱된 노드 이름 (Controller 전달용)
+		Transform* transform;      // 씬의 실제 Transform 컴포넌트
+		Pose defaultPose;          // 미리 Decompose 해둔 초기 포즈 (T-Pose)
+	};
+
 public:
 	virtual ~Animator();
 	static AnimatorUPtr Create(ModelPtr model, AnimControllerUPtr controller);
+	virtual void OnStart() override;
 	virtual void OnUpdate() override;
 
 	AnimController* GetController() const { return m_controller.get(); }
@@ -48,6 +57,7 @@ private:
 	std::vector<glm::mat4> m_finalBoneMatrices;
 	std::unordered_map<std::string, Transform*> m_boneTransformMap;
 	std::vector<Transform*> m_skinningTransforms;
+	std::vector<AnimBinding> m_animationBindings;
 
 	RenderBounds m_currentLocalAABB		{ RenderBounds::Empty() };
 };

@@ -33,7 +33,12 @@ AnimationUPtr Animation::Load(const std::string& filePath, Model* model)
 
 AnimChannel* Animation::FindChannel(const std::string& name)
 {
-	auto it = m_channelMap.find(name);
+	return FindChannel(Utils::StrHash(name));
+}
+
+AnimChannel* Animation::FindChannel(uint32 nameHash)
+{
+	auto it = m_channelMap.find(nameHash);
 	if (it != m_channelMap.end()) return it->second;
 	return nullptr;
 }
@@ -92,13 +97,13 @@ bool Animation::LoadByBinary(const std::string& filePath)
 		auto newChannel = AnimChannel::Create
 		(
 			boneName,
-			-1,
 			std::move(rawCh.positions),
 			std::move(rawCh.rotations),
 			std::move(rawCh.scales)
 		);
 
-		m_channelMap[boneName] = newChannel.get();
+		uint32 nameHash = Utils::StrHash(boneName);
+		m_channelMap[nameHash] = newChannel.get();
 		m_channels.push_back(std::move(newChannel));
 	}
 
@@ -110,15 +115,15 @@ bool Animation::LoadByBinary(const std::string& filePath)
 void Animation::ParseAssimpChannels(const aiAnimation* animation)
 {
 	uint32 size = animation->mNumChannels;
+	m_channels.reserve(size);
+
 	for (uint32 i = 0; i < size; i++)
 	{
 		aiNodeAnim* channel = animation->mChannels[i];
 		std::string boneName = channel->mNodeName.C_Str();
 
-		// ID는 -1로 설정 (이름으로 매핑하므로 ID 불필요)
-		auto newChannel = AnimChannel::Create(boneName, -1, channel);
-
-		m_channelMap[boneName] = newChannel.get();
+		auto newChannel = AnimChannel::Create(boneName, channel);
+		m_channelMap[newChannel->GetNameHash()] = newChannel.get();
 		m_channels.push_back(std::move(newChannel));
 	}
 }

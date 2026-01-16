@@ -10,8 +10,10 @@ SkeletonUPtr Skeleton::Create()
 
 int32 Skeleton::AddBone(const std::string& name, const glm::mat4& offset)
 {
+	uint32 nameHash = Utils::StrHash(name);
+
 	// 1. 이미 등록된 뼈인지 확인
-	auto it = m_boneInfoMap.find(name);
+	auto it = m_boneInfoMap.find(nameHash);
 	if (it != m_boneInfoMap.end()) return it->second.id;
 
 	// 2. 새로운 뼈 등록
@@ -19,7 +21,7 @@ int32 Skeleton::AddBone(const std::string& name, const glm::mat4& offset)
 	newBoneInfo.id = m_boneCounter;
 	newBoneInfo.offset = offset;
 
-	m_boneInfoMap[name] = newBoneInfo;
+	m_boneInfoMap[nameHash] = newBoneInfo;
 
 	// 3. 벡터 캐시에 오프셋 행렬 저장 (인덱스 = ID)
 	if (m_boneOffsets.size() <= m_boneCounter)
@@ -65,7 +67,7 @@ void Skeleton::SetData(const BoneMap& map, int32 count)
 	m_boneOffsets.clear(); // 안전하게 비우고 시작
 	m_boneOffsets.resize(count, glm::mat4(1.0f));
 
-	for (const auto& [name, info] : m_boneInfoMap)
+	for (const auto& [hash, info] : m_boneInfoMap)
 	{
 		if (info.id >= 0 && info.id < count)
 			m_boneOffsets[info.id] = info.offset;
@@ -76,11 +78,16 @@ const Skeleton::BoneMap& Skeleton::GetBoneInfoMap() const { return m_boneInfoMap
 
 int32 Skeleton::GetBoneCount() const { return m_boneCounter; }
 
-int32 Skeleton::GetBoneID(const std::string& name) const
+int32 Skeleton::GetBoneID(uint32 nameHash) const
 {
-	auto it = m_boneInfoMap.find(name);
+	auto it = m_boneInfoMap.find(nameHash);
 	if (it != m_boneInfoMap.end()) return it->second.id;
 	return -1;
+}
+
+int32 Skeleton::GetBoneID(const std::string& name) const
+{
+	return GetBoneID(Utils::StrHash(name));
 }
 
 const glm::mat4& Skeleton::GetBoneOffset(int32 boneID) const

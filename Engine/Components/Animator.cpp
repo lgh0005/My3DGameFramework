@@ -55,36 +55,59 @@ bool Animator::Init(ModelPtr model, AnimControllerUPtr controller)
 //========================================*/
 void Animator::BindBoneTransforms()
 {
-    if (m_boneTransformMap.empty())
+    if (!m_animationBindings.empty()) return;
+
+    GameObject* owner = GetOwner();
+    if (!owner) return;
+
+    // 1. 재귀적으로 모든 자식 Transform을 이름 기반 맵에 등록
+    m_boneTransformMap.clear();
+    RecursiveBindBoneTransforms(&owner->GetTransform());
+    LOG_INFO("Animator Binding: Found {} transforms in hierarchy.", m_boneTransformMap.size());
+
+    // 2. Model Node 정보를 기반으로 Animation Binding 데이터 생성
+    const auto& nodes = m_currentModel->GetNodes();
+    m_animationBindings.reserve(nodes.size());
+
+    for (const auto& node : nodes)
     {
-        GameObject* owner = GetOwner();
-        if (!owner) return;
-
-        // 1. 재귀적으로 모든 자식 Transform을 맵에 등록
-        RecursiveBindBoneTransforms(&owner->GetTransform());
-
-        LOG_INFO("Animator Binding: Found {} transforms in hierarchy.", m_boneTransformMap.size());
-
-        // 2. Skeleton 정보를 기반으로 Skinning용 Transform 벡터 채우기
-        auto skeleton = m_currentModel->GetSkeleton();
-        if (skeleton)
+        // 이름으로 Scene Transform 찾기
+        auto it = m_boneTransformMap.find(node.name);
+        if (it != m_boneTransformMap.end())
         {
-            int32 mappedCount = 0;
-            const auto& boneInfoMap = skeleton->GetBoneInfoMap();
-            for (const auto& [name, info] : boneInfoMap)
-            {
-                if (m_boneTransformMap.count(name))
-                {
-                    // BoneID 위치에 Transform 포인터 저장
-                    if (info.id < m_skinningTransforms.size())
-                    {
-                        m_skinningTransforms[info.id] = m_boneTransformMap[name];
-                        mappedCount++;
-                    }
-                }
-            }
-            LOG_INFO("Animator Binding: Mapped {} / {} bones.", mappedCount, skeleton->GetBoneCount());
+            AnimBinding binding;
+
+            // [최적화 1] 이름을 미리 해싱하여 저장 (Update때 해싱 안 함)
+            binding.nodeNameHash = Utils::StrHash(node.name);
+
+            binding.transform = it->second;
+
+            // [최적화 2] 초기 행렬을 미리 Pose로 분해하여 저장 (Update때 Decompose 안 함)
+            binding.defaultPose = Pose::FromMat4(node.localTransform);
+
+            m_animationBindings.push_back(binding);
         }
+    }
+
+    // 3. Skeleton 정보를 기반으로 Skinning용 Transform 벡터 채우기
+    auto skeleton = m_currentModel->GetSkeleton();
+    if (skeleton)
+    {
+        int32 mappedCount = 0;
+
+        // 맵에 있는 모든 Transform에 대해 스켈레톤 ID가 있는지 확인
+        for (const auto& [name, transform] : m_boneTransformMap)
+        {
+            // [최적화 연동] Skeleton::GetBoneID가 내부적으로 해싱하거나 문자열을 받음
+            int32 boneID = skeleton->GetBoneID(name);
+
+            if (boneID != -1 && boneID < (int32)m_skinningTransforms.size())
+            {
+                m_skinningTransforms[boneID] = transform;
+                mappedCount++;
+            }
+        }
+        LOG_INFO("Animator Binding: Mapped {} / {} bones.", mappedCount, skeleton->GetBoneCount());
     }
 }
 
@@ -103,14 +126,14 @@ void Animator::RecursiveBindBoneTransforms(Transform* nodeTransform)
 /*====================================//
 //   animation update logic methods   //
 //====================================*/
+void Animator::OnStart()
+{
+    BindBoneTransforms();
+}
+
 void Animator::OnUpdate()
 {
     if (!m_currentModel) return;
-
-    // 0. 바인딩이 안 되어 있다면 수행 (Lazy Init)
-    // TODO : 이 또한 Component 의 생명주기에 맞춰서 코드를 적을 필요가 있음
-    // 아마 Start와 같은 곳에서?
-    if (m_boneTransformMap.empty()) BindBoneTransforms();
 
     // 1. 시간 업데이트
     m_controller->Update(TIME.GetDeltaTime());
@@ -127,28 +150,18 @@ void Animator::OnUpdate()
 
 void Animator::UpdateAnimationToTransforms()
 {
-    const auto& nodes = m_currentModel->GetNodes();
-
-    // 모든 노드를 순회하며 애니메이션 포즈 적용
-    for (const auto& node : nodes)
+    for (const auto& binding : m_animationBindings)
     {
-        // 1. 이 노드 이름에 해당하는 Transform이 있는지 확인
-        auto it = m_boneTransformMap.find(node.name);
-        if (it == m_boneTransformMap.end()) continue;
+        // 1. 캐싱된 초기 포즈
+        const Pose& defaultPose = binding.defaultPose;
 
-        Transform* transform = it->second;
+        // 2. 컨트롤러에게 포즈 요청 (해시값 전달)
+        Pose finalPose = m_controller->GetPose(binding.nodeNameHash, defaultPose);
 
-        // 2. 초기 포즈(T-Pose) 가져오기
-        Pose defaultPose = Pose::FromMat4(node.localTransform);
-
-        // 3. 컨트롤러에게 블렌딩된 최종 로컬 포즈 요청
-        Pose finalPose = m_controller->GetPose(node.name, defaultPose);
-
-        // 4. [핵심] Transform 컴포넌트 직접 수정!
-        // Matrix 분해 비용 없이 Pose(TRS) 데이터를 바로 꽂아넣음
-        transform->SetPosition(finalPose.position);
-        transform->SetRotation(finalPose.rotation);
-        transform->SetScale(finalPose.scale);
+        // 3. Transform 컴포넌트에 로컬 변환 적용
+        binding.transform->SetLocalPosition(finalPose.position);
+        binding.transform->SetLocalRotation(finalPose.rotation);
+        binding.transform->SetLocalScale(finalPose.scale);
     }
 }
 

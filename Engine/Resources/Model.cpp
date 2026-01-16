@@ -18,6 +18,7 @@
 #include "Resources/Program.h"
 #include "Misc/AssetFormat.h"
 #include "Misc/AssetUtils.h"
+#include "Misc/Utils.h"
 
 DECLARE_DEFAULTS_IMPL(Model)
 
@@ -489,7 +490,7 @@ void Model::ReadBinarySkeleton(std::ifstream& inFile)
         rawBoneInfos[i].id = AssetUtils::ReadData<uint32>(inFile);
         rawBoneInfos[i].offset = AssetUtils::ReadData<glm::mat4>(inFile);
     }
-    maxId = (int32_t)rawBoneInfos.size();
+    maxId = (int32)rawBoneInfos.size();
 
     // 2. 이름 매핑 읽기
     uint32 mapCount = AssetUtils::ReadData<uint32>(inFile);
@@ -498,13 +499,13 @@ void Model::ReadBinarySkeleton(std::ifstream& inFile)
         std::string name = AssetUtils::ReadString(inFile);
         int32 id = AssetUtils::ReadData<int32>(inFile);
 
+        uint32 nameHash = Utils::StrHash(name);
         AssetFmt::RawBoneInfo info;
         info.id = id;
         if (id >= 0 && id < (int32)rawBoneInfos.size())
-        {
             info.offset = rawBoneInfos[id].offset;
-        }
-        boneMap[name] = info;
+
+        boneMap[nameHash] = info;
     }
 
     // 3. 다 읽은 데이터를 Skeleton에 주입
