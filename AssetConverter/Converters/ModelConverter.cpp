@@ -81,12 +81,9 @@ bool ModelConverter::RunConversion()
         ProcessMesh(scene->mMeshes[i], scene);
     }
 
-    // ProcessNode(scene->mRootNode, scene);
-
     // 4. 계층 구조 완성 (Hierarchy Extraction)
     LOG_INFO("Processing node hierarchy...");
-    int32 startIndex = 0;
-    ProcessHierarchy(scene->mRootNode, -1, startIndex);
+    ParseNodeHierarchy(scene);
     LOG_INFO(" - Total Nodes extracted: {}", m_rawModel.nodes.size());
 
     // 5. 스켈레톤 존재 여부 최종 확정
@@ -221,38 +218,66 @@ void ModelConverter::CreateORMTextureFromAssimp(aiMaterial* material, AssetFmt::
 /*====================================//
 //   default assimp process methods   //
 //====================================*/
-void ModelConverter::ProcessHierarchy(aiNode* node, int32 parentIndex, int32& currentIndex)
+void ModelConverter::ParseNodeHierarchy(const aiScene* scene)
 {
-    AssetFmt::RawNode rawNode;
+    if (!scene->mRootNode) return;
 
-    // 1. 기본 정보 복사
-    rawNode.name = node->mName.C_Str();
-    rawNode.parentIndex = parentIndex;
-
-    // 2. 행렬 변환 (Assimp -> GLM)
-    rawNode.localTransform = Utils::ConvertToGLMMat4(node->mTransformation);
-
-    // 3. 메쉬 인덱스 정보 복사
-    if (node->mNumMeshes > 0)
+    // 1. 작업을 관리할 구조체 정의
+    struct NodeJob
     {
-        rawNode.meshIndices.resize(node->mNumMeshes);
-        for (uint32 i = 0; i < node->mNumMeshes; ++i)
-            rawNode.meshIndices[i] = node->mMeshes[i];
+        aiNode* node;
+        int32 parentIndex;
+    };
+
+    // 2. 작업 스택 생성 및 예약
+    std::vector<NodeJob> workStack;
+    workStack.reserve(128);
+
+    // 3. 루트 노드 삽입 (부모 인덱스는 -1)
+    workStack.push_back({ scene->mRootNode, -1 });
+
+    // 4. 스택이 빌 때까지 반복 (DFS 순회)
+    while (!workStack.empty())
+    {
+        // 스택에서 작업 하나 꺼내기 (LIFO)
+        NodeJob job = workStack.back();
+        workStack.pop_back();
+
+        aiNode* currNode = job.node;
+        int32 parentIndex = job.parentIndex;
+
+        // RawNode 데이터 기록 시작
+        AssetFmt::RawNode rawNode;
+
+        // 4-1. 이름 복사
+        rawNode.name = currNode->mName.C_Str();
+        rawNode.parentIndex = parentIndex;
+
+        // 4-2. 행렬 변환
+        rawNode.localTransform = Utils::ConvertToGLMMat4(currNode->mTransformation);
+        
+        // 4-3. 메쉬 인덱스 복사
+        if (currNode->mNumMeshes > 0)
+        {
+            rawNode.meshIndices.resize(currNode->mNumMeshes);
+            for (uint32 i = 0; i < currNode->mNumMeshes; ++i)
+                rawNode.meshIndices[i] = currNode->mMeshes[i];
+        }
+
+        // 4-4. 현재 노드가 저장될 인덱스 (= 현재까지 저장된 노드 개수)
+        int32 myIndex = (int32)m_rawModel.nodes.size();
+
+        // 데이터 저장
+        m_rawModel.nodes.push_back(rawNode);
+
+        // 4-5. 부모 노드의 children 리스트에 '나(myIndex)'를 등록
+        if (parentIndex >= 0)
+            m_rawModel.nodes[parentIndex].children.push_back(myIndex);
+
+        // 5. 자식 노드들을 스택에 추가
+        for (int32 i = (int32)currNode->mNumChildren - 1; i >= 0; --i)
+            workStack.push_back({ currNode->mChildren[i], myIndex });
     }
-
-    // 4. 리스트에 추가 (현재 인덱스 = currentIndex)
-    int32 myIndex = currentIndex;
-    m_rawModel.nodes.push_back(rawNode);
-
-    // 5. 부모 노드의 children 리스트에 '나(myIndex)'를 등록
-    if (parentIndex >= 0) m_rawModel.nodes[parentIndex].children.push_back(myIndex);
-
-    // 6. 인덱스 증가
-    currentIndex++;
-
-    // 7. 자식 노드 순회 (재귀 호출)
-    for (uint32 i = 0; i < node->mNumChildren; i++)
-        ProcessHierarchy(node->mChildren[i], myIndex, currentIndex);
 }
 
 void ModelConverter::ProcessMesh(aiMesh* mesh, const aiScene* scene)

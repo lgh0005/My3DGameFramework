@@ -30,7 +30,7 @@ private:
 //   default assimp process methods   //
 //====================================*/
 private:
-	void ProcessHierarchy(aiNode* node, int32 parentIndex, int32& currentIndex);
+	void ParseNodeHierarchy(const aiScene* scene);
 	void ProcessMesh(aiMesh* mesh, const aiScene* scene);
 	void ProcessSkinnedMesh(aiMesh* mesh, AssetFmt::RawMesh& rawMesh);
 	void ProcessStaticMesh(aiMesh* mesh, AssetFmt::RawMesh& rawMesh);
