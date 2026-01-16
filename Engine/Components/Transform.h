@@ -1,9 +1,6 @@
 ﻿#pragma once
 #include "Object/Component.h"
 
-// TODO:
-// 1. 부모-자식의 컴포넌트들의 Active 순회는 Transform을 통해서.
-// 2. transform을 통해서 계층적 게임 오브젝트에 대해서 root를 찾는 방식 추가 필요.
 CLASS_PTR(Transform)
 class Transform : public Component
 {
@@ -78,12 +75,15 @@ public:
 	// Transform을 반환하는게 더 맞을 수도 있음.
 	GameObject* GetRoot() const;
 	GameObject* GetChildGameObjectByIndex(usize index) const;
-	GameObject* GetChildGameObjectByName(const std::string& name) const;
+	GameObject* GetChildGameObjectByNameRecursive(const std::string& name) const;
+	GameObject* GetChildGameObjectByNameRecursive(uint32 targetHash) const;
 
 private:
+	bool IsDescendant(Transform* transform);
 	void AddChild(Transform* child);
 	void RemoveChild(Transform* child);
 	void UpdateTransform() const;
+	void UpdateTransformInternal() const;
 	void UpdateWorldInverseTransform() const;
 	void SetTransformDirty();
 

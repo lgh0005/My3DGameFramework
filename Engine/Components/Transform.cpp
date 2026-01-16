@@ -15,17 +15,36 @@ TransformUPtr Transform::Create()
 //====================================================*/
 void Transform::UpdateTransform() const
 {
-	// 1. 부모가 있다면 부모부터 최신 상태인지 확인
-	if (m_parent) m_parent->GetWorldMatrix();
+	// 1. 나부터 위로 올라가며 Dirty한 조상들을 스택에 쌓음
+	std::vector<const Transform*> updateStack;
+	updateStack.reserve(16);
 
-	// 2. 로컬 행렬 계산 (SRT)
+	const Transform* curr = this;
+	while (curr && curr->m_isTransformDirty)
+	{
+		updateStack.push_back(curr);
+		curr = curr->m_parent;
+	}
+
+	// 2. 위에서부터(Root -> 나) 내려오면서 순서대로 갱신
+	while (!updateStack.empty())
+	{
+		const Transform* target = updateStack.back();
+		updateStack.pop_back();
+		target->UpdateTransformInternal();
+	}
+}
+
+void Transform::UpdateTransformInternal() const
+{
+	// 1. 로컬 행렬 계산 (SRT)
 	glm::mat4 localMat = GetLocalMatrix();
 
-	// 3. 월드 행렬 계산
-	if (m_parent) m_worldMatrix = m_parent->GetWorldMatrix() * localMat;
+	// 2. 월드 행렬 계산
+	if (m_parent) m_worldMatrix = m_parent->m_worldMatrix * localMat;
 	else m_worldMatrix = localMat;
 
-	// 4. 월드 속성 캐싱 (Position, Rotation, Scale 분해)
+	// 3. 월드 속성 캐싱 (Position, Rotation, Scale 분해)
 	m_worldPosition = glm::vec3(m_worldMatrix[3]);
 
 	// 위치
@@ -39,8 +58,8 @@ void Transform::UpdateTransform() const
 	m_worldScale.z = glm::length(glm::vec3(m_worldMatrix[2]));
 
 	// 회전
-	if (Utils::HasLength(axisX) && 
-		Utils::HasLength(axisY) && 
+	if (Utils::HasLength(axisX) &&
+		Utils::HasLength(axisY) &&
 		Utils::HasLength(axisZ))
 	{
 		glm::mat3 rotationMat;
@@ -54,7 +73,7 @@ void Transform::UpdateTransform() const
 		m_worldRotation = glm::quat(1.0f, 0.0f, 0.0f, 0.0f);
 	}
 
-	// 5. 갱신 완료 -> Dirty 해제
+	// 4. 갱신 완료 -> Dirty 해제
 	m_isTransformDirty = false;
 }
 
@@ -69,11 +88,30 @@ void Transform::SetTransformDirty()
 	// 이미 Dirty라면 자식들도 이미 Dirty일 것이므로 패스 (중복 호출 방지)
 	if (m_isTransformDirty) return;
 
-	m_isTransformDirty = true;
-	m_isWorldInverseDirty = true;
+	// 작업 스택
+	std::vector<Transform*> workStack;
+	workStack.reserve(16);
+	workStack.push_back(this);
 
-	// 자식들도 다 Dirty로 만듦 (부모가 움직이면 자식도 월드 좌표가 바뀌니까)
-	for (Transform* child : m_children) child->SetTransformDirty();
+	// DFS로 Dirty 마킹
+	while (!workStack.empty())
+	{
+		// 1. 스택에서 하나 꺼냄 (LIFO)
+		Transform* current = workStack.back();
+		workStack.pop_back();
+
+		// 2. Dirty 마킹
+		current->m_isTransformDirty = true;
+		current->m_isWorldInverseDirty = true;
+
+		// 3. 자식들을 스택에 추가
+		for (Transform* child : current->m_children)
+		{
+			// 이미 Dirty 상태인 자식은 굳이 스택에 넣을 필요 없음 (가지치기)
+			if (!child->m_isTransformDirty)
+				workStack.push_back(child);
+		}
+	}
 }
 
 /*====================================================//
@@ -285,6 +323,13 @@ void Transform::SetParent(Transform* parent)
 	// 1. 자기 자신이나, 이미 같은 부모라면 무시
 	if (this == parent || m_parent == parent) return;
 
+	// 2. 순환 참조 방지
+	if (IsDescendant(parent))
+	{
+		LOG_ERROR("SetParent Failed: Cannot make a descendant the parent (Cycle detected).");
+		return;
+	}
+
 	// 2. 기존 부모와의 연결 끊기
 	if (m_parent) m_parent->RemoveChild(this);
 
@@ -296,6 +341,27 @@ void Transform::SetParent(Transform* parent)
 
 	// 5. 부모가 바뀌었으므로 월드 행렬을 다시 계산해야 함 (Dirty 마킹)
 	SetTransformDirty();
+}
+
+bool Transform::IsDescendant(Transform* transform)
+{
+	if (!transform) return false;
+
+	std::vector<Transform*> workStack;
+	workStack.reserve(16);
+	for (auto* child : m_children) workStack.push_back(child);
+
+	while (!workStack.empty())
+	{
+		Transform* current = workStack.back();
+		workStack.pop_back();
+		if (current == transform) return true;
+
+		for (auto* child : current->m_children) 
+			workStack.push_back(child);
+	}
+
+	return false;
 }
 
 void Transform::AddChild(Transform* child)
@@ -312,7 +378,7 @@ void Transform::RemoveChild(Transform* child)
 
 GameObject* Transform::GetRoot() const
 {
-	// 2. 부모를 타고 올라감
+	// 부모를 타고 올라감
 	const Transform* current = this;
 	while (current->GetParent() != nullptr) current = current->GetParent();
 	return current->GetOwner();
@@ -324,13 +390,37 @@ GameObject* Transform::GetChildGameObjectByIndex(usize index) const
 	return m_children[index]->GetOwner();
 }
 
-GameObject* Transform::GetChildGameObjectByName(const std::string& name) const
+GameObject* Transform::GetChildGameObjectByNameRecursive(const std::string& name) const
 {
-	for (Transform* child : m_children)
+	if (name.empty()) return nullptr;
+	return GetChildGameObjectByNameRecursive(Utils::StrHash(name));
+}
+
+GameObject* Transform::GetChildGameObjectByNameRecursive(uint32 targetHash) const
+{
+	if (m_children.empty()) return nullptr;
+
+	// 작업 스택 (DFS)
+	std::vector<Transform*> workStack;
+	workStack.reserve(16);
+
+	// 순서 보장을 위해 역순으로 스택에 넣음 (0번부터 탐색되도록)
+	for (auto it = m_children.rbegin(); it != m_children.rend(); ++it)
+		workStack.push_back(*it);
+
+	while (!workStack.empty())
 	{
-		GameObject* owner = child->GetOwner();
-		if (!owner) continue;
-		if (owner->GetName() == name) return owner;
+		Transform* current = workStack.back();
+		workStack.pop_back();
+
+		GameObject* owner = current->GetOwner();
+
+		// [Current Code] GameObject에 해시 캐싱이 없다면:
+		if (owner && owner->GetNameHash() == targetHash) return owner;
+
+		// 자식들을 스택에 추가
+		for (auto it = current->m_children.rbegin(); it != current->m_children.rend(); ++it)
+			workStack.push_back(*it);
 	}
 
 	return nullptr;
