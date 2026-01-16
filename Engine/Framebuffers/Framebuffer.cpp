@@ -6,7 +6,6 @@ Framebuffer::Framebuffer() = default;
 Framebuffer::~Framebuffer()
 {
     if (m_fbo) glDeleteFramebuffers(1, &m_fbo);
-    if (m_depthBuffer) glDeleteRenderbuffers(1, &m_depthBuffer);
 }
 
 void Framebuffer::BindToDefault()
@@ -22,6 +21,11 @@ void Framebuffer::Bind() const
 const TexturePtr Framebuffer::GetColorAttachment(int32 index) const
 {
     return GetTexture(index);
+}
+
+const TexturePtr Framebuffer::GetDepthAttachment() const
+{
+    return m_depthTexture;
 }
 
 const TexturePtr Framebuffer::GetTexture(int32 index) const

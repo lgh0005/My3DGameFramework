@@ -36,10 +36,10 @@ bool PostProcessFramebuffer::Init(int32 width, int32 height, bool useDepth)
 	// SRP 메인 버퍼로 쓸 때는 Depth가 필요하고, Bloom 핑퐁용일 때는 불필요
 	if (useDepth)
 	{
-		glGenRenderbuffers(1, &m_depthBuffer);
-		glBindRenderbuffer(GL_RENDERBUFFER, m_depthBuffer);
-		glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, width, height);
-		glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, m_depthBuffer);
+		m_depthTexture = Texture::Create(width, height, GL_DEPTH24_STENCIL8, GL_DEPTH_STENCIL, GL_UNSIGNED_INT_24_8);
+		m_depthTexture->SetFilter(GL_NEAREST, GL_NEAREST);
+		m_depthTexture->SetWrap(GL_CLAMP_TO_EDGE, GL_CLAMP_TO_EDGE);
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_TEXTURE_2D, m_depthTexture->Get(), 0);
 	}
 
 	// 6. 완성 확인

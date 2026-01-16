@@ -43,21 +43,15 @@ bool GBufferFramebuffer::Init(int32 width, int32 height)
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT3, GL_TEXTURE_2D, emissionTexture->Get(), 0);
     m_textures.push_back(std::move(emissionTexture));
 
-    // Draw Buffers ����
-    uint32 attachments[4] =
-    {
-        GL_COLOR_ATTACHMENT0,
-        GL_COLOR_ATTACHMENT1,
-        GL_COLOR_ATTACHMENT2,
-        GL_COLOR_ATTACHMENT3
-    };
+    // Draw Buffers 부착
+    uint32 attachments[4] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2, GL_COLOR_ATTACHMENT3 };
     glDrawBuffers(4, attachments);
 
-    // Depth Attachment
-    glGenRenderbuffers(1, &m_depthBuffer); // ���� ��Ȱ��
-    glBindRenderbuffer(GL_RENDERBUFFER, m_depthBuffer);
-    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, width, height);
-    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, m_depthBuffer);
+    // Depth Texture 사용
+    m_depthTexture = Texture::Create(width, height, GL_DEPTH24_STENCIL8, GL_DEPTH_STENCIL, GL_UNSIGNED_INT_24_8);
+    m_depthTexture->SetFilter(GL_NEAREST, GL_NEAREST);
+    m_depthTexture->SetWrap(GL_CLAMP_TO_EDGE, GL_CLAMP_TO_EDGE);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_TEXTURE_2D, m_depthTexture->Get(), 0);
 
     // Result check
     auto gBufferResult = glCheckFramebufferStatus(GL_FRAMEBUFFER);

@@ -13,8 +13,9 @@ public:
     static void BindToDefault();
     void Bind() const;
 
-    const TexturePtr GetColorAttachment(int32 index = 0) const;
     const TexturePtr GetTexture(int32 index = 0) const;
+    const TexturePtr GetColorAttachment(int32 index = 0) const;
+    const TexturePtr GetDepthAttachment() const;
     const uint32 Get() const { return m_fbo; }
 
     int32 GetWidth() const { return m_width; }
@@ -34,5 +35,5 @@ protected:
     std::vector<TexturePtr> m_textures;
 
     // 깊이 버퍼
-    uint32 m_depthBuffer{ 0 };
+    TexturePtr m_depthTexture;
 };

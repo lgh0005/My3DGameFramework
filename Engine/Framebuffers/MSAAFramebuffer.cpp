@@ -28,13 +28,13 @@ void MSAAFramebuffer::Resolve() const
     glBindFramebuffer(GL_READ_FRAMEBUFFER, m_msaaFbo);
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, m_fbo);
 
-    // 컬러 버퍼 복사 (Linear 보간 안 됨, Nearest만 가능)
-    // 여러 개의 Attachment가 있다면 반복문으로 처리 가능 (여기선 0번만 예시)
+    // 컬러 버퍼 복사 및 깊이 정보도 텍스처로 복사
     glBlitFramebuffer
     (
         0, 0, m_width, m_height,
         0, 0, m_width, m_height,
-        GL_COLOR_BUFFER_BIT, GL_NEAREST
+        GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT,
+        GL_NEAREST
     );
 
     // 상태 복구
@@ -57,7 +57,6 @@ bool MSAAFramebuffer::Init(int32 width, int32 height, int32 samples)
     uint32 colorBuffer;
     glGenRenderbuffers(1, &colorBuffer);
     glBindRenderbuffer(GL_RENDERBUFFER, colorBuffer);
-    // HDR을 위해 GL_RGBA16F 사용
     glRenderbufferStorageMultisample(GL_RENDERBUFFER, samples, GL_RGBA16F, width, height);
     glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_RENDERBUFFER, colorBuffer);
     m_msaaColorBuffers.push_back(colorBuffer);
@@ -79,19 +78,22 @@ bool MSAAFramebuffer::Init(int32 width, int32 height, int32 samples)
     glGenFramebuffers(1, &m_fbo); // 부모 멤버 m_fbo
     glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
 
+    // 2-1. Color Texture
     auto texture = Texture::Create(width, height, GL_RGBA16F, GL_RGBA, GL_FLOAT);
     texture->SetFilter(GL_LINEAR, GL_LINEAR);
     texture->SetWrap(GL_CLAMP_TO_EDGE, GL_CLAMP_TO_EDGE);
-
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, texture->Get(), 0);
-
-    // 부모의 텍스처 리스트에 등록
     m_textures.push_back(std::move(texture));
+
+    // 2-2. Depth Texture 생성 및 부착
+    m_depthTexture = Texture::Create(width, height, GL_DEPTH24_STENCIL8, GL_DEPTH_STENCIL, GL_UNSIGNED_INT_24_8);
+    m_depthTexture->SetFilter(GL_NEAREST, GL_NEAREST);
+    m_depthTexture->SetWrap(GL_CLAMP_TO_EDGE, GL_CLAMP_TO_EDGE);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_TEXTURE_2D, m_depthTexture->Get(), 0);
 
     // DrawBuffer 설정
     uint32 attachments[1] = { GL_COLOR_ATTACHMENT0 };
     glDrawBuffers(1, attachments);
-
     if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
         return false;
 

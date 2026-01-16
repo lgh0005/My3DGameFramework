@@ -147,12 +147,15 @@ void StandardPostProcessPass::RenderCompositePass(Texture* sceneTexture, Texture
 	m_compositeProgram->Use();
 
 	// 1. Camera Dirt 텍스쳐 바인딩
+	// TODO : 현재 composite 셰이더 프로그램 코드에는 lens dirt는
+	// bloom을 쓸지 말지 에 대한 유니폼 변수에 종속적임. 쉽게 말해서
+	// bloom을 안쓰면 lens dirt는 아얘 보이지 않게 설계되어있는데 이 부분 수정 필요
 	if (m_cameraDirtTexture)
 	{
 		glActiveTexture(GL_TEXTURE2);
 		m_cameraDirtTexture->Bind();
 		m_compositeProgram->SetUniform("cameraDirtTex", 2);
-		m_compositeProgram->SetUniform("dirtAmbient", 0.3f);    // 먼지의 기본 색상 표시 강도 (0.0f에서 0.5f값 사이 정도)
+		m_compositeProgram->SetUniform("dirtAmbient", 0.05f);    // 먼지의 기본 색상 표시 강도 (0.0f에서 0.5f값 사이 정도)
 		m_compositeProgram->SetUniform("dirtIntensity", 15.0f); // 먼지가 bloom을 산란시키는 정도
 	}
 
