@@ -63,7 +63,7 @@ void Skeleton::SetData(const BoneMap& map, int32 count)
 
 	// 맵 데이터를 기반으로 벡터 캐시 재구축
 	m_boneOffsets.clear(); // 안전하게 비우고 시작
-	m_boneOffsets.resize(count, Utils::IdentityMat4);
+	m_boneOffsets.resize(count, glm::mat4(1.0f));
 
 	for (const auto& [name, info] : m_boneInfoMap)
 	{
@@ -86,5 +86,5 @@ int32 Skeleton::GetBoneID(const std::string& name) const
 const glm::mat4& Skeleton::GetBoneOffset(int32 boneID) const
 {
 	if (boneID >= 0 && boneID < m_boneOffsets.size()) return m_boneOffsets[boneID];
-	return Utils::IdentityMat4;
+	return glm::mat4(1.0f);
 }

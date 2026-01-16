@@ -140,13 +140,25 @@ void Scene::Destroy(GameObject* obj)
 	GetGameObjectRegistry()->DestroyGameObject(obj);
 }
 
+GameObject* Scene::FindObjectByID(InstanceID id)
+{
+	if (!m_sceneRegistry) return nullptr;
+	return m_sceneRegistry->GetGameObjectRegistry()->GetGameObjectByID(id);
+}
+
+GameObject* Scene::FindObjectByName(const std::string& name)
+{
+	if (!m_sceneRegistry) return nullptr;
+	return m_sceneRegistry->GetGameObjectRegistry()->FindGameObjectByName(name);
+}
+
 /*==================================//
 //   object management for scene    //
 //==================================*/
 void Scene::ProcessPendingAdds()
 {
 	// 1. 매니저에게 "새 친구들 명단" 요청
-	const auto& pendingAdds = m_sceneRegistry->GetGameObjectRegistry()->GetPendingCreateQueue();
+	const auto& pendingAdds = GetGameObjectRegistry()->GetPendingCreateQueue();
 	if (pendingAdds.empty()) return;
 
 	for (const auto& go : pendingAdds)
@@ -217,14 +229,14 @@ GameObjectRegistry* Scene::GetGameObjectRegistry()
 	return m_sceneRegistry->GetGameObjectRegistry();
 }
 
-void Scene::AddRenderPass(const std::string& name, GeneralRenderPassUPtr renderPass)
-{
-	GetComponentRegistry()->AddCustomRenderPass(name, std::move(renderPass));
-}
-
 GeneralRenderPass* Scene::GetRenderPass(const std::string& name)
 {
 	return GetComponentRegistry()->GetCustomRenderPass(name);
+}
+
+void Scene::AddRenderPass(const std::string& name, GeneralRenderPassUPtr renderPass)
+{
+	GetComponentRegistry()->AddCustomRenderPass(name, std::move(renderPass));
 }
 
 void Scene::SetSkyLight(SkyLightUPtr skyLight)

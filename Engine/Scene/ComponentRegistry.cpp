@@ -89,7 +89,9 @@ void ComponentRegistry::RegisterComponent(Component* component)
 
 	// 2. 자기 자신의 구체적 타입(Leaf Class) 위치에 저장
 	usize index = (usize)type;
-	m_componentCache[index].push_back(component);
+	auto& vec = m_componentCache[index];
+	vec.push_back(component);
+	component->SetRegistryIndex(vec.size() - 1);
 }
 
 void ComponentRegistry::UnregisterComponent(Component* component)
@@ -105,55 +107,25 @@ void ComponentRegistry::UnregisterComponent(Component* component)
 		case ComponentType::PointLight:
 		case ComponentType::SpotLight:
 		{
-			usize baseIndex = (usize)ComponentType::Light;
-			if (baseIndex < m_componentCache.size())
-			{
-				auto& vec = m_componentCache[baseIndex];
-				auto it = std::find(vec.begin(), vec.end(), component);
-				if (it != vec.end())
-				{
-					std::iter_swap(it, vec.end() - 1);
-					vec.pop_back();
-				}
-			}
+			RemoveComponentFromBaseList(ComponentType::Light, component);
 			break;
 		}
 
-		// [MeshRenderer 계열] MeshRenderer 버킷에서 제거
+		// [MeshRenderer 계열]
 		case ComponentType::StaticMeshRenderer:
 		case ComponentType::SkinnedMeshRenderer:
 		case ComponentType::InstancedMeshRenderer:
 		{
-			usize baseIndex = (usize)ComponentType::MeshRenderer;
-			if (baseIndex < m_componentCache.size())
-			{
-				auto& vec = m_componentCache[baseIndex];
-				auto it = std::find(vec.begin(), vec.end(), component);
-				if (it != vec.end())
-				{
-					std::iter_swap(it, vec.end() - 1);
-					vec.pop_back();
-				}
-			}
+			RemoveComponentFromBaseList(ComponentType::MeshRenderer, component);
 			break;
 		}
 
-		// [Collider 계열] Collider 버킷에서 제거
+		// [Collider 계열]
 		case ComponentType::BoxCollider:
 		case ComponentType::SphereCollider:
 		case ComponentType::CapsuleCollider:
 		{
-			usize baseIndex = (usize)ComponentType::Collider;
-			if (baseIndex < m_componentCache.size())
-			{
-				auto& vec = m_componentCache[baseIndex];
-				auto it = std::find(vec.begin(), vec.end(), component);
-				if (it != vec.end())
-				{
-					std::iter_swap(it, vec.end() - 1);
-					vec.pop_back();
-				}
-			}
+			RemoveComponentFromBaseList(ComponentType::Collider, component);
 			break;
 		}
 	}
@@ -161,12 +133,26 @@ void ComponentRegistry::UnregisterComponent(Component* component)
 	// 2. 자기 자신의 구체적 타입 위치에서 삭제
 	usize index = (usize)type;
 	if (index >= m_componentCache.size()) return;
-
 	auto& vec = m_componentCache[index];
+
+	usize regIdx = component->GetRegistryIndex();
+	if (regIdx >= vec.size() || vec[regIdx] != component) return;
+
+	Component* lastComp = vec.back();
+	vec[regIdx] = lastComp;
+	lastComp->SetRegistryIndex(regIdx);
+	vec.pop_back();
+
+	component->SetRegistryIndex(Component::INVALID_REGISTRY_IDX);
+}
+
+void ComponentRegistry::RemoveComponentFromBaseList(ComponentType baseType, Component* component)
+{
+	auto& vec = m_componentCache[(usize)baseType];
 	auto it = std::find(vec.begin(), vec.end(), component);
 	if (it != vec.end())
 	{
-		std::iter_swap(it, vec.end() - 1);
+		*it = vec.back();
 		vec.pop_back();
 	}
 }

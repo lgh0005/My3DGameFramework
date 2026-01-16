@@ -44,11 +44,9 @@ public:
 	static bool HasLength(const glm::vec3& v);
 	static glm::vec3 SafeNormalize(const glm::vec3& v);
 
-/*==================================//
-//   Common Constants (공용 상수)    //
-//==================================*/
-public:
-	inline static const glm::mat4 IdentityMat4 = glm::mat4(1.0f);
+	// 문자열 해시 유틸 함수 : FNV-1a Hash
+	static constexpr uint32 StrHash(const char* str);
+	static constexpr uint32 StrHash(const std::string& str);
 };
 
 #include "Misc/Utils.inl"

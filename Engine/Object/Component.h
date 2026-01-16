@@ -1,7 +1,6 @@
 ﻿#pragma once
 #include "Misc/Enums.h"
 #include "Object.h"
-#include "Managers/ObjectManager.h"
 
 #pragma region FORWARD_DECLARATION
 CLASS_PTR(GameObject)

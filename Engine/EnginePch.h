@@ -81,4 +81,4 @@ using json = nlohmann::json;
 #define AUDIO     AudioManager::Instance()
 #define PHYSICS   PhysicsManager::Instance()
 #define UI		  UIManager::Instance()
-#define OBJECT	  ObjectManager::Instance()
+#define OBJECT    ObjectManager::Instance()

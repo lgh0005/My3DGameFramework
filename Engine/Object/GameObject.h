@@ -25,10 +25,11 @@ public:
 	void SetInstanceID(InstanceID id) { m_instanceID = id; }
 	void SetSceneIndex(usize index) { m_sceneIndex = index; }
 	RegistryIndex GetSceneIndex() const { return m_sceneIndex; }
-
 	Transform& GetTransform()    const;
-	const std::string& GetName() const		 { return m_name; }
-	void SetName(const std::string& name)	 { m_name = name; }
+
+	const std::string& GetName() const { return m_name; }
+	uint32 GetNameHash() const { return m_nameHash; }
+	void SetName(const std::string& name);
 
 /*=============================================//
 //   GameObject life-cycle methods by engine   //
@@ -101,8 +102,10 @@ private:
 	std::vector<Script*> m_scripts;
 
 	// ObjectManager상에서의 게임 오브젝트 상태 기록 캐시
-	InstanceID m_instanceID						 { INVALID_INSTANCE_ID };
-	SceneIndex m_sceneIndex						 { INVALID_SCENE_INDEX };
+	std::string m_name;
+	uint32      m_nameHash						{ 0 };
+	InstanceID  m_instanceID					{ INVALID_INSTANCE_ID };
+	SceneIndex  m_sceneIndex					{ INVALID_SCENE_INDEX };
 };
 
 /*=================================//

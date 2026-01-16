@@ -24,7 +24,7 @@ add_library(Engine STATIC
    # Scene
    "Scene/Scene.h"                   "Scene/Scene.cpp"
    "Scene/GameObjectRegistry.h"       "Scene/GameObjectRegistry.cpp"
-   "Scene/ComponentRegistry.h"           "Scene/ComponentRegistry.cpp"
+   "Scene/ComponentRegistry.h"           "Scene/ComponentRegistry.cpp"      "Scene/ComponentRegistry.inl"
    "Scene/SceneRegistry.h"          "Scene/SceneRegistry.cpp"
    "Scene/SceneUtils.h"              "Scene/SceneUtils.cpp"
 

@@ -21,7 +21,6 @@ void SceneManager::LoadScene(const std::string& scene, const std::string& pipeli
 	// 3. 기존 씬 정리 (소멸자 호출 -> 리소스 해제)
 	UI.Clear();
 	m_activeScene.reset();
-	OBJECT.Clear();
 	LOG_INFO("Loading Scene: {} ...", scene);
 
 	// 4. 새 씬 메모리 할당 (Factory 호출)

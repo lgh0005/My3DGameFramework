@@ -9,7 +9,6 @@ CLASS_PTR(Script)
 class ObjectManager
 {
 	DECLARE_SINGLE(ObjectManager)
-	DECLARE_NONINSTANTIABLE(ObjectManager)
 
 public:
 	using ComponentVector = std::vector<Component*>;
@@ -24,8 +23,12 @@ public:
 	static constexpr usize INVALID_ID	 = static_cast<usize>(-1);
 
 public:
+	~ObjectManager();
 	void Init();
 	void Clear();
+
+private:
+	ObjectManager();
 
 /*==========================================//
 //   GameObject instance managing methods   //
@@ -52,16 +55,30 @@ public:
 	void UnregisterComponent(Component* comp);
 	template<typename T> const ComponentVector* GetComponents();
 
-/*=========================================//
-//   active scene state checking methods   //
-//=========================================*/
-public:
-
-
-
 private:
 	std::array<ComponentVector, MAX_ENGINE_COMPONENTS> m_componentCache;
 	std::vector<ComponentVector> m_userScriptComponentCache;
+
+/*===================================//
+//   runtime GameObject management   //
+//===================================*/
+public:
+	void AddGameObject(GameObjectUPtr go);
+	void DestroyGameObject(GameObject* go);
+	void ProcessPendingCreates(bool isSceneAwake, bool isSceneRunning);
+	void ProcessPendingDestroys();
+
+	const std::vector<GameObjectUPtr>& GetGameObjects() const;
+	const std::vector<GameObjectUPtr>& GetPendingCreateQueue() const;
+	const std::vector<GameObject*>& GetPendingDestroyQueue() const;
+
+private:
+	void FlushCreateQueue();
+	void FlushDestroyQueue();
+
+	std::vector<GameObjectUPtr> m_gameObjects;
+	std::vector<GameObjectUPtr> m_pendingCreateQueue;
+	std::vector<GameObject*>	m_pendingDestroyQueue;
 };
 
 #include "Managers/ObjectManager.inl"

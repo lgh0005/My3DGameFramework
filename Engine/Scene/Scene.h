@@ -23,6 +23,13 @@ public:
 	void OnScreenResize(int32 width, int32 height);
 	void SetSceneState(SceneState state) { m_state = state; }
 	SceneState GetSceneState() const	 { return m_state; }
+	
+/*==================================//
+//   object management for scene    //
+//==================================*/
+public:
+	void ProcessPendingAdds();  // 생성 대기열 처리
+	void ProcessPendingKills(); // 삭제 대기열 처리
 
 /*======================================//
 //   default scene life-cycle methods   //
@@ -39,17 +46,13 @@ public:
 //   object utilities for scene   //
 //================================*/
 public:
-	// 2. 오브젝트 관리 인터페이스 (Manager에게 위임)
 	void AddGameObject(GameObjectUPtr gameObject);
 	void Destroy(GameObject* obj);
 
-/*==================================//
-//   object management for scene    //
-//==================================*/
-public:
-	// 4. 파괴 예약된 오브젝트를 삭제하기
-	void ProcessPendingAdds();  // 생성 대기열 처리
-	void ProcessPendingKills(); // 삭제 대기열 처리
+	GameObject* FindObjectByID(InstanceID id);
+	GameObject* FindObjectByName(const std::string& name);
+	template<typename T> GameObject* FindObjectByType();
+	template<typename T> std::vector<GameObject*> FindObjectsByType();
 
 /*================================================//
 //   scene property getters from SceneRegistry    //
@@ -82,3 +85,5 @@ protected:
 	SceneRegistryUPtr		  m_sceneRegistry;
 	SceneState			      m_state{ SceneState::Uninitialized };
 };
+
+#include "Scene/Scene.inl"

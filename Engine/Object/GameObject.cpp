@@ -5,19 +5,7 @@
 #include "Components/Transform.h"
 #include "Components/Script.h"
 
-GameObject::GameObject() = default;
-GameObject::~GameObject()
-{
-	// 1. 내가 가진 모든 컴포넌트를 ObjectManager 캐시에서 제거
-	for (auto& comp : m_components)
-	{
-		if (comp) OBJECT.UnregisterComponent(comp.get());
-	}
-
-	// 2. this(GameObject)을 ObjectManager 관리 대장에서 말소
-	if (OBJECT.IsGameObjectAlive(m_instanceID))
-		OBJECT.UnregisterGameObject(m_instanceID);
-}
+DECLARE_DEFAULTS_IMPL(GameObject)
 
 GameObjectUPtr GameObject::Create()
 {
@@ -30,7 +18,8 @@ bool GameObject::Init()
 {
 	// ObjectManager에 자신을 등록
 	m_componentCache.fill(nullptr);
-	m_instanceID = OBJECT.RegisterGameObject(this);
+	m_instanceID = INVALID_INSTANCE_ID;
+	SetName("GameObject");
 
 	// 기본적으로 Transform을 소유
 	auto transform = Transform::Create();
@@ -41,6 +30,12 @@ bool GameObject::Init()
 Transform& GameObject::GetTransform() const
 {
 	return *static_cast<Transform*>(m_componentCache[(usize)ComponentType::Transform]);
+}
+
+void GameObject::SetName(const std::string& name)
+{
+	m_name = name;
+	m_nameHash = Utils::StrHash(m_name);
 }
 
 /*=============================================//

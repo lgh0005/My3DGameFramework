@@ -4,15 +4,29 @@
 #include "Object/GameObject.h"
 #include "Components/Script.h"
 
+#include "Scene/Scene.h"
+#include "Scene/SceneRegistry.h"
+
+DECLARE_DEFAULTS_IMPL(ObjectManager)
+
 void ObjectManager::Init()
 {
 	m_gameObjectSlots.reserve(1024);
 	m_userScriptComponentCache.reserve(1024);
+
+	m_gameObjects.reserve(4096);
+	m_pendingCreateQueue.reserve(1024);
+	m_pendingDestroyQueue.reserve(1024);
 }
 
 void ObjectManager::Clear()
 {
-	// GameObject 삭제
+	// 게임 오브젝트들부터 전부 파괴
+	m_gameObjects.clear();
+	m_pendingCreateQueue.clear();
+	m_pendingDestroyQueue.clear();
+
+	// 슬롯 초기화
 	m_goSlotfreeHead = 0xFFFFFFFF;
 	m_gameObjectSlots.clear();
 
@@ -206,8 +220,9 @@ void ObjectManager::UnregisterComponent(Component* comp)
 	if (components)
 	{
 		ComponentVector& vec = *components;
-		usize lastIndex = vec.size() - 1;
+		if (vec.empty()) return;
 
+		usize lastIndex = vec.size() - 1;
 		if (indexToRemove <= lastIndex)
 		{
 			if (indexToRemove != lastIndex)
@@ -220,4 +235,168 @@ void ObjectManager::UnregisterComponent(Component* comp)
 			comp->SetRegistryIndex(INVALID_INDEX);
 		}
 	}
+}
+
+/*===================================//
+//   runtime GameObject management   //
+//===================================*/
+void ObjectManager::AddGameObject(GameObjectUPtr go)
+{
+	if (!go) return;
+	m_pendingCreateQueue.push_back(std::move(go));
+}
+
+void ObjectManager::DestroyGameObject(GameObject* go)
+{
+	if (!go) return;
+
+	// 이미 죽은 상태라면 중복 요청 무시
+	// (IsValid를 쓰면 더 안전하지만, 내부 로직이므로 IsDead 체크로도 충분)
+	if (go->IsDead()) return;
+
+	// 플래그 설정
+	go->SetDestroy();
+
+	// 삭제 대기열 등록
+	m_pendingDestroyQueue.push_back(go);
+
+	// 자식들도 같이 순장 (재귀 호출)
+	Transform& transform = go->GetTransform();
+	const auto& children = transform.GetChildren();
+	for (Transform* child : children) DestroyGameObject(child->GetOwner());
+}
+
+void ObjectManager::FlushCreateQueue()
+{
+	if (m_pendingCreateQueue.empty()) return;
+
+	// 1. 사이즈 계산
+	usize currentSize = m_gameObjects.size();
+	usize addCount = m_pendingCreateQueue.size();
+	usize requiredSize = currentSize + addCount;
+	if (m_gameObjects.capacity() < requiredSize)
+	{
+		usize doubledCapacity = m_gameObjects.capacity() * 2;
+		m_gameObjects.reserve(Utils::Max<usize>(requiredSize, doubledCapacity));
+	}
+
+	// 2. [이동] 소유권이 m_gameObjects로 넘어갑니다.
+	// 주의: 이 시점 이후 m_pendingCreateQueue 내부의 unique_ptr들은 nullptr가 됩니다.
+	m_gameObjects.insert
+	(
+		m_gameObjects.end(),
+		std::make_move_iterator(m_pendingCreateQueue.begin()),
+		std::make_move_iterator(m_pendingCreateQueue.end())
+	);
+
+	// 3. 인덱스 갱신 및 ID 등록
+	for (usize i = 0; i < addCount; ++i)
+	{
+		GameObject* addedObj = m_gameObjects[currentSize + i].get();
+		addedObj->SetSceneIndex(currentSize + i);
+	}
+
+	// 4. [비우기] 껍데기만 남은 대기열을 확실하게 초기화합니다.
+	m_pendingCreateQueue.clear();
+}
+
+void ObjectManager::FlushDestroyQueue()
+{
+	if (m_pendingDestroyQueue.empty()) return;
+
+	// 1. SceneIndex를 이용한 Swap & Pop : O(k)
+	for (GameObject* deadObj : m_pendingDestroyQueue)
+	{
+		// [삭제] m_liveObjectSet.erase(deadObj);
+
+		// [추가/중요] 슬롯맵(ID 시스템)에서 이 객체를 말소시켜야 함!
+		// 이제 이 ID를 가진 녀석은 "죽은 세대"가 되어 IsGameObjectAlive(id)가 false를 반환함.
+		UnregisterGameObject(deadObj->GetInstanceID());
+
+		// 1. SceneIndex를 이용한 Swap & Pop 로직
+		usize index = deadObj->GetSceneIndex();
+
+		if (index >= m_gameObjects.size() || m_gameObjects[index].get() != deadObj)
+			continue;
+
+		// 1-1. Swap
+		usize lastIndex = m_gameObjects.size() - 1;
+		if (index != lastIndex)
+		{
+			std::swap(m_gameObjects[index], m_gameObjects[lastIndex]);
+			m_gameObjects[index]->SetSceneIndex(index);
+		}
+
+		// 1-2. 메모리 해제 (소멸자 호출)
+		m_gameObjects.pop_back();
+	}
+
+	m_pendingDestroyQueue.clear();
+}
+
+void ObjectManager::ProcessPendingCreates(bool isSceneAwake, bool isSceneRunning)
+{
+	if (m_pendingCreateQueue.empty()) return;
+
+	// 1. [순회] 이동하기 전이므로 unique_ptr들이 살아있습니다.
+	for (const auto& go : m_pendingCreateQueue)
+	{
+		// 1-1. 컴포넌트 등록 (Scene에 있던 로직 이동)
+		for (const auto& comp : go->GetComponents())
+		{
+			RegisterComponent(comp.get());
+		}
+
+		// 1-2. Lifecycle Catch-up (Scene 상태에 맞춰 따라잡기)
+		if (isSceneAwake) go->Awake();
+		if (isSceneRunning && go->IsActive()) go->Start();
+	}
+
+	// 2. [이동 및 비우기] 처리가 다 끝났으니 안전하게 옮깁니다.
+	FlushCreateQueue();
+}
+
+void ObjectManager::ProcessPendingDestroys()
+{
+	if (m_pendingDestroyQueue.empty()) return;
+
+	for (GameObject* deadObj : m_pendingDestroyQueue)
+	{
+		// 1. 최후의 유언
+		deadObj->OnDestroy();
+
+		// 2. 컴포넌트 말소
+		for (const auto& comp : deadObj->GetComponents())
+		{
+			UnregisterComponent(comp.get());
+		}
+
+		// 3. 부모 연결 끊기
+		// Transform은 Component이므로 헤더 include만 되어 있으면 접근 가능
+		Transform& myTransform = deadObj->GetTransform();
+		Transform* parentTransform = myTransform.GetParent();
+		if (parentTransform)
+		{
+			GameObject* parentGO = parentTransform->GetOwner();
+			if (parentGO && !parentGO->IsDead()) myTransform.SetParent(nullptr);
+		}
+	}
+
+	// 4. 메모리 해제
+	FlushDestroyQueue();
+}
+
+const std::vector<GameObjectUPtr>& ObjectManager::GetGameObjects() const
+{
+	return m_gameObjects;
+}
+
+const std::vector<GameObjectUPtr>& ObjectManager::GetPendingCreateQueue() const
+{
+	return m_pendingCreateQueue;
+}
+
+const std::vector<GameObject*>& ObjectManager::GetPendingDestroyQueue() const
+{
+	return m_pendingDestroyQueue;
 }

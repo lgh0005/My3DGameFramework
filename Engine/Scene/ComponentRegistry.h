@@ -24,6 +24,7 @@ public:
 private:
 	void Init();
 	ComponentRegistry();
+	void RemoveComponentFromBaseList(ComponentType baseType, Component* component);
 
 /*=======================================//
 //   getters and setters of components   //
@@ -42,12 +43,4 @@ private:
 	SkyLightUPtr m_sky;
 };
 
-/*====================================//
-//   scene registry template inlines  //
-//====================================*/
-template<typename T>
-inline const std::vector<Component*>& ComponentRegistry::GetComponents()
-{
-	ComponentType type = T::GetStaticComponentType();
-	return m_componentCache[(usize)type];
-}
+#include "Scene/ComponentRegistry.inl"
