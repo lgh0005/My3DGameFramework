@@ -68,7 +68,6 @@ using json = nlohmann::json;
 #include "Managers/AudioManager.h"
 #include "Managers/PhysicsManager.h"
 #include "Managers/UIManager.h"
-#include "Managers/ObjectManager.h"
 
 // TODO : 일부 외부 헤더 때문에 네이밍 컨벤션이
 // 충돌하는 모양. 이름을 조금 수정해볼 필요가 있음.
@@ -81,4 +80,3 @@ using json = nlohmann::json;
 #define AUDIO     AudioManager::Instance()
 #define PHYSICS   PhysicsManager::Instance()
 #define UI		  UIManager::Instance()
-#define OBJECT    ObjectManager::Instance()

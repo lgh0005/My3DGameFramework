@@ -73,7 +73,7 @@ bool ModelConverter::RunConversion()
         m_rawModel.materials.push_back(ProcessMaterial(scene->mMaterials[i], i));
     }
 
-    // 3. 노드/메쉬 처리 (재귀 호출 시작)
+    // 3. 노드/메쉬 처리
     LOG_INFO("Processing meshes... Total: {}", scene->mNumMeshes);
     m_rawModel.meshes.reserve(scene->mNumMeshes);
     for (uint32 i = 0; i < scene->mNumMeshes; ++i)

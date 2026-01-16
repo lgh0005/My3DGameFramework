@@ -138,19 +138,29 @@ bool GameObject::GetLocalActive() const
 
 bool GameObject::IsActive() const
 {
-	// 1. 나 자신이 꺼져있으면 false
+	// 1. 나 자신이 꺼져있으면 즉시 false
 	if (!m_active) return false;
 
-	// 2. 계층 구조 탐색을 위한 트랜스폼 가져오기
-	Transform* transform = static_cast<Transform*>(m_componentCache[(usize)ComponentType::Transform]);
-	if (!transform) return false;
+	// 2. 부모를 타고 올라가며 하나라도 꺼져있는지 검사
+	Transform* current = static_cast<Transform*>(m_componentCache[(usize)ComponentType::Transform]);
+	if (!current) return false;
 
 	// 3. 부모인 경우 true 반환
-	if (!transform->GetParent()) return true;
+	while (current)
+	{
+		Transform* parent = current->GetParent();
+		if (!parent) break; // 부모가 없으면 Root임
 
-	// 부모의 IsActive() 호출 (재귀)
-	// TODO : 이후에는 재귀함수가 아닌 Flat 한 탐색이 이뤄져야 한다.
-	return transform->GetParent()->GetOwner()->IsActive();
+		GameObject* parentGO = parent->GetOwner();
+		// 부모가 존재하는데 꺼져있다면, 나도 비활성화 상태임
+		if (parentGO && !parentGO->GetLocalActive())
+			return false;
+
+		// 위로 이동
+		current = parent;
+	}
+
+	return true;
 }
 
 void GameObject::SetActive(bool active)
@@ -158,103 +168,55 @@ void GameObject::SetActive(bool active)
 	// 1. 로컬 상태 변화 없으면 리턴
 	if (m_active == active) return;
 
-	// 2. 변경 전의 계층 활성 상태 기록
-	// (내가 꺼져있었는데 부모도 꺼져있었다면, 내가 켜져도 여전히 꺼진 상태)
+	// 2. 변경 전/후의 "실제 계층 상태" 비교
 	bool wasActive = IsActive();
-
-	// 3. 상태 변경
 	m_active = active;
-
-	// 4. 변경 후의 계층 활성 상태 확인
 	bool nowActive = IsActive();
 
-	// 5. "실질적인 상태"가 변했을 때만 전파
-	// ex) 부모가 꺼져있으면(was=false), 내가 true로 바껴도(now=false) 변화 없음 -> 전파 안 함.
+	// 3. 실질적인 활성화 상태가 변했을 때만 전파
 	if (wasActive != nowActive)
 		SetActiveState(nowActive);
 }
 
 void GameObject::SetActiveState(bool active)
 {
-	//// 1. 작업 목록(Worklist) 생성 - 명시적 스택 역할
-	//// 재귀 호출 대신 이 벡터에 담아서 처리함.
-	//std::vector<GameObject*> workList;
-	//workList.reserve(16); // 적당한 크기 예약
-	//workList.push_back(this);
+	// 1. 작업 목록(Worklist) 생성 - 명시적 스택 역할
+	std::vector<GameObject*> workList;
+	workList.reserve(16);
+	workList.push_back(this);
 
-	//// 2. 반복문으로 트러 순회 (Iterative Traversal)
-	//while (!workList.empty())
-	//{
-	//	// 스택에서 하나 꺼냄
-	//	GameObject* currentGO = workList.back();
-	//	workList.pop_back();
-
-	//	// A. 컴포넌트 처리 (Catch-up & Event)
-	//	for (auto& comp : currentGO->GetComponents())
-	//	{
-	//		if (comp->IsEnabled())
-	//		{
-	//			if (active)
-	//			{
-	//				comp->EnsureInitialized(); // Catch-up
-	//				comp->OnEnable();
-	//			}
-	//			else
-	//			{
-	//				comp->OnDisable();
-	//			}
-	//		}
-	//	}
-
-	//	// B. 자식들 스택에 추가 (재귀 호출 대체)
-	//	// 주의: 자식의 '로컬 스위치'가 켜져 있는 경우에만 전파 대상임
-	//	const auto& children = currentGO->GetTransform().GetChildren();
-	//	for (Transform* childTransform : children)
-	//	{
-	//		GameObject* childGO = childTransform->GetOwner();
-	//		if (childGO && childGO->GetLocalActive())
-	//			workList.push_back(childGO);
-	//	}
-	//}
-
-	// 1. 내 컴포넌트들에게 알림 (여기서 SetEnable이 호출됨 -> Catch-up 발생!)
-	// 주의: SetEnable은 m_enabled 값을 바꾸는 게 아니라, 
-	// m_enabled가 true인 놈들에게 OnEnable/OnDisable을 유발시키는 역할을 해야 함.
-	// 하지만 Component::SetEnable은 m_enabled를 바꿔버림.
-	for (auto& comp : m_components)
+	// 2. DFS 순회
+	while (!workList.empty())
 	{
-		// 컴포넌트 자체가 켜져있을 때만 OnEnable/Disable 반응
-		if (comp->IsEnabled())
+		// 스택에서 하나 꺼냄
+		GameObject* currentGO = workList.back();
+		workList.pop_back();
+
+		// A. 컴포넌트 처리 (Catch-up & Event)
+		for (auto& comp : currentGO->GetComponents())
 		{
-			if (active)
+			if (comp->IsEnabled())
 			{
-				// [Catch-up] 여기서도 필요함!
-				// 컴포넌트가 켜질 때(OnEnable) 필요한 초기화 보장
-				// Component.h에 friend class GameObject가 있으므로 EnsureInitialized 접근 가능
-				comp->EnsureInitialized();
-				comp->OnEnable();
-			}
-			else
-			{
-				comp->OnDisable();
+				if (active)
+				{
+					comp->EnsureInitialized(); // Catch-up
+					comp->OnEnable();
+				}
+				else
+				{
+					comp->OnDisable();
+				}
 			}
 		}
-	}
 
-	// 2. 자식 게임 오브젝트들에게도 전파 (재귀)
-	// 주의: 자식 자체가 SetActive(false)로 꺼져있다면, 
-	// 부모가 켜지든 말든 걔는 계속 꺼져있어야 하므로 전파하면 안 됨.
-	// 즉, 자식의 로컬 m_active가 true인 경우에만 계층 변화의 영향을 받음.
-	const auto& children = GetTransform().GetChildren();
-	for (Transform* childTransform : children)
-	{
-		GameObject* childGO = childTransform->GetOwner();
-
-		// [중요] 자식의 "로컬 스위치"가 켜져 있을 때만 부모의 영향을 받음.
-		// 자식이 꺼져있다면(GetLocalActive() == false), 부모가 켜지든 말든 계속 꺼져있음.
-		if (childGO && childGO->GetLocalActive())
+		// B. 자식들 스택에 추가 (재귀 호출 대체)
+		// 주의: 자식의 '로컬 스위치'가 켜져 있는 경우에만 전파 대상임
+		const auto& children = currentGO->GetTransform().GetChildren();
+		for (Transform* childTransform : children)
 		{
-			childGO->SetActiveState(active);
+			GameObject* childGO = childTransform->GetOwner();
+			if (childGO && childGO->GetLocalActive())
+				workList.push_back(childGO);
 		}
 	}
 }

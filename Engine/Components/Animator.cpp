@@ -60,7 +60,7 @@ void Animator::BindBoneTransforms()
     GameObject* owner = GetOwner();
     if (!owner) return;
 
-    // 1. 재귀적으로 모든 자식 Transform을 이름 기반 맵에 등록
+    // 1. 모든 자식 Transform을 이름 기반 맵에 등록
     m_boneTransformMap.clear();
     BindBoneTransformsFlat(&owner->GetTransform());
     LOG_INFO("Animator Binding: Found {} transforms in hierarchy.", m_boneTransformMap.size());

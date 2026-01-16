@@ -188,7 +188,6 @@ add_library(Engine STATIC
    "Managers/AudioManager.h"        "Managers/AudioManager.cpp"
    "Managers/PhysicsManager.h"      "Managers/PhysicsManager.cpp"
    "Managers/UIManager.h"           "Managers/UIManager.cpp"
-   "Managers/ObjectManager.h"       "Managers/ObjectManager.cpp"         "Managers/ObjectManager.inl"
 )
 
 # 2. [PCH 설정] EnginePCH.h를 PCH로 사용합니다.
