@@ -62,7 +62,7 @@ void Animator::BindBoneTransforms()
 
     // 1. 재귀적으로 모든 자식 Transform을 이름 기반 맵에 등록
     m_boneTransformMap.clear();
-    RecursiveBindBoneTransforms(&owner->GetTransform());
+    BindBoneTransformsFlat(&owner->GetTransform());
     LOG_INFO("Animator Binding: Found {} transforms in hierarchy.", m_boneTransformMap.size());
 
     // 2. Model Node 정보를 기반으로 Animation Binding 데이터 생성
@@ -72,7 +72,8 @@ void Animator::BindBoneTransforms()
     for (const auto& node : nodes)
     {
         // 이름으로 Scene Transform 찾기
-        auto it = m_boneTransformMap.find(node.name);
+        uint32 nodeHash = Utils::StrHash(node.name);
+        auto it = m_boneTransformMap.find(nodeHash);
         if (it != m_boneTransformMap.end())
         {
             AnimBinding binding;
@@ -96,10 +97,10 @@ void Animator::BindBoneTransforms()
         int32 mappedCount = 0;
 
         // 맵에 있는 모든 Transform에 대해 스켈레톤 ID가 있는지 확인
-        for (const auto& [name, transform] : m_boneTransformMap)
+        for (const auto& [hash, transform] : m_boneTransformMap)
         {
             // [최적화 연동] Skeleton::GetBoneID가 내부적으로 해싱하거나 문자열을 받음
-            int32 boneID = skeleton->GetBoneID(name);
+            int32 boneID = skeleton->GetBoneID(hash);
 
             if (boneID != -1 && boneID < (int32)m_skinningTransforms.size())
             {
@@ -111,16 +112,32 @@ void Animator::BindBoneTransforms()
     }
 }
 
-void Animator::RecursiveBindBoneTransforms(Transform* nodeTransform)
+void Animator::BindBoneTransformsFlat(Transform* rootTransform)
 {
-    if (!nodeTransform) return;
+    if (!rootTransform) return;
+
+    // 작업 스택 (vector를 스택처럼 사용)
+    std::vector<Transform*> workStack;
+    workStack.reserve(32); // 뼈대 개수만큼 미리 예약하면 좋음
+    workStack.push_back(rootTransform);
 
     // 이름으로 매핑 (GameObject 이름 = 노드/뼈 이름)
-    std::string name = nodeTransform->GetOwner()->GetName();
-    m_boneTransformMap[name] = nodeTransform;
+    while (!workStack.empty())
+    {
+        Transform* current = workStack.back();
+        workStack.pop_back();
 
-    for (auto* child : nodeTransform->GetChildren())
-        RecursiveBindBoneTransforms(child);
+        // 맵에 등록
+        uint32 nameHash = current->GetOwner()->GetNameHash();
+        m_boneTransformMap[nameHash] = current;
+
+        // 자식들을 스택에 추가
+        const auto& children = current->GetChildren();
+        for (auto* child : children)
+        {
+            workStack.push_back(child);
+        }
+    }
 }
 
 /*====================================//

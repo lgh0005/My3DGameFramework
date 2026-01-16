@@ -58,16 +58,36 @@ GameObjectUPtr Model::Instantiate(Scene* scene, Animator* animator)
 {
     if (!scene || m_nodes.empty()) return nullptr;
 
-    // 2. 재귀 생성 시작 (받은 포인터를 그대로 넘김)
-    GameObjectUPtr root = CreateGameObjectFromNode(scene, nullptr, m_nodes[0], animator);
+    // 1. 생성된 GameObject들을 인덱스로 접근하기 위한 캐시
+    std::vector<GameObject*> createdGOs(m_nodes.size(), nullptr);
+    GameObjectUPtr rootUPtr = nullptr;
 
-    // TODO : 생명주기 초기화(Start 등)는 나중으로 미룸
+    // 2. m_nodes는 부모->자식 순서(DFS 순서)로 저장되어 있음이 보장됩니다.
+    for (usize i = 0; i < m_nodes.size(); ++i)
+    {
+        const auto& node = m_nodes[i];
 
-    return std::move(root);
+        // 2-1. 부모 찾기 (RawNode에 저장된 parentIndex 활용)
+        GameObject* parentGO = nullptr;
+        if (node.parentIndex >= 0 && node.parentIndex < (int32)createdGOs.size())
+            parentGO = createdGOs[node.parentIndex];
+
+        // 2-2. 단일 노드 생성 (재귀 호출 없음)
+        auto goUPtr = CreateGameObjectForSingleNode(scene, parentGO, node, animator);
+
+        // 3. 캐싱
+        createdGOs[i] = goUPtr.get();
+
+        // 4. 씬 등록 및 루트 반환 처리
+        if (i == 0) rootUPtr = std::move(goUPtr);
+        else scene->AddGameObject(std::move(goUPtr));
+    }
+
+    return std::move(rootUPtr);
 }
 
 // TODO : 이 메서드 조금 정리할 필요가 있음
-GameObjectUPtr Model::CreateGameObjectFromNode
+GameObjectUPtr Model::CreateGameObjectForSingleNode
 (
     Scene* scene,
     GameObject* parent,
@@ -156,16 +176,6 @@ GameObjectUPtr Model::CreateGameObjectFromNode
             scene->AddGameObject(std::move(subGOPtr));
     }
 
-    // 5. 자식 노드 재귀 호출 (기존 코드 유지)
-    for (int32 childIndex : node.children)
-    {
-        if (childIndex >= 0 && childIndex < m_nodes.size())
-        {
-            GameObjectUPtr childGO = CreateGameObjectFromNode(scene, currentGO, m_nodes[childIndex], animator);
-            if (childGO) scene->AddGameObject(std::move(childGO));
-        }
-    }
-
     return goUPtr;
 }
 
@@ -210,36 +220,56 @@ bool Model::LoadByAssimp(const std::string& filename)
         ProcessAssimpMesh(scene->mMeshes[i], scene);
 
     // 5. 계층 구조 추출 (런타임 생성)
-    int32 currentIndex = 0;
-    ProcessAssimpHierarchy(scene->mRootNode, -1, currentIndex);
+    ParseAssimpHierarchy(scene);
 
     return true;
 }
 
-void Model::ProcessAssimpHierarchy(aiNode* node, int32 parentIndex, int32& currentIndex)
+void Model::ParseAssimpHierarchy(const aiScene* scene)
 {
-    AssetFmt::RawNode rawNode;
-    rawNode.name = node->mName.C_Str();
-    rawNode.parentIndex = parentIndex;
-    rawNode.localTransform = Utils::ConvertToGLMMat4(node->mTransformation);
+    if (!scene->mRootNode) return;
 
-    // 메쉬 인덱스 정보 복사
-    if (node->mNumMeshes > 0)
+    struct NodeJob
     {
-        rawNode.meshIndices.resize(node->mNumMeshes);
-        for (uint32 i = 0; i < node->mNumMeshes; ++i)
-            rawNode.meshIndices[i] = node->mMeshes[i];
+        aiNode* node;
+        int32 parentIndex;
+    };
+
+    std::vector<NodeJob> workStack;
+    workStack.reserve(128);
+    workStack.push_back({ scene->mRootNode, -1 });
+
+    while (!workStack.empty())
+    {
+        NodeJob job = workStack.back();
+        workStack.pop_back();
+
+        aiNode* currNode = job.node;
+        int32 parentIndex = job.parentIndex;
+
+        // 데이터 처리
+        AssetFmt::RawNode rawNode;
+        rawNode.name = currNode->mName.C_Str();
+        rawNode.parentIndex = parentIndex;
+        rawNode.localTransform = Utils::ConvertToGLMMat4(currNode->mTransformation);
+
+        if (currNode->mNumMeshes > 0)
+        {
+            rawNode.meshIndices.resize(currNode->mNumMeshes);
+            for (uint32 i = 0; i < currNode->mNumMeshes; ++i)
+                rawNode.meshIndices[i] = currNode->mMeshes[i];
+        }
+
+        int32 myIndex = (int32)m_nodes.size();
+        m_nodes.push_back(rawNode);
+
+        if (parentIndex >= 0 && parentIndex < m_nodes.size())
+            m_nodes[parentIndex].children.push_back(myIndex);
+
+        // 자식 스택 추가 (역순)
+        for (int32 i = (int32)currNode->mNumChildren - 1; i >= 0; --i)
+            workStack.push_back({ currNode->mChildren[i], myIndex });
     }
-
-    int32 myIndex = currentIndex;
-    m_nodes.push_back(rawNode);
-    if (parentIndex >= 0 && parentIndex < m_nodes.size())
-        m_nodes[parentIndex].children.push_back(myIndex);
-
-    currentIndex++;
-
-    for (uint32 i = 0; i < node->mNumChildren; i++)
-        ProcessAssimpHierarchy(node->mChildren[i], myIndex, currentIndex);
 }
 
 void Model::ProcessAssimpMaterials(const aiScene* scene, const std::filesystem::path& modelDir)
@@ -758,3 +788,5 @@ void Model::ExtractBoneWeightForVertices(std::vector<SkinnedVertex>& vertices, a
         }
     }
 }
+
+

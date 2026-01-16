@@ -37,7 +37,7 @@ public:
 //==================================*/
 private:
 	void BindBoneTransforms();
-	void RecursiveBindBoneTransforms(Transform* nodeTransform);
+	void BindBoneTransformsFlat(Transform* rootTransform);
 
 /*==============================//
 //   animation update methods   //
@@ -55,7 +55,7 @@ private:
 	AnimControllerUPtr m_controller;
 
 	std::vector<glm::mat4> m_finalBoneMatrices;
-	std::unordered_map<std::string, Transform*> m_boneTransformMap;
+	std::unordered_map<uint32, Transform*> m_boneTransformMap;
 	std::vector<Transform*> m_skinningTransforms;
 	std::vector<AnimBinding> m_animationBindings;
 
