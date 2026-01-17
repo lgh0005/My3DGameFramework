@@ -22,6 +22,9 @@ public:
 	glm::mat4 GetViewProjectionMatrix() const;
 	const glm::mat4& GetOrthoProjectionMatrix() const { return m_orthoProjectionMatrix; }
 
+	const glm::mat4& GetPrevViewProjectionMatrix() const { return m_prevViewProjectionMatrix; }
+	void UpdatePrevViewProjectionMatrix() const;
+
 	void LookAt(const glm::vec3& target, const glm::vec3& up = glm::vec3(0.0f, 1.0f, 0.0f));
 	Ray ScreenPointToRay(const glm::vec2& screenPos, const glm::vec2& screenSize);
 
@@ -39,6 +42,7 @@ private:
 
 	// ViewProjection 캐싱을 위한 변수
 	mutable glm::mat4 m_viewProjectionMatrix	{ 1.0f };
+	mutable glm::mat4 m_prevViewProjectionMatrix{ 1.0f };
 	mutable glm::mat4 m_lastViewMatrix			{ 1.0f }; // 변경 감지용
 	mutable bool m_isProjectionDirty			{ true }; // 투영 변경 감지용
 };

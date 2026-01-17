@@ -62,6 +62,8 @@ public:
 	glm::mat4 GetLocalMatrix() const;
 	glm::mat4 GetWorldMatrix() const;
 	glm::mat4 GetWorldInverseMatrix() const;
+	const glm::mat4& GetPrevWorldMatrix() const { return m_prevWorldMatrix; }
+	void UpdatePrevWorldMatrix() const;
 
 /*====================================================//
 //                 Hierarchy System                   //
@@ -97,6 +99,7 @@ private:
 	std::vector<Transform*> m_children;
 
 	mutable glm::mat4 m_worldMatrix		{ 1.0f };
+	mutable glm::mat4 m_prevWorldMatrix { 1.0f };
 	mutable bool m_isTransformDirty		{ true };
 	mutable glm::vec3 m_worldPosition	{ 0.0f, 0.0f, 0.0f };
 	mutable glm::quat m_worldRotation	{ 1.0f, 0.0f, 0.0f, 0.0f };

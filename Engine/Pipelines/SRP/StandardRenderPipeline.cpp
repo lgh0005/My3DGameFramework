@@ -180,6 +180,10 @@ void StandardRenderPipeline::Render(Scene* scene)
 	//   imgui debug context   //
 	//=========================*/
 	RenderIMGUIContext();
+
+	// [후처리] prev 행렬들 갱신
+	registry->UpdatePrevTransformMatrices();
+	registry->UpdatePrevCameraMatrices();
 }
 
 void StandardRenderPipeline::OnResize(int32 width, int32 height)

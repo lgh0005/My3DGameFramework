@@ -249,6 +249,12 @@ glm::mat4 Transform::GetWorldInverseMatrix() const
 	return m_worldInverseMatrix;
 }
 
+void Transform::UpdatePrevWorldMatrix() const
+{
+	if (m_isTransformDirty) UpdateTransform();
+	m_prevWorldMatrix = m_worldMatrix;
+}
+
 glm::vec3 Transform::GetWorldPosition() const
 {
 	if (m_isTransformDirty) UpdateTransform();

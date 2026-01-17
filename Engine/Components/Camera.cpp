@@ -79,6 +79,12 @@ glm::mat4 Camera::GetViewProjectionMatrix() const
     return m_viewProjectionMatrix;
 }
 
+void Camera::UpdatePrevViewProjectionMatrix() const
+{
+    if (m_isProjectionDirty) GetViewProjectionMatrix();
+    m_prevViewProjectionMatrix = m_viewProjectionMatrix;
+}
+
 void Camera::LookAt(const glm::vec3& target, const glm::vec3& up)
 {
     Transform& transform = GetTransform();

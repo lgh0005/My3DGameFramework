@@ -21,6 +21,9 @@ public:
 	void UnregisterComponent(Component* component);
 	template<typename T> const std::vector<Component*>& GetComponents();
 
+	void UpdatePrevTransformMatrices();
+	void UpdatePrevCameraMatrices();
+
 private:
 	void Init();
 	ComponentRegistry();
