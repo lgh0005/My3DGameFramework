@@ -12,6 +12,7 @@ public:
 	bool Init();
 	void Render(Scene* scene);
 	void OnResize(int32 width, int32 height);
+	void Clear();
 
 	template<typename T>
 	void RegisterPipeline(const std::string & name);
@@ -19,8 +20,6 @@ public:
 	void SetPipeline(const std::string& name);
 	Renderer* GetRenderer() const { return m_renderer.get(); }
 	void UpdateViewport(int32* outWidth, int32* outHeight);
-
-	void Clear();
 
 private:
 	std::unordered_map<std::string, PipelineFactory> m_pipelines;

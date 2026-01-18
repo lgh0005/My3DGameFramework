@@ -18,8 +18,15 @@ public:
     void SetPipeline(RenderPipelineUPtr pipeline);
     RenderPipeline* GetPipeline() const { return m_pipeline.get(); }
 
+    void SetRefreshRate(int32 refreshRate);
+    int32 GetRefreshRate() const { return m_refreshRate; }
+    float GetTargetShutterSpeed() const { return m_targetShutterSpeed; }
+
 protected:
 	Renderer();
-    void Init();
+    bool Init();
+    
     RenderPipelineUPtr m_pipeline;
+    int32 m_refreshRate           { 60 };
+    float m_targetShutterSpeed    { 1.0f / 60.0f };
 };

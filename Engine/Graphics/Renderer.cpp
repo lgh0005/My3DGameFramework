@@ -8,12 +8,19 @@ DECLARE_DEFAULTS_IMPL(Renderer)
 RendererUPtr Renderer::Create()
 {
 	auto renderer = RendererUPtr(new Renderer());
-	renderer->Init();
+	if (!renderer->Init()) return nullptr;
 	return std::move(renderer);
 }
 
-void Renderer::Init()
+bool Renderer::Init()
 {
+	// GLFW에서 모니터 정보 추출 및 주사율 주입
+	GLFWmonitor* monitor = glfwGetPrimaryMonitor();
+	const GLFWvidmode* mode = glfwGetVideoMode(monitor);
+	if (!mode) return false;
+	int32 hz = mode->refreshRate;
+	SetRefreshRate(hz);
+
 	// 기본 OpenGL 상태 설정 (초기화)
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);
@@ -23,6 +30,8 @@ void Renderer::Init()
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
+
+	return true;
 }
 
 void Renderer::Render(Scene* scene)
@@ -48,4 +57,11 @@ void Renderer::OnResize(int32 width, int32 height)
 void Renderer::SetPipeline(RenderPipelineUPtr pipeline)
 {
 	m_pipeline = std::move(pipeline);
+}
+
+void Renderer::SetRefreshRate(int32 refreshRate)
+{
+	if (refreshRate <= 0) refreshRate = 60;
+	m_refreshRate = refreshRate;
+	m_targetShutterSpeed = 1.0f / static_cast<float>(m_refreshRate);
 }
