@@ -2,12 +2,77 @@
 #include "Camera.h"
 #include "Components/Transform.h"
 #include "Graphics/Ray.h"
+#include "Graphics/Velocitybuffer.h"
 
-DECLARE_DEFAULTS_IMPL(Camera)
+Camera::Camera()
+{
+    m_lastRawPosition = glm::vec3(0.0f);
+}
+Camera::~Camera() = default;
 
 CameraUPtr Camera::Create()
 {
-    return CameraUPtr(new Camera());
+    auto cam = CameraUPtr(new Camera());
+    if (!cam->Init()) return nullptr;
+    return std::move(cam);
+}
+
+bool Camera::Init()
+{
+    m_posVelocityBuffer = Velocitybuffer::Create();
+    m_rotVelocityBuffer = Velocitybuffer::Create();
+    if (!m_posVelocityBuffer) return false;
+    return true;
+}
+
+void Camera::OnStart()
+{
+    m_lastRawForward = GetTransform().GetForwardVector();
+}
+
+void Camera::OnUpdate()
+{
+    UpdateVelocity(TIME.GetDeltaTime());
+}
+
+glm::mat4 Camera::GetVirtualPrevViewProjectionMatrix(float targetShutterSpeed) const
+{
+    // 1. 위치 역산 (기존)
+    glm::vec3 smoothDisplacement = m_posVelocityBuffer->GetSmoothVelocity(targetShutterSpeed);
+    glm::vec3 currentPos = GetTransform().GetWorldPosition();
+    glm::vec3 virtualPrevPos = currentPos - smoothDisplacement * 2.0f;
+
+    // 2. 방향(Forward) 역산 (회전은 그대로 둠 - 보통 회전은 1.0으로도 충분히 강함)
+    glm::vec3 smoothDeltaForward = m_rotVelocityBuffer->GetSmoothVelocity(targetShutterSpeed);
+    glm::vec3 currentForward = GetTransform().GetForwardVector();
+    glm::vec3 virtualPrevForward = glm::normalize(currentForward - smoothDeltaForward);
+
+    // 3. 행렬 재구성
+    glm::vec3 up = GetTransform().GetUpVector();
+    glm::mat4 virtualPrevView = glm::lookAt(virtualPrevPos, virtualPrevPos + virtualPrevForward, up);
+
+    return m_projectionMatrix * virtualPrevView;
+}
+
+void Camera::UpdateVelocity(float dt)
+{
+    glm::vec3 currentPos = GetTransform().GetWorldPosition();
+    glm::vec3 currentForward = GetTransform().GetForwardVector();
+
+    if (dt > 1e-6f)
+    {
+        // 1. 위치 기록 (기존)
+        glm::vec3 displacement = currentPos - m_lastRawPosition;
+        m_posVelocityBuffer->RecordMovement(displacement, dt);
+
+        // 2. ★ 회전(방향) 기록
+        // 방향 벡터의 차이를 속도처럼 기록합니다.
+        glm::vec3 deltaForward = currentForward - m_lastRawForward;
+        m_rotVelocityBuffer->RecordMovement(deltaForward, dt);
+    }
+
+    m_lastRawPosition = currentPos;
+    m_lastRawForward = currentForward;
 }
 
 void Camera::SetProjection(float fovDegrees, float aspectRatio, 
@@ -77,12 +142,6 @@ glm::mat4 Camera::GetViewProjectionMatrix() const
     }
 
     return m_viewProjectionMatrix;
-}
-
-void Camera::UpdatePrevViewProjectionMatrix() const
-{
-    if (m_isProjectionDirty) GetViewProjectionMatrix();
-    m_prevViewProjectionMatrix = m_viewProjectionMatrix;
 }
 
 void Camera::LookAt(const glm::vec3& target, const glm::vec3& up)

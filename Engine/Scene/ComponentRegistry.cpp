@@ -202,23 +202,3 @@ SkyLight* ComponentRegistry::GetSkyLight() const
 {
 	return m_sky.get();
 }
-
-void ComponentRegistry::UpdatePrevTransformMatrices()
-{
-	const auto& transforms = GetComponents<Transform>();
-	for (Component* comp : transforms)
-	{
-		auto transform = static_cast<Transform*>(comp);
-		transform->UpdatePrevWorldMatrix();
-	}
-}
-
-void ComponentRegistry::UpdatePrevCameraMatrices()
-{
-	const auto& cameras = GetComponents<Camera>();
-	for (Component* comp : cameras)
-	{
-		auto camera = static_cast<Camera*>(comp);
-		camera->UpdatePrevViewProjectionMatrix();
-	}
-}

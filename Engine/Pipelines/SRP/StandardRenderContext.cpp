@@ -15,6 +15,7 @@ void StandardRenderContext::SetGBuffer(GBufferFramebuffer* gBuffer)
 		m_gNormal = m_gBuffer->GetColorAttachment(1).get();
 		m_gAlbedoSpec = m_gBuffer->GetColorAttachment(2).get();
 		m_gEmission = m_gBuffer->GetColorAttachment(3).get();
+		m_gVelocity = m_gBuffer->GetColorAttachment(4).get();
 	}
 	else
 	{
@@ -22,5 +23,6 @@ void StandardRenderContext::SetGBuffer(GBufferFramebuffer* gBuffer)
 		m_gNormal = nullptr;
 		m_gAlbedoSpec = nullptr;
 		m_gEmission = nullptr;
+		m_gVelocity = nullptr;
 	}
 }

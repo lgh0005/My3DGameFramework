@@ -1,4 +1,4 @@
-#version 460 core
+﻿#version 460 core
 
 layout (location = 0) in vec3 aPos;
 layout (location = 1) in vec3 aNormal;
@@ -12,7 +12,10 @@ out vec2 TexCoords;
 out vec3 Normal;
 out mat3 TBN;
 
-// ī�޶� UBO
+out vec4 vCurrClipPos; 
+out vec4 vPrevClipPos;
+
+// 카메라 UBO
 layout (std140, binding = 0) uniform CameraData
 {
     mat4 view;
@@ -21,6 +24,7 @@ layout (std140, binding = 0) uniform CameraData
 };
 
 uniform mat4 model;
+uniform mat4 uPrevModelViewProj;
 
 const int MAX_BONES = 100;
 const int MAX_BONE_INFLUENCE = 4;
@@ -32,7 +36,7 @@ void main()
     vec3 totalNormal   = vec3(0.0f);
     vec3 totalTangent  = vec3(0.0f);
     
-    // 1. �� ����ġ ���
+    // 1. 본 가중치 계산
     for (int i = 0 ; i < MAX_BONE_INFLUENCE ; i++)
     {
         if(aBoneIDs[i] == -1)  continue;
@@ -52,7 +56,7 @@ void main()
         totalTangent += localTangent * aWeights[i];
     }
     
-    // ����ġ�� ���� ��� (Ȥ�� ����) ���� ���
+    // 가중치가 없는 경우 (혹은 오류) 원본 사용
     float totalWeight = aWeights[0] + aWeights[1] + aWeights[2] + aWeights[3];
     if (totalWeight == 0.0)
     {
@@ -61,7 +65,7 @@ void main()
         totalTangent  = aTangent;
     }
 
-    // 2. ���� ��ȯ
+    // 2. 월드 변환
     vec4 worldPos = model * totalPosition;
     FragPos = worldPos.xyz; 
     TexCoords = aTexCoord;
@@ -75,5 +79,13 @@ void main()
     Normal = N;
     TBN = mat3(T, B, N);
 
-    gl_Position = projection * view * worldPos;
+    // 3-1. 현재 클립 좌표
+    vCurrClipPos = projection * view * worldPos;
+    gl_Position = vCurrClipPos;
+
+    // 3-2. 과거 클립 좌표
+    // 주의: 애니메이션 자체의 움직임(이전 프레임의 본 위치)은 무시하고, 
+    // '현재 포즈' 그대로 '카메라만 과거 위치'였을 때를 가정합니다. (Camera Motion Blur Only)
+    // totalPosition은 이미 본 변형이 끝난 로컬 좌표이므로, 여기에 과거 MVP를 곱하면 됩니다.
+    vPrevClipPos = uPrevModelViewProj * totalPosition;
 }

@@ -1,17 +1,21 @@
-#version 460 core
+ï»¿#version 460 core
 
-// TODO : ÀÎÇ²°ú ¾Æ¿ôÇ²Àº ½½½½ ÇÏ³ªÀÇ ¹­À½À¸·Î Ã³¸®
-// ÇÒ ÇÊ¿ä°¡ ÀÖ´Ù. vs_in, vs_out, fs_in, fs_out µî°ú °°ÀÌ.
+// TODO : ì¸í’‹ê³¼ ì•„ì›ƒí’‹ì€ ìŠ¬ìŠ¬ í•˜ë‚˜ì˜ ë¬¶ìŒìœ¼ë¡œ ì²˜ë¦¬
+// í•  í•„ìš”ê°€ ìˆë‹¤. vs_in, vs_out, fs_in, fs_out ë“±ê³¼ ê°™ì´.
 
 layout (location = 0) out vec4 gPosition;      // Attachment 0
 layout (location = 1) out vec4 gNormal;        // Attachment 1
 layout (location = 2) out vec4 gAlbedoSpec;    // Attachment 2 (RGB: Albedo, A: Specular)
 layout (location = 3) out vec4 gEmission;      // Attachment 3
+layout (location = 4) out vec2 gVelocity;      // Attachment 4: ì†ë„ ë²¡í„°
 
 in vec3 FragPos;
 in vec2 TexCoords;
 in vec3 Normal;
 in mat3 TBN;
+
+in vec4 vCurrClipPos;
+in vec4 vPrevClipPos;
 
 layout (std140, binding = 0) uniform CameraData
 {
@@ -40,7 +44,7 @@ struct Material
 };
 uniform Material material;
 
-// Parallax Mapping ÇÔ¼ö
+// Parallax Mapping í•¨ìˆ˜
 vec2 ParallaxMapping(vec2 texCoords, vec3 viewDir)
 {
     const float minLayers = 8.0;
@@ -54,14 +58,14 @@ vec2 ParallaxMapping(vec2 texCoords, vec3 viewDir)
   
     vec2 currentTexCoords = texCoords;
 
-    // [¼öÁ¤ 1] texture -> textureLod(..., 0.0)
-    // Height ¸Ê ÀĞÀ» ¶§´Â ¹Ó¸Ê ÇÊ¿ä ¾øÀ½. °­Á¦·Î 0¹ø ·¹º§ »ç¿ë.
+    // [ìˆ˜ì • 1] texture -> textureLod(..., 0.0)
+    // Height ë§µ ì½ì„ ë•ŒëŠ” ë°‰ë§µ í•„ìš” ì—†ìŒ. ê°•ì œë¡œ 0ë²ˆ ë ˆë²¨ ì‚¬ìš©.
     float currentDepthMapValue = 1.0 - textureLod(material.height, currentTexCoords, 0.0).r;
       
     while (currentLayerDepth < currentDepthMapValue)
     {
         currentTexCoords -= deltaTexCoords;
-        // [¼öÁ¤ 2] textureLod
+        // [ìˆ˜ì • 2] textureLod
         currentDepthMapValue = 1.0 - textureLod(material.height, currentTexCoords, 0.0).r;  
         currentLayerDepth += layerDepth;  
     }
@@ -69,7 +73,7 @@ vec2 ParallaxMapping(vec2 texCoords, vec3 viewDir)
     vec2 prevTexCoords = currentTexCoords + deltaTexCoords;
     float afterDepth  = currentDepthMapValue - currentLayerDepth;
     
-    // [¼öÁ¤ 3] textureLod
+    // [ìˆ˜ì • 3] textureLod
     float beforeDepth = (1.0 - textureLod(material.height, prevTexCoords, 0.0).r) - (currentLayerDepth - layerDepth);
  
     float weight = afterDepth / (afterDepth - beforeDepth);
@@ -80,35 +84,35 @@ vec2 ParallaxMapping(vec2 texCoords, vec3 viewDir)
 
 void main()
 {
-// [ÇÙ½É 1] ÆĞ·²·¢½º °è»ê Àü, ¿ø·¡ UVÀÇ ±â¿ï±â(Gradient) ÀúÀå
+// [í•µì‹¬ 1] íŒ¨ëŸ´ë™ìŠ¤ ê³„ì‚° ì „, ì›ë˜ UVì˜ ê¸°ìš¸ê¸°(Gradient) ì €ì¥
     vec2 ddx = dFdx(TexCoords);
     vec2 ddy = dFdy(TexCoords);
 
     vec2 texCoord = TexCoords;
 
-    // 1. TBN ÀçÁ¤·Ä ¹× ÆĞ·²·¢½º ¸ÅÇÎ
+    // 1. TBN ì¬ì •ë ¬ ë° íŒ¨ëŸ´ë™ìŠ¤ ë§¤í•‘
     vec3 T = normalize(TBN[0]);
     vec3 B = normalize(TBN[1]);
     vec3 N = normalize(TBN[2]);
     mat3 orthoTBN = mat3(T, B, N);
     
-    // [ÇÙ½É 2] HeightScaleÀÌ ¾ÆÁÖ ÀÛÀ¸¸é ¾Æ¿¹ ÆĞ·²·¢½º ½ºÅµ
-    // C++¿¡¼­ HeightMapÀÌ ¾øÀ¸¸é heightScaleÀ» 0.0À¸·Î º¸³»¾ß ÇÔ!
+    // [í•µì‹¬ 2] HeightScaleì´ ì•„ì£¼ ì‘ìœ¼ë©´ ì•„ì˜ˆ íŒ¨ëŸ´ë™ìŠ¤ ìŠ¤í‚µ
+    // C++ì—ì„œ HeightMapì´ ì—†ìœ¼ë©´ heightScaleì„ 0.0ìœ¼ë¡œ ë³´ë‚´ì•¼ í•¨!
     if (material.heightScale > 0.001)
     {
         vec3 viewDir = normalize(viewPos - FragPos);
         mat3 worldToTangent = transpose(orthoTBN);
         vec3 viewDirTangent = normalize(worldToTangent * viewDir);
         
-        // À§¿¡¼­ °íÄ£ ÇÔ¼ö È£Ãâ
+        // ìœ„ì—ì„œ ê³ ì¹œ í•¨ìˆ˜ í˜¸ì¶œ
         texCoord = ParallaxMapping(TexCoords, viewDirTangent);
         
-        // ¸¸¾à UV°¡ ¹üÀ§¸¦ ¹ş¾î³ª¸é ¹ö¸®´Â ·ÎÁ÷ (¼±ÅÃ»çÇ×)
+        // ë§Œì•½ UVê°€ ë²”ìœ„ë¥¼ ë²—ì–´ë‚˜ë©´ ë²„ë¦¬ëŠ” ë¡œì§ (ì„ íƒì‚¬í•­)
         // if(texCoord.x > 1.0 || texCoord.y > 1.0 || texCoord.x < 0.0 || texCoord.y < 0.0) discard;
     }
 
-    // 2. ÅØ½ºÃ³ »ùÇÃ¸µ
-    // 2-1. AO ¸Ê »ùÇÃ¸µ (Legacy ¸ğµå¿¡¼­µµ AO´Â ¾µ °Å´Ï±î ÀĞ½À´Ï´Ù!)
+    // 2. í…ìŠ¤ì²˜ ìƒ˜í”Œë§
+    // 2-1. AO ë§µ ìƒ˜í”Œë§ (Legacy ëª¨ë“œì—ì„œë„ AOëŠ” ì“¸ ê±°ë‹ˆê¹Œ ì½ìŠµë‹ˆë‹¤!)
     // 1. AO
     float ao = 1.0;
     if (material.hasORM)
@@ -116,15 +120,15 @@ void main()
     else
         ao = textureGrad(material.ao, texCoord, ddx, ddy).r;  // texture -> textureGrad
 
-    // 3. G-Buffer µ¥ÀÌÅÍ ÀúÀå
-    // RGB: ¿ùµå ÁÂÇ¥
+    // 3. G-Buffer ë°ì´í„° ì €ì¥
+    // RGB: ì›”ë“œ ì¢Œí‘œ
     // A: Ambient Occlusion (AO)
     gPosition.rgb = FragPos;
     gPosition.a = ao;
 
     // [gNormal]
-    // RGB: ³ë¸Ö
-    // A: Shininess (Legacy¿ë)
+    // RGB: ë…¸ë©€
+    // A: Shininess (Legacyìš©)
     vec3 normalMapValue = texture(material.normal, texCoord).rgb;
     normalMapValue = normalize(normalMapValue * 2.0 - 1.0);
     gNormal.rgb = normalize(orthoTBN * normalMapValue);
@@ -132,7 +136,7 @@ void main()
 
     // [gAlbedoSpec]
     // RGB: Albedo
-    // A: Specular Intensity (Legacy¿ë)
+    // A: Specular Intensity (Legacyìš©)
     vec4 albedoSample = texture(material.diffuse, texCoord);
     vec3 finalAlbedo = albedoSample.rgb * material.albedoFactor.rgb;
     float finalAlpha = albedoSample.a * material.albedoFactor.a;
@@ -140,12 +144,18 @@ void main()
     gAlbedoSpec.rgb = finalAlbedo;
     gAlbedoSpec.a = texture(material.specular, texCoord).r;
 
-    // [gEmission] Emission »ö»ó ÀúÀå
-    // TODO : emission ÆÄ¶ó¹ÌÅÍ ¼³Á¤ ÇÊ¿ä
+    // [gEmission] Emission ìƒ‰ìƒ ì €ì¥
+    // TODO : emission íŒŒë¼ë¯¸í„° ì„¤ì • í•„ìš”
     vec3 emissionTex = texture(material.emission, texCoord).rgb;
-    // (¼±ÅÃ: °¨¸¶º¸Á¤Àº ÅØ½ºÃ³ ·Îµå½Ã sRGB ¿É¼Ç ÄÑ´Â °Ô Á¤¼®)
-    // Áï, È¤½Ã ÅØ½ºÃÄ ÀÎÄÚµùÀÌ sRGB°¡ ¾Æ´Ñ °ÍÀ¸·Î µÇ¾îÀÖ´Â Áö¸¦ ¸ÕÀú È®ÀÎ ÇÊ¿ä
-    emissionTex = pow(emissionTex, vec3(2.2));  // °¨¸¶ º¸Á¤
-    emissionTex = emissionTex * 5.0;           // °­µµ »½Æ¢±â
+    // (ì„ íƒ: ê°ë§ˆë³´ì •ì€ í…ìŠ¤ì²˜ ë¡œë“œì‹œ sRGB ì˜µì…˜ ì¼œëŠ” ê²Œ ì •ì„)
+    // ì¦‰, í˜¹ì‹œ í…ìŠ¤ì³ ì¸ì½”ë”©ì´ sRGBê°€ ì•„ë‹Œ ê²ƒìœ¼ë¡œ ë˜ì–´ìˆëŠ” ì§€ë¥¼ ë¨¼ì € í™•ì¸ í•„ìš”
+    emissionTex = pow(emissionTex, vec3(2.2));  // ê°ë§ˆ ë³´ì •
+    emissionTex = emissionTex * 5.0;           // ê°•ë„ ë»¥íŠ€ê¸°
     gEmission = vec4(emissionTex * material.emissionStrength, 1.0);
+
+    // [gVelocity] Velocity Map
+    vec2 currNDC = vCurrClipPos.xy / vCurrClipPos.w;
+    vec2 prevNDC = vPrevClipPos.xy / vPrevClipPos.w;
+    vec2 velocity = (currNDC - prevNDC) * 0.5;
+    gVelocity = velocity;
 }

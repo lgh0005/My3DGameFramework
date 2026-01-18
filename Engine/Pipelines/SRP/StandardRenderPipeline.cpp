@@ -10,6 +10,7 @@
 #include "Pipelines/SRP/RenderPasses/StandardGeometryPass.h"
 #include "Pipelines/SRP/RenderPasses/StandardDeferredLightingPass.h"
 #include "Pipelines/SRP/RenderPasses/StandardSSAOPass.h"
+#include "Pipelines/SRP/RenderPasses/StandardMotionBlurPass.h"
 #include "Pipelines/SRP/StandardGlobalUniforms.h"
 #include "Pipelines/SRP/StandardRenderContext.h"
 
@@ -80,6 +81,10 @@ bool StandardRenderPipeline::Init()
 	// Light 패스 생성
 	m_deferredLightPass = StandardDeferredLightingPass::Create();
 	if (!m_deferredLightPass) return false;
+
+	// 모션 블러 패스 생성
+	m_motionBlurPass = StandardMotionBlurPass::Create();
+	if (!m_motionBlurPass) return false;
 
 	return true;
 }
@@ -165,25 +170,26 @@ void StandardRenderPipeline::Render(Scene* scene)
 	// [패스 7] 아웃라인 패스
 	m_outlinePass->Render(&context);
 
-	// [패스 7.5] 디버그 패스
-	m_debugGizmoPass->Render(&context);
+	m_motionBlurPass->Render(&context);
 
 	// [패스 8] 후처리 패스: m_frameBuffer의 결과를 화면에 Resolve
 	m_postProcessPass->Render(&context);
+
+	// [패스 8.5] 디버그 패스
+	m_debugGizmoPass->Render(&context);
 
 	// ====================================================
 	// [패스 9] UI 패스 : 최종 화면 위에 UI 덧그리기 (Overlay)
 	// ====================================================
 	// 이 시점에서는 Depth Test를 끄고(Screen UI), Alpha Blending을 켜야 함
 
+
+
 	/*=========================//
 	//   imgui debug context   //
 	//=========================*/
 	RenderIMGUIContext();
 
-	// [후처리] prev 행렬들 갱신
-	registry->UpdatePrevTransformMatrices();
-	registry->UpdatePrevCameraMatrices();
 }
 
 void StandardRenderPipeline::OnResize(int32 width, int32 height)

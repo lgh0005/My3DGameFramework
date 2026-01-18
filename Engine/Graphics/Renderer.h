@@ -20,6 +20,7 @@ public:
 
     void SetRefreshRate(int32 refreshRate);
     int32 GetRefreshRate() const { return m_refreshRate; }
+    void SetTargetShutterSpeed(float shutterSpeed);
     float GetTargetShutterSpeed() const { return m_targetShutterSpeed; }
 
 protected:

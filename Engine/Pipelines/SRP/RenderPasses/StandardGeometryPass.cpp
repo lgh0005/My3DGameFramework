@@ -8,6 +8,7 @@
 #include "Resources/Mesh.h"
 #include "Resources/Material.h"
 #include "Resources/Texture.h"
+#include "Components/Camera.h"
 #include "Components/MeshRenderer.h"
 #include "Components/StaticMeshRenderer.h"
 #include "Components/SkinnedMeshRenderer.h"
@@ -41,6 +42,10 @@ void StandardGeometryPass::Render(RenderContext* context)
 {
 	// 0. 자신의 렌더 패스에 활용되고 있는 RenderContext로 캐스팅
 	auto stdCtx = (StandardRenderContext*)context;
+	Camera* camera = stdCtx->GetCamera();
+	float shutterSpeed = RENDER.GetRenderer()->GetTargetShutterSpeed();
+	glm::mat4 virtualPrevVP = glm::mat4(1.0f);
+	if (camera) virtualPrevVP = camera->GetVirtualPrevViewProjectionMatrix(shutterSpeed);
 
 	// 1. G-Buffer FBO 바인딩
 	m_gBuffer->Bind();
@@ -53,10 +58,10 @@ void StandardGeometryPass::Render(RenderContext* context)
 	glDisable(GL_BLEND);
 
 	// 3. Static Mesh 그리기 (정적 오브젝트)
-	RenderStaticGeometry(stdCtx->GetStaticMeshRenderers());
+	RenderStaticGeometry(stdCtx->GetStaticMeshRenderers(), virtualPrevVP);
 		
 	// 4. Skinned Mesh 그리기 (애니메이션 오브젝트)
-	RenderSkinnedGeometry(stdCtx->GetSkinnedMeshRenderers());
+	RenderSkinnedGeometry(stdCtx->GetSkinnedMeshRenderers(), virtualPrevVP);
 
 	// 4. context에 gBuffer 캐싱
 	stdCtx->SetGBuffer(m_gBuffer.get());
@@ -65,7 +70,7 @@ void StandardGeometryPass::Render(RenderContext* context)
 	Framebuffer::BindToDefault();
 }
 
-void StandardGeometryPass::RenderStaticGeometry(const std::vector<StaticMeshRenderer*>& meshes)
+void StandardGeometryPass::RenderStaticGeometry(const std::vector<StaticMeshRenderer*>& meshes, const glm::mat4& vp)
 {
 	if (!m_staticGeometryProgram || meshes.empty()) return;
 
@@ -77,11 +82,15 @@ void StandardGeometryPass::RenderStaticGeometry(const std::vector<StaticMeshRend
 
 		auto model = renderer->GetTransform().GetWorldMatrix();
 		m_staticGeometryProgram->SetUniform("model", model);
+
+		glm::mat4 prevMVP = vp * model;
+		m_staticGeometryProgram->SetUniform("uPrevModelViewProj", prevMVP);
+
 		renderer->Render(m_staticGeometryProgram.get());
 	}
 }
 
-void StandardGeometryPass::RenderSkinnedGeometry(const std::vector<SkinnedMeshRenderer*>& meshes)
+void StandardGeometryPass::RenderSkinnedGeometry(const std::vector<SkinnedMeshRenderer*>& meshes, const glm::mat4& vp)
 {
 	if (!m_skinnedGeometryProgram || meshes.empty()) return;
 
@@ -95,6 +104,9 @@ void StandardGeometryPass::RenderSkinnedGeometry(const std::vector<SkinnedMeshRe
 
 		auto model = renderer->GetTransform().GetWorldMatrix();
 		m_skinnedGeometryProgram->SetUniform("model", model);
+
+		glm::mat4 prevMVP = vp * model;
+		m_skinnedGeometryProgram->SetUniform("uPrevModelViewProj", prevMVP);
 
 		Animator* animator = renderer->GetAnimator();
 		if (animator) m_skinnedGeometryProgram->SetUniform("finalBoneMatrices", animator->GetFinalBoneMatrices());

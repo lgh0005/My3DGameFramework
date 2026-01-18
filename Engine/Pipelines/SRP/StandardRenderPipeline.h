@@ -12,6 +12,7 @@ CLASS_PTR(StandardSSAOPass)
 CLASS_PTR(StandardOutlinePass)
 CLASS_PTR(StandardPostProcessPass)
 CLASS_PTR(StandardGlobalUniforms)
+CLASS_PTR(StandardMotionBlurPass)
 CLASS_PTR(GBufferFramebuffer)
 CLASS_PTR(PostProcessFramebuffer)
 #pragma endregion
@@ -47,6 +48,7 @@ private:
 	StandardDeferredLightingPassUPtr  m_deferredLightPass { nullptr };
 	StandardSSAOPassUPtr			  m_ssaoPass		  { nullptr };
 	StandardOutlinePassUPtr		      m_outlinePass		  { nullptr };
+	StandardMotionBlurPassUPtr		  m_motionBlurPass	  { nullptr };
 
 	// SRP 공통 유니폼 변수 버퍼
 	StandardGlobalUniformsUPtr        m_globalUniforms	  { nullptr };

@@ -43,9 +43,19 @@ bool GBufferFramebuffer::Init(int32 width, int32 height)
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT3, GL_TEXTURE_2D, emissionTexture->Get(), 0);
     m_textures.push_back(std::move(emissionTexture));
 
+    // Attachment 4 : velocity
+    auto velocityTexture = Texture::Create(width, height, GL_RG16F, GL_RG, GL_FLOAT);
+    velocityTexture->SetFilter(GL_NEAREST, GL_NEAREST);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT4, GL_TEXTURE_2D, velocityTexture->Get(), 0);
+    m_textures.push_back(std::move(velocityTexture));
+
     // Draw Buffers 부착
-    uint32 attachments[4] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2, GL_COLOR_ATTACHMENT3 };
-    glDrawBuffers(4, attachments);
+    uint32 attachments[5] = {
+        GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1,
+        GL_COLOR_ATTACHMENT2, GL_COLOR_ATTACHMENT3,
+        GL_COLOR_ATTACHMENT4 
+    };
+    glDrawBuffers(5, attachments);
 
     // Depth Texture 사용
     m_depthTexture = Texture::Create(width, height, GL_DEPTH24_STENCIL8, GL_DEPTH_STENCIL, GL_UNSIGNED_INT_24_8);

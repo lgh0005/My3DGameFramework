@@ -43,6 +43,7 @@ add_library(Engine STATIC
    "Pipelines/Common/UIWorldSpacePass.h"  "Pipelines/Common/UIWorldSpacePass.cpp"
    "Pipelines/Common/UIScreenSpacePass.h" "Pipelines/Common/UIScreenSpacePass.cpp"
    "Pipelines/Common/JoltDebugGizmoPass.h"  "Pipelines/Common/JoltDebugGizmoPass.cpp"
+   "Pipelines/SRP/RenderPasses/StandardMotionBlurPass.h" "Pipelines/SRP/RenderPasses/StandardMotionBlurPass.cpp"
 
    # Standard Render Pipeline
    "Pipelines/SRP/RenderPasses/StandardPostProcessPass.h" "Pipelines/SRP/RenderPasses/StandardPostProcessPass.cpp"
@@ -108,6 +109,7 @@ add_library(Engine STATIC
    "Graphics/RenderPipeline.h"          "Graphics/RenderPipeline.cpp"
    "Graphics/RenderContext.h"           "Graphics/RenderContext.cpp"
    "Graphics/GlobalUniforms.h"          "Graphics/GlobalUniforms.cpp"
+   "Graphics/Velocitybuffer.h"      "Graphics/Velocitybuffer.cpp"
 
    # Framebuffers
    "Framebuffers/Framebuffer.h"             "Framebuffers/Framebuffer.cpp"

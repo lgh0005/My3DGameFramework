@@ -67,3 +67,26 @@ void PostProcessFramebuffer::AttachTexture(Texture* texture, int32 attachmentInd
 	glDrawBuffers(1, attachments);
 }
 
+void PostProcessFramebuffer::Blit(PostProcessFramebuffer* src, PostProcessFramebuffer* dst, int32 width, int32 height, uint32 mask, uint32 filter)
+{
+	// 1. ID 추출 (nullptr이면 0 = 기본 화면)
+	// 상속 구조에 따라 GetFBO()나 m_fbo를 사용하세요. 
+	// (같은 클래스이므로 private 멤버 m_fbo에 접근 가능합니다.)
+	uint32 srcID = src ? src->m_fbo : 0;
+	uint32 dstID = dst ? dst->m_fbo : 0;
+
+	// 2. 바인딩 (읽기 전용 / 쓰기 전용 분리)
+	glBindFramebuffer(GL_READ_FRAMEBUFFER, srcID);
+	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, dstID);
+
+	// 3. 고속 복사 (Blit)
+	// (srcX0, srcY0, srcX1, srcY1) -> (dstX0, dstY0, dstX1, dstY1)
+	glBlitFramebuffer(0, 0, width, height,  // Source Rect
+		0, 0, width, height,  // Dest Rect
+		mask,                 // 무엇을 복사할지?
+		filter);              // 크기가 다를 때 어떻게 처리할지?
+
+	// 4. 언바인딩 (안전장치)
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+}
+

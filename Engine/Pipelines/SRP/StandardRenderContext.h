@@ -26,6 +26,7 @@ public:
 	Texture* GetGBufferNormal()   const { return m_gNormal; }
 	Texture* GetGBufferAlbedo() const { return m_gAlbedoSpec; }
 	Texture* GetGBufferEmission() const { return m_gEmission; }
+	Texture* GetGBufferVelocity() const { return m_gVelocity; }
 
 	// For StandardSSAOPass
 	void SetSSAOTexture(Texture* texture) { m_ssaoTexture = texture; }
@@ -42,6 +43,7 @@ private:
 	Texture* m_gNormal{ nullptr };
 	Texture* m_gAlbedoSpec{ nullptr };
 	Texture* m_gEmission{ nullptr };
+	Texture* m_gVelocity{ nullptr };
 
 	// For StandardSSAOPass
 	Texture* m_ssaoTexture{ nullptr };

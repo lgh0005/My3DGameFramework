@@ -82,6 +82,11 @@
             "vs":  "./Resources/Shaders/Standard/Standard_Post_Blur.vert",
             "fs":  "./Resources/Shaders/Standard/Standard_Post_Blur.frag"
         },
+        {
+            "key": "standard_motion_blur",
+            "vs":  "./Resources/Shaders/Standard/Standard_Motion_Blur.vert",
+            "fs":  "./Resources/Shaders/Standard/Standard_Motion_Blur.frag"
+        },
 
 
 

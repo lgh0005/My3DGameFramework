@@ -65,3 +65,14 @@ void Renderer::SetRefreshRate(int32 refreshRate)
 	m_refreshRate = refreshRate;
 	m_targetShutterSpeed = 1.0f / static_cast<float>(m_refreshRate);
 }
+
+void Renderer::SetTargetShutterSpeed(float shutterSpeed)
+{
+	// 0이나 음수가 들어오면 곤란하니 방어 코드
+	if (shutterSpeed <= 0.0001f)
+	{
+		m_targetShutterSpeed = 1.0f / 60.0f; // 기본값 복구
+		return;
+	}
+	m_targetShutterSpeed = shutterSpeed;
+}
