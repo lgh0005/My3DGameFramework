@@ -1,19 +1,23 @@
-#version 460 core
+ï»¿#version 460 core
 
-// TODO : ÀÌÈÄ¿¡ spv·Î ¹Ì¸® ÄÄÆÄÀÏ ½ÃÅ°·Á¸é º¸´Ù ¾ö°İÈ÷ Àû¾î¾ß ÇÒ ÇÊ¿ä°¡ ÀÖ´Ù.
+// TODO : ì´í›„ì— spvë¡œ ë¯¸ë¦¬ ì»´íŒŒì¼ ì‹œí‚¤ë ¤ë©´ ë³´ë‹¤ ì—„ê²©íˆ ì ì–´ì•¼ í•  í•„ìš”ê°€ ìˆë‹¤.
 
-// TODO : ÀÎÇ²°ú ¾Æ¿ôÇ²Àº ½½½½ ÇÏ³ªÀÇ ¹­À½À¸·Î Ã³¸®
-// ÇÒ ÇÊ¿ä°¡ ÀÖ´Ù. vs_in, vs_out, fs_in, fs_out µî°ú °°ÀÌ.
+// TODO : ì¸í’‹ê³¼ ì•„ì›ƒí’‹ì€ ìŠ¬ìŠ¬ í•˜ë‚˜ì˜ ë¬¶ìŒìœ¼ë¡œ ì²˜ë¦¬
+// í•  í•„ìš”ê°€ ìˆë‹¤. vs_in, vs_out, fs_in, fs_out ë“±ê³¼ ê°™ì´.
 
 layout (location = 0) out vec4 gPosition;      // Attachment 0
 layout (location = 1) out vec4 gNormal;        // Attachment 1
 layout (location = 2) out vec4 gAlbedoSpec;    // Attachment 2 (RGB: Albedo, A: Specular)
 layout (location = 3) out vec4 gEmission;      // Attachment 3
+layout (location = 4) out vec2 gVelocity;      // Attachment 4: ì†ë„ ë²¡í„°
 
 in vec3 FragPos;
 in vec2 TexCoords;
 in vec3 Normal;
 in mat3 TBN;
+
+in vec4 vCurrClipPos;
+in vec4 vPrevClipPos;
 
 layout (std140, binding = 0) uniform CameraData
 {
@@ -26,7 +30,7 @@ struct Material
 {
     // Textures
     sampler2D diffuse;
-    sampler2D specular; // (Legacy) PBR¿¡¼­´Â Àß ¾È ¾¸
+    sampler2D specular; // (Legacy) PBRì—ì„œëŠ” ì˜ ì•ˆ ì”€
     sampler2D emission;
     sampler2D normal;
     sampler2D height;
@@ -52,7 +56,7 @@ struct Material
 };
 uniform Material material;
 
-// Parallax Mapping ÇÔ¼ö
+// Parallax Mapping í•¨ìˆ˜
 vec2 ParallaxMapping(vec2 texCoords, vec3 viewDir)
 {
     const float minLayers = 8.0;
@@ -66,14 +70,14 @@ vec2 ParallaxMapping(vec2 texCoords, vec3 viewDir)
   
     vec2 currentTexCoords = texCoords;
 
-    // [¼öÁ¤ 1] texture -> textureLod(..., 0.0)
-    // Height ¸Ê ÀĞÀ» ¶§´Â ¹Ó¸Ê ÇÊ¿ä ¾øÀ½. °­Á¦·Î 0¹ø ·¹º§ »ç¿ë.
+    // [ìˆ˜ì • 1] texture -> textureLod(..., 0.0)
+    // Height ë§µ ì½ì„ ë•ŒëŠ” ë°‰ë§µ í•„ìš” ì—†ìŒ. ê°•ì œë¡œ 0ë²ˆ ë ˆë²¨ ì‚¬ìš©.
     float currentDepthMapValue = 1.0 - textureLod(material.height, currentTexCoords, 0.0).r;
       
     while (currentLayerDepth < currentDepthMapValue)
     {
         currentTexCoords -= deltaTexCoords;
-        // [¼öÁ¤ 2] textureLod
+        // [ìˆ˜ì • 2] textureLod
         currentDepthMapValue = 1.0 - textureLod(material.height, currentTexCoords, 0.0).r;  
         currentLayerDepth += layerDepth;  
     }
@@ -81,7 +85,7 @@ vec2 ParallaxMapping(vec2 texCoords, vec3 viewDir)
     vec2 prevTexCoords = currentTexCoords + deltaTexCoords;
     float afterDepth  = currentDepthMapValue - currentLayerDepth;
     
-    // [¼öÁ¤ 3] textureLod
+    // [ìˆ˜ì • 3] textureLod
     float beforeDepth = (1.0 - textureLod(material.height, prevTexCoords, 0.0).r) - (currentLayerDepth - layerDepth);
  
     float weight = afterDepth / (afterDepth - beforeDepth);
@@ -92,43 +96,43 @@ vec2 ParallaxMapping(vec2 texCoords, vec3 viewDir)
 
 void main()
 {
-// [ÇÙ½É 1] ÆĞ·²·¢½º °è»ê Àü, ¿ø·¡ UVÀÇ ±â¿ï±â(Gradient) ÀúÀå
+// [í•µì‹¬ 1] íŒ¨ëŸ´ë™ìŠ¤ ê³„ì‚° ì „, ì›ë˜ UVì˜ ê¸°ìš¸ê¸°(Gradient) ì €ì¥
     vec2 ddx = dFdx(TexCoords);
     vec2 ddy = dFdy(TexCoords);
 
     vec2 texCoord = TexCoords;
 
-    // 1. TBN ÀçÁ¤·Ä ¹× ÆĞ·²·¢½º ¸ÅÇÎ
+    // 1. TBN ì¬ì •ë ¬ ë° íŒ¨ëŸ´ë™ìŠ¤ ë§¤í•‘
     vec3 T = normalize(TBN[0]);
     vec3 B = normalize(TBN[1]);
     vec3 N = normalize(TBN[2]);
     mat3 orthoTBN = mat3(T, B, N);
     
-    // HeightScaleÀÌ À¯ÀÇ¹ÌÇÒ ¶§¸¸ ÆĞ·²·¢½º ¼öÇà
+    // HeightScaleì´ ìœ ì˜ë¯¸í•  ë•Œë§Œ íŒ¨ëŸ´ë™ìŠ¤ ìˆ˜í–‰
     if (material.heightScale > 0.001)
     {
         vec3 viewDir = normalize(viewPos - FragPos);
         mat3 worldToTangent = transpose(orthoTBN);
         vec3 viewDirTangent = normalize(worldToTangent * viewDir);
         
-        // À§¿¡¼­ °íÄ£ ÇÔ¼ö È£Ãâ
+        // ìœ„ì—ì„œ ê³ ì¹œ í•¨ìˆ˜ í˜¸ì¶œ
         texCoord = ParallaxMapping(TexCoords, viewDirTangent);
         
-        // ¸¸¾à UV°¡ ¹üÀ§¸¦ ¹ş¾î³ª¸é ¹ö¸®´Â ·ÎÁ÷ (¼±ÅÃ»çÇ×)
+        // ë§Œì•½ UVê°€ ë²”ìœ„ë¥¼ ë²—ì–´ë‚˜ë©´ ë²„ë¦¬ëŠ” ë¡œì§ (ì„ íƒì‚¬í•­)
         if (texCoord.x > 1.0 || texCoord.y > 1.0 || texCoord.x < 0.0 || texCoord.y < 0.0) 
             discard;
     }
 
-    // ±âº»°ª ¼³Á¤ (Factor Àû¿ë)
+    // ê¸°ë³¸ê°’ ì„¤ì • (Factor ì ìš©)
     float ao = 1.0;
     float roughness = material.roughnessFactor;
     float metallic  = material.metallicFactor;
 
     if (material.hasORM)
     {
-        // [Optimized Path] ORM ÅØ½ºÃ³ ÇÑ ¹ø¸¸ »ùÇÃ¸µ
+        // [Optimized Path] ORM í…ìŠ¤ì²˜ í•œ ë²ˆë§Œ ìƒ˜í”Œë§
         // R: Occlusion, G: Roughness, B: Metallic
-        // textureGrad¸¦ »ç¿ëÇÏ¿© Parallax·Î ÀÎÇÑ UV ¿Ö°î¿¡µµ ¼±¸íÇÏ°Ô »ùÇÃ¸µ
+        // textureGradë¥¼ ì‚¬ìš©í•˜ì—¬ Parallaxë¡œ ì¸í•œ UV ì™œê³¡ì—ë„ ì„ ëª…í•˜ê²Œ ìƒ˜í”Œë§
         vec3 ormSample = textureGrad(material.orm, texCoord, ddx, ddy).rgb;
         ao = ormSample.r;
         roughness *= ormSample.g; // Factor * Texture
@@ -136,13 +140,13 @@ void main()
     }
     else
     {
-        // [Legacy Path] °³º° ÅØ½ºÃ³ »ùÇÃ¸µ
+        // [Legacy Path] ê°œë³„ í…ìŠ¤ì²˜ ìƒ˜í”Œë§
         ao = textureGrad(material.ao, texCoord, ddx, ddy).r;
         roughness *= textureGrad(material.roughness, texCoord, ddx, ddy).r;
         metallic  *= textureGrad(material.metallic, texCoord, ddx, ddy).r;
     }
 
-    // G-Buffer Ã¤¿ì±â (URP Layout)
+    // G-Buffer ì±„ìš°ê¸° (URP Layout)
     gPosition.rgb = FragPos;
     gPosition.a = ao;
 
@@ -167,4 +171,10 @@ void main()
     vec3 emissionTex = textureGrad(material.emission, texCoord, ddx, ddy).rgb;
     vec3 finalEmission = (emissionTex * material.emissionStrength) + material.emissiveFactor;
     gEmission = vec4(finalEmission, 1.0);
+
+    // [gVelocity] Velocity Map
+    vec2 currNDC = vCurrClipPos.xy / vCurrClipPos.w;
+    vec2 prevNDC = vPrevClipPos.xy / vPrevClipPos.w;
+    vec2 velocity = (currNDC - prevNDC) * 0.5;
+    gVelocity = velocity;
 }
