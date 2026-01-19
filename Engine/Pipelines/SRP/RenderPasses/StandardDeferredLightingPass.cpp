@@ -2,9 +2,6 @@
 #include "StandardDeferredLightingPass.h"
 
 #include "Pipelines/Common/ShadowPass.h"
-#include "Pipelines/SRP/StandardRenderPipeline.h"
-#include "Pipelines/SRP/RenderPasses/StandardGeometryPass.h"
-#include "Pipelines/SRP/RenderPasses/StandardPostProcessPass.h"
 
 #include "Scene/ComponentRegistry.h"
 #include "Object/GameObject.h"
@@ -17,8 +14,6 @@
 #include "Components/SpotLight.h"
 #include "Components/Transform.h"
 #include "Framebuffers/PostProcessFramebuffer.h"
-
-#include "Pipelines/SRP/StandardRenderContext.h"
 
 DECLARE_DEFAULTS_IMPL(StandardDeferredLightingPass)
 
@@ -58,20 +53,19 @@ bool StandardDeferredLightingPass::Init()
 void StandardDeferredLightingPass::Render(RenderContext* context)
 {
 	// 0. Context 캐스팅 및 유효성 검사
-	auto stdCtx = (StandardRenderContext*)context;
-	if (!stdCtx) return;
+	if (!context) return;
 
 	// 1. 포스트 프로세싱 프레임 버퍼에 GBuffer 내용 그리기
-	BeginDrawOnPostProcessFBO(stdCtx);
+	BeginDrawOnPostProcessFBO(context);
 
 	// 2. SSAO 텍스쳐 바인딩
-	BindSSAOTexture(stdCtx);
+	BindSSAOTexture(context);
 
 	// 3. 그림자 맵 바인딩
-	BindShadowMaps(stdCtx);
+	BindShadowMaps(context);
 
 	// 4. RenderContext로부터 조명 행렬 가져오기
-	GetLightMatricesFromContext(stdCtx);
+	GetLightMatricesFromContext(context);
 
 	// 5. 그리기
 	glDisable(GL_DEPTH_TEST);
@@ -85,27 +79,17 @@ void StandardDeferredLightingPass::Render(RenderContext* context)
 /*==========================================//
 //   deferred lighting pass helper methods  //
 //==========================================*/
-void StandardDeferredLightingPass::BeginDrawOnPostProcessFBO(StandardRenderContext* context)
+void StandardDeferredLightingPass::BeginDrawOnPostProcessFBO(RenderContext* context)
 {
 	// 1. Context에서 G-Buffer 텍스처 가져오기
-	Texture* tPos = context->GetGBufferPosition();
-	Texture* tNormal = context->GetGBufferNormal();
-	Texture* tAlbedo = context->GetGBufferAlbedo();
-	Texture* tEmission = context->GetGBufferEmission();
+	Texture* tPos = context->GetTexture(RenderSlot::GPosition);
+	Texture* tNormal = context->GetTexture(RenderSlot::GNormal);
+	Texture* tAlbedo = context->GetTexture(RenderSlot::GAlbedo);
+	Texture* tEmission = context->GetTexture(RenderSlot::GEmission);
 	if (!tPos || !tNormal || !tAlbedo || !tEmission) return;
 
 	// 2. 그리기 준비 (Output FBO 설정)
-	PostProcessFramebuffer* targetFBO = context->GetTargetFramebuffer();
-	if (targetFBO)
-	{
-		targetFBO->Bind();
-		glViewport(0, 0, targetFBO->GetWidth(), targetFBO->GetHeight());
-	}
-	else
-	{
-		Framebuffer::BindToDefault();
-		glViewport(0, 0, tPos->GetWidth(), tPos->GetHeight());
-	}
+	context->BindTargetFramebuffer();
 
 	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 	glClear(GL_COLOR_BUFFER_BIT);
@@ -119,10 +103,11 @@ void StandardDeferredLightingPass::BeginDrawOnPostProcessFBO(StandardRenderConte
 	glActiveTexture(GL_TEXTURE3); tEmission->Bind();
 }
 
-void StandardDeferredLightingPass::BindSSAOTexture(StandardRenderContext* context)
+void StandardDeferredLightingPass::BindSSAOTexture(RenderContext* context)
 {
 	// 4. SSAO 텍스처 바인딩 (Context 데이터 사용)
-	Texture* tSSAO = context->GetSSAOTexture();
+	Texture* tSSAO = context->GetTexture(RenderSlot::SSAO);
+
 	if (tSSAO)
 	{
 		glActiveTexture(GL_TEXTURE12);
@@ -137,7 +122,7 @@ void StandardDeferredLightingPass::BindSSAOTexture(StandardRenderContext* contex
 	}
 }
 
-void StandardDeferredLightingPass::BindShadowMaps(StandardRenderContext* context)
+void StandardDeferredLightingPass::BindShadowMaps(RenderContext* context)
 {
 	// 5. Shadow Maps 바인딩 (Pipeline 데이터 사용 - 기존 유지)
 	for (int i = 0; i < MAX_SHADOW_CASTER; ++i)
@@ -150,23 +135,16 @@ void StandardDeferredLightingPass::BindShadowMaps(StandardRenderContext* context
 	}
 }
 
-void StandardDeferredLightingPass::GetLightMatricesFromContext(StandardRenderContext* context)
+void StandardDeferredLightingPass::GetLightMatricesFromContext(RenderContext* context)
 {
 	// 6. Light Matrices 전송
-	static std::vector<glm::mat4> lightSpaceMatrices;
-	if (lightSpaceMatrices.size() != MAX_SHADOW_CASTER)
-		lightSpaceMatrices.resize(MAX_SHADOW_CASTER);
-
-	// 7. 항등 행렬로 fill
+	static std::vector<glm::mat4> lightSpaceMatrices(MAX_SHADOW_CASTER, glm::mat4(1.0f));
 	std::fill(lightSpaceMatrices.begin(), lightSpaceMatrices.end(), glm::mat4(1.0f));
 
 	// 8. 유효한 조명 가져오기
-	const auto& lights = context->GetSceneRegistry()->GetComponents<Light>();
-	for (Component* comp : lights)
+	const auto& lights = context->GetLights();
+	for (Light* light : lights)
 	{
-		// [변경 3] 사용하기 전에 Light*로 캐스팅 필수
-		auto* light = static_cast<Light*>(comp);
-
 		if (!light->IsEnabled()) continue;
 		if (!light->GetOwner()->IsActive()) continue;
 

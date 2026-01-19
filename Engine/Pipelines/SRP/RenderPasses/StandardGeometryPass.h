@@ -23,8 +23,6 @@ public:
 		int32 heigh = WINDOW_HEIGHT
 	);
 
-	void AddStaticMeshRenderer(StaticMeshRenderer* staticMeshRenderer);
-	void AddSkinnedMeshRenderer(SkinnedMeshRenderer* skinnedMeshRenderer);
 	const std::vector<StaticMeshRenderer*>& GetStaticMeshRenderers() const;
 	const std::vector<SkinnedMeshRenderer*>& GetSkinnedMeshRenderers() const;
 	GBufferFramebuffer* GetGBuffer() { return m_gBuffer.get(); }
@@ -41,7 +39,4 @@ private:
 	GBufferFramebufferUPtr m_gBuffer;
 	ProgramPtr m_staticGeometryProgram;
 	ProgramPtr m_skinnedGeometryProgram;
-	std::vector<StaticMeshRenderer*> m_staticMeshRenderers;
-	std::vector<SkinnedMeshRenderer*> m_skinnedMeshRenderers;
-
 };

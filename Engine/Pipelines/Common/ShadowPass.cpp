@@ -14,9 +14,6 @@
 #include "Components/StaticMeshRenderer.h"
 #include "Components/SkinnedMeshRenderer.h"
 #include "Components/Animator.h"
-#include "Pipelines/SRP/StandardRenderContext.h"
-#include "Pipelines/SRP/StandardRenderPipeline.h"
-#include "Pipelines/SRP/RenderPasses/StandardGeometryPass.h"
 
 DECLARE_DEFAULTS_IMPL(ShadowPass)
 

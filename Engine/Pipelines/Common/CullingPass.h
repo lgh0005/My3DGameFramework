@@ -19,10 +19,10 @@ public:
 //   culling methods   //
 //=====================*/
 private:
-	void CullStaticMeshRenderers(ComponentRegistry* registry, RenderContext* context);
-	void CullSkinnedMeshRenderers(ComponentRegistry* registry, RenderContext* context);
-	void CullMeshOutlines(ComponentRegistry* registry, RenderContext* context);
-	void CullSceneLights(ComponentRegistry* registry, RenderContext* context);
+	void CullStaticMeshRenderers(RenderContext* context);
+	void CullSkinnedMeshRenderers(RenderContext* context);
+	void CullMeshOutlines(RenderContext* context);
+	void CullSceneLights(RenderContext* context);
 
 private:
 	CullingPass();

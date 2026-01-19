@@ -43,7 +43,7 @@ private:
 	ScreenMeshPtr m_screenMesh;
 	ProgramPtr m_maskStaticProgram;  // Static 마스크용
 	ProgramPtr m_maskSkinnedProgram; // Skinned 마스크용
-	ProgramPtr m_postProgram;		  // 합성용
+	ProgramPtr m_postProgram;		 // 합성용
 	glm::vec3 m_color		{ 1.0f };
 	float m_thickness		{ 2.0f };
 };

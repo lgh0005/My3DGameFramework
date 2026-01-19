@@ -7,7 +7,6 @@ CLASS_PTR(ScreenMesh)
 CLASS_PTR(Texture)
 CLASS_PTR(Program)
 CLASS_PTR(RenderContext)
-CLASS_PTR(StandardRenderContext)
 #pragma endregion
 
 CLASS_PTR(StandardDeferredLightingPass)
@@ -17,16 +16,15 @@ public:
 	virtual ~StandardDeferredLightingPass();
 	static StandardDeferredLightingPassUPtr Create();
 	virtual void Render(RenderContext* context) override;
-	void SetSSAOTexture(Texture* ssaoTex) { m_ssaoTexture = ssaoTex; }
 
 /*==========================================//
 //   deferred lighting pass helper methods  //
 //==========================================*/
 private:
-	void BeginDrawOnPostProcessFBO(StandardRenderContext* context);
-	void BindSSAOTexture(StandardRenderContext* context);
-	void BindShadowMaps(StandardRenderContext* context);
-	void GetLightMatricesFromContext(StandardRenderContext* context);
+	void BeginDrawOnPostProcessFBO(RenderContext* context);
+	void BindSSAOTexture(RenderContext* context);
+	void BindShadowMaps(RenderContext* context);
+	void GetLightMatricesFromContext(RenderContext* context);
 
 private:
 	StandardDeferredLightingPass();
@@ -34,5 +32,4 @@ private:
 
 	ScreenMeshPtr m_plane;
 	ProgramPtr m_deferredLightProgram;
-	Texture* m_ssaoTexture{ nullptr };
 };

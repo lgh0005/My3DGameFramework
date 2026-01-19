@@ -11,8 +11,6 @@
 #include "Components/Camera.h"
 #include "Framebuffers/PostProcessFramebuffer.h"
 
-#include "Pipelines/SRP/StandardRenderContext.h"
-
 DECLARE_DEFAULTS_IMPL(StandardPostProcessPass)
 
 StandardPostProcessPassUPtr StandardPostProcessPass::Create(int32 width, int32 height)

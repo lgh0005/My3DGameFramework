@@ -34,22 +34,22 @@ void CullingPass::Render(RenderContext* context)
     m_frustum->Update(camera->GetViewProjectionMatrix());
 
     // 2. Static Mesh Renderer 컬링
-    CullStaticMeshRenderers(scene, context);
+    CullStaticMeshRenderers(context);
 
     // 3. Skinned Mesh Renderer 컬링
-    CullSkinnedMeshRenderers(scene, context);
+    CullSkinnedMeshRenderers(context);
 
     // 4. Mesh Outline 컬링
-    CullMeshOutlines(scene, context);
+    CullMeshOutlines(context);
 
     // 5. Light는 컬링하지 않고 모두 포함 (조명 범위는 Geometry Pass 결과에 의존)
-    CullSceneLights(scene, context);
+    CullSceneLights(context);
 }
 
 /*=====================//
 //   culling methods   //
 //=====================*/
-void CullingPass::CullStaticMeshRenderers(ComponentRegistry* registry, RenderContext* context)
+void CullingPass::CullStaticMeshRenderers(RenderContext* context)
 {
     const auto* sourceVec = context->GetSourceStaticMeshes();
     if (!sourceVec) return;
@@ -69,7 +69,7 @@ void CullingPass::CullStaticMeshRenderers(ComponentRegistry* registry, RenderCon
     }
 }
 
-void CullingPass::CullSkinnedMeshRenderers(ComponentRegistry* registry, RenderContext* context)
+void CullingPass::CullSkinnedMeshRenderers(RenderContext* context)
 {
     const auto* sourceVec = context->GetSourceSkinnedMeshes();
     if (!sourceVec) return;
@@ -88,7 +88,7 @@ void CullingPass::CullSkinnedMeshRenderers(ComponentRegistry* registry, RenderCo
     }
 }
 
-void CullingPass::CullMeshOutlines(ComponentRegistry* registry, RenderContext* context)
+void CullingPass::CullMeshOutlines(RenderContext* context)
 {
     const auto* sourceVec = context->GetSourceMeshOutlines();
     if (!sourceVec) return;
@@ -118,7 +118,7 @@ void CullingPass::CullMeshOutlines(ComponentRegistry* registry, RenderContext* c
     }
 }
 
-void CullingPass::CullSceneLights(ComponentRegistry* registry, RenderContext* context)
+void CullingPass::CullSceneLights(RenderContext* context)
 {
     const auto* sourceVec = context->GetSourceLights();
     if (!sourceVec) return;

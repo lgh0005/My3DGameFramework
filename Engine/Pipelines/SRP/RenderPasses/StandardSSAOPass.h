@@ -31,8 +31,8 @@ public:
 //   ssao pass helper methods   //
 //==============================*/
 private:
-	void ComputeSSAO(StandardRenderContext* context);
-	void BlurSSAOResult(StandardRenderContext* context);
+	void ComputeSSAO(RenderContext* context);
+	void BlurSSAOResult(RenderContext* context);
 	void GenerateKernel();
 	void GenerateNoiseTexture();
 
@@ -49,5 +49,4 @@ private:
 
 	SSAOFramebufferUPtr    m_ssaoFBO{ nullptr };	 // Raw SSAO
 	SSAOFramebufferUPtr    m_ssaoBlurFBO{ nullptr }; // Blurred SSAO
-
 };

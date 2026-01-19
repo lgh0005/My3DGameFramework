@@ -11,8 +11,14 @@
 #include "Scene/SceneRegistry.h"
 #include "Scene/ComponentRegistry.h"
 #include "Object/Component.h"
+#include "Framebuffers/Framebuffer.h"
+#include "Framebuffers/GBufferFramebuffer.h"
 
-DECLARE_DEFAULTS_IMPL(RenderContext)
+RenderContext::RenderContext()
+{
+	m_textures.fill(nullptr);
+}
+RenderContext::~RenderContext() = default;
 
 /*====================================//
 //   default render context methods   //
@@ -46,6 +52,12 @@ void RenderContext::Reset(Scene* scene, Camera* camera)
 	m_culledSkinnedMeshRenderers.clear();
 	m_culledMeshOutlines.clear();
 	m_culledLights.clear();
+
+	// 4. 자원 및 타겟 초기화 (매 프레임 깨끗하게 시작)
+	m_textures.fill(nullptr);
+	m_targetFramebuffer = nullptr;
+	for (int i = 0; i < MAX_SHADOW_CASTER; ++i) m_shadowMaps[i] = nullptr;
+	if (m_skyLight) m_skyboxTexture = m_skyLight->GetSkybox();
 }
 
 void RenderContext::AddMeshOutline(MeshOutline* outline)
@@ -66,6 +78,54 @@ void RenderContext::AddSkinnedMeshRenderer(SkinnedMeshRenderer* renderer)
 void RenderContext::AddLight(Light* light)
 {
 	m_culledLights.push_back(light);
+}
+
+/*====================================//
+//    Resource & Target Management    //
+//====================================*/
+void RenderContext::SetGBuffer(GBufferFramebuffer* gBuffer)
+{
+	if (gBuffer)
+	{
+		// G-Buffer의 각 텍스처를 표준 슬롯에 연결
+		SetTexture(RenderSlot::GPosition, gBuffer->GetColorAttachment(0).get());
+		SetTexture(RenderSlot::GNormal, gBuffer->GetColorAttachment(1).get());
+		SetTexture(RenderSlot::GAlbedo, gBuffer->GetColorAttachment(2).get());
+		SetTexture(RenderSlot::GEmission, gBuffer->GetColorAttachment(3).get());
+		SetTexture(RenderSlot::GVelocity, gBuffer->GetColorAttachment(4).get());
+	}
+	else
+	{
+		// null이 들어오면 관련 슬롯 비우기
+		SetTexture(RenderSlot::GPosition, nullptr);
+		SetTexture(RenderSlot::GNormal, nullptr);
+		SetTexture(RenderSlot::GAlbedo, nullptr);
+		SetTexture(RenderSlot::GEmission, nullptr);
+		SetTexture(RenderSlot::GVelocity, nullptr);
+	}
+}
+
+void RenderContext::BindTargetFramebuffer() const
+{
+	if (m_targetFramebuffer)
+	{
+		// 지정된 타겟(FBO) 바인딩 및 뷰포트 설정
+		m_targetFramebuffer->Bind();
+		glViewport(0, 0, m_targetFramebuffer->GetWidth(), m_targetFramebuffer->GetHeight());
+	}
+	else
+	{
+		// 타겟이 없으면 기본 백버퍼(화면) 바인딩
+		Framebuffer::BindToDefault();
+		glViewport(0, 0, WINDOW.GetWindowWidth(), WINDOW.GetWindowHeight());
+	}
+
+	// [중요] 렌더 패스 간 상태 오염 방지를 위한 기본 상태 강제 설정
+	glEnable(GL_DEPTH_TEST);
+	glDepthFunc(GL_LESS);
+	glDisable(GL_BLEND);
+	glEnable(GL_CULL_FACE);
+	glCullFace(GL_BACK);
 }
 
 /*====================================//

@@ -12,20 +12,45 @@ CLASS_PTR(MeshOutline)
 CLASS_PTR(SkyLight)
 CLASS_PTR(CubeTexture)
 CLASS_PTR(Texture)
+CLASS_PTR(GBufferFramebuffer) // 추가
+CLASS_PTR(Framebuffer)        // 추가
 #pragma endregion
+
+enum class RenderSlot : uint8
+{
+	GPosition, GNormal, GAlbedo, GEmission, GVelocity, // Geometry Pass Output
+	SSAO,                                              // SSAO Pass Output
+	MotionBlur,                                        // Motion Blur / PostProcess Input
+	MAX
+};
 
 CLASS_PTR(RenderContext)
 class RenderContext
 {
 	using ComponentVectorRawPtr = const std::vector<Component*>*;
 
+/*====================================//
+//   default render context methods   //
+//====================================*/
 public:
+	RenderContext();
 	virtual ~RenderContext();
 	void Reset(Scene* scene, Camera* camera);
 	void AddMeshOutline(MeshOutline* outline);
 	void AddStaticMeshRenderer(StaticMeshRenderer* renderer);
 	void AddSkinnedMeshRenderer(SkinnedMeshRenderer* renderer);
 	void AddLight(Light* light);
+
+/*====================================//
+//    Resource & Target Management    //
+//====================================*/
+public:
+	void SetGBuffer(GBufferFramebuffer* gBuffer);
+	void SetTexture(RenderSlot slot, Texture* texture) { m_textures[(uint8)slot] = texture; }
+	Texture* GetTexture(RenderSlot slot) const { return m_textures[(uint8)slot]; }
+	void SetTargetFramebuffer(Framebuffer* fbo) { m_targetFramebuffer = fbo; }
+	Framebuffer* GetTargetFramebuffer() const { return m_targetFramebuffer; }
+	void BindTargetFramebuffer() const;
 
 /*====================================//
 //   default render context getters   //
@@ -49,7 +74,6 @@ public:
 //   default render context members   //
 //====================================*/
 protected:
-	RenderContext();
 
 	// 씬과 카메라
 	ComponentRegistry* m_componentRegistry			      { nullptr };
@@ -85,4 +109,7 @@ public:
 protected: 
 	Texture* m_shadowMaps[MAX_SHADOW_CASTER] = { nullptr };
 	CubeTexture* m_skyboxTexture{ nullptr };
+
+	Framebuffer* m_targetFramebuffer{ nullptr };
+	std::array<Texture*, (size_t)RenderSlot::MAX> m_textures;
 };

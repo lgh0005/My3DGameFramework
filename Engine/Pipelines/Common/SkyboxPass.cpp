@@ -34,27 +34,12 @@ bool SkyboxPass::Init()
 void SkyboxPass::Render(RenderContext* context)
 {
 	// 0. 자신의 렌더 패스에 활용되고 있는 RenderContext로 캐스팅
-	auto stdCtx = (StandardRenderContext*)context;
-	auto camera = stdCtx->GetCamera();
-	auto skyLight = stdCtx->GetSkyLight();
-	if (!camera || !skyLight) return;
-
-	auto skyTexture = skyLight->GetSkybox();
-	if (!skyTexture) return;
+	Camera* camera = context->GetCamera();
+	CubeTexture* skyTexture = context->GetSkyboxTexture();
+	if (!camera || !skyTexture) return;
 
 	// 1. 대상 프레임버퍼 바인딩 (PostProcessFramebuffer 등)
-	auto* target = stdCtx->GetTargetFramebuffer();
-	if (target)
-	{
-		target->Bind();
-		glViewport(0, 0, target->GetWidth(), target->GetHeight());
-	}
-	else
-	{
-		Framebuffer::BindToDefault();
-		auto* gPos = stdCtx->GetGBufferPosition();
-		if (gPos) glViewport(0, 0, gPos->GetWidth(), gPos->GetHeight());
-	}
+	context->BindTargetFramebuffer();
 
 	// 2. 렌더링 상태 설정
 	glEnable(GL_DEPTH_TEST);

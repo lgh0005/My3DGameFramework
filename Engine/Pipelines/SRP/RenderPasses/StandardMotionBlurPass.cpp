@@ -37,8 +37,8 @@ void StandardMotionBlurPass::Render(RenderContext* context)
 	if (!stdCtx) return;
 
 	// 1. Input 가져오기 (Context가 가리키는 현재 메인 화면)
-	PostProcessFramebuffer* mainFBO = stdCtx->GetTargetFramebuffer();
-	Texture* velocityTex = stdCtx->GetGBufferVelocity();
+	Framebuffer* mainFBO = context->GetTargetFramebuffer();
+	Texture* velocityTex = context->GetTexture(RenderSlot::GVelocity);
 	if (!mainFBO || !velocityTex) return;
 
 	// [Step 1] 블러 처리: Main FBO -> Blur FBO
@@ -67,13 +67,7 @@ void StandardMotionBlurPass::Render(RenderContext* context)
 	m_plane->Draw();
 
 	// [Step 2] 결과 복사: Blur FBO -> Main FBO
-	Framebuffer::Blit
-	(
-		m_blurFBO.get(),
-		mainFBO,
-		GL_COLOR_BUFFER_BIT,
-		GL_NEAREST
-	);
+	Framebuffer::Blit(m_blurFBO.get(), mainFBO, GL_COLOR_BUFFER_BIT, GL_NEAREST);
 
 	// 다음 패스를 위해 상태 복구 및 바인딩 해제
 	glEnable(GL_DEPTH_TEST);

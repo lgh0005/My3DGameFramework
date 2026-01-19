@@ -12,7 +12,6 @@
 #include "Pipelines/SRP/RenderPasses/StandardSSAOPass.h"
 #include "Pipelines/SRP/RenderPasses/StandardMotionBlurPass.h"
 #include "Pipelines/SRP/StandardGlobalUniforms.h"
-#include "Pipelines/SRP/StandardRenderContext.h"
 
 #include "Scene/Scene.h"
 #include "Scene/ComponentRegistry.h"
@@ -86,6 +85,10 @@ bool StandardRenderPipeline::Init()
 	m_motionBlurPass = StandardMotionBlurPass::Create();
 	if (!m_motionBlurPass) return false;
 
+	// 깊이 부착
+	auto depthTex = m_geometryPass->GetGBuffer()->GetDepthAttachment();
+	m_postProcessPass->GetFramebuffer()->AttachDepthTexture(depthTex);
+
 	return true;
 }
 
@@ -102,7 +105,7 @@ void StandardRenderPipeline::Render(Scene* scene)
 	if (!camera) return;
 
 	// 0. 스택 영역에 StandardRenderContext 생성
-	StandardRenderContext context;
+	RenderContext context;
 	context.Reset(scene, camera);
 
 	// [패스 0~1] 컬링 및 그림자
@@ -138,7 +141,6 @@ void StandardRenderPipeline::Render(Scene* scene)
 	// [패스 9] 디버그 패스 (ImGUI 컨텍스트와 충돌 기즈모 출력)
 	m_debugGizmoPass->Render(&context);
 	RenderIMGUIContext();
-
 }
 
 void StandardRenderPipeline::OnResize(int32 width, int32 height)

@@ -54,18 +54,15 @@ void StandardSSAOPass::Resize(int32 width, int32 height)
 }
 
 void StandardSSAOPass::Render(RenderContext* context)
-{
-    // 0. 자신의 렌더 패스에 활용되고 있는 RenderContext로 캐스팅
-    auto stdCtx = (StandardRenderContext*)context;
-    
+{    
     // 1. SSAO 계산 (G-Buffer -> Raw SSAO)
-    ComputeSSAO(stdCtx);
+    ComputeSSAO(context);
 
     // 2. 노이즈 제거 (Raw SSAO -> Blurred SSAO)
-    BlurSSAOResult(stdCtx);
+    BlurSSAOResult(context);
 
     // 3. context에 ssao 결과 캐싱
-    stdCtx->SetSSAOTexture(m_ssaoBlurFBO->GetColorAttachment(0).get());
+    context->SetTexture(RenderSlot::SSAO, m_ssaoBlurFBO->GetColorAttachment(0).get());
     
     // 4. 복귀
     Framebuffer::BindToDefault();
@@ -125,11 +122,11 @@ void StandardSSAOPass::GenerateNoiseTexture()
     m_noiseTexture->SetData(ssaoNoise.data());
 }
 
-void StandardSSAOPass::ComputeSSAO(StandardRenderContext* context)
+void StandardSSAOPass::ComputeSSAO(RenderContext* context)
 {
     Camera* camera = context->GetCamera();
-    Texture* gPos = context->GetGBufferPosition();
-    Texture* gNormal = context->GetGBufferNormal();
+    Texture* gPos = context->GetTexture(RenderSlot::GPosition);
+    Texture* gNormal = context->GetTexture(RenderSlot::GNormal);
     if (!camera || !gPos || !gNormal) return;
 
     m_ssaoFBO->Bind();
@@ -154,7 +151,7 @@ void StandardSSAOPass::ComputeSSAO(StandardRenderContext* context)
     m_screenQuad->Draw();
 }
 
-void StandardSSAOPass::BlurSSAOResult(StandardRenderContext* context)
+void StandardSSAOPass::BlurSSAOResult(RenderContext* context)
 {
     // SSAO Blur
     m_ssaoBlurFBO->Bind();

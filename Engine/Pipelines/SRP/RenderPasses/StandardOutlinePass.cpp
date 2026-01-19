@@ -59,10 +59,13 @@ bool StandardOutlinePass::Init
 
 void StandardOutlinePass::Render(RenderContext* context)
 {
-	// 0. 캐스팅 및 데이터 확인
-	auto stdCtx = (StandardRenderContext*)context;
+	// 0. 데이터 확인
+	if (!context) return;
 	const auto& outlines = context->GetMeshOutlines();
 	if (outlines.empty()) return;
+
+	Camera* camera = context->GetCamera();
+	if (!camera) return
 
 	// [Pass 1] 마스크 텍스처 생성 (Mask Generation)
 	m_maskFBO->Bind();
@@ -83,18 +86,7 @@ void StandardOutlinePass::Render(RenderContext* context)
 	glDepthFunc(GL_LESS);
 
 	// 다시 메인 화면(디폴트 FBO)으로 복귀
-	auto* target = stdCtx->GetTargetFramebuffer();
-	if (target)
-	{
-		target->Bind();
-		glViewport(0, 0, target->GetWidth(), target->GetHeight());
-	}
-	else
-	{
-		Framebuffer::BindToDefault();
-		auto* tPos = stdCtx->GetGBufferPosition();
-		glViewport(0, 0, tPos->GetWidth(), tPos->GetHeight());
-	}
+	context->BindTargetFramebuffer();
 
 	// [Pass 2] 포스트 프로세싱 합성
 	glDisable(GL_DEPTH_TEST);
