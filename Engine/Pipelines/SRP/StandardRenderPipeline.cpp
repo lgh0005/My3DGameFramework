@@ -71,12 +71,10 @@ bool StandardRenderPipeline::Init()
 
 	// 포스트-프로세스 패스 생성
 	m_postProcessPass = StandardPostProcessPass::Create();
-	m_postProcessPass->GetFramebuffer()->CreateAndAttachDepth();
 	if (!m_postProcessPass) return false;
 
 	// G-buffer 패스 생성
 	m_geometryPass = StandardGeometryPass::Create();
-	m_geometryPass->GetGBuffer()->CreateAndAttachDepth();
 	if (!m_geometryPass) return false;
 
 	// Light 패스 생성
@@ -131,16 +129,14 @@ void StandardRenderPipeline::Render(Scene* scene)
 	for (const auto& [name, pass] : registry->GetCustomRenderPasses())
 		pass->Render(scene, camera);
 
-	// [패스 6] 스카이박스 패스 (공유된 깊이를 기반으로 깊이 테스트 수행하며 덧그림)
+	// [패스 6] 스카이박스 패스
 	m_skyboxPass->Render(&context);
-
-	auto tmp = m_postProcessPass->GetFramebuffer();
 
 	// [패스 7] 모션 블러 & 아웃라인 (2D 후처리 효과들)
 	m_motionBlurPass->Render(&context);
 	m_outlinePass->Render(&context);
 
-	// [패스 8] 후처리 패스 (최종 합성 및 화면 출력)
+	// [패스 8] 포스트 프로세싱 패스 (최종 합성 및 화면 출력)
 	m_postProcessPass->Render(&context);
 
 	// [패스 9] 디버그 패스 (ImGUI 컨텍스트와 충돌 기즈모 출력)
@@ -151,15 +147,11 @@ void StandardRenderPipeline::Render(Scene* scene)
 
 void StandardRenderPipeline::OnResize(int32 width, int32 height)
 {
-	// 1. 모든 패스의 FBO 내부 텍스처 갱신
+	// 모든 패스의 FBO 내부 텍스처 갱신
 	m_geometryPass->Resize(width, height);
 	m_postProcessPass->Resize(width, height);
 	m_ssaoPass->Resize(width, height);
 	m_outlinePass->Resize(width, height);
-
-	// 2. 깊이 버퍼 재연결
-	auto mainDepth = m_geometryPass->GetGBuffer()->GetDepthAttachment();
-	m_postProcessPass->GetFramebuffer()->AttachDepthTexture(mainDepth);
 }
 
 /*======================//

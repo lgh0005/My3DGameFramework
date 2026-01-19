@@ -4,8 +4,10 @@
 #include "Pipelines/Common/CullingPass.h"
 #include "Pipelines/Common/ShadowPass.h"
 #include "Pipelines/Common/SkyboxPass.h"
+#include "Pipelines/Common/JoltDebugGizmoPass.h"
 #include "Pipelines/Common/SSAOPass.h"
 #include "Pipelines/Common/OutlinePass.h"
+#include "Pipelines/Common/MotionBlurPass.h"
 #include "Pipelines/URP/RenderPasses/UniversalGeometryPass.h"
 #include "Pipelines/URP/RenderPasses/UniversalPostProcessPass.h"
 #include "Pipelines/URP/RenderPasses/UniversalDeferredLightingPass.h"
@@ -78,75 +80,66 @@ bool UniversalRenderPipeline::Init()
 	m_deferredLightPass = UniversalDeferredLightingPass::Create();
 	if (!m_deferredLightPass) return false;
 
+	// 모션 블러 패스 생성
+	m_motionBlurPass = MotionBlurPass::Create();
+	if (!m_motionBlurPass) return false;
+
 	return true;
 }
 
 void UniversalRenderPipeline::Render(Scene* scene)
 {
-	// TEMP : 첫 뷰포트 설정.
-	int width, height;
-	glfwGetFramebufferSize(WINDOW.GetWindow(), &width, &height);
-	glViewport(0, 0, width, height);
-	glClearColor(0.1f, 0.1f, 0.15f, 1.0f);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	glEnable(GL_DEPTH_TEST);
-
-	// TODO : PBR 렌더링을 위한 URP 렌더패스들 지나면서 Context 기반 렌더링 수행
 	/*====================================//
 	//   get essential scene properties   //
 	//====================================*/
 	// 메인 카메라 속성 가져오기
+	// TODO : 이후에는 여러 카메라를 지원할 것이라면 카메라 개수 만큼
+	// 반복해야 할 수도 있음.
 	auto* registry = scene->GetComponentRegistry();
 	auto* camera = registry->GetCamera(0);
 	if (!camera) return;
 
 	// 0. 스택 영역에 StandardRenderContext 생성
-	UniversalRenderContext context;
+	RenderContext context;
 	context.Reset(scene, camera);
 
-	// [패스 0] 컬링 패스 : 절두체 범위 안에 있는 대상만 추리기
+	// [패스 0~1] 컬링 및 그림자
 	m_cullingPass->Render(&context);
-
-	// 1. ubo 갱신
 	m_globalUniforms->PreRender(&context);
-
-	/*================================//
-	//   main scene rendergin logic   //
-	//================================*/
-	// [패스 1] 그림자 패스: m_shadowMap에 깊이 정보 기록
 	m_shadowPass->Render(&context);
 
-	// [패스 2] 디퍼드 셰이딩 : G-buffer 채우기
+	// [패스 2] 디퍼드 지오메트리 (G-Buffer 채우기)
 	m_geometryPass->Render(&context);
 
-	// [패스 3] SSAO
+	// [패스 3] SSAO (G-Buffer 읽어서 Occlusion 계산)
 	m_ssaoPass->Render(&context);
 
-	// [패스 4] Deferred Lighting 패스: G-buffer를 기반으로 라이팅 연산 시작
-	// 포스트 프로세싱을 위해 포스트 프로세스 프레임 버퍼게 그림을 그림
+	// [패스 4] 디퍼드 라이팅 (G-Buffer + SSAO + Shadow -> PostProcessFBO)
 	context.SetTargetFramebuffer(m_postProcessPass->GetFramebuffer());
 	m_deferredLightPass->Render(&context);
-
-	// 포스트 프로세스 프레임 버퍼에 깊이 복사
-	auto gBuffer = m_geometryPass->GetGBuffer();
-	auto postFBO = m_postProcessPass->GetFramebuffer();
+	Framebuffer::Blit
+	(
+		m_geometryPass->GetGBuffer(), m_postProcessPass->GetFramebuffer(),
+		GL_DEPTH_BUFFER_BIT, GL_NEAREST
+	);
 
 	// [패스 5] 포워드 셰이딩
+	context.BindTargetFramebuffer();
 	for (const auto& [name, pass] : registry->GetCustomRenderPasses())
 		pass->Render(scene, camera);
 
 	// [패스 6] 스카이박스 패스
 	m_skyboxPass->Render(&context);
 
-	// [패스 7] 아웃라인 패스
+	// [패스 7] 모션 블러 & 아웃라인 (2D 후처리 효과들)
+	m_motionBlurPass->Render(&context);
 	m_outlinePass->Render(&context);
 
-	// [패스 7] 포스트 프로세싱 패스
+	// [패스 8] 포스트 프로세싱 패스 (최종 합성 및 화면 출력)
 	m_postProcessPass->Render(&context);
 
-	/*=========================//
-	//   imgui debug context   //
-	//=========================*/
+	// [패스 9] 디버그 패스 (ImGUI 컨텍스트와 충돌 기즈모 출력)
+	// m_debugGizmoPass->Render(&context);
 	RenderIMGUIContext();
 }
 
@@ -177,23 +170,3 @@ void UniversalRenderPipeline::RenderIMGUIContext()
 }
 
 #pragma endregion
-
-void UniversalRenderPipeline::BlitCopyDepth
-(
-	GBufferFramebuffer* src, PostProcessFramebuffer* dst,
-	int32 width, int32 height
-)
-{
-	if (!src || !dst) return;
-
-	glBindFramebuffer(GL_READ_FRAMEBUFFER, src->Get());
-	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, dst->Get());
-
-	glBlitFramebuffer
-	(
-		0, 0, width, height,
-		0, 0, width, height,
-		GL_DEPTH_BUFFER_BIT,
-		GL_NEAREST
-	);
-}

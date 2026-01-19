@@ -27,13 +27,10 @@ bool PostProcessFramebuffer::CreateAttachments()
 	ClearAttachments();
 	glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
 
-	// 1. 컬러 텍스처 생성 (HDR 대응: RGBA16F)
+	// 1. 컬러 및 깊이 텍스쳐 생성 (HDR 대응: RGBA16F)
 	CreateAndAttachColor(0, GL_RGBA16F, GL_RGBA, GL_FLOAT, GL_LINEAR);
+	CreateAndAttachDepth(GL_DEPTH24_STENCIL8, GL_DEPTH_STENCIL, GL_UNSIGNED_INT_24_8);
 
-	// 2. Draw Buffer 설정 (컬러가 1개뿐이므로 0번 활성화)
-	uint32 attachments[1] = { GL_COLOR_ATTACHMENT0 };
-	glDrawBuffers(1, attachments);
-
-	// 3. 상태 확인 및 언바인드 (부모의 CheckFramebufferStatus 활용)
+	// 2. 상태 확인 및 언바인드 (부모의 CheckFramebufferStatus 활용)
 	return CheckFramebufferStatus("PostProcess");
 }

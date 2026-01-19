@@ -17,9 +17,6 @@
 #include "Components/Animator.h"
 #include "Framebuffers/GBufferFramebuffer.h"
 
-#include "Pipelines/URP/UniversalRenderPipeline.h"
-#include "Pipelines/URP/UniversalRenderContext.h"
-
 DECLARE_DEFAULTS_IMPL(UniversalGeometryPass)
 
 UniversalGeometryPassUPtr UniversalGeometryPass::Create(int32 width, int32 height)
@@ -40,9 +37,6 @@ bool UniversalGeometryPass::Init(int32 width, int32 height)
 
 void UniversalGeometryPass::Render(RenderContext* context)
 {
-	// 0. 자신의 렌더 패스에 활용되고 있는 RenderContext로 캐스팅
-	auto stdCtx = (UniversalRenderContext*)context;
-
 	// 1. G-Buffer FBO 바인딩
 	m_gBuffer->Bind();
 
@@ -54,13 +48,13 @@ void UniversalGeometryPass::Render(RenderContext* context)
 	glDisable(GL_BLEND);
 	
 	// 3. Static Mesh 그리기 (정적 오브젝트)
-	RenderStaticGeometry(stdCtx->GetStaticMeshRenderers());
+	RenderStaticGeometry(context->GetStaticMeshRenderers());
 
 	// 4. Skinned Mesh 그리기 (애니메이션 오브젝트)
-	RenderSkinnedGeometry(stdCtx->GetSkinnedMeshRenderers());
+	RenderSkinnedGeometry(context->GetSkinnedMeshRenderers());
 
 	// 5. context에 gBuffer 캐싱
-	stdCtx->SetGBuffer(m_gBuffer.get());
+	context->SetGBuffer(m_gBuffer.get());
 
 	// 6. 그리기 완료 후 기본 프레임버퍼로 복귀
 	Framebuffer::BindToDefault();
@@ -108,25 +102,3 @@ void UniversalGeometryPass::Resize(int32 width, int32 height)
 	m_gBuffer = GBufferFramebuffer::Create(width, height);
 }
 
-/*=================================================//
-//   universal geometry pass getters and setters   //
-//=================================================*/
-void UniversalGeometryPass::AddStaticMeshRenderer(StaticMeshRenderer* staticMeshRenderer)
-{
-	m_staticMeshRenderers.push_back(staticMeshRenderer);
-}
-
-void UniversalGeometryPass::AddSkinnedMeshRenderer(SkinnedMeshRenderer* skinnedMeshRenderer)
-{
-	m_skinnedMeshRenderers.push_back(skinnedMeshRenderer);
-}
-
-const std::vector<StaticMeshRenderer*>& UniversalGeometryPass::GetStaticMeshRenderers() const
-{
-	return m_staticMeshRenderers;
-}
-
-const std::vector<SkinnedMeshRenderer*>& UniversalGeometryPass::GetSkinnedMeshRenderers() const
-{
-	return m_skinnedMeshRenderers;
-}

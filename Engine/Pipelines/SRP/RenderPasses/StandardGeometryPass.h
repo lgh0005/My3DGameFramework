@@ -22,9 +22,6 @@ public:
 		int32 width = WINDOW_WIDTH,
 		int32 heigh = WINDOW_HEIGHT
 	);
-
-	const std::vector<StaticMeshRenderer*>& GetStaticMeshRenderers() const;
-	const std::vector<SkinnedMeshRenderer*>& GetSkinnedMeshRenderers() const;
 	GBufferFramebuffer* GetGBuffer() { return m_gBuffer.get(); }
 
 	virtual void Render(RenderContext* context) override;

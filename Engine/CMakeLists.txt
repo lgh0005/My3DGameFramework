@@ -56,11 +56,11 @@ add_library(Engine STATIC
    "Pipelines/SRP/StandardRenderPipeline.h"    "Pipelines/SRP/StandardRenderPipeline.cpp"
    
    # Universal Render Pipeline
-   #"Pipelines/URP/RenderPasses/UniversalGeometryPass.h" "Pipelines/URP/RenderPasses/UniversalGeometryPass.cpp"
-   #"Pipelines/URP/RenderPasses/UniversalPostProcessPass.h"  "Pipelines/URP/RenderPasses/UniversalPostProcessPass.cpp"
-   #"Pipelines/URP/RenderPasses/UniversalDeferredLightingPass.h" "Pipelines/URP/RenderPasses/UniversalDeferredLightingPass.cpp"
-   #"Pipelines/URP/UniversalGlobalUniforms.h"   "Pipelines/URP/UniversalGlobalUniforms.cpp"
-   #"Pipelines/URP/UniversalRenderPipeline.h"   "Pipelines/URP/UniversalRenderPipeline.cpp"
+   "Pipelines/URP/RenderPasses/UniversalGeometryPass.h" "Pipelines/URP/RenderPasses/UniversalGeometryPass.cpp"
+   "Pipelines/URP/RenderPasses/UniversalPostProcessPass.h"  "Pipelines/URP/RenderPasses/UniversalPostProcessPass.cpp"
+   "Pipelines/URP/RenderPasses/UniversalDeferredLightingPass.h" "Pipelines/URP/RenderPasses/UniversalDeferredLightingPass.cpp"
+   "Pipelines/URP/UniversalGlobalUniforms.h"   "Pipelines/URP/UniversalGlobalUniforms.cpp"
+   "Pipelines/URP/UniversalRenderPipeline.h"   "Pipelines/URP/UniversalRenderPipeline.cpp"
 
    # Misc
    "Misc/Defines.h"                 
@@ -115,6 +115,8 @@ add_library(Engine STATIC
    "Framebuffers/PostProcessFramebuffer.h"  "Framebuffers/PostProcessFramebuffer.cpp"
    "Framebuffers/SSAOFramebuffer.h"         "Framebuffers/SSAOFramebuffer.cpp"
    "Framebuffers/OutlineFramebuffer.h"      "Framebuffers/OutlineFramebuffer.cpp"
+   "Framebuffers/OutlineFramebuffer.h"      "Framebuffers/OutlineFramebuffer.cpp"
+   "Framebuffers/EffectFramebuffer.h"        "Framebuffers/EffectFramebuffer.cpp"
 
    # Resources
    "Resources/Resource.h"           "Resources/Resource.cpp"

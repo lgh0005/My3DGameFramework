@@ -8,7 +8,6 @@ CLASS_PTR(ScreenMesh)
 CLASS_PTR(Texture)
 CLASS_PTR(Program)
 CLASS_PTR(RenderContext)
-CLASS_PTR(UniversalRenderContext)
 #pragma endregion
 
 CLASS_PTR(UniversalDeferredLightingPass)
@@ -24,11 +23,11 @@ public:
 //   deferred lighting pass helper methods   //
 //===========================================*/
 private:
-	void BeginDrawOnPostProcessFBO(UniversalRenderContext* context);
-	void BindSSAOTexture(UniversalRenderContext* context);
-	void BindShadowMaps(UniversalRenderContext* context);
-	void BindIBLMaps(UniversalRenderContext* context);
-	void GetLightMatricesFromContext(UniversalRenderContext* context);
+	void BeginDrawOnPostProcessFBO(RenderContext* context);
+	void BindSSAOTexture(RenderContext* context);
+	void BindShadowMaps(RenderContext* context);
+	void BindIBLMaps(RenderContext* context);
+	void GetLightMatricesFromContext(RenderContext* context);
 
 private:
 	UniversalDeferredLightingPass();

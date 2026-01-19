@@ -36,10 +36,10 @@ void My3DGameFramework::OnInit()
     );
 
     // 1. URP 전용 씬
-    /*RegisterLevel<PBRScene, UniversalRenderPipeline>
+    RegisterLevel<PBRScene, UniversalRenderPipeline>
     (
         "PBRLevel",
         "PBRScene",
         "Universal"
-    );*/
+    );
 }

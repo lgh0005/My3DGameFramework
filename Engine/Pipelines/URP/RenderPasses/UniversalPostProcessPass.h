@@ -6,6 +6,7 @@ CLASS_PTR(Scene)
 CLASS_PTR(Camera)
 CLASS_PTR(Framebuffer)
 CLASS_PTR(PostProcessFramebuffer)
+CLASS_PTR(EffectFramebuffer)
 CLASS_PTR(ScreenMesh)
 CLASS_PTR(RenderContext)
 CLASS_PTR(Program)
@@ -14,7 +15,7 @@ CLASS_PTR(Texture)
 
 struct KawaseBloomMips
 {
-	TextureUPtr texture;
+	TexturePtr texture;
 	int32 width; int32 height;
 };
 
@@ -39,6 +40,7 @@ public:
 private:
 	Texture* RenderKawaseBloom(Texture* hdrTexture);
 	void RenderComposite(Texture* hdrTexture, Texture* bloomTexture);
+	void CreateBloomMips(int32 width, int32 height);
 
 private:
 	UniversalPostProcessPass();
@@ -52,6 +54,6 @@ private:
 	float m_exposure		  { 0.7f };
 	float m_threshold		  { 1.0f };
 
-	PostProcessFramebufferUPtr m_bloomFBO;				  // Bloom 처리용 FBO
+	EffectFramebufferUPtr		 m_bloomFBO;	  // Bloom 처리용 FBO
 	std::vector<KawaseBloomMips> m_bloomMips; // Bloom 텍스처 체인 (보통 5~6단계)
 };

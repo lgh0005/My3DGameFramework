@@ -90,13 +90,11 @@ void StandardDeferredLightingPass::BeginDrawOnPostProcessFBO(RenderContext* cont
 
 	// 2. 그리기 준비 (Output FBO 설정)
 	context->BindTargetFramebuffer();
-
 	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 	glClear(GL_COLOR_BUFFER_BIT);
 
-	m_deferredLightProgram->Use();
-
 	// 3. G-Buffer 텍스처 바인딩 (Context 데이터 사용)
+	m_deferredLightProgram->Use();
 	glActiveTexture(GL_TEXTURE0); tPos->Bind();
 	glActiveTexture(GL_TEXTURE1); tNormal->Bind();
 	glActiveTexture(GL_TEXTURE2); tAlbedo->Bind();
@@ -107,17 +105,16 @@ void StandardDeferredLightingPass::BindSSAOTexture(RenderContext* context)
 {
 	// 4. SSAO 텍스처 바인딩 (Context 데이터 사용)
 	Texture* tSSAO = context->GetTexture(RenderSlot::SSAO);
+	glActiveTexture(GL_TEXTURE12);
 
 	if (tSSAO)
 	{
-		glActiveTexture(GL_TEXTURE12);
 		tSSAO->Bind();
 		m_deferredLightProgram->SetUniform("useSSAO", true);
 	}
 	else
 	{
-		glActiveTexture(GL_TEXTURE12);
-		glBindTexture(GL_TEXTURE_2D, 0);
+		glBindTexture(GL_TEXTURE_2D, 0); // TODO : 이것도 static 메서드로 빼두기
 		m_deferredLightProgram->SetUniform("useSSAO", false);
 	}
 }

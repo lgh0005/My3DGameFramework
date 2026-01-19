@@ -10,8 +10,7 @@
 #include "Graphics/Geometry.h"
 #include "Components/Camera.h"
 #include "Framebuffers/PostProcessFrameBuffer.h"
-
-#include "Pipelines/URP/UniversalRenderContext.h"
+#include "Framebuffers/EffectFramebuffer.h"
 
 DECLARE_DEFAULTS_IMPL(UniversalPostProcessPass)
 
@@ -24,42 +23,20 @@ UniversalPostProcessPassUPtr UniversalPostProcessPass::Create(int32 width, int32
 
 bool UniversalPostProcessPass::Init(int32 width, int32 height)
 {
-	// 1. Kawase Bloom
 	m_bloomProgram = RESOURCE.GetResource<Program>("universal_postprocess_blur");
-
-	// Bloom용 FBO 및 텍스처 생성 (추가됨)
-	m_bloomFBO = PostProcessFramebuffer::Create(1, 1, false); // 크기는 매번 바꿀거라 임시 생성
-	m_bloomMips.clear();
-
-	int32 mipWidth = width;
-	int32 mipHeight = height;
-	for (int i = 0; i < 5; i++) // 5단계 정도의 Mip Chain 생성
-	{
-		mipWidth >>= 1;
-		mipHeight >>= 1;
-		if (width < 2 || height < 2) break;
-
-		KawaseBloomMips mip;
-		mip.width = mipWidth;
-		mip.height = mipHeight;
-		mip.texture = Texture::Create(mipWidth, mipHeight, GL_R11F_G11F_B10F, GL_RGB, GL_FLOAT);
-		
-		// 중요: Linear 필터링과 Clamp 설정
-		mip.texture->SetFilter(GL_LINEAR, GL_LINEAR);
-		mip.texture->SetWrap(GL_CLAMP_TO_EDGE, GL_CLAMP_TO_EDGE);
-
-		m_bloomMips.push_back(std::move(mip));
-	}
-
-	// 2. FXAA, 톤 매핑 그리고 감마 코렉션 
 	m_compositeProgram = RESOURCE.GetResource<Program>("universal_postprocess_postprocess");
-
-	// 2. 스크린 메쉬 생성
 	m_plane = RESOURCE.GetResource<ScreenMesh>("Screen");
 
-	// 3. 프레임 버퍼 생성
-	m_frameBuffer = PostProcessFramebuffer::Create(width, height, true);
+	// 1. 프레임 버퍼 생성
+	m_frameBuffer = PostProcessFramebuffer::Create(width, height);
 	if (!m_frameBuffer) return false;
+
+	// 2. Bloom용 FBO 및 텍스처 생성 (추가됨)
+	m_bloomFBO = EffectFramebuffer::CreateEmpty();
+	if (!m_bloomFBO) return false;
+
+	// 3. Bloom 밉맵 체인 생성
+	CreateBloomMips(width, height);
 
 	return true;
 }
@@ -79,28 +56,10 @@ void UniversalPostProcessPass::Render(RenderContext* context)
 
 void UniversalPostProcessPass::Resize(int32 width, int32 height)
 {
-	m_frameBuffer = PostProcessFramebuffer::Create(width, height, true);
+	m_frameBuffer->OnResize(width, height);
 
 	// Bloom Mip Chain 재생성 (Init 코드와 동일한 로직)
-	m_bloomMips.clear();
-	int32 mipWidth = width;
-	int32 mipHeight = height;
-
-	for (int i = 0; i < 5; i++)
-	{
-		mipWidth >>= 1;
-		mipHeight >>= 1;
-		if (mipWidth < 2 || mipHeight < 2) break;
-
-		KawaseBloomMips mip;
-		mip.width = mipWidth;
-		mip.height = mipHeight;
-		mip.texture = Texture::Create(mipWidth, mipHeight, GL_R11F_G11F_B10F, GL_RGB, GL_FLOAT);
-		mip.texture->SetFilter(GL_LINEAR, GL_LINEAR);
-		mip.texture->SetWrap(GL_CLAMP_TO_EDGE, GL_CLAMP_TO_EDGE);
-
-		m_bloomMips.push_back(std::move(mip));
-	}
+	CreateBloomMips(width, height);
 }
 
 /*==============================================//
@@ -122,7 +81,7 @@ Texture* UniversalPostProcessPass::RenderKawaseBloom(Texture* hdrTexture)
 	m_bloomProgram->SetUniform("threshold", m_threshold);
 
 	// [수정] AttachTexture에 0번 인덱스 명시
-	m_bloomFBO->AttachTexture(m_bloomMips[0].texture.get(), 0);
+	m_bloomFBO->AttachColorTexture(0, m_bloomMips[0].texture);
 	glViewport(0, 0, m_bloomMips[0].width, m_bloomMips[0].height);
 	glClear(GL_COLOR_BUFFER_BIT);
 
@@ -141,10 +100,10 @@ Texture* UniversalPostProcessPass::RenderKawaseBloom(Texture* hdrTexture)
 	//==========================================*/
 	m_bloomProgram->SetUniform("mode", 1);
 
-	for (size_t i = 1; i < m_bloomMips.size(); i++)
+	for (usize i = 1; i < m_bloomMips.size(); i++)
 	{
 		// Target: Current Mip
-		m_bloomFBO->AttachTexture(m_bloomMips[i].texture.get(), 0);
+		m_bloomFBO->AttachColorTexture(0, m_bloomMips[i].texture);
 		glViewport(0, 0, m_bloomMips[i].width, m_bloomMips[i].height);
 		glClear(GL_COLOR_BUFFER_BIT);
 
@@ -167,10 +126,10 @@ Texture* UniversalPostProcessPass::RenderKawaseBloom(Texture* hdrTexture)
 
 	m_bloomProgram->SetUniform("mode", 2);
 
-	for (int32 i = (int32)m_bloomMips.size() - 1; i > 0; i--)
+	for (usize i = m_bloomMips.size() - 1; i > 0; i--)
 	{
 		// Target: Upper Mip (이미 그려진 것 위에 덧칠)
-		m_bloomFBO->AttachTexture(m_bloomMips[i - 1].texture.get(), 0);
+		m_bloomFBO->AttachColorTexture(0, m_bloomMips[i - 1].texture);
 		glViewport(0, 0, m_bloomMips[i - 1].width, m_bloomMips[i - 1].height);
 
 		// Source: Current Mip
@@ -232,5 +191,30 @@ void UniversalPostProcessPass::RenderComposite(Texture* hdrTexture, Texture* blo
 	// 상태 복구
 	glEnable(GL_CULL_FACE);
 	glEnable(GL_DEPTH_TEST);
+}
+
+void UniversalPostProcessPass::CreateBloomMips(int32 width, int32 height)
+{
+	m_bloomMips.clear();
+
+	int32 mipWidth = width;
+	int32 mipHeight = height;
+	for (int32 i = 0; i < 5; i++) // 5단계 정도의 Mip Chain 생성
+	{
+		mipWidth >>= 1;
+		mipHeight >>= 1;
+		if (width < 2 || height < 2) break;
+
+		KawaseBloomMips mip;
+		mip.width = mipWidth;
+		mip.height = mipHeight;
+		mip.texture = Texture::Create(mipWidth, mipHeight, GL_R11F_G11F_B10F, GL_RGB, GL_FLOAT);
+
+		// 중요: Linear 필터링과 Clamp 설정
+		mip.texture->SetFilter(GL_LINEAR, GL_LINEAR);
+		mip.texture->SetWrap(GL_CLAMP_TO_EDGE, GL_CLAMP_TO_EDGE);
+
+		m_bloomMips.push_back(std::move(mip));
+	}
 }
 

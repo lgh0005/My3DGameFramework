@@ -7,6 +7,7 @@ CLASS_PTR(Camera)
 CLASS_PTR(Program)
 CLASS_PTR(Framebuffer)
 CLASS_PTR(PostProcessFramebuffer)
+CLASS_PTR(EffectFramebuffer)
 CLASS_PTR(ScreenMesh)
 CLASS_PTR(RenderContext)
 CLASS_PTR(Texture)
@@ -43,7 +44,7 @@ private:
 	ProgramPtr							  m_compositeProgram;
 	ProgramPtr							  m_thresholdProgram;
 	PostProcessFramebufferUPtr			  m_frameBuffer;
-	PostProcessFramebufferUPtr			  m_pingPongFBOs[2];
+	EffectFramebufferUPtr				  m_pingPongFBOs[2];
 	TexturePtr							  m_cameraDirtTexture;
 	float m_gamma						  { 2.2f };
 	float m_exposure					  { 1.0f };

@@ -56,7 +56,7 @@ void MotionBlurPass::Render(RenderContext* context)
 	velocityTex->Bind();
 
 	// 블러 강도 등 유니폼 설정 (필요시)
-	m_motionBlurProgram->SetUniform("uBlurScale", 0.95f);
+	m_motionBlurProgram->SetUniform("uBlurScale", 0.95f); // 0.95f 정도
 
 	// 그리기 (Quad)
 	m_plane->Draw();
