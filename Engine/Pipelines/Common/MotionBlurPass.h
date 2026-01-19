@@ -8,21 +8,17 @@ CLASS_PTR(ScreenMesh)
 CLASS_PTR(PostProcessFramebuffer)
 #pragma endregion
 
-CLASS_PTR(StandardMotionBlurPass)
-class StandardMotionBlurPass : public ContextRenderPass
+CLASS_PTR(MotionBlurPass)
+class MotionBlurPass : public ContextRenderPass
 {
 public:
-	~StandardMotionBlurPass();
-	static StandardMotionBlurPassUPtr Create
-	(
-		int32 width = WINDOW_WIDTH,
-		int32 heigh = WINDOW_HEIGHT
-	);
+	~MotionBlurPass();
+	static MotionBlurPassUPtr Create(int32 width = WINDOW_WIDTH, int32 heigh = WINDOW_HEIGHT);
 	virtual void Render(RenderContext* context) override;
 	void Resize(int32 width, int32 height);
 
 private:
-	StandardMotionBlurPass();
+	MotionBlurPass();
 	bool Init(int32 width, int32 height);
 
 	ScreenMeshPtr					m_plane;

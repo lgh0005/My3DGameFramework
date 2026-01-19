@@ -43,19 +43,18 @@ add_library(Engine STATIC
    "Pipelines/Common/UIWorldSpacePass.h"  "Pipelines/Common/UIWorldSpacePass.cpp"
    "Pipelines/Common/UIScreenSpacePass.h" "Pipelines/Common/UIScreenSpacePass.cpp"
    "Pipelines/Common/JoltDebugGizmoPass.h"  "Pipelines/Common/JoltDebugGizmoPass.cpp"
-   "Pipelines/SRP/RenderPasses/StandardMotionBlurPass.h" "Pipelines/SRP/RenderPasses/StandardMotionBlurPass.cpp"
+   "Pipelines/Common/MotionBlurPass.h" "Pipelines/Common/MotionBlurPass.cpp"
+   "Pipelines/Common/SSAOPass.h"    "Pipelines/Common/SSAOPass.cpp"
+   "Pipelines/Common/OutlinePass.h" "Pipelines/Common/OutlinePass.cpp"
 
    # Standard Render Pipeline
    "Pipelines/SRP/RenderPasses/StandardPostProcessPass.h" "Pipelines/SRP/RenderPasses/StandardPostProcessPass.cpp"
    "Pipelines/SRP/RenderPasses/StandardGeometryPass.h"  "Pipelines/SRP/RenderPasses/StandardGeometryPass.cpp"
    "Pipelines/SRP/RenderPasses/StandardDeferredLightingPass.h"  "Pipelines/SRP/RenderPasses/StandardDeferredLightingPass.cpp"
-   "Pipelines/SRP/RenderPasses/StandardSSAOPass.h"    "Pipelines/SRP/RenderPasses/StandardSSAOPass.cpp"
    "Pipelines/SRP/RenderPasses/StandardPostProcessPass.h"  "Pipelines/SRP/RenderPasses/StandardPostProcessPass.cpp"
    "Pipelines/SRP/StandardGlobalUniforms.h"    "Pipelines/SRP/StandardGlobalUniforms.cpp"
-   "Pipelines/SRP/StandardRenderContext.h"     "Pipelines/SRP/StandardRenderContext.cpp"
    "Pipelines/SRP/StandardRenderPipeline.h"    "Pipelines/SRP/StandardRenderPipeline.cpp"
-   "Pipelines/SRP/RenderPasses/StandardOutlinePass.h" "Pipelines/SRP/RenderPasses/StandardOutlinePass.cpp"
-
+   
    # Universal Render Pipeline
    #"Pipelines/URP/RenderPasses/UniversalGeometryPass.h" "Pipelines/URP/RenderPasses/UniversalGeometryPass.cpp"
    #"Pipelines/URP/RenderPasses/UniversalPostProcessPass.h"  "Pipelines/URP/RenderPasses/UniversalPostProcessPass.cpp"

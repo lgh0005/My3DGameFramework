@@ -5,16 +5,14 @@
 CLASS_PTR(CullingPass)
 CLASS_PTR(ShadowPass)
 CLASS_PTR(SkyboxPass)
-CLASS_PTR(JoltDebugGizmoPass)
+CLASS_PTR(SSAOPass)
+CLASS_PTR(OutlinePass)
+CLASS_PTR(MotionBlurPass)
 CLASS_PTR(StandardDeferredLightingPass)
 CLASS_PTR(StandardGeometryPass)
-CLASS_PTR(StandardSSAOPass)
-CLASS_PTR(StandardOutlinePass)
 CLASS_PTR(StandardPostProcessPass)
 CLASS_PTR(StandardGlobalUniforms)
-CLASS_PTR(StandardMotionBlurPass)
-CLASS_PTR(GBufferFramebuffer)
-CLASS_PTR(PostProcessFramebuffer)
+CLASS_PTR(JoltDebugGizmoPass)
 #pragma endregion
 
 CLASS_PTR(StandardRenderPipeline)
@@ -35,14 +33,14 @@ private:
 	ShadowPassUPtr					  m_shadowPass		  { nullptr };
 	SkyboxPassUPtr                    m_skyboxPass		  { nullptr };
 	JoltDebugGizmoPassUPtr			  m_debugGizmoPass	  { nullptr };
+	SSAOPassUPtr					  m_ssaoPass		  { nullptr };
+	OutlinePassUPtr					  m_outlinePass		  { nullptr };
+	MotionBlurPassUPtr				  m_motionBlurPass	  { nullptr };
 
 	// SRP 필수 렌더 패스
 	StandardPostProcessPassUPtr		  m_postProcessPass	  { nullptr };
 	StandardGeometryPassUPtr		  m_geometryPass	  { nullptr };
 	StandardDeferredLightingPassUPtr  m_deferredLightPass { nullptr };
-	StandardSSAOPassUPtr			  m_ssaoPass		  { nullptr };
-	StandardOutlinePassUPtr		      m_outlinePass		  { nullptr };
-	StandardMotionBlurPassUPtr		  m_motionBlurPass	  { nullptr };
 
 	// SRP 공통 유니폼 변수 버퍼
 	StandardGlobalUniformsUPtr        m_globalUniforms	  { nullptr };

@@ -7,12 +7,12 @@ CLASS_PTR(OutlineFramebuffer)
 CLASS_PTR(ScreenMesh)
 #pragma endregion
 
-CLASS_PTR(StandardOutlinePass)
-class StandardOutlinePass : public ContextRenderPass
+CLASS_PTR(OutlinePass)
+class OutlinePass : public ContextRenderPass
 {
 public:
-	virtual ~StandardOutlinePass();
-	static StandardOutlinePassUPtr Create
+	virtual ~OutlinePass();
+	static OutlinePassUPtr Create
 	(
 		int32 width = WINDOW_WIDTH,
 		int32 height = WINDOW_HEIGHT,
@@ -31,7 +31,7 @@ private:
 	void MaskSkinnedMeshes(const std::vector<MeshOutline*>& outlines);
 
 private:
-	StandardOutlinePass();
+	OutlinePass();
 	bool Init
 	(
 		int32 width, int32 height, 

@@ -1,5 +1,5 @@
 ﻿#include "EnginePch.h"
-#include "StandardSSAOPass.h"
+#include "SSAOPass.h"
 
 #include "Scene/Scene.h"
 #include "Graphics/RenderContext.h"
@@ -11,18 +11,16 @@
 #include "Resources/Program.h"
 #include "Framebuffers/SSAOFramebuffer.h"
 
-#include "Pipelines/SRP/StandardRenderContext.h"
+DECLARE_DEFAULTS_IMPL(SSAOPass)
 
-DECLARE_DEFAULTS_IMPL(StandardSSAOPass)
-
-StandardSSAOPassUPtr StandardSSAOPass::Create(int32 width, int32 height)
+SSAOPassUPtr SSAOPass::Create(int32 width, int32 height)
 {
-    auto pass = StandardSSAOPassUPtr(new StandardSSAOPass());
+    auto pass = SSAOPassUPtr(new SSAOPass());
     if (!pass->Init(width, height)) return nullptr;
     return std::move(pass);
 }
 
-bool StandardSSAOPass::Init(int32 width, int32 height)
+bool SSAOPass::Init(int32 width, int32 height)
 {
     m_ssaoProgram = RESOURCE.GetResource<Program>("standard_ssao");
     m_ssaoBlurProgram = RESOURCE.GetResource<Program>("standard_ssao_blur");
@@ -47,13 +45,13 @@ bool StandardSSAOPass::Init(int32 width, int32 height)
     return true;
 }
 
-void StandardSSAOPass::Resize(int32 width, int32 height)
+void SSAOPass::Resize(int32 width, int32 height)
 {
     m_ssaoFBO->OnResize(width, height);
     m_ssaoBlurFBO->OnResize(width, height);
 }
 
-void StandardSSAOPass::Render(RenderContext* context)
+void SSAOPass::Render(RenderContext* context)
 {    
     // 1. SSAO 계산 (G-Buffer -> Raw SSAO)
     ComputeSSAO(context);
@@ -71,7 +69,7 @@ void StandardSSAOPass::Render(RenderContext* context)
 /*==============================//
 //   ssao pass helper methods   //
 //==============================*/
-void StandardSSAOPass::GenerateKernel()
+void SSAOPass::GenerateKernel()
 {
     std::uniform_real_distribution<float> randomFloats(0.0, 1.0);
     std::default_random_engine generator;
@@ -95,7 +93,7 @@ void StandardSSAOPass::GenerateKernel()
     }
 }
 
-void StandardSSAOPass::GenerateNoiseTexture()
+void SSAOPass::GenerateNoiseTexture()
 {
     std::uniform_real_distribution<float> randomFloats(0.0, 1.0);
     std::default_random_engine generator;
@@ -122,7 +120,7 @@ void StandardSSAOPass::GenerateNoiseTexture()
     m_noiseTexture->SetData(ssaoNoise.data());
 }
 
-void StandardSSAOPass::ComputeSSAO(RenderContext* context)
+void SSAOPass::ComputeSSAO(RenderContext* context)
 {
     Camera* camera = context->GetCamera();
     Texture* gPos = context->GetTexture(RenderSlot::GPosition);
@@ -151,7 +149,7 @@ void StandardSSAOPass::ComputeSSAO(RenderContext* context)
     m_screenQuad->Draw();
 }
 
-void StandardSSAOPass::BlurSSAOResult(RenderContext* context)
+void SSAOPass::BlurSSAOResult(RenderContext* context)
 {
     // SSAO Blur
     m_ssaoBlurFBO->Bind();

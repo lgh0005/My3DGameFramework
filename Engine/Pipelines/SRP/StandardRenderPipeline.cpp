@@ -5,12 +5,12 @@
 #include "Pipelines/Common/ShadowPass.h"
 #include "Pipelines/Common/SkyboxPass.h"
 #include "Pipelines/Common/JoltDebugGizmoPass.h"
-#include "Pipelines/SRP/RenderPasses/StandardOutlinePass.h"
+#include "Pipelines/Common/OutlinePass.h"
+#include "Pipelines/Common/SSAOPass.h"
+#include "Pipelines/Common/MotionBlurPass.h"
 #include "Pipelines/SRP/RenderPasses/StandardPostProcessPass.h"
 #include "Pipelines/SRP/RenderPasses/StandardGeometryPass.h"
 #include "Pipelines/SRP/RenderPasses/StandardDeferredLightingPass.h"
-#include "Pipelines/SRP/RenderPasses/StandardSSAOPass.h"
-#include "Pipelines/SRP/RenderPasses/StandardMotionBlurPass.h"
 #include "Pipelines/SRP/StandardGlobalUniforms.h"
 
 #include "Scene/Scene.h"
@@ -50,7 +50,7 @@ bool StandardRenderPipeline::Init()
 	if (!m_cullingPass) return false;
 
 	// 아웃라인 패스 생성
-	m_outlinePass = StandardOutlinePass::Create();
+	m_outlinePass = OutlinePass::Create();
 	if (!m_outlinePass) return false;
 
 	// 셰도우 패스 생성
@@ -66,7 +66,7 @@ bool StandardRenderPipeline::Init()
 	if (!m_debugGizmoPass) return false;
 
 	// SSAO 패스 생성
-	m_ssaoPass = StandardSSAOPass::Create();
+	m_ssaoPass = SSAOPass::Create();
 	if (!m_ssaoPass) return false;
 
 	// 포스트-프로세스 패스 생성
@@ -82,7 +82,7 @@ bool StandardRenderPipeline::Init()
 	if (!m_deferredLightPass) return false;
 
 	// 모션 블러 패스 생성
-	m_motionBlurPass = StandardMotionBlurPass::Create();
+	m_motionBlurPass = MotionBlurPass::Create();
 	if (!m_motionBlurPass) return false;
 
 	// 깊이 부착

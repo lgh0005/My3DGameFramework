@@ -1,5 +1,5 @@
 ﻿#include "EnginePch.h"
-#include "StandardOutlinePass.h"
+#include "OutlinePass.h"
 
 #include "Graphics/RenderContext.h"
 #include "Object/GameObject.h"
@@ -15,23 +15,20 @@
 #include "Components/Animator.h"
 #include "Components/Transform.h"
 
-#include "Pipelines/SRP/StandardRenderContext.h"
-#include "Pipelines/SRP/RenderPasses/StandardPostProcessPass.h"
+DECLARE_DEFAULTS_IMPL(OutlinePass)
 
-DECLARE_DEFAULTS_IMPL(StandardOutlinePass)
-
-StandardOutlinePassUPtr StandardOutlinePass::Create
+OutlinePassUPtr OutlinePass::Create
 (
 	int32 width, int32 height, 
 	const glm::vec3& color,
 	float thickness)
 {
-	auto pass = StandardOutlinePassUPtr(new StandardOutlinePass());
+	auto pass = OutlinePassUPtr(new OutlinePass());
 	if (!pass->Init(width, height, color, thickness)) return nullptr;
 	return std::move(pass);
 }
 
-bool StandardOutlinePass::Init
+bool OutlinePass::Init
 (
 	int32 width, int32 height, 
 	const glm::vec3& color,
@@ -57,7 +54,7 @@ bool StandardOutlinePass::Init
 	return true;
 }
 
-void StandardOutlinePass::Render(RenderContext* context)
+void OutlinePass::Render(RenderContext* context)
 {
 	// 0. 데이터 확인
 	if (!context) return;
@@ -115,7 +112,7 @@ void StandardOutlinePass::Render(RenderContext* context)
 	glCullFace(GL_BACK);
 }
 
-void StandardOutlinePass::Resize(int32 width, int32 height)
+void OutlinePass::Resize(int32 width, int32 height)
 {
 	m_maskFBO->OnResize(width, height);
 }
@@ -123,7 +120,7 @@ void StandardOutlinePass::Resize(int32 width, int32 height)
 /*==============================//
 //   outlining helper methods   //
 //==============================*/
-void StandardOutlinePass::MaskMeshes(const std::vector<MeshOutline*>& outlines)
+void OutlinePass::MaskMeshes(const std::vector<MeshOutline*>& outlines)
 {
 	// 1. 분류를 위한 정적 벡터
 	static std::vector<MeshOutline*> staticOutlines;  staticOutlines.clear();
@@ -166,7 +163,7 @@ void StandardOutlinePass::MaskMeshes(const std::vector<MeshOutline*>& outlines)
 	if (!skinnedOutlines.empty()) MaskSkinnedMeshes(skinnedOutlines);
 }
 
-void StandardOutlinePass::MaskStaticMeshes(const std::vector<MeshOutline*>& outlines)
+void OutlinePass::MaskStaticMeshes(const std::vector<MeshOutline*>& outlines)
 {
 	m_maskStaticProgram->Use();
 
@@ -184,7 +181,7 @@ void StandardOutlinePass::MaskStaticMeshes(const std::vector<MeshOutline*>& outl
 	}
 }
 
-void StandardOutlinePass::MaskSkinnedMeshes(const std::vector<MeshOutline*>& outlines)
+void OutlinePass::MaskSkinnedMeshes(const std::vector<MeshOutline*>& outlines)
 {
 	m_maskSkinnedProgram->Use();
 

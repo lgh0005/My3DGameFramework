@@ -1,23 +1,21 @@
 ﻿#include "EnginePch.h"
-#include "StandardMotionBlurPass.h"
+#include "MotionBlurPass.h"
 #include "Graphics/RenderContext.h"
 #include "Resources/Program.h"
 #include "Resources/ScreenMesh.h"
 #include "Resources/Texture.h"
 #include "Framebuffers/PostProcessFramebuffer.h"
 
-#include "Pipelines/SRP/StandardRenderContext.h"
+DECLARE_DEFAULTS_IMPL(MotionBlurPass)
 
-DECLARE_DEFAULTS_IMPL(StandardMotionBlurPass)
-
-StandardMotionBlurPassUPtr StandardMotionBlurPass::Create(int32 width, int32 height)
+MotionBlurPassUPtr MotionBlurPass::Create(int32 width, int32 height)
 {
-	auto pass = StandardMotionBlurPassUPtr(new StandardMotionBlurPass());
+	auto pass = MotionBlurPassUPtr(new MotionBlurPass());
 	if (!pass->Init(width, height)) return nullptr;
 	return std::move(pass);
 }
 
-bool StandardMotionBlurPass::Init(int32 width, int32 height)
+bool MotionBlurPass::Init(int32 width, int32 height)
 {
 	m_motionBlurProgram = RESOURCE.GetResource<Program>("standard_motion_blur");
 	m_plane = RESOURCE.GetResource<ScreenMesh>("Screen");
@@ -31,11 +29,8 @@ bool StandardMotionBlurPass::Init(int32 width, int32 height)
 	return true;
 }
 
-void StandardMotionBlurPass::Render(RenderContext* context)
+void MotionBlurPass::Render(RenderContext* context)
 {
-	auto stdCtx = (StandardRenderContext*)context;
-	if (!stdCtx) return;
-
 	// 1. Input 가져오기 (Context가 가리키는 현재 메인 화면)
 	Framebuffer* mainFBO = context->GetTargetFramebuffer();
 	Texture* velocityTex = context->GetTexture(RenderSlot::GVelocity);
@@ -74,7 +69,7 @@ void StandardMotionBlurPass::Render(RenderContext* context)
 	Framebuffer::BindToDefault();
 }
 
-void StandardMotionBlurPass::Resize(int32 width, int32 height)
+void MotionBlurPass::Resize(int32 width, int32 height)
 {
 	m_blurFBO->OnResize(width, height);
 }

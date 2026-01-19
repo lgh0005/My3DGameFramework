@@ -13,8 +13,6 @@
 #include "Components/Camera.h"
 #include "Framebuffers/PostProcessFramebuffer.h"
 
-#include "Pipelines/SRP/StandardRenderContext.h"
-
 DECLARE_DEFAULTS_IMPL(SkyboxPass)
 
 SkyboxPassUPtr SkyboxPass::Create()

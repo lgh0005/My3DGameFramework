@@ -14,12 +14,12 @@ CLASS_PTR(RenderContext)
 CLASS_PTR(StandardRenderContext)
 #pragma endregion
 
-CLASS_PTR(StandardSSAOPass)
-class StandardSSAOPass : public ContextRenderPass
+CLASS_PTR(SSAOPass)
+class SSAOPass : public ContextRenderPass
 {
 public:
-	virtual ~StandardSSAOPass();
-	static StandardSSAOPassUPtr Create
+	virtual ~SSAOPass();
+	static SSAOPassUPtr Create
 	(
 		int32 width = WINDOW_WIDTH, 
 		int32 height = WINDOW_HEIGHT
@@ -37,7 +37,7 @@ private:
 	void GenerateNoiseTexture();
 
 private:
-	StandardSSAOPass();
+	SSAOPass();
 	bool Init(int32 width, int32 height);
 
 	ScreenMeshPtr		   m_screenQuad{ nullptr };
