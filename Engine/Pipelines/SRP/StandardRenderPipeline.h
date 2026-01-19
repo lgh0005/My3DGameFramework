@@ -29,12 +29,6 @@ public:
 private:
 	StandardRenderPipeline();
 	bool Init();
-	void BlitCopyDepth
-	(
-		GBufferFramebuffer* src, PostProcessFramebuffer* dst,
-		int32 width = WINDOW_WIDTH,
-		int32 height = WINDOW_HEIGHT
-	);
 
 	// 공통 필수 렌더 패스
 	CullingPassUPtr					  m_cullingPass		  { nullptr };

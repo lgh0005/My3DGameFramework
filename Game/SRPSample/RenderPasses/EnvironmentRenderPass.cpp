@@ -48,6 +48,7 @@ void EnvironmentRenderPass::Render(Scene* scene, Camera* camera)
 	m_envProgram->SetUniform("projection", projection);
 	m_envProgram->SetUniform("cameraPos", cameraPos);
 
+	glActiveTexture(GL_TEXTURE0);
 	m_cubeTexture->Bind();
 	m_envProgram->SetUniform("skybox", 0);
 

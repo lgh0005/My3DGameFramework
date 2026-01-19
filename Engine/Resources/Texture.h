@@ -6,6 +6,8 @@
 CLASS_PTR(Image)
 #pragma endregion
 
+// TODO : 이것도 Texture를 상위 클래스로 두고 전용 텍스쳐로
+// 조금 나눌 필요가 있어보인다.
 CLASS_PTR(Texture)
 class Texture : public Resource
 {
@@ -18,6 +20,7 @@ public:
 	static TextureUPtr CreateFromHDR(const Image* image);
 	static TextureUPtr CreateFromKtxImage(const std::string& ktxFilePath);
 	static TextureUPtr CreateFromKtxHDR(const std::string& ktxFilePath);
+	static TextureUPtr CreateMultisample(int32 width, int32 height, int32 samples, uint32 internalFormat);
 
 public:
 	const uint32 Get() const	{ return m_texture; }
@@ -34,6 +37,10 @@ public:
 	uint32 GetType()	   const    { return m_type; }
 	uint32 GetFormat()     const	{ return m_format; }
 
+	int32 GetSamples() const { return m_samples; }
+
+	void Resize(int32 width, int32 height);
+
 private:
 	Texture();
 	void CreateTexture();
@@ -44,6 +51,8 @@ private:
 	uint32	m_texture		{ 0 };
 	int32	m_width			{ 0 };
 	int32	m_height		{ 0 };
+	uint32  m_internalFormat{ 0 };
+	int32   m_samples		{ 1 };
 	uint32  m_type			{ GL_UNSIGNED_BYTE };
 	uint32	m_format		{ GL_RGBA };
 	GLenum  m_target		{ GL_TEXTURE_2D };

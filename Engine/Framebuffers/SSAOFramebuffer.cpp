@@ -18,27 +18,22 @@ bool SSAOFramebuffer::Init(int32 width, int32 height)
 
     // 1. 부모의 m_fbo 사용
     glGenFramebuffers(1, &m_fbo);
+
+    return CreateAttachments();
+}
+
+bool SSAOFramebuffer::CreateAttachments()
+{
+    ClearAttachments();
     glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
 
-    // 2. 텍스처 생성 (R16F)
-    auto texture = Texture::Create(width, height, GL_R16F, GL_RED, GL_FLOAT);
-    texture->SetFilter(GL_NEAREST, GL_NEAREST);
-    texture->SetWrap(GL_CLAMP_TO_EDGE, GL_CLAMP_TO_EDGE);
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, texture->Get(), 0);
+    // 1. SSAO용 텍스처 생성 (R16F)
+    CreateAndAttachColor(0, GL_R16F, GL_RED, GL_FLOAT, GL_NEAREST);
 
-    // 3. 부모의 텍스처 컨테이너에 등록
-    m_textures.push_back(std::move(texture));
-
-    // 4. Draw Buffer 설정
+    // 2. Draw Buffer 설정
     uint32 attachments[1] = { GL_COLOR_ATTACHMENT0 };
     glDrawBuffers(1, attachments);
 
-    if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
-    {
-        LOG_ERROR("SSAO Framebuffer Incomplete!");
-        return false;
-    }
-
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
-    return true;
+    // 3. 상태 확인 및 언바인드
+    return CheckFramebufferStatus("SSAO");
 }

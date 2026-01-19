@@ -74,8 +74,12 @@ void StandardDeferredLightingPass::Render(RenderContext* context)
 	GetLightMatricesFromContext(stdCtx);
 
 	// 5. 그리기
+	glDisable(GL_DEPTH_TEST);
 	m_plane->Draw();
 	glEnable(GL_DEPTH_TEST);
+
+	// 5. 사용한 FBO 해제
+	Framebuffer::BindToDefault();
 }
 
 /*==========================================//
@@ -96,18 +100,15 @@ void StandardDeferredLightingPass::BeginDrawOnPostProcessFBO(StandardRenderConte
 	{
 		targetFBO->Bind();
 		glViewport(0, 0, targetFBO->GetWidth(), targetFBO->GetHeight());
-		glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
-		glClear(GL_COLOR_BUFFER_BIT);
 	}
 	else
 	{
 		Framebuffer::BindToDefault();
-		// 텍스처 크기를 기준으로 뷰포트 설정
 		glViewport(0, 0, tPos->GetWidth(), tPos->GetHeight());
-		glDisable(GL_DEPTH_TEST);
-		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-		glClear(GL_COLOR_BUFFER_BIT);
 	}
+
+	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+	glClear(GL_COLOR_BUFFER_BIT);
 
 	m_deferredLightProgram->Use();
 

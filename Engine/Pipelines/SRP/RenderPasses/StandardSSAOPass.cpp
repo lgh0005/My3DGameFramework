@@ -49,8 +49,8 @@ bool StandardSSAOPass::Init(int32 width, int32 height)
 
 void StandardSSAOPass::Resize(int32 width, int32 height)
 {
-    m_ssaoFBO = SSAOFramebuffer::Create(width, height);
-    m_ssaoBlurFBO = SSAOFramebuffer::Create(width, height);
+    m_ssaoFBO->OnResize(width, height);
+    m_ssaoBlurFBO->OnResize(width, height);
 }
 
 void StandardSSAOPass::Render(RenderContext* context)
@@ -133,6 +133,7 @@ void StandardSSAOPass::ComputeSSAO(StandardRenderContext* context)
     if (!camera || !gPos || !gNormal) return;
 
     m_ssaoFBO->Bind();
+    glViewport(0, 0, m_ssaoFBO->GetWidth(), m_ssaoFBO->GetHeight());
     glClear(GL_COLOR_BUFFER_BIT);
 
     m_ssaoProgram->Use();

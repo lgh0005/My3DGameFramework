@@ -17,60 +17,33 @@ bool GBufferFramebuffer::Init(int32 width, int32 height)
     m_height = height;
 
     glGenFramebuffers(1, &m_fbo);
+
+    return CreateAttachments();
+}
+
+bool GBufferFramebuffer::CreateAttachments()
+{
+    ClearAttachments();
     glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
 
-    // Attachment 0: Position (RGB16F)
-    auto posTexture = Texture::Create(width, height, GL_RGBA16F, GL_RGBA, GL_FLOAT);
-    posTexture->SetFilter(GL_NEAREST, GL_NEAREST);
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, posTexture->Get(), 0);
-    m_textures.push_back(std::move(posTexture));
-
-    // Attachment 1: Normal + shininess (RGB16F)
-    auto normTexture = Texture::Create(width, height, GL_RGBA16F, GL_RGBA, GL_FLOAT);
-    normTexture->SetFilter(GL_NEAREST, GL_NEAREST);
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, normTexture->Get(), 0);
-    m_textures.push_back(std::move(normTexture));
-
-    // Attachment 2: Albedo + Specular (RGBA)
-    auto colorTexture = Texture::Create(width, height, GL_RGBA16F, GL_RGBA, GL_UNSIGNED_BYTE);
-    colorTexture->SetFilter(GL_NEAREST, GL_NEAREST);
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT2, GL_TEXTURE_2D, colorTexture->Get(), 0);
-    m_textures.push_back(std::move(colorTexture));
-
-    // Attachment 3 : Emission
-    auto emissionTexture = Texture::Create(width, height, GL_RGBA16F, GL_RGBA, GL_FLOAT);
-    emissionTexture->SetFilter(GL_NEAREST, GL_NEAREST);
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT3, GL_TEXTURE_2D, emissionTexture->Get(), 0);
-    m_textures.push_back(std::move(emissionTexture));
-
-    // Attachment 4 : velocity
-    auto velocityTexture = Texture::Create(width, height, GL_RG16F, GL_RG, GL_FLOAT);
-    velocityTexture->SetFilter(GL_NEAREST, GL_NEAREST);
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT4, GL_TEXTURE_2D, velocityTexture->Get(), 0);
-    m_textures.push_back(std::move(velocityTexture));
+    CreateAndAttachColor(0, GL_RGBA16F, GL_RGBA, GL_FLOAT);         // Position
+    CreateAndAttachColor(1, GL_RGBA16F, GL_RGBA, GL_FLOAT);         // Normal
+    CreateAndAttachColor(2, GL_RGBA16F, GL_RGBA, GL_UNSIGNED_BYTE); // Albedo
+    CreateAndAttachColor(3, GL_RGBA16F, GL_RGBA, GL_FLOAT);         // Emission
+    CreateAndAttachColor(4, GL_RG16F, GL_RG, GL_FLOAT);             // Velocity
 
     // Draw Buffers 부착
-    uint32 attachments[5] = {
+    uint32 attachments[5] = 
+    {
         GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1,
         GL_COLOR_ATTACHMENT2, GL_COLOR_ATTACHMENT3,
-        GL_COLOR_ATTACHMENT4 
+        GL_COLOR_ATTACHMENT4
     };
     glDrawBuffers(5, attachments);
 
     // Depth Texture 사용
-    m_depthTexture = Texture::Create(width, height, GL_DEPTH24_STENCIL8, GL_DEPTH_STENCIL, GL_UNSIGNED_INT_24_8);
-    m_depthTexture->SetFilter(GL_NEAREST, GL_NEAREST);
-    m_depthTexture->SetWrap(GL_CLAMP_TO_EDGE, GL_CLAMP_TO_EDGE);
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_TEXTURE_2D, m_depthTexture->Get(), 0);
+    CreateAndAttachDepth();
 
-    // Result check
-    auto gBufferResult = glCheckFramebufferStatus(GL_FRAMEBUFFER);
-    if (gBufferResult != GL_FRAMEBUFFER_COMPLETE)
-    {
-        LOG_ERROR("failed to create gBuffer: {}", gBufferResult);
-        return false;
-    }
-
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
-    return true;
+    // 5. 상태 체크
+    return CheckFramebufferStatus("GBufferFramebuffer");
 }

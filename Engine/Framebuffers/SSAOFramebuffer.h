@@ -11,4 +11,5 @@ public:
 private:
 	bool Init(int32 width, int32 height);
 	SSAOFramebuffer();
+	virtual bool CreateAttachments() override;
 };

@@ -31,9 +31,9 @@ bool StandardPostProcessPass::Init(int32 width, int32 height)
 	m_cameraDirtTexture = RESOURCE.GetResource<Texture>("camera_dirt");
 	if (!m_plane) return false;
 
-	m_frameBuffer	  = PostProcessFramebuffer::Create(width, height, true);
-	m_pingPongFBOs[0] = PostProcessFramebuffer::Create(width, height, false);
-	m_pingPongFBOs[1] = PostProcessFramebuffer::Create(width, height, false);
+	m_frameBuffer	  = PostProcessFramebuffer::Create(width, height);
+	m_pingPongFBOs[0] = PostProcessFramebuffer::Create(width, height);
+	m_pingPongFBOs[1] = PostProcessFramebuffer::Create(width, height);
 
 	return (m_frameBuffer && m_pingPongFBOs[0] && m_pingPongFBOs[1]);
 }
@@ -61,15 +61,14 @@ void StandardPostProcessPass::Render(RenderContext* context)
 
 void StandardPostProcessPass::Resize(int32 width, int32 height)
 {
-	m_frameBuffer = PostProcessFramebuffer::Create(width, height, true);
-	m_pingPongFBOs[0] = PostProcessFramebuffer::Create(width, height, false);
-	m_pingPongFBOs[1] = PostProcessFramebuffer::Create(width, height, false);
+	m_frameBuffer->OnResize(width, height);
+	m_pingPongFBOs[0]->OnResize(width, height);
+	m_pingPongFBOs[1]->OnResize(width, height);
 
 	if (m_compositeProgram)
 	{
 		m_compositeProgram->Use();
-		m_compositeProgram->SetUniform
-		(
+		m_compositeProgram->SetUniform(
 			"inverseScreenSize",
 			glm::vec2(1.0f / (float)width, 1.0f / (float)height)
 		);

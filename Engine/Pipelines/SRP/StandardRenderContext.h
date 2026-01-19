@@ -15,9 +15,10 @@ public:
 	StandardRenderContext();
 	virtual ~StandardRenderContext();
 
-	// For DeferredLightingPass : draw on Post-processing framebuffer
+	// draw on Post-processing framebuffer
 	void SetTargetFramebuffer(PostProcessFramebuffer* fbo) { m_targetFramebuffer = fbo; }
 	PostProcessFramebuffer* GetTargetFramebuffer() const { return m_targetFramebuffer; }
+	void BindTargetFramebuffer();
 
 	// For StandardGeometryPass
 	void SetGBuffer(GBufferFramebuffer* gBuffer);

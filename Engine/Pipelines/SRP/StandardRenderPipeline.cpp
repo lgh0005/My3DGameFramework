@@ -89,26 +89,6 @@ bool StandardRenderPipeline::Init()
 	return true;
 }
 
-void StandardRenderPipeline::BlitCopyDepth
-(
-	GBufferFramebuffer* src, PostProcessFramebuffer* dst,
-	int32 width,		 int32 height
-)
-{
-	if (!src || !dst) return;
-
-	glBindFramebuffer(GL_READ_FRAMEBUFFER, src->Get());
-	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, dst->Get());
-
-	glBlitFramebuffer
-	(
-		0, 0, width, height,
-		0, 0, width, height,
-		GL_DEPTH_BUFFER_BIT,
-		GL_NEAREST
-	);
-}
-
 void StandardRenderPipeline::Render(Scene* scene)
 {
 	/*====================================//
@@ -125,79 +105,53 @@ void StandardRenderPipeline::Render(Scene* scene)
 	StandardRenderContext context;
 	context.Reset(scene, camera);
 
-	// [패스 0] 컬링 패스 : 절두체 범위 안에 있는 대상만 추리기
+	// [패스 0~1] 컬링 및 그림자
 	m_cullingPass->Render(&context);
-
-	// 1. ubo 갱신
 	m_globalUniforms->PreRender(&context);
-
-	/*================================//
-	//   main scene rendergin logic   //
-	//================================*/
-	// [패스 1] 그림자 패스: m_shadowMap에 깊이 정보 기록
 	m_shadowPass->Render(&context);
 
-	// [패스 2] 디퍼드 셰이딩 : G-buffer 채우기
+	// [패스 2] 디퍼드 지오메트리 (G-Buffer 채우기)
 	m_geometryPass->Render(&context);
 
-	// [패스 3] SSAO
+	// [패스 3] SSAO (G-Buffer 읽어서 Occlusion 계산)
 	m_ssaoPass->Render(&context);
 
-	// [패스 4] Deferred Lighting 패스: G-buffer를 기반으로 라이팅 연산 시작
-	// 포스트 프로세싱을 위해 포스트 프로세스 프레임 버퍼게 그림을 그림
+	// [패스 4] 디퍼드 라이팅 (G-Buffer + SSAO + Shadow -> PostProcessFBO)
 	context.SetTargetFramebuffer(m_postProcessPass->GetFramebuffer());
 	m_deferredLightPass->Render(&context);
 
-	// 포스트 프로세스 프레임 버퍼에 깊이 복사
-	auto gBuffer = m_geometryPass->GetGBuffer();
-	auto postFBO = m_postProcessPass->GetFramebuffer();
-	BlitCopyDepth(gBuffer, postFBO, gBuffer->GetWidth(), gBuffer->GetHeight());
-
 	// [패스 5] 포워드 셰이딩
+	context.BindTargetFramebuffer();
 	for (const auto& [name, pass] : registry->GetCustomRenderPasses())
 		pass->Render(scene, camera);
 
-	// ====================================================
-	// [패스 5.5] World Space UI 패스 (3D 공간 UI)
-	// ====================================================
-	// 위치: 후처리(Pass 8) 전이어야 함! 그래야 Bloom도 먹고 톤맵핑도 먹음.
-	// 설정: Depth Test 켜야 함 (벽 뒤에 숨어야 하니까)
-	// m_uiPass->Render(&context, UIRenderMode::WorldSpace);
-
-	// [패스 6] 스카이박스 패스: m_frameBuffer에 스카이박스 덧그리기
+	// [패스 6] 스카이박스 패스 (공유된 깊이를 기반으로 깊이 테스트 수행하며 덧그림)
 	m_skyboxPass->Render(&context);
 
-	// [패스 7] 아웃라인 패스
+	// [패스 7] 모션 블러 & 아웃라인 (2D 후처리 효과들)
+	m_motionBlurPass->Render(&context);
 	m_outlinePass->Render(&context);
 
-	m_motionBlurPass->Render(&context);
-
-	// [패스 8] 후처리 패스: m_frameBuffer의 결과를 화면에 Resolve
+	// [패스 8] 후처리 패스 (최종 합성 및 화면 출력)
 	m_postProcessPass->Render(&context);
 
-	// [패스 8.5] 디버그 패스
+	// [패스 9] 디버그 패스 (ImGUI 컨텍스트와 충돌 기즈모 출력)
 	m_debugGizmoPass->Render(&context);
-
-	// ====================================================
-	// [패스 9] UI 패스 : 최종 화면 위에 UI 덧그리기 (Overlay)
-	// ====================================================
-	// 이 시점에서는 Depth Test를 끄고(Screen UI), Alpha Blending을 켜야 함
-
-
-
-	/*=========================//
-	//   imgui debug context   //
-	//=========================*/
 	RenderIMGUIContext();
 
 }
 
 void StandardRenderPipeline::OnResize(int32 width, int32 height)
 {
+	// 1. 모든 패스의 FBO 내부 텍스처 갱신
 	m_geometryPass->Resize(width, height);
 	m_postProcessPass->Resize(width, height);
 	m_ssaoPass->Resize(width, height);
 	m_outlinePass->Resize(width, height);
+
+	// 2. 깊이 버퍼 재연결
+	auto mainDepth = m_geometryPass->GetGBuffer()->GetDepthAttachment();
+	m_postProcessPass->GetFramebuffer()->AttachDepthTexture(mainDepth);
 }
 
 /*======================//

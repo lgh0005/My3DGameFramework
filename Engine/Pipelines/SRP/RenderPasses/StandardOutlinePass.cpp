@@ -72,11 +72,10 @@ void StandardOutlinePass::Render(RenderContext* context)
 	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	// [핵심] 깊이 테스트 끄기 (Always On Top / X-Ray)
-	// 벽 뒤에 있든 말든 무조건 마스크를 그립니다.
+	// Always On Top 효과를 위해 깊이 설정 조정
 	glDepthFunc(GL_ALWAYS);
 	glDisable(GL_DEPTH_TEST);
-	glDisable(GL_CULL_FACE); // 구멍 없이 꽉 채우기 위해 컬링 끔
+	glDisable(GL_CULL_FACE); 
 
 	// 마스킹 렌더링 (단색으로 그리기)
 	MaskMeshes(outlines);
@@ -92,7 +91,6 @@ void StandardOutlinePass::Render(RenderContext* context)
 	}
 	else
 	{
-		// TODO : 뷰포트 바꾸는 로직 수정 필요
 		Framebuffer::BindToDefault();
 		auto* tPos = stdCtx->GetGBufferPosition();
 		glViewport(0, 0, tPos->GetWidth(), tPos->GetHeight());
@@ -107,7 +105,7 @@ void StandardOutlinePass::Render(RenderContext* context)
 
 	// 0번 슬롯에 마스크 텍스처 바인딩
 	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, m_maskFBO->GetTexture()->Get());
+	m_maskFBO->GetTexture()->Bind();
 
 	// 해상도 및 두께 전달
 	m_postProgram->SetUniform("canvasSize", glm::vec2(m_maskFBO->GetWidth(), m_maskFBO->GetHeight()));
@@ -118,6 +116,7 @@ void StandardOutlinePass::Render(RenderContext* context)
 	m_screenMesh->Draw();
 
 	// 상태 복구
+	Framebuffer::BindToDefault();
 	glDisable(GL_BLEND);
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);
@@ -126,7 +125,7 @@ void StandardOutlinePass::Render(RenderContext* context)
 
 void StandardOutlinePass::Resize(int32 width, int32 height)
 {
-	m_maskFBO = OutlineFramebuffer::Create(width, height);
+	m_maskFBO->OnResize(width, height);
 }
 
 /*==============================//

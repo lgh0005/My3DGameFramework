@@ -19,7 +19,7 @@ public:
 	static ShadowPassUPtr Create(int32 resolution = 1024);
 	virtual void Render(RenderContext* context) override;
 	ShadowMap* GetShadowMap(int32 index) { return m_shadowMaps[index].get(); }
-	void Resize(int32 widht, int32 height);
+	void Resize(int32 resolution );
 
 /*==================================//
 //   shadow casting helper methods  //
@@ -45,8 +45,6 @@ private:
 
 	int32	    m_resolution;
 	std::vector<ShadowMapUPtr> m_shadowMaps;
-	/*ProgramUPtr m_staticDepthProgram;
-	ProgramUPtr m_skinnedDepthProgram;*/
 
 	ProgramPtr m_staticDepthProgram;
 	ProgramPtr m_skinnedDepthProgram;

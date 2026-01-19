@@ -11,4 +11,5 @@ public:
 private:
 	GBufferFramebuffer();
 	bool Init(int32 width, int32 height);
+	virtual bool CreateAttachments() override;
 };

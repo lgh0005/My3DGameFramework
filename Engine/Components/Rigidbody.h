@@ -3,6 +3,9 @@
 #include "Physics/RigidbodyConstraint.h"
 #include <Jolt/Physics/Body/MotionType.h>
 
+// TODO : 현재 구조는 Rigidbody가 있어야만 충돌이 감지되는 구조임
+// Rigidbody로부터 충돌 감지 역할을 하는 부분만 걷어내어서 다른 컴포넌트
+// 클래스를 만들던가 아니면 Collider로 이전을 시켜주는 것이 필요해보임
 CLASS_PTR(Rigidbody)
 class Rigidbody : public PhysicsComponent
 {

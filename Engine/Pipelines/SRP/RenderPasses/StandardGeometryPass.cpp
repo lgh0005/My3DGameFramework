@@ -118,7 +118,7 @@ void StandardGeometryPass::RenderSkinnedGeometry(const std::vector<SkinnedMeshRe
 
 void StandardGeometryPass::Resize(int32 width, int32 height)
 {
-	m_gBuffer = GBufferFramebuffer::Create(width, height);
+	m_gBuffer->OnResize(width, height);
 }
 
 /*================================================//

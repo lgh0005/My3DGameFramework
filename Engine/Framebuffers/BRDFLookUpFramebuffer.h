@@ -11,4 +11,5 @@ public:
 private:
 	bool Init(int32 width, int32 height);
 	BRDFLookUpFramebuffer();
+	virtual bool CreateAttachments() override;
 };

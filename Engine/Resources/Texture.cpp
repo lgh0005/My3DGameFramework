@@ -93,6 +93,22 @@ TextureUPtr Texture::CreateFromKtxHDR(const std::string& ktxFilePath)
     return std::move(texture);
 }
 
+TextureUPtr Texture::CreateMultisample(int32 width, int32 height, int32 samples, uint32 internalFormat)
+{
+    auto texture = TextureUPtr(new Texture());
+
+    // 1. ID 생성 및 타겟 설정
+    glGenTextures(1, &texture->m_texture);
+    texture->m_target = GL_TEXTURE_2D_MULTISAMPLE;
+    texture->m_samples = samples;
+    texture->m_internalFormat = internalFormat;
+
+    // 2. 메모리 할당 (SetTextureFormat 활용)
+    texture->SetTextureFormat(width, height, internalFormat, 0, 0);
+
+    return std::move(texture);
+}
+
 /*=============================//
 //   default texture setters   //
 //=============================*/
@@ -170,11 +186,23 @@ void Texture::SetTextureFormat(int32 width, int32 height,
 {
     m_width  = width;
     m_height = height;
+    m_internalFormat = internalFormat;
     m_format = format;
     m_type   = type;
 
-    glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, m_width, m_height, 0,
-        format, m_type, nullptr);
+    Bind();
+    
+    if (m_target == GL_TEXTURE_2D_MULTISAMPLE)
+    {
+        // 멀티샘플 텍스처 전용 할당
+        // GL_TRUE: 고정된 샘플 위치 사용
+        glTexImage2DMultisample(m_target, m_samples, m_internalFormat, m_width, m_height, GL_TRUE);
+    }
+    else
+    {
+        // 일반 2D 텍스처 할당
+        glTexImage2D(m_target, 0, m_internalFormat, m_width, m_height, 0, m_format, m_type, nullptr);
+    }
 }
 
 TextureUPtr Texture::LoadKtx(const std::string& ktxFilePath)
@@ -228,6 +256,12 @@ TexturePtr Texture::s_whiteTex = nullptr;
 TexturePtr Texture::s_grayTex = nullptr;
 TexturePtr Texture::s_blackTex = nullptr;
 TexturePtr Texture::s_blueTex = nullptr;
+
+void Texture::Resize(int32 width, int32 height)
+{
+    if (m_width == width && m_height == height) return;
+    SetTextureFormat(width, height, m_internalFormat, m_format, m_type);
+}
 
 TexturePtr Texture::Create4x4Texture(const std::vector<uint8>& colorData)
 {

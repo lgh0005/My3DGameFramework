@@ -41,7 +41,7 @@ bool ShadowPass::Init(int32 resolution)
 	m_shadowMaps.resize(MAX_SHADOW_CASTER);
 	for (int i = 0; i < MAX_SHADOW_CASTER; ++i)
 	{
-		m_shadowMaps[i] = ShadowMap::Create(resolution, resolution);
+		m_shadowMaps[i] = ShadowMap::Create(resolution);
 		if (!m_shadowMaps[i])
 		{
 			LOG_ERROR("Failed to create ShadowMap index {}", i);
@@ -199,5 +199,17 @@ void ShadowPass::RegisterShadowMapsToContext(RenderContext* context)
 		{
 			context->SetShadowMap(i, nullptr);
 		}
+	}
+}
+
+void ShadowPass::Resize(int32 resolution)
+{
+	if (m_resolution == resolution) return;
+
+	m_resolution = resolution;
+	for (auto& shadowMap : m_shadowMaps)
+	{
+		if (shadowMap)
+			shadowMap->Resize(m_resolution);
 	}
 }
