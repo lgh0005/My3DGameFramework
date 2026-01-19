@@ -4,13 +4,13 @@
 #include "Pipelines/Common/CullingPass.h"
 #include "Pipelines/Common/ShadowPass.h"
 #include "Pipelines/Common/SkyboxPass.h"
+#include "Pipelines/Common/SSAOPass.h"
+#include "Pipelines/Common/OutlinePass.h"
 #include "Pipelines/URP/RenderPasses/UniversalGeometryPass.h"
-#include "Pipelines/URP/RenderPasses/UniversalSSAOPass.h"
 #include "Pipelines/URP/RenderPasses/UniversalPostProcessPass.h"
 #include "Pipelines/URP/RenderPasses/UniversalDeferredLightingPass.h"
-#include "Pipelines/URP/RenderPasses/UniversalOutlinePass.h"
 #include "Pipelines/URP/UniversalGlobalUniforms.h"
-#include "Pipelines/URP/UniversalRenderContext.h"
+#include "Graphics/RenderContext.h"
 
 #include "Scene/Scene.h"
 #include "Scene/ComponentRegistry.h"
@@ -51,7 +51,7 @@ bool UniversalRenderPipeline::Init()
 	if (!m_cullingPass) return false;
 
 	// 아웃라인 패스 생성
-	m_outlinePass = UniversalOutlinePass::Create();
+	m_outlinePass = OutlinePass::Create();
 	if (!m_outlinePass) return false;
 
 	// 셰도우 패스 생성
@@ -63,7 +63,7 @@ bool UniversalRenderPipeline::Init()
 	if (!m_skyboxPass) return false;
 
 	// SSAO 패스 생성
-	m_ssaoPass = UniversalSSAOPass::Create();
+	m_ssaoPass = SSAOPass::Create();
 	if (!m_ssaoPass) return false;
 
 	// 포스트-프로세싱 패스 생성
@@ -130,7 +130,6 @@ void UniversalRenderPipeline::Render(Scene* scene)
 	// 포스트 프로세스 프레임 버퍼에 깊이 복사
 	auto gBuffer = m_geometryPass->GetGBuffer();
 	auto postFBO = m_postProcessPass->GetFramebuffer();
-	BlitCopyDepth(gBuffer, postFBO, gBuffer->GetWidth(), gBuffer->GetHeight());
 
 	// [패스 5] 포워드 셰이딩
 	for (const auto& [name, pass] : registry->GetCustomRenderPasses())

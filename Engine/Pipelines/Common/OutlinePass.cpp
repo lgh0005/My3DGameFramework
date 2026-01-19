@@ -61,9 +61,6 @@ void OutlinePass::Render(RenderContext* context)
 	const auto& outlines = context->GetMeshOutlines();
 	if (outlines.empty()) return;
 
-	Camera* camera = context->GetCamera();
-	if (!camera) return
-
 	// [Pass 1] 마스크 텍스처 생성 (Mask Generation)
 	m_maskFBO->Bind();
 

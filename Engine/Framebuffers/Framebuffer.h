@@ -33,11 +33,6 @@ public:
     int32 GetHeight() const { return m_height; }
     bool OnResize(int32 width, int32 height);
 
-protected:
-    Framebuffer();
-    virtual bool CreateAttachments() = 0;
-    bool CheckFramebufferStatus(const std::string& name) const;
-
     TexturePtr CreateAndAttachColor
     (
         uint32 index, // 0, 1, 2... (GL_COLOR_ATTACHMENT0 + index)
@@ -54,6 +49,11 @@ protected:
         uint32 type = GL_UNSIGNED_INT_24_8,
         uint32 filter = GL_NEAREST
     );
+
+protected:
+    Framebuffer();
+    virtual bool CreateAttachments() = 0;
+    bool CheckFramebufferStatus(const std::string& name) const;
 
     // FBO ID
     uint32 m_fbo{ 0 };

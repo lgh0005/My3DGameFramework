@@ -32,7 +32,6 @@ private:
 	CullingPassUPtr					  m_cullingPass		  { nullptr };
 	ShadowPassUPtr					  m_shadowPass		  { nullptr };
 	SkyboxPassUPtr                    m_skyboxPass		  { nullptr };
-	JoltDebugGizmoPassUPtr			  m_debugGizmoPass	  { nullptr };
 	SSAOPassUPtr					  m_ssaoPass		  { nullptr };
 	OutlinePassUPtr					  m_outlinePass		  { nullptr };
 	MotionBlurPassUPtr				  m_motionBlurPass	  { nullptr };
@@ -44,6 +43,9 @@ private:
 
 	// SRP 공통 유니폼 변수 버퍼
 	StandardGlobalUniformsUPtr        m_globalUniforms	  { nullptr };
+
+	// 디버그
+	JoltDebugGizmoPassUPtr			  m_debugGizmoPass{ nullptr };
 
 /*================================//
 //   IMGUI debug context method   //

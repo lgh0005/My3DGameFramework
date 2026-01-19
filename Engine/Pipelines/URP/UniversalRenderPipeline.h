@@ -5,14 +5,14 @@
 CLASS_PTR(CullingPass)
 CLASS_PTR(ShadowPass)
 CLASS_PTR(SkyboxPass)
+CLASS_PTR(SSAOPass)
+CLASS_PTR(OutlinePass)
+CLASS_PTR(MotionBlurPass)
 CLASS_PTR(UniversalPostProcessPass)
 CLASS_PTR(UniversalGeometryPass)
-CLASS_PTR(UniversalSSAOPass)
-CLASS_PTR(UniversalOutlinePass)
 CLASS_PTR(UniversalDeferredLightingPass)
 CLASS_PTR(UniversalGlobalUniforms)
-CLASS_PTR(GBufferFramebuffer)
-CLASS_PTR(PostProcessFramebuffer)
+CLASS_PTR(JoltDebugGizmoPass)
 #pragma endregion
 
 CLASS_PTR(UniversalRenderPipeline)
@@ -27,31 +27,25 @@ public:
 private:
 	UniversalRenderPipeline();
 	bool Init();
-	void BlitCopyDepth
-	(
-		GBufferFramebuffer* src, PostProcessFramebuffer* dst,
-		int32 width = WINDOW_WIDTH,
-		int32 height = WINDOW_HEIGHT
-	);
-
-	// TODO : PBR 기반 렌더링 파이프라인
-	// SRP에 쓰였던 일부 렌더링 파이프라인을 재사용하거나 조금 수정
-	// 필요할 수 있음.
 
 	// 공통 필수 렌더 패스
 	CullingPassUPtr		         m_cullingPass      { nullptr };
 	ShadowPassUPtr				 m_shadowPass		{ nullptr };
 	SkyboxPassUPtr               m_skyboxPass       { nullptr };
+	SSAOPassUPtr				 m_ssaoPass			{ nullptr };
+	OutlinePassUPtr			     m_outlinePass		{ nullptr };
+	MotionBlurPassUPtr			 m_motionBlurPass	{ nullptr };
 
 	// URP 필수 렌더 패스
-	UniversalPostProcessPassUPtr m_postProcessPass	{ nullptr };
-	UniversalGeometryPassUPtr    m_geometryPass     { nullptr };
-	UniversalSSAOPassUPtr		 m_ssaoPass			{ nullptr };
+	UniversalPostProcessPassUPtr	   m_postProcessPass	{ nullptr };
+	UniversalGeometryPassUPtr		   m_geometryPass       { nullptr };
 	UniversalDeferredLightingPassUPtr  m_deferredLightPass  { nullptr };
-	UniversalOutlinePassUPtr		 m_outlinePass		{ nullptr };
 
 	// URP 공통 유니폼 변수 버퍼
 	UniversalGlobalUniformsUPtr  m_globalUniforms	{ nullptr }; 
+
+	// 디버그
+	JoltDebugGizmoPassUPtr		 m_debugGizmoPass   { nullptr };
 
 /*================================//
 //   IMGUI debug context method   //

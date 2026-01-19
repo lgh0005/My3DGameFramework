@@ -71,10 +71,12 @@ bool StandardRenderPipeline::Init()
 
 	// 포스트-프로세스 패스 생성
 	m_postProcessPass = StandardPostProcessPass::Create();
+	m_postProcessPass->GetFramebuffer()->CreateAndAttachDepth();
 	if (!m_postProcessPass) return false;
 
 	// G-buffer 패스 생성
 	m_geometryPass = StandardGeometryPass::Create();
+	m_geometryPass->GetGBuffer()->CreateAndAttachDepth();
 	if (!m_geometryPass) return false;
 
 	// Light 패스 생성
@@ -84,10 +86,6 @@ bool StandardRenderPipeline::Init()
 	// 모션 블러 패스 생성
 	m_motionBlurPass = MotionBlurPass::Create();
 	if (!m_motionBlurPass) return false;
-
-	// 깊이 부착
-	auto depthTex = m_geometryPass->GetGBuffer()->GetDepthAttachment();
-	m_postProcessPass->GetFramebuffer()->AttachDepthTexture(depthTex);
 
 	return true;
 }
@@ -122,6 +120,11 @@ void StandardRenderPipeline::Render(Scene* scene)
 	// [패스 4] 디퍼드 라이팅 (G-Buffer + SSAO + Shadow -> PostProcessFBO)
 	context.SetTargetFramebuffer(m_postProcessPass->GetFramebuffer());
 	m_deferredLightPass->Render(&context);
+	Framebuffer::Blit
+	(
+		m_geometryPass->GetGBuffer(),m_postProcessPass->GetFramebuffer(),
+		GL_DEPTH_BUFFER_BIT, GL_NEAREST
+	);
 
 	// [패스 5] 포워드 셰이딩
 	context.BindTargetFramebuffer();
@@ -131,6 +134,8 @@ void StandardRenderPipeline::Render(Scene* scene)
 	// [패스 6] 스카이박스 패스 (공유된 깊이를 기반으로 깊이 테스트 수행하며 덧그림)
 	m_skyboxPass->Render(&context);
 
+	auto tmp = m_postProcessPass->GetFramebuffer();
+
 	// [패스 7] 모션 블러 & 아웃라인 (2D 후처리 효과들)
 	m_motionBlurPass->Render(&context);
 	m_outlinePass->Render(&context);
@@ -139,7 +144,8 @@ void StandardRenderPipeline::Render(Scene* scene)
 	m_postProcessPass->Render(&context);
 
 	// [패스 9] 디버그 패스 (ImGUI 컨텍스트와 충돌 기즈모 출력)
-	m_debugGizmoPass->Render(&context);
+	// m_debugGizmoPass->Render(&context);
+
 	RenderIMGUIContext();
 }
 
