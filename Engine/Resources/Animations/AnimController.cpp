@@ -1,9 +1,9 @@
 ﻿#include "EnginePch.h"
 #include "AnimController.h"
-#include "Resources/Animation.h"
-#include "Resources/AnimState.h"
-#include "Resources/AnimChannel.h"
-#include "Resources/Pose.h"
+#include "Resources/Animations/Animation.h"
+#include "Resources/Animations/AnimState.h"
+#include "Resources/Animations/AnimChannel.h"
+#include "Resources/Animations/Pose.h"
 
 DECLARE_DEFAULTS_IMPL(AnimController)
 

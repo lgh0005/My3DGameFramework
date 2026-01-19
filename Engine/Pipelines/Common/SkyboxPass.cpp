@@ -3,15 +3,15 @@
 
 #include "Scene/Scene.h"
 #include "Graphics/RenderContext.h"
-#include "Resources/CubeTexture.h"
-#include "Resources/Mesh.h"
-#include "Resources/StaticMesh.h"
+#include "Resources/Textures/CubeTexture.h"
+#include "Resources/Meshes/Mesh.h"
+#include "Resources/Meshes/StaticMesh.h"
 #include "Resources/Program.h"
-#include "Resources/Texture.h"
+#include "Resources/Textures/Texture.h"
 #include "Graphics/Geometry.h"
 #include "Graphics/SkyLight.h"
 #include "Components/Camera.h"
-#include "Framebuffers/PostProcessFramebuffer.h"
+#include "Graphics/Framebuffers/PostProcessFramebuffer.h"
 
 DECLARE_DEFAULTS_IMPL(SkyboxPass)
 

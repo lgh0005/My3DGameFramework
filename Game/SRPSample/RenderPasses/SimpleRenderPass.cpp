@@ -3,7 +3,7 @@
 
 #include "Scene/Scene.h"
 #include "Resources/Program.h"
-#include "Resources/Mesh.h"
+#include "Resources/Meshes/Mesh.h"
 #include "Resources/Material.h"
 #include "Components/Camera.h"
 #include "Components/StaticMeshRenderer.h"

@@ -4,12 +4,12 @@
 #include "Scene/Scene.h"
 #include "Graphics/RenderContext.h"
 #include "Components/Camera.h"
-#include "Resources/Texture.h"
-#include "Resources/ScreenMesh.h"
-#include "Resources/StaticMesh.h"
+#include "Resources/Textures/Texture.h"
+#include "Resources/Meshes/ScreenMesh.h"
+#include "Resources/Meshes/StaticMesh.h"
 #include "Graphics/Geometry.h"
 #include "Resources/Program.h"
-#include "Framebuffers/SSAOFramebuffer.h"
+#include "Graphics/Framebuffers/SSAOFramebuffer.h"
 
 DECLARE_DEFAULTS_IMPL(SSAOPass)
 
@@ -22,8 +22,8 @@ SSAOPassUPtr SSAOPass::Create(int32 width, int32 height)
 
 bool SSAOPass::Init(int32 width, int32 height)
 {
-    m_ssaoProgram = RESOURCE.GetResource<Program>("standard_ssao");
-    m_ssaoBlurProgram = RESOURCE.GetResource<Program>("standard_ssao_blur");
+    m_ssaoProgram = RESOURCE.GetResource<Program>("common_ssao");
+    m_ssaoBlurProgram = RESOURCE.GetResource<Program>("common_ssao_blur");
     if (!m_ssaoProgram || !m_ssaoBlurProgram) return false;
 
     // FBO 생성 (우리가 추가한 CreateSSAO 사용)

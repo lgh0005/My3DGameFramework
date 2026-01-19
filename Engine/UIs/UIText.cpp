@@ -1,7 +1,7 @@
 ﻿#include "EnginePch.h"
 #include "UIText.h"
 #include "Components/Transform.h"
-#include "Resources/UIMesh.h"    // UIMesh 구현체
+#include "Resources/Meshes/UIMesh.h"    // UIMesh 구현체
 #include "Resources/Material.h"
 #include "Resources/Font.h"
 #include "Resources/Program.h"

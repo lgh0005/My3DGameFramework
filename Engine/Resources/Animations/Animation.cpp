@@ -1,7 +1,7 @@
 ﻿#include "Animation.h"
 #include "Resources/Model.h"
-#include "Resources/AnimChannel.h"
-#include "Resources/Skeleton.h"
+#include "Resources/Animations/AnimChannel.h"
+#include "Resources/Animations/Skeleton.h"
 #include "Misc/AssetUtils.h"
 
 DECLARE_DEFAULTS_IMPL(Animation)

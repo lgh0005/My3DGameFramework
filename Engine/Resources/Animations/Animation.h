@@ -1,6 +1,6 @@
 ﻿#pragma once
 #include "Resources/Resource.h"
-#include "Resources/AnimChannel.h"
+#include "Resources/Animations/AnimChannel.h"
 #include "Misc/AssetFormat.h"
 #include "Misc/Utils.h"
 

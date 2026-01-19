@@ -1,6 +1,6 @@
 ﻿#include "EnginePch.h"
 #include "AnimState.h"
-#include "Resources/Animation.h"
+#include "Resources/Animations/Animation.h"
 #include "Misc/Utils.h"
 
 DECLARE_DEFAULTS_IMPL(AnimState)

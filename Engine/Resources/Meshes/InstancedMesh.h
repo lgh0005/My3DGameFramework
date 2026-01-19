@@ -1,5 +1,5 @@
 ﻿#pragma once
-#include "Resources/Mesh.h"
+#include "Resources/Meshes/Mesh.h"
 
 // TODO : 지금은 StaticMesh에 대해서만 인스턴싱을 하고 있는데
 // 이후에는 SkinnedMesh에 대해서도 인스턴싱을 할 수 있어야 한다.

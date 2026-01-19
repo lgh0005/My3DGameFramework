@@ -1,6 +1,6 @@
 ﻿#include "EnginePch.h"
-#include "Resources/AnimChannel.h"
-#include "Resources/Pose.h"
+#include "Resources/Animations/AnimChannel.h"
+#include "Resources/Animations/Pose.h"
 
 DECLARE_DEFAULTS_IMPL(AnimChannel)
 

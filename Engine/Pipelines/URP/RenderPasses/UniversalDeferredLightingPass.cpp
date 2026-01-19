@@ -8,16 +8,16 @@
 #include "Scene/SceneRegistry.h"
 #include "Graphics/Geometry.h"
 #include "Resources/Program.h"
-#include "Resources/ScreenMesh.h"
-#include "Resources/StaticMesh.h" 
-#include "Resources/Texture.h"
-#include "Resources/CubeTexture.h"
+#include "Resources/Meshes/ScreenMesh.h"
+#include "Resources/Meshes/StaticMesh.h" 
+#include "Resources/Textures/Texture.h"
+#include "Resources/Textures/CubeTexture.h"
 #include "Graphics/ShadowMap.h"
 #include "Graphics/SkyLight.h"
 #include "Components/Camera.h"
 #include "Components/SpotLight.h"
 #include "Components/Transform.h"
-#include "Framebuffers/PostProcessFramebuffer.h"
+#include "Graphics/Framebuffers/PostProcessFramebuffer.h"
 
 DECLARE_DEFAULTS_IMPL(UniversalDeferredLightingPass)
 

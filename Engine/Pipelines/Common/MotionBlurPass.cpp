@@ -2,9 +2,9 @@
 #include "MotionBlurPass.h"
 #include "Graphics/RenderContext.h"
 #include "Resources/Program.h"
-#include "Resources/ScreenMesh.h"
-#include "Resources/Texture.h"
-#include "Framebuffers/PostProcessFramebuffer.h"
+#include "Resources/Meshes/ScreenMesh.h"
+#include "Resources/Textures/Texture.h"
+#include "Graphics/Framebuffers/PostProcessFramebuffer.h"
 
 DECLARE_DEFAULTS_IMPL(MotionBlurPass)
 
@@ -17,7 +17,7 @@ MotionBlurPassUPtr MotionBlurPass::Create(int32 width, int32 height)
 
 bool MotionBlurPass::Init(int32 width, int32 height)
 {
-	m_motionBlurProgram = RESOURCE.GetResource<Program>("standard_motion_blur");
+	m_motionBlurProgram = RESOURCE.GetResource<Program>("common_motion_blur");
 	m_plane = RESOURCE.GetResource<ScreenMesh>("Screen");
 	m_blurFBO = PostProcessFramebuffer::Create(width, height);
 	if (!m_motionBlurProgram || !m_plane || !m_blurFBO) return false;

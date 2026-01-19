@@ -5,7 +5,7 @@
 #include "Components/Animator.h"
 #include "Components/Transform.h"
 #include "Components/Collider.h"
-#include "Resources/AnimController.h"
+#include "Resources/Animations/AnimController.h"
 
 DECLARE_DEFAULTS_IMPL(PlayerController)
 

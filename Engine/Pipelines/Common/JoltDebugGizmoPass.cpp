@@ -2,7 +2,7 @@
 #include "Components/Camera.h"
 #include "JoltDebugGizmoPass.h"
 #include "Resources/Program.h"
-#include "Resources/DebugMesh.h"
+#include "Resources/Meshes/DebugMesh.h"
 #include "Physics/JoltGizmo.h"
 
 DECLARE_DEFAULTS_IMPL(JoltDebugGizmoPass)

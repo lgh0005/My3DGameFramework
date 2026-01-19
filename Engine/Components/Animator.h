@@ -1,6 +1,7 @@
 ﻿#pragma once
 #include "Object/Component.h"
-#include "Resources/Animation.h"
+#include "Resources/Animations/Animation.h"
+#include "Resources/Animations/Pose.h"
 #include "Graphics/Geometry.h"
 
 #pragma region FORWARD_DECLARATION

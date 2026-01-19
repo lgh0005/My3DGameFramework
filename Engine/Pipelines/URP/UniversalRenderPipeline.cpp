@@ -21,17 +21,17 @@
 #include "Graphics/RenderPass.h"
 #include "Resources/Program.h"
 #include "Graphics/ShadowMap.h"
-#include "Resources/Texture.h"
-#include "Resources/CubeTexture.h"
-#include "Resources/Mesh.h"
-#include "Resources/StaticMesh.h" 
+#include "Resources/Textures/Texture.h"
+#include "Resources/Textures/CubeTexture.h"
+#include "Resources/Meshes/Mesh.h"
+#include "Resources/Meshes/StaticMesh.h" 
 #include "Components/Light.h"
 #include "Components/SpotLight.h"
 #include "Components/Transform.h"
 #include "Components/MeshRenderer.h"
 #include "Components/Animator.h"
-#include "Framebuffers/PostProcessFramebuffer.h"
-#include "Framebuffers/GBufferFramebuffer.h"
+#include "Graphics/Framebuffers/PostProcessFramebuffer.h"
+#include "Graphics/Framebuffers/GBufferFramebuffer.h"
 
 DECLARE_DEFAULTS_IMPL(UniversalRenderPipeline)
 

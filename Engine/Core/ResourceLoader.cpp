@@ -2,16 +2,16 @@
 #include "ResourceLoader.h"
 
 #include "Graphics/Geometry.h"
-#include "Resources/ScreenMesh.h"
+#include "Resources/Meshes/ScreenMesh.h"
 #include "Resources/Program.h"
-#include "Resources/Texture.h"
+#include "Resources/Textures/Texture.h"
 #include "Resources/Model.h"
-#include "Resources/Animation.h"
+#include "Resources/Animations/Animation.h"
 #include "Resources/Font.h"
 #include "Resources/Image.h"
 #include "Resources/AudioClip.h"
-#include "Resources/CubeTexture.h"
-#include "Resources/StaticMesh.h"
+#include "Resources/Textures/CubeTexture.h"
+#include "Resources/Meshes/StaticMesh.h"
 #include "Resources/Material.h"
 
 /*======================//

@@ -1,6 +1,6 @@
 ﻿#pragma once
 #include "Misc/AssetFormat.h"
-#include "Resources/Pose.h"
+#include "Resources/Animations/Pose.h"
 
 CLASS_PTR(AnimChannel)
 class AnimChannel

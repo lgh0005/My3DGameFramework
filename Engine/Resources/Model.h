@@ -4,7 +4,7 @@
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
 #include "Graphics/Vertex.h"
-#include "Resources/AnimChannel.h"
+#include "Resources/Animations/AnimChannel.h"
 #include "Misc/AssetFormat.h"
 
 #pragma region FORWARD_DECLARATION

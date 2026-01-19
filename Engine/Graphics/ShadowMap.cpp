@@ -1,6 +1,6 @@
 ﻿#include "EnginePch.h"
 #include "ShadowMap.h"
-#include "Resources/Texture.h"
+#include "Resources/Textures/Texture.h"
 
 ShadowMap::ShadowMap() = default;
 ShadowMap::~ShadowMap()

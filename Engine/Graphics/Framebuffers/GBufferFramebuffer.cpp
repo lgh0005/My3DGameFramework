@@ -1,6 +1,6 @@
 ﻿#include "EnginePch.h"
 #include "GBufferFramebuffer.h"
-#include "Resources/Texture.h"
+#include "Resources/Textures/Texture.h"
 
 DECLARE_DEFAULTS_IMPL(GBufferFramebuffer)
 

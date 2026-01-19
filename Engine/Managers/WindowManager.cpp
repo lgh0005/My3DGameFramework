@@ -1,6 +1,6 @@
 ﻿#include "WindowManager.h"
 #include "EnginePch.h"
-#include "Resources/Texture.h"
+#include "Resources/Textures/Texture.h"
 #include "Components/Camera.h"
 
 bool WindowManager::Init(int32 width, int32 height, const std::string& title)

@@ -1,5 +1,5 @@
 ﻿#pragma once
-#include "Resources/Mesh.h"
+#include "Resources/Meshes/Mesh.h"
 #include "Graphics/Vertex.h"
 
 #pragma region FORWARD_DECLARATION

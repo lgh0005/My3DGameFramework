@@ -31,6 +31,21 @@
             "vs":  "./Resources/Shaders/Common/Common_Sky_Skybox.vert",
             "fs":  "./Resources/Shaders/Common/Common_Sky_Skybox.frag" 
         },
+        {
+            "key": "common_ssao",
+            "vs":  "./Resources/Shaders/Common/Common_SSAO.vert",
+            "fs":  "./Resources/Shaders/Common/Common_SSAO_pass.frag"
+        },
+        {
+            "key": "common_ssao_blur",
+            "vs":  "./Resources/Shaders/Common/Common_SSAO.vert",
+            "fs":  "./Resources/Shaders/Common/Common_SSAO_blur.frag"
+        },
+        {
+            "key": "common_motion_blur",
+            "vs":  "./Resources/Shaders/Common/Common_Motion_Blur.vert",
+            "fs":  "./Resources/Shaders/Common/Common_Motion_Blur.frag"
+        },
 
 
 
@@ -58,16 +73,6 @@
             "fs":  "./Resources/Shaders/Standard/Standard_Deferred_LightPass.frag"
         },
         {
-            "key": "standard_ssao",
-            "vs":  "./Resources/Shaders/Standard/Standard_SSAO.vert",
-            "fs":  "./Resources/Shaders/Standard/Standard_SSAO_pass.frag"
-        },
-        {
-            "key": "standard_ssao_blur",
-            "vs":  "./Resources/Shaders/Standard/Standard_SSAO.vert",
-            "fs":  "./Resources/Shaders/Standard/Standard_SSAO_blur.frag"
-        },
-        {
             "key": "standard_postprocess_threshold",
             "vs":  "./Resources/Shaders/Standard/Standard_Post_Threshold.vert",
             "fs":  "./Resources/Shaders/Standard/Standard_Post_Threshold.frag"
@@ -81,11 +86,6 @@
             "key": "standard_postprocess_blur",
             "vs":  "./Resources/Shaders/Standard/Standard_Post_Blur.vert",
             "fs":  "./Resources/Shaders/Standard/Standard_Post_Blur.frag"
-        },
-        {
-            "key": "standard_motion_blur",
-            "vs":  "./Resources/Shaders/Standard/Standard_Motion_Blur.vert",
-            "fs":  "./Resources/Shaders/Standard/Standard_Motion_Blur.frag"
         },
 
 
@@ -104,16 +104,6 @@
             "key": "universal_deferred_lighting",
             "vs":  "./Resources/Shaders/Universal/Universal_Deferred_LightPass.vert",
             "fs":  "./Resources/Shaders/Universal/Universal_Deferred_LightPass.frag"
-        },
-        {
-            "key": "universal_ssao",
-            "vs":  "./Resources/Shaders/Universal/Universal_SSAO.vert",
-            "fs":  "./Resources/Shaders/Universal/Universal_SSAO_pass.frag"
-        },
-        {
-            "key": "universal_ssao_blur",
-            "vs":  "./Resources/Shaders/Universal/Universal_SSAO.vert",
-            "fs":  "./Resources/Shaders/Universal/Universal_SSAO_blur.frag"
         },
         {
             "key": "universal_postprocess_blur",

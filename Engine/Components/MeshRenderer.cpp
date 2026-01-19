@@ -3,7 +3,7 @@
 
 #include "Components/Transform.h"
 #include "Resources/Program.h"
-#include "Resources/Mesh.h"
+#include "Resources/Meshes/Mesh.h"
 #include "Resources/Material.h"
 
 DECLARE_DEFAULTS_IMPL(MeshRenderer)

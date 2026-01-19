@@ -1,6 +1,6 @@
 ﻿#include "EnginePch.h"
 #include "Framebuffer.h"
-#include "Resources/Texture.h"
+#include "Resources/Textures/Texture.h"
 
 Framebuffer::Framebuffer() = default;
 Framebuffer::~Framebuffer()

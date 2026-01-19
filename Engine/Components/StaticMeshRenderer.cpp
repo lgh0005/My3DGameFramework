@@ -1,6 +1,6 @@
 ﻿#include "EnginePch.h"
 #include "StaticMeshRenderer.h"
-#include "Resources/StaticMesh.h"
+#include "Resources/Meshes/StaticMesh.h"
 #include "Resources/Material.h"
 #include "Resources/Program.h"
 #include "Graphics/VertexLayout.h"

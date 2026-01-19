@@ -1,7 +1,7 @@
 ﻿#include "EnginePch.h"
 #include "UIImage.h"
 #include "Resources/Program.h"
-#include "Resources/UIMesh.h"
+#include "Resources/Meshes/UIMesh.h"
 #include "Resources/Material.h"
 
 DECLARE_DEFAULTS_IMPL(UIImage)

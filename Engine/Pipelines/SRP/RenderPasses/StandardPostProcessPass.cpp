@@ -5,12 +5,12 @@
 #include "Graphics/RenderContext.h"
 #include "Resources/Program.h"
 #include "Graphics/Geometry.h"
-#include "Resources/ScreenMesh.h"
-#include "Resources/StaticMesh.h"
-#include "Resources/Texture.h"
+#include "Resources/Meshes/ScreenMesh.h"
+#include "Resources/Meshes/StaticMesh.h"
+#include "Resources/Textures/Texture.h"
 #include "Components/Camera.h"
-#include "Framebuffers/PostProcessFramebuffer.h"
-#include "Framebuffers/EffectFramebuffer.h"
+#include "Graphics/Framebuffers/PostProcessFramebuffer.h"
+#include "Graphics/Framebuffers/EffectFramebuffer.h"
 
 DECLARE_DEFAULTS_IMPL(StandardPostProcessPass)
 

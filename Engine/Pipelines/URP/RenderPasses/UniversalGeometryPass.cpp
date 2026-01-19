@@ -5,9 +5,9 @@
 #include "Object/GameObject.h"
 #include "Graphics/RenderContext.h"
 #include "Resources/Program.h"
-#include "Resources/Mesh.h"
+#include "Resources/Meshes/Mesh.h"
 #include "Resources/Material.h"
-#include "Resources/Texture.h"
+#include "Resources/Textures/Texture.h"
 #include "Components/Camera.h"
 #include "Components/MeshRenderer.h"
 #include "Components/StaticMeshRenderer.h"
@@ -15,7 +15,7 @@
 #include "Components/Transform.h"
 #include "Components/SpotLight.h"
 #include "Components/Animator.h"
-#include "Framebuffers/GBufferFramebuffer.h"
+#include "Graphics/Framebuffers/GBufferFramebuffer.h"
 
 DECLARE_DEFAULTS_IMPL(UniversalGeometryPass)
 

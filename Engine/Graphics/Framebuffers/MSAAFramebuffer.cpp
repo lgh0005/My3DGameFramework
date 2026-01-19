@@ -1,6 +1,6 @@
 ﻿#include "EnginePch.h"
 #include "MSAAFramebuffer.h"
-#include "Resources/Texture.h"
+#include "Resources/Textures/Texture.h"
 
 MSAAFramebuffer::MSAAFramebuffer() = default;
 MSAAFramebuffer::~MSAAFramebuffer()

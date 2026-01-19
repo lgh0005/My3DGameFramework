@@ -2,7 +2,7 @@
 #include "InstancedMesh.h"
 #include "Graphics/VertexLayout.h"
 #include "Resources/Material.h"
-#include "Resources/StaticMesh.h"
+#include "Resources/Meshes/StaticMesh.h"
 #include "Graphics/Buffer.h"
 
 DECLARE_DEFAULTS_IMPL(InstancedMesh)

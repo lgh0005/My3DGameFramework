@@ -3,7 +3,7 @@
 #include "Object/GameObject.h"
 #include "Components/Animator.h"
 #include "Components/Transform.h"
-#include "Resources/SkinnedMesh.h"
+#include "Resources/Meshes/SkinnedMesh.h"
 #include "Resources/Material.h"
 #include "Resources/Program.h"
 #include "Graphics/VertexLayout.h"

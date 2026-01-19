@@ -1,6 +1,6 @@
 ﻿#include "EnginePch.h"
 #include "InstancedMeshRenderer.h"
-#include "Resources/InstancedMesh.h"
+#include "Resources/Meshes/InstancedMesh.h"
 #include "Resources/Material.h"
 #include "Resources/Program.h"
 #include "Graphics/VertexLayout.h"

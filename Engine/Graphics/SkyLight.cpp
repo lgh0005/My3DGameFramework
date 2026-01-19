@@ -1,7 +1,7 @@
 ﻿#include "EnginePch.h"
 #include "SkyLight.h"
-#include "Resources/Texture.h"
-#include "Resources/CubeTexture.h"
+#include "Resources/Textures/Texture.h"
+#include "Resources/Textures/CubeTexture.h"
 #include "Resources/EnvironmentMap.h"
 
 DECLARE_DEFAULTS_IMPL(SkyLight)

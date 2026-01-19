@@ -2,11 +2,11 @@
 #include "Animator.h"
 #include "Object/GameObject.h"
 #include "Components/Transform.h"
-#include "Resources/AnimChannel.h"
+#include "Resources/Animations/AnimChannel.h"
 #include "Resources/Model.h"
-#include "Resources/Skeleton.h"
-#include "Resources/AnimController.h"
-#include "Resources/Pose.h"
+#include "Resources/Animations/Skeleton.h"
+#include "Resources/Animations/AnimController.h"
+#include "Resources/Animations/Pose.h"
 
 DECLARE_DEFAULTS_IMPL(Animator)
 

@@ -1,6 +1,6 @@
 ﻿#include "EnginePch.h"
 #include "CubeFramebuffer.h"
-#include "Resources/CubeTexture.h"
+#include "Resources/Textures/CubeTexture.h"
 
 CubeFramebuffer::CubeFramebuffer() = default;
 CubeFramebuffer::~CubeFramebuffer()

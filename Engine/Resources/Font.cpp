@@ -1,6 +1,6 @@
 ﻿#include "EnginePch.h"
 #include "Font.h"
-#include "Resources/Texture.h"
+#include "Resources/Textures/Texture.h"
 
 Font::Font() = default;
 Font::~Font()

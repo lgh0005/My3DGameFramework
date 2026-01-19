@@ -1,6 +1,6 @@
 ﻿#include "EnginePch.h"
 #include "JoltGizmo.h"
-#include "Resources/StaticMesh.h"
+#include "Resources/Meshes/StaticMesh.h"
 
 DECLARE_DEFAULTS_IMPL(JoltGizmo)
 

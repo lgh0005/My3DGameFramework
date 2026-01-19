@@ -3,9 +3,9 @@
 
 #include "Scene/Scene.h"
 #include "Resources/Program.h"
-#include "Resources/Mesh.h"
+#include "Resources/Meshes/Mesh.h"
 #include "Resources/Material.h"
-#include "Resources/CubeTexture.h"
+#include "Resources/Textures/CubeTexture.h"
 #include "Components/Camera.h"
 #include "Components/MeshRenderer.h"
 #include "Components/StaticMeshRenderer.h"
