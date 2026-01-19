@@ -45,3 +45,17 @@ bool EffectFramebuffer::InitEmpty()
 	glGenFramebuffers(1, &m_fbo);
 	return true;
 }
+
+void EffectFramebuffer::AttachTextureDirect(int32 index, uint32 textureID)
+{
+	Bind();
+
+	// 2. 텍스처 교체
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + index,
+		GL_TEXTURE_2D, textureID, 0);
+
+	// 3. Draw Buffer 즉시 갱신 (이전 코드와 동일한 로직)
+	// "다른 건 모르겠고, 지금 지정한 이 인덱스에만 그려라"
+	uint32 attachments[1] = { GL_COLOR_ATTACHMENT0 + (uint32)index };
+	glDrawBuffers(1, attachments);
+}

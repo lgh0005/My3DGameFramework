@@ -1,10 +1,10 @@
-#version 460 core
+ï»¿#version 460 core
 
 out vec4 FragColor;
 in vec2 TexCoords;
 
-uniform sampler2D screenTexture; // ¿øº» HDR
-uniform sampler2D bloomTexture;  // Bloom °á°ú
+uniform sampler2D screenTexture; // ì›ë³¸ HDR
+uniform sampler2D bloomTexture;  // Bloom ê²°ê³¼
 
 uniform float gamma;
 uniform float exposure;
@@ -85,29 +85,29 @@ void main()
 {
     vec3 hdrColor;
 
-    // 1. ¿øº» HDR »ö»ó °¡Á®¿À±â (FXAA Àû¿ë ¿©ºÎ °áÁ¤)
+    // 1. ì›ë³¸ HDR ìƒ‰ìƒ ê°€ì ¸ì˜¤ê¸° (FXAA ì ìš© ì—¬ë¶€ ê²°ì •)
     if (useFXAA)
     {
-        // ¿øº» ÅØ½ºÃ³¿¡ FXAA¸¦ Àû¿ëÇØ¼­ °¡Á®¿È
+        // ì›ë³¸ í…ìŠ¤ì²˜ì— FXAAë¥¼ ì ìš©í•´ì„œ ê°€ì ¸ì˜´
         hdrColor = ApplyFXAA(screenTexture, TexCoords, inverseScreenSize);
     }
     else
     {
-        // ±×³É °¡Á®¿È
+        // ê·¸ëƒ¥ ê°€ì ¸ì˜´
         hdrColor = texture(screenTexture, TexCoords).rgb;
     }
 
-    // 2. ºí·ë(Blur) ÅØ½ºÃ³ °¡Á®¿À±â
+    // 2. ë¸”ë£¸(Blur) í…ìŠ¤ì²˜ ê°€ì ¸ì˜¤ê¸°
     vec3 bloomColor = texture(bloomTexture, TexCoords).rgb;
 
-    // 3. ÇÕ¼º (Additive Blending)
-    // ¾ÈÆ¼ ¾Ù¸®¾î½ÌµÈ ¿øº» À§¿¡ ºûÀ» ´õÇÔ
+    // 3. í•©ì„± (Additive Blending)
+    // ì•ˆí‹° ì•¨ë¦¬ì–´ì‹±ëœ ì›ë³¸ ìœ„ì— ë¹›ì„ ë”í•¨
     hdrColor += bloomColor * bloomStrength; 
 
-    // 4. Åæ ¸ÅÇÎ (ACES)
+    // 4. í†¤ ë§¤í•‘ (ACES)
     vec3 mapped = ACESToneMapping(hdrColor * exposure);
 
-    // 5. °¨¸¶ º¸Á¤
+    // 5. ê°ë§ˆ ë³´ì •
     mapped = pow(mapped, vec3(1.0 / gamma));
 
     FragColor = vec4(mapped, 1.0);

@@ -81,7 +81,7 @@ Texture* UniversalPostProcessPass::RenderKawaseBloom(Texture* hdrTexture)
 	m_bloomProgram->SetUniform("threshold", m_threshold);
 
 	// [수정] AttachTexture에 0번 인덱스 명시
-	m_bloomFBO->AttachColorTexture(0, m_bloomMips[0].texture);
+	m_bloomFBO->AttachTextureDirect(0, m_bloomMips[0].texture->Get());
 	glViewport(0, 0, m_bloomMips[0].width, m_bloomMips[0].height);
 	glClear(GL_COLOR_BUFFER_BIT);
 
@@ -103,7 +103,7 @@ Texture* UniversalPostProcessPass::RenderKawaseBloom(Texture* hdrTexture)
 	for (usize i = 1; i < m_bloomMips.size(); i++)
 	{
 		// Target: Current Mip
-		m_bloomFBO->AttachColorTexture(0, m_bloomMips[i].texture);
+		m_bloomFBO->AttachTextureDirect(0, m_bloomMips[i].texture->Get());
 		glViewport(0, 0, m_bloomMips[i].width, m_bloomMips[i].height);
 		glClear(GL_COLOR_BUFFER_BIT);
 
@@ -129,7 +129,7 @@ Texture* UniversalPostProcessPass::RenderKawaseBloom(Texture* hdrTexture)
 	for (usize i = m_bloomMips.size() - 1; i > 0; i--)
 	{
 		// Target: Upper Mip (이미 그려진 것 위에 덧칠)
-		m_bloomFBO->AttachColorTexture(0, m_bloomMips[i - 1].texture);
+		m_bloomFBO->AttachTextureDirect(0, m_bloomMips[i - 1].texture->Get());
 		glViewport(0, 0, m_bloomMips[i - 1].width, m_bloomMips[i - 1].height);
 
 		// Source: Current Mip

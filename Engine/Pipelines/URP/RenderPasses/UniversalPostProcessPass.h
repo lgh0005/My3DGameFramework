@@ -52,7 +52,7 @@ private:
 	PostProcessFramebufferUPtr			  m_frameBuffer;
 	float m_gamma			  { 2.2f };
 	float m_exposure		  { 0.7f };
-	float m_threshold		  { 0.0f };
+	float m_threshold		  { 1.0f };
 
 	EffectFramebufferUPtr		 m_bloomFBO;  // Bloom 처리용 FBO
 	std::vector<KawaseBloomMips> m_bloomMips; // Bloom 텍스처 체인 (보통 5~6단계)
