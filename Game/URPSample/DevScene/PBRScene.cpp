@@ -115,6 +115,18 @@ bool PBRScene::LoadSceneResources()
 		RESOURCE.AddResource<Material>(std::move(box1Mat), "GroundMat");
 	}
 	
+	// 머티리얼 6
+	{
+		auto box6Mat = Material::Create();
+		box6Mat->diffuse = RESOURCE.GetResource<Texture>("toybox_diffuse");
+		box6Mat->normal = RESOURCE.GetResource<Texture>("toybox_normal");
+		box6Mat->height = RESOURCE.GetResource<Texture>("toybox_disp");
+		box6Mat->shininess = 14.0f;
+		box6Mat->emissionStrength = 0.0f;
+		box6Mat->heightScale = 0.065f;
+		RESOURCE.AddResource<Material>(std::move(box6Mat), "boxMat5");
+	}
+
 	return true;
 }
 
@@ -251,6 +263,31 @@ bool PBRScene::OnPlaceActors()
 
 		auto meshRenderer = StaticMeshRenderer::Create
 		(RESOURCE.GetResource<StaticMesh>("Cube"), RESOURCE.GetResource<Material>("GroundMat"));
+		cubeObj->AddComponent(std::move(meshRenderer));
+		AddGameObject(std::move(cubeObj));
+	}
+
+
+	// 6. 패럴랙스 매핑 블록
+	{
+		auto cubeObj = GameObject::Create();
+		cubeObj->SetName("ToyBlock");
+		auto& cubeTransform = cubeObj->GetTransform();
+		cubeTransform.SetPosition(glm::vec3(-3.0f, 3.0f, 1.0f));
+		cubeTransform.SetRotation(glm::vec3(45.0f));
+		cubeTransform.SetScale(glm::vec3(0.75f));
+
+		auto collider = BoxCollider::Create(glm::vec3(0.75f));
+		cubeObj->AddComponent(std::move(collider));
+
+		auto rb = Rigidbody::Create();
+		rb->SetMotionType(JPH::EMotionType::Static); // 절대 움직이지 않음 (질량 무한대 취급)
+		rb->SetRestitution(0.5f);					 // 약간 튕기게 설정 (선택)
+		rb->SetFriction(0.5f);
+		cubeObj->AddComponent(std::move(rb));
+
+		auto meshRenderer = StaticMeshRenderer::Create
+		(RESOURCE.GetResource<StaticMesh>("Cube"), RESOURCE.GetResource<Material>("boxMat5"));
 		cubeObj->AddComponent(std::move(meshRenderer));
 		AddGameObject(std::move(cubeObj));
 	}

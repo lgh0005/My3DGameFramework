@@ -30,6 +30,13 @@ const int MAX_BONES = 100;
 const int MAX_BONE_INFLUENCE = 4;
 uniform mat4 finalBoneMatrices[MAX_BONES];
 
+// [안전장치 추가]
+vec3 SafeNormalize(vec3 v)
+{
+    if (dot(v, v) < 1e-6) return vec3(0, 0, 1);
+    return normalize(v);
+}
+
 void main()
 {
     vec4 totalPosition = vec4(0.0f);
@@ -58,7 +65,7 @@ void main()
     
     // 가중치가 없는 경우 (혹은 오류) 원본 사용
     float totalWeight = aWeights[0] + aWeights[1] + aWeights[2] + aWeights[3];
-    if (totalWeight == 0.0)
+    if (totalWeight < 1e-4 || dot(totalNormal, totalNormal) < 1e-6)
     {
         totalPosition = vec4(aPos, 1.0f);
         totalNormal   = aNormal;
@@ -71,10 +78,15 @@ void main()
     TexCoords = aTexCoord;
 
     mat3 normalMatrix = transpose(inverse(mat3(model)));
-    vec3 T = normalize(normalMatrix * totalTangent);
-    vec3 N = normalize(normalMatrix * totalNormal);
-    T = normalize(T - dot(T, N) * N);
+    vec3 T = SafeNormalize(normalMatrix * totalTangent);
+    vec3 N = SafeNormalize(normalMatrix * totalNormal);
+    T = SafeNormalize(T - dot(T, N) * N);
     vec3 B = cross(N, T);
+    if (dot(B, B) < 1e-6) 
+    {
+        vec3 up = abs(N.y) < 0.999 ? vec3(0, 1, 0) : vec3(0, 0, 1);
+        B = normalize(cross(N, up));
+    }
 
     Normal = N;
     TBN = mat3(T, B, N);

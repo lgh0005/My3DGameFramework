@@ -1,11 +1,11 @@
-#version 460 core
+ï»¿#version 460 core
 out vec4 FragColor;
 
 in vec2 TexCoords; // Screen Quad UV
 
 uniform sampler2D gPosition;    // RGB: WorldPos, A: Material AO
-uniform sampler2D gNormal;      // RGB: Normal,   A: Roughness
-uniform sampler2D gAlbedoSpec;  // RGB: Albedo,   A: Metallic
+uniform sampler2D gNormal;      // RGB: Normal,    A: Roughness
+uniform sampler2D gAlbedoSpec;  // RGB: Albedo,    A: Metallic
 uniform sampler2D gEmission;    // RGB: Emission
 
 uniform sampler2D ssaoTexture;
@@ -50,22 +50,17 @@ const float PI = 3.14159265359;
 // --- Shadow Calculation (PCF) ---
 float CalculateShadow(sampler2D shadowMap, vec4 fragPosLightSpace, vec3 normal, vec3 lightDir)
 {
-    // Perspective divide
     vec3 projCoords = fragPosLightSpace.xyz / fragPosLightSpace.w;
-    // [-1,1] -> [0,1]
     projCoords = projCoords * 0.5 + 0.5;
     
-    // Far plane ³Ñ¾î°¡´Â °Í ¿¹¿ÜÃ³¸®
     if(projCoords.z > 1.0) return 0.0;
 
     float currentDepth = projCoords.z;
-    // Shadow Acne ¹æÁö¿ë Bias
     float bias = max(0.00025 * (1.0 - dot(normal, lightDir)), 0.000025);
 
     float shadow = 0.0;
     vec2 texelSize = 1.0 / textureSize(shadowMap, 0);
     
-    // PCF (3x3 Sampling)
     for(int x = -1; x <= 1; ++x)
     {
         for(int y = -1; y <= 1; ++y)
@@ -78,8 +73,6 @@ float CalculateShadow(sampler2D shadowMap, vec4 fragPosLightSpace, vec3 normal, 
     return shadow;
 }
 
-// --- Shadow Map Selector ---
-// GLSL ¹è¿­ ÀÎµ¦½Ì ¹®Á¦ ÇØ°áÀ» À§ÇÑ ºÐ±â¹®
 float GetShadowFactor(int index, vec4 fragPosLightSpace, vec3 normal, vec3 lightDir)
 {
     if (index == 0) return CalculateShadow(shadowMaps[0], fragPosLightSpace, normal, lightDir);
@@ -93,7 +86,7 @@ float GetShadowFactor(int index, vec4 fragPosLightSpace, vec3 normal, vec3 light
     return 0.0;
 }
 
-// --- PBR Math Functions ---
+// --- PBR Math Functions (Safety Guarded) ---
 float DistributionGGX(vec3 normal, vec3 halfDir, float roughness) 
 {
     float a = roughness * roughness;
@@ -101,14 +94,19 @@ float DistributionGGX(vec3 normal, vec3 halfDir, float roughness)
     float dotNH = max(dot(normal, halfDir), 0.0);
     float dotNH2 = dotNH * dotNH;
     float denom = (dotNH2 * (a2 - 1.0) + 1.0);
-    return a2 / (PI * denom * denom);
+    denom = PI * denom * denom;
+    // [Safety] ë¶„ëª¨ 0 ë°©ì§€
+    return a2 / max(denom, 0.0000001);
 }
 
 float GeometrySchlickGGX(float dotNV, float roughness) 
 {
     float r = (roughness + 1.0);
     float k = (r * r) / 8.0;
-    return dotNV / (dotNV * (1.0 - k) + k);
+    float nom    = dotNV;
+    float denom = dotNV * (1.0 - k) + k;
+    // [Safety] ë¶„ëª¨ 0 ë°©ì§€
+    return nom / max(denom, 0.0000001);
 }
 
 float GeometrySmith(vec3 normal, vec3 viewDir, vec3 lightDir, float roughness) 
@@ -122,32 +120,41 @@ float GeometrySmith(vec3 normal, vec3 viewDir, vec3 lightDir, float roughness)
 
 vec3 FresnelSchlick(float cosTheta, vec3 F0) 
 {
-    return F0 + (1.0 - F0) * pow(1.0 - cosTheta, 5.0);
+    return F0 + (1.0 - F0) * pow(clamp(1.0 - cosTheta, 0.0, 1.0), 5.0);
 }
 
 vec3 FresnelSchlickRoughness(float cosTheta, vec3 F0, float roughness) 
 {
-    return F0 + (max(vec3(1.0 - roughness), F0) - F0) * pow(1.0 - cosTheta, 5.0);
+    return F0 + (max(vec3(1.0 - roughness), F0) - F0) * pow(clamp(1.0 - cosTheta, 0.0, 1.0), 5.0);
+}
+
+// [Safety] NaN ê²€ì‚¬ í•¨ìˆ˜
+bool IsExploded(vec3 v)
+{
+    return isnan(v.x) || isnan(v.y) || isnan(v.z) || isinf(v.x) || isinf(v.y) || isinf(v.z);
 }
 
 void main()
 {
+    // [Debug Flag] NaN ë°œìƒ ì—¬ë¶€ ì¶”ì 
+    bool isExploded = false;
+
     // 1. G-Buffer Unpacking
     vec4 posSample = texture(gPosition, TexCoords);
     vec3 FragPos   = posSample.rgb;
-    float MatAO    = posSample.a; // Material AO (ORM.r)
+    float MatAO    = posSample.a; 
 
     vec4 normSample = texture(gNormal, TexCoords);
     vec3 N          = normSample.rgb;
-    float Roughness = normSample.a; // Roughness (ORM.g)
+    // [Safety] Roughness ìµœì†Œê°’ ê°•ì œ (ê°€ìž¥ ì¤‘ìš”)
+    float Roughness = max(normSample.a, 0.05); 
 
     vec4 albedoSample = texture(gAlbedoSpec, TexCoords);
     vec3 Albedo       = albedoSample.rgb;
-    float Metallic    = albedoSample.a; // Metallic (ORM.b)
+    float Metallic    = albedoSample.a; 
 
     vec3 Emission = texture(gEmission, TexCoords).rgb;
 
-    // SSAO Sampling & Combine
     float SSAO = texture(ssaoTexture, TexCoords).r;
     float FinalAO = MatAO * SSAO;
 
@@ -166,30 +173,40 @@ void main()
         // Calculate Light Direction & Attenuation
         vec3 L;
         float attenuation = 1.0;
+        float dist = 0.0;
 
         if (lights[i].type == 0) // Directional
         {
             L = normalize(-lights[i].direction);
+            dist = 1.0; 
         }
         else // Point & Spot
         {
-            L = normalize(lights[i].position - FragPos);
-            float dist = length(lights[i].position - FragPos);
-            attenuation = 1.0 / (lights[i].attenuation.x + lights[i].attenuation.y * dist + lights[i].attenuation.z * dist * dist);
+            vec3 lightVec = lights[i].position - FragPos;
+            dist = length(lightVec);
+            
+            // [Safety] ê´‘ì›ê³¼ ë„ˆë¬´ ê°€ê¹Œìš°ë©´(ê±°ë¦¬ 0) ê³„ì‚° ìŠ¤í‚µ
+            if(dist < 0.001) continue;
+
+            L = normalize(lightVec);
+            
+            // [Safety] ê°ì‡  ê³µì‹ ë¶„ëª¨ 0 ë°©ì§€
+            float attenDenom = lights[i].attenuation.x + lights[i].attenuation.y * dist + lights[i].attenuation.z * dist * dist;
+            attenuation = 1.0 / max(attenDenom, 0.0001);
         }
 
         if (lights[i].type == 2) // Spot Intensity
         {
              float theta = dot(L, normalize(-lights[i].direction));
              float epsilon = lights[i].cutoff.x - lights[i].cutoff.y;
-             float spotIntensity = clamp((theta - lights[i].cutoff.y) / epsilon, 0.0, 1.0);
+             // [Safety] ì—¡ì‹¤ë¡  0 ë°©ì§€
+             float spotIntensity = clamp((theta - lights[i].cutoff.y) / max(epsilon, 0.0001), 0.0, 1.0);
              attenuation *= spotIntensity;
         }
 
         // Shadow Calculation
         float shadow = 0.0;
         int shadowIdx = lights[i].shadowMapIndex;
-        // À¯È¿ÇÑ ±×¸²ÀÚ ÀÎµ¦½ºÀÏ ¶§¸¸ °è»ê
         if (shadowIdx >= 0 && shadowIdx < 8) 
         {
             vec4 lightSpacePos = lightSpaceMatrices[shadowIdx] * vec4(FragPos, 1.0);
@@ -197,7 +214,14 @@ void main()
         }
 
         // Cook-Torrance BRDF
-        vec3 H = normalize(V + L);
+        vec3 H;
+        vec3 lightDirPlusViewDir = V + L;
+        // [Safety] Half Vector ì•ˆì „ ì •ê·œí™”
+        if (dot(lightDirPlusViewDir, lightDirPlusViewDir) < 1e-6)
+            H = N;
+        else
+            H = normalize(lightDirPlusViewDir);
+
         vec3 radiance = lights[i].diffuse * lights[i].intensity * attenuation;
 
         float NDF = DistributionGGX(N, H, Roughness);   
@@ -205,17 +229,29 @@ void main()
         vec3 F    = FresnelSchlick(max(dot(H, V), 0.0), F0);
 
         vec3 numerator    = NDF * G * F; 
+        
+        // [Safety] Specular ë¶„ëª¨ 0 ë°©ì§€
         float denominator = 4.0 * max(dot(N, V), 0.0) * max(dot(N, L), 0.0) + 0.0001;
         vec3 specular     = numerator / denominator;
 
         vec3 kS = F;
         vec3 kD = vec3(1.0) - kS;
-        kD *= (1.0 - Metallic);       
+        kD *= (1.0 - Metallic);        
 
         float NdotL = max(dot(N, L), 0.0);        
         
-        // Final Additive Lighting
-        Lo += (1.0 - shadow) * (kD * Albedo / PI + specular) * radiance * NdotL;
+        // ê° ë¼ì´íŠ¸ë³„ ê²°ê³¼ ê³„ì‚°
+        vec3 lightResult = (1.0 - shadow) * (kD * Albedo / PI + specular) * radiance * NdotL;
+
+        // [Debug] ê²°ê³¼ê°€ NaNì¸ì§€ í™•ì¸
+        if (IsExploded(lightResult))
+        {
+            isExploded = true;
+        }
+        else
+        {
+            Lo += lightResult;
+        }
     }
 
     // 4. Ambient (IBL)
@@ -243,11 +279,21 @@ void main()
         ambient = vec3(0.03) * Albedo * FinalAO; 
     }
 
+    // [Debug] IBL ê³„ì‚° ê²°ê³¼ë„ NaNì¸ì§€ í™•ì¸ (ì˜µì…˜)
+    if (IsExploded(ambient)) isExploded = true;
+
     // 5. Final Mix
     vec3 color = ambient + Lo + Emission;
 
-    FragColor = vec4(color, 1.0);
-
-    // [µð¹ö±× ¸ðµå] AO¸¸ ½Ã°¢È­ (0.0: ¾îµÎ¿ò/Â÷Æó, 1.0: ¹àÀ½)
-    // FragColor = vec4(vec3(FinalAO), 1.0);
+    // [ìµœì¢… ë””ë²„ê·¸ ì¶œë ¥]
+    if (isExploded)
+    {
+        // ìˆ˜í•™ì  ì˜¤ë¥˜(NaN/Inf) ë°œìƒ ì‹œ í•«í•‘í¬ ì¶œë ¥
+        FragColor = vec4(1.0, 0.0, 1.0, 1.0); 
+    }
+    else
+    {
+        // ì •ìƒ ì¶œë ¥
+        FragColor = vec4(color, 1.0);
+    }
 }

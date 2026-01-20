@@ -24,6 +24,13 @@ layout (std140, binding = 0) uniform CameraData
 uniform mat4 model;
 uniform mat4 uPrevModelViewProj;
 
+vec3 SafeNormalize(vec3 v)
+{
+    // 길이가 0에 가까우면(엡실론) 임의의 안전한 벡터 반환
+    if (dot(v, v) < 1e-6) return vec3(0, 0, 1);
+    return normalize(v);
+}
+
 void main()
 {
     vec4 worldPos = model * vec4(aPos, 1.0);
@@ -33,12 +40,18 @@ void main()
     // Normal Matrix 계산 (Model 행렬의 역전치 행렬)
     mat3 normalMatrix = transpose(inverse(mat3(model)));
     
-    vec3 T = normalize(normalMatrix * aTangent);
-    vec3 N = normalize(normalMatrix * aNormal);
+    vec3 T = SafeNormalize(normalMatrix * aTangent);
+    vec3 N = SafeNormalize(normalMatrix * aNormal);
     
     // Gram-Schmidt 직교화 (T를 N에 수직하게 재보정)
-    T = normalize(T - dot(T, N) * N);
+    T = SafeNormalize(T - dot(T, N) * N);
     vec3 B = cross(N, T);
+    if (dot(B, B) < 1e-6) 
+    {
+        // 비상시: N이 (0,1,0)이 아니면 (0,1,0)을 외적, 맞으면 (0,0,1) 외적
+        vec3 up = abs(N.y) < 0.999 ? vec3(0, 1, 0) : vec3(0, 0, 1);
+        B = normalize(cross(N, up));
+    }
     
     Normal = N; // TBN이 필요 없는 경우를 대비한 백업
     TBN = mat3(T, B, N);
