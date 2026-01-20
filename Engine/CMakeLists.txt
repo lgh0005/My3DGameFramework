@@ -107,6 +107,7 @@ add_library(Engine STATIC
    "Graphics/Velocitybuffer.h"      "Graphics/Velocitybuffer.cpp"
 
    # Framebuffers
+   "Graphics/Framebuffers/FramebufferBase.h"       "Graphics/Framebuffers/FramebufferBase.cpp"
    "Graphics/Framebuffers/Framebuffer.h"             "Graphics/Framebuffers/Framebuffer.cpp"
    "Graphics/Framebuffers/CubeFramebuffer.h"         "Graphics/Framebuffers/CubeFramebuffer.cpp"
    "Graphics/Framebuffers/BRDFLookUpFramebuffer.h"   "Graphics/Framebuffers/BRDFLookUpFramebuffer.cpp"
@@ -194,7 +195,8 @@ add_library(Engine STATIC
    "Managers/AudioManager.h"        "Managers/AudioManager.cpp"
    "Managers/PhysicsManager.h"      "Managers/PhysicsManager.cpp"
    "Managers/UIManager.h"           "Managers/UIManager.cpp"
- "Resources/Textures/TextureBase.h" "Resources/Textures/TextureBase.cpp")
+ "Resources/Textures/TextureBase.h" "Resources/Textures/TextureBase.cpp"
+ )
 
 # 2. [PCH 설정] EnginePCH.h를 PCH로 사용합니다.
 target_precompile_headers(Engine  PUBLIC EnginePCH.h)

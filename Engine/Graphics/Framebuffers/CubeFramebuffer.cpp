@@ -5,8 +5,7 @@
 CubeFramebuffer::CubeFramebuffer() = default;
 CubeFramebuffer::~CubeFramebuffer()
 {
-    if (m_depthStencilBuffer) glDeleteRenderbuffers(1, &m_depthStencilBuffer);
-    if (m_framebuffer) glDeleteFramebuffers(1, &m_framebuffer);
+    CleanDepthStencil();
 }
 
 CubeFramebufferUPtr CubeFramebuffer::Create(const CubeTexturePtr colorAttachment, uint32 mipLevel)
@@ -17,16 +16,25 @@ CubeFramebufferUPtr CubeFramebuffer::Create(const CubeTexturePtr colorAttachment
     return std::move(framebuffer);
 }
 
-void CubeFramebuffer::BindToDefault()
+bool CubeFramebuffer::OnResize(int32 width, int32 height)
 {
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    // 1. 크기가 같으면 패스
+    if (m_width == width && m_height == height) return true;
+
+    // 2. 기존 자원 정리
+    Super::Clean();
+    CleanDepthStencil();
+
+    // 3. 다시 초기화
+    return InitWithColorAttachment(m_colorAttachment, m_mipLevel);
 }
 
 void CubeFramebuffer::Bind(int32 cubeIndex) const
 {
-    glBindFramebuffer(GL_FRAMEBUFFER, m_framebuffer);
+    // 1. FBO 자체를 활성화 (부모의 멤버 m_fbo 사용)
+    Super::Bind();
 
-    // 타겟 텍스쳐의 특정 밉맵 레벨에 그립니다.
+    // 2. 렌더링할 큐브맵의 면(Face)을 교체
     glFramebufferTexture2D
     (
         GL_FRAMEBUFFER,
@@ -35,60 +43,50 @@ void CubeFramebuffer::Bind(int32 cubeIndex) const
         m_colorAttachment->Get(),
         m_mipLevel
     );
+}
 
-    // TODO : 밉맵 레벨이 바뀌면 Viewport 크기도 그에 맞춰 줄여줘야 합니다.
-    // 이는 이 함수를 호출하는 쪽(Baking Loop)에서 glViewport로 처리해야 합니다.
-    // IBL Specular를 위해 필요
-    // (미리보기) 나중에 작성할 로직
-    //for (int mip = 0; mip < maxMipLevels; ++mip)
-    //{
-    //    // 밉맵 레벨에 따라 뷰포트 크기를 줄임 (ex: 128 -> 64 -> 32 ...)
-    //    unsigned int mipWidth = width * std::pow(0.5, mip);
-    //    unsigned int mipHeight = height * std::pow(0.5, mip);
-
-    //    // [중요] FBO 바인딩 전/후에 뷰포트 조절 필수
-    //    glViewport(0, 0, mipWidth, mipHeight);
-
-    //    for (int i = 0; i < 6; ++i)
-    //    {
-    //        framebuffer->Bind(i, mip); // 여기서 바인딩
-    //        // ... 그리기 ...
-    //    }
-    //}
+void CubeFramebuffer::CleanDepthStencil()
+{
+    if (m_depthStencilBuffer)
+    {
+        glDeleteRenderbuffers(1, &m_depthStencilBuffer);
+        m_depthStencilBuffer = 0;
+    }
 }
 
 bool CubeFramebuffer::InitWithColorAttachment(const CubeTexturePtr& colorAttachment, uint32 mipLevel)
 {
     m_colorAttachment = colorAttachment;
     m_mipLevel = mipLevel;
-    glGenFramebuffers(1, &m_framebuffer);
-    glBindFramebuffer(GL_FRAMEBUFFER, m_framebuffer);
+    glGenFramebuffers(1, &m_fbo);
+    glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
 
     glFramebufferTexture2D(GL_FRAMEBUFFER,
         GL_COLOR_ATTACHMENT0, GL_TEXTURE_CUBE_MAP_POSITIVE_X,
         m_colorAttachment->Get(), m_mipLevel);
 
-    int32 width = m_colorAttachment->GetWidth() >> m_mipLevel;
-    int32 height = m_colorAttachment->GetHeight() >> m_mipLevel;
+    m_width = m_colorAttachment->GetWidth() >> m_mipLevel;
+    m_height = m_colorAttachment->GetHeight() >> m_mipLevel;
+    if (m_width <= 0) m_width = 1;
+    if (m_height <= 0) m_height = 1;
 
     // 깊이 버퍼 생성
     glGenRenderbuffers(1, &m_depthStencilBuffer);
     glBindRenderbuffer(GL_RENDERBUFFER, m_depthStencilBuffer);
-    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, width, height);
+    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, m_width, m_height);
     glBindRenderbuffer(GL_RENDERBUFFER, 0);
 
-    glFramebufferRenderbuffer(
+    glFramebufferRenderbuffer
+    (
         GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT,
         GL_RENDERBUFFER, m_depthStencilBuffer);
 
-    auto result = glCheckFramebufferStatus(GL_FRAMEBUFFER);
-    if (result != GL_FRAMEBUFFER_COMPLETE)
+    if (!CheckFramebufferStatus())
     {
-        LOG_ERROR("failed to create framebuffer: 0x{:04x}", result);
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
         return false;
     }
 
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
     return true;
 }

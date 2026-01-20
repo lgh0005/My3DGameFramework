@@ -35,5 +35,5 @@ bool SSAOFramebuffer::CreateAttachments()
     glDrawBuffers(1, attachments);
 
     // 3. 상태 확인 및 언바인드
-    return CheckFramebufferStatus("SSAO");
+    return CheckFramebufferStatus();
 }

@@ -25,7 +25,7 @@ bool EffectFramebuffer::CreateAttachments()
 	glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
 
 	CreateAndAttachColor(0, GL_RGBA16F, GL_RGBA, GL_FLOAT, GL_LINEAR);
-	return CheckFramebufferStatus("EffectFramebuffer");
+	return CheckFramebufferStatus();
 }
 
 bool EffectFramebuffer::Init(int32 width, int32 height)

@@ -102,6 +102,6 @@ bool MSAAFramebuffer::CreateAttachments()
     glDrawBuffers((GLsizei)drawBuffers.size(), drawBuffers.data());
 
     // 5. 상태 체크
-    return CheckFramebufferStatus("MSAAFramebuffer");
+    return CheckFramebufferStatus();
 }
 

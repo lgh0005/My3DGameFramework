@@ -32,5 +32,5 @@ bool PostProcessFramebuffer::CreateAttachments()
 	CreateAndAttachDepth(GL_DEPTH24_STENCIL8, GL_DEPTH_STENCIL, GL_UNSIGNED_INT_24_8);
 
 	// 2. 상태 확인 및 언바인드 (부모의 CheckFramebufferStatus 활용)
-	return CheckFramebufferStatus("PostProcess");
+	return CheckFramebufferStatus();
 }

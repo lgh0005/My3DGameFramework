@@ -42,5 +42,5 @@ bool BRDFLookUpFramebuffer::CreateAttachments()
     glDrawBuffers(1, attachments);
 
     // 5. 상태 체크
-    return CheckFramebufferStatus("BRDFLookupFramebuffer");
+    return CheckFramebufferStatus();
 }

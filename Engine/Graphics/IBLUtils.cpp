@@ -12,11 +12,7 @@
 CubeTexturePtr IBLUtils::CreateCubemapFromHDR(Texture* hdrTexture, int32 resolution)
 {
 	// 일회용 유틸성 쉐이더 로드
-	auto sphericalToCubeProgram = Program::Create
-	(
-		"./Resources/Shaders/IBLUtils/IBLUtils_Common.vert",
-		"./Resources/Shaders/IBLUtils/IBLUtils_Spherical_Map.frag"
-	);
+	auto sphericalToCubeProgram = RESOURCE.GetResource<Program>("ibl_utils_sphericalToCube");
 	if (!sphericalToCubeProgram) return nullptr;
 
 	// 일회용 큐브 메쉬 생성
@@ -49,7 +45,6 @@ CubeTexturePtr IBLUtils::CreateCubemapFromHDR(Texture* hdrTexture, int32 resolut
 	GLint prevViewport[4];
 	glGetIntegerv(GL_VIEWPORT, prevViewport);
 	glViewport(0, 0, resolution, resolution);
-	captureFBO->Bind();
 
 	glDisable(GL_CULL_FACE);
 	for (int i = 0; i < 6; ++i)
@@ -60,7 +55,7 @@ CubeTexturePtr IBLUtils::CreateCubemapFromHDR(Texture* hdrTexture, int32 resolut
 		cubeMesh->Draw();
 	}
 	glEnable(GL_CULL_FACE);
-	CubeFramebuffer::BindToDefault();
+	FramebufferBase::BindToDefault();
 	glViewport(prevViewport[0], prevViewport[1], prevViewport[2], prevViewport[3]);
 
 	// 6. 밉맵 생성
@@ -72,11 +67,7 @@ CubeTexturePtr IBLUtils::CreateCubemapFromHDR(Texture* hdrTexture, int32 resolut
 CubeTexturePtr IBLUtils::CreateIrradianceMap(CubeTexture* src)
 {
 	// 일회용 유틸성 쉐이더 로드
-	auto convolutionProgram = Program::Create
-	(
-		"./Resources/Shaders/IBLUtils/IBLUtils_Common.vert",
-		"./Resources/Shaders/IBLUtils/IBLUtils_Diffuse_Irradiance.frag"
-	);
+	auto convolutionProgram = RESOURCE.GetResource<Program>("ibl_utils_convolution");
 	if (!convolutionProgram) return nullptr;
 
 	// 일회용 큐브 메쉬 생성
@@ -111,7 +102,6 @@ CubeTexturePtr IBLUtils::CreateIrradianceMap(CubeTexture* src)
 	glGetIntegerv(GL_VIEWPORT, prevViewport);
 	glViewport(0, 0, resolution, resolution);
 
-	captureFBO->Bind();
 	glDisable(GL_CULL_FACE);
 	for (int i = 0; i < 6; ++i)
 	{
@@ -135,11 +125,7 @@ CubeTexturePtr IBLUtils::CreatePrefilteredMap(CubeTexture* src)
 	glGetIntegerv(GL_VIEWPORT, prevViewport);
 
 	// 일회용 유틸성 쉐이더 로드
-	auto preFilteredProgram = Program::Create
-	(
-		"./Resources/Shaders/IBLUtils/IBLUtils_Common.vert",
-		"./Resources/Shaders/IBLUtils/IBLUtils_Prefiltered_Light.frag"
-	);
+	auto preFilteredProgram = RESOURCE.GetResource<Program>("ibl_utils_prefiltered");
 	if (!preFilteredProgram) return nullptr;
 
 	auto cubeMesh = GeometryGenerator::CreateBox();
@@ -201,11 +187,7 @@ TexturePtr IBLUtils::CreateBRDFLUT()
 	glGetIntegerv(GL_VIEWPORT, prevViewport);
 	glViewport(0, 0, resolution, resolution);
 
-	auto brdfProgram = Program::Create
-	(
-		"./Resources/Shaders/IBLUtils/IBLUtils_BRDF_Lookup.vert",
-		"./Resources/Shaders/IBLUtils/IBLUtils_BRDF_Lookup.frag"
-	);
+	auto brdfProgram = RESOURCE.GetResource<Program>("ibl_utils_brdf_lut");
 	if (!brdfProgram) return nullptr;
 
 	auto lookupFramebuffer = BRDFLookUpFramebuffer::Create(resolution, resolution);

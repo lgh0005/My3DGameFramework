@@ -50,6 +50,29 @@
 
 
         {
+            "key": "ibl_utils_sphericalToCube",
+            "vs":  "./Resources/Shaders/IBLUtils/IBLUtils_Common.vert",
+            "fs":  "./Resources/Shaders/IBLUtils/IBLUtils_Spherical_Map.frag"
+        },
+        {
+          "key": "ibl_utils_convolution",
+          "vs": "./Resources/Shaders/IBLUtils/IBLUtils_Common.vert",
+          "fs": "./Resources/Shaders/IBLUtils/IBLUtils_Diffuse_Irradiance.frag"
+        },
+        {
+            "key": "ibl_utils_prefiltered",
+            "vs":  "./Resources/Shaders/IBLUtils/IBLUtils_Common.vert",
+            "fs":  "./Resources/Shaders/IBLUtils/IBLUtils_Prefiltered_Light.frag"
+        },
+        {
+            "key": "ibl_utils_brdf_lut",
+            "vs":  "./Resources/Shaders/IBLUtils/IBLUtils_BRDF_Lookup.vert",
+            "fs":  "./Resources/Shaders/IBLUtils/IBLUtils_BRDF_Lookup.frag"
+        },
+
+
+
+        {
             "key": "debug_gizmos",
             "vs":  "./Resources/Shaders/Debug/Debug_Jolt_Physics_Gizmo.vert",
             "fs":  "./Resources/Shaders/Debug/Debug_Jolt_Physics_Gizmo.frag" 

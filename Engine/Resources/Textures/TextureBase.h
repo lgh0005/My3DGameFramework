@@ -10,6 +10,7 @@ public:
 
 	const uint32 Get() const { return m_texture; }
 	void Bind() const;
+	void Unbind() const;
 
 	int32  GetWidth()    const { return m_width; }
 	int32  GetHeight()   const { return m_height; }

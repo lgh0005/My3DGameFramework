@@ -45,5 +45,5 @@ bool GBufferFramebuffer::CreateAttachments()
     CreateAndAttachDepth();
 
     // 5. 상태 체크
-    return CheckFramebufferStatus("GBufferFramebuffer");
+    return CheckFramebufferStatus();
 }

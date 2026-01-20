@@ -30,5 +30,5 @@ bool OutlineFramebuffer::CreateAttachments()
     CreateAndAttachColor(0, GL_RGBA8, GL_RGBA, GL_UNSIGNED_BYTE, GL_LINEAR);
 
     // 2. 결과 출력
-    return CheckFramebufferStatus("Outline");
+    return CheckFramebufferStatus();
 }

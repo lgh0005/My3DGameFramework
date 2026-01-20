@@ -15,3 +15,8 @@ void TextureBase::Bind() const
 {
 	glBindTexture(m_target, m_texture);
 }
+
+void TextureBase::Unbind() const
+{
+	glBindTexture(m_target, 0);
+}
