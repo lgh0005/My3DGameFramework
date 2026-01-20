@@ -11,6 +11,7 @@
 #include "Resources/Image.h"
 #include "Resources/AudioClip.h"
 #include "Resources/Textures/CubeTexture.h"
+#include "Resources/Textures/TextureUtils.h"
 #include "Resources/Meshes/StaticMesh.h"
 #include "Resources/Material.h"
 
@@ -140,46 +141,16 @@ bool ResourceLoader::LoadTextures(const std::vector<ResourceData>& dataList)
 
 	for (const auto& data : dataList)
 	{
-		TexturePtr texture = nullptr;
-		std::string path = data.path;
+		// 확장자 체크 로직 제거 -> TextureLoader 내부에서 처리
+		auto texture = TextureUtils::LoadTexture(data.path);
 
-		// 확장자 처리
-		std::string ext = fs::path(path).extension().string();
-		std::transform(ext.begin(), ext.end(), ext.begin(), ::tolower);
-
-		// 확장자에 따른 텍스쳐 로드
-		if (ext == ".ktx")
-		{
-			auto texUPtr = Texture::CreateFromKtxImage(path);
-			if (texUPtr) texture = std::move(texUPtr);
-		}
-		else if (ext == ".hdr")
-		{
-			auto image = Image::LoadHDR(path, true);
-			if (image)
-			{
-				auto tex = Texture::CreateFromHDR(image.get());
-				if (tex) texture = std::move(tex);
-			}
-		}
-		else
-		{
-			auto image = Image::Load(path, true);
-			if (image)
-			{
-				auto tex = Texture::CreateFromImage(image.get());
-				if (tex) texture = std::move(tex);
-			}
-		}
-
-		// 텍스쳐 등록
 		if (texture)
 		{
-			RESOURCE.AddResource<Texture>(texture, data.key, path);
+			RESOURCE.AddResource<Texture>(std::move(texture), data.key, data.path);
 		}
 		else
 		{
-			LOG_ERROR("Failed to create Texture: '{}' ({})", data.key, path);
+			LOG_ERROR("Failed to create Texture: '{}' ({})", data.key, data.path);
 			success = false;
 		}
 	}
@@ -194,51 +165,53 @@ bool ResourceLoader::LoadCubeTextures(const std::vector<CubeMapData>& dataList)
 	for (const auto& data : dataList)
 	{
 		CubeTextureUPtr texture = nullptr;
+		usize fileCount = data.paths.size();
 
-		// CASE 1: 단일 파일 (KTX, HDR 등)
-		if (data.paths.size() == 1)
+		switch (fileCount)
 		{
-			std::string path = data.paths[0];
-			std::string ext = fs::path(path).extension().string();
-			std::transform(ext.begin(), ext.end(), ext.begin(), ::tolower);
-
-			if (ext == ".ktx")
+			case 1:
 			{
-				texture = CubeTexture::CreateFromKtxImage(path);
+				std::string path = data.paths[0];
+				std::string ext = fs::path(path).extension().string();
+				std::transform(ext.begin(), ext.end(), ext.begin(), ::tolower);
+				if (ext == ".ktx") texture = TextureUtils::LoadCubeMapFromKtx(path);
+				break;
 			}
-		}
 
-		// CASE 2: 6장 이미지 (Right, Left, Top, Bottom, Front, Back 순서 가정)
-		else if (data.paths.size() == 6)
-		{
-			std::vector<Image*> rawImages;
-			std::vector<ImageUPtr> imageOwner; // 메모리 해제 관리용
-
-			bool loadFailed = false;
-			for (const auto& path : data.paths)
+			case 6:
 			{
-				// 큐브맵은 Flip하지 않음 (false)
-				auto img = Image::Load(path, false);
-				if (!img)
+				std::vector<Image*> rawImages;
+				std::vector<ImageUPtr> imageOwner; // 메모리 해제 관리용
+
+				bool loadFailed = false;
+				for (const auto& path : data.paths)
 				{
-					LOG_ERROR("Failed to load cubemap face: {}", path);
-					loadFailed = true;
-					break;
+					// 큐브맵은 Flip하지 않음 (false)
+					auto img = Image::Load(path, false);
+					if (!img)
+					{
+						LOG_ERROR("Failed to load cubemap face: {}", path);
+						loadFailed = true;
+						break;
+					}
+					rawImages.push_back(img.get());
+					imageOwner.push_back(std::move(img)); // 소유권 보존
 				}
-				rawImages.push_back(img.get());
-				imageOwner.push_back(std::move(img)); // 소유권 보존
-			}
 
-			if (!loadFailed)
-			{
-				texture = CubeTexture::CreateFromImages(rawImages);
+				if (!loadFailed)
+				{
+					texture = TextureUtils::LoadCubeMapFromImages(rawImages);
+				}
+
+				break;
 			}
-		}
-		else
-		{
-			LOG_ERROR("Invalid path count for CubeMap '{}': {}. Expected 1 or 6.", data.key, data.paths.size());
-			success = false;
-			continue;
+		
+			default:
+			{
+				LOG_ERROR("Invalid path count for CubeMap '{}': {}. Expected 1 or 6.", data.key, data.paths.size());
+				success = false;
+				continue;;
+			}
 		}
 
 		// 등록

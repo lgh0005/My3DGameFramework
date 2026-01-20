@@ -12,6 +12,7 @@
 #include "Resources/Meshes/SkinnedMesh.h"
 #include "Resources/Material.h"
 #include "Resources/Image.h"
+#include "Resources/Textures/TextureUtils.h"
 #include "Resources/Textures/Texture.h"
 #include "Resources/Animations/Skeleton.h"
 #include "Graphics/VertexLayout.h"
@@ -719,7 +720,7 @@ TexturePtr Model::LoadTextureFromKTX(const std::string& filename, const std::fil
     // 3. 파일이 실제로 존재하는지 확인 후 로드
     if (std::filesystem::exists(ktxPath))
     {
-        auto texture = Texture::CreateFromKtxImage(ktxFullPath);
+        auto texture = TextureUtils::LoadTextureFromKtx(ktxFullPath);
         if (texture)
         {
             RESOURCE.AddResource<Texture>(std::move(texture), ktxFullPath);
@@ -750,7 +751,7 @@ TexturePtr Model::LoadTextureFromImage(const std::string& filename, const std::f
     }
 
     // 4. 텍스처 생성 및 등록
-    auto texture = Texture::CreateFromImage(image.get());
+    auto texture = TextureUtils::LoadTextureFromImage(image.get());
     RESOURCE.AddResource<Texture>(std::move(texture), originalFullPath);
 
     return RESOURCE.GetResource<Texture>(originalFullPath);

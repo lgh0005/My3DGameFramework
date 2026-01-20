@@ -7,6 +7,7 @@
 #include "Resources/Meshes/StaticMesh.h"
 #include "Resources/Meshes/SkinnedMesh.h"
 #include "Resources/Material.h"
+#include "Resources/Textures/TextureUtils.h"
 #include "Resources/Textures/Texture.h"
 #include "Resources/Textures/CubeTexture.h"
 #include "Resources/Image.h"
@@ -51,11 +52,11 @@ bool PBRScene::LoadSceneResources()
 	{
 		auto solidColorMat = Material::Create();
 		if (!solidColorMat) return false;
-		solidColorMat->diffuse = Texture::CreateFromImage(Image::CreateSingleColorImage
+		solidColorMat->diffuse = TextureUtils::LoadTextureFromImage(Image::CreateSingleColorImage
 		(4, 4, glm::vec4(0.75f, 0.1f, 0.2f, 1.0f)).get());
-		solidColorMat->metallic = Texture::CreateFromImage(Image::CreateSingleColorImage
+		solidColorMat->metallic = TextureUtils::LoadTextureFromImage(Image::CreateSingleColorImage
 		(4, 4, glm::vec4(0.85f, 0.85f, 0.85f, 1.0f)).get());
-		solidColorMat->roughness = Texture::CreateFromImage(Image::CreateSingleColorImage
+		solidColorMat->roughness = TextureUtils::LoadTextureFromImage(Image::CreateSingleColorImage
 		(4, 4, glm::vec4(0.25f, 0.35f, 0.25f, 1.0f)).get());
 		RESOURCE.AddResource<Material>(std::move(solidColorMat), "solidColor");
 	}
@@ -65,13 +66,13 @@ bool PBRScene::LoadSceneResources()
 		// TODO : 이후에는 ktx로 한 번 구울 필요가 있음.
 		auto rustedIronMat = Material::Create();
 		if (!rustedIronMat) return false;
-		rustedIronMat->diffuse = Texture::CreateFromImage
+		rustedIronMat->diffuse = TextureUtils::LoadTextureFromImage
 		(Image::Load("./Resources/Images/rustediron/rustediron2_basecolor.png").get());
-		rustedIronMat->roughness = Texture::CreateFromImage
+		rustedIronMat->roughness = TextureUtils::LoadTextureFromImage
 		(Image::Load("./Resources/Images/rustediron/rustediron2_roughness.png").get());
-		rustedIronMat->metallic = Texture::CreateFromImage
+		rustedIronMat->metallic = TextureUtils::LoadTextureFromImage
 		(Image::Load("./Resources/Images/rustediron/rustediron2_metallic.png").get());
-		rustedIronMat->normal = Texture::CreateFromImage
+		rustedIronMat->normal = TextureUtils::LoadTextureFromImage
 		(Image::Load("./Resources/Images/rustediron/rustediron2_normal.png").get());
 		RESOURCE.AddResource<Material>(std::move(rustedIronMat), "Rusted_Iron");
 	}
@@ -81,11 +82,11 @@ bool PBRScene::LoadSceneResources()
 		// TODO : 이후에는 ktx로 한 번 구울 필요가 있음.
 		auto rustedIronMat = Material::Create();
 		if (!rustedIronMat) return false;
-		rustedIronMat->diffuse = Texture::CreateFromImage
+		rustedIronMat->diffuse = TextureUtils::LoadTextureFromImage
 		(Image::Load("./Resources/Images/rustediron/rustediron2_basecolor.png").get());
-		rustedIronMat->normal = Texture::CreateFromImage
+		rustedIronMat->normal = TextureUtils::LoadTextureFromImage
 		(Image::Load("./Resources/Images/rustediron/rustediron2_normal.png").get());
-		rustedIronMat->orm = Texture::CreateFromImage
+		rustedIronMat->orm = TextureUtils::LoadTextureFromImage
 		(Image::Load("./Resources/Images/rustediron/rustediron2_ORM.png").get());
 		RESOURCE.AddResource<Material>(std::move(rustedIronMat), "Rusted_Iron_orm");
 	}
@@ -94,7 +95,7 @@ bool PBRScene::LoadSceneResources()
 	{
 		auto hdrCubeMat = Material::Create();
 		if (!hdrCubeMat) return false;
-		hdrCubeMat->diffuse = Texture::CreateFromHDR
+		hdrCubeMat->diffuse = TextureUtils::LoadTextureFromHDR
 		(Image::LoadHDR("./Resources/Images/IBL/mirrored_hall_4k.hdr").get());
 		RESOURCE.AddResource<Material>(std::move(hdrCubeMat), "hdrCubeMat");
 	}
@@ -102,7 +103,7 @@ bool PBRScene::LoadSceneResources()
 	// HDR Skybox 생성 (IBLUtils 사용)
 	{
 		auto hdrImage = Image::LoadHDR("./Resources/Images/IBL/mirrored_hall_4k.hdr");
-		auto hdrTex = Texture::CreateFromHDR(hdrImage.get());
+		auto hdrTex = TextureUtils::LoadTextureFromHDR(hdrImage.get());
 		RESOURCE.AddResource<Texture>(std::move(hdrTex), "hdrImage");
 
 		auto envMap = EnvironmentMap::CreateIBL(RESOURCE.GetResource<Texture>("hdrImage"));
@@ -430,7 +431,7 @@ void PBRScene::TestSpheresForPBRChart(HDRRenderPass* hdrPass)
 
 	// [최적화] 모든 구가 공유할 기본 텍스처들 (White)
 	// 텍스처 값(1.0) * 팩터 값(설정값) = 최종 값
-	TexturePtr sharedWhite = Texture::CreateWhite();
+	TexturePtr sharedWhite = TextureUtils::GetWhiteTexture();
 
 	const int rows = 7;
 	const int cols = 7;
@@ -484,7 +485,7 @@ void PBRScene::TestSpheresForPBRChartDeferred()
 
 	// [최적화] 모든 구가 공유할 기본 텍스처들 (White)
 	// 텍스처 값(1.0) * 팩터 값(설정값) = 최종 값
-	TexturePtr sharedWhite = Texture::CreateWhite();
+	TexturePtr sharedWhite = TextureUtils::GetWhiteTexture();
 
 	const int rows = 7;
 	const int cols = 7;

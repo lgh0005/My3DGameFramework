@@ -129,6 +129,7 @@ add_library(Engine STATIC
    "Resources/Animations/Pose.h"               "Resources/Animations/Pose.cpp"
    "Resources/Animations/Skeleton.h"           "Resources/Animations/Skeleton.cpp"
    "Resources/Textures/Texture.h"            "Resources/Textures/Texture.cpp" 
+   "Resources/Textures/TextureUtils.h"            "Resources/Textures/TextureUtils.cpp" 
    "Resources/Meshes/Mesh.h"               "Resources/Meshes/Mesh.cpp"
    "Resources/Meshes/StaticMesh.h"         "Resources/Meshes/StaticMesh.cpp" 
    "Resources/Meshes/SkinnedMesh.h"        "Resources/Meshes/SkinnedMesh.cpp"

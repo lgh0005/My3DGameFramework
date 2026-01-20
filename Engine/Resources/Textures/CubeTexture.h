@@ -1,5 +1,6 @@
 ﻿#pragma once
 #include "Resources/Resource.h"
+#include "Resources/Textures/TextureUtils.h"
 #include <ktx.h>
 
 #pragma region FORWARD_DECLARATION
@@ -9,12 +10,12 @@ CLASS_PTR(Image)
 CLASS_PTR(CubeTexture)
 class CubeTexture : public Resource
 {
+    friend class TextureUtils;
+
 public:
     virtual ~CubeTexture();
     static const ResourceType s_ResourceType = ResourceType::CubeTexture;
     virtual ResourceType GetResourceType() const override { return ResourceType::CubeTexture; }
-    static CubeTextureUPtr CreateFromImages(const std::vector<Image*> images);
-    static CubeTextureUPtr CreateFromKtxImage(const std::string& ktxFilePath);
     static CubeTextureUPtr Create(int32 width, int32 height, uint32 format, uint32 type = GL_UNSIGNED_BYTE);
 
     const uint32 Get() const { return m_texture; }
@@ -28,10 +29,6 @@ public:
 private:
     CubeTexture();
     void Init(int32 width, int32 height, uint32 format, uint32 type);
-    bool InitFromImages(const std::vector<Image*> images);
-    static CubeTextureUPtr LoadKtx(const std::string& ktxFilePath);
-    static void GetFormatsFromImage(const Image* image,
-        GLenum& outInternal, GLenum& outFormat, GLenum& outType);
 
     uint32 m_texture    { 0 };
     int32  m_width      { 0 };
