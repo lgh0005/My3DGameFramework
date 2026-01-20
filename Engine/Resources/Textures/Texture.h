@@ -1,16 +1,13 @@
 ﻿#pragma once
-#include "Resources/Resource.h"
+#include "Resources/Textures/TextureBase.h"
 #include "Resources/Textures/TextureUtils.h"
-#include <ktx.h>
 
 #pragma region FORWARD_DECLARATION
 CLASS_PTR(Image)
 #pragma endregion
 
-// TODO : 이것도 Texture를 상위 클래스로 두고 전용 텍스쳐로
-// 조금 나눌 필요가 있어보인다.
 CLASS_PTR(Texture)
-class Texture : public Resource
+class Texture : public TextureBase
 {
 	friend class TextureUtils;
 
@@ -31,23 +28,11 @@ public:
 	void SetData(const void* data, uint32 size = 0);
 
 	void Bind() const;
-	const uint32 Get() const { return m_texture; }
-	int32  GetWidth()	   const	{ return m_width; }
-	int32  GetHeight()	   const	{ return m_height; }
-	uint32 GetType()	   const    { return m_type; }
-	uint32 GetFormat()     const	{ return m_format; }
 	int32 GetSamples() const { return m_samples; }
-
+	
 private:
 	Texture();
 	void CreateTexture();
 
-	uint32	m_texture		{ 0 };
-	int32	m_width			{ 0 };
-	int32	m_height		{ 0 };
-	uint32  m_internalFormat{ 0 };
-	int32   m_samples		{ 1 };
-	uint32  m_type			{ GL_UNSIGNED_BYTE };
-	uint32	m_format		{ GL_RGBA };
-	GLenum  m_target		{ GL_TEXTURE_2D };
+	int32   m_samples{ 1 };
 };

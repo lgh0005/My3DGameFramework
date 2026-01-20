@@ -26,7 +26,7 @@ bool ResourceLoader::Init()
 
 bool ResourceLoader::Load(const std::string& manifestPath)
 {
-	LOG_INFO("Start Resource Loading...");
+	LOG_INFO("Start Resource Loading... : {}", manifestPath);
 	bool success = true;
 
 	// 1. JSON 매니페스트 파싱

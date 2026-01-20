@@ -2,11 +2,11 @@
 #include "CubeTexture.h"
 #include "Resources/Image.h"
 
-CubeTexture::CubeTexture() = default;
-CubeTexture::~CubeTexture()
+CubeTexture::CubeTexture()
 {
-    if (m_texture) glDeleteTextures(1, &m_texture);
+    m_target = GL_TEXTURE_CUBE_MAP;
 }
+CubeTexture::~CubeTexture() = default;
 
 /*=========================================//
 //   default cube texture create methods   //
@@ -21,11 +21,6 @@ CubeTextureUPtr CubeTexture::Create(int32 width, int32 height, uint32 format, ui
 /*==================================//
 //   default cube texture setters   //
 //==================================*/
-void CubeTexture::Bind() const 
-{
-    glBindTexture(GL_TEXTURE_CUBE_MAP, m_texture);
-}
-
 void CubeTexture::GenerateMipmap() const
 {
     Bind();

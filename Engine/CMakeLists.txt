@@ -95,7 +95,6 @@ add_library(Engine STATIC
    "Graphics/IBLUtils.h"            "Graphics/IBLUtils.cpp"
    "Graphics/Frustum.h"             "Graphics/Frustum.cpp"
    "Graphics/Geometry.h"            "Graphics/Geometry.cpp"
-   "Graphics/CubeFramebuffer.h"     "Graphics/CubeFramebuffer.cpp"
    "Graphics/SkyLight.h"            "Graphics/SkyLight.cpp"
    "Graphics/ShadowMap.h"           "Graphics/ShadowMap.cpp"
    "Graphics/Ray.h"                 "Graphics/Ray.cpp"
@@ -109,6 +108,7 @@ add_library(Engine STATIC
 
    # Framebuffers
    "Graphics/Framebuffers/Framebuffer.h"             "Graphics/Framebuffers/Framebuffer.cpp"
+   "Graphics/Framebuffers/CubeFramebuffer.h"         "Graphics/Framebuffers/CubeFramebuffer.cpp"
    "Graphics/Framebuffers/BRDFLookUpFramebuffer.h"   "Graphics/Framebuffers/BRDFLookUpFramebuffer.cpp"
    "Graphics/Framebuffers/GBufferFramebuffer.h"      "Graphics/Framebuffers/GBufferFramebuffer.cpp"
    "Graphics/Framebuffers/MSAAFramebuffer.h"         "Graphics/Framebuffers/MSAAFramebuffer.cpp"
@@ -124,25 +124,30 @@ add_library(Engine STATIC
    "Resources/AudioClip.h"          "Resources/AudioClip.cpp"
    "Resources/Image.h"              "Resources/Image.cpp"
    "Resources/Model.h"              "Resources/Model.cpp"
+   "Resources/Material.h"           "Resources/Material.cpp"
+   "Resources/Font.h"               "Resources/Font.cpp"
+   "Resources/EnvironmentMap.h"     "Resources/EnvironmentMap.cpp"
+
    "Resources/Animations/Animation.h"          "Resources/Animations/Animation.cpp"
    "Resources/Animations/AnimChannel.h"        "Resources/Animations/AnimChannel.cpp"
    "Resources/Animations/Pose.h"               "Resources/Animations/Pose.cpp"
    "Resources/Animations/Skeleton.h"           "Resources/Animations/Skeleton.cpp"
-   "Resources/Textures/Texture.h"            "Resources/Textures/Texture.cpp" 
-   "Resources/Textures/TextureUtils.h"            "Resources/Textures/TextureUtils.cpp" 
-   "Resources/Meshes/Mesh.h"               "Resources/Meshes/Mesh.cpp"
-   "Resources/Meshes/StaticMesh.h"         "Resources/Meshes/StaticMesh.cpp" 
-   "Resources/Meshes/SkinnedMesh.h"        "Resources/Meshes/SkinnedMesh.cpp"
-   "Resources/Meshes/InstancedMesh.h"      "Resources/Meshes/InstancedMesh.cpp"
-   "Resources/Meshes/ScreenMesh.h"         "Resources/Meshes/ScreenMesh.cpp"
-   "Resources/Meshes/DebugMesh.h"          "Resources/Meshes/DebugMesh.cpp"
-   "Resources/Meshes/UIMesh.h"             "Resources/Meshes/UIMesh.cpp"
-   "Resources/Material.h"           "Resources/Material.cpp"
-   "Resources/Textures/CubeTexture.h"        "Resources/Textures/CubeTexture.cpp"
-   "Resources/Animations/AnimController.h"     "Resources/Animations/AnimController.cpp"
+    "Resources/Animations/AnimController.h"    "Resources/Animations/AnimController.cpp"
    "Resources/Animations/AnimState.h"          "Resources/Animations/AnimState.cpp"
-   "Resources/Font.h"               "Resources/Font.cpp"
-   "Resources/EnvironmentMap.h"    "Resources/EnvironmentMap.cpp"
+
+   "Resources/Textures/TextureBase.h"        "Resources/Textures/TextureBase.cpp" 
+   "Resources/Textures/Texture.h"            "Resources/Textures/Texture.cpp" 
+   "Resources/Textures/TextureUtils.h"       "Resources/Textures/TextureUtils.cpp" 
+   "Resources/Textures/CubeTexture.h"        "Resources/Textures/CubeTexture.cpp"
+
+   "Resources/Meshes/Mesh.h"                 "Resources/Meshes/Mesh.cpp"
+   "Resources/Meshes/StaticMesh.h"           "Resources/Meshes/StaticMesh.cpp" 
+   "Resources/Meshes/SkinnedMesh.h"          "Resources/Meshes/SkinnedMesh.cpp"
+   "Resources/Meshes/InstancedMesh.h"        "Resources/Meshes/InstancedMesh.cpp"
+   "Resources/Meshes/ScreenMesh.h"           "Resources/Meshes/ScreenMesh.cpp"
+   "Resources/Meshes/DebugMesh.h"            "Resources/Meshes/DebugMesh.cpp"
+   "Resources/Meshes/UIMesh.h"               "Resources/Meshes/UIMesh.cpp"
+   
 
    # Components
    "Components/Light.h"             "Components/Light.cpp"
@@ -189,7 +194,7 @@ add_library(Engine STATIC
    "Managers/AudioManager.h"        "Managers/AudioManager.cpp"
    "Managers/PhysicsManager.h"      "Managers/PhysicsManager.cpp"
    "Managers/UIManager.h"           "Managers/UIManager.cpp"
-)
+ "Resources/Textures/TextureBase.h" "Resources/Textures/TextureBase.cpp")
 
 # 2. [PCH 설정] EnginePCH.h를 PCH로 사용합니다.
 target_precompile_headers(Engine  PUBLIC EnginePCH.h)
