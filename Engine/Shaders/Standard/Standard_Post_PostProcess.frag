@@ -9,11 +9,36 @@ uniform float exposure;
 uniform bool bloom;
 uniform sampler2D tex;
 uniform sampler2D bloomBlur;
+uniform float bloomStrength;
 uniform vec2 inverseScreenSize;
+uniform int toneMappingMode;
 
 uniform sampler2D cameraDirtTex; // 추가
 uniform float dirtIntensity;     // 추가
 uniform float dirtAmbient;
+
+// 1. ACES Filmic Tone Mapping (Narkowicz 2015)
+vec3 ACESToneMapping(vec3 x)
+{
+    const float a = 2.51;
+    const float b = 0.03;
+    const float c = 2.43;
+    const float d = 0.59;
+    const float e = 0.14;
+    return clamp((x * (a * x + b)) / (x * (c * x + d) + e), 0.0, 1.0);
+}
+
+// 2. Exposure Tone Mapping (기존 방식 함수화)
+vec3 ExposureToneMapping(vec3 color, float exposure)
+{
+    return vec3(1.0) - exp(-color * exposure);
+}
+
+// 3. Reinhard Tone Mapping (차분함, 하이라이트 보존)
+vec3 ReinhardToneMapping(vec3 x)
+{
+    return x / (x + vec3(1.0));
+}
 
 // FXAA 알고리즘 함수
 vec3 ApplyFXAA(sampler2D tex, vec2 coords, vec2 inverseScreenSize) 
@@ -85,13 +110,34 @@ void main()
 	// 3. 원본에 블룸과 Camera Dirt 더하기 (Additive Blending)
     if (bloom)
     {
-        vec3 specDirt = bloomColor * dirtData * dirtIntensity;
+        vec3 finalBloom = bloomColor * bloomStrength;
+        vec3 specDirt = finalBloom * dirtData * dirtIntensity;
         vec3 ambientDirt = dirtData * dirtAmbient;
-        hdrColor += bloomColor + specDirt + ambientDirt;
+        hdrColor += finalBloom + specDirt + ambientDirt;
     }
 
 	// 2. 톤 매핑 (Tone Mapping) - Exposure 방식
-	vec3 mapped = vec3(1.0) - exp(-hdrColor * exposure);
+	// vec3 mapped = vec3(1.0) - exp(-hdrColor * exposure);
+    vec3 mapped = ACESToneMapping(hdrColor * exposure);
+
+    switch (toneMappingMode)
+    {
+        case 0:
+         mapped = ExposureToneMapping(hdrColor, exposure);
+         break;
+
+        case 1:
+         mapped = ACESToneMapping(hdrColor * exposure);
+         break;
+
+        case 2:
+         mapped = ReinhardToneMapping(hdrColor * exposure);
+         break;
+
+        default:
+         mapped = ExposureToneMapping(hdrColor, exposure);
+         break;
+    }
 
 	// 3. 감마 보정 (Gamma Correction)
 	mapped = pow(mapped, vec3(1.0 / gamma));

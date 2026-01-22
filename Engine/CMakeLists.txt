@@ -43,9 +43,7 @@ add_library(Engine STATIC
    "Pipelines/Common/UIWorldSpacePass.h"  "Pipelines/Common/UIWorldSpacePass.cpp"
    "Pipelines/Common/UIScreenSpacePass.h" "Pipelines/Common/UIScreenSpacePass.cpp"
    "Pipelines/Common/JoltDebugGizmoPass.h"  "Pipelines/Common/JoltDebugGizmoPass.cpp"
-   "Pipelines/Common/MotionBlurPass.h" "Pipelines/Common/MotionBlurPass.cpp"
    "Pipelines/Common/SSAOPass.h"    "Pipelines/Common/SSAOPass.cpp"
-   "Pipelines/Common/OutlinePass.h" "Pipelines/Common/OutlinePass.cpp"
    "Pipelines/Common/PostProcessPass.h"     "Pipelines/Common/PostProcessPass.cpp"
 
    # Standard Render Pipeline
@@ -56,7 +54,6 @@ add_library(Engine STATIC
    
    # Universal Render Pipeline
    "Pipelines/URP/RenderPasses/UniversalGeometryPass.h" "Pipelines/URP/RenderPasses/UniversalGeometryPass.cpp"
-   "Pipelines/URP/RenderPasses/UniversalPostProcessPass.h"  "Pipelines/URP/RenderPasses/UniversalPostProcessPass.cpp"
    "Pipelines/URP/RenderPasses/UniversalDeferredLightingPass.h" "Pipelines/URP/RenderPasses/UniversalDeferredLightingPass.cpp"
    "Pipelines/URP/UniversalGlobalUniforms.h"   "Pipelines/URP/UniversalGlobalUniforms.cpp"
    "Pipelines/URP/UniversalRenderPipeline.h"   "Pipelines/URP/UniversalRenderPipeline.cpp"
@@ -111,6 +108,7 @@ add_library(Engine STATIC
    "Pipelines/PostProcessing/OutlineEffect.h"       "Pipelines/PostProcessing/OutlineEffect.cpp"
    "Pipelines/PostProcessing/GaussianBloomEffect.h"  "Pipelines/PostProcessing/GaussianBloomEffect.cpp"
    "Pipelines/PostProcessing/DisplayMappingEffect.h"  "Pipelines/PostProcessing/DisplayMappingEffect.cpp"
+    "Pipelines/PostProcessing/KawaseBloomEffect.h" "Pipelines/PostProcessing/KawaseBloomEffect.cpp"
 
    # Framebuffers
    "Graphics/Framebuffers/FramebufferBase.h"       "Graphics/Framebuffers/FramebufferBase.cpp"

@@ -49,6 +49,7 @@ bool DisplayMappingEffect::Render(RenderContext* context, Framebuffer* mainFBO, 
 	m_compositeProgram->SetUniform("gamma", m_gamma);
 	m_compositeProgram->SetUniform("exposure", m_exposure);
 	m_compositeProgram->SetUniform("inverseScreenSize", glm::vec2(1.0f / m_width, 1.0f / m_height));
+	m_compositeProgram->SetUniform("toneMappingMode", (int32)m_toneMappingMode);
 
 	// [Input 0] MainFBO (Scene Color - HDR)
 	glActiveTexture(GL_TEXTURE0);
@@ -62,10 +63,12 @@ bool DisplayMappingEffect::Render(RenderContext* context, Framebuffer* mainFBO, 
 		glActiveTexture(GL_TEXTURE1);
 		bloomTex->Bind();
 		m_compositeProgram->SetUniform("bloom", true);
+		m_compositeProgram->SetUniform("bloomStrength", m_bloomStrength);
 	}
 	else
 	{
 		m_compositeProgram->SetUniform("bloom", false);
+		m_compositeProgram->SetUniform("bloomStrength", 0.0f);
 	}
 
 	// [Input 2] Dirt Texture (Optional)

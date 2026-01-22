@@ -6,10 +6,9 @@
 #include "Pipelines/Common/SkyboxPass.h"
 #include "Pipelines/Common/JoltDebugGizmoPass.h"
 #include "Pipelines/Common/SSAOPass.h"
-#include "Pipelines/Common/OutlinePass.h"
-#include "Pipelines/Common/MotionBlurPass.h"
+#include "Pipelines/Common/PostProcessPass.h"
+
 #include "Pipelines/URP/RenderPasses/UniversalGeometryPass.h"
-#include "Pipelines/URP/RenderPasses/UniversalPostProcessPass.h"
 #include "Pipelines/URP/RenderPasses/UniversalDeferredLightingPass.h"
 #include "Pipelines/URP/UniversalGlobalUniforms.h"
 #include "Graphics/RenderContext.h"
@@ -33,6 +32,11 @@
 #include "Graphics/Framebuffers/PostProcessFramebuffer.h"
 #include "Graphics/Framebuffers/GBufferFramebuffer.h"
 
+#include "Pipelines/PostProcessing/MotionBlurEffect.h"
+#include "Pipelines/PostProcessing/OutlineEffect.h"
+#include "Pipelines/PostProcessing/KawaseBloomEffect.h"
+#include "Pipelines/PostProcessing/DisplayMappingEffect.h"
+
 DECLARE_DEFAULTS_IMPL(UniversalRenderPipeline)
 
 UniversalRenderPipelineUPtr UniversalRenderPipeline::Create()
@@ -52,10 +56,6 @@ bool UniversalRenderPipeline::Init()
 	m_cullingPass = CullingPass::Create();
 	if (!m_cullingPass) return false;
 
-	// 아웃라인 패스 생성
-	m_outlinePass = OutlinePass::Create();
-	if (!m_outlinePass) return false;
-
 	// 셰도우 패스 생성
 	m_shadowPass = ShadowPass::Create();
 	if (!m_shadowPass) return false;
@@ -68,9 +68,22 @@ bool UniversalRenderPipeline::Init()
 	m_ssaoPass = SSAOPass::Create();
 	if (!m_ssaoPass) return false;
 
-	// 포스트-프로세싱 패스 생성
-	m_postProcessPass = UniversalPostProcessPass::Create();
+	// 통합 포스트-프로세싱 패스 생성
+	m_postProcessPass = PostProcessPass::Create();
 	if (!m_postProcessPass) return false;
+	{
+		auto motion = MotionBlurEffect::Create(0);
+		m_postProcessPass->AddEffect(std::move(motion));
+		auto outline = OutlineEffect::Create(1);
+		m_postProcessPass->AddEffect(std::move(outline));
+		auto bloom = KawaseBloomEffect::Create(2);
+		m_postProcessPass->AddEffect(std::move(bloom));
+		auto display = DisplayMappingEffect::Create(3);
+		display->SetToneMappingMode(ToneMappingMode::ACES); // 1번 모드
+		display->SetBloomStrength(0.05f);					// Kawase + HDR은 빛이 세므로 아주 약하게!
+		display->SetExposure(1.0f);							// ACES에 맞는 노출값
+		m_postProcessPass->AddEffect(std::move(display));
+	}
 
 	// G-buffer 패스 생성
 	m_geometryPass = UniversalGeometryPass::Create();
@@ -79,10 +92,6 @@ bool UniversalRenderPipeline::Init()
 	// Light 패스 생성
 	m_deferredLightPass = UniversalDeferredLightingPass::Create();
 	if (!m_deferredLightPass) return false;
-
-	// 모션 블러 패스 생성
-	m_motionBlurPass = MotionBlurPass::Create();
-	if (!m_motionBlurPass) return false;
 
 	return true;
 }
@@ -131,11 +140,7 @@ void UniversalRenderPipeline::Render(Scene* scene)
 	// [패스 6] 스카이박스 패스
 	m_skyboxPass->Render(&context);
 
-	// [패스 7] 모션 블러 & 아웃라인 (2D 후처리 효과들)
-	m_motionBlurPass->Render(&context);
-	m_outlinePass->Render(&context);
-
-	// [패스 8] 포스트 프로세싱 패스 (최종 합성 및 화면 출력)
+	// [패스 7] 포스트-프로세싱 패스
 	m_postProcessPass->Render(&context);
 
 	// [패스 9] 디버그 패스 (ImGUI 컨텍스트와 충돌 기즈모 출력)
@@ -148,7 +153,6 @@ void UniversalRenderPipeline::OnResize(int32 width, int32 height)
 	m_geometryPass->Resize(width, height);
 	m_postProcessPass->Resize(width, height);
 	m_ssaoPass->Resize(width, height);
-	m_outlinePass->Resize(width, height);
 }
 
 /*======================//

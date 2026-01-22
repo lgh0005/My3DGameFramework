@@ -60,6 +60,8 @@ void ShadowPass::Render(RenderContext* context)
 	// 1. 공통 설정
 	glEnable(GL_DEPTH_TEST);
 	glCullFace(GL_FRONT);
+	glEnable(GL_POLYGON_OFFSET_FILL);
+	glPolygonOffset(2.0f, 4.0f); // 깊이 값을 살짝 밀어서 여드름 해소
 
 	// 2. 전체 조명 리스트 순회
 	for (auto* light : lights)
@@ -94,6 +96,7 @@ void ShadowPass::Render(RenderContext* context)
 	}
 
 	glCullFace(GL_BACK);
+	glDisable(GL_POLYGON_OFFSET_FILL);
 
 	// 3. 그림자를 구운 텍스쳐를 Context에 등록
 	RegisterShadowMapsToContext(context);

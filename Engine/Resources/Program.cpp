@@ -56,7 +56,7 @@ void Program::SetUniform(const std::string& name, bool value) const
     glUniform1i(loc, static_cast<int>(value));
 }
 
-void Program::SetUniform(const std::string& name, int value) const 
+void Program::SetUniform(const std::string& name, int32 value) const 
 {
     auto loc = glGetUniformLocation(m_program, name.c_str());
     glUniform1i(loc, value);

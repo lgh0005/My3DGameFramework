@@ -8,6 +8,13 @@ CLASS_PTR(PostProcessFramebuffer)
 CLASS_PTR(Texture)
 #pragma endregion
 
+enum class ToneMappingMode : uint8
+{
+	Exposure = 0, // SRP용 (기본, 선명함)
+	ACES = 1, // URP용 (필름 느낌, 대비 강함)
+	Reinhard = 2  // 범용 (차분함, 하이라이트 억제 좋음)
+};
+
 CLASS_PTR(DisplayMappingEffect)
 class DisplayMappingEffect : public PostProcessEffect
 {
@@ -31,6 +38,10 @@ public:
 	) override;
 
 	virtual void OnResize(int32 width, int32 height) override;
+	
+	void SetToneMappingMode(ToneMappingMode mode) { m_toneMappingMode = mode; }
+	void SetBloomStrength(float strength) { m_bloomStrength = strength; }
+	void SetExposure(float exposure) { m_exposure = exposure; }
 
 private:
 	DisplayMappingEffect();
@@ -40,6 +51,9 @@ private:
 	ProgramPtr m_compositeProgram;
 	TexturePtr m_cameraDirtTexture;
 
+	float m_bloomStrength{ 2.0f };
+
+	ToneMappingMode m_toneMappingMode{ ToneMappingMode::Exposure };
 	float m_gamma		{ 2.2f };
 	float m_exposure	{ 1.0f };
 	

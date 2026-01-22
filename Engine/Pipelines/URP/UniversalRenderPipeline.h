@@ -6,9 +6,7 @@ CLASS_PTR(CullingPass)
 CLASS_PTR(ShadowPass)
 CLASS_PTR(SkyboxPass)
 CLASS_PTR(SSAOPass)
-CLASS_PTR(OutlinePass)
-CLASS_PTR(MotionBlurPass)
-CLASS_PTR(UniversalPostProcessPass)
+CLASS_PTR(PostProcessPass)
 CLASS_PTR(UniversalGeometryPass)
 CLASS_PTR(UniversalDeferredLightingPass)
 CLASS_PTR(UniversalGlobalUniforms)
@@ -33,11 +31,13 @@ private:
 	ShadowPassUPtr				 m_shadowPass		{ nullptr };
 	SkyboxPassUPtr               m_skyboxPass       { nullptr };
 	SSAOPassUPtr				 m_ssaoPass			{ nullptr };
-	OutlinePassUPtr			     m_outlinePass		{ nullptr };
-	MotionBlurPassUPtr			 m_motionBlurPass	{ nullptr };
+	PostProcessPassUPtr			 m_postProcessPass{ nullptr };
+
+	/*OutlinePassUPtr			     m_outlinePass		{ nullptr };
+	MotionBlurPassUPtr			 m_motionBlurPass	{ nullptr };*/
 
 	// URP 필수 렌더 패스
-	UniversalPostProcessPassUPtr	   m_postProcessPass	{ nullptr };
+	// UniversalPostProcessPassUPtr	   m_postProcessPass	{ nullptr };
 	UniversalGeometryPassUPtr		   m_geometryPass       { nullptr };
 	UniversalDeferredLightingPassUPtr  m_deferredLightPass  { nullptr };
 

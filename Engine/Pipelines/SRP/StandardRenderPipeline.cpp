@@ -31,6 +31,7 @@
 #include "Pipelines/PostProcessing/MotionBlurEffect.h"
 #include "Pipelines/PostProcessing/OutlineEffect.h"
 #include "Pipelines/PostProcessing/GaussianBloomEffect.h"
+#include "Pipelines/PostProcessing/KawaseBloomEffect.h"
 #include "Pipelines/PostProcessing/DisplayMappingEffect.h"
 
 DECLARE_DEFAULTS_IMPL(StandardRenderPipeline)
@@ -71,14 +72,18 @@ bool StandardRenderPipeline::Init()
 	// 통용 포스트-프로세스 패스 생성
 	m_postProcessPass = PostProcessPass::Create();
 	if (!m_postProcessPass) return false;
-	auto motion = MotionBlurEffect::Create(0, WINDOW.GetWindowWidth(), WINDOW.GetWindowHeight());
+	auto motion = MotionBlurEffect::Create(0);
 	m_postProcessPass->AddEffect(std::move(motion));
-	auto outline = OutlineEffect::Create(1, WINDOW.GetWindowWidth(), WINDOW.GetWindowHeight());
+	auto outline = OutlineEffect::Create(1);
 	m_postProcessPass->AddEffect(std::move(outline));
 	auto bloom = GaussianBloomEffect::Create(2);
 	m_postProcessPass->AddEffect(std::move(bloom));
 	auto display = DisplayMappingEffect::Create(3);
+	display->SetToneMappingMode(ToneMappingMode::Exposure); // 0번 모드
+	display->SetBloomStrength(1.0f); // 가우시안 블러는 빛이 약해지므로 강하게!
+	display->SetExposure(1.0f);
 	m_postProcessPass->AddEffect(std::move(display));
+
 
 	// G-buffer 패스 생성
 	m_geometryPass = StandardGeometryPass::Create();
