@@ -43,6 +43,10 @@ bool OutlineEffect::Init
 	if (!m_maskStaticProgram || !m_maskSkinnedProgram || !m_postProgram || !m_maskFBO)
 		return false;
 
+	m_postProgram->Use();
+	m_postProgram->SetUniform("stencilTexture", 0);
+	m_postProgram->SetUniform("canvasSize", glm::vec2(m_maskFBO->GetWidth(), m_maskFBO->GetHeight()));
+
 	return true;
 }
 
@@ -85,20 +89,8 @@ bool OutlineEffect::Render(RenderContext* context, Framebuffer* mainFBO, ScreenM
 	// 0번 슬롯에 마스크 텍스처 바인딩
 	glActiveTexture(GL_TEXTURE0);
 	m_maskFBO->GetTexture()->Bind();
-	m_postProgram->SetUniform("stencilTexture", 0);
 
-	// 디버그
-	if (m_maskFBO->GetWidth() != mainFBO->GetWidth() || m_maskFBO->GetHeight() != mainFBO->GetHeight())
-	{
-		// 이 로그가 찍힌다면 리사이즈 로직이 끊긴 겁니다.
-		LOG_FATAL("Size Mismatch! Mask: {} x {}, Main: {} x {}",
-			m_maskFBO->GetWidth(), m_maskFBO->GetHeight(),
-			mainFBO->GetWidth(), mainFBO->GetHeight());
-	}
-
-
-	// 해상도 및 두께 전달
-	m_postProgram->SetUniform("canvasSize", glm::vec2(mainFBO->GetWidth(), mainFBO->GetHeight()));
+	// 아웃라인 색상 및 두께 전달
 	m_postProgram->SetUniform("outlineSize", m_thickness);
 	m_postProgram->SetUniform("outlineColor", glm::vec4(m_color, 1.0f));
 
@@ -207,6 +199,14 @@ void OutlineEffect::MaskSkinnedMeshes(const std::vector<MeshOutline*>& outlines)
 
 void OutlineEffect::OnResize(int32 width, int32 height)
 {
+	// 1. 멤버 변수 및 FBO 리사이즈
 	Super::OnResize(width, height);
-	if (m_maskFBO) m_maskFBO->OnResize(width, height);
+	m_maskFBO->OnResize(m_width, m_height);
+
+	// 2. 셰이더에게 변경된 해상도 알려주기
+	if (m_postProgram)
+	{
+		m_postProgram->Use();
+		m_postProgram->SetUniform("canvasSize", glm::vec2(width, height));
+	}
 }

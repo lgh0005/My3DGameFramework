@@ -25,6 +25,10 @@ bool DisplayMappingEffect::Init(int32 priority, int32 width, int32 height)
 	m_cameraDirtTexture = RESOURCE.GetResource<Texture>("camera_dirt");
 	m_resultFBO = PostProcessFramebuffer::Create(width, height);
 
+	m_compositeProgram->Use();
+	m_compositeProgram->SetUniform("bloomBlur", 1);
+	m_compositeProgram->SetUniform("cameraDirtTex", 2);
+
 	return (m_compositeProgram && m_resultFBO);
 }
 
@@ -57,7 +61,6 @@ bool DisplayMappingEffect::Render(RenderContext* context, Framebuffer* mainFBO, 
 	{
 		glActiveTexture(GL_TEXTURE1);
 		bloomTex->Bind();
-		m_compositeProgram->SetUniform("bloomBlur", 1);
 		m_compositeProgram->SetUniform("bloom", true);
 	}
 	else
@@ -70,17 +73,15 @@ bool DisplayMappingEffect::Render(RenderContext* context, Framebuffer* mainFBO, 
 	{
 		glActiveTexture(GL_TEXTURE2);
 		m_cameraDirtTexture->Bind();
-		m_compositeProgram->SetUniform("cameraDirtTex", 2);
-		// 이 값들은 필요하면 멤버 변수로 빼세요
-		m_compositeProgram->SetUniform("dirtAmbient", 0.05f);
-		m_compositeProgram->SetUniform("dirtIntensity", 2.0f);
+		m_compositeProgram->SetUniform("dirtAmbient", m_cameraDirtAmbient);
+		m_compositeProgram->SetUniform("dirtIntensity", m_cameraDirtIntensity);
 	}
 
 	// 3. 합성 그리기 (Internal FBO에 그려짐)
 	screenMesh->Draw();
 
-	// 4. [핵심] 결과를 MainFBO에 고속 복사 (Blit)
-	// 이제 MainFBO는 최종 LDR 이미지를 갖게 됩니다.
+	// 4. 결과를 MainFBO에 고속 복사 (Blit)
+	// TODO : 고속 복사 로직 해소 필요
 	Framebuffer::Blit(m_resultFBO.get(), mainFBO, GL_COLOR_BUFFER_BIT, GL_NEAREST);
 
 	return true;

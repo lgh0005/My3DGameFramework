@@ -34,4 +34,5 @@ private:
 
 	ProgramPtr						m_motionBlurProgram;
 	PostProcessFramebufferUPtr	    m_motionBlurFBO;
+	float m_blurScale	{ 1.0f };
 };

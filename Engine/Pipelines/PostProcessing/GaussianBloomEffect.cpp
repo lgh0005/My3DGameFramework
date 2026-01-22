@@ -25,6 +25,9 @@ bool GaussianBloomEffect::Init(int32 priority, int32 width, int32 height)
 	m_pingPongFBOs[0] = PostProcessFramebuffer::Create(width, height);
 	m_pingPongFBOs[1] = PostProcessFramebuffer::Create(width, height);
 
+	m_thresholdProgram->Use();
+	m_thresholdProgram->SetUniform("screenTexture", 0);
+
 	return (m_thresholdProgram && m_blurProgram && m_pingPongFBOs[0] && m_pingPongFBOs[1]);
 }
 
@@ -41,7 +44,7 @@ bool GaussianBloomEffect::Render(RenderContext* context, Framebuffer* mainFBO, S
 	// 2. 가우시안 블러 수행 (PingPong[0] <-> PingPong[1])
 	Texture* finalBloom = ComputeGaussianBlur(screenMesh);
 
-	// 3. [핵심] 결과를 MainFBO에 그리는 게 아니라, Context에 등록함.
+	// 3. 결과를 MainFBO에 그리는 게 아니라, Context에 등록함.
 	// 나중에 DisplayMappingEffect가 이 텍스처를 가져다가 합칠 것임.
 	context->SetTexture(RenderSlot::Bloom, finalBloom);
 
@@ -57,7 +60,6 @@ void GaussianBloomEffect::ExtractBrightAreas(Texture* src, ScreenMesh* mesh)
 	m_thresholdProgram->Use();
 	glActiveTexture(GL_TEXTURE0);
 	src->Bind();
-	m_thresholdProgram->SetUniform("screenTexture", 0);
 
 	mesh->Draw();
 }
@@ -100,6 +102,6 @@ Texture* GaussianBloomEffect::ComputeGaussianBlur(ScreenMesh* mesh)
 void GaussianBloomEffect::OnResize(int32 width, int32 height)
 {
 	Super::OnResize(width, height);
-	if (m_pingPongFBOs[0]) m_pingPongFBOs[0]->OnResize(width, height);
-	if (m_pingPongFBOs[1]) m_pingPongFBOs[1]->OnResize(width, height);
+	if (m_pingPongFBOs[0]) m_pingPongFBOs[0]->OnResize(m_width, m_height);
+	if (m_pingPongFBOs[1]) m_pingPongFBOs[1]->OnResize(m_width, m_height);
 }

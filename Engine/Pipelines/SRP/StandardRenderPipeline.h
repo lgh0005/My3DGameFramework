@@ -7,12 +7,8 @@ CLASS_PTR(ShadowPass)
 CLASS_PTR(SkyboxPass)
 CLASS_PTR(SSAOPass)
 CLASS_PTR(PostProcessPass)
-
-CLASS_PTR(OutlinePass)
-CLASS_PTR(MotionBlurPass)
 CLASS_PTR(StandardDeferredLightingPass)
 CLASS_PTR(StandardGeometryPass)
-CLASS_PTR(StandardPostProcessPass)
 CLASS_PTR(StandardGlobalUniforms)
 CLASS_PTR(JoltDebugGizmoPass)
 #pragma endregion
@@ -35,13 +31,9 @@ private:
 	ShadowPassUPtr					  m_shadowPass		  { nullptr };
 	SkyboxPassUPtr                    m_skyboxPass		  { nullptr };
 	SSAOPassUPtr					  m_ssaoPass		  { nullptr };
-	PostProcessPassUPtr				  m_postProcessPass{ nullptr };
-
-	OutlinePassUPtr					  m_outlinePass		  { nullptr };
-	MotionBlurPassUPtr				  m_motionBlurPass	  { nullptr };
+	PostProcessPassUPtr				  m_postProcessPass	  { nullptr };
 
 	// SRP 필수 렌더 패스
-	// StandardPostProcessPassUPtr		  m_postProcessPass	  { nullptr };
 	StandardGeometryPassUPtr		  m_geometryPass	  { nullptr };
 	StandardDeferredLightingPassUPtr  m_deferredLightPass { nullptr };
 
@@ -49,7 +41,7 @@ private:
 	StandardGlobalUniformsUPtr        m_globalUniforms	  { nullptr };
 
 	// 디버그
-	JoltDebugGizmoPassUPtr			  m_debugGizmoPass{ nullptr };
+	JoltDebugGizmoPassUPtr			  m_debugGizmoPass	  { nullptr };
 
 /*================================//
 //   IMGUI debug context method   //

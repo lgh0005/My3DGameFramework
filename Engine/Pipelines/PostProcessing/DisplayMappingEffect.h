@@ -40,6 +40,9 @@ private:
 	ProgramPtr m_compositeProgram;
 	TexturePtr m_cameraDirtTexture;
 
-	float m_gamma = 2.2f;
-	float m_exposure = 1.0f;
+	float m_gamma		{ 2.2f };
+	float m_exposure	{ 1.0f };
+	
+	float m_cameraDirtAmbient{ 0.05f };
+	float m_cameraDirtIntensity{ 2.0f };
 };

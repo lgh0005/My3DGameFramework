@@ -30,9 +30,9 @@ public:
 	) override;
 	virtual void OnResize(int32 width, int32 height) override;
 
-	/*==============================//
-	//   outlining helper methods   //
-	//==============================*/
+/*==============================//
+//   outlining helper methods   //
+//==============================*/
 private:
 	void MaskMeshes(const std::vector<MeshOutline*>& outlines);
 	void MaskStaticMeshes(const std::vector<MeshOutline*>& outlines);

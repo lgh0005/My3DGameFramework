@@ -20,6 +20,11 @@ bool MotionBlurEffect::Init(int32 priority, int32 width, int32 height)
 	m_motionBlurProgram = RESOURCE.GetResource<Program>("common_motion_blur");
 	m_motionBlurFBO = PostProcessFramebuffer::Create(width, height);
 	if (!m_motionBlurProgram || !m_motionBlurFBO) return false;
+
+	m_motionBlurProgram->Use();
+	m_motionBlurProgram->SetUniform("uColorTexture", 0);
+	m_motionBlurProgram->SetUniform("uVelocityTexture", 1);
+	m_motionBlurProgram->SetUniform("uBlurScale", m_blurScale);
 	return true;
 }
 
@@ -37,17 +42,11 @@ bool MotionBlurEffect::Render(RenderContext* context, Framebuffer* mainFBO, Scre
 
 	// 1번 슬롯: 원본 화면 (MainFBO에서 가져옴)
 	m_motionBlurProgram->Use();
-	glActiveTexture(GL_TEXTURE0);
-	mainFBO->GetColorAttachment(0)->Bind();
-	m_motionBlurProgram->SetUniform("uColorTexture", 0);
+	glActiveTexture(GL_TEXTURE0); mainFBO->GetColorAttachment(0)->Bind();
 
 	// 2번 슬롯: 속도 버퍼 (G-Buffer에서 가져옴)
 	glActiveTexture(GL_TEXTURE1);
-	velocityTex->Bind();
-	m_motionBlurProgram->SetUniform("uVelocityTexture", 1);
-
-	float blurScale = 1.0f;
-	m_motionBlurProgram->SetUniform("uBlurScale", blurScale);
+	velocityTex->Bind(); m_motionBlurProgram->SetUniform("uVelocityTexture", 1);
 
 	// [Step 3] 그리기 (Internal FBO에 그려짐)
 	// 깊이 테스트는 필요 없으니 끕니다.
@@ -57,9 +56,8 @@ bool MotionBlurEffect::Render(RenderContext* context, Framebuffer* mainFBO, Scre
 	screenMesh->Draw();
 
 	// [Step 4] 결과 반영 (Internal FBO -> Main FBO)
-	// 내가 그린 블러된 이미지를 다시 메인 도화지에 '고속 복사' 합니다.
-	// TODO : 이후에 복사 비용 최적화를 위해서
-	// 1) Texture Swap, Framebuffer Swap 방식을 이용할 필요가 있음.
+	// TODO : 이후에 복사 비용 최적화를 위해서 Texture Swap, Framebuffer Swap 등의 
+	// 방식을 이용할 필요가 있음.
 	Framebuffer::Blit
 	(
 		m_motionBlurFBO.get(), // Source: 내 작업물
@@ -78,5 +76,5 @@ bool MotionBlurEffect::Render(RenderContext* context, Framebuffer* mainFBO, Scre
 void MotionBlurEffect::OnResize(int32 width, int32 height)
 {
 	Super::OnResize(width, height);
-	m_motionBlurFBO->OnResize(width, height);
+	m_motionBlurFBO->OnResize(m_width, m_height);
 }
