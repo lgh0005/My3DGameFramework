@@ -1,21 +1,21 @@
 ﻿#include "EnginePch.h"
-#include "DisplayMappingEffect.h"
+#include "DisplayMappingEffects.h"
 #include "Graphics/RenderContext.h"
 #include "Graphics/Framebuffers/PostProcessFramebuffer.h"
 #include "Resources/Program.h"
 #include "Resources/Meshes/ScreenMesh.h"
 #include "Resources/Textures/Texture.h"
 
-DECLARE_DEFAULTS_IMPL(DisplayMappingEffect)
+DECLARE_DEFAULTS_IMPL(DisplayMappingEffects)
 
-DisplayMappingEffectUPtr DisplayMappingEffect::Create(int32 priority, int32 width, int32 height)
+DisplayMappingEffectsUPtr DisplayMappingEffects::Create(int32 priority, int32 width, int32 height)
 {
-	auto effect = DisplayMappingEffectUPtr(new DisplayMappingEffect());
+	auto effect = DisplayMappingEffectsUPtr(new DisplayMappingEffects());
 	if (!effect->Init(priority, width, height)) return nullptr;
 	return std::move(effect);
 }
 
-bool DisplayMappingEffect::Init(int32 priority, int32 width, int32 height)
+bool DisplayMappingEffects::Init(int32 priority, int32 width, int32 height)
 {
 	m_priority = priority;
 	m_width = width;
@@ -32,7 +32,7 @@ bool DisplayMappingEffect::Init(int32 priority, int32 width, int32 height)
 	return true;
 }
 
-bool DisplayMappingEffect::Render(RenderContext* context, Framebuffer* srcFBO, Framebuffer* dstFBO, ScreenMesh* screenMesh)
+bool DisplayMappingEffects::Render(RenderContext* context, Framebuffer* srcFBO, Framebuffer* dstFBO, ScreenMesh* screenMesh)
 {
 	if (!context || !srcFBO || !dstFBO) return false;
 
@@ -85,7 +85,7 @@ bool DisplayMappingEffect::Render(RenderContext* context, Framebuffer* srcFBO, F
 	return true;
 }
 
-void DisplayMappingEffect::OnResize(int32 width, int32 height)
+void DisplayMappingEffects::OnResize(int32 width, int32 height)
 {
 	Super::OnResize(width, height);
 }

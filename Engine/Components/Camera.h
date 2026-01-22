@@ -27,6 +27,12 @@ public:
 	glm::mat4 GetViewProjectionMatrix() const;
 	const glm::mat4& GetOrthoProjectionMatrix() const { return m_orthoProjectionMatrix; }
 
+	float GetNear() const { return m_nearPlane; }
+	float GetFar() const { return m_farPlane; }
+	float GetFOV() const { return m_fovDegrees; }
+	float GetAspectRatio() const { return m_aspectRatio; }
+	const glm::mat4& GetInvProjectionMatrix() const { return m_invProjectionMatrix; }
+
 	void LookAt(const glm::vec3& target, const glm::vec3& up = glm::vec3(0.0f, 1.0f, 0.0f));
 	Ray ScreenPointToRay(const glm::vec2& screenPos, const glm::vec2& screenSize);
 

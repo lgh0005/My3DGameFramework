@@ -7,7 +7,7 @@ layout (location = 0) out vec4 gPosition;      // Attachment 0
 layout (location = 1) out vec4 gNormal;        // Attachment 1
 layout (location = 2) out vec4 gAlbedoSpec;    // Attachment 2 (RGB: Albedo, A: Specular)
 layout (location = 3) out vec4 gEmission;      // Attachment 3
-layout (location = 4) out vec2 gVelocity;      // Attachment 4: 속도 벡터
+layout (location = 4) out vec4 gVelocity;      // Attachment 4: 속도 벡터
 
 in vec3 FragPos;
 in vec2 TexCoords;
@@ -154,8 +154,13 @@ void main()
     gEmission = vec4(emissionTex * material.emissionStrength, 1.0);
 
     // [gVelocity] Velocity Map
+    // RG : Velocity
+    // B  : Depth (of main camera)
     vec2 currNDC = vCurrClipPos.xy / vCurrClipPos.w;
     vec2 prevNDC = vPrevClipPos.xy / vPrevClipPos.w;
     vec2 velocity = (currNDC - prevNDC) * 0.5;
-    gVelocity = velocity;
+    float linearDepth = vCurrClipPos.w;
+    gVelocity.xy = velocity;
+    gVelocity.z = linearDepth; // 여기에 깊이 저장!
+    gVelocity.w = 0.0;         // 예비용
 }

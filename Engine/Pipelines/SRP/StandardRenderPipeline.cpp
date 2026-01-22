@@ -28,11 +28,11 @@
 #include "Graphics/Framebuffers/PostProcessFramebuffer.h"
 #include "Graphics/Framebuffers/GBufferFramebuffer.h"
 
-#include "Pipelines/PostProcessing/MotionBlurEffect.h"
-#include "Pipelines/PostProcessing/OutlineEffect.h"
-#include "Pipelines/PostProcessing/GaussianBloomEffect.h"
-#include "Pipelines/PostProcessing/KawaseBloomEffect.h"
-#include "Pipelines/PostProcessing/DisplayMappingEffect.h"
+#include "Pipelines/PostProcessing/World/MotionBlurEffect.h"
+#include "Pipelines/PostProcessing/World/OutlineEffect.h"
+#include "Pipelines/PostProcessing/World/WorldSpaceEffects.h"
+#include "Pipelines/PostProcessing/Bloom/GaussianBloomEffect.h"
+#include "Pipelines/PostProcessing/Display/DisplayMappingEffects.h"
 
 DECLARE_DEFAULTS_IMPL(StandardRenderPipeline)
 
@@ -76,14 +76,15 @@ bool StandardRenderPipeline::Init()
 	m_postProcessPass->AddEffect(std::move(motion));
 	auto outline = OutlineEffect::Create(1);
 	m_postProcessPass->AddEffect(std::move(outline));
-	auto bloom = GaussianBloomEffect::Create(2);
+	auto world = WorldSpaceEffects::Create(2);
+	m_postProcessPass->AddEffect(std::move(world));
+	auto bloom = GaussianBloomEffect::Create(3);
 	m_postProcessPass->AddEffect(std::move(bloom));
-	auto display = DisplayMappingEffect::Create(3);
+	auto display = DisplayMappingEffects::Create(4);
 	display->SetToneMappingMode(ToneMappingMode::Exposure); // 0번 모드
 	display->SetBloomStrength(1.0f); // 가우시안 블러는 빛이 약해지므로 강하게!
 	display->SetExposure(1.0f);
 	m_postProcessPass->AddEffect(std::move(display));
-
 
 	// G-buffer 패스 생성
 	m_geometryPass = StandardGeometryPass::Create();

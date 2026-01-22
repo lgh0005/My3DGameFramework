@@ -12,15 +12,14 @@ CLASS_PTR(MeshOutline)
 CLASS_PTR(SkyLight)
 CLASS_PTR(CubeTexture)
 CLASS_PTR(Texture)
-CLASS_PTR(GBufferFramebuffer) // 추가
-CLASS_PTR(Framebuffer)        // 추가
+CLASS_PTR(GBufferFramebuffer)
+CLASS_PTR(Framebuffer)
 #pragma endregion
 
 enum class RenderSlot : uint8
 {
-	GPosition, GNormal, GAlbedo, GEmission, GVelocity, // Geometry Pass Output
-	SSAO,                                              // SSAO Pass Output
-	Bloom,                                        
+	GPosition, GNormal, GAlbedo, GEmission, GVelocity, GDepth, // Geometry Pass Output
+	SSAO, Bloom,                                               // Intermediate                                       
 	MAX
 };
 

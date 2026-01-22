@@ -15,15 +15,15 @@ enum class ToneMappingMode : uint8
 	Reinhard = 2  // 범용 (차분함, 하이라이트 억제 좋음)
 };
 
-CLASS_PTR(DisplayMappingEffect)
-class DisplayMappingEffect : public PostProcessEffect
+CLASS_PTR(DisplayMappingEffects)
+class DisplayMappingEffects : public PostProcessEffect
 {
 	using Super = PostProcessEffect;
 
 public:
-	virtual ~DisplayMappingEffect() override;
+	virtual ~DisplayMappingEffects() override;
 
-	static DisplayMappingEffectUPtr Create
+	static DisplayMappingEffectsUPtr Create
 	(
 		int32 priority,
 		int32 width = WINDOW_WIDTH,
@@ -45,7 +45,7 @@ public:
 	void SetExposure(float exposure) { m_exposure = exposure; }
 
 private:
-	DisplayMappingEffect();
+	DisplayMappingEffects();
 	bool Init(int32 priority, int32 width, int32 height);
 
 	ProgramPtr m_compositeProgram;

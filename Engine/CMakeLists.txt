@@ -104,12 +104,14 @@ add_library(Engine STATIC
 
    # Post-processing effects
    "Pipelines/PostProcessing/PostProcessEffect.h"    "Pipelines/PostProcessing/PostProcessEffect.cpp"
-   "Pipelines/PostProcessing/MotionBlurEffect.h"    "Pipelines/PostProcessing/MotionBlurEffect.cpp"
-   "Pipelines/PostProcessing/OutlineEffect.h"       "Pipelines/PostProcessing/OutlineEffect.cpp"
-   "Pipelines/PostProcessing/GaussianBloomEffect.h"  "Pipelines/PostProcessing/GaussianBloomEffect.cpp"
-   "Pipelines/PostProcessing/DisplayMappingEffect.h"  "Pipelines/PostProcessing/DisplayMappingEffect.cpp"
-    "Pipelines/PostProcessing/KawaseBloomEffect.h" "Pipelines/PostProcessing/KawaseBloomEffect.cpp"
-
+   "Pipelines/PostProcessing/World/MotionBlurEffect.h"    "Pipelines/PostProcessing/World/MotionBlurEffect.cpp"
+   "Pipelines/PostProcessing/World/OutlineEffect.h"       "Pipelines/PostProcessing/World/OutlineEffect.cpp"
+   "Pipelines/PostProcessing/World/WorldSpaceEffects.h" "Pipelines/PostProcessing/World/WorldSpaceEffects.cpp"
+   "Pipelines/PostProcessing/Bloom/BloomSpaceEffects.h" "Pipelines/PostProcessing/Bloom/BloomSpaceEffects.cpp"
+   "Pipelines/PostProcessing/Bloom/GaussianBloomEffect.h"  "Pipelines/PostProcessing/Bloom/GaussianBloomEffect.cpp"
+   "Pipelines/PostProcessing/Bloom/KawaseBloomEffect.h" "Pipelines/PostProcessing/Bloom/KawaseBloomEffect.cpp"
+   "Pipelines/PostProcessing/Display/DisplayMappingEffects.h"  "Pipelines/PostProcessing/Display/DisplayMappingEffects.cpp"
+   
    # Framebuffers
    "Graphics/Framebuffers/FramebufferBase.h"       "Graphics/Framebuffers/FramebufferBase.cpp"
    "Graphics/Framebuffers/Framebuffer.h"             "Graphics/Framebuffers/Framebuffer.cpp"

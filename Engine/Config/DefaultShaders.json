@@ -70,6 +70,14 @@
             "fs":  "./Resources/Shaders/IBLUtils/IBLUtils_BRDF_Lookup.frag"
         },
 
+        
+
+        {
+            "key": "world_space_effects",
+            "vs":  "./Resources/Shaders/PostProcessing/PostProcess_World_Space_Effects.vert",
+            "fs":  "./Resources/Shaders/PostProcessing/PostProcess_World_Space_Effects.frag"
+        },
+
 
 
         {

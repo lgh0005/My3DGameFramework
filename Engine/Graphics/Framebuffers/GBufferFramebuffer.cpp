@@ -30,7 +30,7 @@ bool GBufferFramebuffer::CreateAttachments()
     CreateAndAttachColor(1, GL_RGBA16F, GL_RGBA, GL_FLOAT);         // Normal
     CreateAndAttachColor(2, GL_RGBA16F, GL_RGBA, GL_UNSIGNED_BYTE); // Albedo
     CreateAndAttachColor(3, GL_RGBA16F, GL_RGBA, GL_FLOAT);         // Emission
-    CreateAndAttachColor(4, GL_RG16F, GL_RG, GL_FLOAT);             // Velocity
+    CreateAndAttachColor(4, GL_RGBA16F, GL_RGBA, GL_FLOAT);         // Velocity
 
     // Draw Buffers 부착
     uint32 attachments[5] = 

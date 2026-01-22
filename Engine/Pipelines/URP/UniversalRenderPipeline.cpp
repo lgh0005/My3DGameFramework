@@ -32,10 +32,10 @@
 #include "Graphics/Framebuffers/PostProcessFramebuffer.h"
 #include "Graphics/Framebuffers/GBufferFramebuffer.h"
 
-#include "Pipelines/PostProcessing/MotionBlurEffect.h"
-#include "Pipelines/PostProcessing/OutlineEffect.h"
-#include "Pipelines/PostProcessing/KawaseBloomEffect.h"
-#include "Pipelines/PostProcessing/DisplayMappingEffect.h"
+#include "Pipelines/PostProcessing/World/MotionBlurEffect.h"
+#include "Pipelines/PostProcessing/World/OutlineEffect.h"
+#include "Pipelines/PostProcessing/Bloom/KawaseBloomEffect.h"
+#include "Pipelines/PostProcessing/Display/DisplayMappingEffects.h"
 
 DECLARE_DEFAULTS_IMPL(UniversalRenderPipeline)
 
@@ -78,7 +78,7 @@ bool UniversalRenderPipeline::Init()
 		m_postProcessPass->AddEffect(std::move(outline));
 		auto bloom = KawaseBloomEffect::Create(2);
 		m_postProcessPass->AddEffect(std::move(bloom));
-		auto display = DisplayMappingEffect::Create(3);
+		auto display = DisplayMappingEffects::Create(3);
 		display->SetToneMappingMode(ToneMappingMode::ACES); // 1번 모드
 		display->SetBloomStrength(0.05f);					// Kawase + HDR은 빛이 세므로 아주 약하게!
 		display->SetExposure(1.0f);							// ACES에 맞는 노출값
