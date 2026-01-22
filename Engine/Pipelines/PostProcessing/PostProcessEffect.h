@@ -11,7 +11,13 @@ class PostProcessEffect
 {
 public:
 	virtual ~PostProcessEffect();
-	virtual bool Render(RenderContext* context, Framebuffer* mainFBO, ScreenMesh* screenMesh) = 0;
+	virtual bool Render
+	(
+		RenderContext* context,
+		Framebuffer* srcFBO,
+		Framebuffer* dstFBO,
+		ScreenMesh* screenMesh
+	) = 0;
 	virtual void OnResize(int32 width, int32 height);
 
 	void SetEnable(bool enable) { m_isEnable = enable; }

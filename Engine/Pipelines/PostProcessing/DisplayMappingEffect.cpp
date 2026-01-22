@@ -23,26 +23,25 @@ bool DisplayMappingEffect::Init(int32 priority, int32 width, int32 height)
 
 	m_compositeProgram = RESOURCE.GetResource<Program>("standard_postprocess_postprocess");
 	m_cameraDirtTexture = RESOURCE.GetResource<Texture>("camera_dirt");
-	m_resultFBO = PostProcessFramebuffer::Create(width, height);
+	if (!m_compositeProgram) return false;
 
 	m_compositeProgram->Use();
 	m_compositeProgram->SetUniform("bloomBlur", 1);
 	m_compositeProgram->SetUniform("cameraDirtTex", 2);
 
-	return (m_compositeProgram && m_resultFBO);
+	return true;
 }
 
-bool DisplayMappingEffect::Render(RenderContext* context, Framebuffer* mainFBO, ScreenMesh* screenMesh)
+bool DisplayMappingEffect::Render(RenderContext* context, Framebuffer* srcFBO, Framebuffer* dstFBO, ScreenMesh* screenMesh)
 {
-	if (!context || !mainFBO) return false;
+	if (!context || !srcFBO || !dstFBO) return false;
 
 	// 1. 내 작업 공간(Internal FBO) 준비
-	m_resultFBO->Bind();
+	dstFBO->Bind();
 	glViewport(0, 0, m_width, m_height);
-	glClear(GL_COLOR_BUFFER_BIT); // 깔끔하게 지우고 시작
+	glClear(GL_COLOR_BUFFER_BIT);
 	glDisable(GL_DEPTH_TEST);
 	glDisable(GL_CULL_FACE);
-
 	m_compositeProgram->Use();
 
 	// 2. 유니폼 설정
@@ -53,7 +52,7 @@ bool DisplayMappingEffect::Render(RenderContext* context, Framebuffer* mainFBO, 
 
 	// [Input 0] MainFBO (Scene Color - HDR)
 	glActiveTexture(GL_TEXTURE0);
-	mainFBO->GetColorAttachment(0)->Bind();
+	srcFBO->GetColorAttachment(0)->Bind();
 	m_compositeProgram->SetUniform("tex", 0);
 
 	// [Input 1] Bloom Texture (Context에서 가져옴)
@@ -83,15 +82,10 @@ bool DisplayMappingEffect::Render(RenderContext* context, Framebuffer* mainFBO, 
 	// 3. 합성 그리기 (Internal FBO에 그려짐)
 	screenMesh->Draw();
 
-	// 4. 결과를 MainFBO에 고속 복사 (Blit)
-	// TODO : 고속 복사 로직 해소 필요
-	Framebuffer::Blit(m_resultFBO.get(), mainFBO, GL_COLOR_BUFFER_BIT, GL_NEAREST);
-
 	return true;
 }
 
 void DisplayMappingEffect::OnResize(int32 width, int32 height)
 {
 	Super::OnResize(width, height);
-	if (m_resultFBO) m_resultFBO->OnResize(width, height);
 }

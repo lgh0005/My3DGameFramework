@@ -17,8 +17,9 @@ PostProcessPassUPtr PostProcessPass::Create(int32 width, int32 height)
 bool PostProcessPass::Init(int32 width, int32 height)
 {
 	m_screen = ScreenMesh::Create();
-	m_frameBuffer = PostProcessFramebuffer::Create(width, height);
-	if (!m_screen || !m_frameBuffer) return false;
+	m_swapFrameBuffers[0] = PostProcessFramebuffer::Create(width, height);
+	m_swapFrameBuffers[1] = PostProcessFramebuffer::Create(width, height);
+	if (!m_screen || !m_swapFrameBuffers[0] || !m_swapFrameBuffers[1]) return false;
 	
 	Resize(width, height);
 	return true;
@@ -27,19 +28,30 @@ bool PostProcessPass::Init(int32 width, int32 height)
 void PostProcessPass::Render(RenderContext* context)
 {
 	// 0. 메인 FBO가 유효한지 확인
-	if (!m_frameBuffer) return;
+	int32 sourceIdx = 0;
+	m_lastResultIdx = 0;
 
 	// 1. 이펙트 순회
 	for (const auto& effect : m_effects)
 	{
 		if (effect->IsEffectEnable())
 		{
-			effect->Render
+			int32 destIdx = 1 - sourceIdx;
+
+			bool success = effect->Render
 			(
-				context, 
-				m_frameBuffer.get(),
+				context,
+				m_swapFrameBuffers[sourceIdx].get(), // src
+				m_swapFrameBuffers[destIdx].get(),  // dst
 				m_screen.get()
 			);
+
+			if (success)
+			{
+				// 그리기에 성공했다면 역할을 교체(Swap)
+				sourceIdx = destIdx;
+				m_lastResultIdx = sourceIdx;
+			}
 		}
 	}
 
@@ -49,19 +61,20 @@ void PostProcessPass::Render(RenderContext* context)
 
 void PostProcessPass::PresentToScreen()
 {
-	if (!m_frameBuffer) return;
+	auto& finalFBO = m_swapFrameBuffers[m_lastResultIdx];
+	if (!finalFBO) return;
 
 	// 1. 기본 백버퍼(화면) 바인딩 및 클리어
 	Framebuffer::BindToDefault();
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	// 2. Main FBO의 내용을 화면으로 고속 복사 (Blit)
-	int32 srcW = m_frameBuffer->GetWidth();
-	int32 srcH = m_frameBuffer->GetHeight();
+	int32 srcW = finalFBO->GetWidth();
+	int32 srcH = finalFBO->GetHeight();
 	int32 dstW = WINDOW.GetWindowWidth();
 	int32 dstH = WINDOW.GetWindowHeight();
 
-	glBindFramebuffer(GL_READ_FRAMEBUFFER, m_frameBuffer->Get());
+	glBindFramebuffer(GL_READ_FRAMEBUFFER, finalFBO->Get());
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
 	glBlitFramebuffer
 	(
@@ -75,9 +88,9 @@ void PostProcessPass::PresentToScreen()
 
 void PostProcessPass::Resize(int32 width, int32 height)
 {
-	// 1. 메인 프레임버퍼 리사이즈
-	if (m_frameBuffer)
-		m_frameBuffer->OnResize(width, height);
+	// 1. 메인 스왑 프레임버퍼 리사이즈
+	for (auto& fbo : m_swapFrameBuffers)
+		fbo->OnResize(width, height);
 
 	// 2. 등록된 모든 이펙트에게 리사이즈 전파
 	for (const auto& effect : m_effects)

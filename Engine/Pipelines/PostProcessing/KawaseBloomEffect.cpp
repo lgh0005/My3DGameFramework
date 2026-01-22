@@ -30,10 +30,10 @@ bool KawaseBloomEffect::Init(int32 priority, int32 width, int32 height)
 	return true;
 }
 
-bool KawaseBloomEffect::Render(RenderContext* context, Framebuffer* mainFBO, ScreenMesh* screenMesh)
+bool KawaseBloomEffect::Render(RenderContext* context, Framebuffer* srcFBO, Framebuffer* dstFBO, ScreenMesh* screenMesh)
 {
 	// 0. 유효성 검사
-	if (!context || !mainFBO || m_bloomMips.empty()) return false;
+	if (!context || !srcFBO || m_bloomMips.empty()) return false;
 	
 	glDisable(GL_DEPTH_TEST);
 	glDisable(GL_CULL_FACE);
@@ -54,10 +54,10 @@ bool KawaseBloomEffect::Render(RenderContext* context, Framebuffer* mainFBO, Scr
 
 	// Source: Main Scene (HDR)
 	glActiveTexture(GL_TEXTURE0);
-	mainFBO->GetColorAttachment(0)->Bind();
+	srcFBO->GetColorAttachment(0)->Bind();
 	m_bloomProgram->SetUniform("mainTexture", 0);
 
-	glm::vec2 texelSize = { 1.0f / mainFBO->GetWidth(), 1.0f / mainFBO->GetHeight() };
+	glm::vec2 texelSize = { 1.0f / srcFBO->GetWidth(), 1.0f / srcFBO->GetHeight() };
 	m_bloomProgram->SetUniform("texelSize", texelSize);
 
 	screenMesh->Draw();
@@ -114,7 +114,7 @@ bool KawaseBloomEffect::Render(RenderContext* context, Framebuffer* mainFBO, Scr
 	//  결과 등록 (MainFBO 수정 X)  //
 	//=============================*/
 	context->SetTexture(RenderSlot::Bloom, m_bloomMips[0].texture.get());
-	return true;
+	return false;
 }
 
 void KawaseBloomEffect::CreateBloomMips(int32 width, int32 height)

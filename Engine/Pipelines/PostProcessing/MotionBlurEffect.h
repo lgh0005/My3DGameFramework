@@ -22,8 +22,9 @@ public:
 	);
 	virtual bool Render
 	(
-		RenderContext* context, 
-		Framebuffer* mainFBO, 
+		RenderContext* context,
+		Framebuffer* srcFBO,
+		Framebuffer* dstFBO,
 		ScreenMesh* screenMesh
 	) override;
 	virtual void OnResize(int32 width, int32 height) override;
@@ -33,6 +34,5 @@ private:
 	bool Init(int32 priority, int32 width, int32 height);
 
 	ProgramPtr						m_motionBlurProgram;
-	PostProcessFramebufferUPtr	    m_motionBlurFBO;
 	float m_blurScale	{ 1.0f };
 };

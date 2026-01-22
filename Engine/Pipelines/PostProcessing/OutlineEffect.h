@@ -25,9 +25,11 @@ public:
 	virtual bool Render
 	(
 		RenderContext* context,
-		Framebuffer* mainFBO,
+		Framebuffer* srcFBO,
+		Framebuffer* dstFBO,
 		ScreenMesh* screenMesh
 	) override;
+
 	virtual void OnResize(int32 width, int32 height) override;
 
 /*==============================//

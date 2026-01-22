@@ -43,56 +43,51 @@ bool OutlineEffect::Init
 	if (!m_maskStaticProgram || !m_maskSkinnedProgram || !m_postProgram || !m_maskFBO)
 		return false;
 
-	m_postProgram->Use();
-	m_postProgram->SetUniform("stencilTexture", 0);
-	m_postProgram->SetUniform("canvasSize", glm::vec2(m_maskFBO->GetWidth(), m_maskFBO->GetHeight()));
-
 	return true;
 }
 
-bool OutlineEffect::Render(RenderContext* context, Framebuffer* mainFBO, ScreenMesh* screenMesh)
+bool OutlineEffect::Render(RenderContext* context, Framebuffer* srcFBO, Framebuffer* dstFBO, ScreenMesh* screenMesh)
 {
 	// 0. 데이터 확인
-	if (!context || !mainFBO) return false;
+	if (!context || !srcFBO || !dstFBO) return false;
 	const auto& outlines = context->GetMeshOutlines();
-	if (outlines.empty()) return true;
+	if (outlines.empty())
+	{
+		Framebuffer::Blit(srcFBO, dstFBO, GL_COLOR_BUFFER_BIT, GL_NEAREST);
+		return true;
+	}
 
 	// [Pass 1] 마스크 텍스처 생성 (Mask Generation)
 	m_maskFBO->Bind();
-
-	// 1. 화면 클리어 (투명한 검은색)
 	glViewport(0, 0, m_maskFBO->GetWidth(), m_maskFBO->GetHeight());
 	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	// Always On Top 효과를 위해 깊이 설정 조정
-	glDepthFunc(GL_ALWAYS);
 	glDisable(GL_DEPTH_TEST);
 	glDisable(GL_CULL_FACE);
-
-	// 마스킹 렌더링 (단색으로 그리기)
 	MaskMeshes(outlines);
 
-	glDepthFunc(GL_LESS);
-
-	// 다시 메인 화면(디폴트 FBO)으로 복귀
-	mainFBO->Bind();
-	glViewport(0, 0, mainFBO->GetWidth(), mainFBO->GetHeight());
-
-	// [Pass 2] 포스트 프로세싱 합성
-	glDisable(GL_DEPTH_TEST);
-	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	// [Pass 2] 최종 합성
+	dstFBO->Bind();
+	glViewport(0, 0, m_width, m_height);
+	glClear(GL_COLOR_BUFFER_BIT);
 
 	m_postProgram->Use();
 
-	// 0번 슬롯에 마스크 텍스처 바인딩
+	// 0번 슬롯: 이전 패스 장면 (srcFBO)
 	glActiveTexture(GL_TEXTURE0);
+	srcFBO->GetColorAttachment(0)->Bind();
+	m_postProgram->SetUniform("uSceneTexture", 0);
+
+	// 1번 슬롯: 아웃라인 마스크 (m_maskFBO)
+	glActiveTexture(GL_TEXTURE1);
 	m_maskFBO->GetTexture()->Bind();
+	m_postProgram->SetUniform("stencilTexture", 1);
 
 	// 아웃라인 색상 및 두께 전달
 	m_postProgram->SetUniform("outlineSize", m_thickness);
 	m_postProgram->SetUniform("outlineColor", glm::vec4(m_color, 1.0f));
+	m_postProgram->SetUniform("canvasSize", glm::vec2(m_width, m_height));
 
 	// ScreenMesh로 화면 꽉 차게 그리기
 	screenMesh->Draw();

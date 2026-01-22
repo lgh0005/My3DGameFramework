@@ -13,7 +13,7 @@ class PostProcessPass : public ContextRenderPass
 public:
 	virtual ~PostProcessPass();
 	static PostProcessPassUPtr Create(int32 width = WINDOW_WIDTH, int32 height = WINDOW_HEIGHT);
-	PostProcessFramebuffer* GetFramebuffer() const { return m_frameBuffer.get(); }
+	PostProcessFramebuffer* GetFramebuffer() const { return m_swapFrameBuffers[0].get(); }
 	virtual void Render(RenderContext* context) override;
 	void PresentToScreen();
 
@@ -25,6 +25,7 @@ private:
 	bool Init(int32 width, int32 height);
 
 	ScreenMeshPtr						  m_screen;
-	PostProcessFramebufferUPtr			  m_frameBuffer;
+	std::array<PostProcessFramebufferUPtr, 2> m_swapFrameBuffers;
 	std::vector<PostProcessEffectUPtr>    m_effects;
+	int32 m_lastResultIdx	{ 0 };
 };

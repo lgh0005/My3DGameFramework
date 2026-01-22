@@ -24,9 +24,11 @@ public:
 	virtual bool Render
 	(
 		RenderContext* context,
-		Framebuffer* mainFBO,
+		Framebuffer* srcFBO,
+		Framebuffer* dstFBO,
 		ScreenMesh* screenMesh
 	) override;
+
 	virtual void OnResize(int32 width, int32 height) override;
 
 private:
@@ -35,7 +37,7 @@ private:
 	void ExtractBrightAreas(Texture* src, ScreenMesh* mesh);
 	Texture* ComputeGaussianBlur(ScreenMesh* mesh);
 
-	PostProcessFramebufferUPtr m_pingPongFBOs[2]; // 블러용 핑퐁 버퍼
+	std::array<PostProcessFramebufferUPtr, 2> m_pingPongFBOs; // 블러용 핑퐁 버퍼
 	ProgramPtr m_thresholdProgram; // 밝은 영역 추출 셰이더
 	ProgramPtr m_blurProgram;      // 가우시안 블러 셰이더
 };

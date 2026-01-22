@@ -32,8 +32,9 @@ public:
 
 	virtual bool Render
 	(
-		RenderContext* context,
-		Framebuffer* mainFBO,
+		RenderContext* context, 
+		Framebuffer* srcFBO, 
+		Framebuffer* dstFBO, 
 		ScreenMesh* screenMesh
 	) override;
 
@@ -47,7 +48,6 @@ private:
 	DisplayMappingEffect();
 	bool Init(int32 priority, int32 width, int32 height);
 
-	PostProcessFramebufferUPtr m_resultFBO;
 	ProgramPtr m_compositeProgram;
 	TexturePtr m_cameraDirtTexture;
 

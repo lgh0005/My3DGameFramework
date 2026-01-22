@@ -1,4 +1,4 @@
-#version 330 core  
+ï»¿#version 330 core  
 
 /*============================================================================*/
 // Reference Article here :                                                   //
@@ -7,38 +7,44 @@
 
 out vec4 finalColor;  
 
-uniform vec4 outlineColor;        // C++¿¡¼­ ¼³Á¤ (±âº»°ª ¼³Á¤Àº ¼ÎÀÌ´õ ¹öÀüµû¶ó ´Ù¸¦ ¼ö ÀÖÀ½)
-uniform float outlineSize;        // µÎ²²
-uniform vec2 canvasSize;          // È­¸é ÇØ»óµµ
-uniform sampler2D stencilTexture; // ¸¶½ºÅ© ÅØ½ºÃ³
+uniform sampler2D uSceneTexture;
+uniform sampler2D stencilTexture; // ë§ˆìŠ¤í¬ í…ìŠ¤ì²˜
+
+uniform vec4 outlineColor;        // C++ì—ì„œ ì„¤ì • (ê¸°ë³¸ê°’ ì„¤ì •ì€ ì…°ì´ë” ë²„ì „ë”°ë¼ ë‹¤ë¥¼ ìˆ˜ ìˆìŒ)
+uniform float outlineSize;        // ë‘ê»˜
+uniform vec2 canvasSize;          // í™”ë©´ í•´ìƒë„
 
 void main() 
 {  
     vec2 texelSize = 1.0 / canvasSize;  
-    
-    // ¹öÅØ½º ¼Ó¼º ¹«½ÃÇÏ°í È­¸é ÁÂÇ¥·Î Á÷Á¢ °è»ê
     vec2 textureCoord = gl_FragCoord.xy / canvasSize;  
     
+    // 1. ì´ì „ íŒ¨ìŠ¤ì˜ ì¥ë©´ ìƒ‰ìƒì„ ë¨¼ì € ê°€ì ¸ì˜´
+    vec4 sceneColor = texture(uSceneTexture, textureCoord);
     vec4 stencilValue = texture(stencilTexture, textureCoord);  
 
-    // 1. ³» ÀÚ¸®°¡ Èò»ö(¸öÅë)ÀÌ¸é »ı·«
-    if (stencilValue.r > 0.0) discard;  
+    // 2. ë¬¼ì²´ ëª¸í†µ ë¶€ë¶„ì´ë©´ ì•„ì›ƒë¼ì¸ì„ ê·¸ë¦¬ì§€ ì•Šê³  ì›ë˜ ì¥ë©´ ì¶œë ¥
+    if (stencilValue.r > 0.5) 
+    {
+        finalColor = sceneColor;
+        return;
+    }
 
     int outInt = int(ceil(outlineSize));  
     float o2 = outlineSize * outlineSize;  
 
-    // 2. ÁÖº¯ Å½»ö (µÕ±Ù ¿Ü°û¼±)
+    // 3. ì£¼ë³€ íƒìƒ‰ (ì™¸ê³½ì„  ì˜ì—­ í™•ì¸)
     for (int y = -outInt; y <= outInt; y++) 
     {
         for (int x = -outInt; x <= outInt; x++) 
         {
-            // ¿øÇü ¹üÀ§ ¹ÛÀº ¹«½Ã (¸ğ¼­¸® µÕ±Û°Ô)
+            // ì›í˜• ë²”ìœ„ ë°–ì€ ë¬´ì‹œ (ëª¨ì„œë¦¬ ë‘¥ê¸€ê²Œ)
             if (x*x + y*y > o2) continue; 
 
             vec2 offset = vec2(x, y) * texelSize;  
             vec4 neighbor = texture(stencilTexture, textureCoord + offset);  
             
-            // ÁÖº¯¿¡ Èò»ö(¸öÅë)ÀÌ ÇÏ³ª¶óµµ ÀÖÀ¸¸é ³ª´Â ¿Ü°û¼±
+            // ì£¼ë³€ì— í°ìƒ‰(ëª¸í†µ)ì´ í•˜ë‚˜ë¼ë„ ìˆìœ¼ë©´ ë‚˜ëŠ” ì™¸ê³½ì„ 
             if (neighbor.r > 0.5) 
             {  
                 finalColor = outlineColor;  
@@ -47,6 +53,6 @@ void main()
         }  
     }  
 
-    // 3. ³ª¸ÓÁö´Â ¹ö¸²
-    discard;
+    // 4. ì•„ì›ƒë¼ì¸ë„ ì•„ë‹ˆê³  ë¬¼ì²´ë„ ì•„ë‹ˆë©´ ì›ë˜ ì¥ë©´ ì¶œë ¥
+    finalColor = sceneColor;
 }

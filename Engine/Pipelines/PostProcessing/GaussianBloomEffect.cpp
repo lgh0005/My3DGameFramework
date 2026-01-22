@@ -25,21 +25,18 @@ bool GaussianBloomEffect::Init(int32 priority, int32 width, int32 height)
 	m_pingPongFBOs[0] = PostProcessFramebuffer::Create(width, height);
 	m_pingPongFBOs[1] = PostProcessFramebuffer::Create(width, height);
 
-	m_thresholdProgram->Use();
-	m_thresholdProgram->SetUniform("screenTexture", 0);
-
 	return (m_thresholdProgram && m_blurProgram && m_pingPongFBOs[0] && m_pingPongFBOs[1]);
 }
 
-bool GaussianBloomEffect::Render(RenderContext* context, Framebuffer* mainFBO, ScreenMesh* screenMesh)
+bool GaussianBloomEffect::Render(RenderContext* context, Framebuffer* srcFBO, Framebuffer* dstFBO, ScreenMesh* screenMesh)
 {
-	if (!context || !mainFBO) return false;
+	if (!context || !srcFBO || !dstFBO) return false;
 	glDisable(GL_DEPTH_TEST);
 	glDisable(GL_CULL_FACE);
 
 	// 1. 밝은 영역 추출 (MainFBO -> PingPong[0])
 	// MainFBO의 0번 텍스처(현재 화면)를 입력으로 사용
-	ExtractBrightAreas(mainFBO->GetColorAttachment(0).get(), screenMesh);
+	ExtractBrightAreas(srcFBO->GetColorAttachment(0).get(), screenMesh);
 
 	// 2. 가우시안 블러 수행 (PingPong[0] <-> PingPong[1])
 	Texture* finalBloom = ComputeGaussianBlur(screenMesh);
@@ -48,7 +45,8 @@ bool GaussianBloomEffect::Render(RenderContext* context, Framebuffer* mainFBO, S
 	// 나중에 DisplayMappingEffect가 이 텍스처를 가져다가 합칠 것임.
 	context->SetTexture(RenderSlot::Bloom, finalBloom);
 
-	return true;
+	// 4. 이어서 그리기 위해서 버퍼 스왑을 하지 않음
+	return false;
 }
 
 void GaussianBloomEffect::ExtractBrightAreas(Texture* src, ScreenMesh* mesh)
@@ -60,6 +58,7 @@ void GaussianBloomEffect::ExtractBrightAreas(Texture* src, ScreenMesh* mesh)
 	m_thresholdProgram->Use();
 	glActiveTexture(GL_TEXTURE0);
 	src->Bind();
+	m_thresholdProgram->SetUniform("screenTexture", 0);
 
 	mesh->Draw();
 }
