@@ -1,12 +1,9 @@
 ﻿#include "EnginePch.h"
-#include "OutlinePass.h"
-
-#include "Graphics/RenderContext.h"
+#include "OutlineEffect.h"
 #include "Object/GameObject.h"
-#include "Resources/Program.h"
+#include "Graphics/RenderContext.h"
 #include "Graphics/Framebuffers/OutlineFramebuffer.h"
-#include "Graphics/Framebuffers/PostProcessFramebuffer.h"
-#include "Resources/Meshes/Mesh.h"
+#include "Resources/Program.h"
 #include "Resources/Meshes/ScreenMesh.h"
 #include "Resources/Textures/Texture.h"
 #include "Components/StaticMeshRenderer.h"
@@ -15,52 +12,46 @@
 #include "Components/Animator.h"
 #include "Components/Transform.h"
 
-DECLARE_DEFAULTS_IMPL(OutlinePass)
+DECLARE_DEFAULTS_IMPL(OutlineEffect)
 
-OutlinePassUPtr OutlinePass::Create
+OutlineEffectUPtr OutlineEffect::Create
 (
-	int32 width, int32 height, 
-	const glm::vec3& color,
-	float thickness
+	int32 priority, int32 width, int32 height,
+	const glm::vec3& color, float thickness
 )
 {
-	auto pass = OutlinePassUPtr(new OutlinePass());
-	if (!pass->Init(width, height, color, thickness)) return nullptr;
-	return std::move(pass);
+	auto effect = OutlineEffectUPtr(new OutlineEffect());
+	if (!effect->Init(priority, width, height, color, thickness)) return nullptr;
+	return std::move(effect);
 }
 
-bool OutlinePass::Init
+bool OutlineEffect::Init
 (
-	int32 width, int32 height, 
-	const glm::vec3& color,
-	float thickness
+	int32 priority, int32 width, int32 height,
+	const glm::vec3& color, float thickness
 )
 {
 	m_color = color;
 	m_thickness = thickness;
+	m_width = width;
+	m_height = height;
 
 	m_maskStaticProgram = RESOURCE.GetResource<Program>("common_outline_static");
 	m_maskSkinnedProgram = RESOURCE.GetResource<Program>("common_outline_skinned");
 	m_postProgram = RESOURCE.GetResource<Program>("common_outline_postprocess");
-	m_screenMesh = RESOURCE.GetResource<ScreenMesh>("Screen");
 	m_maskFBO = OutlineFramebuffer::Create(width, height);
-	if (!m_maskStaticProgram || !m_maskSkinnedProgram || !m_postProgram || !m_screenMesh || !m_maskFBO)
+	if (!m_maskStaticProgram || !m_maskSkinnedProgram || !m_postProgram || !m_maskFBO)
 		return false;
-
-	// 변하지 않는 유니폼은 Init에서 설정
-	m_postProgram->Use();
-	m_postProgram->SetUniform("stencilTexture", 0);
-	m_postProgram->SetUniform("outlineColor", glm::vec4(m_color, 1.0f));
 
 	return true;
 }
 
-void OutlinePass::Render(RenderContext* context)
+bool OutlineEffect::Render(RenderContext* context, Framebuffer* mainFBO, ScreenMesh* screenMesh)
 {
 	// 0. 데이터 확인
-	if (!context) return;
+	if (!context || !mainFBO) return false;
 	const auto& outlines = context->GetMeshOutlines();
-	if (outlines.empty()) return;
+	if (outlines.empty()) return true;
 
 	// [Pass 1] 마스크 텍스처 생성 (Mask Generation)
 	m_maskFBO->Bind();
@@ -73,7 +64,7 @@ void OutlinePass::Render(RenderContext* context)
 	// Always On Top 효과를 위해 깊이 설정 조정
 	glDepthFunc(GL_ALWAYS);
 	glDisable(GL_DEPTH_TEST);
-	glDisable(GL_CULL_FACE); 
+	glDisable(GL_CULL_FACE);
 
 	// 마스킹 렌더링 (단색으로 그리기)
 	MaskMeshes(outlines);
@@ -81,7 +72,8 @@ void OutlinePass::Render(RenderContext* context)
 	glDepthFunc(GL_LESS);
 
 	// 다시 메인 화면(디폴트 FBO)으로 복귀
-	context->BindTargetFramebuffer();
+	mainFBO->Bind();
+	glViewport(0, 0, mainFBO->GetWidth(), mainFBO->GetHeight());
 
 	// [Pass 2] 포스트 프로세싱 합성
 	glDisable(GL_DEPTH_TEST);
@@ -93,32 +85,39 @@ void OutlinePass::Render(RenderContext* context)
 	// 0번 슬롯에 마스크 텍스처 바인딩
 	glActiveTexture(GL_TEXTURE0);
 	m_maskFBO->GetTexture()->Bind();
+	m_postProgram->SetUniform("stencilTexture", 0);
+
+	// 디버그
+	if (m_maskFBO->GetWidth() != mainFBO->GetWidth() || m_maskFBO->GetHeight() != mainFBO->GetHeight())
+	{
+		// 이 로그가 찍힌다면 리사이즈 로직이 끊긴 겁니다.
+		LOG_FATAL("Size Mismatch! Mask: {} x {}, Main: {} x {}",
+			m_maskFBO->GetWidth(), m_maskFBO->GetHeight(),
+			mainFBO->GetWidth(), mainFBO->GetHeight());
+	}
+
 
 	// 해상도 및 두께 전달
-	m_postProgram->SetUniform("canvasSize", glm::vec2(m_maskFBO->GetWidth(), m_maskFBO->GetHeight()));
+	m_postProgram->SetUniform("canvasSize", glm::vec2(mainFBO->GetWidth(), mainFBO->GetHeight()));
 	m_postProgram->SetUniform("outlineSize", m_thickness);
-	m_postProgram->SetUniform("outlineColor", glm::vec4(m_color, 1.0f)); 
+	m_postProgram->SetUniform("outlineColor", glm::vec4(m_color, 1.0f));
 
 	// ScreenMesh로 화면 꽉 차게 그리기
-	m_screenMesh->Draw();
+	screenMesh->Draw();
 
 	// 상태 복구
-	Framebuffer::BindToDefault();
 	glDisable(GL_BLEND);
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);
 	glCullFace(GL_BACK);
-}
 
-void OutlinePass::Resize(int32 width, int32 height)
-{
-	m_maskFBO->OnResize(width, height);
+	return true;
 }
 
 /*==============================//
 //   outlining helper methods   //
 //==============================*/
-void OutlinePass::MaskMeshes(const std::vector<MeshOutline*>& outlines)
+void OutlineEffect::MaskMeshes(const std::vector<MeshOutline*>& outlines)
 {
 	// 1. 분류를 위한 정적 벡터
 	static std::vector<MeshOutline*> staticOutlines;  staticOutlines.clear();
@@ -138,21 +137,21 @@ void OutlinePass::MaskMeshes(const std::vector<MeshOutline*>& outlines)
 		// 3. MeshRenderer의 타입에 맞춰서 분리
 		switch (renderer->GetComponentType())
 		{
-			case ComponentType::StaticMeshRenderer:
-			{
-				staticOutlines.push_back(outline);
-				break;
-			}
+		case ComponentType::StaticMeshRenderer:
+		{
+			staticOutlines.push_back(outline);
+			break;
+		}
 
-			case ComponentType::SkinnedMeshRenderer:
-			{
-				skinnedOutlines.push_back(outline);
-				break;
-			}
+		case ComponentType::SkinnedMeshRenderer:
+		{
+			skinnedOutlines.push_back(outline);
+			break;
+		}
 
-			// TODO : InstancedMeshRenderer에 대해서도 처리 필요
-			default:
-				break;
+		// TODO : InstancedMeshRenderer에 대해서도 처리 필요
+		default:
+			break;
 		}
 	}
 
@@ -161,7 +160,7 @@ void OutlinePass::MaskMeshes(const std::vector<MeshOutline*>& outlines)
 	if (!skinnedOutlines.empty()) MaskSkinnedMeshes(skinnedOutlines);
 }
 
-void OutlinePass::MaskStaticMeshes(const std::vector<MeshOutline*>& outlines)
+void OutlineEffect::MaskStaticMeshes(const std::vector<MeshOutline*>& outlines)
 {
 	m_maskStaticProgram->Use();
 
@@ -179,7 +178,7 @@ void OutlinePass::MaskStaticMeshes(const std::vector<MeshOutline*>& outlines)
 	}
 }
 
-void OutlinePass::MaskSkinnedMeshes(const std::vector<MeshOutline*>& outlines)
+void OutlineEffect::MaskSkinnedMeshes(const std::vector<MeshOutline*>& outlines)
 {
 	m_maskSkinnedProgram->Use();
 
@@ -198,10 +197,16 @@ void OutlinePass::MaskSkinnedMeshes(const std::vector<MeshOutline*>& outlines)
 		Animator* animator = skinnedRenderer->GetAnimator();
 		const auto& boneMatrices = (animator && animator->IsEnabled() && animator->GetOwner()->IsActive())
 			? animator->GetFinalBoneMatrices()
-			: GetIdentityBones();
+			: Utils::GetIdentityBones();
 
 		m_maskSkinnedProgram->SetUniform("finalBoneMatrices", boneMatrices);
 
 		renderer->Render(m_maskSkinnedProgram.get());
 	}
+}
+
+void OutlineEffect::OnResize(int32 width, int32 height)
+{
+	Super::OnResize(width, height);
+	if (m_maskFBO) m_maskFBO->OnResize(width, height);
 }

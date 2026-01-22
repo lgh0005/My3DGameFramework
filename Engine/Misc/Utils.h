@@ -47,6 +47,9 @@ public:
 	// 문자열 해시 유틸 함수 : FNV-1a Hash
 	static constexpr uint32 StrHash(const char* str);
 	static constexpr uint32 StrHash(const std::string& str);
+	
+	// 기본 뼈 행렬 벡터 반환 IIFE 패턴 유틸 함수
+	static const std::vector<glm::mat4>& GetIdentityBones();
 };
 
 #include "Misc/Utils.inl"

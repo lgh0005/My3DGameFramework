@@ -20,7 +20,7 @@ enum class RenderSlot : uint8
 {
 	GPosition, GNormal, GAlbedo, GEmission, GVelocity, // Geometry Pass Output
 	SSAO,                                              // SSAO Pass Output
-	MotionBlur,                                        // Motion Blur / PostProcess Input
+	Bloom,                                        
 	MAX
 };
 

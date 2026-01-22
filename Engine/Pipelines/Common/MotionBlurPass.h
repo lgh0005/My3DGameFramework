@@ -18,7 +18,7 @@ public:
 	void Resize(int32 width, int32 height);
 
 private:
-	MotionBlurPass();
+	MotionBlurPass();	
 	bool Init(int32 width, int32 height);
 
 	ScreenMeshPtr					m_plane;

@@ -143,3 +143,16 @@ glm::vec3 Utils::SafeNormalize(const glm::vec3& v)
 	return v * glm::inversesqrt(len2);
 }
 
+/*====================================//
+//   기본 뼈 행렬 벡터 반환 유틸 함수   //
+//====================================*/
+const std::vector<glm::mat4>& Utils::GetIdentityBones()
+{
+	static const std::vector<glm::mat4> identityBones = []()
+	{
+		std::vector<glm::mat4> bones(MAX_BONES, glm::mat4(1.0f));
+		return bones;
+	}();
+
+	return identityBones;
+}

@@ -5,6 +5,8 @@
 #include "Pipelines/Common/ShadowPass.h"
 #include "Pipelines/Common/SkyboxPass.h"
 #include "Pipelines/Common/JoltDebugGizmoPass.h"
+#include "Pipelines/Common/PostProcessPass.h"
+
 #include "Pipelines/Common/OutlinePass.h"
 #include "Pipelines/Common/SSAOPass.h"
 #include "Pipelines/Common/MotionBlurPass.h"
@@ -30,6 +32,11 @@
 #include "Graphics/Framebuffers/PostProcessFramebuffer.h"
 #include "Graphics/Framebuffers/GBufferFramebuffer.h"
 
+#include "Pipelines/PostProcessing/MotionBlurEffect.h"
+#include "Pipelines/PostProcessing/OutlineEffect.h"
+#include "Pipelines/PostProcessing/GaussianBloomEffect.h"
+#include "Pipelines/PostProcessing/DisplayMappingEffect.h"
+
 DECLARE_DEFAULTS_IMPL(StandardRenderPipeline)
 
 StandardRenderPipelineUPtr StandardRenderPipeline::Create()
@@ -49,9 +56,9 @@ bool StandardRenderPipeline::Init()
 	m_cullingPass = CullingPass::Create();
 	if (!m_cullingPass) return false;
 
-	// 아웃라인 패스 생성
-	m_outlinePass = OutlinePass::Create();
-	if (!m_outlinePass) return false;
+	//// 아웃라인 패스 생성
+	//m_outlinePass = OutlinePass::Create();
+	//if (!m_outlinePass) return false;
 
 	// 셰도우 패스 생성
 	m_shadowPass = ShadowPass::Create();
@@ -69,9 +76,22 @@ bool StandardRenderPipeline::Init()
 	m_ssaoPass = SSAOPass::Create();
 	if (!m_ssaoPass) return false;
 
-	// 포스트-프로세스 패스 생성
-	m_postProcessPass = StandardPostProcessPass::Create();
+	// 통용 포스트-프로세스 패스 생성
+	m_postProcessPass = PostProcessPass::Create();
 	if (!m_postProcessPass) return false;
+	auto motion = MotionBlurEffect::Create(0, WINDOW.GetWindowWidth(), WINDOW.GetWindowHeight());
+	m_postProcessPass->AddEffect(std::move(motion));
+	auto outline = OutlineEffect::Create(1, WINDOW.GetWindowWidth(), WINDOW.GetWindowHeight());
+	m_postProcessPass->AddEffect(std::move(outline));
+	
+	auto bloom = GaussianBloomEffect::Create(2);
+	m_postProcessPass->AddEffect(std::move(bloom));
+	auto display = DisplayMappingEffect::Create(3);
+	m_postProcessPass->AddEffect(std::move(display));
+
+	// 포스트-프로세스 패스 생성
+	/*m_postProcessPass = StandardPostProcessPass::Create();
+	if (!m_postProcessPass) return false;*/
 
 	// G-buffer 패스 생성
 	m_geometryPass = StandardGeometryPass::Create();
@@ -81,9 +101,9 @@ bool StandardRenderPipeline::Init()
 	m_deferredLightPass = StandardDeferredLightingPass::Create();
 	if (!m_deferredLightPass) return false;
 
-	// 모션 블러 패스 생성
-	m_motionBlurPass = MotionBlurPass::Create();
-	if (!m_motionBlurPass) return false;
+	//// 모션 블러 패스 생성
+	//m_motionBlurPass = MotionBlurPass::Create();
+	//if (!m_motionBlurPass) return false;
 
 	return true;
 }
@@ -133,8 +153,8 @@ void StandardRenderPipeline::Render(Scene* scene)
 	m_skyboxPass->Render(&context);
 
 	// [패스 7] 모션 블러 & 아웃라인 (2D 후처리 효과들)
-	m_motionBlurPass->Render(&context);
-	m_outlinePass->Render(&context);
+	//m_motionBlurPass->Render(&context);
+	//m_outlinePass->Render(&context);
 
 	// [패스 8] 포스트 프로세싱 패스 (최종 합성 및 화면 출력)
 	m_postProcessPass->Render(&context);
@@ -149,9 +169,8 @@ void StandardRenderPipeline::OnResize(int32 width, int32 height)
 {
 	// 모든 패스의 FBO 내부 텍스처 갱신
 	m_geometryPass->Resize(width, height);
-	m_postProcessPass->Resize(width, height);
+	// m_postProcessPass->Resize(width, height);
 	m_ssaoPass->Resize(width, height);
-	m_outlinePass->Resize(width, height);
 }
 
 /*======================//

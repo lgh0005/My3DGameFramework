@@ -46,6 +46,7 @@ add_library(Engine STATIC
    "Pipelines/Common/MotionBlurPass.h" "Pipelines/Common/MotionBlurPass.cpp"
    "Pipelines/Common/SSAOPass.h"    "Pipelines/Common/SSAOPass.cpp"
    "Pipelines/Common/OutlinePass.h" "Pipelines/Common/OutlinePass.cpp"
+   "Pipelines/Common/PostProcessPass.h"     "Pipelines/Common/PostProcessPass.cpp"
 
    # Standard Render Pipeline
    "Pipelines/SRP/RenderPasses/StandardPostProcessPass.h" "Pipelines/SRP/RenderPasses/StandardPostProcessPass.cpp"
@@ -106,6 +107,13 @@ add_library(Engine STATIC
    "Graphics/GlobalUniforms.h"          "Graphics/GlobalUniforms.cpp"
    "Graphics/Velocitybuffer.h"      "Graphics/Velocitybuffer.cpp"
 
+   # Post-processing effects
+   "Pipelines/PostProcessing/PostProcessEffect.h"    "Pipelines/PostProcessing/PostProcessEffect.cpp"
+   "Pipelines/PostProcessing/MotionBlurEffect.h"    "Pipelines/PostProcessing/MotionBlurEffect.cpp"
+   "Pipelines/PostProcessing/OutlineEffect.h"       "Pipelines/PostProcessing/OutlineEffect.cpp"
+   "Pipelines/PostProcessing/GaussianBloomEffect.h"  "Pipelines/PostProcessing/GaussianBloomEffect.cpp"
+   "Pipelines/PostProcessing/DisplayMappingEffect.h"  "Pipelines/PostProcessing/DisplayMappingEffect.cpp"
+
    # Framebuffers
    "Graphics/Framebuffers/FramebufferBase.h"       "Graphics/Framebuffers/FramebufferBase.cpp"
    "Graphics/Framebuffers/Framebuffer.h"             "Graphics/Framebuffers/Framebuffer.cpp"
@@ -133,7 +141,7 @@ add_library(Engine STATIC
    "Resources/Animations/AnimChannel.h"        "Resources/Animations/AnimChannel.cpp"
    "Resources/Animations/Pose.h"               "Resources/Animations/Pose.cpp"
    "Resources/Animations/Skeleton.h"           "Resources/Animations/Skeleton.cpp"
-    "Resources/Animations/AnimController.h"    "Resources/Animations/AnimController.cpp"
+   "Resources/Animations/AnimController.h"    "Resources/Animations/AnimController.cpp"
    "Resources/Animations/AnimState.h"          "Resources/Animations/AnimState.cpp"
 
    "Resources/Textures/TextureBase.h"        "Resources/Textures/TextureBase.cpp" 
@@ -195,8 +203,7 @@ add_library(Engine STATIC
    "Managers/AudioManager.h"        "Managers/AudioManager.cpp"
    "Managers/PhysicsManager.h"      "Managers/PhysicsManager.cpp"
    "Managers/UIManager.h"           "Managers/UIManager.cpp"
- "Resources/Textures/TextureBase.h" "Resources/Textures/TextureBase.cpp"
- )
+)
 
 # 2. [PCH 설정] EnginePCH.h를 PCH로 사용합니다.
 target_precompile_headers(Engine  PUBLIC EnginePCH.h)
