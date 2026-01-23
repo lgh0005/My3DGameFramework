@@ -50,6 +50,18 @@ bool DisplayMappingEffects::Render(RenderContext* context, Framebuffer* srcFBO, 
 	m_compositeProgram->SetUniform("inverseScreenSize", glm::vec2(1.0f / m_width, 1.0f / m_height));
 	m_compositeProgram->SetUniform("toneMappingMode", (int32)m_toneMappingMode);
 
+	// 3. 추가 효과 유니폼 설정
+	m_compositeProgram->SetUniform("time", (float)TIME.GetTime());
+	m_compositeProgram->SetUniform("distortionK", m_distortionK);
+	m_compositeProgram->SetUniform("scanlineIntensity", m_scanlineIntensity);
+	m_compositeProgram->SetUniform("phosphorIntensity", m_phosphorIntensity);
+	m_compositeProgram->SetUniform("flickerIntensity", m_flickerIntensity);
+	m_compositeProgram->SetUniform("chromaticAmount", m_chromaticAmount);
+	m_compositeProgram->SetUniform("vignetteIntensity", m_vignetteIntensity);
+	m_compositeProgram->SetUniform("grainAmount", m_grainAmount);
+	m_compositeProgram->SetUniform("scanlineIntensity", m_scanlineIntensity);
+	m_compositeProgram->SetUniform("sharpenAmount", m_sharpenAmount);
+
 	// [Input 0] MainFBO (Scene Color - HDR)
 	glActiveTexture(GL_TEXTURE0);
 	srcFBO->GetColorAttachment(0)->Bind();
