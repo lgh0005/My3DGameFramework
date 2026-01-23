@@ -82,6 +82,11 @@
             "vs":  "./Resources/Shaders/PostProcessing/PostProcess_Depth_Of_View_Effect.vert",
             "fs":  "./Resources/Shaders/PostProcessing/PostProcess_Depth_Of_View_Effect.frag"
         },
+        {
+            "key": "lens_flare",
+            "vs":  "./Resources/Shaders/PostProcessing/PostProcess_Lens_Flare.vert",
+            "fs":  "./Resources/Shaders/PostProcessing/PostProcess_Lens_Flare.frag"
+        },
 
 
         {

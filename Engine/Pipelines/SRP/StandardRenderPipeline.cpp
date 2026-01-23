@@ -33,6 +33,7 @@
 #include "Pipelines/PostProcessing/World/WorldSpaceEffects.h"
 #include "Pipelines/PostProcessing/Bloom/DOFEffect.h"
 #include "Pipelines/PostProcessing/Bloom/GaussianBloomEffect.h"
+#include "Pipelines/PostProcessing/Bloom/LensFlareEffect.h"
 #include "Pipelines/PostProcessing/Display/DisplayMappingEffects.h"
 
 DECLARE_DEFAULTS_IMPL(StandardRenderPipeline)
@@ -83,7 +84,9 @@ bool StandardRenderPipeline::Init()
 	m_postProcessPass->AddEffect(std::move(outline));
 	auto bloom = GaussianBloomEffect::Create(4);
 	m_postProcessPass->AddEffect(std::move(bloom));
-	auto display = DisplayMappingEffects::Create(5);
+	auto lens = LensFlareEffect::Create(5);
+	m_postProcessPass->AddEffect(std::move(lens));
+	auto display = DisplayMappingEffects::Create(6);
 	display->SetToneMappingMode(ToneMappingMode::Exposure); // 0번 모드
 	display->SetBloomStrength(1.0f); // 가우시안 블러는 빛이 약해지므로 강하게!
 	display->SetExposure(1.0f);
