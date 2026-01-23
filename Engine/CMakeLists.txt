@@ -107,9 +107,13 @@ add_library(Engine STATIC
    "Pipelines/PostProcessing/World/MotionBlurEffect.h"    "Pipelines/PostProcessing/World/MotionBlurEffect.cpp"
    "Pipelines/PostProcessing/World/OutlineEffect.h"       "Pipelines/PostProcessing/World/OutlineEffect.cpp"
    "Pipelines/PostProcessing/World/WorldSpaceEffects.h" "Pipelines/PostProcessing/World/WorldSpaceEffects.cpp"
-   "Pipelines/PostProcessing/Bloom/BloomSpaceEffects.h" "Pipelines/PostProcessing/Bloom/BloomSpaceEffects.cpp"
+
+   #"Pipelines/PostProcessing/Bloom/BloomSpaceEffects.h" "Pipelines/PostProcessing/Bloom/BloomSpaceEffects.cpp"
+   "Pipelines/PostProcessing/Bloom/DOFEffect.h"         "Pipelines/PostProcessing/Bloom/DOFEffect.cpp"
+   "Pipelines/PostProcessing/Bloom/LensFlareEffect.h"   "Pipelines/PostProcessing/Bloom/LensFlareEffect.cpp"
    "Pipelines/PostProcessing/Bloom/GaussianBloomEffect.h"  "Pipelines/PostProcessing/Bloom/GaussianBloomEffect.cpp"
    "Pipelines/PostProcessing/Bloom/KawaseBloomEffect.h" "Pipelines/PostProcessing/Bloom/KawaseBloomEffect.cpp"
+
    "Pipelines/PostProcessing/Display/DisplayMappingEffects.h"  "Pipelines/PostProcessing/Display/DisplayMappingEffects.cpp"
    
    # Framebuffers

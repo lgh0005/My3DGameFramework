@@ -1,12 +1,12 @@
 ﻿#pragma once
 #include "Pipelines/PostProcessing/PostProcessEffect.h"
 
-CLASS_PTR(BloomSpaceEffects)
-class BloomSpaceEffects : public PostProcessEffect
+CLASS_PTR(LensFlareEffect)
+class LensFlareEffect : public PostProcessEffect
 {
 public:
-	virtual ~BloomSpaceEffects();
-	static BloomSpaceEffectsUPtr Create
+	virtual ~LensFlareEffect();
+	static LensFlareEffectUPtr Create
 	(
 		int32 priority,
 		int32 width = WINDOW_WIDTH,
@@ -24,6 +24,9 @@ public:
 	virtual void OnResize(int32 width, int32 height) override;
 
 private:
-	BloomSpaceEffects();
+	LensFlareEffect();
 	bool Init(int32 priority, int32 width, int32 height);
+
+	// DOF (Depth of field)
+
 };

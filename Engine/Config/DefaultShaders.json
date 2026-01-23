@@ -77,7 +77,11 @@
             "vs":  "./Resources/Shaders/PostProcessing/PostProcess_World_Space_Effects.vert",
             "fs":  "./Resources/Shaders/PostProcessing/PostProcess_World_Space_Effects.frag"
         },
-
+        {
+            "key": "dof_effect",
+            "vs":  "./Resources/Shaders/PostProcessing/PostProcess_Depth_Of_View_Effect.vert",
+            "fs":  "./Resources/Shaders/PostProcessing/PostProcess_Depth_Of_View_Effect.frag"
+        },
 
 
         {

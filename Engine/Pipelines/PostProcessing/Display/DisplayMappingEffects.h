@@ -56,30 +56,28 @@ private:
 	// 톤매핑 및 감마 보정
 	ToneMappingMode m_toneMappingMode{ ToneMappingMode::Exposure };
 	float m_gamma		{ 2.2f };
-	float m_exposure	{ 1.5f };
+	float m_exposure	{ 1.0f };
 	
 	// Camera dirt
 	TexturePtr m_cameraDirtTexture;
 	float m_cameraDirtAmbient{ 0.05f };
 	float m_cameraDirtIntensity{ 2.0f };
 
-	// 괜찮은 연출을 보이는 인자 값들임. 참고할 것.
-
 	// CRT screen effect
-	glm::vec2 m_distortionK{ 0.08f, 0.04f }; // CRT 곡률
-	float m_scanlineIntensity{ 0.45f };		 // 가로줄
+	glm::vec2 m_distortionK{ 0.0f, 0.0f }; // CRT 곡률
+	float m_scanlineIntensity{ 0.0f };		 // 가로줄
 	float m_phosphorIntensity{ 0.0f };		 // 세로 격자
-	float m_flickerIntensity{ 0.002f };	     // 미세 떨림(약간의 깜빡임)
+	float m_flickerIntensity{ 0.0f };	     // 미세 떨림(약간의 깜빡임)
 
 	// 색수차
-	float m_chromaticAmount{ 0.004f };       // 색수차 강도
+	float m_chromaticAmount{ 0.0f };       // 색수차 강도
 
 	// vignette
-	float m_vignetteIntensity{ 0.05f };     // 비네팅 강도
+	float m_vignetteIntensity{ 0.0f };     // 비네팅 강도
 
 	// 필름 그레인
-	float m_grainAmount{ 0.01f };           // 필름 그레인 강도
+	float m_grainAmount{ 0.0f };           // 필름 그레인 강도
 
 	// 선명도 강도
-	float m_sharpenAmount{ 0.2f };          // 선명도 강도
+	float m_sharpenAmount{ 0.0f };          // 선명도 강도
 };
