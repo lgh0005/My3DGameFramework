@@ -21,6 +21,7 @@ uniform float dirtIntensity;
 uniform float dirtAmbient;
 
 // [4. CRT 및 레트로 효과 설정]
+uniform bool  useCRT;
 uniform vec2  distortionK;        // CRT 곡률 (배럴 왜곡)
 uniform float scanlineIntensity;  // 가로 주사선 강도
 uniform float phosphorIntensity;  // 세로 격자(Phosphor) 강도
@@ -143,13 +144,16 @@ vec3 ApplySharpen(sampler2D t, vec2 uv, float amt)
 void main() 
 {
     // [단계 1] 기하학 왜곡 (CRT Curvature)
-    vec2 uv = Curvature(texCoord);
+    vec2 uv = useCRT ? Curvature(texCoord) : texCoord;
 
     // 화면 밖 영역 검은색 처리
-    if (uv.x < 0.0 || uv.x > 1.0 || uv.y < 0.0 || uv.y > 1.0) 
+    if (useCRT) 
     {
-        fragColor = vec4(0.0, 0.0, 0.0, 1.0);
-        return;
+        if (uv.x < 0.0 || uv.x > 1.0 || uv.y < 0.0 || uv.y > 1.0) 
+        {
+            fragColor = vec4(0.0, 0.0, 0.0, 1.0);
+            return;
+        }
     }
 
     // [단계 2] HDR 샘플링 및 색수차 (Chromatic Aberration);
@@ -190,25 +194,28 @@ void main()
     mapped += (noise - 0.5) * grainAmount;
 
     // 6-3. CRT 레트로 효과 (스캔라인 + 격자 + 플리커)
-    // 6-3-1. 가로 스캔라인 (정적)
-    float scanline = sin(uv.y * (1.0 / inverseScreenSize.y) * 2.0) * 0.5 + 0.5;
-    mapped *= mix(1.0, scanline, scanlineIntensity);
+    if (useCRT)
+    {
+        // 6-3-1. 가로 스캔라인 (정적)
+        float scanline = sin(uv.y * (1.0 / inverseScreenSize.y) * 2.0) * 0.5 + 0.5;
+        mapped *= mix(1.0, scanline, scanlineIntensity);
 
-    // 6-3-2. 세로 RGB 격자 (정적)
-    float phosphor = sin(uv.x * (1.0 / inverseScreenSize.x) * 3.0) * 0.2 + 0.8;
-    mapped *= mix(1.0, phosphor, phosphorIntensity);
+        // 6-3-2. 세로 RGB 격자 (정적)
+        float phosphor = sin(uv.x * (1.0 / inverseScreenSize.x) * 3.0) * 0.2 + 0.8;
+        mapped *= mix(1.0, phosphor, phosphorIntensity);
 
-    // 6-3-3. 움직이는 노이즈 띠 (Rolling Bar)
-    float rollingBar = sin(uv.y * 2.0 + time * 1.5 + hash(time) * 0.1);
-    rollingBar = smoothstep(0.95, 1.0, rollingBar);
+        // 6-3-3. 움직이는 노이즈 띠 (Rolling Bar)
+        float rollingBar = sin(uv.y * 2.0 + time * 1.5 + hash(time) * 0.1);
+        rollingBar = smoothstep(0.95, 1.0, rollingBar);
 
-    // 6-3-4. 전압 강하 플리커 (Voltage Drop Flicker)
-    float baseFlicker = sin(time * 2.0) * 0.5 + 0.5; // 천천히 울렁거림
-    float dropTrigger = hash(time * 15.0);           // 불규칙한 트리거
-    float voltageDrop = (dropTrigger > 0.995) ? 0.85 : 1.0; // 가끔 틱 하고 어두워짐
-    float finalFlicker = (1.0 + (baseFlicker - 0.5) * flickerIntensity) * voltageDrop;
-    mapped *= finalFlicker;
-    mapped += rollingBar * flickerIntensity * 2.0;
+        // 6-3-4. 전압 강하 플리커 (Voltage Drop Flicker)
+        float baseFlicker = sin(time * 2.0) * 0.5 + 0.5; // 천천히 울렁거림
+        float dropTrigger = hash(time * 15.0);           // 불규칙한 트리거
+        float voltageDrop = (dropTrigger > 0.995) ? 0.85 : 1.0; // 가끔 틱 하고 어두워짐
+        float finalFlicker = (1.0 + (baseFlicker - 0.5) * flickerIntensity) * voltageDrop;
+        mapped *= finalFlicker;
+        mapped += rollingBar * flickerIntensity * 2.0;   
+    }
 
     // [단계 7] 감마 보정 및 최종 출력
     mapped = pow(mapped, vec3(1.0 / gamma));

@@ -43,12 +43,22 @@ public:
 	void SetToneMappingMode(ToneMappingMode mode) { m_toneMappingMode = mode; }
 	void SetBloomStrength(float strength) { m_bloomStrength = strength; }
 	void SetExposure(float exposure) { m_exposure = exposure; }
+	void SetUseCRT(bool use) { m_useCRT = use; }
 
 private:
 	DisplayMappingEffects();
 	bool Init(int32 priority, int32 width, int32 height);
 
 	ProgramPtr m_compositeProgram;
+
+	// --- 효과 활성화 스위치 ---
+	bool m_useBloom{ true };
+	bool m_useCameraDirt{ true };
+	bool m_useCRT{ true };
+	bool m_useChromatic{ true };
+	bool m_useVignette{ true };
+	bool m_useGrain{ true };
+	bool m_useSharpen{ true };
 
 	// 블룸 세기
 	float m_bloomStrength{ 2.0f };
@@ -64,20 +74,21 @@ private:
 	float m_cameraDirtIntensity{ 2.0f };
 
 	// CRT screen effect
-	glm::vec2 m_distortionK{ 0.0f, 0.0f }; // CRT 곡률
-	float m_scanlineIntensity{ 0.0f };		 // 가로줄
+	bool m_useCRTScreen	{ true };
+	glm::vec2 m_distortionK{ 0.08f, 0.04f }; // CRT 곡률
+	float m_scanlineIntensity{ 0.45f };		 // 가로줄
 	float m_phosphorIntensity{ 0.0f };		 // 세로 격자
-	float m_flickerIntensity{ 0.0f };	     // 미세 떨림(약간의 깜빡임)
+	float m_flickerIntensity{ 0.002f };	     // 미세 떨림(약간의 깜빡임)
 
 	// 색수차
-	float m_chromaticAmount{ 0.0f };       // 색수차 강도
+	float m_chromaticAmount{ 0.004f };       // 색수차 강도
 
 	// vignette
-	float m_vignetteIntensity{ 0.0f };     // 비네팅 강도
+	float m_vignetteIntensity{ 0.05f };     // 비네팅 강도
 
 	// 필름 그레인
-	float m_grainAmount{ 0.0f };           // 필름 그레인 강도
+	float m_grainAmount{ 0.01f };           // 필름 그레인 강도
 
 	// 선명도 강도
-	float m_sharpenAmount{ 0.0f };          // 선명도 강도
+	float m_sharpenAmount{ 0.2f };          // 선명도 강도
 };

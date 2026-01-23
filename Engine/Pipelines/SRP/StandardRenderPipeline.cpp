@@ -78,18 +78,15 @@ bool StandardRenderPipeline::Init()
 	m_postProcessPass->AddEffect(std::move(motion));
 	auto world = WorldSpaceEffects::Create(1);
 	m_postProcessPass->AddEffect(std::move(world));
-	auto dof = DOFEffect::Create(2);
-	m_postProcessPass->AddEffect(std::move(dof));
 	auto outline = OutlineEffect::Create(3);
 	m_postProcessPass->AddEffect(std::move(outline));
 	auto bloom = GaussianBloomEffect::Create(4);
 	m_postProcessPass->AddEffect(std::move(bloom));
-	auto lens = LensFlareEffect::Create(5);
-	m_postProcessPass->AddEffect(std::move(lens));
 	auto display = DisplayMappingEffects::Create(6);
 	display->SetToneMappingMode(ToneMappingMode::Exposure); // 0번 모드
-	display->SetBloomStrength(1.0f); // 가우시안 블러는 빛이 약해지므로 강하게!
+	display->SetBloomStrength(1.0f);
 	display->SetExposure(1.0f);
+	display->SetUseCRT(false);
 	m_postProcessPass->AddEffect(std::move(display));
 
 	// G-buffer 패스 생성

@@ -52,6 +52,7 @@ bool DisplayMappingEffects::Render(RenderContext* context, Framebuffer* srcFBO, 
 
 	// 3. 추가 효과 유니폼 설정
 	m_compositeProgram->SetUniform("time", (float)TIME.GetTime());
+	m_compositeProgram->SetUniform("useCRT", m_useCRT);
 	m_compositeProgram->SetUniform("distortionK", m_distortionK);
 	m_compositeProgram->SetUniform("scanlineIntensity", m_scanlineIntensity);
 	m_compositeProgram->SetUniform("phosphorIntensity", m_phosphorIntensity);
