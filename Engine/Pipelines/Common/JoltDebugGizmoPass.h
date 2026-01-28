@@ -1,6 +1,6 @@
 ﻿#pragma once
-#include "Graphics/RenderPass.h"
-#include "Graphics/Vertex.h"
+#include "Graphics/Rendering/RenderPass.h"
+#include "Graphics/Layouts/Vertex.h"
 #include "Physics/GizmoCommand.h"
 
 #pragma region FORWARD_DECLARATION

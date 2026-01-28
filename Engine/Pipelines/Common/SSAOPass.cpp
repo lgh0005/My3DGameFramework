@@ -2,12 +2,12 @@
 #include "SSAOPass.h"
 
 #include "Scene/Scene.h"
-#include "Graphics/RenderContext.h"
+#include "Graphics/Rendering/RenderContext.h"
 #include "Components/Camera.h"
 #include "Resources/Textures/Texture.h"
 #include "Resources/Meshes/ScreenMesh.h"
 #include "Resources/Meshes/StaticMesh.h"
-#include "Graphics/Geometry.h"
+#include "Graphics/Geometry/Geometry.h"
 #include "Resources/Program.h"
 #include "Graphics/Framebuffers/SSAOFramebuffer.h"
 

@@ -2,7 +2,7 @@
 #include "ComponentRegistry.h"
 
 #include "Object/GameObject.h"
-#include "Graphics/RenderPass.h"
+#include "Graphics/Rendering/RenderPass.h"
 #include "Components/SkyLight.h"
 #include "Components/Light.h"
 #include "Components/PointLight.h"

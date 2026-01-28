@@ -3,7 +3,7 @@
 #include "Resources/Meshes/StaticMesh.h"
 #include "Resources/Material.h"
 #include "Resources/Program.h"
-#include "Graphics/VertexLayout.h"
+#include "Graphics/Layouts/VertexLayout.h"
 #include "Components/Transform.h"
 
 DECLARE_DEFAULTS_IMPL(StaticMeshRenderer)

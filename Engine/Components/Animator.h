@@ -2,7 +2,7 @@
 #include "Object/Component.h"
 #include "Resources/Animations/Animation.h"
 #include "Resources/Animations/Pose.h"
-#include "Graphics/Geometry.h"
+#include "Graphics/Geometry/Geometry.h"
 
 #pragma region FORWARD_DECLARATION
 CLASS_PTR(Model)

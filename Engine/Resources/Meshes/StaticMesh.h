@@ -1,6 +1,6 @@
 ﻿#pragma once
 #include "Resources/Meshes/Mesh.h"
-#include "Graphics/Vertex.h"
+#include "Graphics/Layouts/Vertex.h"
 
 #pragma region FORWARD_DECLARATION
 CLASS_PTR(Buffer)

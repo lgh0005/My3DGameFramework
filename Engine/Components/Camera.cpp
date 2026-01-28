@@ -1,8 +1,8 @@
 ﻿#include "EnginePch.h"
 #include "Camera.h"
 #include "Components/Transform.h"
-#include "Graphics/Ray.h"
-#include "Graphics/Velocitybuffer.h"
+#include "Graphics/Raycasting/Ray.h"
+#include "Graphics/Buffers/Velocitybuffer.h"
 
 Camera::Camera()
 {

@@ -5,7 +5,7 @@
 
 #include "Scene/ComponentRegistry.h"
 #include "Object/GameObject.h"
-#include "Graphics/Geometry.h"
+#include "Graphics/Geometry/Geometry.h"
 #include "Resources/Program.h"
 #include "Resources/Meshes/ScreenMesh.h"
 #include "Resources/Meshes/StaticMesh.h" 

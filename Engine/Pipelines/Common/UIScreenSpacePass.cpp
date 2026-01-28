@@ -1,6 +1,6 @@
 ﻿#include "EnginePch.h"
 #include "UIScreenSpacePass.h"
-#include "Graphics/RenderContext.h"
+#include "Graphics/Rendering/RenderContext.h"
 
 DECLARE_DEFAULTS_IMPL(UIScreenSpacePass)
 

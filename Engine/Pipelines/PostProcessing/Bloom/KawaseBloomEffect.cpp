@@ -1,6 +1,6 @@
 ﻿#include "EnginePch.h"
 #include "KawaseBloomEffect.h"
-#include "Graphics/RenderContext.h"
+#include "Graphics/Rendering/RenderContext.h"
 #include "Graphics/Framebuffers/EffectFramebuffer.h"
 #include "Resources/Program.h"
 #include "Resources/Meshes/ScreenMesh.h"

@@ -5,8 +5,8 @@
 #include "Components/MeshOutline.h"
 #include "Object/GameObject.h"
 #include "PlayerController.h"
-#include "Graphics/Ray.h"
-#include "Graphics/RaycastHit.h"
+#include "Graphics/Raycasting/Ray.h"
+#include "Graphics/Raycasting/RaycastHit.h"
 
 DECLARE_DEFAULTS_IMPL(CameraController)
 

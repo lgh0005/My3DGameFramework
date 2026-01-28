@@ -1,9 +1,9 @@
 ﻿#include "EnginePch.h"
 #include "ScreenMesh.h"
 #include "Resources/Material.h"
-#include "Graphics/Buffer.h"
-#include "Graphics/Vertex.h"
-#include "Graphics/VertexLayout.h"
+#include "Graphics/Buffers/Buffer.h"
+#include "Graphics/Layouts/Vertex.h"
+#include "Graphics/Layouts/VertexLayout.h"
 #include "Resources/Program.h"
 
 DECLARE_DEFAULTS_IMPL(ScreenMesh)

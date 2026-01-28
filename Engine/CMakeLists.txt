@@ -83,23 +83,29 @@ add_library(Engine STATIC
 
    # Graphics
    "Graphics/Shader.h"              "Graphics/Shader.cpp"
-   "Graphics/Buffer.h"              "Graphics/Buffer.cpp" 
-   "Graphics/VertexLayout.h"        "Graphics/VertexLayout.cpp"
-   "Graphics/Vertex.h"              "Graphics/Vertex.cpp"
-   "Graphics/UniformBuffer.h"       "Graphics/UniformBuffer.cpp"
-   "Graphics/Uniform.h"             "Graphics/Uniform.cpp"
    "Graphics/IBLUtils.h"            "Graphics/IBLUtils.cpp"
-   "Graphics/Frustum.h"             "Graphics/Frustum.cpp"
-   "Graphics/Geometry.h"            "Graphics/Geometry.cpp"
    "Graphics/ShadowMap.h"           "Graphics/ShadowMap.cpp"
-   "Graphics/Ray.h"                 "Graphics/Ray.cpp"
-   "Graphics/RaycastHit.h"          "Graphics/RaycastHit.cpp"
-   "Graphics/Renderer.h"                "Graphics/Renderer.cpp"
-   "Graphics/RenderPass.h"              "Graphics/RenderPass.cpp"
-   "Graphics/RenderPipeline.h"          "Graphics/RenderPipeline.cpp"
-   "Graphics/RenderContext.h"           "Graphics/RenderContext.cpp"
-   "Graphics/GlobalUniforms.h"          "Graphics/GlobalUniforms.cpp"
-   "Graphics/Velocitybuffer.h"      "Graphics/Velocitybuffer.cpp"
+
+   "Graphics/Raycasting/Ray.h"                 "Graphics/Raycasting/Ray.cpp"
+   "Graphics/Raycasting/RaycastHit.h"          "Graphics/Raycasting/RaycastHit.cpp"
+
+    "Graphics/Geometry/Frustum.h"             "Graphics/Geometry/Frustum.cpp"
+   "Graphics/Geometry/Geometry.h"            "Graphics/Geometry/Geometry.cpp"
+
+   "Graphics/Rendering/Renderer.h"                "Graphics/Rendering/Renderer.cpp"
+   "Graphics/Rendering/RenderPass.h"              "Graphics/Rendering/RenderPass.cpp"
+   "Graphics/Rendering/RenderPipeline.h"          "Graphics/Rendering/RenderPipeline.cpp"
+   "Graphics/Rendering/RenderContext.h"           "Graphics/Rendering/RenderContext.cpp"
+   "Graphics/Rendering/GlobalUniforms.h"          "Graphics/Rendering/GlobalUniforms.cpp"
+
+   "Graphics/Buffers/Buffer.h"              "Graphics/Buffers/Buffer.cpp" 
+   "Graphics/Buffers/UniformBuffer.h"       "Graphics/Buffers/UniformBuffer.cpp"
+   "Graphics/Buffers/Velocitybuffer.h"      "Graphics/Buffers/Velocitybuffer.cpp"
+
+   "Graphics/Layouts/VertexLayout.h"        "Graphics/Layouts/VertexLayout.cpp"
+   "Graphics/Layouts/Vertex.h"              "Graphics/Layouts/Vertex.cpp"
+   "Graphics/Layouts/Uniform.h"             "Graphics/Layouts/Uniform.cpp"
+
 
    # Post-processing effects
    "Pipelines/PostProcessing/PostProcessEffect.h"    "Pipelines/PostProcessing/PostProcessEffect.cpp"
@@ -182,6 +188,7 @@ add_library(Engine STATIC
    "Components/SphereCollider.h"        "Components/SphereCollider.cpp"
    "Components/CapsuleCollider.h"       "Components/CapsuleCollider.cpp"
    "Components/Rigidbody.h"             "Components/Rigidbody.cpp"
+                   
    "Components/Terrain.h"               "Components/Terrain.cpp"
 
    # Navigation Mesh

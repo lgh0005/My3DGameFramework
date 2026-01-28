@@ -11,8 +11,8 @@
 #include "Scene/SceneRegistry.h"
 #include "Scene/ComponentRegistry.h"
 #include "Object/Component.h"
-#include "Framebuffers/Framebuffer.h"
-#include "Framebuffers/GBufferFramebuffer.h"
+#include "Graphics/Framebuffers/Framebuffer.h"
+#include "Graphics/Framebuffers/GBufferFramebuffer.h"
 
 RenderContext::RenderContext()
 {

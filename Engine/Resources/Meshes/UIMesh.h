@@ -1,6 +1,6 @@
 ﻿#pragma once
 #include "Resources/Meshes/Mesh.h"
-#include "Graphics/Vertex.h"
+#include "Graphics/Layouts/Vertex.h"
 
 CLASS_PTR(UIMesh)
 class UIMesh : public Mesh

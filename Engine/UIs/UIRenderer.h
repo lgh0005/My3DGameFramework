@@ -1,6 +1,6 @@
 ﻿#pragma once
 #include "Object/Component.h"
-#include "Graphics/Geometry.h"
+#include "Graphics/Geometry/Geometry.h"
 
 #pragma region FORWARD_DECLARATION
 CLASS_PTR(UIMesh)

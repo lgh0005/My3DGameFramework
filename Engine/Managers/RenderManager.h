@@ -1,6 +1,6 @@
 ﻿#pragma once
-#include "Graphics/Renderer.h"
-#include "Graphics/RenderPipeline.h"
+#include "Graphics/Rendering/Renderer.h"
+#include "Graphics/Rendering/RenderPipeline.h"
 
 class RenderManager
 {

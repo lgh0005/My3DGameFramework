@@ -1,6 +1,6 @@
 ﻿#include "EnginePch.h"
 #include "MotionBlurEffect.h"
-#include "Graphics/RenderContext.h"
+#include "Graphics/Rendering/RenderContext.h"
 #include "Graphics/Framebuffers/PostProcessFrameBuffer.h"
 #include "Resources/Program.h"
 #include "Resources/Meshes/ScreenMesh.h"

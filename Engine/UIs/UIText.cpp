@@ -5,7 +5,7 @@
 #include "Resources/Material.h"
 #include "Resources/Font.h"
 #include "Resources/Program.h"
-#include "Graphics/Vertex.h"
+#include "Graphics/Layouts/Vertex.h"
 
 DECLARE_DEFAULTS_IMPL(UIText)
 

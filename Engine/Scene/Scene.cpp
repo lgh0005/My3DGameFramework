@@ -5,7 +5,7 @@
 #include "Scene/ComponentRegistry.h"
 #include "Scene/GameObjectRegistry.h"
 #include "Scene/SceneRegistry.h"
-#include "Graphics/RenderPass.h"
+#include "Graphics/Rendering/RenderPass.h"
 #include "Components/SkyLight.h"
 #include "Components/Camera.h"
 #include "Components/Transform.h"

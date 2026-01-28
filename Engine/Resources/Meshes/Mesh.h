@@ -1,6 +1,6 @@
 ﻿#pragma once
 #include "Resources/Resource.h"
-#include "Graphics/Geometry.h"
+#include "Graphics/Geometry/Geometry.h"
 
 #pragma region FORWARD_DECLARATION
 CLASS_PTR(Buffer)

@@ -1,6 +1,6 @@
 ﻿#include "EnginePch.h"
 #include "Geometry.h"
-#include "Graphics/Vertex.h"
+#include "Graphics/Layouts/Vertex.h"
 #include "Resources/Meshes/StaticMesh.h"
 
 /*===================//

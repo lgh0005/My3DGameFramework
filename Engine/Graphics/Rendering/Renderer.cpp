@@ -1,7 +1,7 @@
 ﻿#include "EnginePch.h"
 #include "Renderer.h"
 #include "Scene/Scene.h"
-#include "Graphics/RenderPipeline.h"
+#include "Graphics/Rendering/RenderPipeline.h"
 
 DECLARE_DEFAULTS_IMPL(Renderer)
 

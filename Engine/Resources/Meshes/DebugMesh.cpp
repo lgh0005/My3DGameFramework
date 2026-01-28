@@ -1,7 +1,7 @@
 ﻿#include "EnginePch.h"
 #include "DebugMesh.h"
-#include "Graphics/VertexLayout.h"
-#include "Graphics/Buffer.h"
+#include "Graphics/Layouts/VertexLayout.h"
+#include "Graphics/Buffers/Buffer.h"
 
 DECLARE_DEFAULTS_IMPL(DebugMesh)
 

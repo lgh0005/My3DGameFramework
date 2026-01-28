@@ -1,5 +1,5 @@
 ﻿#pragma once
-#include "Graphics/RenderPipeline.h"
+#include "Graphics/Rendering/RenderPipeline.h"
 
 #pragma region FORWARD_DECLARATION
 CLASS_PTR(CullingPass)

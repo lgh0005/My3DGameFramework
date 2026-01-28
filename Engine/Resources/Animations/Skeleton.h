@@ -1,6 +1,6 @@
 ﻿#pragma once
 #include "Misc/AssetFormat.h"
-#include "Graphics/Vertex.h"
+#include "Graphics/Layouts/Vertex.h"
 
 CLASS_PTR(Skeleton)
 class Skeleton

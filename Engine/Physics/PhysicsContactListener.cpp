@@ -31,6 +31,7 @@ void PhysicsContactListener::OnContactAdded(const Body& inBody1, const Body& inB
 
 void PhysicsContactListener::OnContactPersisted(const Body& inBody1, const Body& inBody2, const ContactManifold& inManifold, ContactSettings& ioSettings)
 {
+	// TODO : 정말 필요한 게 아니라면 OnContactPersisted 내부 코드를 비워버리거나, 큐에 넣지 않도록 수정하세요.
 	if (inBody1.IsStatic() || inBody2.IsStatic()) return;
 	ScopedLock lock(m_mutex);
 	m_collisionEventQueue.push_back({ CollisionType::Stay, inBody1.GetUserData(), inBody2.GetUserData() });

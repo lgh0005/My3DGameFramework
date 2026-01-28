@@ -1,6 +1,6 @@
 ﻿#pragma once
-#include "Graphics/Uniform.h"
-#include "Graphics/RenderContext.h"
+#include "Graphics/Layouts/Uniform.h"
+#include "Graphics/Rendering/RenderContext.h"
 #include "Scene/SceneUtils.h"
 
 #pragma region FORWARD_DECLARATION

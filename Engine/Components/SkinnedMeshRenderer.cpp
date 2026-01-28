@@ -6,7 +6,7 @@
 #include "Resources/Meshes/SkinnedMesh.h"
 #include "Resources/Material.h"
 #include "Resources/Program.h"
-#include "Graphics/VertexLayout.h"
+#include "Graphics/Layouts/VertexLayout.h"
 
 DECLARE_DEFAULTS_IMPL(SkinnedMeshRenderer)
 

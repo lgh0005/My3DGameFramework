@@ -2,7 +2,7 @@
 #include "Application.h"
 #include "Core/EngineConfigurator.h"
 #include "Scene/Scene.h"
-#include "Graphics/RenderPipeline.h"
+#include "Graphics/Rendering/RenderPipeline.h"
 
 Application::Application() = default;
 Application::~Application() { Shutdown(); }

@@ -1,7 +1,7 @@
 ﻿#include "EnginePch.h"
 #include "OutlineEffect.h"
 #include "Object/GameObject.h"
-#include "Graphics/RenderContext.h"
+#include "Graphics/Rendering/RenderContext.h"
 #include "Graphics/Framebuffers/OutlineFramebuffer.h"
 #include "Resources/Program.h"
 #include "Resources/Meshes/ScreenMesh.h"

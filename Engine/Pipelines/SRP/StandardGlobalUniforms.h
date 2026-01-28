@@ -1,5 +1,5 @@
 ﻿#pragma once
-#include "Graphics/GlobalUniforms.h"
+#include "Graphics/Rendering/GlobalUniforms.h"
 
 #pragma region FORWARD_DECLARATION
 CLASS_PTR(RenderContext)
