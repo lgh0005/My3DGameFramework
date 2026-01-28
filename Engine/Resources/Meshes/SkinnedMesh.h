@@ -12,9 +12,9 @@ CLASS_PTR(Program)
 CLASS_PTR(SkinnedMesh)
 class SkinnedMesh : public Mesh
 {
+    DEFINE_RESOURCE_TYPE(ResourceType::SkinnedMesh)
+
 public:
-    static const ResourceType s_ResourceType = ResourceType::SkinnedMesh;
-    virtual ResourceType GetResourceType() const override { return ResourceType::SkinnedMesh; }
     static SkinnedMeshUPtr Create
     (
         const std::vector<SkinnedVertex>& vertices,

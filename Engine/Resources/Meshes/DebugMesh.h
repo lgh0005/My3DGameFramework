@@ -12,11 +12,11 @@ CLASS_PTR(Program)
 CLASS_PTR(DebugMesh)
 class DebugMesh : public Mesh
 {
+	DEFINE_RESOURCE_TYPE(ResourceType::DebugMesh)
+
 public:
 	virtual ~DebugMesh();
 	static DebugMeshUPtr Create(uint32 primitiveType);
-	static const ResourceType s_ResourceType = ResourceType::DebugMesh;
-	virtual ResourceType GetResourceType() const override { return ResourceType::DebugMesh; }
 	virtual void Draw() const override;
 	void UpdateGeometry(const std::vector<GizmoVertex>& vertices);
 

@@ -9,7 +9,7 @@
 #include "Resources/Program.h"
 #include "Resources/Textures/Texture.h"
 #include "Graphics/Geometry.h"
-#include "Graphics/SkyLight.h"
+#include "Components/SkyLight.h"
 #include "Components/Camera.h"
 #include "Graphics/Framebuffers/PostProcessFramebuffer.h"
 

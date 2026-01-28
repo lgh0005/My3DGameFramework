@@ -23,10 +23,10 @@ CLASS_PTR(Skeleton)
 CLASS_PTR(Model)
 class Model : public Resource
 {
+	DEFINE_RESOURCE_TYPE(ResourceType::Model)
+
 public:
 	virtual ~Model();
-	static const ResourceType s_ResourceType = ResourceType::Model;
-	virtual ResourceType GetResourceType() const override { return ResourceType::Model; }
 	static ModelUPtr Load(const std::string& filename);
 
 	uint32 GetMeshCount() const { return (uint32)m_meshes.size(); }

@@ -1,4 +1,5 @@
 ﻿#pragma once
+#include "Object/Component.h"
 
 #pragma region FORWARD_DECLARATION
 CLASS_PTR(Texture)
@@ -7,8 +8,10 @@ CLASS_PTR(EnvironmentMap)
 #pragma endregion
 
 CLASS_PTR(SkyLight)
-class SkyLight
+class SkyLight : public Component
 {
+	DEFINE_COMPONENT_TYPE(ComponentType::SkyLight)
+
 public:
 	~SkyLight();
 	static SkyLightUPtr Create(const EnvironmentMapPtr& envMap);

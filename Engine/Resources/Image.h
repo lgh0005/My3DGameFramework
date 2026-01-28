@@ -4,10 +4,10 @@
 CLASS_PTR(Image)
 class Image : public Resource
 {
+	DEFINE_RESOURCE_TYPE(ResourceType::Image)
+
 public:
 	virtual ~Image();
-	static const ResourceType s_ResourceType = ResourceType::Image;
-	virtual ResourceType GetResourceType() const override { return ResourceType::Image; }
 	static ImageUPtr Load(const std::string& filepath, bool flipVertical = true);
 	static ImageUPtr LoadHDR(const std::string& filepath, bool flipVertical = true);
 	static ImageUPtr Create(int32 width, int32 height, int32 channelCount = 4, int32 bytePerChannel = 1);

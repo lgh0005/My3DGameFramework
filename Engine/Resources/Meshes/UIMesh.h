@@ -5,11 +5,11 @@
 CLASS_PTR(UIMesh)
 class UIMesh : public Mesh
 {
+	DEFINE_RESOURCE_TYPE(ResourceType::UIMesh)
+
 public:
 	virtual ~UIMesh();
 	static UIMeshUPtr Create();
-	static const ResourceType s_ResourceType = ResourceType::UIMesh;
-	virtual ResourceType GetResourceType() const override { return ResourceType::UIMesh; }
 	virtual void Draw() const override;
 
 	void SetVertices(const std::vector<UIVertex>& vertices);

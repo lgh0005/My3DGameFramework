@@ -8,7 +8,7 @@
 #include "Resources/Material.h"
 #include "Resources/Textures/CubeTexture.h"
 #include "Resources/Textures/Texture.h"
-#include "Graphics/SkyLight.h"
+#include "Components/SkyLight.h"
 #include "Components/Camera.h"
 #include "Components/MeshRenderer.h"
 #include "Components/StaticMeshRenderer.h"

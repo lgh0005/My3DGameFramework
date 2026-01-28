@@ -11,11 +11,11 @@ CLASS_PTR(Program)
 CLASS_PTR(ScreenMesh)
 class ScreenMesh : public Mesh
 {
+	DEFINE_RESOURCE_TYPE(ResourceType::ScreenMesh)
+
 public:
 	virtual ~ScreenMesh() override;
 	static ScreenMeshUPtr Create();
-	static const ResourceType s_ResourceType = ResourceType::ScreenMesh;
-	virtual ResourceType GetResourceType() const override { return ResourceType::ScreenMesh; }
 	virtual void Draw() const override;
 
 private:

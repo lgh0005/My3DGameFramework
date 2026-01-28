@@ -1,6 +1,6 @@
 ﻿#include "EnginePch.h"
 #include "RenderContext.h"
-#include "Graphics/SkyLight.h"
+#include "Components/SkyLight.h"
 #include "Components/StaticMeshRenderer.h"
 #include "Components/SkinnedMeshRenderer.h"
 #include "Components/Light.h"

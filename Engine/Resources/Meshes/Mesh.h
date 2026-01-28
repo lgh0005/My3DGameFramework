@@ -13,6 +13,7 @@ CLASS_PTR(Mesh)
 class Mesh : public Resource
 {
     using Super = Resource;
+    DEFINE_RESOURCE_TYPE(ResourceType::ScreenMesh)
 
 public:
     virtual ~Mesh();

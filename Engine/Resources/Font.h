@@ -20,11 +20,11 @@ struct GlyphInfo
 CLASS_PTR(Font)
 class Font : public Resource
 {
+	DEFINE_RESOURCE_TYPE(ResourceType::Font)
+
 public:
 	virtual ~Font();
 	static FontUPtr Load(const std::string& path, uint32 fontSize);
-	static const ResourceType s_ResourceType = ResourceType::Font;
-	virtual ResourceType GetResourceType() const override { return ResourceType::Font; }
 
 	const GlyphInfo& GetOrLoadGlyph(uint32 codePoint);
 	TexturePtr GetAtlasTexture() const { return m_atlasTexture; }

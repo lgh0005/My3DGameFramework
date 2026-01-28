@@ -12,9 +12,9 @@ CLASS_PTR(Program)
 CLASS_PTR(StaticMesh)
 class StaticMesh : public Mesh
 {
+    DEFINE_RESOURCE_TYPE(ResourceType::StaticMesh)
+
 public:
-    static const ResourceType s_ResourceType = ResourceType::StaticMesh;
-    virtual ResourceType GetResourceType() const override { return ResourceType::StaticMesh; }
     static StaticMeshUPtr Create
     (
         const std::vector<StaticVertex>& vertices,

@@ -3,7 +3,7 @@
 enum class ResourceType
 {
 	Animation,
-	AudilClip,
+	AudioClip,
 	CubeTexture,
 	Image,
 	Material,
@@ -30,6 +30,7 @@ enum class ComponentType
 	Camera,
 
 	// Rendering
+	SkyLight,
 	MeshRenderer,
 	SkinnedMeshRenderer,
 	StaticMeshRenderer,

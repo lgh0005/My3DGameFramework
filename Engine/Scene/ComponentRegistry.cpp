@@ -3,7 +3,7 @@
 
 #include "Object/GameObject.h"
 #include "Graphics/RenderPass.h"
-#include "Graphics/SkyLight.h"
+#include "Components/SkyLight.h"
 #include "Components/Light.h"
 #include "Components/PointLight.h"
 #include "Components/DirectionalLight.h"

@@ -10,11 +10,10 @@ CLASS_PTR(Texture)
 class Texture : public TextureBase
 {
 	friend class TextureUtils;
+	DEFINE_RESOURCE_TYPE(ResourceType::Texture)
 
 public:
 	virtual ~Texture();
-	static const ResourceType s_ResourceType = ResourceType::Texture;
-	virtual ResourceType GetResourceType() const override { return ResourceType::Texture; }
 	static TextureUPtr Create(int32 width, int32 height, uint32 internalFormat, uint32 format, uint32 type);
 	static TextureUPtr CreateMultisample(int32 width, int32 height, int32 samples, uint32 internalFormat);
 

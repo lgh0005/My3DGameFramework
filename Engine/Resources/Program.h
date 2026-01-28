@@ -8,9 +8,9 @@ CLASS_PTR(Shader)
 CLASS_PTR(Program)
 class Program : public Resource
 {
+    DEFINE_RESOURCE_TYPE(ResourceType::Shader)
+
 public:
-    static const ResourceType s_ResourceType = ResourceType::Shader;
-    virtual ResourceType GetResourceType() const override { return ResourceType::Shader; }
     static ProgramUPtr Create(const std::vector<ShaderPtr>& shaders);
     static ProgramUPtr Create(const std::string& vertShaderFilename,
                               const std::string& fragShaderFilename);

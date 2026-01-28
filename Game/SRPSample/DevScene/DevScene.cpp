@@ -16,7 +16,7 @@
 #include "Graphics/Buffer.h"
 #include "Resources/Meshes/InstancedMesh.h"
 #include "Graphics/Geometry.h"
-#include "Graphics/SkyLight.h"
+#include "Components/SkyLight.h"
 #include "Resources/AudioClip.h"
 #include "Resources/Animations/AnimController.h"
 #include "Resources/EnvironmentMap.h"

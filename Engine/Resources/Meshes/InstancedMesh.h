@@ -10,6 +10,8 @@ CLASS_PTR(StaticMesh)
 CLASS_PTR(InstancedMesh)
 class InstancedMesh : public Mesh
 {
+    DEFINE_RESOURCE_TYPE(ResourceType::InstancedMesh)
+
 public:
     // 인스턴스 속성에 따른 람다 함수
     using SetupFunc =
@@ -17,8 +19,6 @@ public:
             uint32 instanceAttribStartIndex)>;
 
     virtual ~InstancedMesh();
-    static const ResourceType s_ResourceType = ResourceType::InstancedMesh;
-    virtual ResourceType GetResourceType() const override { return ResourceType::InstancedMesh; }
     static InstancedMeshUPtr Create
     (
         StaticMeshPtr baseMesh,           

@@ -11,11 +11,10 @@ CLASS_PTR(CubeTexture)
 class CubeTexture : public TextureBase
 {
     friend class TextureUtils;
+    DEFINE_RESOURCE_TYPE(ResourceType::CubeTexture)
 
 public:
     virtual ~CubeTexture();
-    static const ResourceType s_ResourceType = ResourceType::CubeTexture;
-    virtual ResourceType GetResourceType() const override { return ResourceType::CubeTexture; }
     static CubeTextureUPtr Create(int32 width, int32 height, uint32 format, uint32 type = GL_UNSIGNED_BYTE);
     void GenerateMipmap() const;
 

@@ -13,7 +13,7 @@
 #include "Resources/Textures/Texture.h"
 #include "Resources/Textures/CubeTexture.h"
 #include "Graphics/ShadowMap.h"
-#include "Graphics/SkyLight.h"
+#include "Components/SkyLight.h"
 #include "Components/Camera.h"
 #include "Components/SpotLight.h"
 #include "Components/Transform.h"

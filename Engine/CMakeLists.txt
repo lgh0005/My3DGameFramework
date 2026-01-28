@@ -91,7 +91,6 @@ add_library(Engine STATIC
    "Graphics/IBLUtils.h"            "Graphics/IBLUtils.cpp"
    "Graphics/Frustum.h"             "Graphics/Frustum.cpp"
    "Graphics/Geometry.h"            "Graphics/Geometry.cpp"
-   "Graphics/SkyLight.h"            "Graphics/SkyLight.cpp"
    "Graphics/ShadowMap.h"           "Graphics/ShadowMap.cpp"
    "Graphics/Ray.h"                 "Graphics/Ray.cpp"
    "Graphics/RaycastHit.h"          "Graphics/RaycastHit.cpp"
@@ -108,7 +107,6 @@ add_library(Engine STATIC
    "Pipelines/PostProcessing/World/OutlineEffect.h"       "Pipelines/PostProcessing/World/OutlineEffect.cpp"
    "Pipelines/PostProcessing/World/WorldSpaceEffects.h" "Pipelines/PostProcessing/World/WorldSpaceEffects.cpp"
 
-   #"Pipelines/PostProcessing/Bloom/BloomSpaceEffects.h" "Pipelines/PostProcessing/Bloom/BloomSpaceEffects.cpp"
    "Pipelines/PostProcessing/Bloom/DOFEffect.h"         "Pipelines/PostProcessing/Bloom/DOFEffect.cpp"
    "Pipelines/PostProcessing/Bloom/LensFlareEffect.h"   "Pipelines/PostProcessing/Bloom/LensFlareEffect.cpp"
    "Pipelines/PostProcessing/Bloom/GaussianBloomEffect.h"  "Pipelines/PostProcessing/Bloom/GaussianBloomEffect.cpp"
@@ -167,6 +165,7 @@ add_library(Engine STATIC
    "Components/MeshRenderer.h"      "Components/MeshRenderer.cpp"
    "Components/Collider.h"          "Components/Collider.cpp"
 
+   "Components/SkyLight.h"          "Components/SkyLight.cpp"
    "Components/Camera.h"            "Components/Camera.cpp"
    "Components/Transform.h"         "Components/Transform.cpp"
    "Components/DirectionalLight.h"  "Components/DirectionalLight.cpp"

@@ -104,3 +104,12 @@ public:                                                                         
 	static constexpr ComponentType GetStaticComponentType() { return TypeEnum; }          \
     static const ComponentType s_ComponentType = TypeEnum;                                \
     virtual ComponentType GetComponentType() const override { return GetStaticComponentType(); }
+
+/*==================================================//
+//    compile-time resource type definition macro   //
+//==================================================*/
+#define DEFINE_RESOURCE_TYPE(TypeEnum)                                                    \
+public:                                                                                   \
+    static constexpr ResourceType GetStaticResourceType() { return TypeEnum; }            \
+    static const ResourceType s_ResourceType = TypeEnum;                                  \
+    virtual ResourceType GetResourceType() const override { return GetStaticResourceType(); }
