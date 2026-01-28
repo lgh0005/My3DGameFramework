@@ -2,6 +2,8 @@
 #include "ScreenMesh.h"
 #include "Resources/Material.h"
 #include "Graphics/Buffers/Buffer.h"
+#include "Graphics/Buffers/VertexBuffer.h"
+#include "Graphics/Buffers/IndexBuffer.h"
 #include "Graphics/Layouts/Vertex.h"
 #include "Graphics/Layouts/VertexLayout.h"
 #include "Resources/Program.h"
@@ -30,25 +32,13 @@ void ScreenMesh::Init()
 	};
 
 	// 인덱스 설정
-	std::vector<uint32> indices = 
-	{
-		0, 1, 2, // 첫 번째 삼각형
-		2, 1, 3  // 두 번째 삼각형
-	};
+	std::vector<uint32> indices = { 0, 1, 2, 2, 1, 3 };
 	m_indexCount = indices.size();
 	
 	// 버퍼 생성
 	m_vertexLayout = VertexLayout::Create();
-	m_vertexBuffer = Buffer::CreateWithData
-	(
-		GL_ARRAY_BUFFER, GL_STATIC_DRAW,
-		vertices.data(), sizeof(ScreenVertex), vertices.size()
-	);
-	m_indexBuffer = Buffer::CreateWithData
-	(
-		GL_ELEMENT_ARRAY_BUFFER, GL_STATIC_DRAW,
-		indices.data(), sizeof(uint32), indices.size()
-	);
+	m_vertexBuffer = VertexBuffer::Create(vertices.data(), sizeof(ScreenVertex), vertices.size());
+	m_indexBuffer = IndexBuffer::Create(indices);
 
 	// 정점 속성 설정
 	m_vertexLayout->SetAttrib(0, 3, GL_FLOAT, false, sizeof(ScreenVertex), offsetof(ScreenVertex, position));

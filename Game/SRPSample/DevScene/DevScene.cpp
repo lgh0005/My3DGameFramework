@@ -14,6 +14,7 @@
 #include "Resources/Animations/Animation.h"
 #include "Resources/Model.h"
 #include "Graphics/Buffers/Buffer.h"
+#include "Graphics/Buffers/VertexBuffer.h"
 #include "Resources/Meshes/InstancedMesh.h"
 #include "Components/SkyLight.h"
 #include "Resources/AudioClip.h"
@@ -561,12 +562,12 @@ void DevScene::PlantTenThousandGrass(InstancedRenderPass* pass)
 		instanceData[i] = glm::vec3(x, y_rot, z);
 	}
 
-	BufferPtr instanceBuffer = Buffer::CreateWithData
+	VertexBufferPtr instanceBuffer = VertexBuffer::Create
 	(
-		GL_ARRAY_BUFFER, GL_STATIC_DRAW,
-		instanceData.data(), sizeof(glm::vec3), instanceData.size()
+		instanceData.data(), 
+		sizeof(glm::vec3), 
+		instanceData.size()
 	);
-
 	auto instancedGrass = InstancedMesh::Create
 	(
 		bladeMesh,

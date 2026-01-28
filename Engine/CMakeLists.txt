@@ -85,12 +85,12 @@ add_library(Engine STATIC
    "Graphics/Shader.h"              "Graphics/Shader.cpp"
    "Graphics/IBLUtils.h"            "Graphics/IBLUtils.cpp"
    "Graphics/ShadowMap.h"           "Graphics/ShadowMap.cpp"
+   "Graphics/Velocitybuffer.h"      "Graphics/Velocitybuffer.cpp"
 
    "Graphics/Raycasting/Ray.h"                 "Graphics/Raycasting/Ray.cpp"
    "Graphics/Raycasting/RaycastHit.h"          "Graphics/Raycasting/RaycastHit.cpp"
 
     "Graphics/Geometry/Frustum.h"             "Graphics/Geometry/Frustum.cpp"
-   # "Graphics/Geometry/Geometry.h"            "Graphics/Geometry/Geometry.cpp"
    "Graphics/Geometry/CullingPlane.h"           "Graphics/Geometry/CullingPlane.cpp"
    "Graphics/Geometry/RenderBounds.h"           "Graphics/Geometry/RenderBounds.cpp"
    "Graphics/Geometry/GeometryGenerator.h"   "Graphics/Geometry/GeometryGenerator.cpp"
@@ -101,9 +101,9 @@ add_library(Engine STATIC
    "Graphics/Rendering/RenderContext.h"           "Graphics/Rendering/RenderContext.cpp"
    "Graphics/Rendering/GlobalUniforms.h"          "Graphics/Rendering/GlobalUniforms.cpp"
 
-   "Graphics/Buffers/Buffer.h"              "Graphics/Buffers/Buffer.cpp" 
-   "Graphics/Buffers/UniformBuffer.h"       "Graphics/Buffers/UniformBuffer.cpp"
-   "Graphics/Buffers/Velocitybuffer.h"      "Graphics/Buffers/Velocitybuffer.cpp"
+   "Graphics/Buffers/Buffer.h"               "Graphics/Buffers/Buffer.cpp" 
+   "Graphics/Buffers/VertexBuffer.h"         "Graphics/Buffers/VertexBuffer.cpp" 
+   "Graphics/Buffers/UniformBuffer.h"        "Graphics/Buffers/UniformBuffer.cpp"
 
    "Graphics/Layouts/VertexLayout.h"        "Graphics/Layouts/VertexLayout.cpp"
    "Graphics/Layouts/Vertex.h"              "Graphics/Layouts/Vertex.cpp"
@@ -214,7 +214,7 @@ add_library(Engine STATIC
    "Managers/AudioManager.h"        "Managers/AudioManager.cpp"
    "Managers/PhysicsManager.h"      "Managers/PhysicsManager.cpp"
    "Managers/UIManager.h"           "Managers/UIManager.cpp"
-)
+ "Graphics/Buffers/VertexBuffer.h" "Graphics/Buffers/VertexBuffer.cpp" "Graphics/Buffers/IndexBuffer.h" "Graphics/Buffers/IndexBuffer.cpp")
 
 # 2. [PCH 설정] EnginePCH.h를 PCH로 사용합니다.
 target_precompile_headers(Engine  PUBLIC EnginePCH.h)

@@ -2,6 +2,8 @@
 #include "SkinnedMesh.h"
 #include "Resources/Material.h"
 #include "Graphics/Buffers/Buffer.h"
+#include "Graphics/Buffers/VertexBuffer.h"
+#include "Graphics/Buffers/IndexBuffer.h"
 #include "Graphics/Layouts/VertexLayout.h"
 #include "Resources/Program.h"
 
@@ -22,16 +24,9 @@ void SkinnedMesh::Init(const std::vector<SkinnedVertex>& vertices,
 {
     m_primitiveType = primitiveType;
     m_vertexLayout = VertexLayout::Create();
-    m_vertexBuffer = Buffer::CreateWithData
-    (
-        GL_ARRAY_BUFFER, GL_STATIC_DRAW,
-        vertices.data(), sizeof(SkinnedVertex), vertices.size()
-    );
-    m_indexBuffer = Buffer::CreateWithData
-    (
-        GL_ELEMENT_ARRAY_BUFFER, GL_STATIC_DRAW,
-        indices.data(), sizeof(uint32), indices.size()
-    );
+    m_vertexBuffer = VertexBuffer::Create(vertices.data(), sizeof(SkinnedVertex), vertices.size());
+    m_indexBuffer = IndexBuffer::Create(indices);
+
     m_vertexLayout->SetAttrib(0, 3, GL_FLOAT, false, sizeof(SkinnedVertex), 0);
     m_vertexLayout->SetAttrib(1, 3, GL_FLOAT, false, sizeof(SkinnedVertex), offsetof(SkinnedVertex, normal));
     m_vertexLayout->SetAttrib(2, 2, GL_FLOAT, false, sizeof(SkinnedVertex), offsetof(SkinnedVertex, texCoord));

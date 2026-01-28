@@ -7,14 +7,15 @@ public:
     static BufferUPtr CreateWithData(uint32 bufferType, 
         uint32 usage, const void* data, usize stride, usize count);
     
-    ~Buffer();
+public:
+    virtual ~Buffer();
     uint32 Get() const { return m_buffer; }
     usize GetStride() const { return m_stride; }
     usize GetCount() const { return m_count; }
     void SetData(const void* data, usize size);
     void Bind() const;
 
-private:
+protected:
     Buffer();
     bool Init(uint32 bufferType, uint32 usage, 
         const void* data, usize stride, usize count);

@@ -2,6 +2,8 @@
 #include "StaticMesh.h"
 #include "Resources/Material.h"
 #include "Graphics/Buffers/Buffer.h"
+#include "Graphics/Buffers/VertexBuffer.h"
+#include "Graphics/Buffers/IndexBuffer.h"
 #include "Graphics/Layouts/VertexLayout.h"
 #include "Resources/Program.h"
 
@@ -25,16 +27,9 @@ void StaticMesh::Init(const std::vector<StaticVertex>& vertices,
         ComputeTangents(const_cast<std::vector<StaticVertex>&>(vertices), indices);
 
     m_vertexLayout = VertexLayout::Create();
-    m_vertexBuffer = Buffer::CreateWithData
-    (
-        GL_ARRAY_BUFFER, GL_STATIC_DRAW,
-        vertices.data(), sizeof(StaticVertex), vertices.size()
-    );
-    m_indexBuffer = Buffer::CreateWithData
-    (
-        GL_ELEMENT_ARRAY_BUFFER, GL_STATIC_DRAW,
-        indices.data(), sizeof(uint32), indices.size()
-    );
+    m_vertexBuffer = VertexBuffer::Create(vertices.data(), sizeof(StaticVertex), vertices.size());
+    m_indexBuffer = IndexBuffer::Create(indices);
+
     m_vertexLayout->SetAttrib(0, 3, GL_FLOAT, false, sizeof(StaticVertex), 0);
     m_vertexLayout->SetAttrib(1, 3, GL_FLOAT, false, sizeof(StaticVertex), offsetof(StaticVertex, normal));
     m_vertexLayout->SetAttrib(2, 2, GL_FLOAT, false, sizeof(StaticVertex), offsetof(StaticVertex, texCoord));

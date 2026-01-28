@@ -2,7 +2,7 @@
 #include "Camera.h"
 #include "Components/Transform.h"
 #include "Graphics/Raycasting/Ray.h"
-#include "Graphics/Buffers/Velocitybuffer.h"
+#include "Graphics/Velocitybuffer.h"
 
 Camera::Camera()
 {
