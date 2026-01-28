@@ -8,6 +8,7 @@
 #include "Resources/Textures/Texture.h"
 #include "Graphics/Framebuffers/CubeFramebuffer.h"
 #include "Graphics/Framebuffers/BRDFLookUpFramebuffer.h"
+#include "Graphics/Geometry/GeometryGenerator.h"
 
 CubeTexturePtr IBLUtils::CreateCubemapFromHDR(Texture* hdrTexture, int32 resolution)
 {

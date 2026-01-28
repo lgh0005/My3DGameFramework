@@ -1,5 +1,6 @@
 ﻿#pragma once
-#include "Graphics/Geometry/Geometry.h"
+#include "Graphics/Geometry/RenderBounds.h"
+#include "Graphics/Geometry/CullingPlane.h"
 
 CLASS_PTR(Frustum)
 class Frustum

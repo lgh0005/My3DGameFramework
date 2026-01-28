@@ -1,7 +1,7 @@
 ﻿#include "EnginePch.h"
 #include "ResourceLoader.h"
 
-#include "Graphics/Geometry/Geometry.h"
+#include "Graphics/Geometry/GeometryGenerator.h"
 #include "Resources/Meshes/ScreenMesh.h"
 #include "Resources/Program.h"
 #include "Resources/Textures/Texture.h"

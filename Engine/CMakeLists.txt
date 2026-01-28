@@ -90,7 +90,10 @@ add_library(Engine STATIC
    "Graphics/Raycasting/RaycastHit.h"          "Graphics/Raycasting/RaycastHit.cpp"
 
     "Graphics/Geometry/Frustum.h"             "Graphics/Geometry/Frustum.cpp"
-   "Graphics/Geometry/Geometry.h"            "Graphics/Geometry/Geometry.cpp"
+   # "Graphics/Geometry/Geometry.h"            "Graphics/Geometry/Geometry.cpp"
+   "Graphics/Geometry/CullingPlane.h"           "Graphics/Geometry/CullingPlane.cpp"
+   "Graphics/Geometry/RenderBounds.h"           "Graphics/Geometry/RenderBounds.cpp"
+   "Graphics/Geometry/GeometryGenerator.h"   "Graphics/Geometry/GeometryGenerator.cpp"
 
    "Graphics/Rendering/Renderer.h"                "Graphics/Rendering/Renderer.cpp"
    "Graphics/Rendering/RenderPass.h"              "Graphics/Rendering/RenderPass.cpp"

@@ -614,7 +614,7 @@ void Model::ReadBinaryMeshes(std::ifstream& inFile, uint32 meshCount)
 void Model::CreateBinarySkinnedMesh(const AssetFmt::RawMesh& rawMesh)
 {
     std::vector<SkinnedVertex> engineVerts(rawMesh.skinnedVertices.size());
-    for (size_t v = 0; v < rawMesh.skinnedVertices.size(); ++v)
+    for (usize v = 0; v < rawMesh.skinnedVertices.size(); ++v)
     {
         const auto& src = rawMesh.skinnedVertices[v];
         auto& dst = engineVerts[v];
@@ -648,7 +648,7 @@ void Model::CreateBinaryStaticMesh(const AssetFmt::RawMesh& rawMesh)
 {
     // 1. 정점 변환 (Raw -> Engine)
     std::vector<StaticVertex> engineVerts(rawMesh.staticVertices.size());
-    for (size_t v = 0; v < rawMesh.staticVertices.size(); ++v)
+    for (usize v = 0; v < rawMesh.staticVertices.size(); ++v)
     {
         const auto& src = rawMesh.staticVertices[v];
         auto& dst = engineVerts[v];

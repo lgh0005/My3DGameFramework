@@ -110,5 +110,5 @@ protected:
 	CubeTexture* m_skyboxTexture{ nullptr };
 
 	Framebuffer* m_targetFramebuffer{ nullptr };
-	std::array<Texture*, (size_t)RenderSlot::MAX> m_textures;
+	std::array<Texture*, (usize)RenderSlot::MAX> m_textures;
 };

@@ -8,7 +8,6 @@
 #include "Resources/Meshes/StaticMesh.h"
 #include "Resources/Program.h"
 #include "Resources/Textures/Texture.h"
-#include "Graphics/Geometry/Geometry.h"
 #include "Components/SkyLight.h"
 #include "Components/Camera.h"
 #include "Graphics/Framebuffers/PostProcessFramebuffer.h"
