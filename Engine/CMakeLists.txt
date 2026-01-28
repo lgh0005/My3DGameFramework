@@ -140,13 +140,16 @@ add_library(Engine STATIC
 
    # Resources
    "Resources/Resource.h"           "Resources/Resource.cpp"
-   "Resources/Programs/Program.h"            "Resources/Programs/Program.cpp"
    "Resources/AudioClip.h"          "Resources/AudioClip.cpp"
    "Resources/Image.h"              "Resources/Image.cpp"
    "Resources/Model.h"              "Resources/Model.cpp"
    "Resources/Material.h"           "Resources/Material.cpp"
    "Resources/Font.h"               "Resources/Font.cpp"
    "Resources/EnvironmentMap.h"     "Resources/EnvironmentMap.cpp"
+
+   "Resources/Programs/Program.h"            "Resources/Programs/Program.cpp"
+   "Resources/Programs/GraphicsProgram.h" "Resources/Programs/GraphicsProgram.cpp" 
+   "Resources/Programs/ComputeProgram.h" "Resources/Programs/ComputeProgram.cpp"
 
    "Resources/Animations/Animation.h"          "Resources/Animations/Animation.cpp"
    "Resources/Animations/AnimChannel.h"        "Resources/Animations/AnimChannel.cpp"

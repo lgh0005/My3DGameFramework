@@ -30,16 +30,11 @@ public:
     void SetUniform(const std::string& name, const glm::vec3& value) const;
     void SetUniform(const std::string& name, const glm::vec4& value) const;
     void SetUniform(const std::string& name, const glm::mat4& value) const;
-
-/*==============================================//
-//   default arithmetic value uniform setters   //
-//==============================================*/
-public:
-    void SetUniform(const std::string& name, const std::vector<int>& value) const;
+    void SetUniform(const std::string& name, const std::vector<int32>& value) const;
     void SetUniform(const std::string& name, const std::vector<glm::mat4>& value) const;
     void SetUniform(const std::string& name, const std::vector<glm::vec3>& value) const;
 
-private:
+protected:
     Program();
     bool Link(const std::vector<ShaderPtr>& shaders);
     usize m_program{ 0 };

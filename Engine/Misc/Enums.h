@@ -16,7 +16,11 @@ enum class ResourceType
 	InstancedMesh,
 	UIMesh,
 	DebugMesh,
+	
 	Shader,
+	GraphicsProgram,
+	ComputeProgram,
+
 	EnvironmentMap
 };
 

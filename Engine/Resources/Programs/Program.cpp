@@ -92,10 +92,7 @@ void Program::SetUniform(const std::string& name, const glm::mat4& value) const
     glUniformMatrix4fv(loc, 1, GL_FALSE, glm::value_ptr(value));
 }
 
-/*==============================================//
-//   default arithmetic array uniform setters   //
-//==============================================*/
-void Program::SetUniform(const std::string& name, const std::vector<int>& value) const
+void Program::SetUniform(const std::string& name, const std::vector<int32>& value) const
 {
     auto loc = glGetUniformLocation(m_program, name.c_str());
     glUniform1iv(loc, (GLsizei)value.size(), value.data());
