@@ -1,7 +1,7 @@
 ﻿#include "EnginePch.h"
 #include "WorldSpaceEffects.h"
 #include "Graphics/Rendering/RenderContext.h"
-#include "Resources/Program.h"
+#include "Resources/Programs/Program.h"
 #include "Resources/Textures/Texture.h"
 #include "Resources/Meshes/ScreenMesh.h"
 #include "Graphics/Framebuffers/PostProcessFrameBuffer.h"

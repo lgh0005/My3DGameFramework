@@ -2,7 +2,7 @@
 #include "EnvironmentRenderPass.h"
 
 #include "Scene/Scene.h"
-#include "Resources/Program.h"
+#include "Resources/Programs/Program.h"
 #include "Resources/Meshes/Mesh.h"
 #include "Resources/Material.h"
 #include "Resources/Textures/CubeTexture.h"

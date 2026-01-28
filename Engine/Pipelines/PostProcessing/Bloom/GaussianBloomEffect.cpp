@@ -1,6 +1,6 @@
 ﻿#include "EnginePch.h"
 #include "GaussianBloomEffect.h"
-#include "Resources/Program.h"
+#include "Resources/Programs/Program.h"
 #include "Graphics/Framebuffers/PostProcessFrameBuffer.h"
 #include "Resources/Textures/Texture.h"
 #include "Resources/Meshes/ScreenMesh.h"

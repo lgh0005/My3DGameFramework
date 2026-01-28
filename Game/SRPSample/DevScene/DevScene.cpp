@@ -3,7 +3,7 @@
 
 #include "Object/GameObject.h"
 #include "Graphics/Rendering/Renderer.h"
-#include "Resources/Program.h"
+#include "Resources/Programs/Program.h"
 #include "Resources/Meshes/Mesh.h"
 #include "Resources/Meshes/StaticMesh.h"
 #include "Resources/Meshes/SkinnedMesh.h"

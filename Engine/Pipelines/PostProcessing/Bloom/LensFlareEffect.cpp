@@ -1,6 +1,6 @@
 ﻿#include "EnginePch.h"
 #include "LensFlareEffect.h"
-#include "Resources/Program.h"
+#include "Resources/Programs/Program.h"
 #include "Resources/Textures/Texture.h"
 #include "Resources/Meshes/ScreenMesh.h"
 #include "Graphics/Framebuffers/Framebuffer.h"

@@ -6,7 +6,7 @@
 #include "Graphics/Buffers/IndexBuffer.h"
 #include "Graphics/Layouts/Vertex.h"
 #include "Graphics/Layouts/VertexLayout.h"
-#include "Resources/Program.h"
+#include "Resources/Programs/Program.h"
 
 DECLARE_DEFAULTS_IMPL(ScreenMesh)
 

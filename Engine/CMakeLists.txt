@@ -103,7 +103,9 @@ add_library(Engine STATIC
 
    "Graphics/Buffers/Buffer.h"               "Graphics/Buffers/Buffer.cpp" 
    "Graphics/Buffers/VertexBuffer.h"         "Graphics/Buffers/VertexBuffer.cpp" 
-   "Graphics/Buffers/UniformBuffer.h"        "Graphics/Buffers/UniformBuffer.cpp"
+   "Graphics/Buffers/IndexBuffer.h"         "Graphics/Buffers/IndexBuffer.cpp" 
+   "Graphics/Buffers/UniformBuffer.h"       "Graphics/Buffers/UniformBuffer.cpp"
+   "Graphics/Buffers/ShaderStorageBuffer.h" "Graphics/Buffers/ShaderStorageBuffer.cpp"
 
    "Graphics/Layouts/VertexLayout.h"        "Graphics/Layouts/VertexLayout.cpp"
    "Graphics/Layouts/Vertex.h"              "Graphics/Layouts/Vertex.cpp"
@@ -138,7 +140,7 @@ add_library(Engine STATIC
 
    # Resources
    "Resources/Resource.h"           "Resources/Resource.cpp"
-   "Resources/Program.h"            "Resources/Program.cpp"
+   "Resources/Programs/Program.h"            "Resources/Programs/Program.cpp"
    "Resources/AudioClip.h"          "Resources/AudioClip.cpp"
    "Resources/Image.h"              "Resources/Image.cpp"
    "Resources/Model.h"              "Resources/Model.cpp"
@@ -214,7 +216,7 @@ add_library(Engine STATIC
    "Managers/AudioManager.h"        "Managers/AudioManager.cpp"
    "Managers/PhysicsManager.h"      "Managers/PhysicsManager.cpp"
    "Managers/UIManager.h"           "Managers/UIManager.cpp"
- "Graphics/Buffers/VertexBuffer.h" "Graphics/Buffers/VertexBuffer.cpp" "Graphics/Buffers/IndexBuffer.h" "Graphics/Buffers/IndexBuffer.cpp")
+)
 
 # 2. [PCH 설정] EnginePCH.h를 PCH로 사용합니다.
 target_precompile_headers(Engine  PUBLIC EnginePCH.h)

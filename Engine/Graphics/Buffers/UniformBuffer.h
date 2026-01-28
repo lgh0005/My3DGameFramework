@@ -1,23 +1,27 @@
 ﻿#pragma once
+#include "Graphics/Buffers/Buffer.h"
 
-CLASS_PTR(Uniformbuffer)
-class Uniformbuffer
+CLASS_PTR(UniformBuffer)
+class UniformBuffer : public Buffer
 {
 public:
-	static UniformbufferUPtr Create(uint32 size, uint32 bindingPoint);
-	~Uniformbuffer();
+	virtual ~UniformBuffer() override;
 
-	uint32 Get() const { return m_buffer; }
-	void Bind() const;
+	// 1. 데이터 없이 공간만 할당 (매 프레임 갱신용 - 예: Camera, Light)
+	static UniformBufferUPtr Create
+	(
+		usize byteSize, 
+		uint32 usage = GL_DYNAMIC_DRAW
+	);
 
-	// 데이터 전체 혹은 일부를 업데이트하는 핵심 함수
-	void SetData(const void* data, uint32 size, uint32 offset = 0);
+	// 2. 초기 데이터와 함께 생성 (거의 안 변하는 데이터용 - 예: Material Constants)
+	static UniformBufferUPtr CreateWithData
+	(
+		const void* data, 
+		usize byteSize, 
+		uint32 usage = GL_STATIC_DRAW
+	);
 
 private:
-	Uniformbuffer();
-	void Init(uint32 size, uint32 bindingPoint);
-
-	uint32 m_buffer			{ 0 };
-	uint32 m_bindingPoint	{ 0 };
-	uint32 m_size			{ 0 }; 
+	UniformBuffer();
 };

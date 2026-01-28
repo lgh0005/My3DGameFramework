@@ -4,7 +4,7 @@
 #include "Scene/Scene.h"
 #include "Object/GameObject.h"
 #include "Graphics/Rendering/RenderContext.h"
-#include "Resources/Program.h"
+#include "Resources/Programs/Program.h"
 #include "Resources/Meshes/Mesh.h"
 #include "Resources/Material.h"
 #include "Resources/Textures/Texture.h"

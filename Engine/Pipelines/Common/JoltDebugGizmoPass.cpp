@@ -1,7 +1,7 @@
 ﻿#include "EnginePch.h"
 #include "Components/Camera.h"
 #include "JoltDebugGizmoPass.h"
-#include "Resources/Program.h"
+#include "Resources/Programs/Program.h"
 #include "Resources/Meshes/DebugMesh.h"
 #include "Physics/JoltGizmo.h"
 

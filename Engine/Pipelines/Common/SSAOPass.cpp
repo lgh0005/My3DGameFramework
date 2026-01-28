@@ -7,7 +7,7 @@
 #include "Resources/Textures/Texture.h"
 #include "Resources/Meshes/ScreenMesh.h"
 #include "Resources/Meshes/StaticMesh.h"
-#include "Resources/Program.h"
+#include "Resources/Programs/Program.h"
 #include "Graphics/Framebuffers/SSAOFramebuffer.h"
 
 DECLARE_DEFAULTS_IMPL(SSAOPass)

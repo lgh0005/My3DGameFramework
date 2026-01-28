@@ -3,7 +3,7 @@
 
 #include "Graphics/Geometry/GeometryGenerator.h"
 #include "Resources/Meshes/ScreenMesh.h"
-#include "Resources/Program.h"
+#include "Resources/Programs/Program.h"
 #include "Resources/Textures/Texture.h"
 #include "Resources/Model.h"
 #include "Resources/Animations/Animation.h"

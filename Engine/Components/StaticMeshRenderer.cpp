@@ -2,7 +2,7 @@
 #include "StaticMeshRenderer.h"
 #include "Resources/Meshes/StaticMesh.h"
 #include "Resources/Material.h"
-#include "Resources/Program.h"
+#include "Resources/Programs/Program.h"
 #include "Graphics/Layouts/VertexLayout.h"
 #include "Components/Transform.h"
 

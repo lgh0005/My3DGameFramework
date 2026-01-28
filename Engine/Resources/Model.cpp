@@ -16,7 +16,7 @@
 #include "Resources/Textures/Texture.h"
 #include "Resources/Animations/Skeleton.h"
 #include "Graphics/Layouts/VertexLayout.h"
-#include "Resources/Program.h"
+#include "Resources/Programs/Program.h"
 #include "Misc/AssetFormat.h"
 #include "Misc/AssetUtils.h"
 #include "Misc/Utils.h"

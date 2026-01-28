@@ -2,7 +2,7 @@
 #include "InstancedMeshRenderer.h"
 #include "Resources/Meshes/InstancedMesh.h"
 #include "Resources/Material.h"
-#include "Resources/Program.h"
+#include "Resources/Programs/Program.h"
 #include "Graphics/Layouts/VertexLayout.h"
 
 DECLARE_DEFAULTS_IMPL(InstancedMeshRenderer)

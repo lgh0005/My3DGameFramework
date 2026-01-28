@@ -21,8 +21,12 @@ StandardGlobalUniformsUPtr StandardGlobalUniforms::Create()
 
 bool StandardGlobalUniforms::Init()
 {
-	m_cameraUBO = Uniformbuffer::Create(sizeof(CameraData), UBO_POINT_CAMERA);
-	m_lightUBO = Uniformbuffer::Create(sizeof(LightData), UBO_POINT_LIGHT);
+	m_cameraUBO = UniformBuffer::Create(sizeof(CameraData));
+	if (m_cameraUBO) m_cameraUBO->BindBase(UBO_POINT_CAMERA);
+
+	m_lightUBO = UniformBuffer::Create(sizeof(LightData));
+	if (m_lightUBO) m_lightUBO->BindBase(UBO_POINT_LIGHT);
+
 	return (m_cameraUBO && m_lightUBO);
 }
 

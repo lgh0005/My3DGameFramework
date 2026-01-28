@@ -12,8 +12,10 @@ public:
     uint32 Get() const { return m_buffer; }
     usize GetStride() const { return m_stride; }
     usize GetCount() const { return m_count; }
+
     void SetData(const void* data, usize size);
     void Bind() const;
+    void BindBase(uint32 index) const;
 
 protected:
     Buffer();

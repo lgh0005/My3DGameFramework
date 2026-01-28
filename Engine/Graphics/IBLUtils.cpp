@@ -1,6 +1,6 @@
 ﻿#include "EnginePch.h"
 #include "IBLUtils.h"
-#include "Resources/Program.h"
+#include "Resources/Programs/Program.h"
 #include "Resources/Meshes/Mesh.h"
 #include "Resources/Meshes/ScreenMesh.h"
 #include "Resources/Meshes/StaticMesh.h"

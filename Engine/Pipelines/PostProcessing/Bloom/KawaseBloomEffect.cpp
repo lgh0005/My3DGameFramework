@@ -2,7 +2,7 @@
 #include "KawaseBloomEffect.h"
 #include "Graphics/Rendering/RenderContext.h"
 #include "Graphics/Framebuffers/EffectFramebuffer.h"
-#include "Resources/Program.h"
+#include "Resources/Programs/Program.h"
 #include "Resources/Meshes/ScreenMesh.h"
 #include "Resources/Textures/Texture.h"
 

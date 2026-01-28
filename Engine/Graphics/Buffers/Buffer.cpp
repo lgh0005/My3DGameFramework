@@ -26,6 +26,11 @@ void Buffer::Bind() const
     glBindBuffer(m_bufferType, m_buffer);
 }
 
+void Buffer::BindBase(uint32 index) const
+{
+    glBindBufferBase(m_bufferType, index, m_buffer);
+}
+
 bool Buffer::Init(uint32 bufferType, uint32 usage, 
                   const void* data, usize stride, usize count)
 {
