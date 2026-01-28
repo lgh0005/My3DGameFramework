@@ -4,7 +4,6 @@
 CLASS_PTR(GameObject)
 CLASS_PTR(Component)
 CLASS_PTR(GeneralRenderPass)
-CLASS_PTR(SkyLight)
 #pragma endregion
 
 CLASS_PTR(ComponentRegistry)
@@ -31,16 +30,14 @@ private:
 //=======================================*/
 public:
 	Camera* GetCamera(uint32 idx) const;
+	SkyLight* GetSkyLight(uint32 idx) const;
 	void AddCustomRenderPass(const std::string& name, GeneralRenderPassUPtr pass);
 	GeneralRenderPass* GetCustomRenderPass(const std::string& name);
 	CustomPassMap& GetCustomRenderPasses();
-	void SetSkyLight(SkyLightUPtr skyLight);
-	SkyLight* GetSkyLight() const;
 
 private:
 	ComponentCache m_componentCache;
 	CustomPassMap m_customPasses;
-	SkyLightUPtr m_sky;
 };
 
 #include "Scene/ComponentRegistry.inl"

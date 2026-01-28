@@ -28,10 +28,7 @@ bool Scene::Init()
 	// 3. 렌더 패스 설정
 	if (!CreateCustomRenderPasses()) return false;
 
-	// 4. Skybox과 같은 환경 설정
-	if (!SetupSceneEnvironment()) return false;
-
-	// 5. Actor들을 배치
+	// 4. Actor들을 배치
 	if (!OnPlaceActors()) return false;
 
 	return true;
@@ -237,9 +234,4 @@ GeneralRenderPass* Scene::GetRenderPass(const std::string& name)
 void Scene::AddRenderPass(const std::string& name, GeneralRenderPassUPtr renderPass)
 {
 	GetComponentRegistry()->AddCustomRenderPass(name, std::move(renderPass));
-}
-
-void Scene::SetSkyLight(SkyLightUPtr skyLight)
-{
-	GetComponentRegistry()->SetSkyLight(std::move(skyLight));
 }

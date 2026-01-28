@@ -179,25 +179,24 @@ bool DevScene::CreateCustomRenderPasses()
 	return true;
 }
 
-bool DevScene::SetupSceneEnvironment()
-{
-	auto sky = SkyLight::Create(RESOURCE.GetResource<EnvironmentMap>("StandardSkybox"));
-	if (!sky) return false;
-	SetSkyLight(std::move(sky));
-	return true;
-}
-
 bool DevScene::OnPlaceActors()
 {
 	SimpleRenderPass* lightPass = (SimpleRenderPass*)GetRenderPass("LightGizmo");
 	InstancedRenderPass* grassPass = (InstancedRenderPass*)GetRenderPass("Instanced");
 	EnvironmentRenderPass* envMapPass = (EnvironmentRenderPass*)GetRenderPass("EnvMap");
 
+	// 0. 하늘 GameObject 생성
+	{
+		auto skyObj = GameObject::Create(); if (!skyObj) return false;
+		auto sky = SkyLight::Create(RESOURCE.GetResource<EnvironmentMap>("StandardSkybox"));
+		skyObj->AddComponent(std::move(sky));
+		AddGameObject(std::move(skyObj));
+	}
+
 	// 1. 카메라 GameObject 생성
 	{
 		auto cameraObj = GameObject::Create(); if (!cameraObj) return false;
 		auto camera = Camera::Create();		   if (!camera)	   return false;
-		auto* cameraPtr = camera.get();
 
 		// 카메라 컴포넌트 생성 및 추가
 		cameraObj->GetTransform().SetPosition(glm::vec3(0.0f, 2.5f, 8.0f));

@@ -193,12 +193,15 @@ ComponentRegistry::CustomPassMap& ComponentRegistry::GetCustomRenderPasses()
 	return m_customPasses;
 }
 
-void ComponentRegistry::SetSkyLight(SkyLightUPtr skyLight)
+SkyLight* ComponentRegistry::GetSkyLight(uint32 idx) const
 {
-	m_sky = std::move(skyLight);
-}
+	const auto& sky = m_componentCache[(usize)ComponentType::SkyLight];
 
-SkyLight* ComponentRegistry::GetSkyLight() const
-{
-	return m_sky.get();
+	if (idx >= sky.size())
+	{
+		LOG_ERROR("Skybox index out of range: {}", idx);
+		return nullptr;
+	}
+
+	return static_cast<SkyLight*>(sky[idx]);
 }

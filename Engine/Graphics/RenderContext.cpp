@@ -36,7 +36,7 @@ void RenderContext::Reset(Scene* scene, Camera* camera)
 		m_skinnedMeshRenderersSrc = &m_componentRegistry->GetComponents<SkinnedMeshRenderer>();
 		m_meshOutlinesSrc		  = &m_componentRegistry->GetComponents<MeshOutline>();
 		m_lightsSrc				  = &m_componentRegistry->GetComponents<Light>();
-		m_skyLight			      = m_componentRegistry->GetSkyLight();
+		m_skyLight			      = m_componentRegistry->GetSkyLight(0); // TODO : 임시처방. 이거 따로 빼야할 수 있음
 	}
 	else
 	{

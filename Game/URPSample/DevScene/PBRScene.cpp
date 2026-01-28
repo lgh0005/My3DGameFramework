@@ -146,14 +146,6 @@ bool PBRScene::CreateCustomRenderPasses()
 	return true;
 }
 
-bool PBRScene::SetupSceneEnvironment()
-{
-	auto sky = SkyLight::Create(RESOURCE.GetResource<EnvironmentMap>("UnviersalSky"));
-	if (!sky) return false;
-	SetSkyLight(std::move(sky));
-	return true;
-}
-
 bool PBRScene::OnPlaceActors()
 {
 	// 0. 추가한 렌더패스 가져오기

@@ -61,7 +61,6 @@ public:
 	// 3. SceneRegistry에 있는 컴포넌트, 렌더 패스, 스카이 박스 접근
 	ComponentRegistry* GetComponentRegistry();
 	GameObjectRegistry* GetGameObjectRegistry();
-	void SetSkyLight(SkyLightUPtr skyLight);
 	void AddRenderPass(const std::string& name, GeneralRenderPassUPtr renderPass);
 	GeneralRenderPass* GetRenderPass(const std::string& name);
 
@@ -74,7 +73,6 @@ protected:
 	// 씬의 컨텍스트를 작성하는 가상 함수들
 	virtual bool LoadSceneResources()	    = 0;
 	virtual bool CreateCustomRenderPasses() = 0;
-	virtual bool SetupSceneEnvironment()    = 0;
 	virtual bool OnPlaceActors()			= 0;
 	virtual bool OnBeginPlay()				= 0;
 
