@@ -4,6 +4,8 @@
 #include "Graphics/Geometry/GeometryGenerator.h"
 #include "Resources/Meshes/ScreenMesh.h"
 #include "Resources/Programs/Program.h"
+#include "Resources/Programs/GraphicsProgram.h"
+#include "Resources/Programs/ComputeProgram.h"
 #include "Resources/Textures/Texture.h"
 #include "Resources/Model.h"
 #include "Resources/Animations/Animation.h"
@@ -57,6 +59,9 @@ bool ResourceLoader::LoadResourcesFromManifest(const ResourceManifest& manifest)
 
 	// 1. 셰이더 로드
 	if (!LoadShaders(manifest.shaders)) return false;
+
+	// 2. 컴퓨트 셰이더 로드
+	if (!LoadComputeShaders(manifest.computeShaders)) return false;
 
 	// 3. 텍스쳐 로드
 	if (!LoadTextures(manifest.textures)) return false;
@@ -123,8 +128,8 @@ bool ResourceLoader::LoadShaders(const std::vector<ShaderData>& dataList)
 	bool success = true;
 	for (const auto& data : dataList)
 	{
-		ProgramPtr shader = Program::Create(data.vsPath, data.fsPath);
-		if (shader) RESOURCE.AddResource<Program>(std::move(shader), data.key);
+		GraphicsProgramUPtr shader = GraphicsProgram::Create(data.vsPath, data.fsPath);
+		if (shader) RESOURCE.AddResource<GraphicsProgram>(std::move(shader), data.key);
 		else
 		{
 			LOG_ERROR("Failed to create Shader: '{}'", data.key);
@@ -132,6 +137,27 @@ bool ResourceLoader::LoadShaders(const std::vector<ShaderData>& dataList)
 		}
 	}
 
+	return success;
+}
+
+bool ResourceLoader::LoadComputeShaders(const std::vector<ResourceData>& dataList)
+{
+	bool success = true;
+	for (const auto& data : dataList)
+	{
+		// ComputeProgram::Create는 경로 하나만 받습니다.
+		ComputeProgramUPtr shader = ComputeProgram::Create(data.path);
+
+		if (shader)
+		{
+			RESOURCE.AddResource<ComputeProgram>(std::move(shader), data.key);
+		}
+		else
+		{
+			LOG_ERROR("Failed to create ComputeProgram: '{}' ({})", data.key, data.path);
+			success = false;
+		}
+	}
 	return success;
 }
 
@@ -350,6 +376,7 @@ std::optional<ResourceManifest> ResourceLoader::ParseManifest(const std::string&
 
 	// 쉐이더 (Key + VS + FS)
 	ParseShaderResources(root, "shaders", manifest.shaders);
+	ParseGeneralResources(root, "compute_shaders", manifest.computeShaders);
 
 	// 큐브맵 (Key + Path[Array or String])
 	// *헤더에 ParseCubeMapResources 선언이 필요합니다.

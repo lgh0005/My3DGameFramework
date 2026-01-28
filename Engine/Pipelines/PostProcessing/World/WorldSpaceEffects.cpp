@@ -2,6 +2,7 @@
 #include "WorldSpaceEffects.h"
 #include "Graphics/Rendering/RenderContext.h"
 #include "Resources/Programs/Program.h"
+#include "Resources/Programs/GraphicsProgram.h"
 #include "Resources/Textures/Texture.h"
 #include "Resources/Meshes/ScreenMesh.h"
 #include "Graphics/Framebuffers/PostProcessFrameBuffer.h"
@@ -21,7 +22,7 @@ bool WorldSpaceEffects::Init(int32 priority, int32 width, int32 height)
 	m_priority = priority;
 	m_width = width;
 	m_height = height;
-	m_worldSpaceEffectProgram = RESOURCE.GetResource<Program>("world_space_effects");
+	m_worldSpaceEffectProgram = RESOURCE.GetResource<GraphicsProgram>("world_space_effects");
 
 	return m_worldSpaceEffectProgram != nullptr;
 }

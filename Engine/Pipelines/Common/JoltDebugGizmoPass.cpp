@@ -2,6 +2,7 @@
 #include "Components/Camera.h"
 #include "JoltDebugGizmoPass.h"
 #include "Resources/Programs/Program.h"
+#include "Resources/Programs/GraphicsProgram.h"
 #include "Resources/Meshes/DebugMesh.h"
 #include "Physics/JoltGizmo.h"
 
@@ -21,7 +22,7 @@ bool JoltDebugGizmoPass::Init(float lineWidth)
 
 	// 1. 쉐이더 로드 (이전 단계에서 만든 Gizmo.glsl)
 	// 이름은 리소스 매니저에 등록된 이름으로 맞춰주세요.
-	m_debugProgram = RESOURCE.GetResource<Program>("debug_gizmos");
+	m_debugProgram = RESOURCE.GetResource<GraphicsProgram>("debug_gizmos");
 	if (!m_debugProgram) return false;
 
 	// 2. 디버그 메쉬 생성

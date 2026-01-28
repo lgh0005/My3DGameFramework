@@ -4,6 +4,7 @@
 #include "Graphics/Rendering/RenderContext.h"
 #include "Graphics/Framebuffers/OutlineFramebuffer.h"
 #include "Resources/Programs/Program.h"
+#include "Resources/Programs/GraphicsProgram.h"
 #include "Resources/Meshes/ScreenMesh.h"
 #include "Resources/Textures/Texture.h"
 #include "Components/StaticMeshRenderer.h"
@@ -36,9 +37,9 @@ bool OutlineEffect::Init
 	m_width = width;
 	m_height = height;
 
-	m_maskStaticProgram = RESOURCE.GetResource<Program>("common_outline_static");
-	m_maskSkinnedProgram = RESOURCE.GetResource<Program>("common_outline_skinned");
-	m_postProgram = RESOURCE.GetResource<Program>("common_outline_postprocess");
+	m_maskStaticProgram = RESOURCE.GetResource<GraphicsProgram>("common_outline_static");
+	m_maskSkinnedProgram = RESOURCE.GetResource<GraphicsProgram>("common_outline_skinned");
+	m_postProgram = RESOURCE.GetResource<GraphicsProgram>("common_outline_postprocess");
 	m_maskFBO = OutlineFramebuffer::Create(width, height);
 	if (!m_maskStaticProgram || !m_maskSkinnedProgram || !m_postProgram || !m_maskFBO)
 		return false;

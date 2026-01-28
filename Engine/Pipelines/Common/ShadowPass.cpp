@@ -4,6 +4,7 @@
 #include "Scene/Scene.h"
 #include "Object/GameObject.h"
 #include "Resources/Programs/Program.h" 
+#include "Resources/Programs/GraphicsProgram.h"
 #include "Graphics/ShadowMap.h"
 #include "Resources/Meshes/Mesh.h"
 #include "Resources/Meshes/StaticMesh.h"
@@ -30,8 +31,8 @@ bool ShadowPass::Init(int32 resolution)
 	m_resolution = resolution;
 
 	// 1. 그림자 셰이더 프로그램 생성
-	m_staticDepthProgram = RESOURCE.GetResource<Program>("common_shadow_depth_static");
-	m_skinnedDepthProgram = RESOURCE.GetResource<Program>("common_shadow_depth_skinned");
+	m_staticDepthProgram = RESOURCE.GetResource<GraphicsProgram>("common_shadow_depth_static");
+	m_skinnedDepthProgram = RESOURCE.GetResource<GraphicsProgram>("common_shadow_depth_skinned");
 
 	// 2. 그림자가 드리워지는 최대 조명 개수 만큼 그림자 맵 생성
 	// 최대(MAX_SHADOW_CASTER) 8개

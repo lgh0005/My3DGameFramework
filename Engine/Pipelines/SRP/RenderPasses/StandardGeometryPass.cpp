@@ -5,6 +5,7 @@
 #include "Object/GameObject.h"
 #include "Graphics/Rendering/RenderContext.h"
 #include "Resources/Programs/Program.h"
+#include "Resources/Programs/GraphicsProgram.h"
 #include "Resources/Meshes/Mesh.h"
 #include "Resources/Material.h"
 #include "Resources/Textures/Texture.h"
@@ -28,8 +29,8 @@ StandardGeometryPassUPtr StandardGeometryPass::Create(int32 width, int32 height)
 
 bool StandardGeometryPass::Init(int32 width, int32 height)
 {
-	m_staticGeometryProgram = RESOURCE.GetResource<Program>("standard_deferred_geometry_static");
-	m_skinnedGeometryProgram = RESOURCE.GetResource<Program>("standard_deferred_geometry_skinned");
+	m_staticGeometryProgram = RESOURCE.GetResource<GraphicsProgram>("standard_deferred_geometry_static");
+	m_skinnedGeometryProgram = RESOURCE.GetResource<GraphicsProgram>("standard_deferred_geometry_skinned");
 	m_gBuffer = GBufferFramebuffer::Create(width, height);
 	if (!m_gBuffer) return false;
 	return true;

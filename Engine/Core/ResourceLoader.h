@@ -18,6 +18,7 @@ private:
 	static bool LoadResourcesFromManifest(const ResourceManifest& manifest);
 	static bool LoadBuiltInResources();
 	static bool LoadShaders(const std::vector<ShaderData>& dataList);
+	static bool LoadComputeShaders(const std::vector<ResourceData>& dataList);
 	static bool LoadTextures(const std::vector<ResourceData>& dataList);
 	static bool LoadCubeTextures(const std::vector<CubeMapData>& dataList);
 	static bool LoadModels(const std::vector<ResourceData>& dataList);

@@ -1,6 +1,7 @@
 ﻿#include "EnginePch.h"
 #include "DOFEffect.h"
 #include "Resources/Programs/Program.h"
+#include "Resources/Programs/GraphicsProgram.h"
 #include "Resources/Textures/Texture.h"
 #include "Resources/Meshes/ScreenMesh.h"
 #include "Graphics/Framebuffers/Framebuffer.h"
@@ -19,7 +20,7 @@ bool DOFEffect::Init(int32 priority, int32 width, int32 height)
 	m_priority = priority;
 	m_width = width;
 	m_height = height;
-	m_DepthOfFieldProgram = RESOURCE.GetResource<Program>("dof_effect");
+	m_DepthOfFieldProgram = RESOURCE.GetResource<GraphicsProgram>("dof_effect");
 	return m_DepthOfFieldProgram != nullptr;
 }
 

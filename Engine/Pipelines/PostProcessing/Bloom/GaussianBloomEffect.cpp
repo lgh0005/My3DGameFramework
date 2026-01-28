@@ -1,6 +1,7 @@
 ﻿#include "EnginePch.h"
 #include "GaussianBloomEffect.h"
 #include "Resources/Programs/Program.h"
+#include "Resources/Programs/GraphicsProgram.h"
 #include "Graphics/Framebuffers/PostProcessFrameBuffer.h"
 #include "Resources/Textures/Texture.h"
 #include "Resources/Meshes/ScreenMesh.h"
@@ -20,8 +21,8 @@ bool GaussianBloomEffect::Init(int32 priority, int32 width, int32 height)
 	m_width = width;
 	m_height = height;
 
-	m_thresholdProgram = RESOURCE.GetResource<Program>("standard_postprocess_threshold");
-	m_blurProgram = RESOURCE.GetResource<Program>("standard_postprocess_blur");
+	m_thresholdProgram = RESOURCE.GetResource<GraphicsProgram>("standard_postprocess_threshold");
+	m_blurProgram = RESOURCE.GetResource<GraphicsProgram>("standard_postprocess_blur");
 	m_pingPongFBOs[0] = PostProcessFramebuffer::Create(width, height);
 	m_pingPongFBOs[1] = PostProcessFramebuffer::Create(width, height);
 

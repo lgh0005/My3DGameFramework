@@ -2,6 +2,8 @@
 #include "GraphicsProgram.h"
 #include "Graphics/Shader.h"
 
+DECLARE_DEFAULTS_IMPL(GraphicsProgram)
+
 GraphicsProgramUPtr GraphicsProgram::Create(const std::vector<ShaderPtr>& shaders)
 {
 	// 자식 클래스 인스턴스 생성 (생성자는 private이므로 내부에서 new)

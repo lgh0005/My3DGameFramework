@@ -3,6 +3,7 @@
 #include "Graphics/Rendering/RenderContext.h"
 #include "Graphics/Framebuffers/PostProcessFramebuffer.h"
 #include "Resources/Programs/Program.h"
+#include "Resources/Programs/GraphicsProgram.h"
 #include "Resources/Meshes/ScreenMesh.h"
 #include "Resources/Textures/Texture.h"
 
@@ -21,7 +22,7 @@ bool DisplayMappingEffects::Init(int32 priority, int32 width, int32 height)
 	m_width = width;
 	m_height = height;
 
-	m_compositeProgram = RESOURCE.GetResource<Program>("standard_postprocess_postprocess");
+	m_compositeProgram = RESOURCE.GetResource<GraphicsProgram>("standard_postprocess_postprocess");
 	m_cameraDirtTexture = RESOURCE.GetResource<Texture>("camera_dirt");
 	if (!m_compositeProgram) return false;
 

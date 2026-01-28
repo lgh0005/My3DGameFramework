@@ -1,6 +1,7 @@
 ﻿#include "EnginePch.h"
 #include "LensFlareEffect.h"
 #include "Resources/Programs/Program.h"
+#include "Resources/Programs/GraphicsProgram.h"
 #include "Resources/Textures/Texture.h"
 #include "Resources/Meshes/ScreenMesh.h"
 #include "Graphics/Framebuffers/Framebuffer.h"
@@ -19,7 +20,7 @@ bool LensFlareEffect::Init(int32 priority, int32 width, int32 height)
 	m_priority = priority;
 	m_width = width;
 	m_height = height;
-	m_lensFlareProgram = RESOURCE.GetResource<Program>("lens_flare");
+	m_lensFlareProgram = RESOURCE.GetResource<GraphicsProgram>("lens_flare");
 	return m_lensFlareProgram != nullptr;
 }
 

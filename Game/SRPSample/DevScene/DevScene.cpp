@@ -4,6 +4,7 @@
 #include "Object/GameObject.h"
 #include "Graphics/Rendering/Renderer.h"
 #include "Resources/Programs/Program.h"
+#include "Resources/Programs/GraphicsProgram.h"
 #include "Resources/Meshes/Mesh.h"
 #include "Resources/Meshes/StaticMesh.h"
 #include "Resources/Meshes/SkinnedMesh.h"
@@ -147,7 +148,7 @@ bool DevScene::CreateCustomRenderPasses()
 
 	// 1. Instanced 셰이더 (잔디)
 	{
-		auto prog = Program::Create(
+		auto prog = GraphicsProgram::Create(
 			"./Resources/Shaders/grass.vert",
 			"./Resources/Shaders/grass.frag");
 		if (!prog) return false;
@@ -156,7 +157,7 @@ bool DevScene::CreateCustomRenderPasses()
 
 	// 2. Simple 셰이더 (조명 기즈모)
 	{
-		auto prog = Program::Create(
+		auto prog = GraphicsProgram::Create(
 			"./Resources/Shaders/simple.vert",
 			"./Resources/Shaders/simple.frag");
 		if (!prog) return false;
@@ -165,7 +166,7 @@ bool DevScene::CreateCustomRenderPasses()
 
 	// 3. 환경맵
 	{
-		auto prog = Program::Create
+		auto prog = GraphicsProgram::Create
 		(
 			"./Resources/Shaders/environment.vert",
 			"./Resources/Shaders/environment.frag"

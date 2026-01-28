@@ -7,6 +7,7 @@
 #include "Resources/Meshes/Mesh.h"
 #include "Resources/Meshes/StaticMesh.h"
 #include "Resources/Programs/Program.h"
+#include "Resources/Programs/GraphicsProgram.h"
 #include "Resources/Textures/Texture.h"
 #include "Components/SkyLight.h"
 #include "Components/Camera.h"
@@ -23,7 +24,7 @@ SkyboxPassUPtr SkyboxPass::Create()
 
 bool SkyboxPass::Init()
 {
-	m_skyboxProgram = RESOURCE.GetResource<Program>("common_skybox");
+	m_skyboxProgram = RESOURCE.GetResource<GraphicsProgram>("common_skybox");
 	m_cubeMesh = RESOURCE.GetResource<StaticMesh>("Cube");
 	return true;
 };

@@ -11,9 +11,9 @@ class Program : public Resource
     DEFINE_RESOURCE_TYPE(ResourceType::Shader)
 
 public:
-    static ProgramUPtr Create(const std::vector<ShaderPtr>& shaders);
+    /*static ProgramUPtr Create(const std::vector<ShaderPtr>& shaders);
     static ProgramUPtr Create(const std::string& vertShaderFilename,
-                              const std::string& fragShaderFilename);
+                              const std::string& fragShaderFilename);*/
 
     usize Get() const { return m_program; }
     void Use() const;

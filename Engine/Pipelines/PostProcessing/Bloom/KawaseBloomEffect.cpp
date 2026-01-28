@@ -3,6 +3,7 @@
 #include "Graphics/Rendering/RenderContext.h"
 #include "Graphics/Framebuffers/EffectFramebuffer.h"
 #include "Resources/Programs/Program.h"
+#include "Resources/Programs/GraphicsProgram.h"
 #include "Resources/Meshes/ScreenMesh.h"
 #include "Resources/Textures/Texture.h"
 
@@ -21,7 +22,7 @@ bool KawaseBloomEffect::Init(int32 priority, int32 width, int32 height)
 	m_width = width;
 	m_height = height;
 
-	m_bloomProgram = RESOURCE.GetResource<Program>("universal_postprocess_blur");
+	m_bloomProgram = RESOURCE.GetResource<GraphicsProgram>("universal_postprocess_blur");
 	m_bloomFBO = EffectFramebuffer::CreateEmpty();
 	if (!m_bloomProgram || !m_bloomFBO) return false;
 

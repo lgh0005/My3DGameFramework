@@ -155,5 +155,10 @@
             "vs":  "./Resources/Shaders/Universal/Universal_Post_PostProcess.vert",
             "fs":  "./Resources/Shaders/Universal/Universal_Post_PostProcess.frag"
         }
+    ],
+
+    "compute_shaders":
+    [
+        
     ]
 }

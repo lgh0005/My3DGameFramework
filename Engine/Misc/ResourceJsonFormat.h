@@ -30,6 +30,7 @@ namespace ResourceJsonFmt
 		std::vector<ResourceData> models;
 		std::vector<ResourceData> animations;
 		std::vector<ShaderData>   shaders;
+		std::vector<ResourceData> computeShaders;
 		// TODO : fonts 추가 필요
 	};
 }

@@ -3,6 +3,7 @@
 #include "Graphics/Rendering/RenderContext.h"
 #include "Graphics/Framebuffers/PostProcessFrameBuffer.h"
 #include "Resources/Programs/Program.h"
+#include "Resources/Programs/GraphicsProgram.h"
 #include "Resources/Meshes/ScreenMesh.h"
 #include "Resources/Textures/Texture.h"
 
@@ -21,7 +22,7 @@ bool MotionBlurEffect::Init(int32 priority, int32 width, int32 height)
 	m_width = width;
 	m_height = height;
 
-	m_motionBlurProgram = RESOURCE.GetResource<Program>("common_motion_blur");
+	m_motionBlurProgram = RESOURCE.GetResource<GraphicsProgram>("common_motion_blur");
 	if (!m_motionBlurProgram) return false;
 
 	m_motionBlurProgram->Use();
