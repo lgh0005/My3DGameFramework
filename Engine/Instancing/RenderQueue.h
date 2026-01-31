@@ -10,12 +10,12 @@ CLASS_PTR(RenderQueue)
 class RenderQueue
 {
 public:
-	virtual ~RenderQueue() = default;
+	virtual ~RenderQueue();
 
 	virtual bool Init(uint32 maxInstanceCount) = 0;
 	virtual void Clear() = 0;
 	virtual void Execute(GraphicsProgram* prog) = 0;
 
 protected:
-	RenderQueue() = default;
+	RenderQueue();
 };
