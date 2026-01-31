@@ -81,6 +81,14 @@ add_library(Engine STATIC
    "Physics/GizmoCommand.h"         "Physics/GizmoCommand.cpp"
    "Physics/RigidbodyConstraint.h"      "Physics/RigidbodyConstraint.cpp"
 
+   # Instancing
+   "Instancing/InstanceBuffer.h"    "Instancing/InstanceBuffer.cpp"
+   "Instancing/InstanceProperty.h"      "Instancing/InstanceProperty.cpp"
+   "Instancing/RenderBatch.h"       "Instancing/RenderBatch.cpp"
+    "Instancing/RenderQueue.h"      "Instancing/RenderQueue.cpp"
+    "Instancing/StaticRenderQueue.h" "Instancing/StaticRenderQueue.cpp" 
+    "Instancing/SkinnedRenderQueue.h" "Instancing/SkinnedRenderQueue.cpp"
+
    # Graphics
    "Graphics/Shader.h"              "Graphics/Shader.cpp"
    "Graphics/IBLUtils.h"            "Graphics/IBLUtils.cpp"

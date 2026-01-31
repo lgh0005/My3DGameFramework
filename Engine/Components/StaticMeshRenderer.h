@@ -1,5 +1,6 @@
 ﻿#pragma once
 #include "MeshRenderer.h"
+#include "Instancing/InstanceProperty.h"
 
 #pragma region FORWARD_DECLARATION
 CLASS_PTR(StaticMesh)
@@ -17,9 +18,12 @@ public:
 	virtual ~StaticMeshRenderer();
 	static StaticMeshRendererUPtr Create(StaticMeshPtr mesh, MaterialPtr material);
 	virtual RenderBounds GetWorldBounds() const override { return Super::GetWorldBounds(); }
+	const StaticInstanceProperty& GetInstanceProperty() const { return m_instanceProperty; }
 	virtual void Render(Program* program) const;
+	virtual void UpdateInstanceProperty() override;
 
 private:
 	StaticMeshRenderer();
 	bool Init(StaticMeshPtr mesh, MaterialPtr material);
+	StaticInstanceProperty m_instanceProperty;
 };

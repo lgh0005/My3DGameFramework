@@ -1,6 +1,6 @@
 ﻿#pragma once 
 
-struct CameraData
+struct alignas(16) CameraData
 {
     glm::mat4 view;         // 64 bytes
     glm::mat4 projection;   // 64 bytes
@@ -8,9 +8,9 @@ struct CameraData
     float pad0;             // 4 bytes (총 144 bytes)
 };
 
-struct LightData
+struct alignas(16) LightData
 {
-    struct LightInfo
+    struct alignas(16) LightInfo
     {
         glm::vec3 position;     float pad0;
         glm::vec3 direction;    float pad1;

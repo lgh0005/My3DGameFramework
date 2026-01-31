@@ -9,6 +9,8 @@ public:
 
     uint32 Get() const { return m_vertexArrayObject; }
     void Bind() const;
+    void Unbind() const;
+
     void SetAttrib(uint32 attribIndex, int count, uint32 type, 
         bool normalized, usize stride, uint64 offset) const;
     void SetAttribI(uint32 attribIndex, int count, uint32 type,

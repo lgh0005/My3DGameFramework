@@ -15,6 +15,7 @@ public:
 
     void SetData(const void* data, usize size);
     void Bind() const;
+    void Unbind() const;
     void BindBase(uint32 index) const;
 
 protected:

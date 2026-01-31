@@ -19,6 +19,10 @@ public:
     virtual ~Mesh();
     virtual void Draw() const = 0;
 
+    virtual void Bind() const;
+    virtual void Unbind() const;
+    virtual void RenderInstanced(uint32 count) const;
+
     usize GetIndexCount() const { return m_indexCount; }
     uint32 GetPrimitiveType() const { return m_primitiveType; }
     BufferPtr GetIndexBuffer() const { return m_indexBuffer; }

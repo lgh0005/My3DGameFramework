@@ -19,6 +19,11 @@ void VertexLayout::Bind() const
     glBindVertexArray(m_vertexArrayObject);
 }
 
+void VertexLayout::Unbind() const
+{
+    glBindVertexArray(0);
+}
+
 void VertexLayout::SetAttrib(uint32 attribIndex, int count, uint32 type,
             bool normalized, usize stride, uint64 offset) const
 {

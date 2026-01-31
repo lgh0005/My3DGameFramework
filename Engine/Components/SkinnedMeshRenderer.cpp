@@ -78,3 +78,10 @@ void SkinnedMeshRenderer::Render(Program* program) const
     if (m_material) m_material->SetToProgram(program);
     m_mesh->Draw();
 }
+
+void SkinnedMeshRenderer::UpdateInstanceProperty()
+{
+    m_instanceProperty.common.worldMatrix = GetTransform().GetWorldMatrix();
+    // 2. Bone Offset은 Animator의 상태나 RenderQueue의 배치 결과에 따라 
+    // 외부에서 SetBoneOffset()을 통해 주입받는 것이 구조적으로 깔끔합니다.
+}
