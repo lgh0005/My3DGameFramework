@@ -29,7 +29,7 @@ bool SkinnedRenderQueue::Init(uint32 maxInstanceCount, uint32 maxBoneCount)
 
 void SkinnedRenderQueue::Add
 (
-    SkinnedMesh* mesh, Material* material, 
+    Mesh* mesh, Material* material, 
     SkinnedInstanceProperty prop, 
     const std::vector<glm::mat4>& boneMatrices
 )
@@ -54,7 +54,7 @@ void SkinnedRenderQueue::Add
     batch.boneData.insert(batch.boneData.end(), boneMatrices.begin(), boneMatrices.end());
 }
 
-void SkinnedRenderQueue::Execute(GraphicsProgram* prog)
+void SkinnedRenderQueue::Execute(Program* prog)
 {
     if (m_batches.empty()) return;
 
@@ -83,6 +83,13 @@ void SkinnedRenderQueue::Execute(GraphicsProgram* prog)
             mesh->RenderInstanced(static_cast<uint32>(batch.instanceData.size()));
         }
     }
+
+    m_instanceBuffer->Unbind(0);
+    m_boneBuffer->Unbind(1);
+
+    // TODO : 이거 각각 static으로 감싸야 할 필요가 있을 듯
+    glBindVertexArray(0);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 }
 
 void SkinnedRenderQueue::Clear()

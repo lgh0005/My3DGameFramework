@@ -37,6 +37,10 @@ void InstanceBuffer::Update(const void* data, uint32 size)
 
 void InstanceBuffer::Bind(uint32 slot) const
 {
-	// 셰이더의 layout(std430, binding = slot)과 연결
 	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, slot, m_id);
+}
+
+void InstanceBuffer::Unbind(uint32 slot) const
+{
+	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, slot, 0);
 }

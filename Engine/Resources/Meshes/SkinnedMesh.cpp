@@ -23,6 +23,7 @@ void SkinnedMesh::Init(const std::vector<SkinnedVertex>& vertices,
                        uint32 primitiveType)
 {
     m_primitiveType = primitiveType;
+    m_indexCount = indices.size();
     m_vertexLayout = VertexLayout::Create();
     m_vertexBuffer = VertexBuffer::Create(vertices.data(), sizeof(SkinnedVertex), vertices.size());
     m_indexBuffer = IndexBuffer::Create(indices);

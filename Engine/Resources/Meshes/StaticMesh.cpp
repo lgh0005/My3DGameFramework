@@ -23,9 +23,9 @@ void StaticMesh::Init(const std::vector<StaticVertex>& vertices,
                       uint32 primitiveType)
 {
     m_primitiveType = primitiveType;
+    m_indexCount = indices.size();
     if (m_primitiveType == GL_TRIANGLES)
         ComputeTangents(const_cast<std::vector<StaticVertex>&>(vertices), indices);
-
     m_vertexLayout = VertexLayout::Create();
     m_vertexBuffer = VertexBuffer::Create(vertices.data(), sizeof(StaticVertex), vertices.size());
     m_indexBuffer = IndexBuffer::Create(indices);

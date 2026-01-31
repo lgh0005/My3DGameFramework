@@ -9,6 +9,7 @@ public:
     static InstanceBufferUPtr Create(uint32 maxCount, uint32 structSize);
     void Update(const void* data, uint32 size);
     void Bind(uint32 slot) const;
+    void Unbind(uint32 slot) const;
 
 private:
     InstanceBuffer();

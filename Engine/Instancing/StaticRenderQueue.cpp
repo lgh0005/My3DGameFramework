@@ -22,13 +22,13 @@ bool StaticRenderQueue::Init(uint32 maxInstanceCount)
     return true;
 }
 
-void StaticRenderQueue::Add(StaticMesh* mesh, Material* material, const StaticInstanceProperty& prop)
+void StaticRenderQueue::Add(Mesh* mesh, Material* material, const StaticInstanceProperty& prop)
 {
     if (!mesh || !material) return;
     m_batches[mesh][material].push_back(prop);
 }
 
-void StaticRenderQueue::Execute(GraphicsProgram* prog)
+void StaticRenderQueue::Execute(Program* prog)
 {
     if (m_batches.empty()) return;
 
@@ -57,6 +57,12 @@ void StaticRenderQueue::Execute(GraphicsProgram* prog)
             mesh->RenderInstanced(instanceCount);
         }
     }
+
+    m_instanceBuffer->Unbind(0);
+
+    // TODO : 이거 각각 static으로 감싸야 할 필요가 있을 듯
+    glBindVertexArray(0);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 }
 
 void StaticRenderQueue::Clear()

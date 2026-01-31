@@ -12,7 +12,7 @@ class SkinnedRenderQueue : public RenderQueue
 {
 public:
 	using MaterialMap = std::unordered_map<Material*, SkinnedRenderBatch>;
-	using SkinnedMeshMap = std::unordered_map<SkinnedMesh*, MaterialMap>;
+	using SkinnedMeshMap = std::unordered_map<Mesh*, MaterialMap>;
 
 public:
 	virtual ~SkinnedRenderQueue() override;
@@ -21,11 +21,11 @@ public:
 	virtual bool Init(uint32 maxInstanceCount) override;
 	bool Init(uint32 maxInstanceCount, uint32 maxBoneCount);
 	virtual void Clear() override;
-	virtual void Execute(GraphicsProgram* prog) override;
+	virtual void Execute(Program* prog) override;
 
 	void Add
 	(
-		SkinnedMesh* mesh, Material* material, 
+		Mesh* mesh, Material* material,
 		SkinnedInstanceProperty prop, 
 		const std::vector<glm::mat4>& boneMatrices
 	);
