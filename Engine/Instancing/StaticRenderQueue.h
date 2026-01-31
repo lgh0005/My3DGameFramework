@@ -10,7 +10,7 @@ CLASS_PTR(InstanceBuffer)
 CLASS_PTR(StaticRenderQueue)
 class StaticRenderQueue : public RenderQueue
 {
-	using MaterialBatch = std::unordered_map<Material*, std::vector<StaticInstanceProperty>>;
+	using MaterialBatch = std::unordered_map<Material*, StaticRenderBatch>;
 	using StaticMeshBatch = std::unordered_map<Mesh*, MaterialBatch>;
 
 public:

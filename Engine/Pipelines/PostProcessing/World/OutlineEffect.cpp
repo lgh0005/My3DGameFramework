@@ -12,6 +12,8 @@
 #include "Components/MeshOutline.h"
 #include "Components/Animator.h"
 #include "Components/Transform.h"
+//#include "Instancing/OutlineStaticRenderQueue.h"
+//#include "Instancing/OutlineSkinnedRenderQueue.h"
 
 DECLARE_DEFAULTS_IMPL(OutlineEffect)
 
@@ -206,3 +208,49 @@ void OutlineEffect::OnResize(int32 width, int32 height)
 		m_postProgram->SetUniform("canvasSize", glm::vec2(width, height));
 	}
 }
+
+/*============================================//
+//   Instancing Test                          //
+//============================================*/
+//void OutlineEffect::MaskStaticMeshes(const std::vector<MeshOutline*>& outlines)
+//{
+//	m_staticOutlineQueue->Clear();
+//	m_maskStaticProgram->Use();
+//
+//	for (auto* outline : outlines)
+//	{
+//		auto* staticRenderer = static_cast<StaticMeshRenderer*>(outline->GetMeshRenderer());
+//
+//		OutlineStaticInstanceProperty prop;
+//		prop.common.worldMatrix = staticRenderer->GetTransform().GetWorldMatrix();
+//		prop.outlineColor = glm::vec4(outline->GetColor(), 1.0f); // 개별 색상 적용
+//
+//		// 머티리얼은 마스크 생성 시 의미 없으므로 nullptr 혹은 기본 머티리얼 사용
+//		m_staticOutlineQueue->Add(staticRenderer->GetMesh().get(), nullptr, prop);
+//	}
+//
+//	m_staticOutlineQueue->Execute(m_maskStaticProgram.get());
+//}
+//
+//void OutlineEffect::MaskSkinnedMeshes(const std::vector<MeshOutline*>& outlines)
+//{
+//	m_skinnedOutlineQueue->Clear();
+//	m_maskSkinnedProgram->Use();
+//
+//	for (auto* outline : outlines)
+//	{
+//		auto* skinnedRenderer = static_cast<SkinnedMeshRenderer*>(outline->GetMeshRenderer());
+//
+//		OutlineSkinnedInstanceProperty prop;
+//		prop.common.worldMatrix = skinnedRenderer->GetTransform().GetWorldMatrix();
+//		prop.outlineColor = glm::vec4(outline->GetColor(), 1.0f);
+//
+//		Animator* animator = skinnedRenderer->GetAnimator();
+//		const auto& bones = (animator && animator->IsEnabled())
+//			? animator->GetFinalBoneMatrices() : Utils::GetIdentityBones();
+//
+//		m_skinnedOutlineQueue->Add(skinnedRenderer->GetMesh().get(), nullptr, prop, bones);
+//	}
+//
+//	m_skinnedOutlineQueue->Execute(m_maskSkinnedProgram.get());
+//}

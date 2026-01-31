@@ -88,6 +88,8 @@ add_library(Engine STATIC
     "Instancing/RenderQueue.h"      "Instancing/RenderQueue.cpp"
     "Instancing/StaticRenderQueue.h" "Instancing/StaticRenderQueue.cpp" 
     "Instancing/SkinnedRenderQueue.h" "Instancing/SkinnedRenderQueue.cpp"
+    #"Instancing/OutlineStaticRenderQueue.h" "Instancing/OutlineStaticRenderQueue.cpp"
+    #"Instancing/OutlineSkinnedRenderQueue.h" "Instancing/OutlineSkinnedRenderQueue.cpp"
 
    # Graphics
    "Graphics/Shader.h"              "Graphics/Shader.cpp"

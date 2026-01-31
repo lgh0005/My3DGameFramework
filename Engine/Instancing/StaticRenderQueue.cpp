@@ -24,8 +24,22 @@ bool StaticRenderQueue::Init(uint32 maxInstanceCount)
 
 void StaticRenderQueue::Add(Mesh* mesh, Material* material, const StaticInstanceProperty& prop)
 {
+    // 0. 유효성 검사
     if (!mesh || !material) return;
-    m_batches[mesh][material].push_back(prop);
+
+    // 1. 해당 메쉬/머티리얼 조합의 배치를 가져오거나 생성 (없으면 자동 생성됨)
+    auto& batch = m_batches[mesh][material];
+
+    // 2. 처음 생성된 배치라면 메쉬와 머티리얼 정보 세팅
+    if (batch.mesh == nullptr)
+    {
+        batch.mesh = mesh;
+        batch.material = material;
+    }
+
+    // 3. 인스턴스 속성 추가
+    // StaticMesh는 BoneOffset 연산이 필요 없으므로 바로 추가합니다.
+    batch.Add(prop);
 }
 
 void StaticRenderQueue::Execute(Program* prog)
@@ -39,22 +53,20 @@ void StaticRenderQueue::Execute(Program* prog)
         mesh->Bind();
 
         // [Step 2] Material 단위 순회 (안쪽 루프)
-        for (auto& [material, instanceList] : materialMap)
+        for (auto& [material, batch] : materialMap)
         {
-            if (instanceList.empty()) continue;
+            if (batch.instanceData.empty()) continue;
 
-            // 1. 머티리얼 속성 전송 (Texture, Uniforms)
+            // 머티리얼 적용
             material->SetToProgram(prog);
 
-            // 2. 인스턴싱 데이터 업데이트 (CPU -> GPU)
-            uint32 instanceCount = static_cast<uint32>(instanceList.size());
-            m_instanceBuffer->Update(instanceList.data(), instanceCount * sizeof(StaticInstanceProperty));
-
-            // 3. 인스턴스 버퍼 바인딩 (layout binding = 0)
+            // 데이터 업데이트 및 드로우 콜
+            m_instanceBuffer->Update(batch.instanceData.data(), 
+                static_cast<uint32>(batch.instanceData.size()) * sizeof(StaticInstanceProperty));
             m_instanceBuffer->Bind(0);
 
             // 4. 인스턴싱 드로우 콜 수행
-            mesh->RenderInstanced(instanceCount);
+            mesh->RenderInstanced(static_cast<uint32>(batch.instanceData.size()));
         }
     }
 
@@ -69,7 +81,7 @@ void StaticRenderQueue::Clear()
 {
     for (auto& [mesh, materialMap] : m_batches)
     {
-        for (auto& [material, instanceList] : materialMap)
-            instanceList.clear();
+        for (auto& [material, batch] : materialMap)
+            batch.Clear();
     }
 }

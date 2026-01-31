@@ -15,6 +15,8 @@
 #include "Components/StaticMeshRenderer.h"
 #include "Components/SkinnedMeshRenderer.h"
 #include "Components/Animator.h"
+#include "Instancing/StaticRenderQueue.h"
+#include "Instancing/SkinnedRenderQueue.h"
 
 DECLARE_DEFAULTS_IMPL(ShadowPass)
 
@@ -33,6 +35,10 @@ bool ShadowPass::Init(int32 resolution)
 	// 1. 그림자 셰이더 프로그램 생성
 	m_staticDepthProgram = RESOURCE.GetResource<GraphicsProgram>("common_shadow_depth_static");
 	m_skinnedDepthProgram = RESOURCE.GetResource<GraphicsProgram>("common_shadow_depth_skinned");
+	m_staticDepthInstancedProgram = RESOURCE.GetResource<GraphicsProgram>("common_shadow_depth_static_instanced");
+	m_skinnedDepthInstancedProgram = RESOURCE.GetResource<GraphicsProgram>("common_shadow_depth_skinned_instanced");
+	m_staticQueue = StaticRenderQueue::Create(5000);
+	m_skinnedQueue = SkinnedRenderQueue::Create(1000, 1000 * 100);
 
 	// 2. 그림자가 드리워지는 최대 조명 개수 만큼 그림자 맵 생성
 	// 최대(MAX_SHADOW_CASTER) 8개
@@ -90,10 +96,12 @@ void ShadowPass::Render(RenderContext* context)
 		light->SetLightSpaceMatrix(lightSpaceMatrix);
 
 		// 2-5. StaticMesh 렌더링
-		RenderStaticMeshes(staticMeshes, lightSpaceMatrix);
+		// RenderStaticMeshes(staticMeshes, lightSpaceMatrix);
+		RenderStaticMeshesInstanced(staticMeshes, lightSpaceMatrix);
 
 		// 2-6. SkinnedMesh 렌더링
-		RenderSkinnedMeshes(skinnedMeshes, lightSpaceMatrix);
+		// RenderSkinnedMeshes(skinnedMeshes, lightSpaceMatrix);
+		RenderSkinnedMeshesInstanced(skinnedMeshes, lightSpaceMatrix);
 	}
 
 	glCullFace(GL_BACK);
@@ -213,4 +221,56 @@ void ShadowPass::Resize(int32 resolution)
 		if (shadowMap)
 			shadowMap->Resize(m_resolution);
 	}
+}
+
+/*==========================================================//
+//  ShadowPass.h (Instancing 확장)                          //
+//==========================================================*/
+void ShadowPass::RenderStaticMeshesInstanced(const std::vector<StaticMeshRenderer*>& meshes, const glm::mat4& lightSpaceMatrix)
+{
+	if (!m_staticDepthInstancedProgram || meshes.empty()) return;
+
+	m_staticQueue->Clear();
+	m_staticDepthInstancedProgram->Use();
+
+	// G-Buffer의 uPrevVP처럼, 그림자에서는 lightSpaceMatrix가 기준 VP입니다.
+	m_staticDepthInstancedProgram->SetUniform("lightSpaceMatrix", lightSpaceMatrix);
+
+	for (const auto* renderer : meshes)
+	{
+		if (!renderer->IsEnabled() || !renderer->GetOwner()->IsActive()) continue;
+
+		StaticInstanceProperty prop;
+		prop.common.worldMatrix = renderer->GetTransform().GetWorldMatrix();
+
+		// 그림자 패스에서는 머티리얼 구분이 무의미하지만, 
+		// 큐 구조상 메쉬별 배칭을 위해 머티리얼은 그대로 넣어줍니다.
+		m_staticQueue->Add(renderer->GetMesh().get(), renderer->GetMaterial().get(), prop);
+	}
+
+	m_staticQueue->Execute(m_staticDepthInstancedProgram.get());
+}
+
+void ShadowPass::RenderSkinnedMeshesInstanced(const std::vector<SkinnedMeshRenderer*>& meshes, const glm::mat4& lightSpaceMatrix)
+{
+	if (!m_skinnedDepthInstancedProgram || meshes.empty()) return;
+
+	m_skinnedQueue->Clear();
+	m_skinnedDepthInstancedProgram->Use();
+	m_skinnedDepthInstancedProgram->SetUniform("lightSpaceMatrix", lightSpaceMatrix);
+
+	for (const auto* renderer : meshes)
+	{
+		if (!renderer->IsEnabled() || !renderer->GetOwner()->IsActive()) continue;
+
+		SkinnedInstanceProperty prop;
+		prop.common.worldMatrix = renderer->GetTransform().GetWorldMatrix();
+
+		Animator* animator = renderer->GetAnimator();
+		const std::vector<glm::mat4>& bones = animator ? animator->GetFinalBoneMatrices() : GetIdentityBones();
+
+		m_skinnedQueue->Add(renderer->GetMesh().get(), renderer->GetMaterial().get(), prop, bones);
+	}
+
+	m_skinnedQueue->Execute(m_skinnedDepthInstancedProgram.get());
 }

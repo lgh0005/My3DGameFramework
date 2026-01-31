@@ -5,6 +5,9 @@
 CLASS_PTR(RenderContext)
 CLASS_PTR(Program)
 CLASS_PTR(OutlineFramebuffer)
+
+//CLASS_PTR(OutlineStaticRenderQueue)
+//CLASS_PTR(OutlineSkinnedRenderQueue)
 #pragma endregion
 
 CLASS_PTR(OutlineEffect)
@@ -54,4 +57,18 @@ private:
 	ProgramPtr m_postProgram;		 // 합성용
 	glm::vec3 m_color  { 1.0f };
 	float m_thickness  { 2.0f };
+
+/*============================================//
+//   Instancing Test                          //
+//============================================*/
+//private:
+//
+//	void MaskStaticMeshesInstanced(const std::vector<MeshOutline*>& outlines);
+//	void MaskSkinnedMeshesInstanced(const std::vector<MeshOutline*>& outlines);
+//
+//	ProgramPtr m_maskStaticProgram;  // Static 마스크용
+//	ProgramPtr m_maskSkinnedProgram; // Skinned 마스크용
+//
+//	OutlineStaticRenderQueueUPtr  m_staticOutlineQueue;
+//	OutlineSkinnedRenderQueueUPtr m_skinnedOutlineQueue;
 };

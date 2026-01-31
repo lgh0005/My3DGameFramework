@@ -74,8 +74,8 @@ bool StandardRenderPipeline::Init()
 	// 통용 포스트-프로세스 패스 생성
 	m_postProcessPass = PostProcessPass::Create();
 	if (!m_postProcessPass) return false;
-	/*auto motion = MotionBlurEffect::Create(0);
-	m_postProcessPass->AddEffect(std::move(motion));*/
+	auto motion = MotionBlurEffect::Create(0);
+	m_postProcessPass->AddEffect(std::move(motion));
 	auto world = WorldSpaceEffects::Create(1);
 	m_postProcessPass->AddEffect(std::move(world));
 	auto outline = OutlineEffect::Create(3);
