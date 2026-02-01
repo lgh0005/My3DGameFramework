@@ -2,6 +2,11 @@
     "shaders": 
     [
         { 
+            "key": "common_outline_instanced", 
+            "vs":  "./Resources/Shaders/Instanced_Test/PostProcess_Outline_Mask.vert",
+            "fs":  "./Resources/Shaders/Instanced_Test/PostProcess_Outline_Mask.frag"
+        },
+        { 
             "key": "common_outline_static", 
             "vs":  "./Resources/Shaders/Common/Common_Outline_Mask_Static.vert",
             "fs":  "./Resources/Shaders/Common/Common_Outline_Mask.frag"

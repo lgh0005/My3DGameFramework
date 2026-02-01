@@ -5,9 +5,7 @@
 CLASS_PTR(RenderContext)
 CLASS_PTR(Program)
 CLASS_PTR(OutlineFramebuffer)
-
-//CLASS_PTR(OutlineStaticRenderQueue)
-//CLASS_PTR(OutlineSkinnedRenderQueue)
+CLASS_PTR(RenderQueue)
 #pragma endregion
 
 CLASS_PTR(OutlineEffect)
@@ -61,14 +59,8 @@ private:
 /*============================================//
 //   Instancing Test                          //
 //============================================*/
-//private:
-//
-//	void MaskStaticMeshesInstanced(const std::vector<MeshOutline*>& outlines);
-//	void MaskSkinnedMeshesInstanced(const std::vector<MeshOutline*>& outlines);
-//
-//	ProgramPtr m_maskStaticProgram;  // Static 마스크용
-//	ProgramPtr m_maskSkinnedProgram; // Skinned 마스크용
-//
-//	OutlineStaticRenderQueueUPtr  m_staticOutlineQueue;
-//	OutlineSkinnedRenderQueueUPtr m_skinnedOutlineQueue;
+private:
+	void CollectOutlines(const std::vector<class MeshOutline*>& outlines);
+	ProgramPtr m_maskInstancedProgram;
+	RenderQueueUPtr m_renderQueue;
 };

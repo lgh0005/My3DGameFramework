@@ -12,8 +12,7 @@
 #include "Components/MeshOutline.h"
 #include "Components/Animator.h"
 #include "Components/Transform.h"
-//#include "Instancing/OutlineStaticRenderQueue.h"
-//#include "Instancing/OutlineSkinnedRenderQueue.h"
+#include "Instancing/RenderQueue.h"
 
 DECLARE_DEFAULTS_IMPL(OutlineEffect)
 
@@ -46,6 +45,9 @@ bool OutlineEffect::Init
 	if (!m_maskStaticProgram || !m_maskSkinnedProgram || !m_postProgram || !m_maskFBO)
 		return false;
 
+	m_maskInstancedProgram = RESOURCE.GetResource<GraphicsProgram>("common_outline_instanced");
+	m_renderQueue = RenderQueue::Create(1024, 512 * MAX_BONES);
+
 	return true;
 }
 
@@ -68,7 +70,8 @@ bool OutlineEffect::Render(RenderContext* context, Framebuffer* srcFBO, Framebuf
 
 	glDisable(GL_DEPTH_TEST);
 	glDisable(GL_CULL_FACE);
-	MaskMeshes(outlines);
+	// MaskMeshes(outlines);
+	CollectOutlines(outlines);
 
 	// [Pass 2] 최종 합성
 	dstFBO->Bind();
@@ -212,45 +215,48 @@ void OutlineEffect::OnResize(int32 width, int32 height)
 /*============================================//
 //   Instancing Test                          //
 //============================================*/
-//void OutlineEffect::MaskStaticMeshes(const std::vector<MeshOutline*>& outlines)
-//{
-//	m_staticOutlineQueue->Clear();
-//	m_maskStaticProgram->Use();
-//
-//	for (auto* outline : outlines)
-//	{
-//		auto* staticRenderer = static_cast<StaticMeshRenderer*>(outline->GetMeshRenderer());
-//
-//		OutlineStaticInstanceProperty prop;
-//		prop.common.worldMatrix = staticRenderer->GetTransform().GetWorldMatrix();
-//		prop.outlineColor = glm::vec4(outline->GetColor(), 1.0f); // 개별 색상 적용
-//
-//		// 머티리얼은 마스크 생성 시 의미 없으므로 nullptr 혹은 기본 머티리얼 사용
-//		m_staticOutlineQueue->Add(staticRenderer->GetMesh().get(), nullptr, prop);
-//	}
-//
-//	m_staticOutlineQueue->Execute(m_maskStaticProgram.get());
-//}
-//
-//void OutlineEffect::MaskSkinnedMeshes(const std::vector<MeshOutline*>& outlines)
-//{
-//	m_skinnedOutlineQueue->Clear();
-//	m_maskSkinnedProgram->Use();
-//
-//	for (auto* outline : outlines)
-//	{
-//		auto* skinnedRenderer = static_cast<SkinnedMeshRenderer*>(outline->GetMeshRenderer());
-//
-//		OutlineSkinnedInstanceProperty prop;
-//		prop.common.worldMatrix = skinnedRenderer->GetTransform().GetWorldMatrix();
-//		prop.outlineColor = glm::vec4(outline->GetColor(), 1.0f);
-//
-//		Animator* animator = skinnedRenderer->GetAnimator();
-//		const auto& bones = (animator && animator->IsEnabled())
-//			? animator->GetFinalBoneMatrices() : Utils::GetIdentityBones();
-//
-//		m_skinnedOutlineQueue->Add(skinnedRenderer->GetMesh().get(), nullptr, prop, bones);
-//	}
-//
-//	m_skinnedOutlineQueue->Execute(m_maskSkinnedProgram.get());
-//}
+void OutlineEffect::CollectOutlines(const std::vector<MeshOutline*>& outlines)
+{
+	m_renderQueue->Clear();
+
+	for (auto* outline : outlines)
+	{
+		if (!outline->IsEnabled() || !outline->GetOwner()->IsActive()) continue;
+
+		MeshRenderer* renderer = outline->GetMeshRenderer();
+		if (!renderer || !renderer->IsEnabled()) continue;
+
+		// 통합 구조체 채우기
+		InstanceProperty prop;
+		prop.worldMatrix = renderer->GetTransform().GetWorldMatrix();
+		prop.color = glm::vec4(outline->GetColor(), 1.0f);
+
+		// 스킨드 메쉬인 경우 뼈 데이터 추출
+		switch (renderer->GetComponentType())
+		{
+			case ComponentType::StaticMeshRenderer:
+			{
+				m_renderQueue->Add(renderer->GetMesh().get(), nullptr, prop);
+				break;
+			}
+
+			case ComponentType::SkinnedMeshRenderer:
+			{
+				auto* skinned = static_cast<SkinnedMeshRenderer*>(renderer);
+				Animator* animator = skinned->GetAnimator();
+				const auto& bones = (animator && animator->IsEnabled())
+					? animator->GetFinalBoneMatrices()
+					: Utils::GetIdentityBones();
+
+				m_renderQueue->Add(renderer->GetMesh().get(), nullptr, prop, bones);
+				break;
+			}
+		}
+	}
+
+	if (m_maskInstancedProgram)
+	{
+		m_maskInstancedProgram->Use();
+		m_renderQueue->Execute(m_maskInstancedProgram.get());
+	}
+}

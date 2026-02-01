@@ -23,7 +23,7 @@ bool RenderQueue::Init(uint32 maxInstanceCount, uint32 maxBoneCount)
 
 void RenderQueue::Add(Mesh* mesh, Material* material, const InstanceProperty& prop, const std::vector<glm::mat4>& bones)
 {
-    if (!mesh || !material) return;
+    if (!mesh) return;
 
     auto& batch = m_batches[mesh][material];
 
@@ -52,7 +52,7 @@ void RenderQueue::Execute(Program* prog)
             if (batch.instanceData.empty()) continue;
 
             // 1. 머티리얼 적용
-            material->SetToProgram(prog);
+            if (material) material->SetToProgram(prog);
 
             // 2. 통합 인스턴스 데이터 전송 (Slot 0)
             m_instanceBuffer->Update(batch.instanceData.data(),
