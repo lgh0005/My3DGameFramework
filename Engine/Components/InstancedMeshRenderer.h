@@ -20,7 +20,6 @@ public:
 	static InstancedMeshRendererUPtr Create(InstancedMeshPtr mesh, MaterialPtr material);
 	virtual RenderBounds GetWorldBounds() const override;
 	virtual void Render(Program* program) const;
-	virtual void UpdateInstanceProperty() override;
 
 private:
 	InstancedMeshRenderer();

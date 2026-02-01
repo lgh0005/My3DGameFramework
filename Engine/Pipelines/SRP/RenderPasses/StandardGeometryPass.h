@@ -10,9 +10,7 @@ CLASS_PTR(RenderContext)
 CLASS_PTR(GBufferFramebuffer)
 CLASS_PTR(StaticMeshRenderer)
 CLASS_PTR(SkinnedMeshRenderer)
-
-CLASS_PTR(StaticRenderQueue)
-CLASS_PTR(SkinnedRenderQueue)
+CLASS_PTR(RenderQueue)
 #pragma endregion
 
 CLASS_PTR(StandardGeometryPass)
@@ -44,12 +42,7 @@ private:
 //   Instancing test   //
 //=====================*/
 private:
-	void RenderStaticGeometryInstanced(const std::vector<StaticMeshRenderer*>& meshes, const glm::mat4& vp);
-	void RenderSkinnedGeometryInstanced(const std::vector<SkinnedMeshRenderer*>& meshes, const glm::mat4& vp);
-
-	ProgramPtr m_staticGeometryInstancedProgram;
-	ProgramPtr m_skinnedGeometryInstancedProgram;
-
-	StaticRenderQueueUPtr m_staticQueue;
-	SkinnedRenderQueueUPtr m_skinnedQueue;
+	void RenderGeometryInstanced(RenderContext* context, const glm::mat4& prevVP);
+	ProgramPtr m_geometryInstancedProgram;
+	RenderQueueUPtr m_renderQueue;
 };

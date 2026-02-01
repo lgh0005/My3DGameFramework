@@ -8,21 +8,16 @@ CLASS_PTR(Material)
 
 struct RenderBatch
 {
+	void Clear();
+	void Add
+	(
+		const InstanceProperty& prop,
+		const std::vector<glm::mat4>& bones = {}
+	);
+
 	Mesh* mesh;
 	Material* material;
-};
-
-struct StaticRenderBatch : RenderBatch
-{
-	void Clear();
-	void Add(const StaticInstanceProperty& prop);
-	std::vector<StaticInstanceProperty> instanceData;
-};
-
-struct SkinnedRenderBatch : RenderBatch
-{
-	void Clear();
-	void Add(const SkinnedInstanceProperty& prop);
-	std::vector<SkinnedInstanceProperty> instanceData;
+	std::vector<InstanceProperty> instanceData;
 	std::vector<glm::mat4> boneData;
 };
+

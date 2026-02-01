@@ -25,7 +25,6 @@ public:
 	virtual bool MatchesType(ComponentType type) const override;
 	virtual RenderBounds GetWorldBounds() const;
 	virtual void Render(Program* program) const = 0;
-	virtual void UpdateInstanceProperty() = 0;
 
 	void SetMesh(MeshPtr mesh) { m_mesh = mesh; }
 	MeshPtr GetMesh() const { return m_mesh; }
@@ -33,10 +32,13 @@ public:
 	RenderStage GetRenderStage() const { return m_renderStage; }
 	void SetMaterial(MaterialPtr material) { m_material = material; }
 	MaterialPtr GetMaterial() const { return m_material; }
+	void SetColor(const glm::vec4& color) { m_color = color; }
+	const glm::vec4& GetColor() const { return m_color; }
 
 protected:
 	MeshRenderer();
 	MeshPtr m_mesh;
 	MaterialPtr m_material;
+	glm::vec4 m_color			{ 1.0f };
 	RenderStage m_renderStage	{ RenderStage::Deferred };
 };

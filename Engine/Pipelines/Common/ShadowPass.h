@@ -9,9 +9,6 @@ CLASS_PTR(ShadowMap)
 CLASS_PTR(StaticMeshRenderer)
 CLASS_PTR(SkinnedMeshRenderer)
 CLASS_PTR(RenderContext)
-
-CLASS_PTR(StaticRenderQueue)
-CLASS_PTR(SkinnedRenderQueue)
 #pragma endregion
 
 CLASS_PTR(ShadowPass)
@@ -56,12 +53,4 @@ private:
 //   Instancing Test                          //
 //============================================*/
 private:
-	void RenderStaticMeshesInstanced(const std::vector<StaticMeshRenderer*>& meshes, const glm::mat4& lightSpaceMatrix);
-	void RenderSkinnedMeshesInstanced(const std::vector<SkinnedMeshRenderer*>& meshes, const glm::mat4& lightSpaceMatrix);
-
-	ProgramPtr m_staticDepthInstancedProgram;
-	ProgramPtr m_skinnedDepthInstancedProgram;
-
-	StaticRenderQueueUPtr m_staticQueue;
-	SkinnedRenderQueueUPtr m_skinnedQueue;
 };

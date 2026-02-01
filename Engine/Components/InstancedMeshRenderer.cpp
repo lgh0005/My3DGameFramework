@@ -34,8 +34,3 @@ void InstancedMeshRenderer::Render(Program* program) const
 	if (m_material) m_material->SetToProgram(program);
 	m_instancedMeshCache->Draw();
 }
-
-void InstancedMeshRenderer::UpdateInstanceProperty()
-{
-	// TODO : 필요하면 적절히 추가
-}

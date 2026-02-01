@@ -17,8 +17,7 @@
 #include "Components/SpotLight.h"
 #include "Components/Animator.h"
 #include "Graphics/Framebuffers/GBufferFramebuffer.h"
-#include "Instancing/StaticRenderQueue.h"
-#include "Instancing/SkinnedRenderQueue.h"
+#include "Instancing/RenderQueue.h"
 
 DECLARE_DEFAULTS_IMPL(StandardGeometryPass)
 
@@ -33,14 +32,12 @@ bool StandardGeometryPass::Init(int32 width, int32 height)
 {
 	m_staticGeometryProgram = RESOURCE.GetResource<GraphicsProgram>("standard_deferred_geometry_static");
 	m_skinnedGeometryProgram = RESOURCE.GetResource<GraphicsProgram>("standard_deferred_geometry_skinned");
-	m_staticGeometryInstancedProgram = RESOURCE.GetResource<GraphicsProgram>("standard_deferred_geometry_static_instanced");
-	m_skinnedGeometryInstancedProgram = RESOURCE.GetResource<GraphicsProgram>("standard_deferred_geometry_skinned_instanced");
+	
+	m_geometryInstancedProgram = RESOURCE.GetResource<GraphicsProgram>("standard_deferred_geometry_instanced");
+	m_renderQueue = RenderQueue::Create(1024, 512 * MAX_BONES);
+	
 	m_gBuffer = GBufferFramebuffer::Create(width, height);
 	if (!m_gBuffer) return false;
-
-	// 큐 초기화 (최대 인스턴스 수 및 뼈 개수 설정)
-	m_staticQueue = StaticRenderQueue::Create(2000); // 넉넉하게 2000개
-	m_skinnedQueue = SkinnedRenderQueue::Create(500, 500 * 100);
 
 	return true;
 }
@@ -65,11 +62,11 @@ void StandardGeometryPass::Render(RenderContext* context)
 
 	// 3. Static Mesh 그리기 (정적 오브젝트)
 	// RenderStaticGeometry(context->GetStaticMeshRenderers(), virtualPrevVP);
-	RenderStaticGeometryInstanced(context->GetStaticMeshRenderers(), virtualPrevVP);
 		
 	// 4. Skinned Mesh 그리기 (애니메이션 오브젝트)
 	// RenderSkinnedGeometry(context->GetSkinnedMeshRenderers(), virtualPrevVP);
-	RenderSkinnedGeometryInstanced(context->GetSkinnedMeshRenderers(), virtualPrevVP);
+
+	RenderGeometryInstanced(context, virtualPrevVP);
 
 	// 4. context에 gBuffer 캐싱
 	context->SetGBuffer(m_gBuffer.get());
@@ -132,52 +129,40 @@ void StandardGeometryPass::Resize(int32 width, int32 height)
 /*=====================//
 //   Instancing test   //
 //=====================*/
-void StandardGeometryPass::RenderStaticGeometryInstanced(const std::vector<StaticMeshRenderer*>& meshes, const glm::mat4& vp)
+void StandardGeometryPass::RenderGeometryInstanced(RenderContext* context, const glm::mat4& prevVP)
 {
-	if (!m_staticGeometryInstancedProgram || meshes.empty()) return;
+	if (!m_geometryInstancedProgram) return;
 
-	m_staticQueue->Clear(); // 매 프레임 초기화
-	m_staticGeometryInstancedProgram->Use();
+	// 1. 큐 초기화 및 셰이더 준비
+	m_renderQueue->Clear();
+	m_geometryInstancedProgram->Use();
+	m_geometryInstancedProgram->SetUniform("uPrevVP", prevVP);
 
-	// 1. 이전 프레임의 VP 행렬을 유니폼으로 한 번만 전송
-	m_staticGeometryInstancedProgram->SetUniform("uPrevVP", vp);
-
-	// 2. 데이터 수집 (Collection)
-	for (const auto* renderer : meshes)
+	// 2. Static Mesh 데이터 수집
+	for (const auto* renderer : context->GetStaticMeshRenderers())
 	{
 		if (!renderer->IsEnabled() || !renderer->GetOwner()->IsActive()) continue;
-		StaticInstanceProperty prop;
-		prop.common.worldMatrix = renderer->GetTransform().GetWorldMatrix();
-		m_staticQueue->Add(renderer->GetMesh().get(), renderer->GetMaterial().get(), prop);
+
+		InstanceProperty prop;
+		prop.worldMatrix = renderer->GetTransform().GetWorldMatrix();
+		prop.color = renderer->GetColor();
+		m_renderQueue->Add(renderer->GetMesh().get(), renderer->GetMaterial().get(), prop);
 	}
 
-	// 2. 일괄 실행 (Execution)
-	// 이제 큐 내부에서 Mesh->Bind, Material->SetToProgram, glDrawElementsInstanced를 알아서 처리합니다.
-	m_staticQueue->Execute(m_staticGeometryInstancedProgram.get());
-}
-
-void StandardGeometryPass::RenderSkinnedGeometryInstanced(const std::vector<SkinnedMeshRenderer*>& meshes, const glm::mat4& vp)
-{
-	if (!m_skinnedGeometryInstancedProgram || meshes.empty()) return;
-
-	m_skinnedQueue->Clear();
-	m_skinnedGeometryInstancedProgram->Use();
-
-	// 1. 이전 프레임의 VP 행렬을 유니폼으로 한 번만 전송
-	m_skinnedGeometryInstancedProgram->SetUniform("uPrevVP", vp);
-
-	for (const auto* renderer : meshes)
+	// 3. Skinned Mesh 데이터 수집
+	for (const auto* renderer : context->GetSkinnedMeshRenderers())
 	{
 		if (!renderer->IsEnabled() || !renderer->GetOwner()->IsActive()) continue;
 
-		SkinnedInstanceProperty prop;
-		prop.common.worldMatrix = renderer->GetTransform().GetWorldMatrix();
+		InstanceProperty prop;
+		prop.worldMatrix = renderer->GetTransform().GetWorldMatrix();
+		prop.color = renderer->GetColor();
 
 		Animator* animator = renderer->GetAnimator();
-		const std::vector<glm::mat4>& bones = animator ? animator->GetFinalBoneMatrices() : GetIdentityBones();
-
-		m_skinnedQueue->Add(renderer->GetMesh().get(), renderer->GetMaterial().get(), prop, bones);
+		const auto& bones = animator ? animator->GetFinalBoneMatrices() : Utils::GetIdentityBones();
+		m_renderQueue->Add(renderer->GetMesh().get(), renderer->GetMaterial().get(), prop, bones);
 	}
 
-	m_skinnedQueue->Execute(m_skinnedGeometryInstancedProgram.get());
+	// 4. 단 한 번의 실행으로 모든 Batch를 순회하며 렌더링
+	m_renderQueue->Execute(m_geometryInstancedProgram.get());
 }

@@ -1,22 +1,34 @@
 ﻿#include "EnginePch.h"
 #include "RenderBatch.h"
 
-void StaticRenderBatch::Clear() 
-{ 
-	instanceData.clear(); 
+void RenderBatch::Clear()
+{
+    instanceData.clear();
+    boneData.clear();
 }
 
-void StaticRenderBatch::Add(const StaticInstanceProperty& prop)
+void RenderBatch::Add
+(
+	const InstanceProperty& prop,
+	const std::vector<glm::mat4>& bones
+)
 {
-	instanceData.push_back(prop);
-}
+	InstanceProperty finalProp = prop;
 
-void SkinnedRenderBatch::Clear()
-{
-	instanceData.clear();
-}
+    // 1. Skinned Mesh 로직
+    if (!bones.empty())
+    {
+        finalProp.typeFlag = 1;
+        finalProp.boneOffset = static_cast<uint32_t>(boneData.size());
+        boneData.insert(boneData.end(), bones.begin(), bones.end());
+    }
 
-void SkinnedRenderBatch::Add(const SkinnedInstanceProperty& prop)
-{
-	instanceData.push_back(prop);
+    // 2. Static Mesh 로직
+    else
+    {
+        finalProp.typeFlag = 0;
+        finalProp.boneOffset = 0;
+    }
+
+    instanceData.push_back(finalProp);
 }

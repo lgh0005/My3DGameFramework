@@ -90,8 +90,8 @@ add_library(Engine STATIC
    "Instancing/InstanceProperty.h"      "Instancing/InstanceProperty.cpp"
    "Instancing/RenderBatch.h"       "Instancing/RenderBatch.cpp"
     "Instancing/RenderQueue.h"      "Instancing/RenderQueue.cpp"
-    "Instancing/StaticRenderQueue.h" "Instancing/StaticRenderQueue.cpp" 
-    "Instancing/SkinnedRenderQueue.h" "Instancing/SkinnedRenderQueue.cpp"
+    #"Instancing/StaticRenderQueue.h" "Instancing/StaticRenderQueue.cpp" 
+    #"Instancing/SkinnedRenderQueue.h" "Instancing/SkinnedRenderQueue.cpp"
     #"Instancing/OutlineStaticRenderQueue.h" "Instancing/OutlineStaticRenderQueue.cpp"
     #"Instancing/OutlineSkinnedRenderQueue.h" "Instancing/OutlineSkinnedRenderQueue.cpp"
 

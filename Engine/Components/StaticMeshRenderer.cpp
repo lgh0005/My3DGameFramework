@@ -28,8 +28,3 @@ void StaticMeshRenderer::Render(Program* program) const
 	if (m_material) m_material->SetToProgram(program);
 	m_mesh->Draw();
 }
-
-void StaticMeshRenderer::UpdateInstanceProperty()
-{
-	m_instanceProperty.common.worldMatrix = GetTransform().GetWorldMatrix();
-}

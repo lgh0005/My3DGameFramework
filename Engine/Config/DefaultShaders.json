@@ -118,6 +118,11 @@
             "fs":  "./Resources/Shaders/Standard/Standard_Deferred_GeometryPass.frag"
         },
         {
+            "key": "standard_deferred_geometry_instanced",
+            "vs":  "./Resources/Shaders/Instanced_Test/standard_Deferred_Geometry_Instanced_Integrated.vert",
+            "fs":  "./Resources/Shaders/Instanced_Test/standard_Deferred_Geometry_Instanced_Integrated.frag"
+        },
+        {
             "key": "standard_deferred_geometry_static_instanced",
             "vs":  "./Resources/Shaders/Instanced_Test/Standard_Deferred_Geometry_Instanced_Static.vert",
             "fs":  "./Resources/Shaders/Instanced_Test/Standard_Deferred_Geometry_Instanced.frag"
