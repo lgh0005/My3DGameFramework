@@ -4,12 +4,12 @@
 #pragma region FORWARD_DECLARATION
 CLASS_PTR(Program)
 CLASS_PTR(Scene)
-CLASS_PTR(Camera)
 CLASS_PTR(Framebuffer)
 CLASS_PTR(GBufferFramebuffer)
 CLASS_PTR(RenderContext)
 CLASS_PTR(StaticMeshRenderer)
 CLASS_PTR(SkinnedMeshRenderer)
+CLASS_PTR(RenderQueue)
 #pragma endregion
 
 CLASS_PTR(UniversalGeometryPass)
@@ -37,4 +37,12 @@ private:
 	GBufferFramebufferUPtr m_gBuffer;
 	ProgramPtr m_staticGeometryProgram;
 	ProgramPtr m_skinnedGeometryProgram;
+
+/*=====================//
+//   Instancing test   //
+//=====================*/
+private:
+	void RenderGeometryInstanced(RenderContext* context, const glm::mat4& lightSpaceMatrix);
+	ProgramPtr m_geometryInstancedProgram;
+	RenderQueueUPtr m_renderQueue;
 };

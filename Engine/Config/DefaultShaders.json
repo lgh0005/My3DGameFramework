@@ -6,45 +6,15 @@
             "vs":  "./Resources/Shaders/Instanced_Test/PostProcess_Outline_Mask.vert",
             "fs":  "./Resources/Shaders/Instanced_Test/PostProcess_Outline_Mask.frag"
         },
-        { 
-            "key": "common_outline_static", 
-            "vs":  "./Resources/Shaders/Common/Common_Outline_Mask_Static.vert",
-            "fs":  "./Resources/Shaders/Common/Common_Outline_Mask.frag"
-        },
-        { 
-            "key": "common_outline_skinned", 
-            "vs":  "./Resources/Shaders/Common/Common_Outline_Mask_Skinned.vert",
-            "fs":  "./Resources/Shaders/Common/Common_Outline_Mask.frag"
-        },
         {
             "key": "common_outline_postprocess",
             "vs":  "./Resources/Shaders/Common/Common_Outline_Post.vert",
             "fs":  "./Resources/Shaders/Common/Common_Outline_Post.frag" 
         },
         {
-            "key": "common_shadow_depth_static",
-            "vs":  "./Resources/Shaders/Common/Common_Shadow_DepthPass_Static.vert",
-            "fs":  "./Resources/Shaders/Common/Common_Shadow_DepthPass.frag" 
-        },
-        {
-            "key": "common_shadow_depth_skinned",
-            "vs":  "./Resources/Shaders/Common/Common_Shadow_DepthPass_Skinned.vert",
-            "fs":  "./Resources/Shaders/Common/Common_Shadow_DepthPass.frag" 
-        },
-        {
             "key": "common_shadow_depth_instanced",
             "vs":  "./Resources/Shaders/Instanced_Test/Common_Shadow_DepthPass_Instanced_Integrated.vert",
             "fs":  "./Resources/Shaders/Instanced_Test/Common_Shadow_DepthPass_Instanced_Integrated.frag" 
-        },
-        {
-            "key": "common_shadow_depth_static_instanced",
-            "vs":  "./Resources/Shaders/Instanced_Test/Common_Shadow_DepthPass_Static_Instanced.vert",
-            "fs":  "./Resources/Shaders/Instanced_Test/Common_Shadow_DepthPass_Instanced.frag" 
-        },
-        {
-            "key": "common_shadow_depth_skinned_instanced",
-            "vs":  "./Resources/Shaders/Instanced_Test/Common_Shadow_DepthPass_Skinned_Instanced.vert",
-            "fs":  "./Resources/Shaders/Instanced_Test/Common_Shadow_DepthPass_Instanced.frag" 
         },
         {
             "key": "common_skybox",
@@ -109,6 +79,7 @@
         },
 
 
+
         {
             "key": "debug_gizmos",
             "vs":  "./Resources/Shaders/Debug/Debug_Jolt_Physics_Gizmo.vert",
@@ -118,29 +89,9 @@
 
 
         {
-            "key": "standard_deferred_geometry_static",
-            "vs":  "./Resources/Shaders/Standard/Standard_Deferred_GeometryPass_Static.vert",
-            "fs":  "./Resources/Shaders/Standard/Standard_Deferred_GeometryPass.frag"
-        },
-        {
-            "key": "standard_deferred_geometry_skinned",
-            "vs":  "./Resources/Shaders/Standard/Standard_Deferred_GeometryPass_Skinned.vert",
-            "fs":  "./Resources/Shaders/Standard/Standard_Deferred_GeometryPass.frag"
-        },
-        {
             "key": "standard_deferred_geometry_instanced",
             "vs":  "./Resources/Shaders/Instanced_Test/standard_Deferred_Geometry_Instanced_Integrated.vert",
             "fs":  "./Resources/Shaders/Instanced_Test/standard_Deferred_Geometry_Instanced_Integrated.frag"
-        },
-        {
-            "key": "standard_deferred_geometry_static_instanced",
-            "vs":  "./Resources/Shaders/Instanced_Test/Standard_Deferred_Geometry_Instanced_Static.vert",
-            "fs":  "./Resources/Shaders/Instanced_Test/Standard_Deferred_Geometry_Instanced.frag"
-        },
-        {
-            "key": "standard_deferred_geometry_skinned_instanced",
-            "vs":  "./Resources/Shaders/Instanced_Test/Standard_Deferred_Geometry_Instanced_Skinned.vert",
-            "fs":  "./Resources/Shaders/Instanced_Test/Standard_Deferred_Geometry_Instanced.frag"
         },
         {
             "key": "standard_deferred_lighting",
@@ -164,7 +115,11 @@
         },
 
 
-
+        {
+            "key": "universal_deferred_geometry_instance",
+            "vs":  "./Resources/Shaders/Instanced_Test/universal_Deferred_Geometry_Instanced_Integrated.vert",
+            "fs":  "./Resources/Shaders/Instanced_Test/universal_Deferred_Geometry_Instanced_Integrated.frag"
+        },
         {
             "key": "universal_deferred_geometry_static",
             "vs":  "./Resources/Shaders/Universal/Universal_Deferred_GeometryPass_Static.vert",

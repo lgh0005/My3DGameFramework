@@ -30,10 +30,10 @@ StandardGeometryPassUPtr StandardGeometryPass::Create(int32 width, int32 height)
 
 bool StandardGeometryPass::Init(int32 width, int32 height)
 {
-	m_staticGeometryProgram = RESOURCE.GetResource<GraphicsProgram>("standard_deferred_geometry_static");
-	m_skinnedGeometryProgram = RESOURCE.GetResource<GraphicsProgram>("standard_deferred_geometry_skinned");
+	// m_staticGeometryProgram = RESOURCE.GetResource<GraphicsProgram>("standard_deferred_geometry_static");
+	// m_skinnedGeometryProgram = RESOURCE.GetResource<GraphicsProgram>("standard_deferred_geometry_skinned");
 	
-	// m_geometryInstancedProgram = RESOURCE.GetResource<GraphicsProgram>("standard_deferred_geometry_instanced");
+	m_geometryInstancedProgram = RESOURCE.GetResource<GraphicsProgram>("standard_deferred_geometry_instanced");
 	m_renderQueue = RenderQueue::Create(1024, 512 * MAX_BONES);
 	
 	m_gBuffer = GBufferFramebuffer::Create(width, height);
@@ -61,12 +61,12 @@ void StandardGeometryPass::Render(RenderContext* context)
 	glDisable(GL_BLEND);
 
 	// 3. Static Mesh 그리기 (정적 오브젝트)
-	RenderStaticGeometry(context->GetStaticMeshRenderers(), virtualPrevVP);
+	// RenderStaticGeometry(context->GetStaticMeshRenderers(), virtualPrevVP);
 		
 	// 4. Skinned Mesh 그리기 (애니메이션 오브젝트)
-	RenderSkinnedGeometry(context->GetSkinnedMeshRenderers(), virtualPrevVP);
+	// RenderSkinnedGeometry(context->GetSkinnedMeshRenderers(), virtualPrevVP);
 
-	// RenderGeometryInstanced(context, virtualPrevVP);
+	RenderGeometryInstanced(context, virtualPrevVP);
 
 	// 4. context에 gBuffer 캐싱
 	context->SetGBuffer(m_gBuffer.get());

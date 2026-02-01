@@ -17,6 +17,7 @@
 #include "Components/SpotLight.h"
 #include "Components/Animator.h"
 #include "Graphics/Framebuffers/GBufferFramebuffer.h"
+#include "Instancing/RenderQueue.h"
 
 DECLARE_DEFAULTS_IMPL(UniversalGeometryPass)
 
@@ -31,6 +32,10 @@ bool UniversalGeometryPass::Init(int32 width, int32 height)
 {
 	m_staticGeometryProgram = RESOURCE.GetResource<GraphicsProgram>("universal_deferred_geometry_static");
 	m_skinnedGeometryProgram = RESOURCE.GetResource<GraphicsProgram>("universal_deferred_geometry_skinned");
+	
+	m_geometryInstancedProgram = RESOURCE.GetResource<GraphicsProgram>("universal_deferred_geometry_instance");
+	m_renderQueue = RenderQueue::Create(1024, 512 * MAX_BONES);
+
 	m_gBuffer = GBufferFramebuffer::Create(width, height);
 	if (!m_gBuffer) return false;
 	return true;
@@ -55,10 +60,12 @@ void UniversalGeometryPass::Render(RenderContext* context)
 	glDisable(GL_BLEND);
 	
 	// 3. Static Mesh 그리기 (정적 오브젝트)
-	RenderStaticGeometry(context->GetStaticMeshRenderers(), virtualPrevVP);
+	// RenderStaticGeometry(context->GetStaticMeshRenderers(), virtualPrevVP);
 
 	// 4. Skinned Mesh 그리기 (애니메이션 오브젝트)
-	RenderSkinnedGeometry(context->GetSkinnedMeshRenderers(), virtualPrevVP);
+	// RenderSkinnedGeometry(context->GetSkinnedMeshRenderers(), virtualPrevVP);
+
+	RenderGeometryInstanced(context, virtualPrevVP);
 
 	// 5. context에 gBuffer 캐싱
 	context->SetGBuffer(m_gBuffer.get());
@@ -116,3 +123,43 @@ void UniversalGeometryPass::Resize(int32 width, int32 height)
 	m_gBuffer = GBufferFramebuffer::Create(width, height);
 }
 
+/*=====================//
+//   Instancing test   //
+//=====================*/
+void UniversalGeometryPass::RenderGeometryInstanced(RenderContext* context, const glm::mat4& prevVP)
+{
+	if (!m_geometryInstancedProgram) return;
+
+	// 1. 큐 초기화 및 셰이더 준비
+	m_renderQueue->Clear();
+	m_geometryInstancedProgram->Use();
+	m_geometryInstancedProgram->SetUniform("uPrevVP", prevVP);
+
+	// 2. Static Mesh 데이터 수집
+	for (const auto* renderer : context->GetStaticMeshRenderers())
+	{
+		if (!renderer->IsEnabled() || !renderer->GetOwner()->IsActive()) continue;
+
+		InstanceProperty prop;
+		prop.worldMatrix = renderer->GetTransform().GetWorldMatrix();
+		prop.color = renderer->GetColor();
+		m_renderQueue->Add(renderer->GetMesh().get(), renderer->GetMaterial().get(), prop);
+	}
+
+	// 3. Skinned Mesh 데이터 수집
+	for (const auto* renderer : context->GetSkinnedMeshRenderers())
+	{
+		if (!renderer->IsEnabled() || !renderer->GetOwner()->IsActive()) continue;
+
+		InstanceProperty prop;
+		prop.worldMatrix = renderer->GetTransform().GetWorldMatrix();
+		prop.color = renderer->GetColor();
+
+		Animator* animator = renderer->GetAnimator();
+		const auto& bones = animator ? animator->GetFinalBoneMatrices() : Utils::GetIdentityBones();
+		m_renderQueue->Add(renderer->GetMesh().get(), renderer->GetMaterial().get(), prop, bones);
+	}
+
+	// 4. 단 한 번의 실행으로 모든 Batch를 순회하며 렌더링
+	m_renderQueue->Execute(m_geometryInstancedProgram.get());
+}
