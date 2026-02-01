@@ -33,11 +33,7 @@ private:
 	SSAOPassUPtr				 m_ssaoPass			{ nullptr };
 	PostProcessPassUPtr			 m_postProcessPass{ nullptr };
 
-	/*OutlinePassUPtr			     m_outlinePass		{ nullptr };
-	MotionBlurPassUPtr			 m_motionBlurPass	{ nullptr };*/
-
 	// URP 필수 렌더 패스
-	// UniversalPostProcessPassUPtr	   m_postProcessPass	{ nullptr };
 	UniversalGeometryPassUPtr		   m_geometryPass       { nullptr };
 	UniversalDeferredLightingPassUPtr  m_deferredLightPass  { nullptr };
 

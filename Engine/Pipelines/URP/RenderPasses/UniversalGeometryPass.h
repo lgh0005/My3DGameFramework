@@ -31,18 +31,9 @@ public:
 private:
 	UniversalGeometryPass();
 	bool Init(int32 width, int32 height);
-	void RenderStaticGeometry(const std::vector<StaticMeshRenderer*>& meshes, const glm::mat4& vp);
-	void RenderSkinnedGeometry(const std::vector<SkinnedMeshRenderer*>& meshes, const glm::mat4& vp);
+	void RenderGeometry(RenderContext* context, const glm::mat4& lightSpaceMatrix);
 
-	GBufferFramebufferUPtr m_gBuffer;
-	ProgramPtr m_staticGeometryProgram;
-	ProgramPtr m_skinnedGeometryProgram;
-
-/*=====================//
-//   Instancing test   //
-//=====================*/
-private:
-	void RenderGeometryInstanced(RenderContext* context, const glm::mat4& lightSpaceMatrix);
 	ProgramPtr m_geometryInstancedProgram;
+	GBufferFramebufferUPtr m_gBuffer;
 	RenderQueueUPtr m_renderQueue;
 };

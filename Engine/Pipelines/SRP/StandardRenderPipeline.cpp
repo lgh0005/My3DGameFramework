@@ -74,20 +74,22 @@ bool StandardRenderPipeline::Init()
 	// 통용 포스트-프로세스 패스 생성
 	m_postProcessPass = PostProcessPass::Create();
 	if (!m_postProcessPass) return false;
-	auto motion = MotionBlurEffect::Create(0);
-	m_postProcessPass->AddEffect(std::move(motion));
-	auto world = WorldSpaceEffects::Create(1);
-	m_postProcessPass->AddEffect(std::move(world));
-	auto outline = OutlineEffect::Create(3);
-	m_postProcessPass->AddEffect(std::move(outline));
-	auto bloom = GaussianBloomEffect::Create(4);
-	m_postProcessPass->AddEffect(std::move(bloom));
-	auto display = DisplayMappingEffects::Create(6);
-	display->SetToneMappingMode(ToneMappingMode::Exposure); // 0번 모드
-	display->SetBloomStrength(1.0f);
-	display->SetExposure(1.0f);
-	display->SetUseCRT(false);
-	m_postProcessPass->AddEffect(std::move(display));
+	{
+		auto motion = MotionBlurEffect::Create(0);
+		m_postProcessPass->AddEffect(std::move(motion));
+		auto world = WorldSpaceEffects::Create(1);
+		m_postProcessPass->AddEffect(std::move(world));
+		auto outline = OutlineEffect::Create(3);
+		m_postProcessPass->AddEffect(std::move(outline));
+		auto bloom = GaussianBloomEffect::Create(4);
+		m_postProcessPass->AddEffect(std::move(bloom));
+		auto display = DisplayMappingEffects::Create(6);
+		display->SetToneMappingMode(ToneMappingMode::Exposure);
+		display->SetBloomStrength(1.0f);
+		display->SetExposure(1.0f);
+		display->SetUseCRT(false);
+		m_postProcessPass->AddEffect(std::move(display));
+	}
 
 	// G-buffer 패스 생성
 	m_geometryPass = StandardGeometryPass::Create();

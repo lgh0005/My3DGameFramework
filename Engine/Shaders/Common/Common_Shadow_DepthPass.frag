@@ -1,10 +1,11 @@
-#version 460 core
+﻿#version 460 core
 
-// DEBUG
-out vec4 FragColor;
+// Shadow Pass는 별도의 컬러 출력이 필요 없으나, 
+// 색상 버퍼가 없는 뎁스 전용 렌더링을 수행하므로 비워둡니다.
+// 만약 알파 테스팅이 필요하다면 여기서 texture 샘플링 후 discard 로직이 들어갑니다.
 
-void main()
+void main() 
 {
-    // ���� ���� GPU�� ���� �ڵ����� ���� ���ۿ� ��ϵ˴ϴ�.
-    FragColor = vec4(vec3(gl_FragCoord.z), 1.0);
+    // 아무것도 하지 않음 (GPU가 Depth를 자동으로 기록)
+    // 사용자님이 적어주신 FragColor 출력은 디버깅용이 아니라면 성능을 위해 제거하는 것이 좋습니다.
 }

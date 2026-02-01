@@ -38,20 +38,22 @@ bool OutlineEffect::Init
 	m_width = width;
 	m_height = height;
 
-	m_maskStaticProgram = RESOURCE.GetResource<GraphicsProgram>("common_outline_static");
-	m_maskSkinnedProgram = RESOURCE.GetResource<GraphicsProgram>("common_outline_skinned");
-	m_postProgram = RESOURCE.GetResource<GraphicsProgram>("common_outline_postprocess");
+	m_maskInstancedProgram = RESOURCE.GetResource<GraphicsProgram>("postprocess_outline_mask");
+	m_postProgram = RESOURCE.GetResource<GraphicsProgram>("postprocess_outline_post");
 	m_maskFBO = OutlineFramebuffer::Create(width, height);
-	if (!m_maskStaticProgram || !m_maskSkinnedProgram || !m_postProgram || !m_maskFBO)
-		return false;
-
-	m_maskInstancedProgram = RESOURCE.GetResource<GraphicsProgram>("common_outline_instanced");
 	m_renderQueue = RenderQueue::Create(1024, 512 * MAX_BONES);
+	if (!m_maskInstancedProgram || !m_postProgram || !m_maskFBO || !m_renderQueue)
+		return false;
 
 	return true;
 }
 
-bool OutlineEffect::Render(RenderContext* context, Framebuffer* srcFBO, Framebuffer* dstFBO, ScreenMesh* screenMesh)
+bool OutlineEffect::Render
+(
+	RenderContext* context, 
+	Framebuffer* srcFBO, Framebuffer* dstFBO, 
+	ScreenMesh* screenMesh
+)
 {
 	// 0. 데이터 확인
 	if (!context || !srcFBO || !dstFBO) return false;
@@ -70,7 +72,6 @@ bool OutlineEffect::Render(RenderContext* context, Framebuffer* srcFBO, Framebuf
 
 	glDisable(GL_DEPTH_TEST);
 	glDisable(GL_CULL_FACE);
-	// MaskMeshes(outlines);
 	CollectOutlines(outlines);
 
 	// [Pass 2] 최종 합성
@@ -107,114 +108,6 @@ bool OutlineEffect::Render(RenderContext* context, Framebuffer* srcFBO, Framebuf
 	return true;
 }
 
-/*==============================//
-//   outlining helper methods   //
-//==============================*/
-void OutlineEffect::MaskMeshes(const std::vector<MeshOutline*>& outlines)
-{
-	// 1. 분류를 위한 정적 벡터
-	static std::vector<MeshOutline*> staticOutlines;  staticOutlines.clear();
-	static std::vector<MeshOutline*> skinnedOutlines; skinnedOutlines.clear();
-
-	// 2. 전체 리스트는 여기서 딱 한 번만 순회
-	for (auto* outline : outlines)
-	{
-		// 1. 기본 유효성 검사 (여기서 미리 다 걸러냅니다)
-		if (!outline->IsEnabled()) continue;
-		if (!outline->GetOwner()->IsActive()) continue;
-
-		// 2. 캐싱된 렌더러 가져오기
-		MeshRenderer* renderer = outline->GetMeshRenderer();
-		if (!renderer || !renderer->IsEnabled()) continue;
-
-		// 3. MeshRenderer의 타입에 맞춰서 분리
-		switch (renderer->GetComponentType())
-		{
-		case ComponentType::StaticMeshRenderer:
-		{
-			staticOutlines.push_back(outline);
-			break;
-		}
-
-		case ComponentType::SkinnedMeshRenderer:
-		{
-			skinnedOutlines.push_back(outline);
-			break;
-		}
-
-		// TODO : InstancedMeshRenderer에 대해서도 처리 필요
-		default:
-			break;
-		}
-	}
-
-	// 4. 분류된 리스트를 넘겨서 그리기
-	if (!staticOutlines.empty()) MaskStaticMeshes(staticOutlines);
-	if (!skinnedOutlines.empty()) MaskSkinnedMeshes(skinnedOutlines);
-}
-
-void OutlineEffect::MaskStaticMeshes(const std::vector<MeshOutline*>& outlines)
-{
-	m_maskStaticProgram->Use();
-
-	for (auto* outline : outlines)
-	{
-		// 정적 매쉬 렌더러 가져오기
-		MeshRenderer* renderer = outline->GetMeshRenderer();
-		auto* staticRenderer = static_cast<StaticMeshRenderer*>(renderer);
-
-		// 유니폼 설정
-		m_maskStaticProgram->SetUniform("model", staticRenderer->GetTransform().GetWorldMatrix());
-		m_maskStaticProgram->SetUniform("outlineColor", outline->GetColor());
-
-		renderer->Render(m_maskStaticProgram.get());
-	}
-}
-
-void OutlineEffect::MaskSkinnedMeshes(const std::vector<MeshOutline*>& outlines)
-{
-	m_maskSkinnedProgram->Use();
-
-	// 이미 검증된 Skinned 목록만 들어옴
-	for (auto* outline : outlines)
-	{
-		// 스킨드 매쉬 렌더러 가져오기
-		MeshRenderer* renderer = outline->GetMeshRenderer();
-		auto* skinnedRenderer = static_cast<SkinnedMeshRenderer*>(renderer);
-
-		// 유니폼 설정
-		m_maskSkinnedProgram->SetUniform("model", renderer->GetTransform().GetWorldMatrix());
-		m_maskSkinnedProgram->SetUniform("outlineColor", outline->GetColor());
-
-		// 애니메이터 처리
-		Animator* animator = skinnedRenderer->GetAnimator();
-		const auto& boneMatrices = (animator && animator->IsEnabled() && animator->GetOwner()->IsActive())
-			? animator->GetFinalBoneMatrices()
-			: Utils::GetIdentityBones();
-
-		m_maskSkinnedProgram->SetUniform("finalBoneMatrices", boneMatrices);
-
-		renderer->Render(m_maskSkinnedProgram.get());
-	}
-}
-
-void OutlineEffect::OnResize(int32 width, int32 height)
-{
-	// 1. 멤버 변수 및 FBO 리사이즈
-	Super::OnResize(width, height);
-	m_maskFBO->OnResize(m_width, m_height);
-
-	// 2. 셰이더에게 변경된 해상도 알려주기
-	if (m_postProgram)
-	{
-		m_postProgram->Use();
-		m_postProgram->SetUniform("canvasSize", glm::vec2(width, height));
-	}
-}
-
-/*============================================//
-//   Instancing Test                          //
-//============================================*/
 void OutlineEffect::CollectOutlines(const std::vector<MeshOutline*>& outlines)
 {
 	m_renderQueue->Clear();
@@ -234,23 +127,23 @@ void OutlineEffect::CollectOutlines(const std::vector<MeshOutline*>& outlines)
 		// 스킨드 메쉬인 경우 뼈 데이터 추출
 		switch (renderer->GetComponentType())
 		{
-			case ComponentType::StaticMeshRenderer:
-			{
-				m_renderQueue->Add(renderer->GetMesh().get(), nullptr, prop);
-				break;
-			}
+		case ComponentType::StaticMeshRenderer:
+		{
+			m_renderQueue->Add(renderer->GetMesh().get(), nullptr, prop);
+			break;
+		}
 
-			case ComponentType::SkinnedMeshRenderer:
-			{
-				auto* skinned = static_cast<SkinnedMeshRenderer*>(renderer);
-				Animator* animator = skinned->GetAnimator();
-				const auto& bones = (animator && animator->IsEnabled())
-					? animator->GetFinalBoneMatrices()
-					: Utils::GetIdentityBones();
+		case ComponentType::SkinnedMeshRenderer:
+		{
+			auto* skinned = static_cast<SkinnedMeshRenderer*>(renderer);
+			Animator* animator = skinned->GetAnimator();
+			const auto& bones = (animator && animator->IsEnabled())
+				? animator->GetFinalBoneMatrices()
+				: Utils::GetIdentityBones();
 
-				m_renderQueue->Add(renderer->GetMesh().get(), nullptr, prop, bones);
-				break;
-			}
+			m_renderQueue->Add(renderer->GetMesh().get(), nullptr, prop, bones);
+			break;
+		}
 		}
 	}
 
@@ -258,5 +151,19 @@ void OutlineEffect::CollectOutlines(const std::vector<MeshOutline*>& outlines)
 	{
 		m_maskInstancedProgram->Use();
 		m_renderQueue->Execute(m_maskInstancedProgram.get());
+	}
+}
+
+void OutlineEffect::OnResize(int32 width, int32 height)
+{
+	// 1. 멤버 변수 및 FBO 리사이즈
+	Super::OnResize(width, height);
+	m_maskFBO->OnResize(m_width, m_height);
+
+	// 2. 셰이더에게 변경된 해상도 알려주기
+	if (m_postProgram)
+	{
+		m_postProgram->Use();
+		m_postProgram->SetUniform("canvasSize", glm::vec2(width, height));
 	}
 }

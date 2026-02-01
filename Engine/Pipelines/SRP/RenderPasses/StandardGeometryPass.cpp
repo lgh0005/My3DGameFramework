@@ -30,15 +30,10 @@ StandardGeometryPassUPtr StandardGeometryPass::Create(int32 width, int32 height)
 
 bool StandardGeometryPass::Init(int32 width, int32 height)
 {
-	// m_staticGeometryProgram = RESOURCE.GetResource<GraphicsProgram>("standard_deferred_geometry_static");
-	// m_skinnedGeometryProgram = RESOURCE.GetResource<GraphicsProgram>("standard_deferred_geometry_skinned");
-	
-	m_geometryInstancedProgram = RESOURCE.GetResource<GraphicsProgram>("standard_deferred_geometry_instanced");
+	m_geometryInstancedProgram = RESOURCE.GetResource<GraphicsProgram>("standard_deferred_geometry");
 	m_renderQueue = RenderQueue::Create(1024, 512 * MAX_BONES);
-	
 	m_gBuffer = GBufferFramebuffer::Create(width, height);
-	if (!m_gBuffer) return false;
-
+	if (!m_gBuffer || !m_geometryInstancedProgram || !m_gBuffer) return false;
 	return true;
 }
 
@@ -60,13 +55,8 @@ void StandardGeometryPass::Render(RenderContext* context)
 	glEnable(GL_DEPTH_TEST);
 	glDisable(GL_BLEND);
 
-	// 3. Static Mesh 그리기 (정적 오브젝트)
-	// RenderStaticGeometry(context->GetStaticMeshRenderers(), virtualPrevVP);
-		
-	// 4. Skinned Mesh 그리기 (애니메이션 오브젝트)
-	// RenderSkinnedGeometry(context->GetSkinnedMeshRenderers(), virtualPrevVP);
-
-	RenderGeometryInstanced(context, virtualPrevVP);
+	// 3. 모든 메쉬들을 읽어서 GBuffer에 기록
+	RenderGeometry(context, virtualPrevVP);
 
 	// 4. context에 gBuffer 캐싱
 	context->SetGBuffer(m_gBuffer.get());
@@ -75,61 +65,7 @@ void StandardGeometryPass::Render(RenderContext* context)
 	Framebuffer::BindToDefault();
 }
 
-void StandardGeometryPass::RenderStaticGeometry(const std::vector<StaticMeshRenderer*>& meshes, const glm::mat4& vp)
-{
-	if (!m_staticGeometryProgram || meshes.empty()) return;
-
-	m_staticGeometryProgram->Use();
-	for (const auto* renderer : meshes)
-	{
-		if (!renderer->IsEnabled()) continue;
-		if (!renderer->GetOwner()->IsActive()) continue;
-
-		auto model = renderer->GetTransform().GetWorldMatrix();
-		m_staticGeometryProgram->SetUniform("model", model);
-
-		glm::mat4 prevMVP = vp * model;
-		m_staticGeometryProgram->SetUniform("uPrevModelViewProj", prevMVP);
-
-		renderer->Render(m_staticGeometryProgram.get());
-	}
-}
-
-void StandardGeometryPass::RenderSkinnedGeometry(const std::vector<SkinnedMeshRenderer*>& meshes, const glm::mat4& vp)
-{
-	if (!m_skinnedGeometryProgram || meshes.empty()) return;
-
-	m_skinnedGeometryProgram->Use();
-	for (const auto* renderer : meshes)
-	{
-		// TODO : 이후에 CullingPass와 파티셔닝을 통한 O(N) 렌더링에서 O(k) 렌더링으로
-		// 최적화가 가능하며 순수하게 이러한 파티셔닝 정렬은 멀티스레딩을 이용할 수도 있다.
-		if (!renderer->IsEnabled()) continue;
-		if (!renderer->GetOwner()->IsActive()) continue;
-
-		auto model = renderer->GetTransform().GetWorldMatrix();
-		m_skinnedGeometryProgram->SetUniform("model", model);
-
-		glm::mat4 prevMVP = vp * model;
-		m_skinnedGeometryProgram->SetUniform("uPrevModelViewProj", prevMVP);
-
-		Animator* animator = renderer->GetAnimator();
-		if (animator) m_skinnedGeometryProgram->SetUniform("finalBoneMatrices", animator->GetFinalBoneMatrices());
-		else m_skinnedGeometryProgram->SetUniform("finalBoneMatrices", GetIdentityBones());
-	
-		renderer->Render(m_skinnedGeometryProgram.get());
-	}
-}
-
-void StandardGeometryPass::Resize(int32 width, int32 height)
-{
-	m_gBuffer->OnResize(width, height);
-}
-
-/*=====================//
-//   Instancing test   //
-//=====================*/
-void StandardGeometryPass::RenderGeometryInstanced(RenderContext* context, const glm::mat4& prevVP)
+void StandardGeometryPass::RenderGeometry(RenderContext* context, const glm::mat4& prevVP)
 {
 	if (!m_geometryInstancedProgram) return;
 
@@ -165,4 +101,9 @@ void StandardGeometryPass::RenderGeometryInstanced(RenderContext* context, const
 
 	// 4. 단 한 번의 실행으로 모든 Batch를 순회하며 렌더링
 	m_renderQueue->Execute(m_geometryInstancedProgram.get());
+}
+
+void StandardGeometryPass::Resize(int32 width, int32 height)
+{
+	m_gBuffer->OnResize(width, height);
 }

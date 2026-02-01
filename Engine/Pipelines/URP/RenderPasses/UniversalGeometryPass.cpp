@@ -30,14 +30,10 @@ UniversalGeometryPassUPtr UniversalGeometryPass::Create(int32 width, int32 heigh
 
 bool UniversalGeometryPass::Init(int32 width, int32 height)
 {
-	m_staticGeometryProgram = RESOURCE.GetResource<GraphicsProgram>("universal_deferred_geometry_static");
-	m_skinnedGeometryProgram = RESOURCE.GetResource<GraphicsProgram>("universal_deferred_geometry_skinned");
-	
-	m_geometryInstancedProgram = RESOURCE.GetResource<GraphicsProgram>("universal_deferred_geometry_instance");
+	m_geometryInstancedProgram = RESOURCE.GetResource<GraphicsProgram>("universal_deferred_geometry");
 	m_renderQueue = RenderQueue::Create(1024, 512 * MAX_BONES);
-
 	m_gBuffer = GBufferFramebuffer::Create(width, height);
-	if (!m_gBuffer) return false;
+	if (!m_gBuffer || !m_geometryInstancedProgram || !m_gBuffer) return false;
 	return true;
 }
 
@@ -59,74 +55,17 @@ void UniversalGeometryPass::Render(RenderContext* context)
 	glEnable(GL_DEPTH_TEST);
 	glDisable(GL_BLEND);
 	
-	// 3. Static Mesh 그리기 (정적 오브젝트)
-	// RenderStaticGeometry(context->GetStaticMeshRenderers(), virtualPrevVP);
+	// 3. 모든 메쉬들을 읽어서 GBuffer에 기록
+	RenderGeometry(context, virtualPrevVP);
 
-	// 4. Skinned Mesh 그리기 (애니메이션 오브젝트)
-	// RenderSkinnedGeometry(context->GetSkinnedMeshRenderers(), virtualPrevVP);
-
-	RenderGeometryInstanced(context, virtualPrevVP);
-
-	// 5. context에 gBuffer 캐싱
+	// 4. context에 gBuffer 캐싱
 	context->SetGBuffer(m_gBuffer.get());
 
-	// 6. 그리기 완료 후 기본 프레임버퍼로 복귀
+	// 5. 그리기 완료 후 기본 프레임버퍼로 복귀
 	Framebuffer::BindToDefault();
 }
 
-void UniversalGeometryPass::RenderStaticGeometry(const std::vector<StaticMeshRenderer*>& meshes, const glm::mat4& vp)
-{
-	if (!m_staticGeometryProgram || meshes.empty()) return;
-
-	m_staticGeometryProgram->Use();
-	for (const auto* renderer : meshes)
-	{
-		if (!renderer->IsEnabled()) continue;
-		if (!renderer->GetOwner()->IsActive()) continue;
-
-		auto model = renderer->GetTransform().GetWorldMatrix();
-		m_staticGeometryProgram->SetUniform("model", model);
-
-		glm::mat4 prevMVP = vp * model;
-		m_staticGeometryProgram->SetUniform("uPrevModelViewProj", prevMVP);
-
-		renderer->Render(m_staticGeometryProgram.get());
-	}
-}
-
-void UniversalGeometryPass::RenderSkinnedGeometry(const std::vector<SkinnedMeshRenderer*>& meshes, const glm::mat4& vp)
-{
-	if (!m_skinnedGeometryProgram || meshes.empty()) return;
-
-	m_skinnedGeometryProgram->Use();
-	for (const auto* renderer : meshes)
-	{
-		if (!renderer->IsEnabled()) continue;
-		if (!renderer->GetOwner()->IsActive()) continue;
-
-		auto model = renderer->GetTransform().GetWorldMatrix();
-		m_skinnedGeometryProgram->SetUniform("model", model);
-
-		glm::mat4 prevMVP = vp * model;
-		m_skinnedGeometryProgram->SetUniform("uPrevModelViewProj", prevMVP);
-
-		Animator* animator = renderer->GetAnimator();
-		if (animator) m_skinnedGeometryProgram->SetUniform("finalBoneMatrices", animator->GetFinalBoneMatrices());
-		else m_skinnedGeometryProgram->SetUniform("finalBoneMatrices", GetIdentityBones());
-
-		renderer->Render(m_skinnedGeometryProgram.get());
-	}
-}
-
-void UniversalGeometryPass::Resize(int32 width, int32 height)
-{
-	m_gBuffer = GBufferFramebuffer::Create(width, height);
-}
-
-/*=====================//
-//   Instancing test   //
-//=====================*/
-void UniversalGeometryPass::RenderGeometryInstanced(RenderContext* context, const glm::mat4& prevVP)
+void UniversalGeometryPass::RenderGeometry(RenderContext* context, const glm::mat4& prevVP)
 {
 	if (!m_geometryInstancedProgram) return;
 
@@ -162,4 +101,9 @@ void UniversalGeometryPass::RenderGeometryInstanced(RenderContext* context, cons
 
 	// 4. 단 한 번의 실행으로 모든 Batch를 순회하며 렌더링
 	m_renderQueue->Execute(m_geometryInstancedProgram.get());
+}
+
+void UniversalGeometryPass::Resize(int32 width, int32 height)
+{
+	m_gBuffer = GBufferFramebuffer::Create(width, height);
 }

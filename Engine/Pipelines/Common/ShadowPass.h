@@ -30,31 +30,11 @@ private:
 	bool Init(int32 resolution);
 
 	glm::mat4 CalculateLightSpaceMatrix(Light* light);
-	void RenderStaticMeshes
-	(
-		const std::vector<StaticMeshRenderer*>& meshes,
-		const glm::mat4& lightSpaceMatrix
-	);
-
-	void RenderSkinnedMeshes
-	(
-		const std::vector<SkinnedMeshRenderer*>& meshes,
-		const glm::mat4& lightSpaceMatrix
-	);
-
+	void CastMeshes(RenderContext* context, const glm::mat4& lightSpaceMatrix);
 	void RegisterShadowMapsToContext(RenderContext* context);
 
 	int32	    m_resolution;
-	std::vector<ShadowMapUPtr> m_shadowMaps;
-
-	ProgramPtr m_staticDepthProgram;
-	ProgramPtr m_skinnedDepthProgram;
-
-/*============================================//
-//   Instancing Test                          //
-//============================================*/
-private:
-	void CastMeshesInstanced(RenderContext* context, const glm::mat4& lightSpaceMatrix);
 	ProgramPtr m_meshInstancedDepthProgram;
+	std::vector<ShadowMapUPtr> m_shadowMaps;
 	RenderQueueUPtr m_renderQueue;
 };

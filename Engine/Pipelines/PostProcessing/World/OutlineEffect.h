@@ -33,14 +33,6 @@ public:
 
 	virtual void OnResize(int32 width, int32 height) override;
 
-/*==============================//
-//   outlining helper methods   //
-//==============================*/
-private:
-	void MaskMeshes(const std::vector<MeshOutline*>& outlines);
-	void MaskStaticMeshes(const std::vector<MeshOutline*>& outlines);
-	void MaskSkinnedMeshes(const std::vector<MeshOutline*>& outlines);
-
 private:
 	OutlineEffect();
 	bool Init
@@ -48,19 +40,13 @@ private:
 		int32 priority, int32 width, int32 height,
 		const glm::vec3& color, float thickness
 	);
+	void CollectOutlines(const std::vector<class MeshOutline*>& outlines);
 
 	OutlineFramebufferUPtr m_maskFBO;
-	ProgramPtr m_maskStaticProgram;  // Static 마스크용
-	ProgramPtr m_maskSkinnedProgram; // Skinned 마스크용
-	ProgramPtr m_postProgram;		 // 합성용
+	ProgramPtr m_maskInstancedProgram; // 메쉬 마스크용
+	ProgramPtr m_postProgram;		   // 합성용
+	RenderQueueUPtr m_renderQueue;
+
 	glm::vec3 m_color  { 1.0f };
 	float m_thickness  { 2.0f };
-
-/*============================================//
-//   Instancing Test                          //
-//============================================*/
-private:
-	void CollectOutlines(const std::vector<class MeshOutline*>& outlines);
-	ProgramPtr m_maskInstancedProgram;
-	RenderQueueUPtr m_renderQueue;
 };
