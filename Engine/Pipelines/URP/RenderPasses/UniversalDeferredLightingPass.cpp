@@ -6,8 +6,8 @@
 #include "Scene/ComponentRegistry.h"
 #include "Object/GameObject.h"
 #include "Scene/SceneRegistry.h"
-#include "Graphics/Geometry.h"
-#include "Resources/Program.h"
+#include "Resources/Programs/Program.h"
+#include "Resources/Programs/GraphicsProgram.h"
 #include "Resources/Meshes/ScreenMesh.h"
 #include "Resources/Meshes/StaticMesh.h" 
 #include "Resources/Textures/Texture.h"
@@ -30,7 +30,7 @@ UniversalDeferredLightingPassUPtr UniversalDeferredLightingPass::Create()
 
 bool UniversalDeferredLightingPass::Init()
 {
-	m_deferredLightProgram = RESOURCE.GetResource<Program>("universal_deferred_lighting");
+	m_deferredLightProgram = RESOURCE.GetResource<GraphicsProgram>("universal_deferred_lighting");
 	m_plane = RESOURCE.GetResource<ScreenMesh>("Screen");
 	if (!m_deferredLightProgram || !m_plane) return false;
 

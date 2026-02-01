@@ -57,10 +57,10 @@ add_library(Engine STATIC
    "Pipelines/SRP/StandardRenderPipeline.h"    "Pipelines/SRP/StandardRenderPipeline.cpp"
    
    # Universal Render Pipeline
-   #"Pipelines/URP/RenderPasses/UniversalGeometryPass.h" "Pipelines/URP/RenderPasses/UniversalGeometryPass.cpp"
-   #"Pipelines/URP/RenderPasses/UniversalDeferredLightingPass.h" "Pipelines/URP/RenderPasses/UniversalDeferredLightingPass.cpp"
-   #"Pipelines/URP/UniversalGlobalUniforms.h"   "Pipelines/URP/UniversalGlobalUniforms.cpp"
-   #"Pipelines/URP/UniversalRenderPipeline.h"   "Pipelines/URP/UniversalRenderPipeline.cpp"
+   "Pipelines/URP/RenderPasses/UniversalGeometryPass.h" "Pipelines/URP/RenderPasses/UniversalGeometryPass.cpp"
+   "Pipelines/URP/RenderPasses/UniversalDeferredLightingPass.h" "Pipelines/URP/RenderPasses/UniversalDeferredLightingPass.cpp"
+   "Pipelines/URP/UniversalGlobalUniforms.h"   "Pipelines/URP/UniversalGlobalUniforms.cpp"
+   "Pipelines/URP/UniversalRenderPipeline.h"   "Pipelines/URP/UniversalRenderPipeline.cpp"
 
    # Misc
    "Misc/Defines.h"                 
@@ -89,11 +89,7 @@ add_library(Engine STATIC
    "Instancing/InstanceBuffer.h"    "Instancing/InstanceBuffer.cpp"
    "Instancing/InstanceProperty.h"      "Instancing/InstanceProperty.cpp"
    "Instancing/RenderBatch.h"       "Instancing/RenderBatch.cpp"
-    "Instancing/RenderQueue.h"      "Instancing/RenderQueue.cpp"
-    #"Instancing/StaticRenderQueue.h" "Instancing/StaticRenderQueue.cpp" 
-    #"Instancing/SkinnedRenderQueue.h" "Instancing/SkinnedRenderQueue.cpp"
-    #"Instancing/OutlineStaticRenderQueue.h" "Instancing/OutlineStaticRenderQueue.cpp"
-    #"Instancing/OutlineSkinnedRenderQueue.h" "Instancing/OutlineSkinnedRenderQueue.cpp"
+   "Instancing/RenderQueue.h"      "Instancing/RenderQueue.cpp"
 
    # Graphics
    "Graphics/Shader.h"              "Graphics/Shader.cpp"

@@ -2,7 +2,8 @@
 #include "PBRScene.h"
 
 #include "Object/GameObject.h"
-#include "Resources/Program.h"
+#include "Resources/Programs/Program.h"
+#include "Resources/Programs/GraphicsProgram.h"
 #include "Resources/Meshes/Mesh.h"
 #include "Resources/Meshes/StaticMesh.h"
 #include "Resources/Meshes/SkinnedMesh.h"
@@ -14,7 +15,6 @@
 #include "Resources/Animations/Animation.h"
 #include "Resources/Model.h"
 #include "Resources/Meshes/InstancedMesh.h"
-#include "Graphics/Geometry.h"
 #include "Components/SkyLight.h"
 #include "Resources/AudioClip.h"
 #include "Resources/Animations/AnimController.h"
@@ -135,7 +135,7 @@ bool PBRScene::CreateCustomRenderPasses()
 {
 	// 간단한 머티리얼 포워드 렌더 패스
 	{
-		auto prog = Program::Create
+		auto prog = GraphicsProgram::Create
 		(
 			"./Resources/Shaders/Forward_PBR.vert",
 			"./Resources/Shaders/Forward_PBR.frag"
@@ -168,6 +168,14 @@ bool PBRScene::OnPlaceActors()
 		cameraObj->AddComponent(std::move(cameraCtrl));
 
 		AddGameObject(std::move(cameraObj));
+	}
+
+	// 0. 하늘 GameObject 생성
+	{
+		auto skyObj = GameObject::Create(); if (!skyObj) return false;
+		auto sky = SkyLight::Create(RESOURCE.GetResource<EnvironmentMap>("UnviersalSky"));
+		skyObj->AddComponent(std::move(sky));
+		AddGameObject(std::move(skyObj));
 	}
 
 	// 2. 조명 추가

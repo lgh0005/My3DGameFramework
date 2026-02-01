@@ -1,9 +1,9 @@
 ﻿#pragma once
-#include "Graphics/GlobalUniforms.h"
+#include "Graphics/Rendering/GlobalUniforms.h"
 
 #pragma region FORWARD_DECLARATION
 CLASS_PTR(RenderContext)
-CLASS_PTR(Uniformbuffer)
+CLASS_PTR(UniformBuffer)
 #pragma endregion
 
 CLASS_PTR(UniversalGlobalUniforms)
@@ -29,6 +29,6 @@ private:
 	UniversalGlobalUniforms();
 	bool Init();
 
-	UniformbufferUPtr m_cameraUBO;
-	UniformbufferUPtr m_lightUBO;
+	UniformBufferUPtr m_cameraUBO;
+	UniformBufferUPtr m_lightUBO;
 };

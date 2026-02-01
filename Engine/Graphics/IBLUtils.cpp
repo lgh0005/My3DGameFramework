@@ -1,6 +1,7 @@
 ﻿#include "EnginePch.h"
 #include "IBLUtils.h"
 #include "Resources/Programs/Program.h"
+#include "Resources/Programs/GraphicsProgram.h"
 #include "Resources/Meshes/Mesh.h"
 #include "Resources/Meshes/ScreenMesh.h"
 #include "Resources/Meshes/StaticMesh.h"
@@ -13,7 +14,7 @@
 CubeTexturePtr IBLUtils::CreateCubemapFromHDR(Texture* hdrTexture, int32 resolution)
 {
 	// 일회용 유틸성 쉐이더 로드
-	auto sphericalToCubeProgram = RESOURCE.GetResource<Program>("ibl_utils_sphericalToCube");
+	auto sphericalToCubeProgram = RESOURCE.GetResource<GraphicsProgram>("ibl_utils_sphericalToCube");
 	if (!sphericalToCubeProgram) return nullptr;
 
 	// 일회용 큐브 메쉬 생성
@@ -68,7 +69,7 @@ CubeTexturePtr IBLUtils::CreateCubemapFromHDR(Texture* hdrTexture, int32 resolut
 CubeTexturePtr IBLUtils::CreateIrradianceMap(CubeTexture* src)
 {
 	// 일회용 유틸성 쉐이더 로드
-	auto convolutionProgram = RESOURCE.GetResource<Program>("ibl_utils_convolution");
+	auto convolutionProgram = RESOURCE.GetResource<GraphicsProgram>("ibl_utils_convolution");
 	if (!convolutionProgram) return nullptr;
 
 	// 일회용 큐브 메쉬 생성
@@ -126,7 +127,7 @@ CubeTexturePtr IBLUtils::CreatePrefilteredMap(CubeTexture* src)
 	glGetIntegerv(GL_VIEWPORT, prevViewport);
 
 	// 일회용 유틸성 쉐이더 로드
-	auto preFilteredProgram = RESOURCE.GetResource<Program>("ibl_utils_prefiltered");
+	auto preFilteredProgram = RESOURCE.GetResource<GraphicsProgram>("ibl_utils_prefiltered");
 	if (!preFilteredProgram) return nullptr;
 
 	auto cubeMesh = GeometryGenerator::CreateBox();
@@ -188,7 +189,7 @@ TexturePtr IBLUtils::CreateBRDFLUT()
 	glGetIntegerv(GL_VIEWPORT, prevViewport);
 	glViewport(0, 0, resolution, resolution);
 
-	auto brdfProgram = RESOURCE.GetResource<Program>("ibl_utils_brdf_lut");
+	auto brdfProgram = RESOURCE.GetResource<GraphicsProgram>("ibl_utils_brdf_lut");
 	if (!brdfProgram) return nullptr;
 
 	auto lookupFramebuffer = BRDFLookUpFramebuffer::Create(resolution, resolution);

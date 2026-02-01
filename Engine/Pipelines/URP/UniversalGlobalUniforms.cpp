@@ -1,8 +1,8 @@
 ﻿#include "EnginePch.h"
 #include "Object/GameObject.h"
 #include "UniversalGlobalUniforms.h"
-#include "Graphics/UniformBuffer.h"
-#include "Graphics/RenderContext.h"
+#include "Graphics/Buffers/UniformBuffer.h"
+#include "Graphics/Rendering/RenderContext.h"
 #include "Components/Camera.h"
 #include "Components/Transform.h"
 #include "Components/Light.h"
@@ -21,8 +21,12 @@ UniversalGlobalUniformsUPtr UniversalGlobalUniforms::Create()
 
 bool UniversalGlobalUniforms::Init()
 {
-	m_cameraUBO = Uniformbuffer::Create(sizeof(CameraData), UBO_POINT_CAMERA);
-	m_lightUBO = Uniformbuffer::Create(sizeof(LightData), UBO_POINT_LIGHT);
+	m_cameraUBO = UniformBuffer::Create(sizeof(CameraData));
+	if (m_cameraUBO) m_cameraUBO->BindBase(UBO_POINT_CAMERA);
+
+	m_lightUBO = UniformBuffer::Create(sizeof(LightData));
+	if (m_lightUBO) m_lightUBO->BindBase(UBO_POINT_LIGHT);
+
 	return (m_cameraUBO && m_lightUBO);
 }
 

@@ -17,8 +17,8 @@ add_executable(Game
     "SRPSample/Scripts/PlayerController.h"  "SRPSample/Scripts/PlayerController.cpp"
 
     # Univeral Render Pipeline Sample Scene
-    #"URPSample/DevScene/PBRScene.h"    "URPSample/DevScene/PBRScene.cpp"
-    #"URPSample/RenderPasses/HDRRenderPass.h"   "URPSample/RenderPasses/HDRRenderPass.cpp"
+    "URPSample/DevScene/PBRScene.h"    "URPSample/DevScene/PBRScene.cpp"
+    "URPSample/RenderPasses/HDRRenderPass.h"   "URPSample/RenderPasses/HDRRenderPass.cpp"
   )
 
 # 2. [PCH 설정] Game/pch.h를 Game 타겟 전용(PRIVATE) PCH로 사용합니다.
