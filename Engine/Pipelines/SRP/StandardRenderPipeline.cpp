@@ -86,7 +86,7 @@ bool StandardRenderPipeline::Init()
 	display->SetToneMappingMode(ToneMappingMode::Exposure); // 0번 모드
 	display->SetBloomStrength(1.0f);
 	display->SetExposure(1.0f);
-	display->SetUseCRT(true);
+	display->SetUseCRT(false);
 	m_postProcessPass->AddEffect(std::move(display));
 
 	// G-buffer 패스 생성

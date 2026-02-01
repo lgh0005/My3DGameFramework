@@ -21,6 +21,10 @@ add_library(Engine STATIC
    "Core/ResourceLoader.h"          "Core/ResourceLoader.cpp"
    "Core/EngineConfigurator.h"    "Core/EngineConfigurator.cpp"
 
+   # Entity
+   "Entity/Chunk.h"                 "Entity/Chunk.cpp"
+    "Entity/Archetype.h"             "Entity/Archetype.cpp"
+
    # Scene
    "Scene/Scene.h"                   "Scene/Scene.cpp"
    "Scene/GameObjectRegistry.h"       "Scene/GameObjectRegistry.cpp"
@@ -120,7 +124,6 @@ add_library(Engine STATIC
    "Graphics/Layouts/VertexLayout.h"        "Graphics/Layouts/VertexLayout.cpp"
    "Graphics/Layouts/Vertex.h"              "Graphics/Layouts/Vertex.cpp"
    "Graphics/Layouts/Uniform.h"             "Graphics/Layouts/Uniform.cpp"
-
 
    # Post-processing effects
    "Pipelines/PostProcessing/PostProcessEffect.h"    "Pipelines/PostProcessing/PostProcessEffect.cpp"
@@ -229,6 +232,7 @@ add_library(Engine STATIC
    "Managers/AudioManager.h"        "Managers/AudioManager.cpp"
    "Managers/PhysicsManager.h"      "Managers/PhysicsManager.cpp"
    "Managers/UIManager.h"           "Managers/UIManager.cpp"
+   "Managers/EntityManager.h"           "Managers/EntityManager.cpp"
 )
 
 # 2. [PCH 설정] EnginePCH.h를 PCH로 사용합니다.
