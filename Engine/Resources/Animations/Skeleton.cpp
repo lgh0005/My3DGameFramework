@@ -20,14 +20,13 @@ int32 Skeleton::AddBone(const std::string& name, const glm::mat4& offset)
 	AssetFmt::RawBoneInfo newBoneInfo;
 	newBoneInfo.id = m_boneCounter;
 	newBoneInfo.offset = offset;
-
 	m_boneInfoMap[nameHash] = newBoneInfo;
 
-	// 3. 벡터 캐시에 오프셋 행렬 저장 (인덱스 = ID)
-	if (m_boneOffsets.size() <= m_boneCounter)
-		m_boneOffsets.resize(m_boneCounter + 1);
-
+	// 3. 벡터 캐시에 오프셋 행렬 및 Hash ID 캐시 저장 (인덱스 = ID)
+	if (m_boneOffsets.size() <= m_boneCounter) m_boneOffsets.resize(m_boneCounter + 1);
 	m_boneOffsets[m_boneCounter] = offset;
+	if (m_boneHashByID.size() <= m_boneCounter) m_boneHashByID.resize(m_boneCounter + 1);
+	m_boneHashByID[m_boneCounter] = nameHash;
 
 	// ID 반환 후 카운터 증가
 	return m_boneCounter++;
@@ -67,10 +66,16 @@ void Skeleton::SetData(const BoneMap& map, int32 count)
 	m_boneOffsets.clear(); // 안전하게 비우고 시작
 	m_boneOffsets.resize(count, glm::mat4(1.0f));
 
+	m_boneHashByID.clear();
+	m_boneHashByID.resize(count, 0);
+
 	for (const auto& [hash, info] : m_boneInfoMap)
 	{
 		if (info.id >= 0 && info.id < count)
+		{
 			m_boneOffsets[info.id] = info.offset;
+			m_boneHashByID[info.id] = hash;
+		}
 	}
 }
 
@@ -94,4 +99,13 @@ const glm::mat4& Skeleton::GetBoneOffset(int32 boneID) const
 {
 	if (boneID >= 0 && boneID < m_boneOffsets.size()) return m_boneOffsets[boneID];
 	return glm::mat4(1.0f); // TODO : 지역 변수를 반환한다고 함. Utils에다가 static으로 박아둔 이유가 있었음.
+}
+
+/*========================================//
+//   For GPU-Driven skeleton instancing   //
+//========================================*/
+uint32 Skeleton::GetBoneHash(int32 id) const
+{
+	if (id >= 0 && id < m_boneHashByID.size()) return m_boneHashByID[id];
+	return 0;
 }

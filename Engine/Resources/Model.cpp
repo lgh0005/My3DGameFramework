@@ -223,6 +223,9 @@ bool Model::LoadByAssimp(const std::string& filename)
     // 5. 계층 구조 추출 (런타임 생성)
     ParseAssimpHierarchy(scene);
 
+    // 6. 뼈 인덱스 계층 배열 채우기
+    LinkSkeletonHierarchy();
+
     return true;
 }
 
@@ -290,11 +293,11 @@ void Model::ProcessAssimpMaterials(const aiScene* scene, const std::filesystem::
         else if (aiMat->Get(AI_MATKEY_COLOR_DIFFUSE, color) == AI_SUCCESS)
             material->albedoFactor = { color.r, color.g, color.b, 1.0f };
 
-        // [New] Emissive Color
+        // Emissive Color
         if (aiMat->Get(AI_MATKEY_COLOR_EMISSIVE, color) == AI_SUCCESS)
             material->emissiveFactor = { color.r, color.g, color.b };
 
-        // [New] Emissive Strength
+        // Emissive Strength
         if (aiMat->Get(AI_MATKEY_EMISSIVE_INTENSITY, value) == AI_SUCCESS)
             material->emissionStrength = value;
         else
@@ -468,6 +471,9 @@ bool Model::LoadByBinary(const std::string& filename)
 
     // 5. Meshes Read
     ReadBinaryMeshes(inFile, meshCount);
+
+    // 6. Skeletal Hierarchy Index Write
+    LinkSkeletonHierarchy();
 
     LOG_INFO("Model loaded successfully (Binary): {}", filename);
     inFile.close();
@@ -790,4 +796,52 @@ void Model::ExtractBoneWeightForVertices(std::vector<SkinnedVertex>& vertices, a
     }
 }
 
+void Model::LinkSkeletonHierarchy()
+{
+    if (!m_skeleton || m_nodes.empty()) return;
 
+    int32 boneCount = m_skeleton->GetBoneCount();
+    std::vector<int32> parentIndices(boneCount, -1);
+
+    // 검색 속도를 높이기 위해 [NodeHash -> NodeIndex] 맵을 임시로 생성
+    std::unordered_map<uint32, int32> nodeHashMap;
+    nodeHashMap.reserve(m_nodes.size());
+    for (int32 i = 0; i < m_nodes.size(); ++i)
+    {
+        // RawNode에 nameHash가 없다면 여기서 계산
+        uint32 h = Utils::StrHash(m_nodes[i].name);
+        nodeHashMap[h] = i;
+    }
+
+    // 모든 뼈를 순회하며 부모 찾기
+    for (int32 i = 0; i < boneCount; ++i)
+    {
+        // 1. i번 뼈의 이름 해시를 가져옴
+        uint32 myHash = m_skeleton->GetBoneHash(i);
+
+        // 2. 이 뼈가 어떤 노드에 해당하는지 찾음
+        auto itNode = nodeHashMap.find(myHash);
+        if (itNode == nodeHashMap.end()) continue; // 뼈 이름과 일치하는 노드가 없음 (예외)
+
+        int32 myNodeIdx = itNode->second;
+        const auto& myNode = m_nodes[myNodeIdx];
+
+        // 3. 그 노드의 부모 노드를 확인
+        if (myNode.parentIndex != -1)
+        {
+            const auto& parentNode = m_nodes[myNode.parentIndex];
+            uint32 parentHash = Utils::StrHash(parentNode.name);
+
+            // 4. 부모 노드가 '뼈' 목록에 있는지 확인
+            int32 parentBoneID = m_skeleton->GetBoneID(parentHash);
+
+            // 5. 있으면 그 ID를 부모 인덱스로 등록
+            if (parentBoneID != -1)
+                parentIndices[i] = parentBoneID;
+        }
+    }
+
+    // 완성된 족보를 스켈레톤에 주입
+    m_skeleton->SetParentIndices(parentIndices);
+    LOG_INFO("Skeleton Hierarchy Linked: {} bones", boneCount);
+}

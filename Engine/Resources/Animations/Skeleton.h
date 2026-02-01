@@ -20,9 +20,20 @@ public:
 	int32 AddBone(const std::string& name, const glm::mat4& offset);
 	const glm::mat4& GetBoneOffset(int32 boneID) const;
 
+/*========================================//
+//   For GPU-Driven skeleton instancing   //
+//========================================*/
+public:
+	void SetParentIndices(const std::vector<int32>& parents) { m_parentIndices = parents; }
+	const std::vector<int32>& GetParentIndices() const { return m_parentIndices; }
+	uint32 GetBoneHash(int32 id) const;
+
 private:
 	Skeleton();
 	BoneMap m_boneInfoMap;
 	int32 m_boneCounter	{ 0 };
 	std::vector<glm::mat4> m_boneOffsets;
+
+	std::vector<int32> m_parentIndices; // GPU 연산용 부모 인덱스 (Index = BoneID, Value = ParentBoneID)
+	std::vector<uint32> m_boneHashByID; // ID로 이름을 찾기 위한 캐시 (Index = BoneID)
 };

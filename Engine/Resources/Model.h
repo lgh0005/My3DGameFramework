@@ -89,6 +89,7 @@ private:
 //============================*/
 private:
 	void ExtractBoneWeightForVertices(std::vector<SkinnedVertex>& vertices, aiMesh* mesh, const aiScene* scene);
+	void LinkSkeletonHierarchy();
 	SkeletonPtr m_skeleton;
 
 private:
