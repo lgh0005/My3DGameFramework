@@ -27,6 +27,11 @@
             "fs":  "./Resources/Shaders/Common/Common_Shadow_DepthPass.frag" 
         },
         {
+            "key": "common_shadow_depth_instanced",
+            "vs":  "./Resources/Shaders/Instanced_Test/Common_Shadow_DepthPass_Instanced_Integrated.vert",
+            "fs":  "./Resources/Shaders/Instanced_Test/Common_Shadow_DepthPass_Instanced_Integrated.frag" 
+        },
+        {
             "key": "common_shadow_depth_static_instanced",
             "vs":  "./Resources/Shaders/Instanced_Test/Common_Shadow_DepthPass_Static_Instanced.vert",
             "fs":  "./Resources/Shaders/Instanced_Test/Common_Shadow_DepthPass_Instanced.frag" 

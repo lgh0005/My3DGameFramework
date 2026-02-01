@@ -42,7 +42,7 @@ private:
 //   Instancing test   //
 //=====================*/
 private:
-	void RenderGeometryInstanced(RenderContext* context, const glm::mat4& prevVP);
+	void RenderGeometryInstanced(RenderContext* context, const glm::mat4& lightSpaceMatrix);
 	ProgramPtr m_geometryInstancedProgram;
 	RenderQueueUPtr m_renderQueue;
 };

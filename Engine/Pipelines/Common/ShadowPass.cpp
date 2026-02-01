@@ -15,6 +15,7 @@
 #include "Components/StaticMeshRenderer.h"
 #include "Components/SkinnedMeshRenderer.h"
 #include "Components/Animator.h"
+#include "Instancing/RenderQueue.h"
 
 DECLARE_DEFAULTS_IMPL(ShadowPass)
 
@@ -33,6 +34,9 @@ bool ShadowPass::Init(int32 resolution)
 	// 1. 그림자 셰이더 프로그램 생성
 	m_staticDepthProgram = RESOURCE.GetResource<GraphicsProgram>("common_shadow_depth_static");
 	m_skinnedDepthProgram = RESOURCE.GetResource<GraphicsProgram>("common_shadow_depth_skinned");
+
+	m_meshInstancedDepthProgram = RESOURCE.GetResource<GraphicsProgram>("common_shadow_depth_instanced");
+	m_renderQueue = RenderQueue::Create(1024, 512 * MAX_BONES);
 
 	// 2. 그림자가 드리워지는 최대 조명 개수 만큼 그림자 맵 생성
 	// 최대(MAX_SHADOW_CASTER) 8개
@@ -90,10 +94,11 @@ void ShadowPass::Render(RenderContext* context)
 		light->SetLightSpaceMatrix(lightSpaceMatrix);
 
 		// 2-5. StaticMesh 렌더링
-		RenderStaticMeshes(staticMeshes, lightSpaceMatrix);
+		// RenderStaticMeshes(staticMeshes, lightSpaceMatrix);
 
 		// 2-6. SkinnedMesh 렌더링
-		RenderSkinnedMeshes(skinnedMeshes, lightSpaceMatrix);
+		// RenderSkinnedMeshes(skinnedMeshes, lightSpaceMatrix);
+		CastMeshesInstanced(context, lightSpaceMatrix);
 	}
 
 	glCullFace(GL_BACK);
@@ -218,3 +223,38 @@ void ShadowPass::Resize(int32 resolution)
 /*==========================================================//
 //  ShadowPass.h (Instancing 확장)                          //
 //==========================================================*/
+void ShadowPass::CastMeshesInstanced(RenderContext* context, const glm::mat4& lightSpaceMatrix)
+{
+	if (!m_meshInstancedDepthProgram) return;
+
+	// 1. 큐 비우기 및 프로그램 설정
+	m_renderQueue->Clear();
+	m_meshInstancedDepthProgram->Use();
+	m_meshInstancedDepthProgram->SetUniform("uLightSpaceMatrix", lightSpaceMatrix);
+
+	// 2. Static Mesh 수집
+	for (const auto* renderer : context->GetStaticMeshRenderers())
+	{
+		if (!renderer->IsEnabled() || !renderer->GetOwner()->IsActive()) continue;
+
+		InstanceProperty prop;
+		prop.worldMatrix = renderer->GetTransform().GetWorldMatrix();
+		m_renderQueue->Add(renderer->GetMesh().get(), renderer->GetMaterial().get(), prop);
+	}
+
+	// 3. Skinned Mesh 수집
+	for (const auto* renderer : context->GetSkinnedMeshRenderers())
+	{
+		if (!renderer->IsEnabled() || !renderer->GetOwner()->IsActive()) continue;
+
+		InstanceProperty prop;
+		prop.worldMatrix = renderer->GetTransform().GetWorldMatrix();
+		Animator* animator = renderer->GetAnimator();
+		const auto& bones = animator ? animator->GetFinalBoneMatrices() : Utils::GetIdentityBones();
+		m_renderQueue->Add(renderer->GetMesh().get(), renderer->GetMaterial().get(), prop, bones);
+	}
+
+	// 4. 일괄 실행 (머티리얼 바인딩이 포함되어 있으나, 뎁스 전용 셰이더이므로 
+	// 사실상 메쉬 바인딩과 인스턴스 데이터 전송이 주가 됩니다.)
+	m_renderQueue->Execute(m_meshInstancedDepthProgram.get());
+}
