@@ -77,18 +77,36 @@ bool AnimationConverter::Convert
 
 bool AnimationConverter::LoadReferenceSkeleton(const std::string& path)
 {
+	// [경로 확인 디버깅]
+	LOG_INFO("Trying to open: {}", path);
+
+	if (!std::filesystem::exists(path))
+	{
+		LOG_ERROR("FILE NOT FOUND! Path is wrong.");
+		LOG_ERROR("   -> You typed: {}", path);
+		return false;
+	}
+
 	std::ifstream inFile(path, std::ios::binary);
-	if (!inFile) return false;
+	if (!inFile)
+	{
+		LOG_ERROR("File exists but cannot open (Permission denied?)");
+		LOG_ERROR("Reason : {}", std::strerror(errno));
+		return false;
+	}
+
+	/*std::ifstream inFile(path, std::ios::binary);
+	if (!inFile) return false;*/
 
 	// 1. 헤더 검증
-	uint32_t magic = AssetUtils::ReadData<uint32_t>(inFile);
+	uint32 magic = AssetUtils::ReadData<uint32>(inFile);
 	if (magic != 0x4D594D44) return false; // MYMD
 
 	uint32 version = AssetUtils::ReadData<uint32>(inFile);
 
 	// 2. 불필요한 정보 건너뛰기 (읽어서 버림)
-	AssetUtils::ReadData<uint32_t>(inFile); // matCount
-	AssetUtils::ReadData<uint32_t>(inFile); // meshCount
+	AssetUtils::ReadData<uint32>(inFile); // matCount
+	AssetUtils::ReadData<uint32>(inFile); // meshCount
 	AssetUtils::ReadData<bool>(inFile);     // hasSkeleton
 	AssetUtils::ReadData<glm::vec3>(inFile); // AABB Min
 	AssetUtils::ReadData<glm::vec3>(inFile); // AABB Max

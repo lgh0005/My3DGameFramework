@@ -98,13 +98,19 @@ std::vector<AssetFmt::RawNode> AssetUtils::ReadRawNodes(std::ifstream& file)
         nodes[i].parentIndex = ReadData<int32>(file);
         nodes[i].localTransform = ReadData<glm::mat4>(file);
 
+        // TODO : 해당 부분들은 ReadVector로 대체할 수 있다면 대체 필요.
+        
         // 메쉬 인덱스 정보 읽기
         uint32 meshCount = ReadData<uint32>(file);
-
-        // 벡터 리사이즈 및 데이터 채우기
         nodes[i].meshIndices.resize(meshCount);
         for (uint32 m = 0; m < meshCount; ++m)
             nodes[i].meshIndices[m] = ReadData<uint32>(file);
+
+        // 자식 노드 인덱스 읽기
+        uint32 childCount = ReadData<uint32>(file);
+        nodes[i].children.resize(childCount);
+        for (uint32 c = 0; c < childCount; ++c)
+            nodes[i].children[c] = ReadData<int32>(file);
     }
 
     return nodes;
