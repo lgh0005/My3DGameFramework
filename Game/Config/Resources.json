@@ -39,7 +39,7 @@
 
     "animations" :
     [
-        { "key" : "Idle", "path": "./Resources/Models/spacesoldier/Idle.myanim" },
+        { "key" : "Idle", "path": "./Resources/Models/spacesoldier/Idle_shorten.myanim" },
         { "key" : "Walk", "path": "./Resources/Models/spacesoldier/Walking.myanim" },
         { "key" : "Run", "path": "./Resources/Models/spacesoldier/Running.myanim" },
         { "key" : "Dancing", "path": "./Resources/Models/spacesoldier/Hip Hop Dancing.myanim" }

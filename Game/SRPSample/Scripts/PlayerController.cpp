@@ -71,7 +71,7 @@ void PlayerController::HandleMovement(float dt)
 void PlayerController::UpdateFiniteStateMachine()
 {
     if (m_isMoving) m_animController->CrossFade("Walk");
-    else m_animController->CrossFade("Init");
+    else m_animController->CrossFade("Idle");
 }
 
 void PlayerController::ActiveSelfTest()

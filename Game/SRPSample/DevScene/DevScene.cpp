@@ -427,16 +427,16 @@ bool DevScene::OnPlaceActors()
 	{
 		// 1. 리소스 확보
 		auto model = RESOURCE.GetResource<Model>("aliensoldier");
-		auto anim1 = RESOURCE.GetResource<Animation>("Init");
+		auto anim1 = RESOURCE.GetResource<Animation>("Idle");
 		auto anim2 = RESOURCE.GetResource<Animation>("Walk");
 
 		// 2. AnimController 생성 및 설정
 		auto animCtrl = AnimController::Create();
-		animCtrl->AddState("Init", anim1);
+		animCtrl->AddState("Idle", anim1);
 		animCtrl->AddState("Walk", anim2);
-		animCtrl->SetTransitionDuration("Init", "Walk", 0.2f);
-		animCtrl->SetTransitionDuration("Walk", "Init", 0.2f);
-		animCtrl->SetStartState("Init");
+		animCtrl->SetTransitionDuration("Idle", "Walk", 0.2f);
+		animCtrl->SetTransitionDuration("Walk", "Idle", 0.2f);
+		animCtrl->SetStartState("Idle");
 
 		// 3. Animator 컴포넌트 미리 생성
 		// (Instantiate 내부에서 SkinnedMeshRenderer들이 바인딩할 때 필요하므로 포인터 따기)
