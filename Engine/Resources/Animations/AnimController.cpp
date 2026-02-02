@@ -4,6 +4,7 @@
 #include "Resources/Animations/AnimState.h"
 #include "Resources/Animations/AnimChannel.h"
 #include "Resources/Animations/Pose.h"
+#include "Resources/Animations/Skeleton.h"
 
 DECLARE_DEFAULTS_IMPL(AnimController)
 
@@ -173,4 +174,18 @@ Pose AnimController::GetPose(uint32 nodeNameHash, const Pose& defaultPose) const
     }
 
     return poseA;
+}
+
+void AnimController::BakeAllAnimations(Skeleton* skeleton)
+{
+    if (!skeleton) return;
+
+    for (auto& [name, state] : m_states)
+    {
+        if (state)
+        {
+            auto clip = state->GetClip();
+            if (clip) clip->Bake(skeleton);
+        }
+    }
 }

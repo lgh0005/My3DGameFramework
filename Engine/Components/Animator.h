@@ -16,7 +16,7 @@ class Animator : public Component
 	DEFINE_COMPONENT_TYPE(ComponentType::Animator)
 
 private:
-	using AnimBinding = struct AnimationBinding
+	struct AnimBinding
 	{
 		uint32 nodeNameHash;       // 해싱된 노드 이름 (Controller 전달용)
 		Transform* transform;      // 씬의 실제 Transform 컴포넌트
@@ -32,6 +32,9 @@ public:
 	AnimController* GetController() const { return m_controller.get(); }
 	const std::vector<glm::mat4>& GetFinalBoneMatrices() const { return m_finalBoneMatrices; }
 	const RenderBounds& GetCurrentLocalBounds() const { return m_currentLocalAABB; }
+
+	void SetModel(ModelPtr model);
+	void SetController(AnimControllerUPtr controller);
 
 /*==================================//
 //   animation initialize methods   //
@@ -51,6 +54,7 @@ private:
 private:
 	Animator();
 	bool Init(ModelPtr model, AnimControllerUPtr controller);
+	void CheckAndBakeClips();
 
 	ModelPtr m_currentModel;
 	AnimControllerUPtr m_controller;

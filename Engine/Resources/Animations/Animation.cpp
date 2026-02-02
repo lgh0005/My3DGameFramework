@@ -10,7 +10,7 @@ AnimationUPtr Animation::Load(const std::string& filePath, Model* model)
 {
 	auto animation = AnimationUPtr(new Animation());
 
-	// 파일 확장명 비교 후 로드 : .myanim으로 로드하는 것을 추천
+	// 1. 파일 확장명 비교 후 로드 : .myanim으로 로드하는 것을 추천
 	std::string ext = std::filesystem::path(filePath).extension().string();
 	std::transform(ext.begin(), ext.end(), ext.begin(), ::tolower);
 	if (ext == ".myanim")
@@ -41,6 +41,67 @@ AnimChannel* Animation::FindChannel(uint32 nameHash)
 	auto it = m_channelMap.find(nameHash);
 	if (it != m_channelMap.end()) return it->second;
 	return nullptr;
+}
+
+void Animation::Bake(Skeleton* skeleton)
+{
+	if (!skeleton) return;
+	if (m_bakedData.frameCount > 0 && m_bakedData.boneCount > 0) return;
+
+	// 1. 베이킹 설정 (30 FPS 고정)
+	m_bakedData.frameRate = 30.0f;
+	float timeStep = 1.0f / m_bakedData.frameRate;
+
+	// 전체 프레임 수 계산 (마지막 프레임 포함을 위해 ceil 사용)
+	m_bakedData.frameCount = (uint32)ceil(m_duration * m_bakedData.frameRate) + 1;
+	m_bakedData.boneCount = (uint32)skeleton->GetBoneCount();
+
+	// 2. 메모리 예약 (전체 크기 = 프레임 수 * 뼈 개수)
+	uint32 totalSize = m_bakedData.frameCount * m_bakedData.boneCount;
+	m_bakedData.localMatrices.clear();
+	m_bakedData.localMatrices.resize(totalSize);
+
+	// 3. 베이킹 루프 (시간 -> 뼈)
+	for (uint32 f = 0; f < m_bakedData.frameCount; ++f)
+	{
+		// 현재 샘플링 시간
+		float currentTime = f * timeStep;
+		if (currentTime > m_duration) currentTime = m_duration;
+
+		uint32 frameOffset = f * m_bakedData.boneCount;
+
+		for (int32 b = 0; b < (int32)m_bakedData.boneCount; ++b)
+		{
+			glm::mat4 localMatrix;
+			uint32 boneHash = skeleton->GetBoneHash(b);
+			AnimChannel* channel = FindChannel(boneHash);
+			if (channel)
+			{
+				// 채널이 있다면: 현재 시간의 포즈를 보간해서 가져옴
+				localMatrix = channel->GetPose(currentTime).ToMat4();
+			}
+			else
+			{
+				// 채널이 없다면: 움직이지 않는 뼈 (Identity)
+				// TODO: 추후 Bind Pose가 필요하다면 Skeleton에서 가져와야 함
+				localMatrix = glm::mat4(1.0f);
+			}
+
+			// 3-3. 1차원 배열에 저장
+			// 인덱스 공식: FrameIndex * BoneCount + BoneID
+			m_bakedData.localMatrices[frameOffset + b] = localMatrix;
+		}
+	}
+
+	LOG_WARN
+	(
+		"Animation [{}] Baked: {} Frames ({:.2f} sec), {} Bones (Total {} Matrices)",
+		m_name,
+		m_bakedData.frameCount,
+		m_bakedData.frameCount / m_bakedData.frameRate,
+		m_bakedData.boneCount,
+		totalSize
+	);
 }
 
 /*===================================//

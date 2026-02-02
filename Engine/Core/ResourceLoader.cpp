@@ -379,7 +379,7 @@ std::optional<ResourceManifest> ResourceLoader::ParseManifest(const std::string&
 	ParseGeneralResources(root, "compute_shaders", manifest.computeShaders);
 
 	// 큐브맵 (Key + Path[Array or String])
-	// *헤더에 ParseCubeMapResources 선언이 필요합니다.
+	// 헤더에 ParseCubeMapResources 선언이 필요합니다.
 	ParseCubeMapResources(root, "cubemaps", manifest.cubemaps); // 복수형
 
 	return manifest;

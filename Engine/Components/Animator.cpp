@@ -48,8 +48,57 @@ bool Animator::Init(ModelPtr model, AnimControllerUPtr controller)
     m_finalBoneMatrices.resize(boneCount, glm::mat4(1.0f));
     m_skinningTransforms.resize(boneCount, nullptr);
 
+    // 3. 초기화 즉시, 현재 컨트롤러/모델 조합으로 베이킹 시도
+    CheckAndBakeClips();
+
 	return true;
 }
+
+void Animator::SetModel(ModelPtr model)
+{
+    // 1. 동일 모델이면 무시 (최적화)
+    if (m_currentModel == model) return;
+
+    m_currentModel = model;
+
+    // 2. 모델이 없거나 스켈레톤이 없으면 정리 후 리턴
+    if (!m_currentModel || !m_currentModel->GetSkeleton())
+    {
+        m_finalBoneMatrices.clear();
+        m_skinningTransforms.clear();
+        m_animationBindings.clear();
+        m_boneTransformMap.clear();
+        return;
+    }
+
+    // 3. 버퍼 재할당
+    usize boneCount = m_currentModel->GetSkeleton()->GetBoneCount();
+    m_finalBoneMatrices.clear();
+    m_finalBoneMatrices.resize(boneCount, glm::mat4(1.0f));
+
+    m_skinningTransforms.clear();
+    m_skinningTransforms.resize(boneCount, nullptr);
+
+    // 4. 바인딩 정보 초기화 및 재설정
+    m_animationBindings.clear();
+    m_boneTransformMap.clear();
+
+    // 이미 Start된(Scene에 존재하는) 상태라면 즉시 바인딩 갱신
+    if (GetOwner()) BindBoneTransforms();
+
+    // 5. 새로운 모델(스켈레톤)에 맞춰 애니메이션 베이킹
+    CheckAndBakeClips();
+}
+
+void Animator::SetController(AnimControllerUPtr controller)
+{
+    // 1. 소유권 이동
+    m_controller = std::move(controller);
+
+    // 2. 새로운 컨트롤러의 클립들을 현재 모델 기준으로 베이킹
+    CheckAndBakeClips();
+}
+
 /*========================================//
 //   animation initialize logic methods   //
 //========================================*/
@@ -228,4 +277,16 @@ void Animator::UpdateCurrentPoseLocalBounds()
     // Note: 이 박스는 오직 뼈 관절의 위치만을 기준으로 합니다. 
     //        메쉬의 두께는 MeshRenderer에서 합칠 겁니다.
     m_currentLocalAABB = RenderBounds::CreateFromMinMax(minPos, maxPos);
+}
+
+void Animator::CheckAndBakeClips()
+{
+    // 1. 클립들을 구울 수 없는 상황이라며 건너뛰기
+    if (!m_currentModel) return;
+    if (!m_currentModel->GetSkeleton()) return; 
+
+    // 2. 컨트롤러가 들고 있는 모든 클립들을 굽기
+    Skeleton* skeleton = m_currentModel->GetSkeleton().get();
+    if (m_controller)
+        m_controller->BakeAllAnimations(skeleton);
 }
