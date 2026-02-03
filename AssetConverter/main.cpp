@@ -28,7 +28,7 @@ int main(int argc, char* argv[])
         // Python GUI가 "--check"를 보냈을 때 "AssetConverter verified" 문자열을 기다림
         std::cout << "AssetConverter verified" << std::endl;
         return 0;
-    
+
     // [Model Mode]
     case ConversionMode::Model:
         LOG_INFO(">>> [Mode] Model Conversion Selected");

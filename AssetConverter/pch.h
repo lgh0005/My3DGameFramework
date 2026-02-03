@@ -3,6 +3,7 @@
 // C++
 #include <iostream>
 #include <cfloat>
+#include <cstdlib>
 #include <vector>
 #include <string>
 #include <unordered_map>

@@ -3,7 +3,7 @@
 enum class ConversionMode
 {
     None = 0,
-    Verify,     // --check (Python 연동 확인용)
+    Verify,     // --check (Python 연동 확인용)     
     Model,      // -m
     Animation,  // -a
     ORM         // -orm

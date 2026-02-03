@@ -1,4 +1,4 @@
-import os, subprocess
+﻿import os, subprocess
 import tkinter as tk
 from tkinter import filedialog, messagebox
 from gui_context.gui_context_base import GUIContextBase
@@ -47,18 +47,32 @@ class GuiContextVerifyAssetConverter(GUIContextBase):
             return
 
         try:
+            startupinfo = None
+            if os.name == 'nt':
+                startupinfo = subprocess.STARTUPINFO()
+                startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW
+                startupinfo.wShowWindow = subprocess.SW_HIDE # 확실하게 숨김
+
             result = subprocess.run(
                 [exe_path, "--check"],
                 capture_output=True,
                 text=True,
-                timeout=1
+                stdin=subprocess.DEVNULL,
+                cwd=os.path.dirname(exe_path),
+                timeout=5,
+                startupinfo=startupinfo
             )
-            if "AssetConverter" in result.stdout:
+            if "AssetConverter" in result.stdout.strip():
                 self._window.set_data("exe_path", exe_path)
                 messagebox.showinfo("Success", "AssetConverter.exe verified successfully!")
                 self._window.set_context_by_name("main")
             else:
                 messagebox.showerror("Error", f"Invalid executable.\nOutput:\n{result.stdout}")
+        
+        except subprocess.TimeoutExpired:
+            messagebox.showerror("Timeout", 
+                "Process Timed Out.\nPossible causes:\n1. Missing DLLs in the folder.\n2. Invisible Error Dialog blocking execution.")
+
         except Exception as e:
             messagebox.showerror("Error", f"Failed to run executable.\n{e}")
 
