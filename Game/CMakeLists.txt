@@ -36,12 +36,8 @@ target_include_directories(Game PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 target_link_libraries(Game PRIVATE Engine)
 
 # 리소스 배포
-# 중요: 여기서는 오직 'Game' 프로젝트의 리소스만 'Bin/Project' 폴더로 복사합니다.
-# Engine 리소스 복사는 Engine/CMakeLists.txt에서 이미 처리했습니다.
-
-if (NOT CMAKE_BUILD_TYPE MATCHES Debug)
-    add_custom_command(TARGET Game POST_BUILD
-        COMMENT "Deploying Game Assets to Bin/Project..."
+add_custom_command(TARGET Game POST_BUILD
+    COMMENT "Deploying Game Assets to Bin/Project..."
 
         # 1. Game Assets 복사 (@Assets -> Bin/Project/Assets)
         # 주의: Game 폴더 안에 'Assets' 폴더가 있다고 가정합니다.
@@ -55,5 +51,4 @@ if (NOT CMAKE_BUILD_TYPE MATCHES Debug)
         COMMAND ${CMAKE_COMMAND} -E copy_directory
             "${CMAKE_CURRENT_SOURCE_DIR}/Config"
             "$<TARGET_FILE_DIR:Game>/Project/Config"
-    )
-endif()
+)

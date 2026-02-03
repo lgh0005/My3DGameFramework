@@ -265,8 +265,7 @@ target_compile_definitions(Engine PUBLIC
 )
 
 # 리소스 배포 (Resource Deployment)
-if (NOT CMAKE_BUILD_TYPE MATCHES Debug)
-    add_custom_command(TARGET Engine POST_BUILD
+add_custom_command(TARGET Engine POST_BUILD
         COMMENT "Deploying Engine Assets to Bin/Engine..."
         
         # 1. Shaders 복사 (@Engine/Shaders)
@@ -287,4 +286,3 @@ if (NOT CMAKE_BUILD_TYPE MATCHES Debug)
             "${CMAKE_CURRENT_SOURCE_DIR}/Config"
             "$<TARGET_FILE_DIR:Engine>/../Engine/Config"
     )
-endif()

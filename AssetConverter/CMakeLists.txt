@@ -1,5 +1,6 @@
 ﻿# 소스 파일 목록
 set(ASSET_CONVERTER_SOURCES
+
     # Core
     "main.cpp"
     "pch.h"                 "pch.cpp" 
@@ -37,3 +38,53 @@ target_link_libraries(AssetConverter PRIVATE
     assimp::assimp
     glm::glm
 )
+
+# 출력 경로 개별 설정
+set(CONVERTER_OUTPUT_DIR "${CMAKE_BINARY_DIR}/Bin/AssetConverter")
+set_target_properties(AssetConverter PROPERTIES
+
+    # 실행 파일(.exe)이 생성될 위치 지정
+    RUNTIME_OUTPUT_DIRECTORY "${CONVERTER_OUTPUT_DIR}"
+    
+    # VS 설정(Debug/Release)에 따른 경로 강제 통일
+    RUNTIME_OUTPUT_DIRECTORY_DEBUG "${CONVERTER_OUTPUT_DIR}"
+    RUNTIME_OUTPUT_DIRECTORY_RELEASE "${CONVERTER_OUTPUT_DIR}"
+    RUNTIME_OUTPUT_DIRECTORY_RELWITHDEBINFO "${CONVERTER_OUTPUT_DIR}"
+    RUNTIME_OUTPUT_DIRECTORY_MINSIZEREL "${CONVERTER_OUTPUT_DIR}"
+    
+    # VS 시작 프로젝트 설정
+    VS_STARTUP_PROJECT AssetConverter
+)
+
+# 프론트엔드(Python) 배포 및 PyInstaller 빌드
+add_custom_command(TARGET AssetConverter POST_BUILD
+    COMMENT "Deploying AssetConverter Frontend Tools..."
+
+    # 4-1. Tools 폴더 복사
+    # PyInstaller 빌드 실패 시에도 Python으로 직접 실행할 수 있도록 소스를 복사합니다.
+    COMMAND ${CMAKE_COMMAND} -E make_directory "${CONVERTER_OUTPUT_DIR}/Tools"
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+        "${CMAKE_CURRENT_SOURCE_DIR}/Tools"
+        "${CONVERTER_OUTPUT_DIR}/Tools"
+)
+
+# PyInstaller 자동 빌드
+find_program(PYINSTALLER_PATH "pyinstaller")
+if (PYINSTALLER_PATH)
+    add_custom_command(TARGET AssetConverter POST_BUILD
+        COMMENT "Building Python Frontend with PyInstaller..."
+        
+        # main.py를 AssetTool.exe로 빌드
+        COMMAND ${PYINSTALLER_PATH}
+            --noconfirm --clean --onefile --windowed
+            --distpath "${CONVERTER_OUTPUT_DIR}"
+            --workpath "${CMAKE_CURRENT_BINARY_DIR}/PyInstallerTemp/build"
+            --specpath "${CMAKE_CURRENT_BINARY_DIR}/PyInstallerTemp"
+            --name "AssetTool"
+            "${CMAKE_CURRENT_SOURCE_DIR}/Tools/main.py"
+    )
+    # 빌드 성공 메시지 (CMake 출력창에서 확인 가능)
+    message(STATUS "PyInstaller detected. 'AssetTool.exe' will be built automatically.")
+else()
+    message(STATUS "PyInstaller NOT found. Skipping Python build. (Only source files copied)")
+endif()

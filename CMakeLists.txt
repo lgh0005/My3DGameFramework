@@ -10,7 +10,13 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 # 폴더 정리 활성화
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
-# [컴파일러 옵션
+# 최종 빌드 경로 설정
+set(OUTPUT_DIR "${CMAKE_BINARY_DIR}/Bin")
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${OUTPUT_DIR}")
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${OUTPUT_DIR}")
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${OUTPUT_DIR}")
+
+# 컴파일러 옵션
 if (MSVC)
     add_compile_definitions(NOMINMAX)
     add_compile_options(/utf-8 /W4 /MP /permissive- /Zc:__cplusplus)
