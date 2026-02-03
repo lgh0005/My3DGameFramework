@@ -53,8 +53,7 @@ inline T* GameObject::AddComponent(std::unique_ptr<T> component)
 
 	// 3. 소유권 이동 및 등록
 	m_components.push_back(std::move(component));
-	if (m_sceneIndex != INVALID_SCENE_INDEX)
-		SCENE.GetActiveScene()->GetComponentRegistry()->RegisterComponent(basePtr);
+	RegisterComponentToScene(component.get());
 
 	// 5. 런타임 상태 동기화 (Catch-up)
 	// 컴포넌트가 추가되는 시점의 GameObject 상태에 맞춰, 컴포넌트의 생명주기를 따라잡습니다.

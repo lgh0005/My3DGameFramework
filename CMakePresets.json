@@ -1,62 +1,77 @@
 ﻿{
     "version": 3,
-    "configurePresets": [
+    "configurePresets": 
+    [
         {
-            "name": "windows-base",
+            "name": "base",
             "hidden": true,
+            "description": "Common parent for all presets (OS independent)",
             "generator": "Ninja",
             "binaryDir": "${sourceDir}/out/build/${presetName}",
             "installDir": "${sourceDir}/out/install/${presetName}",
-            "cacheVariables": {
-              "CMAKE_C_COMPILER": "cl.exe",
-              "CMAKE_CXX_COMPILER": "cl.exe",
-              "CMAKE_TOOLCHAIN_FILE": "${sourceDir}/external/vcpkg/scripts/buildsystems/vcpkg.cmake"
-          },
-            "condition": {
+            "cacheVariables": 
+            {
+                "CMAKE_TOOLCHAIN_FILE": "${sourceDir}/external/vcpkg/scripts/buildsystems/vcpkg.cmake"
+            }
+        },
+
+        {
+            "name": "windows-base",
+            "hidden": true,
+            "description": "Windows-specific settings (MSVC compiler)",
+            "inherits": "base",
+            "condition": 
+            {
                 "type": "equals",
                 "lhs": "${hostSystemName}",
                 "rhs": "Windows"
+            },
+            "architecture": 
+            { 
+                "value": "x64", 
+                "strategy": "external" 
+            },
+            "cacheVariables": 
+            {
+                "CMAKE_C_COMPILER": "cl.exe",
+                "CMAKE_CXX_COMPILER": "cl.exe",
+                "VCPKG_TARGET_TRIPLET": "x64-windows",
+                "MSVC_RUNTIME_LIBRARY": "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL"
             }
         },
+
+        {
+            "name": "linux-base",
+            "hidden": true,
+            "description": "Linux-specific settings (GCC/Clang)",
+            "inherits": "base",
+            "condition": 
+            {
+                "type": "equals",
+                "lhs": "${hostSystemName}",
+                "rhs": "Linux"
+            },
+            "architecture": { "value": "x64", "strategy": "external" },
+            "cacheVariables": 
+            {
+                "CMAKE_C_COMPILER": "gcc",
+                "CMAKE_CXX_COMPILER": "g++"
+            }
+        },
+
         {
             "name": "x64-debug",
             "displayName": "x64 Debug",
+            "description": "Debug build (Windows/Linux auto-detection)",
             "inherits": "windows-base",
-            "architecture": {
-                "value": "x64",
-                "strategy": "external"
-            },
-            "cacheVariables": {
-              "CMAKE_BUILD_TYPE": "Debug"
-            }
+            "cacheVariables": { "CMAKE_BUILD_TYPE": "Debug" }
         },
         {
             "name": "x64-release",
             "displayName": "x64 Release",
-            "inherits": "x64-debug",
-            "cacheVariables": {
-                "CMAKE_BUILD_TYPE": "Release"
-            }
-        },
-        {
-            "name": "x86-debug",
-            "displayName": "x86 Debug",
+            "description": "Release build (Optimized)",
             "inherits": "windows-base",
-            "architecture": {
-                "value": "x86",
-                "strategy": "external"
-            },
-            "cacheVariables": {
-                "CMAKE_BUILD_TYPE": "Debug"
-            }
-        },
-        {
-            "name": "x86-release",
-            "displayName": "x86 Release",
-            "inherits": "x86-debug",
-            "cacheVariables": {
-                "CMAKE_BUILD_TYPE": "Release"
-            }
+            "cacheVariables": { "CMAKE_BUILD_TYPE": "Release" }
         }
     ]
 }

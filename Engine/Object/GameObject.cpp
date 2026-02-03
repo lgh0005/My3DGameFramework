@@ -126,6 +126,15 @@ void GameObject::OnDestroy()
 	for (auto& comp : m_components) comp->OnDestroy();
 }
 
+/*=======================//
+//   component methods   //
+//=======================*/
+void GameObject::RegisterComponentToScene(Component* component)
+{
+	if (m_sceneIndex != INVALID_SCENE_INDEX)
+		SCENE.GetActiveScene()->GetComponentRegistry()->RegisterComponent(component);
+}
+
 /*===================================//
 //   GameObject activation methods   //
 //===================================*/

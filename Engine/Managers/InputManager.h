@@ -38,9 +38,9 @@ public:
 	bool GetButtonDown(const std::string& actionName);
 	const glm::vec2& GetMousePos() const { return m_mousePos; }
 
-	// 이벤트 등록 방식의 인풋 처리
-	template<typename T>
-	void BindAction(const std::string& actionName, T* instance, void(T::* func)());
+	//// 이벤트 등록 방식의 인풋 처리
+	//template<typename T>
+	//void BindAction(const std::string& actionName, T* instance, void(T::* func)());
 
 private:
 	static void DispatchKey(GLFWwindow* window, 
@@ -73,4 +73,4 @@ private:
 #pragma endregion
 };
 
-#include "Managers/InputManager.inl"
+// #include "Managers/InputManager.inl"

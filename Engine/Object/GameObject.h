@@ -77,6 +77,9 @@ public:
 	template<typename T> void GetComponentsInChildren(std::vector<T*>& outComponents);
 	const std::vector<ComponentUPtr>& GetComponents() const { return m_components; }
 
+private:
+	void RegisterComponentToScene(Component* component);
+
 /*=======================//
 //   hierarchy methods   //
 //=======================*/

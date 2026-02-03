@@ -1,4 +1,7 @@
 ﻿#pragma once
+#include "Scene/Scene.h"             
+#include "Scene/ComponentRegistry.h"
+#include "Object/GameObject.h"
 
 template<typename T>
 inline GameObject* Scene::FindObjectByType()

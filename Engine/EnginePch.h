@@ -53,6 +53,7 @@ using json = nlohmann::json;
 #include "Misc/Defines.h"
 #include "Misc/Types.h"
 #include "Misc/Utils.h"
+#include "Misc/Enums.h"
 #include "Misc/ImguiManager.h"
 #define IMGUI     ImGuiManager::Instance()
 

@@ -1,5 +1,5 @@
-﻿# 1. "Game"이라는 이름의 실행 파일(.exe)을 만듭니다.
-add_executable(Game
+﻿# 소스 파일 목록
+set(GAME_SOURCES
 
     # Core
     "pch.h"  "pch.cpp" 
@@ -19,61 +19,41 @@ add_executable(Game
     # Univeral Render Pipeline Sample Scene
     "URPSample/DevScene/PBRScene.h"    "URPSample/DevScene/PBRScene.cpp"
     "URPSample/RenderPasses/HDRRenderPass.h"   "URPSample/RenderPasses/HDRRenderPass.cpp"
-  )
+)
 
-# 2. [PCH 설정] Game/pch.h를 Game 타겟 전용(PRIVATE) PCH로 사용합니다.
+# Visual Studio 필터 자동 생성
+source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${GAME_SOURCES})
+
+# 실행 파일 생성 및 VS 시작 프로젝트 설정
+add_executable(Game ${GAME_SOURCES})
+set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT Game)
+
+# Include 및 PCH 설정
 target_precompile_headers(Game PRIVATE pch.h)
-
-# 3. [경로 설정] pch의 위치를 알리기 위해 필요합니다.
 target_include_directories(Game PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 
-# 3. [링크 설정] Game 타겟은 Engine 라이브러리가 필요합니다.
+# 라이브러리 링크
 target_link_libraries(Game PRIVATE Engine)
 
-# 4. 리소스 및 설정 병합 (순서 중요: Engine -> Game)
-add_custom_command(TARGET Game POST_BUILD
-    # [Step 1] 목적지 폴더 생성 (없으면 에러나니까 안전장치)
-    COMMAND ${CMAKE_COMMAND} -E make_directory "$<TARGET_FILE_DIR:Game>/Config"
-    COMMAND ${CMAKE_COMMAND} -E make_directory "$<TARGET_FILE_DIR:Game>/Resources"
-    COMMAND ${CMAKE_COMMAND} -E make_directory "$<TARGET_FILE_DIR:Game>/Resources/Shaders"
+# 리소스 배포
+# 중요: 여기서는 오직 'Game' 프로젝트의 리소스만 'Bin/Project' 폴더로 복사합니다.
+# Engine 리소스 복사는 Engine/CMakeLists.txt에서 이미 처리했습니다.
 
-    # -----------------------------------------------------------------
-    # [Step 2] 셰이더 병합 (Engine 기본값 -> Game 커스텀)
-    # -----------------------------------------------------------------
-    
-    # 2-1. 엔진 필수 셰이더 복사 (Base)
-    # Engine/Shaders 내용을 -> Bin/Resources/Shaders 로 복사
-    COMMAND ${CMAKE_COMMAND} -E copy_directory
-    "${CMAKE_SOURCE_DIR}/Engine/Shaders"
-    "$<TARGET_FILE_DIR:Game>/Resources/Shaders"
+if (NOT CMAKE_BUILD_TYPE MATCHES Debug)
+    add_custom_command(TARGET Game POST_BUILD
+        COMMENT "Deploying Game Assets to Bin/Project..."
 
-    # -----------------------------------------------------------------
-    # [Step 3] 일반 리소스 병합 (Engine 리소스 -> Game 리소스)
-    # -----------------------------------------------------------------
+        # 1. Game Assets 복사 (@Assets -> Bin/Project/Assets)
+        # 주의: Game 폴더 안에 'Assets' 폴더가 있다고 가정합니다.
+        COMMAND ${CMAKE_COMMAND} -E make_directory "$<TARGET_FILE_DIR:Game>/Project/Assets"
+        COMMAND ${CMAKE_COMMAND} -E copy_directory
+            "${CMAKE_CURRENT_SOURCE_DIR}/Assets" 
+            "$<TARGET_FILE_DIR:Game>/Project/Assets"
 
-    # 3-1. 게임 리소스 전체 복사 (Override)
-    # Root/Resources 내용을 -> Bin/Resources 로 복사
-    # (만약 사용자가 커스텀 셰이더를 Resources/Shaders에 넣었다면 여기서 덮어씌워짐)
-    COMMAND ${CMAKE_COMMAND} -E copy_directory
-    "${CMAKE_SOURCE_DIR}/Resources"
-    "$<TARGET_FILE_DIR:Game>/Resources"
-
-    # -----------------------------------------------------------------
-    # [Step 4] 설정(Config) 병합 (Engine 기본값 -> Game 커스텀)
-    # -----------------------------------------------------------------
-
-    # 4-1. 엔진 기본 설정 복사 (Base)
-    # Engine/Config -> Bin/Config
-    COMMAND ${CMAKE_COMMAND} -E copy_directory
-    "${CMAKE_SOURCE_DIR}/Engine/Config"
-    "$<TARGET_FILE_DIR:Game>/Config"
-
-    # 4-2. 게임 전용 설정 복사 (Override)
-    # Game/Config -> Bin/Config
-    COMMAND ${CMAKE_COMMAND} -E copy_directory
-    "${CMAKE_CURRENT_SOURCE_DIR}/Config"
-    "$<TARGET_FILE_DIR:Game>/Config"
-
-    # 로그 출력
-    COMMENT "Deploying Assets: Merging Engine defaults with Game overrides..."
-)
+        # 2. Game Config 복사 (@GameConfig -> Bin/Project/Config)
+        COMMAND ${CMAKE_COMMAND} -E make_directory "$<TARGET_FILE_DIR:Game>/Project/Config"
+        COMMAND ${CMAKE_COMMAND} -E copy_directory
+            "${CMAKE_CURRENT_SOURCE_DIR}/Config"
+            "$<TARGET_FILE_DIR:Game>/Project/Config"
+    )
+endif()

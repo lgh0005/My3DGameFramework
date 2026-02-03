@@ -1,16 +1,5 @@
-﻿find_package(glad CONFIG REQUIRED)
-find_package(glfw3 CONFIG REQUIRED)
-find_package(glm CONFIG REQUIRED)
-find_package(imgui CONFIG REQUIRED)
-find_package(spdlog CONFIG REQUIRED)
-find_package(assimp CONFIG REQUIRED)
-find_package(KTX CONFIG REQUIRED)
-find_package(freetype REQUIRED)
-find_package(Jolt CONFIG REQUIRED)
-find_package(nlohmann_json CONFIG REQUIRED)
-find_package(recastnavigation CONFIG REQUIRED)
-
-add_library(Engine STATIC
+﻿# 소스 파일 목록
+set(ENGINE_SOURCES
 
     # PCH
    "EnginePch.h"                    "EnginePch.cpp"
@@ -233,26 +222,32 @@ add_library(Engine STATIC
    "Managers/InstanceManager.h"      "Managers/InstanceManager.cpp"
 )
 
-# 2. [PCH 설정] EnginePCH.h를 PCH로 사용합니다.
-target_precompile_headers(Engine  PUBLIC EnginePCH.h)
+# Visual Studio 필터 자동 생성
+source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${ENGINE_SOURCES})
 
-# 3. [헤더 경로] 다른 프로젝트(Game)가 Engine의 헤더 파일을
-#    찾을 수 있도록 현재 폴더를 PUBLIC include 경로로 지정합니다.
+# 라이브러리 생성
+add_library(Engine STATIC ${ENGINE_SOURCES})
+
+# Include 경로 및 PCH 설정
 target_include_directories(Engine PUBLIC 
     ${CMAKE_CURRENT_SOURCE_DIR}
     ${CMAKE_CURRENT_SOURCE_DIR}/ThirdParty
 )
 
-# 4. 외부 라이브러리를 여기에 링크
+# 미리 컴파일된 헤더 적용
+target_precompile_headers(Engine PUBLIC EnginePch.h)
+
+# 라이브러리 링크 (Dependencies)
 target_link_libraries(Engine PUBLIC
     glad::glad
     glfw
     glm::glm
+    pugixml::pugixml
     imgui::imgui
     spdlog::spdlog
     assimp::assimp
     KTX::ktx
-    freetype  
+    freetype
     Jolt::Jolt
     nlohmann_json::nlohmann_json
     RecastNavigation::Recast
@@ -262,9 +257,34 @@ target_link_libraries(Engine PUBLIC
     RecastNavigation::DetourTileCache
 )
 
-# 5. [컴파일 정의] Engine 타겟에 C++ 매크로를 정의합니다.
+# 컴파일 정의
 target_compile_definitions(Engine PUBLIC
     WINDOW_WIDTH=1200
     WINDOW_HEIGHT=800
     WINDOW_NAME="My3DGameFramework"
 )
+
+# 리소스 배포 (Resource Deployment)
+if (NOT CMAKE_BUILD_TYPE MATCHES Debug)
+    add_custom_command(TARGET Engine POST_BUILD
+        COMMENT "Deploying Engine Assets to Bin/Engine..."
+        
+        # 1. Shaders 복사 (@Engine/Shaders)
+        COMMAND ${CMAKE_COMMAND} -E make_directory "$<TARGET_FILE_DIR:Engine>/../Engine/Shaders"
+        COMMAND ${CMAKE_COMMAND} -E copy_directory
+            "${CMAKE_CURRENT_SOURCE_DIR}/Shaders"
+            "$<TARGET_FILE_DIR:Engine>/../Engine/Shaders"
+
+        # 2. 기본 리소스 복사 (@Engine/Resources)
+        COMMAND ${CMAKE_COMMAND} -E make_directory "$<TARGET_FILE_DIR:Engine>/../Engine/Resources"
+        COMMAND ${CMAKE_COMMAND} -E copy_directory
+            "${CMAKE_CURRENT_SOURCE_DIR}/Resources"
+            "$<TARGET_FILE_DIR:Engine>/../Engine/Resources"
+
+        # 3. Config 복사 (@Engine/Config)
+        COMMAND ${CMAKE_COMMAND} -E make_directory "$<TARGET_FILE_DIR:Engine>/../Engine/Config"
+        COMMAND ${CMAKE_COMMAND} -E copy_directory
+            "${CMAKE_CURRENT_SOURCE_DIR}/Config"
+            "$<TARGET_FILE_DIR:Engine>/../Engine/Config"
+    )
+endif()
