@@ -156,3 +156,9 @@ const std::vector<glm::mat4>& Utils::GetIdentityBones()
 
 	return identityBones;
 }
+
+const glm::mat4& Utils::GetIdentityBone()
+{
+	static const glm::mat4 identityBone(1.0f);
+	return identityBone;
+}

@@ -93,7 +93,7 @@ void Animation::Bake(Skeleton* skeleton)
 		}
 	}
 
-	LOG_WARN
+	LOG_INFO
 	(
 		"Animation [{}] Baked: {} Frames ({:.2f} sec), {} Bones (Total {} Matrices)",
 		m_name,

@@ -24,9 +24,10 @@ public:
         float frameRate = 30.0f;
     };
 
-public:
     void Bake(Skeleton* skeleton);
     const BakedData& GetBakedData() const { return m_bakedData; }
+    void SetGlobalOffset(uint32 offset) { m_globalOffset = offset; }
+    uint32 GetGlobalOffset() const { return m_globalOffset; }
 
 public:
     virtual ~Animation();
@@ -55,6 +56,7 @@ private:
     Animation();
 
     BakedData m_bakedData;
+    uint32 m_globalOffset{ 0 };
 
     std::string m_name;
     float m_duration            { 0.0f };

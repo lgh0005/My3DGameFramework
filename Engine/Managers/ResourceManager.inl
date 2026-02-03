@@ -1,4 +1,5 @@
-﻿#pragma once
+﻿#include "ResourceManager.h"
+#pragma once
 
 template<typename T>
 inline void ResourceManager::AddResource(std::shared_ptr<T> resource,
@@ -24,6 +25,22 @@ inline void ResourceManager::AddResource(std::shared_ptr<T> resource,
 
 	// 3. 통합 맵에 저장 (자동 업캐스팅)
 	m_resources[name] = resource;
+}
+
+template<typename T>
+inline std::vector<std::shared_ptr<T>> ResourceManager::GetResources() const
+{
+	std::vector<std::shared_ptr<T>> result;
+	result.reserve(m_resources.size());
+
+	ResourceType targetType = T::s_ResourceType;
+	for (const auto& [name, res] : m_resources)
+	{
+		if (res && res->MatchesType(targetType))
+			result.push_back(std::static_pointer_cast<T>(res));
+	}
+
+	return result;
 }
 
 template<typename T>

@@ -9,8 +9,8 @@ class ResourceManager
 public:
 	bool Init();
 
-	template<typename T>
-	std::shared_ptr<T> GetResource(const std::string& name) const;
+	template<typename T> std::shared_ptr<T> GetResource(const std::string& name) const;
+	template<typename T> std::vector<std::shared_ptr<T>> GetResources() const;
 
 	template<typename T>
 	void AddResource

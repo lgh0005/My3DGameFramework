@@ -87,6 +87,7 @@ add_library(Engine STATIC
 
    # Instancing
    "Instancing/InstanceBuffer.h"    "Instancing/InstanceBuffer.cpp"
+   "Instancing/AnimBuffer.h"      "Instancing/AnimBuffer.cpp"
    "Instancing/InstanceProperty.h"      "Instancing/InstanceProperty.cpp"
    "Instancing/RenderBatch.h"       "Instancing/RenderBatch.cpp"
    "Instancing/RenderQueue.h"      "Instancing/RenderQueue.cpp"
@@ -229,6 +230,7 @@ add_library(Engine STATIC
    "Managers/PhysicsManager.h"      "Managers/PhysicsManager.cpp"
    "Managers/UIManager.h"           "Managers/UIManager.cpp"
    "Managers/EntityManager.h"           "Managers/EntityManager.cpp"
+   "Managers/InstanceManager.h"      "Managers/InstanceManager.cpp"
 )
 
 # 2. [PCH 설정] EnginePCH.h를 PCH로 사용합니다.

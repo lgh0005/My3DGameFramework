@@ -20,6 +20,7 @@ void SceneManager::LoadScene(const std::string& scene, const std::string& pipeli
 
 	// 3. 기존 씬 정리 (소멸자 호출 -> 리소스 해제)
 	UI.Clear();
+	INSTANCE.ClearQueue();
 	m_activeScene.reset();
 	LOG_INFO("Loading Scene: {} ...", scene);
 
@@ -35,6 +36,9 @@ void SceneManager::LoadScene(const std::string& scene, const std::string& pipeli
 			m_activeScene.reset();
 			return;
 		}
+
+		// [Step 2] 애니메이션 버퍼 재빌드 (Re-Bake)
+		INSTANCE.BuildGlobalAnimBuffer();
 
 		// [Step 2] Awake: 게임 오브젝트 배치 (OnPlaceActors)
 		// 이 함수 내부에서 ProcessPendingAdds()가 호출되어 카메라 등이 실제 생성됨

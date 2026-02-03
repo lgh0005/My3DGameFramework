@@ -50,6 +50,7 @@ public:
 	
 	// 기본 뼈 행렬 벡터 반환 IIFE 패턴 유틸 함수
 	static const std::vector<glm::mat4>& GetIdentityBones();
+	static const glm::mat4& GetIdentityBone();
 };
 
 #include "Misc/Utils.inl"
