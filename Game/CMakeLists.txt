@@ -26,7 +26,6 @@ source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${GAME_SOURCES})
 
 # 실행 파일 생성 및 VS 시작 프로젝트 설정
 add_executable(Game ${GAME_SOURCES})
-set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT Game)
 
 # Include 및 PCH 설정
 target_precompile_headers(Game PRIVATE pch.h)

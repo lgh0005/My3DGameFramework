@@ -12,6 +12,8 @@ public:
 	fs::path GetConfigRoot() const { return m_configRoot; }
 
 private:
+	static fs::path GetExecutablePath();
+
 	fs::path m_binPath;     // 실행 파일이 있는 Bin 폴더
 	fs::path m_assetRoot;   // Bin/Assets
 	fs::path m_configRoot;  // Bin/Config

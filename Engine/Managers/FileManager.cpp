@@ -1,26 +1,28 @@
 ﻿#include "EnginePch.h"
 #include "FileManager.h"
 #include "Misc/EngineDir.h"
+#include "Managers/FileManager.inl"
 
 bool FileManager::Init()
 {
 	using namespace EnginePolicy;
 
 	// 1. 실행 경로 기준 설정
-	m_binPath = fs::current_path();
+	m_binPath = GetExecutablePath();
+	LOG_INFO("FileManager: Initializing... Executable Root at [{}]", m_binPath.string());
 
 	// 2. 부트 설정 파일 로드 (./Config/EngineConfig.json)
 	fs::path bootConfigPath = m_binPath / fs::path(Disk::BootConfigPath);
 	if (!fs::exists(bootConfigPath))
 	{
-		LOG_ERROR("TODO");
+		LOG_ERROR("FileManager::Init - Boot config NOT found at: {}", bootConfigPath.string());
 		return false;
 	}
 
 	std::ifstream file(bootConfigPath);
 	if (!file.is_open())
 	{
-		LOG_ERROR("TODO");
+		LOG_ERROR("FileManager::Init - Failed to open boot config file: {}", bootConfigPath.string());
 		return false;
 	}
 
@@ -28,7 +30,7 @@ bool FileManager::Init()
 	json data = nlohmann::json::parse(file, nullptr, false);
 	if (data.is_discarded())
 	{
-		LOG_ERROR("TODO");
+		LOG_ERROR("FileManager::Init - JSON Parse Error in EngineConfig.json. Please check syntax.");
 		return false;
 	}
 
@@ -36,7 +38,7 @@ bool FileManager::Init()
 	const std::string settingsKey(Schema::SettingsSection);
 	if (!data.contains(settingsKey))
 	{
-		LOG_ERROR("TODO");
+		LOG_ERROR("FileManager::Init - Missing '{}' section in EngineConfig.json", settingsKey);
 		return false;
 	}
 
@@ -49,7 +51,7 @@ bool FileManager::Init()
 	if (!settings.contains(kAssetRoot) || !settings.contains(kConfigRoot) ||
 		!settings.contains(kEngineDir) || !settings.contains(kGameDir))
 	{
-		LOG_ERROR("TODO");
+		LOG_ERROR("FileManager::Init - Missing required keys (AssetRoot, ConfigRoot, etc.) in settings.");
 		return false;
 	}
 
@@ -79,15 +81,17 @@ bool FileManager::Init()
 	// 7. 엔진 필수 폴더 유효성 검사
 	if (!fs::exists(m_pathMap[pEngine]))
 	{
-		LOG_ERROR("TODO");
+		LOG_ERROR("FileManager::Init - Engine Asset Directory Missing at: {}", m_pathMap[pEngine].string());
 		return false;
 	}
 
+	LOG_INFO("FileManager: Initialization Successful.");
 	return true;
 }
 
 std::string FileManager::Resolve(const std::string& virtualPath)
 {
+	// TODO : 여기는 정책을 따로 다시 생각해봐야함.
 	// 가상 경로 접두사 매칭 확인
 	for (const auto& [prefix, physicalPath] : m_pathMap)
 	{

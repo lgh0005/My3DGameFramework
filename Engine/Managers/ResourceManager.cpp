@@ -1,25 +1,29 @@
 ﻿#include "EnginePch.h"
 #include "ResourceManager.h"
 #include "Core/ResourceLoader.h"
-#include "Core/EngineConfigurator.h"
 
 bool ResourceManager::Init()
 {
-    bool success = true;
-
     // 1. 빌트인 리소스(Cube, Plane, Material 등) 생성
     if (!ResourceLoader::Init()) 
         return false;
 
     // 2. 기본 엔진 셰이더 로드
-    if (!ResourceLoader::Load(EngineConfigurator::GetShaderConfigPath().string()))
+    std::string shaderConfigPath = FILE_MGR.Resolve("@EngineConfig/DefaultShaders.json");
+    if (!ResourceLoader::Load(shaderConfigPath))
+    {
+        LOG_ERROR("ResourceManager: Failed to load Engine Shaders at '{}'", shaderConfigPath);
         return false;
+    }
 
     // 3. 게임 리소스 로드
-    if (!ResourceLoader::Load(EngineConfigurator::GetGameConfigPath().string()))
-        return false;
+    std::string gameConfigPath = FILE_MGR.Resolve("@GameConfig/Resources.json");
+    if (!ResourceLoader::Load(gameConfigPath))
+    {
+        LOG_WARN("ResourceManager: Game resource config not found at '{}'. Skipping.", gameConfigPath);
+    }
 
-    return success;
+    return true;
 }
 
 void ResourceManager::Clear()

@@ -1,10 +1,22 @@
 ﻿{
     "description": "Core Boot Configuration",
+
     "settings": 
     {
-        "assetRoot": "./Assets",
-        "configRoot": "./Config",
-        "engineDir": "Engine",
-        "gameDir": "Game"
+      "assetRoot": "Assets",
+      "configRoot": "Config",
+      "engineDir": "Engine",
+      "gameDir": "Game"
+    },
+
+    "virtualPaths": 
+    {
+      "@Config": "Config",
+      "@EngineConfig": "Config/Engine",
+      "@GameConfig": "Config/Game",
+      "@Assets": "Assets",
+      "@Engine": "Assets/Engine",
+      "@Shader": "Assets/Engine/Shaders",
+      "@Game": "Assets/Game"
     }
 }

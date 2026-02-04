@@ -8,7 +8,6 @@ set(ENGINE_SOURCES
    "Core/Application.h"             "Core/Application.cpp"
    "Core/Logger.h"                  "Core/Logger.cpp"
    "Core/ResourceLoader.h"          "Core/ResourceLoader.cpp"
-   "Core/EngineConfigurator.h"    "Core/EngineConfigurator.cpp"
 
    # Entity
    "Entity/Chunk.h"                 "Entity/Chunk.cpp"
@@ -16,9 +15,9 @@ set(ENGINE_SOURCES
 
    # Scene
    "Scene/Scene.h"                   "Scene/Scene.cpp"
-   "Scene/GameObjectRegistry.h"       "Scene/GameObjectRegistry.cpp"
-   "Scene/ComponentRegistry.h"           "Scene/ComponentRegistry.cpp"      "Scene/ComponentRegistry.inl"
-   "Scene/SceneRegistry.h"          "Scene/SceneRegistry.cpp"
+   "Scene/GameObjectRegistry.h"      "Scene/GameObjectRegistry.cpp"
+   "Scene/ComponentRegistry.h"       "Scene/ComponentRegistry.cpp"      "Scene/ComponentRegistry.inl"
+   "Scene/SceneRegistry.h"           "Scene/SceneRegistry.cpp"
    "Scene/SceneUtils.h"              "Scene/SceneUtils.cpp"
 
    # Object
@@ -221,7 +220,7 @@ set(ENGINE_SOURCES
    "Managers/UIManager.h"           "Managers/UIManager.cpp"
    "Managers/EntityManager.h"           "Managers/EntityManager.cpp"
    "Managers/InstanceManager.h"      "Managers/InstanceManager.cpp"
-   "Managers/FileManager.h"         "Managers/FileManager.cpp"
+   "Managers/FileManager.h"         "Managers/FileManager.cpp"          "Managers/FileManager.inl"
 )
 
 # Visual Studio 필터 자동 생성
