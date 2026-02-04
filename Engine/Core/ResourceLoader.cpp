@@ -1,5 +1,6 @@
 ﻿#include "EnginePch.h"
 #include "ResourceLoader.h"
+#include "Managers/FileManager.h" // [필수] 파일 매니저 포함
 
 #include "Graphics/Geometry/GeometryGenerator.h"
 #include "Resources/Meshes/ScreenMesh.h"
@@ -28,13 +29,14 @@ bool ResourceLoader::Init()
 
 bool ResourceLoader::Load(const std::string& manifestPath)
 {
+	// manifestPath는 이미 ResourceManager에서 Resolve된 절대 경로로 들어옵니다.
 	LOG_INFO("Start Resource Loading... : {}", manifestPath);
 	bool success = true;
 
-	// 1. JSON 매니페스트 파싱
+	// 1. JSON 매니페스트 파싱 (여기서 가상 경로 조립)
 	auto manifestOpt = ParseManifest(manifestPath);
 
-	// 2. 파싱 성공 시 외부 리소스 로드 진행
+	// 2. 파싱 성공 시 외부 리소스 로드 진행 (여기서 Resolve 및 로드)
 	if (manifestOpt.has_value())
 	{
 		if (!LoadResourcesFromManifest(manifestOpt.value()))
@@ -42,7 +44,6 @@ bool ResourceLoader::Load(const std::string& manifestPath)
 	}
 	else
 	{
-		// 매니페스트 파일이 없거나 깨짐
 		LOG_ERROR("ResourceLoader: Failed to parse manifest '{}'.", manifestPath);
 		success = false;
 	}
@@ -55,33 +56,21 @@ bool ResourceLoader::Load(const std::string& manifestPath)
 //==============================*/
 bool ResourceLoader::LoadResourcesFromManifest(const ResourceManifest& manifest)
 {
-	bool success = true;
+	// 각 Load 함수 내부에서 FILE_MGR.Resolve()를 호출합니다.
 
-	// 1. 셰이더 로드
 	if (!LoadShaders(manifest.shaders)) return false;
-
-	// 2. 컴퓨트 셰이더 로드
 	if (!LoadComputeShaders(manifest.computeShaders)) return false;
-
-	// 3. 텍스쳐 로드
 	if (!LoadTextures(manifest.textures)) return false;
-
-	// 4. 큐브 텍스쳐 로드
 	if (!LoadCubeTextures(manifest.cubemaps)) return false;
-
-	// 5. 모델 로드
 	if (!LoadModels(manifest.models)) return false;
-
-	// 6. 애니메이션 로드
 	if (!LoadAnimations(manifest.animations)) return false;
-
-	// 7. 오디오 로드
 	if (!LoadBGM(manifest.bgm)) return false;
 	if (!LoadSFX(manifest.sfx)) return false;
 
 	return true;
 }
 
+// BuiltIn은 메모리 생성이라 경로가 필요 없음 (변경 없음)
 bool ResourceLoader::LoadBuiltInResources()
 {
 	StaticMeshPtr mesh;
@@ -107,15 +96,13 @@ bool ResourceLoader::LoadBuiltInResources()
 	if (!scrnMesh) return false;
 	RESOURCE.AddResource<ScreenMesh>(scrnMesh, "Screen", "@BuiltIn/Screen");
 
-	// 4. Default Material
+	// 5. Default Materials
 	MaterialPtr material;
-	
-	// 4-1. SRP Material
+
 	material = Material::Create();
 	if (!material) return false;
 	RESOURCE.AddResource<Material>(material, "material_SRP", "@BuiltIn/Material/SRP");
 
-	// 4-2. URP Material
 	material = Material::Create();
 	if (!material) return false;
 	RESOURCE.AddResource<Material>(material, "material_URP", "@BuiltIn/Material/URP");
@@ -123,20 +110,28 @@ bool ResourceLoader::LoadBuiltInResources()
 	return true;
 }
 
+// ---------------------------------------------------------
+// [핵심 변경] 모든 Load 함수에 Resolve 적용
+// ---------------------------------------------------------
+
 bool ResourceLoader::LoadShaders(const std::vector<ShaderData>& dataList)
 {
 	bool success = true;
 	for (const auto& data : dataList)
 	{
-		GraphicsProgramUPtr shader = GraphicsProgram::Create(data.vsPath, data.fsPath);
-		if (shader) RESOURCE.AddResource<GraphicsProgram>(std::move(shader), data.key);
+		// VS, FS 경로 각각 해석
+		std::string vsAbsPath = FILE_MGR.Resolve(data.vsPath);
+		std::string fsAbsPath = FILE_MGR.Resolve(data.fsPath);
+
+		GraphicsProgramUPtr shader = GraphicsProgram::Create(vsAbsPath, fsAbsPath);
+		if (shader)
+			RESOURCE.AddResource<GraphicsProgram>(std::move(shader), data.key);
 		else
 		{
 			LOG_ERROR("Failed to create Shader: '{}'", data.key);
 			success = false;
 		}
 	}
-
 	return success;
 }
 
@@ -145,16 +140,14 @@ bool ResourceLoader::LoadComputeShaders(const std::vector<ResourceData>& dataLis
 	bool success = true;
 	for (const auto& data : dataList)
 	{
-		// ComputeProgram::Create는 경로 하나만 받습니다.
-		ComputeProgramUPtr shader = ComputeProgram::Create(data.path);
+		std::string absPath = FILE_MGR.Resolve(data.path);
+		ComputeProgramUPtr shader = ComputeProgram::Create(absPath);
 
 		if (shader)
-		{
 			RESOURCE.AddResource<ComputeProgram>(std::move(shader), data.key);
-		}
 		else
 		{
-			LOG_ERROR("Failed to create ComputeProgram: '{}' ({})", data.key, data.path);
+			LOG_ERROR("Failed to create ComputeProgram: '{}' ({})", data.key, absPath);
 			success = false;
 		}
 	}
@@ -164,95 +157,90 @@ bool ResourceLoader::LoadComputeShaders(const std::vector<ResourceData>& dataLis
 bool ResourceLoader::LoadTextures(const std::vector<ResourceData>& dataList)
 {
 	bool success = true;
-
 	for (const auto& data : dataList)
 	{
-		// 확장자 체크 로직 제거 -> TextureLoader 내부에서 처리
-		auto texture = TextureUtils::LoadTexture(data.path);
+		// 가상 경로(@Game/...)를 절대 경로(C:/.../Bin/...)로 변환
+		std::string absPath = FILE_MGR.Resolve(data.path);
 
+		auto texture = TextureUtils::LoadTexture(absPath);
 		if (texture)
-		{
-			RESOURCE.AddResource<Texture>(std::move(texture), data.key, data.path);
-		}
+			RESOURCE.AddResource<Texture>(std::move(texture), data.key, data.path); // path는 디버깅용으로 원본(가상) 유지 추천
 		else
 		{
-			LOG_ERROR("Failed to create Texture: '{}' ({})", data.key, data.path);
+			LOG_ERROR("Failed to create Texture: '{}' ({})", data.key, absPath);
 			success = false;
 		}
 	}
-
 	return success;
 }
 
 bool ResourceLoader::LoadCubeTextures(const std::vector<CubeMapData>& dataList)
 {
 	bool success = true;
-
 	for (const auto& data : dataList)
 	{
 		CubeTextureUPtr texture = nullptr;
 		usize fileCount = data.paths.size();
 
+		// 모든 경로를 미리 Resolve
+		std::vector<std::string> absPaths;
+		absPaths.reserve(fileCount);
+		for (const auto& virtualPath : data.paths)
+		{
+			absPaths.push_back(FILE_MGR.Resolve(virtualPath));
+		}
+
 		switch (fileCount)
 		{
-			case 1:
-			{
-				std::string path = data.paths[0];
-				std::string ext = fs::path(path).extension().string();
-				std::transform(ext.begin(), ext.end(), ext.begin(), ::tolower);
-				if (ext == ".ktx") texture = TextureUtils::LoadCubeMapFromKtx(path);
-				break;
-			}
-
-			case 6:
-			{
-				std::vector<Image*> rawImages;
-				std::vector<ImageUPtr> imageOwner; // 메모리 해제 관리용
-
-				bool loadFailed = false;
-				for (const auto& path : data.paths)
-				{
-					// 큐브맵은 Flip하지 않음 (false)
-					auto img = Image::Load(path, false);
-					if (!img)
-					{
-						LOG_ERROR("Failed to load cubemap face: {}", path);
-						loadFailed = true;
-						break;
-					}
-					rawImages.push_back(img.get());
-					imageOwner.push_back(std::move(img)); // 소유권 보존
-				}
-
-				if (!loadFailed)
-				{
-					texture = TextureUtils::LoadCubeMapFromImages(rawImages);
-				}
-
-				break;
-			}
-		
-			default:
-			{
-				LOG_ERROR("Invalid path count for CubeMap '{}': {}. Expected 1 or 6.", data.key, data.paths.size());
-				success = false;
-				continue;;
-			}
-		}
-
-		// 등록
-		if (texture)
+		case 1: // .ktx, .hdr 등 단일 파일
 		{
-			// 경로는 대표로 첫 번째 것을 저장
-			RESOURCE.AddResource<CubeTexture>(std::move(texture), data.key, data.paths[0]);
+			std::string path = absPaths[0];
+			std::string ext = fs::path(path).extension().string();
+			std::transform(ext.begin(), ext.end(), ext.begin(), ::tolower);
+
+			if (ext == ".ktx") texture = TextureUtils::LoadCubeMapFromKtx(path);
+			// 추후 .hdr 등 지원 추가 가능
+			break;
 		}
+		case 6: // 낱장 이미지 6개
+		{
+			std::vector<Image*> rawImages;
+			std::vector<ImageUPtr> imageOwner;
+
+			bool loadFailed = false;
+			for (const auto& path : absPaths)
+			{
+				auto img = Image::Load(path, false);
+				if (!img)
+				{
+					LOG_ERROR("Failed to load cubemap face: {}", path);
+					loadFailed = true;
+					break;
+				}
+				rawImages.push_back(img.get());
+				imageOwner.push_back(std::move(img));
+			}
+
+			if (!loadFailed)
+			{
+				texture = TextureUtils::LoadCubeMapFromImages(rawImages);
+			}
+			break;
+		}
+		default:
+			LOG_ERROR("Invalid path count for CubeMap '{}': {}. Expected 1 or 6.", data.key, fileCount);
+			success = false;
+			continue;
+		}
+
+		if (texture)
+			RESOURCE.AddResource<CubeTexture>(std::move(texture), data.key, data.paths[0]); // 대표 경로 저장
 		else
 		{
 			LOG_ERROR("Failed to create CubeTexture: '{}'", data.key);
 			success = false;
 		}
 	}
-
 	return success;
 }
 
@@ -261,14 +249,16 @@ bool ResourceLoader::LoadModels(const std::vector<ResourceData>& dataList)
 	bool success = true;
 	for (const auto& data : dataList)
 	{
-		auto model = Model::Load(data.path);
+		std::string absPath = FILE_MGR.Resolve(data.path);
+
+		// 나중에 여기에 Model Import Settings (meta file) 로직이 추가될 수 있음
+		auto model = Model::Load(absPath);
+
 		if (model)
-		{
 			RESOURCE.AddResource<Model>(std::move(model), data.key, data.path);
-		}
 		else
 		{
-			LOG_ERROR("Failed to load Model: '{}' ({})", data.key, data.path);
+			LOG_ERROR("Failed to load Model: '{}' ({})", data.key, absPath);
 			success = false;
 		}
 	}
@@ -280,12 +270,14 @@ bool ResourceLoader::LoadAnimations(const std::vector<ResourceData>& dataList)
 	bool success = true;
 	for (const auto& data : dataList)
 	{
-		auto anim = Animation::Load(data.path);
+		std::string absPath = FILE_MGR.Resolve(data.path);
+
+		// Model이 필요한 경우(Assimp) 처리는 Animation::Load 내부 혹은 별도 로직 필요
+		// 현재 구조에서는 단독 Load 호출
+		auto anim = Animation::Load(absPath);
 
 		if (anim)
-		{
 			RESOURCE.AddResource<Animation>(std::move(anim), data.key, data.path);
-		}
 		else
 		{
 			LOG_ERROR("Failed to load Animation: '{}'", data.key);
@@ -298,44 +290,38 @@ bool ResourceLoader::LoadAnimations(const std::vector<ResourceData>& dataList)
 bool ResourceLoader::LoadBGM(const std::vector<ResourceData>& dataList)
 {
 	bool success = true;
-
 	for (const auto& data : dataList)
 	{
-		auto bgm = AudioClip::LoadBGM(data.path);
+		std::string absPath = FILE_MGR.Resolve(data.path);
+		auto bgm = AudioClip::LoadBGM(absPath);
 
 		if (bgm)
-		{
 			RESOURCE.AddResource<AudioClip>(std::move(bgm), data.key, data.path);
-		}
 		else
 		{
-			LOG_ERROR("Failed to load BGM: '{}' ({})", data.key, data.path);
+			LOG_ERROR("Failed to load BGM: '{}' ({})", data.key, absPath);
 			success = false;
 		}
 	}
-
 	return success;
 }
 
 bool ResourceLoader::LoadSFX(const std::vector<ResourceData>& dataList)
 {
 	bool success = true;
-
 	for (const auto& data : dataList)
 	{
-		auto sfx = AudioClip::LoadSFX(data.path);
+		std::string absPath = FILE_MGR.Resolve(data.path);
+		auto sfx = AudioClip::LoadSFX(absPath);
 
 		if (sfx)
-		{
 			RESOURCE.AddResource<AudioClip>(std::move(sfx), data.key, data.path);
-		}
 		else
 		{
-			LOG_ERROR("Failed to load SFX: '{}' ({})", data.key, data.path);
+			LOG_ERROR("Failed to load SFX: '{}' ({})", data.key, absPath);
 			success = false;
 		}
 	}
-
 	return success;
 }
 
@@ -344,7 +330,6 @@ bool ResourceLoader::LoadSFX(const std::vector<ResourceData>& dataList)
 //===================================*/
 std::optional<ResourceManifest> ResourceLoader::ParseManifest(const std::string& manifestPath)
 {
-	// 1. 파일 열기
 	std::ifstream file(manifestPath);
 	if (!file.is_open())
 	{
@@ -352,7 +337,6 @@ std::optional<ResourceManifest> ResourceLoader::ParseManifest(const std::string&
 		return std::nullopt;
 	}
 
-	// 2. JSON 파싱
 	json root;
 	try
 	{
@@ -366,55 +350,35 @@ std::optional<ResourceManifest> ResourceLoader::ParseManifest(const std::string&
 
 	ResourceManifest manifest;
 
-	// 3. 각 카테고리별 파싱 (키 이름은 JSON 규격과 일치해야 함)
-	// 일반 리소스 (Key + Path)
-	ParseGeneralResources(root, "bgm", manifest.bgm);
-	ParseGeneralResources(root, "sfx", manifest.sfx);
-	ParseGeneralResources(root, "textures", manifest.textures); // 복수형
-	ParseGeneralResources(root, "models", manifest.models);
-	ParseGeneralResources(root, "animations", manifest.animations);
+	// 1. [스마트 경로 병합] default_root 읽기
+	std::string defaultRoot = "";
+	if (root.contains("default_root"))
+	{
+		defaultRoot = root["default_root"].get<std::string>();
+	}
 
-	// 쉐이더 (Key + VS + FS)
-	ParseShaderResources(root, "shaders", manifest.shaders);
-	ParseGeneralResources(root, "compute_shaders", manifest.computeShaders);
+	// 2. 파싱 (defaultRoot 전달)
+	ParseGeneralResources(root, "bgm", defaultRoot, manifest.bgm);
+	ParseGeneralResources(root, "sfx", defaultRoot, manifest.sfx);
+	ParseGeneralResources(root, "textures", defaultRoot, manifest.textures);
+	ParseGeneralResources(root, "models", defaultRoot, manifest.models);
+	ParseGeneralResources(root, "animations", defaultRoot, manifest.animations);
 
-	// 큐브맵 (Key + Path[Array or String])
-	// 헤더에 ParseCubeMapResources 선언이 필요합니다.
-	ParseCubeMapResources(root, "cubemaps", manifest.cubemaps); // 복수형
+	// 쉐이더는 보통 개별 @Shader 경로를 쓰므로 defaultRoot 적용 여부는 정책 나름
+	// 여기서는 명시적인 경로를 선호하므로 defaultRoot를 ""로 넘기거나, 필요한 경우 적용
+	ParseShaderResources(root, "shaders", defaultRoot, manifest.shaders);
+	ParseGeneralResources(root, "compute_shaders", defaultRoot, manifest.computeShaders);
+
+	ParseCubeMapResources(root, "cubemaps", defaultRoot, manifest.cubemaps);
 
 	return manifest;
 }
 
-void ResourceLoader::ParseGeneralResources(const nlohmann::json& jsonContext, const std::string& categoryKey, std::vector<ResourceData>& outList)
-{
-	// 해당 카테고리가 없으면 조용히 리턴 (선택 사항이므로 에러 아님)
-	if (!jsonContext.contains(categoryKey)) return;
+// ---------------------------------------------------------
+// [핵심 변경] 파싱 헬퍼에서 default_root 처리
+// ---------------------------------------------------------
 
-	const auto& categoryJson = jsonContext[categoryKey];
-	if (!categoryJson.is_array())
-	{
-		LOG_WARN("ResourceLoader: '{}' field exists but is not an array.", categoryKey);
-		return;
-	}
-
-	for (const auto& item : categoryJson)
-	{
-		// 필수 키 검사
-		if (!item.contains("key") || !item.contains("path"))
-		{
-			LOG_WARN("ResourceLoader: Skipped invalid item in '{}'. Missing 'key' or 'path'.", categoryKey);
-			continue;
-		}
-
-		ResourceData data;
-		data.key = item["key"].get<std::string>();
-		data.path = item["path"].get<std::string>();
-
-		outList.push_back(data);
-	}
-}
-
-void ResourceLoader::ParseShaderResources(const nlohmann::json& jsonContext, const std::string& categoryKey, std::vector<ShaderData>& outList)
+void ResourceLoader::ParseGeneralResources(const nlohmann::json& jsonContext, const std::string& categoryKey, const std::string& defaultRoot, std::vector<ResourceData>& outList)
 {
 	if (!jsonContext.contains(categoryKey)) return;
 
@@ -423,23 +387,59 @@ void ResourceLoader::ParseShaderResources(const nlohmann::json& jsonContext, con
 
 	for (const auto& item : categoryJson)
 	{
-		// 쉐이더는 Vertex(vs)와 Fragment(fs) 경로가 필수
-		if (!item.contains("key") || !item.contains("vs") || !item.contains("fs"))
-		{
-			LOG_WARN("ResourceLoader: Skipped invalid shader item. Missing 'key', 'vs', or 'fs'.");
-			continue;
-		}
+		if (!item.contains("key") || !item.contains("path")) continue;
 
-		ShaderData data;
+		ResourceData data;
 		data.key = item["key"].get<std::string>();
-		data.vsPath = item["vs"].get<std::string>();
-		data.fsPath = item["fs"].get<std::string>();
+
+		std::string rawPath = item["path"].get<std::string>();
+
+		// [스마트 병합 로직]
+		// 1. 경로가 @로 시작하면 -> 그대로 사용 (Override)
+		// 2. 아니면 -> defaultRoot + "/" + rawPath
+		if (!rawPath.empty() && rawPath[0] == '@')
+		{
+			data.path = rawPath;
+		}
+		else
+		{
+			// defaultRoot가 비어있지 않으면 슬래시 붙여서 결합
+			if (!defaultRoot.empty())
+				data.path = defaultRoot + "/" + rawPath;
+			else
+				data.path = rawPath;
+		}
 
 		outList.push_back(data);
 	}
 }
 
-void ResourceLoader::ParseCubeMapResources(const nlohmann::json& jsonContext, const std::string& categoryKey, std::vector<CubeMapData>& outList)
+void ResourceLoader::ParseShaderResources(const nlohmann::json& jsonContext, const std::string& categoryKey, const std::string& defaultRoot, std::vector<ShaderData>& outList)
+{
+	if (!jsonContext.contains(categoryKey)) return;
+
+	for (const auto& item : jsonContext[categoryKey])
+	{
+		if (!item.contains("key") || !item.contains("vs") || !item.contains("fs")) continue;
+
+		ShaderData data;
+		data.key = item["key"].get<std::string>();
+
+		// VS 파싱
+		std::string rawVs = item["vs"].get<std::string>();
+		if (!rawVs.empty() && rawVs[0] == '@') data.vsPath = rawVs;
+		else data.vsPath = (defaultRoot.empty() ? rawVs : defaultRoot + "/" + rawVs);
+
+		// FS 파싱
+		std::string rawFs = item["fs"].get<std::string>();
+		if (!rawFs.empty() && rawFs[0] == '@') data.fsPath = rawFs;
+		else data.fsPath = (defaultRoot.empty() ? rawFs : defaultRoot + "/" + rawFs);
+
+		outList.push_back(data);
+	}
+}
+
+void ResourceLoader::ParseCubeMapResources(const nlohmann::json& jsonContext, const std::string& categoryKey, const std::string& defaultRoot, std::vector<CubeMapData>& outList)
 {
 	if (!jsonContext.contains(categoryKey)) return;
 
@@ -452,26 +452,25 @@ void ResourceLoader::ParseCubeMapResources(const nlohmann::json& jsonContext, co
 
 		const auto& pathNode = item["path"];
 
-		// 1. 단일 문자열인 경우 (.ktx, .hdr 등)
+		// 헬퍼 람다: 경로 결합
+		auto ProcessPath = [&](const std::string& raw) -> std::string {
+			if (!raw.empty() && raw[0] == '@') return raw;
+			return (defaultRoot.empty() ? raw : defaultRoot + "/" + raw);
+			};
+
 		if (pathNode.is_string())
 		{
-			data.paths.push_back(pathNode.get<std::string>());
+			data.paths.push_back(ProcessPath(pathNode.get<std::string>()));
 		}
-		// 2. 배열인 경우 (낱장 이미지 6개)
 		else if (pathNode.is_array())
 		{
 			for (const auto& p : pathNode)
 			{
-				if (p.is_string()) data.paths.push_back(p.get<std::string>());
+				if (p.is_string())
+					data.paths.push_back(ProcessPath(p.get<std::string>()));
 			}
-		}
-		else
-		{
-			LOG_WARN("ResourceLoader: Invalid path type for cubemap '{}'. Must be string or array.", data.key);
-			continue;
 		}
 
 		outList.push_back(data);
 	}
 }
-

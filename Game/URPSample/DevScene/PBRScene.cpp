@@ -48,7 +48,7 @@ PBRSceneUPtr PBRScene::Create()
 
 bool PBRScene::LoadSceneResources()
 {
-	// 단색 머티리얼
+	// 단색 머티리얼 (이미지 생성은 경로 무관하므로 그대로 유지)
 	{
 		auto solidColorMat = Material::Create();
 		if (!solidColorMat) return false;
@@ -63,31 +63,39 @@ bool PBRScene::LoadSceneResources()
 
 	// 쇠공 머티리얼 #1
 	{
-		// TODO : 이후에는 ktx로 한 번 구울 필요가 있음.
 		auto rustedIronMat = Material::Create();
 		if (!rustedIronMat) return false;
+
+		// [수정] FILE_MGR.Resolve 사용 (@Game/Images 경로)
 		rustedIronMat->diffuse = TextureUtils::LoadTextureFromImage
-		(Image::Load("./Resources/Images/rustediron/rustediron2_basecolor.png").get());
+		(Image::Load(FILE_MGR.Resolve("@Game/Images/rustediron/rustediron2_basecolor.png")).get());
+
 		rustedIronMat->roughness = TextureUtils::LoadTextureFromImage
-		(Image::Load("./Resources/Images/rustediron/rustediron2_roughness.png").get());
+		(Image::Load(FILE_MGR.Resolve("@Game/Images/rustediron/rustediron2_roughness.png")).get());
+
 		rustedIronMat->metallic = TextureUtils::LoadTextureFromImage
-		(Image::Load("./Resources/Images/rustediron/rustediron2_metallic.png").get());
+		(Image::Load(FILE_MGR.Resolve("@Game/Images/rustediron/rustediron2_metallic.png")).get());
+
 		rustedIronMat->normal = TextureUtils::LoadTextureFromImage
-		(Image::Load("./Resources/Images/rustediron/rustediron2_normal.png").get());
+		(Image::Load(FILE_MGR.Resolve("@Game/Images/rustediron/rustediron2_normal.png")).get());
+
 		RESOURCE.AddResource<Material>(std::move(rustedIronMat), "Rusted_Iron");
 	}
 
 	// 쇠공 머티리얼 #2
 	{
-		// TODO : 이후에는 ktx로 한 번 구울 필요가 있음.
 		auto rustedIronMat = Material::Create();
 		if (!rustedIronMat) return false;
+
 		rustedIronMat->diffuse = TextureUtils::LoadTextureFromImage
-		(Image::Load("./Resources/Images/rustediron/rustediron2_basecolor.png").get());
+		(Image::Load(FILE_MGR.Resolve("@Game/Images/rustediron/rustediron2_basecolor.png")).get());
+
 		rustedIronMat->normal = TextureUtils::LoadTextureFromImage
-		(Image::Load("./Resources/Images/rustediron/rustediron2_normal.png").get());
+		(Image::Load(FILE_MGR.Resolve("@Game/Images/rustediron/rustediron2_normal.png")).get());
+
 		rustedIronMat->orm = TextureUtils::LoadTextureFromImage
-		(Image::Load("./Resources/Images/rustediron/rustediron2_ORM.png").get());
+		(Image::Load(FILE_MGR.Resolve("@Game/Images/rustediron/rustediron2_ORM.png")).get());
+
 		RESOURCE.AddResource<Material>(std::move(rustedIronMat), "Rusted_Iron_orm");
 	}
 
@@ -95,14 +103,17 @@ bool PBRScene::LoadSceneResources()
 	{
 		auto hdrCubeMat = Material::Create();
 		if (!hdrCubeMat) return false;
+
+		// [수정] IBL 폴더 경로 수정
 		hdrCubeMat->diffuse = TextureUtils::LoadTextureFromHDR
-		(Image::LoadHDR("./Resources/Images/IBL/mirrored_hall_4k.hdr").get());
+		(Image::LoadHDR(FILE_MGR.Resolve("@Game/Images/IBL/mirrored_hall_4k.hdr")).get());
+
 		RESOURCE.AddResource<Material>(std::move(hdrCubeMat), "hdrCubeMat");
 	}
 
 	// HDR Skybox 생성 (IBLUtils 사용)
 	{
-		auto hdrImage = Image::LoadHDR("./Resources/Images/IBL/mirrored_hall_4k.hdr");
+		auto hdrImage = Image::LoadHDR(FILE_MGR.Resolve("@Game/Images/IBL/mirrored_hall_4k.hdr"));
 		auto hdrTex = TextureUtils::LoadTextureFromHDR(hdrImage.get());
 		RESOURCE.AddResource<Texture>(std::move(hdrTex), "hdrImage");
 
@@ -110,13 +121,13 @@ bool PBRScene::LoadSceneResources()
 		RESOURCE.AddResource<EnvironmentMap>(std::move(envMap), "UnviersalSky");
 	}
 
-	// 0-4. 머티리얼 2
+	// 0-4. 머티리얼 2 (빈 머티리얼)
 	{
 		auto box1Mat = Material::Create();
 		RESOURCE.AddResource<Material>(std::move(box1Mat), "GroundMat");
 	}
-	
-	// 머티리얼 6
+
+	// 머티리얼 6 (이미 로드된 리소스 참조는 수정 불필요)
 	{
 		auto box6Mat = Material::Create();
 		box6Mat->diffuse = RESOURCE.GetResource<Texture>("toybox_diffuse");
@@ -135,11 +146,15 @@ bool PBRScene::CreateCustomRenderPasses()
 {
 	// 간단한 머티리얼 포워드 렌더 패스
 	{
-		auto prog = GraphicsProgram::Create
-		(
-			"./Resources/Shaders/Forward_PBR.vert",
-			"./Resources/Shaders/Forward_PBR.frag"
-		); if (!prog) return false;
+		// [수정] 셰이더 경로 Resolve
+		// Forward_PBR은 샘플 전용 셰이더로 보이므로 @Game/Shaders 경로 사용
+		// (만약 엔진 공용 셰이더라면 @Shader로 변경하세요)
+		std::string vsPath = FILE_MGR.Resolve("@Game/Shaders/Forward_PBR.vert");
+		std::string fsPath = FILE_MGR.Resolve("@Game/Shaders/Forward_PBR.frag");
+
+		auto prog = GraphicsProgram::Create(vsPath, fsPath);
+		if (!prog) return false;
+
 		AddRenderPass("simpleHDR", HDRRenderPass::Create(std::move(prog)));
 	}
 

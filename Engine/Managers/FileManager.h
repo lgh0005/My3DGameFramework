@@ -17,5 +17,7 @@ private:
 	fs::path m_binPath;     // 실행 파일이 있는 Bin 폴더
 	fs::path m_assetRoot;   // Bin/Assets
 	fs::path m_configRoot;  // Bin/Config
-	std::unordered_map<std::string, fs::path> m_pathMap;
+
+	// pair<가상접두사, 절대경로>
+	std::vector<std::pair<std::string_view, fs::path>> m_virtualPaths;
 };

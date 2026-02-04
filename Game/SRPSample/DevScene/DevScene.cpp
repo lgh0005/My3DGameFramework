@@ -147,37 +147,45 @@ bool DevScene::CreateCustomRenderPasses()
 	auto pipeline = RENDER.GetRenderer()->GetPipeline();
 
 	// 1. Instanced 셰이더 (잔디)
+	// 잔디는 게임 콘텐츠니까 보통 @Game/Shaders 에 위치한다고 가정
 	{
-		auto prog = GraphicsProgram::Create(
-			"./Resources/Shaders/grass.vert",
-			"./Resources/Shaders/grass.frag");
+		std::string vsPath = FILE_MGR.Resolve("@Game/Shaders/grass.vert");
+		std::string fsPath = FILE_MGR.Resolve("@Game/Shaders/grass.frag");
+
+		auto prog = GraphicsProgram::Create(vsPath, fsPath);
 		if (!prog) return false;
+
 		AddRenderPass("Instanced", InstancedRenderPass::Create(std::move(prog)));
 	}
 
 	// 2. Simple 셰이더 (조명 기즈모)
+	// 기즈모는 엔진 기능이니까 @Shader (Assets/Engine/Shaders) 에 있다고 가정
 	{
-		auto prog = GraphicsProgram::Create(
-			"./Resources/Shaders/simple.vert",
-			"./Resources/Shaders/simple.frag");
+		std::string vsPath = FILE_MGR.Resolve("@Game/Shaders/simple.vert");
+		std::string fsPath = FILE_MGR.Resolve("@Game/Shaders/simple.frag");
+
+		auto prog = GraphicsProgram::Create(vsPath, fsPath);
 		if (!prog) return false;
+
 		AddRenderPass("LightGizmo", SimpleRenderPass::Create(std::move(prog)));
 	}
 
-	// 3. 환경맵
+	// 3. 환경맵 (Environment)
+	// 이것도 엔진 셰이더(@Shader)라고 가정
 	{
-		auto prog = GraphicsProgram::Create
-		(
-			"./Resources/Shaders/environment.vert",
-			"./Resources/Shaders/environment.frag"
-		);
+		std::string vsPath = FILE_MGR.Resolve("@Game/Shaders/environment.vert");
+		std::string fsPath = FILE_MGR.Resolve("@Game/Shaders/environment.frag");
+
+		auto prog = GraphicsProgram::Create(vsPath, fsPath);
 		if (!prog) return false;
+
+		// [참고] 이미 로드된 리소스(Texture)를 가져오는 건 경로가 필요 없음 (Key로 조회)
+		// 이건 아주 잘 되어 있습니다!
 		CubeTexturePtr cubeTex = RESOURCE.GetResource<CubeTexture>("SkyboxTexture");
 		if (!cubeTex) return false;
+
 		AddRenderPass("EnvMap", EnvironmentRenderPass::Create(std::move(prog), cubeTex));
 	}
-
-	return true;
 }
 
 bool DevScene::OnPlaceActors()

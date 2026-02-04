@@ -3,136 +3,136 @@
     [
         {
             "key": "common_shadow_depth",
-            "vs":  "./Resources/Shaders/Common/Common_Shadow_DepthPass.vert",
-            "fs":  "./Resources/Shaders/Common/Common_Shadow_DepthPass.frag" 
+            "vs":  "@Shader/Common/Common_Shadow_DepthPass.vert",
+            "fs":  "@Shader/Common/Common_Shadow_DepthPass.frag" 
         },
         {
             "key": "common_skybox",
-            "vs":  "./Resources/Shaders/Common/Common_Sky_Skybox.vert",
-            "fs":  "./Resources/Shaders/Common/Common_Sky_Skybox.frag" 
+            "vs":  "@Shader/Common/Common_Sky_Skybox.vert",
+            "fs":  "@Shader/Common/Common_Sky_Skybox.frag" 
         },
         {
             "key": "common_ssao",
-            "vs":  "./Resources/Shaders/Common/Common_SSAO.vert",
-            "fs":  "./Resources/Shaders/Common/Common_SSAO_pass.frag"
+            "vs":  "@Shader/Common/Common_SSAO.vert",
+            "fs":  "@Shader/Common/Common_SSAO_pass.frag"
         },
         {
             "key": "common_ssao_blur",
-            "vs":  "./Resources/Shaders/Common/Common_SSAO.vert",
-            "fs":  "./Resources/Shaders/Common/Common_SSAO_blur.frag"
+            "vs":  "@Shader/Common/Common_SSAO.vert",
+            "fs":  "@Shader/Common/Common_SSAO_blur.frag"
         },
 
 
 
         {
             "key": "ibl_utils_sphericalToCube",
-            "vs":  "./Resources/Shaders/IBLUtils/IBLUtils_Common.vert",
-            "fs":  "./Resources/Shaders/IBLUtils/IBLUtils_Spherical_Map.frag"
+            "vs":  "@Shader/IBLUtils/IBLUtils_Common.vert",
+            "fs":  "@Shader/IBLUtils/IBLUtils_Spherical_Map.frag"
         },
         {
           "key": "ibl_utils_convolution",
-          "vs": "./Resources/Shaders/IBLUtils/IBLUtils_Common.vert",
-          "fs": "./Resources/Shaders/IBLUtils/IBLUtils_Diffuse_Irradiance.frag"
+          "vs": "@Shader/IBLUtils/IBLUtils_Common.vert",
+          "fs": "@Shader/IBLUtils/IBLUtils_Diffuse_Irradiance.frag"
         },
         {
             "key": "ibl_utils_prefiltered",
-            "vs":  "./Resources/Shaders/IBLUtils/IBLUtils_Common.vert",
-            "fs":  "./Resources/Shaders/IBLUtils/IBLUtils_Prefiltered_Light.frag"
+            "vs":  "@Shader/IBLUtils/IBLUtils_Common.vert",
+            "fs":  "@Shader/IBLUtils/IBLUtils_Prefiltered_Light.frag"
         },
         {
             "key": "ibl_utils_brdf_lut",
-            "vs":  "./Resources/Shaders/IBLUtils/IBLUtils_BRDF_Lookup.vert",
-            "fs":  "./Resources/Shaders/IBLUtils/IBLUtils_BRDF_Lookup.frag"
+            "vs":  "@Shader/IBLUtils/IBLUtils_BRDF_Lookup.vert",
+            "fs":  "@Shader/IBLUtils/IBLUtils_BRDF_Lookup.frag"
         },
 
 
 
         {
             "key": "debug_gizmos",
-            "vs":  "./Resources/Shaders/Debug/Debug_Jolt_Physics_Gizmo.vert",
-            "fs":  "./Resources/Shaders/Debug/Debug_Jolt_Physics_Gizmo.frag" 
+            "vs":  "@Shader/Debug/Debug_Jolt_Physics_Gizmo.vert",
+            "fs":  "@Shader/Debug/Debug_Jolt_Physics_Gizmo.frag" 
         },
 
 
 
         {
             "key": "standard_deferred_geometry",
-            "vs":  "./Resources/Shaders/Standard/Standard_Deferred_Geometry.vert",
-            "fs":  "./Resources/Shaders/Standard/Standard_Deferred_Geometry.frag"
+            "vs":  "@Shader/Standard/Standard_Deferred_Geometry.vert",
+            "fs":  "@Shader/Standard/Standard_Deferred_Geometry.frag"
         },
         {
             "key": "standard_deferred_lighting",
-            "vs":  "./Resources/Shaders/Standard/Standard_Deferred_LightPass.vert",
-            "fs":  "./Resources/Shaders/Standard/Standard_Deferred_LightPass.frag"
+            "vs":  "@Shader/Standard/Standard_Deferred_LightPass.vert",
+            "fs":  "@Shader/Standard/Standard_Deferred_LightPass.frag"
         },
         {
             "key": "standard_postprocess_threshold",
-            "vs":  "./Resources/Shaders/Standard/Standard_Post_Threshold.vert",
-            "fs":  "./Resources/Shaders/Standard/Standard_Post_Threshold.frag"
+            "vs":  "@Shader/Standard/Standard_Post_Threshold.vert",
+            "fs":  "@Shader/Standard/Standard_Post_Threshold.frag"
         },
         {
             "key": "standard_postprocess_postprocess",
-            "vs":  "./Resources/Shaders/Standard/Standard_Post_PostProcess.vert",
-            "fs":  "./Resources/Shaders/Standard/Standard_Post_PostProcess.frag"
+            "vs":  "@Shader/Standard/Standard_Post_PostProcess.vert",
+            "fs":  "@Shader/Standard/Standard_Post_PostProcess.frag"
         },
         {
             "key": "standard_postprocess_blur",
-            "vs":  "./Resources/Shaders/Standard/Standard_Post_Blur.vert",
-            "fs":  "./Resources/Shaders/Standard/Standard_Post_Blur.frag"
+            "vs":  "@Shader/Standard/Standard_Post_Blur.vert",
+            "fs":  "@Shader/Standard/Standard_Post_Blur.frag"
         },
 
 
         {
             "key": "universal_deferred_geometry",
-            "vs":  "./Resources/Shaders/Universal/Universal_Deferred_Geometry.vert",
-            "fs":  "./Resources/Shaders/Universal/Universal_Deferred_Geometry.frag"
+            "vs":  "@Shader/Universal/Universal_Deferred_Geometry.vert",
+            "fs":  "@Shader/Universal/Universal_Deferred_Geometry.frag"
         },
         {
             "key": "universal_deferred_lighting",
-            "vs":  "./Resources/Shaders/Universal/Universal_Deferred_LightPass.vert",
-            "fs":  "./Resources/Shaders/Universal/Universal_Deferred_LightPass.frag"
+            "vs":  "@Shader/Universal/Universal_Deferred_LightPass.vert",
+            "fs":  "@Shader/Universal/Universal_Deferred_LightPass.frag"
         },
         {
             "key": "universal_postprocess_blur",
-            "vs":  "./Resources/Shaders/Universal/Universal_Post_Blur.vert",
-            "fs":  "./Resources/Shaders/Universal/Universal_Post_Blur.frag"
+            "vs":  "@Shader/Universal/Universal_Post_Blur.vert",
+            "fs":  "@Shader/Universal/Universal_Post_Blur.frag"
         },
         {
             "key": "universal_postprocess_postprocess",
-            "vs":  "./Resources/Shaders/Universal/Universal_Post_PostProcess.vert",
-            "fs":  "./Resources/Shaders/Universal/Universal_Post_PostProcess.frag"
+            "vs":  "@Shader/Universal/Universal_Post_PostProcess.vert",
+            "fs":  "@Shader/Universal/Universal_Post_PostProcess.frag"
         },
 
 
         {
             "key": "world_space_effects",
-            "vs":  "./Resources/Shaders/PostProcessing/PostProcess_World_Space_Effects.vert",
-            "fs":  "./Resources/Shaders/PostProcessing/PostProcess_World_Space_Effects.frag"
+            "vs":  "@Shader/PostProcessing/PostProcess_World_Space_Effects.vert",
+            "fs":  "@Shader/PostProcessing/PostProcess_World_Space_Effects.frag"
         },
         {
             "key": "dof_effect",
-            "vs":  "./Resources/Shaders/PostProcessing/PostProcess_Depth_Of_View_Effect.vert",
-            "fs":  "./Resources/Shaders/PostProcessing/PostProcess_Depth_Of_View_Effect.frag"
+            "vs":  "@Shader/PostProcessing/PostProcess_Depth_Of_View_Effect.vert",
+            "fs":  "@Shader/PostProcessing/PostProcess_Depth_Of_View_Effect.frag"
         },
         {
             "key": "lens_flare",
-            "vs":  "./Resources/Shaders/PostProcessing/PostProcess_Lens_Flare.vert",
-            "fs":  "./Resources/Shaders/PostProcessing/PostProcess_Lens_Flare.frag"
+            "vs":  "@Shader/PostProcessing/PostProcess_Lens_Flare.vert",
+            "fs":  "@Shader/PostProcessing/PostProcess_Lens_Flare.frag"
         },
         {
             "key": "postprocess_outline_mask",
-            "vs":  "./Resources/Shaders/PostProcessing/PostProcess_Outline_Mask.vert",
-            "fs":  "./Resources/Shaders/PostProcessing/PostProcess_Outline_Mask.frag"
+            "vs":  "@Shader/PostProcessing/PostProcess_Outline_Mask.vert",
+            "fs":  "@Shader/PostProcessing/PostProcess_Outline_Mask.frag"
         },
         {
             "key": "postprocess_outline_post",
-            "vs":  "./Resources/Shaders/PostProcessing/PostProcess_Outline_Post.vert",
-            "fs":  "./Resources/Shaders/PostProcessing/PostProcess_Outline_Post.frag"
+            "vs":  "@Shader/PostProcessing/PostProcess_Outline_Post.vert",
+            "fs":  "@Shader/PostProcessing/PostProcess_Outline_Post.frag"
         },
         {
             "key": "postprocess_motion_blur",
-            "vs":  "./Resources/Shaders/PostProcessing/PostProcess_Motion_Blur.vert",
-            "fs":  "./Resources/Shaders/PostProcessing/PostProcess_Motion_Blur.frag"
+            "vs":  "@Shader/PostProcessing/PostProcess_Motion_Blur.vert",
+            "fs":  "@Shader/PostProcessing/PostProcess_Motion_Blur.frag"
         }
     ],
 

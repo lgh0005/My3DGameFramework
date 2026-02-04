@@ -1,52 +1,115 @@
 ﻿{
-    "bgm" : 
-    [
-        { "key": "MyBGM", "path": "./Resources/Audios/anubis.wav" }
-    ],
+  "description": "Game Resources Manifest",
 
-    "sfx" : 
-    [
-        { "key": "MySFX", "path": "./Resources/Audios/gunshot.mp3" }
-    ],
+  "default_root": "@Game",
 
-    "textures": 
-    [
-        { "key": "container", "path": "./Resources/Images/baked/container.ktx" },
-        { "key": "matrix", "path": "./Resources/Images/baked/matrix.ktx" },
-        { "key": "container2", "path": "./Resources/Images/baked/container2.ktx" },
-        { "key": "container2_specular", "path": "./Resources/Images/baked/container2_specular.ktx" },
-        { "key": "marble", "path": "./Resources/Images/baked/marble.ktx" },
-        { "key": "brickwall", "path": "./Resources/Images/baked/brickwall.ktx" },
-        { "key": "brickwall_normal", "path": "./Resources/Images/baked/brickwall_normal.ktx" },
-        { "key": "toybox_diffuse", "path": "./Resources/Images/baked/toy_box_diffuse.ktx" },
-        { "key": "toybox_normal", "path": "./Resources/Images/baked/toy_box_normal.ktx" },
-        { "key": "toybox_disp", "path": "./Resources/Images/baked/toy_box_disp.ktx" },
-        { "key": "grass", "path": "./Resources/Images/grass.png" },
-        { "key": "mirrorhall", "path": "./Resources/Images/IBL/mirrored_hall_4k.hdr" },
-        { "key": "camera_dirt", "path": "./Resources/Images/camera_dirt.png" }
-    ],
+  "bgm": [
+    {
+      "key": "MyBGM",
+      "path": "Audios/anubis.wav"
+    }
+  ],
 
-    "cubemaps": 
-    [
-        { "key": "SkyboxTexture", "path": "./Resources/Images/baked/sky.ktx" }
-    ],
+  "sfx": [
+    {
+      "key": "MySFX",
+      "path": "Audios/gunshot.mp3"
+    }
+  ],
 
-    "models" : 
-    [
-        { "key": "aliensoldier", "path": "./Resources/Models/spacesoldier/aliensoldier.mymodel"},
-        { "key" : "backpack", "path": "./Resources/Models/backpack/backpack.mymodel" }
-    ],
+  "textures": [
+    {
+      "key": "container",
+      "path": "Images/baked/container.ktx"
+    },
+    {
+      "key": "matrix",
+      "path": "Images/baked/matrix.ktx"
+    },
+    {
+      "key": "container2",
+      "path": "Images/baked/container2.ktx"
+    },
+    {
+      "key": "container2_specular",
+      "path": "Images/baked/container2_specular.ktx"
+    },
+    {
+      "key": "marble",
+      "path": "Images/baked/marble.ktx"
+    },
+    {
+      "key": "brickwall",
+      "path": "Images/baked/brickwall.ktx"
+    },
+    {
+      "key": "brickwall_normal",
+      "path": "Images/baked/brickwall_normal.ktx"
+    },
+    {
+      "key": "toybox_diffuse",
+      "path": "Images/baked/toy_box_diffuse.ktx"
+    },
+    {
+      "key": "toybox_normal",
+      "path": "Images/baked/toy_box_normal.ktx"
+    },
+    {
+      "key": "toybox_disp",
+      "path": "Images/baked/toy_box_disp.ktx"
+    },
+    {
+      "key": "grass",
+      "path": "Images/grass.png"
+    },
+    {
+      "key": "mirrorhall",
+      "path": "Images/IBL/mirrored_hall_4k.hdr"
+    },
+    {
+      "key": "camera_dirt",
+      "path": "Images/camera_dirt.png"
+    }
+  ],
 
-    "animations" :
-    [
-        { "key" : "Idle", "path": "./Resources/Models/spacesoldier/Idle_shorten.myanim" },
-        { "key" : "Walk", "path": "./Resources/Models/spacesoldier/Walking.myanim" },
-        { "key" : "Run", "path": "./Resources/Models/spacesoldier/Running.myanim" },
-        { "key" : "Dancing", "path": "./Resources/Models/spacesoldier/Hip Hop Dancing.myanim" }
-    ],
+  "cubemaps": [
+    {
+      "key": "SkyboxTexture",
+      "path": "Images/baked/sky.ktx"
+    }
+  ],
 
-    "shaders": 
-    [
+  "models": [
+    {
+      "key": "aliensoldier",
+      "path": "Models/spacesoldier/aliensoldier.mymodel"
+    },
+    {
+      "key": "backpack",
+      "path": "Models/backpack/backpack.mymodel"
+    }
+  ],
 
-    ]
+  "animations": [
+    {
+      "key": "Idle",
+      "path": "Models/spacesoldier/Idle_shorten.myanim"
+    },
+    {
+      "key": "Walk",
+      "path": "Models/spacesoldier/Walking.myanim"
+    },
+    {
+      "key": "Run",
+      "path": "Models/spacesoldier/Running.myanim"
+    },
+    {
+      "key": "Dancing",
+      "path": "Models/spacesoldier/Hip Hop Dancing.myanim"
+    }
+  ],
+
+  "shaders": [
+   
+  ]
 }

@@ -13,11 +13,17 @@
 
 inline fs::path FileManager::GetExecutablePath()
 {
+/*=================================================//
+//   absolute file directory getter (for windows)  //
+//=================================================*/
 #if defined(_WIN32)
 	wchar_t buffer[MAX_PATH];
 	if (GetModuleFileNameW(nullptr, buffer, MAX_PATH) == 0) return fs::current_path();
 	return fs::path(buffer).parent_path();
 
+/*===============================================//
+//   absolute file directory getter (for linux)  //
+//===============================================*/
 #elif defined(__linux__)
 	char buffer[PATH_MAX];
 	ssize_t len = readlink("/proc/self/exe", buffer, sizeof(buffer) - 1);

@@ -30,12 +30,16 @@ private:
 //   json menifest parsing methods   //
 //===================================*/
 private:
+	// 메인 파싱 함수
 	static std::optional<ResourceManifest> ParseManifest(const std::string& manifestPath);
-	
+
+	// [수정] 아래 파싱 헬퍼 함수들에 'defaultRoot' 인자가 추가되었습니다.
+
 	static void ParseGeneralResources
 	(
 		const nlohmann::json& jsonContext,
 		const std::string& categoryKey,
+		const std::string& defaultRoot, // <--- 추가됨
 		std::vector<ResourceData>& outList
 	);
 
@@ -43,6 +47,7 @@ private:
 	(
 		const nlohmann::json& jsonContext,
 		const std::string& categoryKey,
+		const std::string& defaultRoot, // <--- 추가됨
 		std::vector<ShaderData>& outList
 	);
 
@@ -50,6 +55,7 @@ private:
 	(
 		const nlohmann::json& jsonContext,
 		const std::string& categoryKey,
+		const std::string& defaultRoot, // <--- 추가됨
 		std::vector<CubeMapData>& outList
 	);
 };
