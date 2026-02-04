@@ -37,18 +37,18 @@ target_link_libraries(Game PRIVATE Engine)
 
 # 리소스 배포
 add_custom_command(TARGET Game POST_BUILD
-    COMMENT "Deploying Game Assets to Bin/Project..."
+    COMMENT "Deploying Game Centralized Content to Bin..."
 
-        # 1. Game Assets 복사 (@Assets -> Bin/Project/Assets)
-        # 주의: Game 폴더 안에 'Assets' 폴더가 있다고 가정합니다.
-        COMMAND ${CMAKE_COMMAND} -E make_directory "$<TARGET_FILE_DIR:Game>/Project/Assets"
-        COMMAND ${CMAKE_COMMAND} -E copy_directory
-            "${CMAKE_CURRENT_SOURCE_DIR}/Assets" 
-            "$<TARGET_FILE_DIR:Game>/Project/Assets"
-
-        # 2. Game Config 복사 (@GameConfig -> Bin/Project/Config)
-        COMMAND ${CMAKE_COMMAND} -E make_directory "$<TARGET_FILE_DIR:Game>/Project/Config"
-        COMMAND ${CMAKE_COMMAND} -E copy_directory
+    COMMAND ${CMAKE_COMMAND} -E make_directory "${OUTPUT_DIR}/Config"
+    COMMAND ${CMAKE_COMMAND} -E rm -rf "${OUTPUT_DIR}/Config/Game"
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
             "${CMAKE_CURRENT_SOURCE_DIR}/Config"
-            "$<TARGET_FILE_DIR:Game>/Project/Config"
+            "${OUTPUT_DIR}/Config/Game"
+
+    COMMAND ${CMAKE_COMMAND} -E make_directory "${OUTPUT_DIR}/Assets"
+    COMMAND ${CMAKE_COMMAND} -E rm -rf "${OUTPUT_DIR}/Assets/Game"
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+            "${CMAKE_CURRENT_SOURCE_DIR}/Assets"
+            "${OUTPUT_DIR}/Assets/Game"
 )
+

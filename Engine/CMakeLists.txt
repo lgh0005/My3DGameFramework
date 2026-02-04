@@ -12,7 +12,7 @@ set(ENGINE_SOURCES
 
    # Entity
    "Entity/Chunk.h"                 "Entity/Chunk.cpp"
-    "Entity/Archetype.h"             "Entity/Archetype.cpp"
+   "Entity/Archetype.h"             "Entity/Archetype.cpp"
 
    # Scene
    "Scene/Scene.h"                   "Scene/Scene.cpp"
@@ -55,6 +55,7 @@ set(ENGINE_SOURCES
    "Misc/Defines.h"                 
    "Misc/Types.h"
    "Misc/Enums.h"
+   "Misc/EngineDir.h"
 
    "Misc/ImguiManager.h"            "Misc/ImguiManager.cpp"
    "Misc/Utils.h"                   "Misc/Utils.cpp"       
@@ -220,6 +221,7 @@ set(ENGINE_SOURCES
    "Managers/UIManager.h"           "Managers/UIManager.cpp"
    "Managers/EntityManager.h"           "Managers/EntityManager.cpp"
    "Managers/InstanceManager.h"      "Managers/InstanceManager.cpp"
+   "Managers/FileManager.h"         "Managers/FileManager.cpp"
 )
 
 # Visual Studio 필터 자동 생성
@@ -266,23 +268,24 @@ target_compile_definitions(Engine PUBLIC
 
 # 리소스 배포 (Resource Deployment)
 add_custom_command(TARGET Engine POST_BUILD
-        COMMENT "Deploying Engine Assets to Bin/Engine..."
-        
-        # 1. Shaders 복사 (@Engine/Shaders)
-        COMMAND ${CMAKE_COMMAND} -E make_directory "$<TARGET_FILE_DIR:Engine>/../Engine/Shaders"
-        COMMAND ${CMAKE_COMMAND} -E copy_directory
-            "${CMAKE_CURRENT_SOURCE_DIR}/Shaders"
-            "$<TARGET_FILE_DIR:Engine>/../Engine/Shaders"
+    COMMENT "Deploying Engine Centralized Content to Bin..."
 
-        # 2. 기본 리소스 복사 (@Engine/Resources)
-        COMMAND ${CMAKE_COMMAND} -E make_directory "$<TARGET_FILE_DIR:Engine>/../Engine/Resources"
-        COMMAND ${CMAKE_COMMAND} -E copy_directory
-            "${CMAKE_CURRENT_SOURCE_DIR}/Resources"
-            "$<TARGET_FILE_DIR:Engine>/../Engine/Resources"
-
-        # 3. Config 복사 (@Engine/Config)
-        COMMAND ${CMAKE_COMMAND} -E make_directory "$<TARGET_FILE_DIR:Engine>/../Engine/Config"
-        COMMAND ${CMAKE_COMMAND} -E copy_directory
+    # 1. Config (Engine)
+    COMMAND ${CMAKE_COMMAND} -E make_directory "${OUTPUT_DIR}/Config"
+    COMMAND ${CMAKE_COMMAND} -E rm -rf "${OUTPUT_DIR}/Config/Engine"
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
             "${CMAKE_CURRENT_SOURCE_DIR}/Config"
-            "$<TARGET_FILE_DIR:Engine>/../Engine/Config"
-    )
+            "${OUTPUT_DIR}/Config/Engine"
+
+    # 2. Engine boot config (root)
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            "${CMAKE_CURRENT_SOURCE_DIR}/Config/EngineConfig.json"
+            "${OUTPUT_DIR}/Config/EngineConfig.json"
+
+    # 3. Assets (Engine)
+    COMMAND ${CMAKE_COMMAND} -E make_directory "${OUTPUT_DIR}/Assets"
+    COMMAND ${CMAKE_COMMAND} -E rm -rf "${OUTPUT_DIR}/Assets/Engine"
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+            "${CMAKE_CURRENT_SOURCE_DIR}/Assets"
+            "${OUTPUT_DIR}/Assets/Engine"
+)

@@ -56,22 +56,23 @@ set_target_properties(AssetConverter PROPERTIES
     VS_STARTUP_PROJECT AssetConverter
 )
 
-# 프론트엔드(Python) 배포 및 PyInstaller 빌드
-add_custom_command(TARGET AssetConverter POST_BUILD
-    COMMENT "Deploying AssetConverter Frontend Tools..."
+# 프론트엔드(Python) 배포
+add_custom_target(DeployAssetConverterTools
+    COMMENT "Deploying AssetConverter Tools..."
 
-    # 4-1. Tools 폴더 복사
-    # PyInstaller 빌드 실패 시에도 Python으로 직접 실행할 수 있도록 소스를 복사합니다.
-    COMMAND ${CMAKE_COMMAND} -E make_directory "${CONVERTER_OUTPUT_DIR}/Tools"
+    COMMAND ${CMAKE_COMMAND} -E make_directory "${CONVERTER_OUTPUT_DIR}"
+    COMMAND ${CMAKE_COMMAND} -E rm -rf "${CONVERTER_OUTPUT_DIR}/Tools"
     COMMAND ${CMAKE_COMMAND} -E copy_directory
-        "${CMAKE_CURRENT_SOURCE_DIR}/Tools"
-        "${CONVERTER_OUTPUT_DIR}/Tools"
+            "${CMAKE_CURRENT_SOURCE_DIR}/Tools"
+            "${CONVERTER_OUTPUT_DIR}/Tools"
 )
+
+add_dependencies(DeployAssetConverterTools AssetConverter)
 
 # PyInstaller 자동 빌드
 find_program(PYINSTALLER_PATH "pyinstaller")
 if (PYINSTALLER_PATH)
-    add_custom_command(TARGET AssetConverter POST_BUILD
+    add_custom_target(BuildAssetTool
         COMMENT "Building Python Frontend with PyInstaller..."
         
         # main.py를 AssetTool.exe로 빌드
@@ -82,8 +83,12 @@ if (PYINSTALLER_PATH)
             --specpath "${CMAKE_CURRENT_BINARY_DIR}/PyInstallerTemp"
             --name "AssetTool"
             "${CMAKE_CURRENT_SOURCE_DIR}/Tools/main.py"
+
+        WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
     )
+
     # 빌드 성공 메시지 (CMake 출력창에서 확인 가능)
+    add_dependencies(BuildAssetTool DeployAssetConverterTools)
     message(STATUS "PyInstaller detected. 'AssetTool.exe' will be built automatically.")
 else()
     message(STATUS "PyInstaller NOT found. Skipping Python build. (Only source files copied)")

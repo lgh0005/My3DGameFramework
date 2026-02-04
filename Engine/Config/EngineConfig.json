@@ -1,0 +1,10 @@
+﻿{
+    "description": "Core Boot Configuration",
+    "settings": 
+    {
+        "assetRoot": "./Assets",
+        "configRoot": "./Config",
+        "engineDir": "Engine",
+        "gameDir": "Game"
+    }
+}

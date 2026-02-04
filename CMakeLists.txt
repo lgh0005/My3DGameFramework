@@ -42,15 +42,6 @@ find_package(pugixml CONFIG REQUIRED)
 find_package(KTX CONFIG REQUIRED)
 message(STATUS "All Packages Found Successfully!")
 
-# 개발 모드 설정
-if ("${CMAKE_BUILD_TYPE}" MATCHES Debug)
-    add_compile_definitions(
-        ENGINE_SOURCE_DIR="${CMAKE_SOURCE_DIR}/Engine"
-        PROJECT_SOURCE_DIR="${CMAKE_SOURCE_DIR}/Game"
-    )
-    message(STATUS "Dev Mode Enabled: Using Source Directories directly.")
-endif()
-
 # 하위 프로젝트 추가
 add_subdirectory(AssetConverter)
 add_subdirectory(Engine)
