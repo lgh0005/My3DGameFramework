@@ -55,12 +55,14 @@ set(ENGINE_SOURCES
    "Misc/Types.h"
    "Misc/Enums.h"
    "Misc/EngineDir.h"
+   "Misc/ResourceJsonKeys.h"
 
    "Misc/ImguiManager.h"            "Misc/ImguiManager.cpp"
    "Misc/Utils.h"                   "Misc/Utils.cpp"       
    "Misc/AssetFormat.h"             "Misc/AssetFormat.cpp"
    "Misc/AssetUtils.h"              "Misc/AssetUtils.cpp"
    "Misc/ResourceJsonFormat.h"      "Misc/ResourceJsonFormat.cpp"
+   "Misc/ResourceFormat.h"          "Misc/ResourceFormat.cpp" 
 
    # Physics
    "Physics/BPLayerInterface.h"         "Physics/BPLayerInterface.cpp"

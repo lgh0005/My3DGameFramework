@@ -1,5 +1,6 @@
 ﻿#pragma once
 #include "Resources/Resource.h"
+#include "Misc/ResourceFormat.h"
 
 class ResourceManager
 {
@@ -22,8 +23,17 @@ public:
 
 	void Clear();
 
+/*=======================================//
+//   Data-driven resource loading test   //
+//=======================================*/
+public:
+	void LoadAssetConfig(); // AssetConfig.json 로드
+	void LoadAllInDirectory(const std::string& virtualPath);
+	void ImportResource(const fs::path& filePath); // 개별 파일 로드 분기 처리
+
 private:
 	std::unordered_map<std::string, std::shared_ptr<Resource>> m_resources;
+	std::unordered_map<std::string, AssetType> m_extToTypeMap;
 };
 
 #include "Managers/ResourceManager.inl"

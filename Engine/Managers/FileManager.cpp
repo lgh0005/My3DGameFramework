@@ -64,6 +64,7 @@ bool FileManager::Init()
 	return true;
 }
 
+// TODO : 이건 이후에 다시 수정을 하긴 해야함. 안정적이지 못하고 비효율적임.
 std::string FileManager::Resolve(const std::string& virtualPath)
 {
 	// 정렬된 리스트를 순회 (긴 것부터 검사하므로 안전함)
