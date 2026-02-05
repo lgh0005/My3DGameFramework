@@ -54,8 +54,6 @@ set(ENGINE_SOURCES
    "Misc/Defines.h"                 
    "Misc/Types.h"
    "Misc/Enums.h"
-   "Misc/EngineDir.h"
-   "Misc/ResourceJsonKeys.h"
 
    "Misc/ImguiManager.h"            "Misc/ImguiManager.cpp"
    "Misc/Utils.h"                   "Misc/Utils.cpp"       

@@ -1,20 +1,15 @@
 ﻿#include "EnginePch.h"
 #include "FileManager.h"
-#include "Misc/EngineDir.h"
 #include "Managers/FileManager.inl"
 
 bool FileManager::Init()
 {
-	using namespace EnginePolicy;
-
 	// 1. 실행 경로 기준 설정
 	m_binPath = GetExecutablePath();
 	LOG_INFO("FileManager: Initializing... Executable Root at [{}]", m_binPath.string());
 
-	// 2. 부트 설정 파일 로드 (./Config/EngineConfig.json)
-	fs::path bootConfigPath = m_binPath / fs::path(Disk::BootConfigPath);
-	if (!fs::exists(bootConfigPath)) return false;
-
+	// 2. 부트 설정 파일 로드
+	fs::path bootConfigPath = m_binPath / "Config/EngineConfig.json";
 	std::ifstream file(bootConfigPath);
 	if (!file.is_open()) return false;
 
@@ -22,66 +17,99 @@ bool FileManager::Init()
 	json data = nlohmann::json::parse(file, nullptr, false);
 	if (data.is_discarded()) return false;
 
-	// 4. 스키마 검증 및 데이터 추출 (contains 사용)
-	const std::string settingsKey(Schema::SettingsSection);
-	if (!data.contains(settingsKey)) return false;
-
-	// 4-1. 스키마 키 점검
-	const auto& settings = data[settingsKey];
-	const std::string kAssetRoot(Schema::KeyAssetRoot);
-	const std::string kConfigRoot(Schema::KeyConfigRoot);
-	const std::string kEngineDir(Schema::KeyEngineDir);
-	const std::string kGameDir(Schema::KeyGameDir);
-
-	// 5. 물리적 기준 경로 확정
-	m_assetRoot = m_binPath / settings[kAssetRoot].get<std::string>();
-	m_configRoot = m_binPath / settings[kConfigRoot].get<std::string>();
-
-	// 6. 가상 경로 매핑 테이블 구축 (Vector에 넣기)
-	std::string engineDirName = settings[kEngineDir].get<std::string>();
-	std::string gameDirName = settings[kGameDir].get<std::string>();
-	m_virtualPaths.push_back({ Path::PrefixAssets,       m_assetRoot });
-	m_virtualPaths.push_back({ Path::PrefixEngine,       m_assetRoot / engineDirName });
-	m_virtualPaths.push_back({ Path::PrefixGame,         m_assetRoot / gameDirName });
-	m_virtualPaths.push_back({ Path::PrefixConfig,       m_configRoot });
-	m_virtualPaths.push_back({ Path::PrefixEngineConfig, m_configRoot / engineDirName });
-	m_virtualPaths.push_back({ Path::PrefixGameConfig,   m_configRoot / gameDirName });
-	m_virtualPaths.push_back({ "@Shader", m_assetRoot / engineDirName / "Shaders" });
-	
-	// 7. 긴 문자열이 먼저 오도록 정렬
-	std::sort(m_virtualPaths.begin(), m_virtualPaths.end(),
-		[](const auto& a, const auto& b) {
-			return a.first.length() > b.first.length();
-		});
-
-	// 8. 디버그 출력 (이제 m_virtualPaths가 있으니 에러 안 남)
-	LOG_INFO("=== Virtual Path Mappings (Sorted) ===");
-	for (const auto& [prefix, path] : m_virtualPaths)
+	// 4. 가상 경로 매핑 테이블 구축
+	if (data.contains("virtualPaths"))
 	{
-		LOG_INFO("  Key: [{}] -> Val: [{}]", prefix, path.string());
+		for (auto& [key, val] : data["virtualPaths"].items())
+		{
+			std::string relativePathStr = val.get<std::string>();
+			fs::path absPath = m_binPath / relativePathStr;
+			m_virtualPathMap[key] = absPath;
+		}
 	}
+
+	if (m_virtualPathMap.count("@Assets")) m_assetRoot = m_virtualPathMap["@Assets"];
+	if (m_virtualPathMap.count("@Config")) m_configRoot = m_virtualPathMap["@Config"];
+
+	// 5. 디버그 출력
+	LOG_INFO("=== Virtual Path Mappings (Hash Map) ===");
+	for (const auto& [key, path] : m_virtualPathMap)
+		LOG_INFO("  [{}] -> [{}]", key, path.string());
 
 	return true;
 }
 
-// TODO : 이건 이후에 다시 수정을 하긴 해야함. 안정적이지 못하고 비효율적임.
+/*==================================//
+//   file path resolution methods   //
+//==================================*/
 std::string FileManager::Resolve(const std::string& virtualPath)
 {
-	// 정렬된 리스트를 순회 (긴 것부터 검사하므로 안전함)
-	for (const auto& [prefix, physicalPath] : m_virtualPaths)
+	// 1. 빈 경로 체크
+	if (virtualPath.empty()) return "";
+
+	// 2. 가상 경로(@) 처리 로직
+	if (IsVirtualPath(virtualPath))
+		return ResolveVirtualPath(virtualPath);
+
+	// 3. 가상 경로가 아닌 경우 처리
+	return ResolveAbsolutePath(virtualPath);
+}
+
+bool FileManager::IsVirtualPath(const std::string& path)
+{
+	// 1. 기본 체크: 비어있거나 @로 시작하지 않으면 탈락
+	if (path.empty() || path[0] != '@')
+		return false;
+
+	// 2. 최소 길이 체크
+	// "@" 한 글자만 있는 경우는 유효한 경로가 아님
+	if (path.length() < 2)
+		return false;
+
+	// 3. "@\", "@/"로 시작한다면 가상 경로가 아님
+	char secondChar = path[1];
+	if (secondChar == '/' || secondChar == '\\')
+		return false;
+
+	return true;
+}
+
+std::string FileManager::ResolveVirtualPath(const std::string& path)
+{
+	usize slashPos = path.find_first_of("/\\");
+	std::string key;
+	std::string subPath;
+	if (slashPos == std::string::npos) key = path;
+	else
 	{
-		if (virtualPath.compare(0, prefix.length(), prefix) == 0)
-		{
-			// 안전장치: 정확히 일치하거나, 그 뒤가 슬래시여야 함
-			if (virtualPath.length() == prefix.length() ||
-				virtualPath[prefix.length()] == '/' ||
-				virtualPath[prefix.length()] == '\\')
-			{
-				std::string subPath = virtualPath.substr(prefix.length());
-				fs::path result = physicalPath / fs::path(subPath).relative_path();
-				return result.string();
-			}
-		}
+		key = path.substr(0, slashPos);
+		subPath = path.substr(slashPos + 1);
 	}
-	return virtualPath;
+
+	auto it = m_virtualPathMap.find(key);
+	if (it != m_virtualPathMap.end())
+	{
+		// 찾음: 절대 경로 + 하위 경로 결합
+		fs::path result = it->second;
+		if (!subPath.empty()) result /= subPath;
+		return result.string();
+	}
+
+	LOG_ERROR("FileManager: Unregistered virtual path key '{}'", key);
+	return "";
+}
+
+std::string FileManager::ResolveAbsolutePath(const std::string& path)
+{
+	fs::path fsPath(path);
+
+	// 1. 이미 절대 경로인 경우
+	if (fsPath.is_absolute())
+		return fsPath.make_preferred().string();
+
+	// 2. 상대 경로인 경우
+	fs::path absPath = m_binPath / fsPath;
+
+	// 3. 경로 정규화
+	return absPath.lexically_normal().make_preferred().string();
 }

@@ -7,9 +7,19 @@ class FileManager
 
 public:
 	bool Init();
-	std::string Resolve(const std::string& virtualPath);
 	fs::path GetAssetRoot() const { return m_assetRoot; }
 	fs::path GetConfigRoot() const { return m_configRoot; }
+
+/*==================================//
+//   file path resolution methods   //
+//==================================*/
+public:
+	std::string Resolve(const std::string& virtualPath);
+
+private:
+	bool IsVirtualPath(const std::string& path);
+	std::string ResolveVirtualPath(const std::string& path);
+	std::string ResolveAbsolutePath(const std::string& path);
 
 private:
 	static fs::path GetExecutablePath();
@@ -18,6 +28,6 @@ private:
 	fs::path m_assetRoot;   // Bin/Assets
 	fs::path m_configRoot;  // Bin/Config
 
-	// pair<가상접두사, 절대경로>
-	std::vector<std::pair<std::string_view, fs::path>> m_virtualPaths;
+	// 가상 경로 맵
+	std::unordered_map<std::string, fs::path> m_virtualPathMap;
 };
