@@ -283,8 +283,7 @@ add_custom_command(TARGET Engine POST_BUILD
 
     # 3. Assets (Engine)
     COMMAND ${CMAKE_COMMAND} -E make_directory "${OUTPUT_DIR}/Assets"
-    COMMAND ${CMAKE_COMMAND} -E rm -rf "${OUTPUT_DIR}/Assets/Engine"
     COMMAND ${CMAKE_COMMAND} -E copy_directory
-            "${CMAKE_CURRENT_SOURCE_DIR}/Assets"
-            "${OUTPUT_DIR}/Assets/Engine"
+            "${CMAKE_CURRENT_SOURCE_DIR}/BuiltIn"
+            "${OUTPUT_DIR}/Assets/BuiltIn"
 )
