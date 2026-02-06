@@ -1,7 +1,7 @@
 ﻿{
   "description": "Game Resources Manifest",
 
-  "default_root": "@Game",
+  "default_root": "@GameAsset",
 
   "bgm": [
     {
@@ -110,6 +110,6 @@
   ],
 
   "shaders": [
-   
+
   ]
 }

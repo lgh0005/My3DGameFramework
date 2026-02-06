@@ -147,10 +147,10 @@ bool DevScene::CreateCustomRenderPasses()
 	auto pipeline = RENDER.GetRenderer()->GetPipeline();
 
 	// 1. Instanced 셰이더 (잔디)
-	// 잔디는 게임 콘텐츠니까 보통 @Game/Shaders 에 위치한다고 가정
+	// 잔디는 게임 콘텐츠니까 보통 @GameAsset/Shaders 에 위치한다고 가정
 	{
-		std::string vsPath = FILE_MGR.Resolve("@Game/Shaders/grass.vert");
-		std::string fsPath = FILE_MGR.Resolve("@Game/Shaders/grass.frag");
+		std::string vsPath = FILE_MGR.Resolve("@GameAsset/Shaders/grass.vert");
+		std::string fsPath = FILE_MGR.Resolve("@GameAsset/Shaders/grass.frag");
 
 		auto prog = GraphicsProgram::Create(vsPath, fsPath);
 		if (!prog) return false;
@@ -161,8 +161,8 @@ bool DevScene::CreateCustomRenderPasses()
 	// 2. Simple 셰이더 (조명 기즈모)
 	// 기즈모는 엔진 기능이니까 @Shader (Assets/Engine/Shaders) 에 있다고 가정
 	{
-		std::string vsPath = FILE_MGR.Resolve("@Game/Shaders/simple.vert");
-		std::string fsPath = FILE_MGR.Resolve("@Game/Shaders/simple.frag");
+		std::string vsPath = FILE_MGR.Resolve("@GameAsset/Shaders/simple.vert");
+		std::string fsPath = FILE_MGR.Resolve("@GameAsset/Shaders/simple.frag");
 
 		auto prog = GraphicsProgram::Create(vsPath, fsPath);
 		if (!prog) return false;
@@ -173,8 +173,8 @@ bool DevScene::CreateCustomRenderPasses()
 	// 3. 환경맵 (Environment)
 	// 이것도 엔진 셰이더(@Shader)라고 가정
 	{
-		std::string vsPath = FILE_MGR.Resolve("@Game/Shaders/environment.vert");
-		std::string fsPath = FILE_MGR.Resolve("@Game/Shaders/environment.frag");
+		std::string vsPath = FILE_MGR.Resolve("@GameAsset/Shaders/environment.vert");
+		std::string fsPath = FILE_MGR.Resolve("@GameAsset/Shaders/environment.frag");
 
 		auto prog = GraphicsProgram::Create(vsPath, fsPath);
 		if (!prog) return false;

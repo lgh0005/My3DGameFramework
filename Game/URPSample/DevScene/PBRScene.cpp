@@ -66,18 +66,18 @@ bool PBRScene::LoadSceneResources()
 		auto rustedIronMat = Material::Create();
 		if (!rustedIronMat) return false;
 
-		// [수정] FILE_MGR.Resolve 사용 (@Game/Images 경로)
+		// [수정] FILE_MGR.Resolve 사용 (@GameAsset/Images 경로)
 		rustedIronMat->diffuse = TextureUtils::LoadTextureFromImage
-		(Image::Load(FILE_MGR.Resolve("@Game/Images/rustediron/rustediron2_basecolor.png")).get());
+		(Image::Load(FILE_MGR.Resolve("@GameAsset/Images/rustediron/rustediron2_basecolor.png")).get());
 
 		rustedIronMat->roughness = TextureUtils::LoadTextureFromImage
-		(Image::Load(FILE_MGR.Resolve("@Game/Images/rustediron/rustediron2_roughness.png")).get());
+		(Image::Load(FILE_MGR.Resolve("@GameAsset/Images/rustediron/rustediron2_roughness.png")).get());
 
 		rustedIronMat->metallic = TextureUtils::LoadTextureFromImage
-		(Image::Load(FILE_MGR.Resolve("@Game/Images/rustediron/rustediron2_metallic.png")).get());
+		(Image::Load(FILE_MGR.Resolve("@GameAsset/Images/rustediron/rustediron2_metallic.png")).get());
 
 		rustedIronMat->normal = TextureUtils::LoadTextureFromImage
-		(Image::Load(FILE_MGR.Resolve("@Game/Images/rustediron/rustediron2_normal.png")).get());
+		(Image::Load(FILE_MGR.Resolve("@GameAsset/Images/rustediron/rustediron2_normal.png")).get());
 
 		RESOURCE.AddResource<Material>(std::move(rustedIronMat), "Rusted_Iron");
 	}
@@ -88,13 +88,13 @@ bool PBRScene::LoadSceneResources()
 		if (!rustedIronMat) return false;
 
 		rustedIronMat->diffuse = TextureUtils::LoadTextureFromImage
-		(Image::Load(FILE_MGR.Resolve("@Game/Images/rustediron/rustediron2_basecolor.png")).get());
+		(Image::Load(FILE_MGR.Resolve("@GameAsset/Images/rustediron/rustediron2_basecolor.png")).get());
 
 		rustedIronMat->normal = TextureUtils::LoadTextureFromImage
-		(Image::Load(FILE_MGR.Resolve("@Game/Images/rustediron/rustediron2_normal.png")).get());
+		(Image::Load(FILE_MGR.Resolve("@GameAsset/Images/rustediron/rustediron2_normal.png")).get());
 
 		rustedIronMat->orm = TextureUtils::LoadTextureFromImage
-		(Image::Load(FILE_MGR.Resolve("@Game/Images/rustediron/rustediron2_ORM.png")).get());
+		(Image::Load(FILE_MGR.Resolve("@GameAsset/Images/rustediron/rustediron2_ORM.png")).get());
 
 		RESOURCE.AddResource<Material>(std::move(rustedIronMat), "Rusted_Iron_orm");
 	}
@@ -106,14 +106,14 @@ bool PBRScene::LoadSceneResources()
 
 		// [수정] IBL 폴더 경로 수정
 		hdrCubeMat->diffuse = TextureUtils::LoadTextureFromHDR
-		(Image::LoadHDR(FILE_MGR.Resolve("@Game/Images/IBL/mirrored_hall_4k.hdr")).get());
+		(Image::LoadHDR(FILE_MGR.Resolve("@GameAsset/Images/IBL/mirrored_hall_4k.hdr")).get());
 
 		RESOURCE.AddResource<Material>(std::move(hdrCubeMat), "hdrCubeMat");
 	}
 
 	// HDR Skybox 생성 (IBLUtils 사용)
 	{
-		auto hdrImage = Image::LoadHDR(FILE_MGR.Resolve("@Game/Images/IBL/mirrored_hall_4k.hdr"));
+		auto hdrImage = Image::LoadHDR(FILE_MGR.Resolve("@GameAsset/Images/IBL/mirrored_hall_4k.hdr"));
 		auto hdrTex = TextureUtils::LoadTextureFromHDR(hdrImage.get());
 		RESOURCE.AddResource<Texture>(std::move(hdrTex), "hdrImage");
 
@@ -147,10 +147,10 @@ bool PBRScene::CreateCustomRenderPasses()
 	// 간단한 머티리얼 포워드 렌더 패스
 	{
 		// [수정] 셰이더 경로 Resolve
-		// Forward_PBR은 샘플 전용 셰이더로 보이므로 @Game/Shaders 경로 사용
+		// Forward_PBR은 샘플 전용 셰이더로 보이므로 @GameAsset/Shaders 경로 사용
 		// (만약 엔진 공용 셰이더라면 @Shader로 변경하세요)
-		std::string vsPath = FILE_MGR.Resolve("@Game/Shaders/Forward_PBR.vert");
-		std::string fsPath = FILE_MGR.Resolve("@Game/Shaders/Forward_PBR.frag");
+		std::string vsPath = FILE_MGR.Resolve("@GameAsset/Shaders/Forward_PBR.vert");
+		std::string fsPath = FILE_MGR.Resolve("@GameAsset/Shaders/Forward_PBR.frag");
 
 		auto prog = GraphicsProgram::Create(vsPath, fsPath);
 		if (!prog) return false;
