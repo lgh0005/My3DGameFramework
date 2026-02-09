@@ -1,8 +1,9 @@
 ﻿#include "EnginePch.h"
 #include "NavigationManager.h"
-#include <Recast.h>
-#include <DetourNavMesh.h>
-#include <DetourNavMeshQuery.h>
+#include <recastnavigation/Recast.h>
+#include <recastnavigation/DetourNavMesh.h>
+#include <recastnavigation/DetourNavMeshQuery.h>
+
 
 DECLARE_DEFAULTS_IMPL(NavigationManager)
 

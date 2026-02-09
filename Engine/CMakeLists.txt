@@ -5,8 +5,7 @@ set(ENGINE_SOURCES
    "EnginePch.h"                    "EnginePch.cpp"
 
    # Core
-   "Core/Application.h"             "Core/Application.cpp"
-   "Core/Importer.h"                "Core/Importer.cpp" 
+   "Core/Application.h"             "Core/Application.cpp"         
    "Core/ResourceLoader.h"          "Core/ResourceLoader.cpp"
 
    # Debug
@@ -233,10 +232,7 @@ source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${ENGINE_SOURCES})
 add_library(Engine STATIC ${ENGINE_SOURCES})
 
 # Include 경로 및 PCH 설정
-target_include_directories(Engine PUBLIC 
-    ${CMAKE_CURRENT_SOURCE_DIR}
-    ${CMAKE_CURRENT_SOURCE_DIR}/ThirdParty
-)
+target_include_directories(Engine PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
 # 미리 컴파일된 헤더 적용
 target_precompile_headers(Engine PUBLIC EnginePch.h)
@@ -246,19 +242,19 @@ target_link_libraries(Engine PUBLIC
     glad::glad
     glfw
     glm::glm
-    pugixml::pugixml
     imgui::imgui
     spdlog::spdlog
     assimp::assimp
     KTX::ktx
-    freetype
+    Freetype::Freetype
     Jolt::Jolt
     nlohmann_json::nlohmann_json
+
     RecastNavigation::Recast
     RecastNavigation::Detour
     RecastNavigation::DetourCrowd
-    RecastNavigation::DebugUtils
     RecastNavigation::DetourTileCache
+    RecastNavigation::DebugUtils
 )
 
 # 컴파일 정의

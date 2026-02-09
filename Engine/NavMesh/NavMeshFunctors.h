@@ -1,7 +1,7 @@
 ﻿#pragma once
-#include <Recast.h>
-#include <DetourNavMesh.h>
-#include <DetourNavMeshQuery.h>
+#include <recastnavigation/Recast.h>
+#include <recastnavigation/DetourNavMesh.h>
+#include <recastnavigation/DetourNavMeshQuery.h>
 
 struct DetourNavMeshDeleter
 {
