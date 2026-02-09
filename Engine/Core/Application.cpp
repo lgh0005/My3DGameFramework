@@ -9,6 +9,7 @@ Application::~Application() { Shutdown(); }
 bool Application::Init(int32 width, int32 height, const std::string& title)
 {
 	// 0. Logger 초기화 및 Config 설정
+	// TODO : 이후에는 디버그 빌드 시에만 추가되는 용도로 전환이 되어야 한다.
 	LOGGER.Init();
 	LOG_INFO("Application Started [Start]");
 	LOG_INFO("Engine Initialization Started...");

@@ -6,8 +6,11 @@ set(ENGINE_SOURCES
 
    # Core
    "Core/Application.h"             "Core/Application.cpp"
-   "Core/Logger.h"                  "Core/Logger.cpp"
+   "Core/Importer.h"                "Core/Importer.cpp" 
    "Core/ResourceLoader.h"          "Core/ResourceLoader.cpp"
+
+   # Debug
+   "Debug/Logger.h"                  "Debug/Logger.cpp"
 
    # Entity
    "Entity/Chunk.h"                 "Entity/Chunk.cpp"

@@ -60,7 +60,7 @@ using json = nlohmann::json;
 #define IMGUI     ImGuiManager::Instance()
 
 // Logger
-#include "Core/Logger.h"
+#include "Debug/Logger.h"
 #define LOGGER	  Logger::Instance()
 
 // Managers
