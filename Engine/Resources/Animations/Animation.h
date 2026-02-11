@@ -33,7 +33,7 @@ public:
     virtual ~Animation();
 
     // TODO : .myanim 전용 Load 메서드와 애니메이션 파일 전용 Load 메서드를 따로 만들 필요는 있어보인다.
-	static AnimationUPtr Load(const std::string& filePath, Model* model = nullptr);
+	static AnimationUPtr Load(const std::string& filePath);
 
     // [LEGACY: CPU Skinning] 
     // GPU 베이킹 방식이 정착되면 런타임에서는 사용되지 않을 수 있음
@@ -48,9 +48,7 @@ public:
 //   keyframe load process methods   //
 //===================================*/
 private:
-    bool LoadByAssimp(const std::string& filePath, Model* model);
     bool LoadByBinary(const std::string& filePath);
-    void ParseAssimpChannels(const aiAnimation* animation);
 
 private:
     Animation();

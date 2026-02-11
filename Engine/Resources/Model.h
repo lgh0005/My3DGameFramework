@@ -51,17 +51,6 @@ private:
 		Animator* animator
 	);
 
-/*=================================================================//
-//   3d model load process methods : assimp (raw 3d model files)   //
-//=================================================================*/
-private:
-	bool LoadByAssimp(const std::string& filename);
-	void ParseAssimpHierarchy(const aiScene* scene);
-	void ProcessAssimpMaterials(const aiScene* scene, const std::filesystem::path& modelDir);
-	void ProcessAssimpMesh(aiMesh* mesh, const aiScene* scene);
-	void ProcessAssimpSkinnedMesh(aiMesh* mesh, const aiScene* scene);
-	void ProcessAssimpStaticMesh(aiMesh* mesh, const aiScene* scene);
-
 /*========================================================//
 //   .mymodel file load process methods : .mymodel file   //
 //========================================================*/
@@ -88,7 +77,6 @@ private:
 //   skeleton helper method   //
 //============================*/
 private:
-	void ExtractBoneWeightForVertices(std::vector<SkinnedVertex>& vertices, aiMesh* mesh, const aiScene* scene);
 	void LinkSkeletonHierarchy();
 	SkeletonPtr m_skeleton;
 

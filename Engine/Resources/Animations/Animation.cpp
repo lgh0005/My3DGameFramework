@@ -6,29 +6,17 @@
 
 DECLARE_DEFAULTS_IMPL(Animation)
 
-AnimationUPtr Animation::Load(const std::string& filePath, Model* model)
+AnimationUPtr Animation::Load(const std::string& filePath)
 {
-	auto animation = AnimationUPtr(new Animation());
-
-	// 1. 파일 확장명 비교 후 로드 : .myanim으로 로드하는 것을 추천
+	// 1. 파일 확장명 비교 후 로드(.myanim)
 	std::string ext = std::filesystem::path(filePath).extension().string();
 	std::transform(ext.begin(), ext.end(), ext.begin(), ::tolower);
-	if (ext == ".myanim")
-	{
-		if (!animation->LoadByBinary(filePath)) return nullptr;
-	}
-	else
-	{
-		// Assimp 로드 시에는 Model 포인터가 필수
-		if (!model)
-		{
-			LOG_ERROR("Model pointer is required for Assimp animation loading: {}", filePath);
-			return nullptr;
-		}
-		if (!animation->LoadByAssimp(filePath, model)) return nullptr;
-	}
+	if (ext != ".myanim") return nullptr;
 
-	return animation;
+	// 2. 애니메이션 로드
+	auto animation = AnimationUPtr(new Animation());
+	if (!animation->LoadByBinary(filePath)) return nullptr;
+	return std::move(animation);
 }
 
 AnimChannel* Animation::FindChannel(const std::string& name)
@@ -107,26 +95,6 @@ void Animation::Bake(Skeleton* skeleton)
 /*===================================//
 //   keyframe load process methods   //
 //===================================*/
-bool Animation::LoadByAssimp(const std::string& animationPath, Model* model)
-{
-	Assimp::Importer importer;
-	const aiScene* scene = importer.ReadFile(animationPath, aiProcess_LimitBoneWeights);
-	if (!scene || !scene->mRootNode)
-	{
-		LOG_ERROR("Failed to load animation file: {}", animationPath);
-		return false;
-	}
-
-	aiAnimation* animation = scene->mAnimations[0];
-	m_name = animation->mName.C_Str();
-	m_duration = (float)animation->mDuration;
-	m_ticksPerSecond = (float)animation->mTicksPerSecond;
-
-	ParseAssimpChannels(animation);
-
-	return true;
-}
-
 bool Animation::LoadByBinary(const std::string& filePath)
 {
 	std::ifstream inFile(filePath, std::ios::binary);
@@ -171,20 +139,4 @@ bool Animation::LoadByBinary(const std::string& filePath)
 	inFile.close();
 	LOG_INFO("Loaded binary animation: {} ({} channels)", filePath, m_channels.size());
 	return true;
-}
-
-void Animation::ParseAssimpChannels(const aiAnimation* animation)
-{
-	uint32 size = animation->mNumChannels;
-	m_channels.reserve(size);
-
-	for (uint32 i = 0; i < size; i++)
-	{
-		aiNodeAnim* channel = animation->mChannels[i];
-		std::string boneName = channel->mNodeName.C_Str();
-
-		auto newChannel = AnimChannel::Create(boneName, channel);
-		m_channelMap[newChannel->GetNameHash()] = newChannel.get();
-		m_channels.push_back(std::move(newChannel));
-	}
 }

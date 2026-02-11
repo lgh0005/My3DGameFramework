@@ -19,6 +19,9 @@
     "recastnavigation",
     "freetype",
     "nlohmann-json",
+    "yaml-cpp",
+    "lua",
+    "sol2",
     "stb",
     "miniaudio"
   ]

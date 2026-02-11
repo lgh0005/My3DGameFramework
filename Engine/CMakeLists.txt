@@ -223,6 +223,7 @@ set(ENGINE_SOURCES
    "Managers/EntityManager.h"           "Managers/EntityManager.cpp"
    "Managers/InstanceManager.h"      "Managers/InstanceManager.cpp"
    "Managers/FileManager.h"         "Managers/FileManager.cpp"          "Managers/FileManager.inl"
+   "Managers/LuaManager.h"      "Managers/LuaManager.cpp"
 )
 
 # Visual Studio 필터 자동 생성
@@ -250,7 +251,7 @@ target_link_libraries(Engine PUBLIC
     Jolt::Jolt
     nlohmann_json::nlohmann_json
     yaml-cpp::yaml-cpp
-    lua 
+    lua
     sol2::sol2
 
     RecastNavigation::Recast
