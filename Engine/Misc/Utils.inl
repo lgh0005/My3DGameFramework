@@ -1,4 +1,5 @@
-﻿#pragma once
+﻿#include "Utils.h"
+#pragma once
 
 template<typename T>
 inline constexpr T Utils::Min(T a, T b) noexcept

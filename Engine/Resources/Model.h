@@ -1,8 +1,5 @@
 ﻿#pragma once
 #include "Resources/Resource.h"
-#include <assimp/Importer.hpp>
-#include <assimp/scene.h>
-#include <assimp/postprocess.h>
 #include "Graphics/Layouts/Vertex.h"
 #include "Resources/Animations/AnimChannel.h"
 #include "Misc/AssetFormat.h"

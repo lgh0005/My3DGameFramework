@@ -5,8 +5,14 @@ set(ENGINE_SOURCES
    "EnginePch.h"                    "EnginePch.cpp"
 
    # Core
-   "Core/Application.h"             "Core/Application.cpp"         
+   "Core/Application.h"             "Core/Application.cpp"
    "Core/ResourceLoader.h"          "Core/ResourceLoader.cpp"
+
+   # Parsers
+   "Parsers/Parser.h"               "Parsers/Parser.cpp"
+   "Parsers/YamlParser.h"           "Parsers/YamlParser.cpp"
+   "Parsers/JsonParser.h"           "Parsers/JsonParser.cpp"
+   "Parsers/EngineParsers/LuaParser.h"           "Parsers/EngineParsers/LuaParser.cpp"
 
    # Debug
    "Debug/Logger.h"                  "Debug/Logger.cpp"

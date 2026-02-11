@@ -143,6 +143,19 @@ glm::vec3 Utils::SafeNormalize(const glm::vec3& v)
 	return v * glm::inversesqrt(len2);
 }
 
+/*=======================//
+//   빈 문자열 유틸 함수   //
+//=======================*/
+const std::string& Utils::GetEmptyStr()
+{
+	static const std::string empty = []() 
+	{
+		return std::string("");
+	}();
+
+	return empty;
+}
+
 /*====================================//
 //   기본 뼈 행렬 벡터 반환 유틸 함수   //
 //====================================*/
