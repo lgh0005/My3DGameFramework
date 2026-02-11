@@ -249,6 +249,9 @@ target_link_libraries(Engine PUBLIC
     Freetype::Freetype
     Jolt::Jolt
     nlohmann_json::nlohmann_json
+    yaml-cpp::yaml-cpp
+    lua 
+    sol2::sol2
 
     RecastNavigation::Recast
     RecastNavigation::Detour

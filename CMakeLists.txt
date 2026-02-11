@@ -39,6 +39,9 @@ find_package(Freetype CONFIG REQUIRED)
 find_package(Jolt CONFIG REQUIRED)
 find_package(recastnavigation CONFIG REQUIRED)
 find_package(KTX CONFIG REQUIRED)
+find_package(yaml-cpp CONFIG REQUIRED)
+find_package(lua CONFIG REQUIRED)
+find_package(sol2 CONFIG REQUIRED)
 message(STATUS "All Packages Found Successfully!")
 
 # 하위 프로젝트 추가

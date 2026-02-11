@@ -35,6 +35,7 @@ bool Application::Init(int32 width, int32 height, const std::string& title)
 	PHYSICS.Init();						 // 물리
 	AUDIO.Init();						 // 오디오 시스템
 	RESOURCE.Init();					 // 전역 리소스 로드
+	LUA_MGR.Init();						 // Lua 스크립트 컨텍스트 로드
 	IMGUI.Init(true);					 // 디버그 UI (Window가 있어야 가능)
 
 	// 3. 레벨들을 등록
@@ -145,6 +146,7 @@ void Application::Shutdown()
 	LOG_INFO("Engine Shutdown Started...");
 
 	SCENE.Clear();      // 씬/게임 오브젝트 정리
+	LUA_MGR.Clear();    // Lua 스크립트 정리 : TODO : 순서 고려 필요
 	PHYSICS.Clear();    // 물리 엔진 정리
 	RENDER.Clear();     // 렌더 리소스/셰이더 정리
 
