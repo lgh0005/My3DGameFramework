@@ -256,18 +256,15 @@ void Model::ReadBinarySkeleton(std::ifstream& inFile)
 {
     // 로컬 변수에 먼저 읽어들임
     Skeleton::BoneMap boneMap;
-    int32 maxId = 0;
 
     // 1. 뼈 정보 벡터 읽기 (Loop Read 필수!)
     uint32 bCount = AssetUtils::ReadData<uint32>(inFile);
     std::vector<AssetFmt::RawBoneInfo> rawBoneInfos(bCount);
-
     for (uint32 i = 0; i < bCount; ++i)
     {
         rawBoneInfos[i].id = AssetUtils::ReadData<uint32>(inFile);
         rawBoneInfos[i].offset = AssetUtils::ReadData<glm::mat4>(inFile);
     }
-    maxId = (int32)rawBoneInfos.size();
 
     // 2. 이름 매핑 읽기
     uint32 mapCount = AssetUtils::ReadData<uint32>(inFile);
@@ -279,6 +276,7 @@ void Model::ReadBinarySkeleton(std::ifstream& inFile)
         uint32 nameHash = Utils::StrHash(name);
         AssetFmt::RawBoneInfo info;
         info.id = id;
+
         if (id >= 0 && id < (int32)rawBoneInfos.size())
             info.offset = rawBoneInfos[id].offset;
 
@@ -286,7 +284,7 @@ void Model::ReadBinarySkeleton(std::ifstream& inFile)
     }
 
     // 3. 다 읽은 데이터를 Skeleton에 주입
-    if (m_skeleton) m_skeleton->SetData(boneMap, maxId);
+    if (m_skeleton) m_skeleton->SetData(boneMap, (int32)bCount);
 }
 
 void Model::ReadBinaryMaterials(std::ifstream& inFile, uint32 matCount, const std::filesystem::path& modelDir)
@@ -517,26 +515,20 @@ void Model::LinkSkeletonHierarchy()
     std::unordered_map<uint32, int32> nodeHashMap;
     nodeHashMap.reserve(m_nodes.size());
     for (int32 i = 0; i < m_nodes.size(); ++i)
-    {
-        // RawNode에 nameHash가 없다면 여기서 계산
-        uint32 h = Utils::StrHash(m_nodes[i].name);
-        nodeHashMap[h] = i;
-    }
+        nodeHashMap[Utils::StrHash(m_nodes[i].name)] = i;
 
     // 모든 뼈를 순회하며 부모 찾기
     for (int32 i = 0; i < boneCount; ++i)
     {
-        // 1. i번 뼈의 이름 해시를 가져옴
+        // 1. 현재 뼈의 해시로 노드 인덱스 찾기
         uint32 myHash = m_skeleton->GetBoneHash(i);
-
-        // 2. 이 뼈가 어떤 노드에 해당하는지 찾음
         auto itNode = nodeHashMap.find(myHash);
-        if (itNode == nodeHashMap.end()) continue; // 뼈 이름과 일치하는 노드가 없음 (예외)
+        if (itNode == nodeHashMap.end()) continue;
 
         int32 myNodeIdx = itNode->second;
         const auto& myNode = m_nodes[myNodeIdx];
 
-        // 3. 그 노드의 부모 노드를 확인
+        // 2. 해당 노드의 부모 확인
         if (myNode.parentIndex != -1)
         {
             const auto& parentNode = m_nodes[myNode.parentIndex];

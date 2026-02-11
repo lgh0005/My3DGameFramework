@@ -124,6 +124,12 @@ AssetFmt::RawAnimation AssetUtils::ReadRawAnimation(std::ifstream& file)
     anim.duration = ReadData<float>(file);
     anim.ticksPerSecond = ReadData<float>(file);
 
+    // 2. Baking Data
+    ReadData<float>(file, anim.frameRate);
+    ReadData<uint32>(file, anim.frameCount);
+    ReadData<uint32>(file, anim.boneCount);
+    ReadVector<glm::mat4>(file, anim.bakedMatrices);
+
     // 2. Channels
     uint32 channelCount = ReadData<uint32>(file);
     anim.channels.resize(channelCount);

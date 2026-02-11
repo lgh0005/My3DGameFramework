@@ -137,6 +137,12 @@ void AssetUtils::WriteRawAnimation(std::ofstream& file, const AssetFmt::RawAnima
     WriteData(file, anim.duration);
     WriteData(file, anim.ticksPerSecond);
 
+    // 2. Baking Data
+    WriteData(file, anim.frameRate);
+    WriteData(file, anim.frameCount);
+    WriteData(file, anim.boneCount);
+    WriteVector(file, anim.bakedMatrices);
+
     // 2. Channels
     uint32 channelCount = (uint32)anim.channels.size();
     WriteData(file, channelCount);

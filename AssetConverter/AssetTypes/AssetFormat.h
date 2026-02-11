@@ -127,10 +127,12 @@ namespace AssetFmt
         std::string name;
         float duration;
         float ticksPerSecond;
+
         float frameRate = 30.0f;   // 베이킹 FPS
         uint32 frameCount = 0;     // 총 프레임 수
         uint32 boneCount = 0;      // 뼈 개수
         std::vector<glm::mat4> bakedMatrices;
+
         std::vector<RawAnimChannel> channels;
     };
 
