@@ -47,6 +47,17 @@ namespace AssetFmt
     using RawKeyRotation = KeyQuaternion;
 
     // RawBone
+    struct RawBone
+    {
+        std::string name;
+        int32 index = -1;
+        int32 parentIndex = -1;
+        glm::mat4 offsetMatrix{ 1.0f };
+        glm::mat4 localMatrix{ 1.0f };
+        glm::mat4 globalMatrix{ 1.0f };
+    };
+
+    // RawBoneInfo
     struct RawBoneInfo
     {
         uint32 id;
@@ -93,7 +104,7 @@ namespace AssetFmt
     struct RawNode
     {
         std::string name;
-        int32_t parentIndex = -1; // -1이면 루트
+        int32 parentIndex = -1; // -1이면 루트
         glm::mat4 localTransform; // 초기 변환 (T-Pose)
         std::vector<uint32> meshIndices;
         std::vector<int32> children;
@@ -112,10 +123,14 @@ namespace AssetFmt
     struct RawAnimation
     {
         uint32 magic = 0x414E494D; // 'ANIM'
-        uint32 version = 1;
+        uint32 version = 2;
         std::string name;
         float duration;
         float ticksPerSecond;
+        float frameRate = 30.0f;   // 베이킹 FPS
+        uint32 frameCount = 0;     // 총 프레임 수
+        uint32 boneCount = 0;      // 뼈 개수
+        std::vector<glm::mat4> bakedMatrices;
         std::vector<RawAnimChannel> channels;
     };
 

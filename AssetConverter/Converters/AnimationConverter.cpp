@@ -8,9 +8,6 @@ bool AnimationConverter::Convert
 	const std::string& outputPath
 )
 {
-	// 1. 초기화
-	m_validNodeNames.clear();
-
 	LOG_INFO(" [AnimConverter] Start Conversion");
 	LOG_INFO(" - Source: {}", animPath);
 	LOG_INFO(" - Ref Model: {}", refModelPath);
@@ -24,7 +21,7 @@ bool AnimationConverter::Convert
 
 	// 3. Assimp로 애니메이션 파일 로드
 	Assimp::Importer importer;
-	const aiScene* scene = importer.ReadFile(animPath, aiProcess_LimitBoneWeights);
+	const aiScene* scene = importer.ReadFile(animPath, 0);
 	if (!scene || !scene->mRootNode)
 	{
 		LOG_ERROR("Assimp failed: {}", importer.GetErrorString());
@@ -53,15 +50,15 @@ bool AnimationConverter::Convert
 		aiAnimation* srcAnim = scene->mAnimations[i];
 		AssetFmt::RawAnimation rawAnim;
 
-		// 4-1. 변환 (Convert)
-		if (!ProcessSingleClip(srcAnim, rawAnim)) continue;
+		// 이름을 정제
+		rawAnim.name = MakeSafeName(srcAnim->mName.C_Str());
+		if (rawAnim.name.empty()) rawAnim.name = "Clip_" + std::to_string(i);
 
-		// 4-2. 파일명 결정 (원본파일명_클립명.myanim)
-		// 예: Player_Idle.myanim, Player_Run.myanim
-		std::string safeAnimName = rawAnim.name;
-		// (필요하다면 여기서 공백이나 특수문자를 _로 치환하는 로직 추가)
+		// 4-1. 파일명 결정 (원본파일명_클립명.myanim)
+		BakeAnimation(srcAnim, rawAnim);
 
-		std::string finalName = fmt::format("{}_{}.myanim", fileStem, safeAnimName);
+		// 4-2. 저장 경로 설정
+		std::string finalName = fmt::format("{}_{}.myanim", fileStem, rawAnim.name);
 		std::filesystem::path finalPath = std::filesystem::path(parentDir) / finalName;
 
 		// 4-3. 저장 (Write)
@@ -77,9 +74,12 @@ bool AnimationConverter::Convert
 
 bool AnimationConverter::LoadReferenceSkeleton(const std::string& path)
 {
-	// [경로 확인 디버깅]
+	// 1. 초기화
+	m_bones.clear();
+	m_boneNameMap.clear();
 	LOG_INFO("Trying to open: {}", path);
 
+	// 2. 파일 존재 확인
 	if (!std::filesystem::exists(path))
 	{
 		LOG_ERROR("FILE NOT FOUND! Path is wrong.");
@@ -95,59 +95,183 @@ bool AnimationConverter::LoadReferenceSkeleton(const std::string& path)
 		return false;
 	}
 
-	/*std::ifstream inFile(path, std::ios::binary);
-	if (!inFile) return false;*/
-
-	// 1. 헤더 검증
+	// 3. Header 읽기
 	uint32 magic = AssetUtils::ReadData<uint32>(inFile);
 	if (magic != 0x4D594D44) return false; // MYMD
 
-	uint32 version = AssetUtils::ReadData<uint32>(inFile);
+	AssetUtils::ReadData<uint32>(inFile);					   // version
+	AssetUtils::ReadData<uint32>(inFile);					   // matCount
+	AssetUtils::ReadData<uint32>(inFile);					   // meshCount
+	bool hasSkeleton = AssetUtils::ReadData<bool>(inFile);     // hasSkeleton
+	if (!hasSkeleton)
+	{
+		LOG_ERROR("Selected Reference Model has NO Skeleton data! Cannot bake animation.");
+		return false;
+	}
+	AssetUtils::ReadData<glm::vec3>(inFile);				   // AABB Min
+	AssetUtils::ReadData<glm::vec3>(inFile);				   // AABB Max
 
-	// 2. 불필요한 정보 건너뛰기 (읽어서 버림)
-	AssetUtils::ReadData<uint32>(inFile); // matCount
-	AssetUtils::ReadData<uint32>(inFile); // meshCount
-	AssetUtils::ReadData<bool>(inFile);     // hasSkeleton
-	AssetUtils::ReadData<glm::vec3>(inFile); // AABB Min
-	AssetUtils::ReadData<glm::vec3>(inFile); // AABB Max
+	// 4. Hierarchy Nodes 읽기
+	auto rawNodes = AssetUtils::ReadRawNodes(inFile);
+	std::unordered_map<std::string, int32> nodeNameToIndex;
+	for (int32 i = 0; i < (int32)rawNodes.size(); ++i)
+		nodeNameToIndex[rawNodes[i].name] = i;
 
-	// 3. RawNode 리스트 읽기
-	auto nodes = AssetUtils::ReadRawNodes(inFile);
+	// 5. Skeleton Data 읽기
+	uint32 boneCount = AssetUtils::ReadData<uint32>(inFile);
 
-	// 4. 유효 노드 이름 등록
-	for (const auto& node : nodes) m_validNodeNames.insert(node.name);
+	// 5-1. RawBoneInfo 목록 읽기
+	std::vector<AssetFmt::RawBoneInfo> boneInfos(boneCount);
+	for (uint32 i = 0; i < boneCount; ++i)
+	{
+		boneInfos[i].id = AssetUtils::ReadData<uint32>(inFile);
+		boneInfos[i].offset = AssetUtils::ReadData<glm::mat4>(inFile);
+	}
 
-	LOG_INFO(" - Reference Model Valid Nodes: {}", m_validNodeNames.size());
+	// 5-2. Bone Map 읽어서 m_bones 구축
+	uint32 mapCount = AssetUtils::ReadData<uint32>(inFile);
+	m_bones.resize(boneCount);
+
+	for (uint32 i = 0; i < mapCount; ++i)
+	{
+		std::string name = AssetUtils::ReadString(inFile);
+		int32 id = AssetUtils::ReadData<int32>(inFile);
+
+		if (id >= 0 && id < (int32)boneCount)
+		{
+			m_bones[id].name = name;
+			m_bones[id].index = id;
+			m_bones[id].offsetMatrix = boneInfos[id].offset;
+			m_boneNameMap[name] = id;
+		}
+	}
+
+	// 6. 부모 뼈 연결
+	for (auto& bone : m_bones)
+	{
+		auto itNode = nodeNameToIndex.find(bone.name);
+		if (itNode == nodeNameToIndex.end()) continue;
+
+		int32 myNodeIdx = itNode->second;
+		int32 parentNodeIdx = rawNodes[myNodeIdx].parentIndex;
+
+		if (parentNodeIdx != -1)
+		{
+			std::string parentNodeName = rawNodes[parentNodeIdx].name;
+			auto itParentBone = m_boneNameMap.find(parentNodeName);
+			if (itParentBone != m_boneNameMap.end())
+				bone.parentIndex = itParentBone->second;
+		}
+	}
+
+	LOG_INFO(" - Reference Skeleton Loaded: {} bones linked.", boneCount);
 	inFile.close();
 	return true;
 }
 
-bool AnimationConverter::ProcessSingleClip(aiAnimation* srcAnim, AssetFmt::RawAnimation& outAnim)
+AnimChannel AnimationConverter::ConvertAssimpChannelToEngine(aiNodeAnim* srcChannel)
 {
-	std::string animName = srcAnim->mName.C_Str();
-	if (animName.empty()) animName = "Anim";
+	std::string nodeName = srcChannel->mNodeName.C_Str();
 
-	outAnim.name = MakeSafeName(animName);
-	outAnim.duration = (float)srcAnim->mDuration;
-	outAnim.ticksPerSecond = (srcAnim->mTicksPerSecond != 0.0) ? (float)srcAnim->mTicksPerSecond : 25.0f;
-
-	// 채널 순회
-	for (uint32 i = 0; i < srcAnim->mNumChannels; ++i)
+	// 1. Position Keys
+	std::vector<AssetFmt::RawKeyPosition> positions;
+	positions.reserve(srcChannel->mNumPositionKeys);
+	for (uint32 i = 0; i < srcChannel->mNumPositionKeys; ++i)
 	{
-		aiNodeAnim* srcChannel = srcAnim->mChannels[i];
-		std::string nodeName = srcChannel->mNodeName.C_Str();
-
-		// 참조 모델에 존재하는 노드인지 체크
-		if (m_validNodeNames.find(nodeName) == m_validNodeNames.end()) continue;
-
-		// 유효하다면 채널 추가
-		AssetFmt::RawAnimChannel dstChannel;
-		ProcessChannel(srcChannel, dstChannel);
-		outAnim.channels.push_back(std::move(dstChannel));
+		const auto& k = srcChannel->mPositionKeys[i];
+		positions.push_back({ Utils::ConvertToGLMVec(k.mValue), (float)k.mTime });
 	}
 
-	// 채널이 하나도 없으면 실패 처리
-	return !outAnim.channels.empty();
+	// 2. Rotation Keys
+	std::vector<AssetFmt::RawKeyRotation> rotations;
+	rotations.reserve(srcChannel->mNumRotationKeys);
+	for (uint32 i = 0; i < srcChannel->mNumRotationKeys; ++i)
+	{
+		const auto& k = srcChannel->mRotationKeys[i];
+		rotations.push_back({ Utils::ConvertToGLMQuat(k.mValue), (float)k.mTime });
+	}
+
+	// 3. Scale Keys
+	std::vector<AssetFmt::RawKeyScale> scales;
+	scales.reserve(srcChannel->mNumScalingKeys);
+	for (uint32 i = 0; i < srcChannel->mNumScalingKeys; ++i)
+	{
+		const auto& k = srcChannel->mScalingKeys[i];
+		scales.push_back({ Utils::ConvertToGLMVec(k.mValue), (float)k.mTime });
+	}
+
+	return AnimChannel
+	(
+		nodeName, 
+		std::move(positions), 
+		std::move(rotations), 
+		std::move(scales)
+	);
+}
+
+void AnimationConverter::BakeAnimation(const aiAnimation* srcAnim, AssetFmt::RawAnimation& outAnim)
+{
+	// 1. 설정
+	const float FRAME_RATE = 30.0f;
+	float durationTicks = (float)srcAnim->mDuration;
+	float ticksPerSecond = (srcAnim->mTicksPerSecond != 0) ? (float)srcAnim->mTicksPerSecond : 25.0f;
+	float durationSeconds = durationTicks / ticksPerSecond;
+
+	// 헤더 정보 채우기
+	outAnim.duration = durationSeconds;
+	outAnim.ticksPerSecond = ticksPerSecond;
+	outAnim.frameRate = FRAME_RATE;
+	outAnim.boneCount = (uint32)m_bones.size();
+
+	// 프레임 수 계산 (올림 처리)
+	outAnim.frameCount = (uint32)ceil(durationSeconds * FRAME_RATE) + 1;
+	outAnim.bakedMatrices.resize(outAnim.frameCount * outAnim.boneCount);
+
+	// 임시 AnimChannel 맵 생성 (검색 성능 향상)
+	std::unordered_map<std::string, AnimChannel> tempChannels;
+	for (uint32 i = 0; i < srcAnim->mNumChannels; ++i)
+	{
+		auto channel = ConvertAssimpChannelToEngine(srcAnim->mChannels[i]);
+		tempChannels[channel.GetBoneName()] = std::move(channel);
+	}
+
+	// 베이킹 루프
+	float timeStepPerFrame = 1.0f / FRAME_RATE;
+	for (uint32 f = 0; f < outAnim.frameCount; ++f)
+	{
+		float timeInSeconds = f * timeStepPerFrame;
+		float timeInTicks = timeInSeconds * ticksPerSecond;
+		if (timeInTicks > durationTicks) timeInTicks = durationTicks;
+
+		for (int32 b = 0; b < (int32)m_bones.size(); ++b)
+		{
+			auto& bone = m_bones[b];
+
+			// (1) Local Matrix 계산
+			auto itChannel = tempChannels.find(bone.name);
+			if (itChannel != tempChannels.end())
+				bone.localMatrix = itChannel->second.GetPose(timeInTicks).ToMat4();
+			else bone.localMatrix = glm::mat4(1.0f);
+
+			// (2) Global Matrix 계산 (계층 구조 전파)
+			if (bone.parentIndex != -1)
+				bone.globalMatrix = m_bones[bone.parentIndex].globalMatrix * bone.localMatrix;
+			else bone.globalMatrix = bone.localMatrix;
+
+			// (3) 최종 스키닝 행렬 저장 (Global * Offset)
+			glm::mat4 finalMat = bone.globalMatrix * bone.offsetMatrix;
+			uint32 index = f * outAnim.boneCount + b;
+			outAnim.bakedMatrices[index] = finalMat;
+		}
+	}
+
+	LOG_INFO
+	(
+		"   - Baked Info: {:.2f} sec, {} frames, {} bones",
+		outAnim.duration,
+		outAnim.frameCount,
+		outAnim.boneCount
+	);
 }
 
 std::string AnimationConverter::MakeSafeName(const std::string& rawName)
@@ -165,9 +289,7 @@ std::string AnimationConverter::MakeSafeName(const std::string& rawName)
 	{
 		// 금지 문자가 포함되어 있다면 '_'로 변경
 		if (invalidChars.find(c) != std::string::npos)
-		{
 			c = '_';
-		}
 	}
 
 	// 3. 만약 다 지워서 빈 문자열이 됐다면 기본값 부여
@@ -175,51 +297,6 @@ std::string AnimationConverter::MakeSafeName(const std::string& rawName)
 
 	return safeName;
 }
-
-void AnimationConverter::ProcessChannel(aiNodeAnim* srcChannel, AssetFmt::RawAnimChannel& dstChannel)
-{
-	dstChannel.nodeName = srcChannel->mNodeName.C_Str();
-
-	// 1. Position
-	dstChannel.positions.resize(srcChannel->mNumPositionKeys);
-	for (uint32 i = 0; i < srcChannel->mNumPositionKeys; ++i)
-	{
-		const auto& k = srcChannel->mPositionKeys[i];
-		dstChannel.positions[i] = 
-		{
-			glm::vec3(k.mValue.x, k.mValue.y, k.mValue.z),
-			(float)k.mTime
-		};
-	}
-
-	// 2. Rotation
-	dstChannel.rotations.resize(srcChannel->mNumRotationKeys);
-	for (uint32 i = 0; i < srcChannel->mNumRotationKeys; ++i)
-	{
-		const auto& k = srcChannel->mRotationKeys[i];
-		// Assimp (w, x, y, z) -> GLM Quat 생성자 (w, x, y, z) 확인 필수!
-		// GLM 버전에 따라 quat(w, x, y, z) 또는 quat(x, y, z, w)일 수 있음.
-		// 일반적으로 glm::quat(w, x, y, z) 입니다.
-		dstChannel.rotations[i] = 
-		{
-			glm::quat((float)k.mValue.w, (float)k.mValue.x, (float)k.mValue.y, (float)k.mValue.z),
-			(float)k.mTime
-		};
-	}
-
-	// 3. Scale
-	dstChannel.scales.resize(srcChannel->mNumScalingKeys);
-	for (uint32_t i = 0; i < srcChannel->mNumScalingKeys; ++i)
-	{
-		const auto& k = srcChannel->mScalingKeys[i];
-		dstChannel.scales[i] = 
-		{
-			glm::vec3(k.mValue.x, k.mValue.y, k.mValue.z),
-			(float)k.mTime
-		};
-	}
-}
-
 
 bool AnimationConverter::WriteAnimationFile(const std::string& finalPath, const AssetFmt::RawAnimation& anim)
 {

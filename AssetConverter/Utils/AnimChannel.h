@@ -1,13 +1,12 @@
 ﻿#pragma once
-#include "Misc/AssetFormat.h"
-#include "Resources/Animations/Pose.h"
+#include "AssetTypes/AssetFormat.h"
+#include "Utils/Pose.h"
 
-CLASS_PTR(AnimChannel)
 class AnimChannel
 {
 public:
-    virtual ~AnimChannel();
-    static AnimChannelUPtr Create
+    ~AnimChannel() = default;
+    AnimChannel
     (
         const std::string& name,
         std::vector<AssetFmt::RawKeyPosition>&& positions,
@@ -16,6 +15,8 @@ public:
     );
 
     Pose GetPose(float time) const;
+    std::string GetBoneName() const;
+    glm::mat4 GetLocalTransform(float animationTime) const;
 
 /*==============================================//
 //   animation channel default getter methods   //
@@ -24,9 +25,6 @@ public:
     uint32 GetPositionIndex(float animationTime) const;
     uint32 GetRotationIndex(float animationTime) const;
     uint32 GetScaleIndex(float animationTime) const;
-    uint32 GetNameHash() const;
-    std::string GetBoneName() const;
-    glm::mat4 GetLocalTransform(float animationTime) const;
 
 /*===========================//
 //   interpolation methods   //
@@ -39,22 +37,9 @@ private:
 
 private:
     AnimChannel();
-    void Init
-    (
-        const std::string& name,
-        std::vector<AssetFmt::RawKeyPosition>&& positions,
-        std::vector<AssetFmt::RawKeyRotation>&& rotations,
-        std::vector<AssetFmt::RawKeyScale>&& scales
-    );
 
-    uint32 m_nameHash{ 0 };
     std::string m_name;
-
     std::vector<AssetFmt::RawKeyPosition> m_positions;
     std::vector<AssetFmt::RawKeyRotation> m_rotations;
     std::vector<AssetFmt::RawKeyScale>    m_scales;
-
-    uint32 m_numPositions;
-    uint32 m_numRotations;
-    uint32 m_numScalings;
 };

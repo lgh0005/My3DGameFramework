@@ -4,13 +4,6 @@
 
 DECLARE_DEFAULTS_IMPL(AnimChannel)
 
-AnimChannelUPtr AnimChannel::Create(const std::string& name, const aiNodeAnim* channel)
-{
-    auto animChannel = AnimChannelUPtr(new AnimChannel());
-    if (!animChannel->Init(name, channel)) return nullptr;
-    return std::move(animChannel);
-}
-
 AnimChannelUPtr AnimChannel::Create
 (
     const std::string& name,
@@ -34,55 +27,6 @@ Pose AnimChannel::GetPose(float time) const
     glm::quat rotation = InterpolateRotation(time);
     glm::vec3 scale = InterpolateScaling(time);
     return Pose(translation, rotation, scale);
-}
-
-bool AnimChannel::Init(const std::string& name, const aiNodeAnim* channel)
-{
-    if (!channel) return false;
-
-	m_name = name;
-    m_nameHash = Utils::StrHash(name);
-
-	m_numPositions = channel->mNumPositionKeys;
-    m_positions.reserve(m_numPositions);
-    for (uint32 positionIndex = 0; positionIndex < m_numPositions; ++positionIndex)
-    {
-        aiVector3D aiPosition = channel->mPositionKeys[positionIndex].mValue;
-        float timeStamp = channel->mPositionKeys[positionIndex].mTime;
-
-        AssetFmt::RawKeyPosition data;
-        data.vec3 = Utils::ConvertToGLMVec(aiPosition);
-        data.time = timeStamp;
-        m_positions.push_back(data);
-    }
-
-    m_numRotations = channel->mNumRotationKeys;
-    m_rotations.reserve(m_numRotations);
-    for (uint32 rotationIndex = 0; rotationIndex < m_numRotations; ++rotationIndex)
-    {
-        aiQuaternion aiOrientation = channel->mRotationKeys[rotationIndex].mValue;
-        float timeStamp = channel->mRotationKeys[rotationIndex].mTime;
-
-        AssetFmt::RawKeyRotation data;
-        data.quat = Utils::ConvertToGLMQuat(aiOrientation);
-        data.time = timeStamp;
-        m_rotations.push_back(data);
-    }
-
-    m_numScalings = channel->mNumScalingKeys;
-    m_scales.reserve(m_numScalings);
-    for (uint32 keyIndex = 0; keyIndex < m_numScalings; ++keyIndex)
-    {
-        aiVector3D scale = channel->mScalingKeys[keyIndex].mValue;
-        float timeStamp = channel->mScalingKeys[keyIndex].mTime;
-
-        AssetFmt::RawKeyScale data;
-        data.vec3 = Utils::ConvertToGLMVec(scale);
-        data.time = timeStamp;
-        m_scales.push_back(data);
-    }
-
-	return true;
 }
 
 void AnimChannel::Init

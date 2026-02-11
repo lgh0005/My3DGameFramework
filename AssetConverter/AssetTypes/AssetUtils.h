@@ -33,7 +33,7 @@ public:
 /*==================================//
 //  asset format read util methods  //
 //==================================*/
-	static std::vector<AssetFmt::RawNode> AssetUtils::ReadRawNodes(std::ifstream& file);
+	static std::vector<AssetFmt::RawNode> ReadRawNodes(std::ifstream& file);
 };
 
 /*================================//

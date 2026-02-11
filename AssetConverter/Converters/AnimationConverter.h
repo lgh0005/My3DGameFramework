@@ -1,4 +1,5 @@
 ﻿#pragma once
+#include "Utils/AnimChannel.h"
 
 class AnimationConverter
 {
@@ -13,13 +14,14 @@ public:
 	);
 
 private:
-	void ProcessChannel(aiNodeAnim* srcChannel, AssetFmt::RawAnimChannel& dstChannel);
 	bool LoadReferenceSkeleton(const std::string& path);
-    bool ProcessSingleClip(aiAnimation* srcAnim, AssetFmt::RawAnimation& outAnim);
+	AnimChannel ConvertAssimpChannelToEngine(aiNodeAnim* srcChannel);
+	void BakeAnimation(const aiAnimation* srcAnim, AssetFmt::RawAnimation& outAnim);
 	std::string MakeSafeName(const std::string& rawName);
     bool WriteAnimationFile(const std::string& finalPath, const AssetFmt::RawAnimation& anim);
 
 private:
     // m_rawAnim 멤버 변수 제거 (지역 변수 사용)
-    std::unordered_set<std::string> m_validNodeNames;
+	std::vector<AssetFmt::RawBone> m_bones;
+	std::unordered_map<std::string, int32> m_boneNameMap;
 };

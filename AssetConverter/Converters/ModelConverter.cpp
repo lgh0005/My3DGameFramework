@@ -40,6 +40,7 @@ bool ModelConverter::RunConversion()
     // 0. 초기화
     m_rawModel = AssetFmt::RawModel(); // 모델 데이터 초기화
     m_boneNameToIdMap.clear();
+    m_boneOffsets.clear();
     m_boneCounter = 0;
 
     // 0-1. 모델 이름과 상위 경로를 추출
@@ -69,25 +70,26 @@ bool ModelConverter::RunConversion()
     LOG_INFO("Processing materials... Total: {}", scene->mNumMaterials);
     m_rawModel.materials.reserve(scene->mNumMaterials);
     for (uint32 i = 0; i < scene->mNumMaterials; ++i)
-    {
         m_rawModel.materials.push_back(ProcessMaterial(scene->mMaterials[i], i));
-    }
 
-    // 3. 노드/메쉬 처리
-    LOG_INFO("Processing meshes... Total: {}", scene->mNumMeshes);
-    m_rawModel.meshes.reserve(scene->mNumMeshes);
-    for (uint32 i = 0; i < scene->mNumMeshes; ++i)
-    {
-        ProcessMesh(scene->mMeshes[i], scene);
-    }
-
-    // 4. 계층 구조 완성 (Hierarchy Extraction)
+    // 3. 계층 구조 완성 (Hierarchy Extraction)
     LOG_INFO("Processing node hierarchy...");
     ParseNodeHierarchy(scene);
     LOG_INFO(" - Total Nodes extracted: {}", m_rawModel.nodes.size());
 
+    // 3-1. 모든 메쉬를 미리 스캔하여 뼈 이름과 오프셋만 수집
+    CollectBoneOffsets(scene);
+
+    // 3-2. 노드 순서대로 뼈 ID 최종 확정
+    FinalizeBoneIDs();
+
+    // 4. 이제 확정된 ID를 바탕으로 메쉬 처리
+    LOG_INFO("Processing meshes... Total: {}", scene->mNumMeshes);
+    m_rawModel.meshes.reserve(scene->mNumMeshes);
+    for (uint32 i = 0; i < scene->mNumMeshes; ++i)
+        ProcessMesh(scene->mMeshes[i], scene);
+
     // 5. 스켈레톤 존재 여부 최종 확정
-    m_rawModel.hasSkeleton = (m_boneCounter > 0);
     if (m_rawModel.hasSkeleton) LOG_INFO(" - Skeleton Detected (Total Bones: {})", m_boneCounter);
     else LOG_INFO(" - Static Mesh Detected (No Skeleton)");
 
@@ -547,51 +549,84 @@ void ModelConverter::ExtractBoneWeights(std::vector<AssetFmt::RawSkinnedVertex>&
     for (uint32 i = 0; i < mesh->mNumBones; ++i)
     {
         aiBone* bone = mesh->mBones[i];
-        int32 boneID = -1;
         std::string boneName = bone->mName.C_Str();
 
-        // 1. 뼈 등록 단계 (Global Bone Registry)
-        if (m_boneNameToIdMap.find(boneName) == m_boneNameToIdMap.end())
-        {
-            AssetFmt::RawBoneInfo newBoneInfo;
-            newBoneInfo.id = m_boneCounter;
-            newBoneInfo.offset = Utils::ConvertToGLMMat4(bone->mOffsetMatrix);
+        // 1. 이미 FinalizeBoneIDs에서 생성된 ID를 찾아서 사용
+        auto it = m_boneNameToIdMap.find(boneName);
 
-            m_rawModel.boneOffsetInfos.push_back(newBoneInfo);
-
-            // 맵에 등록하고 카운터 증가
-            boneID = m_boneCounter;
-            m_boneNameToIdMap[boneName] = boneID;
-            m_boneCounter++;
-        }
-        else
+        // 계층 구조에는 없는데 메쉬에는 있는 뼈 (매우 드문 케이스, 더미 본 등)
+        if (it == m_boneNameToIdMap.end())
         {
-            // [이미 등록된 뼈] ID만 가져옴
-            boneID = m_boneNameToIdMap[boneName];
+            LOG_WARN("Bone '{}' found in mesh but not in hierarchy! Skipping.", boneName);
+            continue;
         }
 
-        // 2. 가중치 주입 단계 (Vertex Weight Assignment)
-        // 이 뼈가 영향을 주는 모든 정점을 순회
+        int32 boneID = it->second;
+
+        // 2. 가중치 주입 (기존 로직 동일)
         for (uint32 j = 0; j < bone->mNumWeights; ++j)
         {
             const auto& weightData = bone->mWeights[j];
             uint32 vertexId = weightData.mVertexId;
             float weight = weightData.mWeight;
 
-            // 안전 장치: 정점 인덱스가 범위 밖이면 무시
+            // 가중치가 너무 작거나 인덱스가 벗어나면 무시
+            if (weight <= 0.0f) continue;
             if (vertexId >= vertices.size()) continue;
 
-            // 해당 정점의 빈 슬롯(-1)을 찾아서 채움 (최대 4개)
             auto& v = vertices[vertexId];
+
+            // 빈 슬롯(-1)을 찾아 채움
             for (int k = 0; k < MAX_BONE_INFLUENCE; ++k)
             {
                 if (v.boneIDs[k] < 0) // -1이면 비어있다는 뜻
                 {
                     v.boneIDs[k] = boneID;
                     v.weights[k] = weight;
-                    break; // 채웠으면 다음 정점으로
+                    break; // 채웠으면 다음 슬롯 검사 중단
                 }
             }
         }
     }
+}
+
+void ModelConverter::CollectBoneOffsets(const aiScene* scene)
+{
+    for (uint32 i = 0; i < scene->mNumMeshes; ++i)
+    {
+        aiMesh* mesh = scene->mMeshes[i];
+        if (mesh->mNumBones > 0)
+        {
+            for (uint32 b = 0; b < mesh->mNumBones; ++b)
+            {
+                aiBone* bone = mesh->mBones[b];
+                m_boneOffsets[bone->mName.C_Str()] = Utils::ConvertToGLMMat4(bone->mOffsetMatrix);
+            }
+        }
+    }
+}
+
+void ModelConverter::FinalizeBoneIDs()
+{
+    // m_rawModel.nodes는 이미 ParseNodeHierarchy에 의해 DFS 순서(부모->자식)로 정렬됨
+    for (const auto& node : m_rawModel.nodes)
+    {
+        // 수집된 뼈 오프셋 맵에 이 노드 이름이 존재하는가?
+        auto it = m_boneOffsets.find(node.name);
+        if (it != m_boneOffsets.end())
+        {
+            // 존재한다면, 이 노드는 '뼈'임. ID 부여.
+            int32 newID = m_boneCounter++;
+
+            AssetFmt::RawBoneInfo info;
+            info.id = newID;
+            info.offset = it->second;
+
+            m_rawModel.boneOffsetInfos.push_back(info);
+            m_boneNameToIdMap[node.name] = newID;
+        }
+    }
+
+    m_rawModel.hasSkeleton = (m_boneCounter > 0);
+    LOG_INFO("Skeleton ID Finalized: Total {} bones mapped in hierarchy order.", m_boneCounter);
 }

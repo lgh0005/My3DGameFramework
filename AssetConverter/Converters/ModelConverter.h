@@ -51,7 +51,10 @@ private:
 //==========================================*/
 private:
 	void ExtractBoneWeights(std::vector<AssetFmt::RawSkinnedVertex>& vertices, aiMesh* mesh);
+	void CollectBoneOffsets(const aiScene* scene);
+	void FinalizeBoneIDs();
 
 	int32 m_boneCounter{ 0 };
+	std::unordered_map<std::string, glm::mat4> m_boneOffsets;
 	std::unordered_map<std::string, int32> m_boneNameToIdMap;
 };

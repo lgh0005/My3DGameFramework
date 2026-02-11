@@ -20,6 +20,8 @@ set(ASSET_CONVERTER_SOURCES
     "Utils/ArgumentParser.h"            "Utils/ArgumentParser.cpp"
     "Utils/Types.h"
     "Utils/Defines.h"
+    "Utils/AnimChannel.h"               "Utils/AnimChannel.cpp"
+    "Utils/Pose.h"                      "Utils/Pose.cpp"
 )
 
 # Visual Studio 필터 자동 생성
