@@ -54,7 +54,6 @@ private:
 private:
 	Animator();
 	bool Init(ModelPtr model, AnimControllerUPtr controller);
-	void CheckAndBakeClips();
 
 	ModelPtr m_currentModel;
 	AnimControllerUPtr m_controller;

@@ -153,6 +153,7 @@ set(ENGINE_SOURCES
    "Resources/Programs/ComputeProgram.h" "Resources/Programs/ComputeProgram.cpp"
 
    "Resources/Animations/Animation.h"          "Resources/Animations/Animation.cpp"
+   "Resources/Animations/AnimClip.h"            "Resources/Animations/AnimClip.cpp"
    "Resources/Animations/AnimChannel.h"        "Resources/Animations/AnimChannel.cpp"
    "Resources/Animations/Pose.h"               "Resources/Animations/Pose.cpp"
    "Resources/Animations/Skeleton.h"           "Resources/Animations/Skeleton.cpp"
@@ -171,7 +172,6 @@ set(ENGINE_SOURCES
    "Resources/Meshes/ScreenMesh.h"           "Resources/Meshes/ScreenMesh.cpp"
    "Resources/Meshes/DebugMesh.h"            "Resources/Meshes/DebugMesh.cpp"
    "Resources/Meshes/UIMesh.h"               "Resources/Meshes/UIMesh.cpp"
-   
 
    # Components
    "Components/Light.h"             "Components/Light.cpp"

@@ -22,7 +22,6 @@ public:
 	void SetTransitionDuration(const std::string& from, const std::string& to, float duration);
 	void SetStartState(const std::string& name);
 	Pose GetPose(uint32 nodeNameHash, const Pose& defaultPose) const;
-	void BakeAllAnimations(Skeleton* skeleton);
 
 private:
 	AnimController();

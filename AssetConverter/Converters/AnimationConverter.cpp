@@ -218,22 +218,57 @@ void AnimationConverter::BakeAnimation(const aiAnimation* srcAnim, AssetFmt::Raw
 	float durationSeconds = durationTicks / ticksPerSecond;
 
 	// 헤더 정보 채우기
+	outAnim.magic = 0x414E494D; // "ANIM"
+	outAnim.version = 2;
 	outAnim.duration = durationSeconds;
 	outAnim.ticksPerSecond = ticksPerSecond;
 	outAnim.frameRate = FRAME_RATE;
 	outAnim.boneCount = (uint32)m_bones.size();
+	if (outAnim.boneCount == 0)
+	{
+		LOG_ERROR("Cannot bake animation: Reference Skeleton has 0 bones!");
+		return;
+	}
 
-	// 프레임 수 계산 (올림 처리)
-	outAnim.frameCount = (uint32)ceil(durationSeconds * FRAME_RATE) + 1;
-	outAnim.bakedMatrices.resize(outAnim.frameCount * outAnim.boneCount);
-
-	// 임시 AnimChannel 맵 생성 (검색 성능 향상)
-	std::unordered_map<std::string, AnimChannel> tempChannels;
+	// 2. 채널 데이터를 Raw 포맷으로 변환하여 저장 (엔진 런타임 보간용)
+	outAnim.channels.reserve(srcAnim->mNumChannels);
 	for (uint32 i = 0; i < srcAnim->mNumChannels; ++i)
 	{
-		auto channel = ConvertAssimpChannelToEngine(srcAnim->mChannels[i]);
-		tempChannels[channel.GetBoneName()] = std::move(channel);
+		aiNodeAnim* srcCh = srcAnim->mChannels[i];
+		AssetFmt::RawAnimChannel rawCh;
+		rawCh.nodeName = srcCh->mNodeName.C_Str();
+
+		// 위치 키프레임
+		for (uint32 k = 0; k < srcCh->mNumPositionKeys; ++k)
+			rawCh.positions.push_back({ Utils::ConvertToGLMVec(srcCh->mPositionKeys[k].mValue), (float)srcCh->mPositionKeys[k].mTime });
+
+		// 회전 키프레임
+		for (uint32 k = 0; k < srcCh->mNumRotationKeys; ++k)
+			rawCh.rotations.push_back({ Utils::ConvertToGLMQuat(srcCh->mRotationKeys[k].mValue), (float)srcCh->mRotationKeys[k].mTime });
+
+		// 스케일 키프레임
+		for (uint32 k = 0; k < srcCh->mNumScalingKeys; ++k)
+			rawCh.scales.push_back({ Utils::ConvertToGLMVec(srcCh->mScalingKeys[k].mValue), (float)srcCh->mScalingKeys[k].mTime });
+
+		outAnim.channels.push_back(std::move(rawCh));
 	}
+
+	// 3. 베이킹 준비 (행렬 계산을 위해 엔진용 AnimChannel 객체 활용)
+	std::unordered_map<std::string, AnimChannel> bakeHelpers;
+	for (auto& rawCh : outAnim.channels)
+	{
+		// 복사본을 만들어 베이킹 헬퍼로 사용 (원본은 outAnim에 보존)
+		bakeHelpers[rawCh.nodeName] = AnimChannel
+		(
+			rawCh.nodeName,
+			std::vector<AssetFmt::RawKeyPosition>(rawCh.positions),
+			std::vector<AssetFmt::RawKeyRotation>(rawCh.rotations),
+			std::vector<AssetFmt::RawKeyScale>(rawCh.scales)
+		);
+	}
+
+	outAnim.frameCount = (uint32)ceil(durationSeconds * FRAME_RATE) + 1;
+	outAnim.bakedMatrices.resize(outAnim.frameCount * outAnim.boneCount);
 
 	// 베이킹 루프
 	float timeStepPerFrame = 1.0f / FRAME_RATE;
@@ -248,10 +283,11 @@ void AnimationConverter::BakeAnimation(const aiAnimation* srcAnim, AssetFmt::Raw
 			auto& bone = m_bones[b];
 
 			// (1) Local Matrix 계산
-			auto itChannel = tempChannels.find(bone.name);
-			if (itChannel != tempChannels.end())
+			auto itChannel = bakeHelpers.find(bone.name);
+			if (itChannel != bakeHelpers.end())
 				bone.localMatrix = itChannel->second.GetPose(timeInTicks).ToMat4();
-			else bone.localMatrix = glm::mat4(1.0f);
+			else
+				bone.localMatrix = glm::mat4(1.0f);
 
 			// (2) Global Matrix 계산 (계층 구조 전파)
 			if (bone.parentIndex != -1)
@@ -259,9 +295,8 @@ void AnimationConverter::BakeAnimation(const aiAnimation* srcAnim, AssetFmt::Raw
 			else bone.globalMatrix = bone.localMatrix;
 
 			// (3) 최종 스키닝 행렬 저장 (Global * Offset)
-			glm::mat4 finalMat = bone.globalMatrix * bone.offsetMatrix;
 			uint32 index = f * outAnim.boneCount + b;
-			outAnim.bakedMatrices[index] = finalMat;
+			outAnim.bakedMatrices[index] = bone.globalMatrix * bone.offsetMatrix;
 		}
 	}
 

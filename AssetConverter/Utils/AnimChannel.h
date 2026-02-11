@@ -5,7 +5,8 @@
 class AnimChannel
 {
 public:
-    ~AnimChannel() = default;
+    ~AnimChannel();
+    AnimChannel();
     AnimChannel
     (
         const std::string& name,
@@ -36,8 +37,6 @@ private:
     glm::vec3 InterpolateScaling(float animationTime) const;
 
 private:
-    AnimChannel();
-
     std::string m_name;
     std::vector<AssetFmt::RawKeyPosition> m_positions;
     std::vector<AssetFmt::RawKeyRotation> m_rotations;

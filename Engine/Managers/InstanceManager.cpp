@@ -28,7 +28,7 @@ void InstanceManager::BuildGlobalAnimBuffer()
 	// 2. 데이터 병합 (Atlas Packing)
 	for (auto& anim : animations)
 	{
-		const auto& baked = anim->GetBakedData();
+		const auto& baked = anim->GetAnimClip();
 		if (baked.localMatrices.empty()) continue;
 
 		// 각 애니메이션에게 "너는 여기서부터 시작해"라고 알려줌

@@ -2,6 +2,9 @@
 #include "AnimChannel.h"
 #include "Utils/Pose.h"
 
+AnimChannel::AnimChannel() = default;
+AnimChannel::~AnimChannel() = default;
+
 AnimChannel::AnimChannel
 (
     const std::string& name,

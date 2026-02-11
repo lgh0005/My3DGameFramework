@@ -44,9 +44,9 @@ public:
 	void SetWorldRotation(const glm::vec3& eulerAnglesDegrees);
 	void SetWorldScale(const glm::vec3& scale);
 
-	glm::vec3 Transform::GetWorldPosition() const;
-	glm::vec3 Transform::GetWorldScale()	const;
-	glm::quat Transform::GetWorldRotation() const;
+	glm::vec3 GetWorldPosition() const;
+	glm::vec3 GetWorldScale()	const;
+	glm::quat GetWorldRotation() const;
 
 	// 방향 벡터
 	glm::vec3 GetForwardVector() const; // 앞쪽   (-Z)

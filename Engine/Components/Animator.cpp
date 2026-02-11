@@ -43,13 +43,10 @@ bool Animator::Init(ModelPtr model, AnimControllerUPtr controller)
         return false;
     }
 
-    // 2. 버퍼 초기화 (중복 제거됨)
+    // 2. 버퍼 초기화
     usize boneCount = skeleton->GetBoneCount();
     m_finalBoneMatrices.resize(boneCount, glm::mat4(1.0f));
     m_skinningTransforms.resize(boneCount, nullptr);
-
-    // 3. 초기화 즉시, 현재 컨트롤러/모델 조합으로 베이킹 시도
-    CheckAndBakeClips();
 
 	return true;
 }
@@ -73,11 +70,8 @@ void Animator::SetModel(ModelPtr model)
 
     // 3. 버퍼 재할당
     usize boneCount = m_currentModel->GetSkeleton()->GetBoneCount();
-    m_finalBoneMatrices.clear();
-    m_finalBoneMatrices.resize(boneCount, glm::mat4(1.0f));
-
-    m_skinningTransforms.clear();
-    m_skinningTransforms.resize(boneCount, nullptr);
+    m_finalBoneMatrices.assign(boneCount, glm::mat4(1.0f));
+    m_skinningTransforms.assign(boneCount, nullptr);
 
     // 4. 바인딩 정보 초기화 및 재설정
     m_animationBindings.clear();
@@ -85,18 +79,11 @@ void Animator::SetModel(ModelPtr model)
 
     // 이미 Start된(Scene에 존재하는) 상태라면 즉시 바인딩 갱신
     if (GetOwner()) BindBoneTransforms();
-
-    // 5. 새로운 모델(스켈레톤)에 맞춰 애니메이션 베이킹
-    CheckAndBakeClips();
 }
 
 void Animator::SetController(AnimControllerUPtr controller)
 {
-    // 1. 소유권 이동
     m_controller = std::move(controller);
-
-    // 2. 새로운 컨트롤러의 클립들을 현재 모델 기준으로 베이킹
-    CheckAndBakeClips();
 }
 
 /*========================================//
@@ -126,15 +113,9 @@ void Animator::BindBoneTransforms()
         if (it != m_boneTransformMap.end())
         {
             AnimBinding binding;
-
-            // [최적화 1] 이름을 미리 해싱하여 저장 (Update때 해싱 안 함)
-            binding.nodeNameHash = Utils::StrHash(node.name);
-
+            binding.nodeNameHash = nodeHash;
             binding.transform = it->second;
-
-            // [최적화 2] 초기 행렬을 미리 Pose로 분해하여 저장 (Update때 Decompose 안 함)
             binding.defaultPose = Pose::FromMat4(node.localTransform);
-
             m_animationBindings.push_back(binding);
         }
     }
@@ -144,13 +125,16 @@ void Animator::BindBoneTransforms()
     if (skeleton)
     {
         int32 mappedCount = 0;
+        int32 boneCount = skeleton->GetBoneCount();
+
+        // m_skinningTransforms 크기 보장
+        if ((int32)m_skinningTransforms.size() != boneCount)
+            m_skinningTransforms.resize(boneCount, nullptr);
 
         // 맵에 있는 모든 Transform에 대해 스켈레톤 ID가 있는지 확인
         for (const auto& [hash, transform] : m_boneTransformMap)
         {
-            // [최적화 연동] Skeleton::GetBoneID가 내부적으로 해싱하거나 문자열을 받음
             int32 boneID = skeleton->GetBoneID(hash);
-
             if (boneID != -1 && boneID < (int32)m_skinningTransforms.size())
             {
                 m_skinningTransforms[boneID] = transform;
@@ -176,16 +160,13 @@ void Animator::BindBoneTransformsFlat(Transform* rootTransform)
         Transform* current = workStack.back();
         workStack.pop_back();
 
-        // 맵에 등록
-        uint32 nameHash = current->GetOwner()->GetNameHash();
-        m_boneTransformMap[nameHash] = current;
+        auto owner = current->GetOwner();
+        if (owner) m_boneTransformMap[owner->GetNameHash()] = current;
 
         // 자식들을 스택에 추가
         const auto& children = current->GetChildren();
         for (auto* child : children)
-        {
             workStack.push_back(child);
-        }
     }
 }
 
@@ -279,14 +260,3 @@ void Animator::UpdateCurrentPoseLocalBounds()
     m_currentLocalAABB = RenderBounds::CreateFromMinMax(minPos, maxPos);
 }
 
-void Animator::CheckAndBakeClips()
-{
-    // 1. 클립들을 구울 수 없는 상황이라며 건너뛰기
-    if (!m_currentModel) return;
-    if (!m_currentModel->GetSkeleton()) return; 
-
-    // 2. 컨트롤러가 들고 있는 모든 클립들을 굽기
-    Skeleton* skeleton = m_currentModel->GetSkeleton().get();
-    if (m_controller)
-        m_controller->BakeAllAnimations(skeleton);
-}

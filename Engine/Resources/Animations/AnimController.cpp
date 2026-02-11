@@ -95,7 +95,7 @@ void AnimController::Update(float deltaTime)
     if (m_currentState && m_currentState->GetClip())
     {
         auto clip = m_currentState->GetClip();
-        m_currentTime += clip->GetTicksPerSecond() * deltaTime * m_currentState->GetSpeed();
+        m_currentTime += deltaTime * m_currentState->GetSpeed();
 
         float duration = clip->GetDuration();
         if (duration > 0.0f)
@@ -109,7 +109,7 @@ void AnimController::Update(float deltaTime)
     if (m_isBlending && m_nextState && m_nextState->GetClip())
     {
         auto clip = m_nextState->GetClip();
-        m_nextTime += clip->GetTicksPerSecond() * deltaTime * m_nextState->GetSpeed();
+        m_nextTime += deltaTime * m_nextState->GetSpeed();
 
         float duration = clip->GetDuration();
         if (duration > 0.0f)
@@ -137,19 +137,17 @@ void AnimController::Update(float deltaTime)
 
 Pose AnimController::GetPose(uint32 nodeNameHash, const Pose& defaultPose) const
 {
-    // A. 현재 포즈
-    Pose poseA = defaultPose;
-    bool hasA = false;
-
     // A. 현재 상태 포즈
+    Pose poseA = defaultPose;
     if (m_currentState && m_currentState->GetClip())
     {
         // Animation -> AnimChannel -> GetPose
-        const AnimChannel* ch = m_currentState->GetClip()->FindChannel(nodeNameHash);
+        auto clip = m_currentState->GetClip();
+        const AnimChannel* ch = clip->FindChannel(nodeNameHash);
         if (ch)
         {
-            poseA = ch->GetPose(m_currentTime);
-            hasA = true;
+            float timeInTicks = m_currentTime * clip->GetTicksPerSecond();
+            poseA = ch->GetPose(timeInTicks);
         }
     }
 
@@ -158,34 +156,19 @@ Pose AnimController::GetPose(uint32 nodeNameHash, const Pose& defaultPose) const
     // B. 다음 상태 포즈 (블렌딩)
     if (m_nextState && m_nextState->GetClip())
     {
+        auto clipNext = m_nextState->GetClip();
         Pose poseB = defaultPose;
-        bool hasB = false;
 
-        const AnimChannel* chNext = m_nextState->GetClip()->FindChannel(nodeNameHash);
+        const AnimChannel* chNext = clipNext->FindChannel(nodeNameHash);
         if (chNext)
         {
-            poseB = chNext->GetPose(m_nextTime);
-            hasB = true;
+            float nextTimeInTicks = m_nextTime * clipNext->GetTicksPerSecond();
+            poseB = chNext->GetPose(nextTimeInTicks);
         }
 
-        // 둘 중 하나라도 애니메이션이 있으면 섞는다
-        if (hasA || hasB)
-            return Pose::Interpolate(poseA, poseB, m_finalBlendFactor);
+        return Pose::Interpolate(poseA, poseB, m_finalBlendFactor);
     }
 
     return poseA;
 }
 
-void AnimController::BakeAllAnimations(Skeleton* skeleton)
-{
-    if (!skeleton) return;
-
-    for (auto& [name, state] : m_states)
-    {
-        if (state)
-        {
-            auto clip = state->GetClip();
-            if (clip) clip->Bake(skeleton);
-        }
-    }
-}

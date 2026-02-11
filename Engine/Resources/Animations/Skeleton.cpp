@@ -63,12 +63,10 @@ void Skeleton::SetData(const BoneMap& map, int32 count)
 	m_boneCounter = count;
 
 	// 맵 데이터를 기반으로 벡터 캐시 재구축
-	m_boneOffsets.clear(); // 안전하게 비우고 시작
-	m_boneOffsets.resize(count, glm::mat4(1.0f));
+	m_boneOffsets.assign(count, glm::mat4(1.0f));
+	m_boneHashByID.assign(count, 0);
 
-	m_boneHashByID.clear();
-	m_boneHashByID.resize(count, 0);
-
+	m_parentIndices.assign(count, -1);
 	for (const auto& [hash, info] : m_boneInfoMap)
 	{
 		if (info.id >= 0 && info.id < count)
