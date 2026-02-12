@@ -1,10 +1,11 @@
 ﻿#pragma once
 #include "Resources/Resource.h"
+#include "Resources/ResourceDesc.h"
 
 CLASS_PTR(Image)
 class Image : public Resource
 {
-	DEFINE_RESOURCE_TYPE(ResourceType::Image)
+	DEFINE_RESOURCE_TYPE(ResourceType::Image, ImageDesc)
 
 public:
 	virtual ~Image();

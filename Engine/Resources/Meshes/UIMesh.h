@@ -1,11 +1,12 @@
 ﻿#pragma once
+#include "Resources/ResourceDesc.h"
 #include "Resources/Meshes/Mesh.h"
 #include "Graphics/Layouts/Vertex.h"
 
 CLASS_PTR(UIMesh)
 class UIMesh : public Mesh
 {
-	DEFINE_RESOURCE_TYPE(ResourceType::UIMesh)
+	DEFINE_RESOURCE_TYPE(ResourceType::UIMesh, UIMeshDesc)
 
 public:
 	virtual ~UIMesh();

@@ -17,7 +17,6 @@ enum class ResourceType
 	UIMesh,
 	DebugMesh,
 	
-	Shader,
 	GraphicsProgram,
 	ComputeProgram,
 

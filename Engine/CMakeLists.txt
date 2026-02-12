@@ -12,7 +12,10 @@ set(ENGINE_SOURCES
    "Parsers/Parser.h"               "Parsers/Parser.cpp"
    "Parsers/YamlParser.h"           "Parsers/YamlParser.cpp"
    "Parsers/JsonParser.h"           "Parsers/JsonParser.cpp"
-   "Parsers/EngineParsers/LuaParser.h"           "Parsers/EngineParsers/LuaParser.cpp"
+
+   "Parsers/EngineParsers/MaterialYamlParser.h"           "Parsers/EngineParsers/MaterialYamlParser.cpp"
+   "Parsers/EngineParsers/SceneYamlParser.h"           "Parsers/EngineParsers/SceneYamlParser.cpp"
+
 
    # Debug
    "Debug/Logger.h"                  "Debug/Logger.cpp"
@@ -62,6 +65,7 @@ set(ENGINE_SOURCES
    "Misc/Defines.h"                 
    "Misc/Types.h"
    "Misc/Enums.h"
+   "Misc/Constants.h"
 
    "Misc/ImguiManager.h"            "Misc/ImguiManager.cpp"
    "Misc/Utils.h"                   "Misc/Utils.cpp"       
@@ -147,6 +151,7 @@ set(ENGINE_SOURCES
 
    # Resources
    "Resources/Resource.h"           "Resources/Resource.cpp"
+   "Resources/ResourceDesc.h"       "Resources/ResourceDesc.cpp"
    "Resources/AudioClip.h"          "Resources/AudioClip.cpp"
    "Resources/Image.h"              "Resources/Image.cpp"
    "Resources/Model.h"              "Resources/Model.cpp"

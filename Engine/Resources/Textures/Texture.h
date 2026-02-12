@@ -1,4 +1,5 @@
 ﻿#pragma once
+#include "Resources/ResourceDesc.h"
 #include "Resources/Textures/TextureBase.h"
 #include "Resources/Textures/TextureUtils.h"
 
@@ -10,7 +11,7 @@ CLASS_PTR(Texture)
 class Texture : public TextureBase
 {
 	friend class TextureUtils;
-	DEFINE_RESOURCE_TYPE(ResourceType::Texture)
+	DEFINE_RESOURCE_TYPE(ResourceType::Texture, TextureDesc)
 
 public:
 	virtual ~Texture();

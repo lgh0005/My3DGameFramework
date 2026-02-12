@@ -1,10 +1,11 @@
 ﻿#pragma once
+#include "Resources/ResourceDesc.h"
 #include "Resources/Programs/Program.h"
 
 CLASS_PTR(GraphicsProgram)
 class GraphicsProgram : public Program
 {
-	DEFINE_RESOURCE_TYPE(ResourceType::GraphicsProgram)
+	DEFINE_RESOURCE_TYPE(ResourceType::GraphicsProgram, GraphicsProgramDesc)
 
 public:
 	virtual ~GraphicsProgram();

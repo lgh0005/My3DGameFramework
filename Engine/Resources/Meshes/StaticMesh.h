@@ -1,4 +1,5 @@
 ﻿#pragma once
+#include "Resources/ResourceDesc.h"
 #include "Resources/Meshes/Mesh.h"
 #include "Graphics/Layouts/Vertex.h"
 
@@ -12,7 +13,7 @@ CLASS_PTR(Program)
 CLASS_PTR(StaticMesh)
 class StaticMesh : public Mesh
 {
-    DEFINE_RESOURCE_TYPE(ResourceType::StaticMesh)
+    DEFINE_RESOURCE_TYPE(ResourceType::StaticMesh, StaticMeshDesc)
 
 public:
     static StaticMeshUPtr Create

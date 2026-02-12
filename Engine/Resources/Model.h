@@ -1,5 +1,6 @@
 ﻿#pragma once
 #include "Resources/Resource.h"
+#include "Resources/ResourceDesc.h"
 #include "Graphics/Layouts/Vertex.h"
 #include "Resources/Animations/AnimChannel.h"
 #include "Misc/AssetFormat.h"
@@ -20,7 +21,7 @@ CLASS_PTR(Skeleton)
 CLASS_PTR(Model)
 class Model : public Resource
 {
-	DEFINE_RESOURCE_TYPE(ResourceType::Model)
+	DEFINE_RESOURCE_TYPE(ResourceType::Model, TextureDesc)
 
 public:
 	virtual ~Model();

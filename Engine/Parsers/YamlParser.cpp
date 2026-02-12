@@ -45,3 +45,77 @@ bool YamlParser::ValidateRoot(const std::string& rootKey)
 	}
 	return true;
 }
+
+/*============================//
+//   parsing helper methods   //
+//============================*/
+float YamlParser::LoadFloat(const YAML::Node& node, std::string_view tokenKey, float defaultValue)
+{
+	std::string key = GetToken(Utils::StrHash(tokenKey.data()));
+	if (!key.empty() && node[key]) return node[key].as<float>();
+	return defaultValue;
+}
+
+bool YamlParser::LoadBool(const YAML::Node& node, std::string_view tokenKey, bool defaultValue)
+{
+	std::string key = GetToken(Utils::StrHash(tokenKey.data()));
+	if (!key.empty() && node[key]) return node[key].as<bool>();
+	return defaultValue;
+}
+
+int YamlParser::LoadInt(const YAML::Node& node, std::string_view tokenKey, int defaultValue)
+{
+	std::string key = GetToken(Utils::StrHash(tokenKey.data()));
+	if (!key.empty() && node[key]) return node[key].as<int>();
+	return defaultValue;
+}
+
+std::string YamlParser::LoadStr(const YAML::Node& node, std::string_view tokenKey, const std::string& defaultValue)
+{
+	std::string key = GetToken(Utils::StrHash(tokenKey.data()));
+	if (!key.empty() && node[key]) return node[key].as<std::string>();
+	return defaultValue;
+}
+
+glm::vec2 YamlParser::LoadVec2(const YAML::Node& node, std::string_view tokenKey, const glm::vec2& defaultValue)
+{
+	std::string key = GetToken(Utils::StrHash(tokenKey.data()));
+	if (!key.empty() && node[key] && node[key].IsSequence() && node[key].size() >= 2)
+	{
+		return glm::vec2
+		(
+			node[key][0].as<float>(),
+			node[key][1].as<float>()
+		);
+	}
+	return defaultValue;
+}
+
+glm::vec3 YamlParser::LoadVec3(const YAML::Node& node, std::string_view tokenKey, const glm::vec3& defaultValue)
+{
+	std::string key = GetToken(Utils::StrHash(tokenKey.data()));
+	if (!key.empty() && node[key] && node[key].IsSequence() && node[key].size() >= 3)
+	{
+		return glm::vec3
+		(
+			node[key][0].as<float>(),
+			node[key][1].as<float>(),
+			node[key][2].as<float>()
+		);
+	}
+	return defaultValue;
+}
+
+glm::vec4 YamlParser::LoadVec4(const YAML::Node& node, std::string_view tokenKey, const glm::vec4& defaultValue)
+{
+	std::string key = GetToken(Utils::StrHash(tokenKey.data()));
+	if (!key.empty() && node[key] && node[key].IsSequence() && node[key].size() >= 3)
+	{
+		float r = node[key][0].as<float>();
+		float g = node[key][1].as<float>();
+		float b = node[key][2].as<float>();
+		float a = (node[key].size() > 3) ? node[key][3].as<float>() : defaultValue.a;
+		return glm::vec4(r, g, b, a);
+	}
+	return defaultValue;
+}

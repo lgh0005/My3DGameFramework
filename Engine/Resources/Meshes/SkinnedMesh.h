@@ -1,4 +1,5 @@
 ﻿#pragma once
+#include "Resources/ResourceDesc.h"
 #include "Resources/Meshes/Mesh.h"
 #include "Graphics/Layouts/Vertex.h"
 
@@ -12,7 +13,7 @@ CLASS_PTR(Program)
 CLASS_PTR(SkinnedMesh)
 class SkinnedMesh : public Mesh
 {
-    DEFINE_RESOURCE_TYPE(ResourceType::SkinnedMesh)
+    DEFINE_RESOURCE_TYPE(ResourceType::SkinnedMesh, SkinnedMeshDesc)
 
 public:
     static SkinnedMeshUPtr Create

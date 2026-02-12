@@ -1,5 +1,6 @@
 ﻿#pragma once
 #include "Resources/Resource.h"
+#include "Resources/ResourceDesc.h"
 #include <ft2build.h>
 #include FT_FREETYPE_H
 
@@ -20,7 +21,7 @@ struct GlyphInfo
 CLASS_PTR(Font)
 class Font : public Resource
 {
-	DEFINE_RESOURCE_TYPE(ResourceType::Font)
+	DEFINE_RESOURCE_TYPE(ResourceType::Font, FontDesc)
 
 public:
 	virtual ~Font();

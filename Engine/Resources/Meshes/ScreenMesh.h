@@ -1,4 +1,5 @@
 ﻿#pragma once
+#include "Resources/ResourceDesc.h"
 #include "Resources/Meshes/Mesh.h"
 
 #pragma region FORWARD_DECLARATION
@@ -11,7 +12,7 @@ CLASS_PTR(Program)
 CLASS_PTR(ScreenMesh)
 class ScreenMesh : public Mesh
 {
-	DEFINE_RESOURCE_TYPE(ResourceType::ScreenMesh)
+	DEFINE_RESOURCE_TYPE(ResourceType::ScreenMesh, ScreenMeshDesc)
 
 public:
 	virtual ~ScreenMesh() override;

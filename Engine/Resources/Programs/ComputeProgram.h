@@ -1,10 +1,11 @@
 ﻿#pragma once
+#include "Resources/ResourceDesc.h"
 #include "Resources/Programs/Program.h"
 
 CLASS_PTR(ComputeProgram)
 class ComputeProgram : public Program
 {
-	DEFINE_RESOURCE_TYPE(ResourceType::ComputeProgram)
+	DEFINE_RESOURCE_TYPE(ResourceType::ComputeProgram, ComputeProgramDesc)
 
 public:
 	virtual ~ComputeProgram() override;

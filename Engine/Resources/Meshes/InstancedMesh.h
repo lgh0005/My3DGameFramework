@@ -1,4 +1,5 @@
 ﻿#pragma once
+#include "Resources/ResourceDesc.h"
 #include "Resources/Meshes/Mesh.h"
 
 // TODO : 지금은 StaticMesh에 대해서만 인스턴싱을 하고 있는데
@@ -10,7 +11,7 @@ CLASS_PTR(StaticMesh)
 CLASS_PTR(InstancedMesh)
 class InstancedMesh : public Mesh
 {
-    DEFINE_RESOURCE_TYPE(ResourceType::InstancedMesh)
+    DEFINE_RESOURCE_TYPE(ResourceType::InstancedMesh, InstancedMeshDesc)
 
 public:
     // 인스턴스 속성에 따른 람다 함수

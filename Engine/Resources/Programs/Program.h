@@ -1,5 +1,6 @@
 ﻿#pragma once
 #include "Resources/Resource.h"
+#include "Resources/ResourceDesc.h"
 
 #pragma region FORWARD_DECLARATION
 CLASS_PTR(Shader)
@@ -8,7 +9,7 @@ CLASS_PTR(Shader)
 CLASS_PTR(Program)
 class Program : public Resource
 {
-    DEFINE_RESOURCE_TYPE(ResourceType::Shader)
+    /*DEFINE_RESOURCE_TYPE(ResourceType::Shader, ProgramDesc)*/
 
 public:
     /*static ProgramUPtr Create(const std::vector<ShaderPtr>& shaders);

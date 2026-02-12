@@ -1,5 +1,6 @@
 ﻿#pragma once
 #include "Resources/Resource.h"
+#include "Resources/ResourceDesc.h"
 
 #pragma region FORWARD_DECLARATION
 CLASS_PTR(CubeTexture)
@@ -8,7 +9,7 @@ CLASS_PTR(CubeTexture)
 CLASS_PTR(EnvironmentMap)
 class EnvironmentMap : public Resource
 {
-	DEFINE_RESOURCE_TYPE(ResourceType::EnvironmentMap)
+	DEFINE_RESOURCE_TYPE(ResourceType::EnvironmentMap, EnvironmentMap)
 
 public:
 	virtual ~EnvironmentMap();

@@ -1,10 +1,11 @@
 ﻿#pragma once
 #include "Resources/Resource.h"
+#include "Resources/ResourceDesc.h"
 
 CLASS_PTR(AudioClip)
 class AudioClip : public Resource
 {
-	DEFINE_RESOURCE_TYPE(ResourceType::AudioClip)
+	DEFINE_RESOURCE_TYPE(ResourceType::AudioClip, AudioClipDesc)
 
 public:
 	virtual ~AudioClip();

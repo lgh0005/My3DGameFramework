@@ -108,8 +108,9 @@ public:                                                                         
 /*==================================================//
 //    compile-time resource type definition macro   //
 //==================================================*/
-#define DEFINE_RESOURCE_TYPE(TypeEnum)                                                    \
+#define DEFINE_RESOURCE_TYPE(TypeEnum, DescClass)                                         \
 public:                                                                                   \
+    using DescType = DescClass;                                                           \
     static constexpr ResourceType GetStaticResourceType() { return TypeEnum; }            \
     static const ResourceType s_ResourceType = TypeEnum;                                  \
     virtual ResourceType GetResourceType() const override { return GetStaticResourceType(); }

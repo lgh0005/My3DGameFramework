@@ -1,5 +1,6 @@
 ﻿#pragma once
 #include "Resources/Resource.h"
+#include "Resources/ResourceDesc.h"
 
 #pragma region FORWARD_DECLARATION
 CLASS_PTR(Texture)
@@ -26,7 +27,7 @@ enum class TextureSlot : uint8
 CLASS_PTR(Material);
 class Material : public Resource
 {
-    DEFINE_RESOURCE_TYPE(ResourceType::Material)
+    DEFINE_RESOURCE_TYPE(ResourceType::Material, MaterialDesc)
 
 public:
     virtual ~Material();

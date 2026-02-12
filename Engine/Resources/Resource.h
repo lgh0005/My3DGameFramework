@@ -6,6 +6,7 @@ class Resource
 {
 public:
 	virtual ~Resource();
+
 	virtual ResourceType GetResourceType() const = 0;
 	bool MatchesType(ResourceType type) const;
 

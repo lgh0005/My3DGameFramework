@@ -1,5 +1,6 @@
 ﻿#pragma once
 #include "Resources/Resource.h"
+#include "Resources/ResourceDesc.h"
 #include "Resources/Animations/AnimChannel.h"
 #include "Resources/Animations/AnimClip.h"
 #include "Misc/AssetFormat.h"
@@ -14,7 +15,7 @@ CLASS_PTR(Skeleton)
 CLASS_PTR(Animation)
 class Animation : public Resource
 {
-    DEFINE_RESOURCE_TYPE(ResourceType::Animation)
+    DEFINE_RESOURCE_TYPE(ResourceType::Animation, AnimationDesc)
 
 public:
     virtual ~Animation();
