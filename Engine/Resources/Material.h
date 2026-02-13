@@ -32,6 +32,7 @@ class Material : public Resource
 public:
     virtual ~Material();
     static MaterialPtr Load(const MaterialDesc& desc);
+    static MaterialPtr Create();
 
     /*=====================//
     //  material textures  //
@@ -62,6 +63,6 @@ public:
 
     void SetToProgram(const Program* program) const;
 
-protected:
+private:
     Material();
 };

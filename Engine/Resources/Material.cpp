@@ -37,6 +37,34 @@ MaterialPtr Material::Load(const MaterialDesc& desc)
     return material;
 }
 
+MaterialPtr Material::Create()
+{
+    // 1. 머티리얼 인스턴스 생성 (생성자는 protected이므로 내부에서 new)
+    MaterialPtr material(new Material());
+
+    // 2. TextureUtils를 이용한 기본 텍스처 할당
+    material->diffuse = TextureUtils::GetWhiteTexture(); // 색상 영향 없음
+    material->specular = TextureUtils::GetBlackTexture(); // 반사 없음
+    material->emission = TextureUtils::GetBlackTexture(); // 발광 없음
+    material->normal = TextureUtils::GetBlueTexture();  // 평평한 노멀 (0, 0, 1)
+    material->ao = TextureUtils::GetWhiteTexture(); // 차폐 없음
+    material->metallic = TextureUtils::GetBlackTexture(); // 비금속
+    material->roughness = TextureUtils::GetGrayTexture();  // 적당한 거칠기 (0.5)
+
+    // 3. 기본 팩터 설정
+    material->albedoFactor = glm::vec4(1.0f);
+    material->emissiveFactor = glm::vec3(0.0f);
+    material->metallicFactor = 1.0f;
+    material->roughnessFactor = 1.0f;
+    material->shininess = 32.0f;
+
+    // 4. 이름 및 가상 경로 설정
+    material->SetName("DefaultMaterial");
+    material->SetPath("@BuiltIn/Material/Default");
+
+    return material;
+}
+
 // INFO : 현재 이 SetToProgram은 머티리얼 관련 유니폼 변수를 확정적으로 강제하는
 // 것임. 이는 엔진 외부 단에서도 반드시 지켜야 하는 유니폼 작성 포멧임을 유념해야 함.
 // 포멧은 여타 다른 내부 엔진용 셰이더 파일에서 머티리얼 부분을 어떻게 선언하고 있는지 참고 바람.

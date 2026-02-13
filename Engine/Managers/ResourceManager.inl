@@ -1,85 +1,61 @@
 ﻿#pragma once
+#include "ResourceManager.h"
+
+template<typename T>
+inline std::shared_ptr<T> ResourceManager::Get(const std::string& name)
+{
+    // 1. 캐시 검색
+    auto it = m_resources.find(name);
+    if (it != m_resources.end())
+        return std::static_pointer_cast<T>(it->second);
+
+    // 2. 캐시에 없으면 레지스트리(지도)에서 경로 검색
+    auto regIt = m_assetRegistry.find(name);
+    if (regIt == m_assetRegistry.end())
+    {
+        LOG_ERROR("ResourceManager: Asset '{}' not found in registry.", name);
+        return nullptr;
+    }
+
+    // 3. 지연 로딩(Lazy Loading) 시작
+    std::string vPath = regIt->second;
+    std::string actualPath = ResolvePath(vPath);
+
+    LOG_INFO("ResourceManager: Lazy Loading -> {} ({})", name, vPath);
+
+    // 4. 리소스 타입에 맞는 Desc 생성 및 Load 호출
+    typename T::DescType desc(actualPath, name);
+
+    // 특수한 추가 설정이 필요한 경우 (예: Texture의 sRGB 등)는 
+    // 나중에 .meta 파일이나 정책에 따라 여기에 추가할 수 있습니다.
+
+    return Load<T>(desc);
+}
 
 template<typename T>
 inline std::shared_ptr<T> ResourceManager::Load(const ResourceDesc& desc)
 {
-	// 1. 리소스 매니저 내부에서 사용할 키(Key) 생성
-	// (이전 대화에서 이야기한 GetCacheKey() 가상 함수 활용)
-	std::string key = desc.GetCacheKey();
+    std::string key = desc.GetCacheKey();
 
-	// 2. 캐시 검색 (이미 로드된 리소스가 있는지?)
-	auto it = m_resources.find(key);
-	if (it != m_resources.end())
-	{
-		// 부모(Resource) 포인터를 자식(T) 포인터로 변환하여 반환
-		return std::static_pointer_cast<T>(it->second);
-	}
+    // 캐시 재확인 (Load가 직접 호출될 경우 대비)
+    auto it = m_resources.find(key);
+    if (it != m_resources.end())
+        return std::static_pointer_cast<T>(it->second);
 
-	// 3. 없으면 새로 로드 (부모 Desc -> 자식 Desc로 캐스팅 필요)
-	// T::DescType은 해당 리소스 클래스 안에 정의된 디스크립터 타입 (예: TextureDesc)
-	std::shared_ptr<T> resource = T::Load(static_cast<const typename T::DescType&>(desc));
-
-	// 4. 로드 성공 시 매니저에 등록
-	if (resource)
-	{
-		// 맵에는 Resource 타입(부모)으로 저장됨
-		m_resources[key] = resource;
-	}
-
-	return resource;
+    // 실제 리소스 클래스의 정적 Load 함수 호출
+    std::shared_ptr<T> resource = T::Load(static_cast<const typename T::DescType&>(desc));
+    if (resource) m_resources[key] = resource;
+    return resource;
 }
 
 template<typename T>
 inline void ResourceManager::AddResource(std::shared_ptr<T> resource,
-	const std::string& name, const std::string& path)
+    const std::string& name, const std::string& path)
 {
-	// 0. 리소스 유효성 체크
-	if (!resource)
-	{
-		LOG_ERROR("Attempted to add null resource: {}", name);
-		return;
-	}
+    if (!resource) return;
 
-	// 1. 중복 체크
-	if (m_resources.find(name) != m_resources.end())
-	{
-		LOG_WARN("Resource '{}' already exists. Overwriting.", name);
-	}
+    resource->SetName(name);
+    resource->SetPath(path.empty() ? "@Virtual/" + name : path);
 
-	// 2. 리소스 자체에 키(이름/경로) 주입 (나중에 리소스만 보고도 뭔지 알 수 있게)
-	resource->SetName(name);
-	if (path.empty()) resource->SetPath("@VirtualPath/" + name);
-	else			  resource->SetPath(path);
-
-	// 3. 통합 맵에 저장 (자동 업캐스팅)
-	m_resources[name] = resource;
-}
-
-template<typename T>
-inline std::vector<std::shared_ptr<T>> ResourceManager::GetResources() const
-{
-	std::vector<std::shared_ptr<T>> result;
-	result.reserve(m_resources.size());
-
-	ResourceType targetType = T::s_ResourceType;
-	for (const auto& [name, res] : m_resources)
-	{
-		if (res && res->MatchesType(targetType))
-			result.push_back(std::static_pointer_cast<T>(res));
-	}
-
-	return result;
-}
-
-template<typename T>
-inline std::shared_ptr<T> ResourceManager::GetResource(const std::string& name) const
-{
-	ResourceType type = T::s_ResourceType;
-	auto it = m_resources.find(name);
-	if (it != m_resources.end())
-	{
-		if (it->second->MatchesType(type))
-			return std::static_pointer_cast<T>(it->second);
-	}
-	return nullptr;
+    m_resources[name] = resource;
 }

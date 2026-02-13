@@ -6,7 +6,6 @@ set(ENGINE_SOURCES
 
    # Core
    "Core/Application.h"             "Core/Application.cpp"
-   "Core/ResourceLoader.h"          "Core/ResourceLoader.cpp"
 
    # Parsers
    "Parsers/Parser.h"               "Parsers/Parser.cpp"
@@ -15,7 +14,6 @@ set(ENGINE_SOURCES
 
    "Parsers/EngineParsers/MaterialYamlParser.h"           "Parsers/EngineParsers/MaterialYamlParser.cpp"
    "Parsers/EngineParsers/SceneYamlParser.h"           "Parsers/EngineParsers/SceneYamlParser.cpp"
-
 
    # Debug
    "Debug/Logger.h"                  "Debug/Logger.cpp"

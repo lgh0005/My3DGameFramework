@@ -1,5 +1,4 @@
 ﻿#pragma once
-#include "Resources/ResourceType.h"
 
 /*=========================//
 //    Resource descriptor  //

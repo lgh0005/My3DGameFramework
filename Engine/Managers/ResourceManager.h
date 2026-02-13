@@ -12,22 +12,24 @@ public:
 	bool Init();
 	void Clear();
 
+	template<typename T> std::shared_ptr<T> Get(const std::string& name);
 	template<typename T> std::shared_ptr<T> Load(const ResourceDesc& desc);
-	template<typename T> std::shared_ptr<T> GetResource(const std::string& name) const;
-	template<typename T> std::vector<std::shared_ptr<T>> GetResources() const;
-	template<typename T>
-	void AddResource
+	template<typename T> void AddResource
 	(
-		std::shared_ptr<T> resource,
-		const std::string& name,
+		std::shared_ptr<T> resource, 
+		const std::string& name, 
 		const std::string& path = ""
 	);
 
 private:
-
+	void ScanFolder(const std::string& alias, const std::string& actualRoot);
+	std::string ResolvePath(const std::string& virtualPath) const;
+	void AddBuiltInResources();
 
 private:
 	std::unordered_map<std::string, std::shared_ptr<Resource>> m_resources;
+	std::unordered_map<std::string, std::string> m_assetRegistry;
+	std::unordered_map<std::string, std::string> m_virtualPaths;
 };
 
 #include "Managers/ResourceManager.inl"
