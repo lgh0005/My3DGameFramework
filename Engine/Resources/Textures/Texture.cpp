@@ -8,32 +8,83 @@ Texture::Texture()
 }
 Texture::~Texture() = default;
 
+TexturePtr Texture::Load(const TextureDesc& desc)
+{
+    // 1. 확장자 확인 및 이미지 로드
+    std::string ext = std::filesystem::path(desc.path).extension().string();
+    std::transform(ext.begin(), ext.end(), ext.begin(), ::tolower);
+
+    // 2. KTX 파일인 경우 (Image 클래스를 거치지 않고 직접 로드)
+    if (ext == ".ktx")
+    {
+        auto ktxTexture = TextureUtils::LoadTextureFromKtx(desc.path);
+        if (!ktxTexture) return nullptr;
+
+        // 리소스 정보 주입
+        ktxTexture->SetPath(desc.path);
+        ktxTexture->SetName(desc.name);
+        return ktxTexture;
+    }
+
+    // 3. 일반 이미지 로드 (LDR/HDR)
+    ImageDesc imgDesc(desc.path);
+    imgDesc.isFlipY = true;
+
+    auto image = Image::Load(imgDesc);
+    if (!image)
+    {
+        LOG_ERROR("Failed to load texture image: {}", desc.path);
+        return nullptr;
+    }
+
+    // 4. 텍스처 인스턴스 생성 및 초기화
+    auto texture = TexturePtr(new Texture());
+    texture->SetPath(desc.path);
+    texture->SetName(desc.name);
+    texture->CreateTexture();
+
+    // 5. 포맷 결정 (TextureUtils의 헬퍼 함수 활용)
+    GLenum internalFormat, format, type;
+    TextureUtils::GetFormatsFromImage(image.get(), internalFormat, format, type);
+    if (desc.sRGB && image->GetBytePerChannel() == 1)
+    {
+        switch (format)
+        {
+            case GL_RGB: internalFormat = GL_SRGB8; break;
+            case GL_RGBA: internalFormat = GL_SRGB8_ALPHA8; break;
+        }
+    }
+
+    // 6. GPU 메모리 할당 및 데이터 전송
+    texture->SetTextureFormat(image->GetWidth(), image->GetHeight(), internalFormat, format, type);
+    texture->SetData(image->GetData());
+
+    // 7. 밉맵 및 필터 설정
+    if (desc.useMipMap)
+    {
+        texture->GenerateMipmap();
+        texture->SetFilter(GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR);
+    }
+    else
+    {
+        texture->SetFilter(GL_LINEAR, GL_LINEAR);
+    }
+    texture->SetWrap(GL_REPEAT, GL_REPEAT);
+
+    LOG_INFO("Texture Loaded: {} ({}x{})", desc.path, image->GetWidth(), image->GetHeight());
+    return texture;
+}
+
 /*====================================//
 //   default texture create methods   //
 //====================================*/
-TextureUPtr Texture::Create(int32 width, int32 height, uint32 internalFormat, uint32 format, uint32 type)
+TexturePtr Texture::Create(int32 width, int32 height, uint32 internalFormat, uint32 format, uint32 type)
 {
-    auto texture = TextureUPtr(new Texture());
+    auto texture = TexturePtr(new Texture());
     texture->CreateTexture();
     texture->SetTextureFormat(width, height, internalFormat, format, type);
     texture->SetFilter(GL_LINEAR, GL_LINEAR);
-    return std::move(texture);
-}
-
-TextureUPtr Texture::CreateMultisample(int32 width, int32 height, int32 samples, uint32 internalFormat)
-{
-    auto texture = TextureUPtr(new Texture());
-
-    // 1. ID 생성 및 타겟 설정
-    glGenTextures(1, &texture->m_texture);
-    texture->m_target = GL_TEXTURE_2D_MULTISAMPLE;
-    texture->m_samples = samples;
-    texture->m_internalFormat = internalFormat;
-
-    // 2. 메모리 할당 (SetTextureFormat 활용)
-    texture->SetTextureFormat(width, height, internalFormat, 0, 0);
-
-    return std::move(texture);
+    return texture;
 }
 
 /*=============================//
@@ -42,6 +93,12 @@ TextureUPtr Texture::CreateMultisample(int32 width, int32 height, int32 samples,
 void Texture::Bind() const
 {
     glBindTexture(m_target, m_texture);
+}
+
+void Texture::GenerateMipmap() const
+{
+    Bind();
+    glGenerateMipmap(m_target);
 }
 
 void Texture::Resize(int32 width, int32 height)
@@ -101,15 +158,12 @@ void Texture::SetTextureFormat(int32 width, int32 height,
     m_type   = type;
 
     Bind();
-    
-    if (m_target == GL_TEXTURE_2D_MULTISAMPLE)
-    {
-        // 멀티샘플 텍스처 전용 할당
-        glTexImage2DMultisample(m_target, m_samples, m_internalFormat, m_width, m_height, GL_TRUE);
-    }
-    else
-    {
-        // 일반 2D 텍스처 할당
-        glTexImage2D(m_target, 0, m_internalFormat, m_width, m_height, 0, m_format, m_type, nullptr);
-    }
+    glTexImage2D
+    (
+        m_target, 
+        0,
+        m_internalFormat, 
+        m_width, m_height, 0, m_format, m_type, 
+        nullptr
+    );
 }

@@ -1,4 +1,5 @@
 ﻿#pragma once
+#include "Resources/ResourceDesc.h"
 #include "Resources/Resource.h"
 #include "Resources/ResourceDesc.h"
 
@@ -9,10 +10,9 @@ class Image : public Resource
 
 public:
 	virtual ~Image();
-	static ImageUPtr Load(const std::string& filepath, bool flipVertical = true);
-	static ImageUPtr LoadHDR(const std::string& filepath, bool flipVertical = true);
-	static ImageUPtr Create(int32 width, int32 height, int32 channelCount = 4, int32 bytePerChannel = 1);
-	static ImageUPtr CreateSingleColorImage(int32 width,
+	static ImagePtr Load(const ImageDesc& desc);
+	static ImagePtr Create(int32 width, int32 height, int32 channelCount = 4, int32 bytePerChannel = 1);
+	static ImagePtr CreateSingleColorImage(int32 width,
 		int32 height, const glm::vec4& color);
 
 	const uint8* GetData() const	{ return m_data; }

@@ -6,17 +6,21 @@
 
 DECLARE_DEFAULTS_IMPL(Animation)
 
-AnimationUPtr Animation::Load(const std::string& filePath)
+AnimationPtr Animation::Load(const AnimationDesc& desc)
 {
 	// 1. 파일 확장명 비교 후 로드(.myanim)
-	std::string ext = std::filesystem::path(filePath).extension().string();
+	std::string ext = std::filesystem::path(desc.path).extension().string();
 	std::transform(ext.begin(), ext.end(), ext.begin(), ::tolower);
 	if (ext != ".myanim") return nullptr;
 
-	// 2. 애니메이션 로드
-	auto animation = AnimationUPtr(new Animation());
-	if (!animation->LoadByBinary(filePath)) return nullptr;
-	return std::move(animation);
+	// 2. 인스턴스 생성 및 기본 정보 설정
+	AnimationPtr animation(new Animation());
+	animation->SetPath(desc.path);
+	animation->SetName(desc.name);
+
+	// 3. 바이너리 파일 로드 (AssetUtils 활용)
+	if (!animation->LoadByBinary(desc.path)) return nullptr;
+	return animation;
 }
 
 AnimChannel* Animation::FindChannel(const std::string& name)

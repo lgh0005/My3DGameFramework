@@ -33,16 +33,21 @@ StaticMeshPtr Model::GetStaticMesh(int index) const
     return std::static_pointer_cast<StaticMesh>(m_meshes[index]);
 }
 
-ModelUPtr Model::Load(const std::string& filename)
+ModelPtr Model::Load(const ModelDesc& desc)
 {
     // 1. 파일 확장명 비교 후 로드(.mymodel)
-    std::string ext = std::filesystem::path(filename).extension().string();
+    auto path = desc.path;
+    std::string ext = fs::path(path).extension().string();
     std::transform(ext.begin(), ext.end(), ext.begin(), ::tolower);
-    if (ext != ".mymodel") return nullptr;
+    if (ext != ".mymodel")
+    {
+        LOG_ERROR("Model::Load - Invalid extension: {}", path);
+        return nullptr;
+    }
 
     // 2. 모델 로드
-    auto model = ModelUPtr(new Model());
-    if (!model->LoadByBinary(filename)) return nullptr;
+    auto model = ModelPtr(new Model());
+    if (!model->LoadByBinary(path)) return nullptr;
     return std::move(model);
 }
 
@@ -419,6 +424,7 @@ void Model::CreateBinaryStaticMesh(const AssetFmt::RawMesh& rawMesh)
 /*==========================================//
 //   model texture loading helper methods   //
 //==========================================*/
+// TODO : 텍스쳐를 로드하는 부분도 ResourceManager가 수행하도록 바뀌어야 한다.
 TexturePtr Model::LoadMaterialTexture(aiMaterial* material, aiTextureType type, const std::filesystem::path& parentDir)
 {
     if (material->GetTextureCount(type) <= 0) return nullptr;

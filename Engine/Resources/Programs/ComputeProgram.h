@@ -10,8 +10,7 @@ class ComputeProgram : public Program
 public:
 	virtual ~ComputeProgram() override;
 
-	static ComputeProgramUPtr Create(const std::string& shaderPath);
-	static ComputeProgramUPtr Create(ShaderPtr shader);
+	static ComputeProgramPtr Load(const ComputeProgramDesc& desc);
 
 	// 실행 (Dispatch)
 	// 컴퓨트 셰이더의 핵심입니다. x, y, z 그룹 개수를 지정합니다.
@@ -23,4 +22,5 @@ public:
 
 private:
 	ComputeProgram();
+	static ComputeProgramUPtr Create(ShaderPtr shader);
 };

@@ -19,7 +19,7 @@ class Animation : public Resource
 
 public:
     virtual ~Animation();
-    static AnimationUPtr Load(const std::string& filePath);
+    static AnimationPtr Load(const AnimationDesc& desc);
     
     const AnimClip& GetAnimClip() const { return m_animClip; }
     void SetGlobalOffset(uint32 offset) { m_globalOffset = offset; }

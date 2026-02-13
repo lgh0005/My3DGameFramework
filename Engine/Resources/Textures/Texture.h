@@ -15,8 +15,8 @@ class Texture : public TextureBase
 
 public:
 	virtual ~Texture();
-	static TextureUPtr Create(int32 width, int32 height, uint32 internalFormat, uint32 format, uint32 type);
-	static TextureUPtr CreateMultisample(int32 width, int32 height, int32 samples, uint32 internalFormat);
+	static TexturePtr Load(const TextureDesc& desc);
+	static TexturePtr Create(int32 width, int32 height, uint32 internalFormat, uint32 format, uint32 type);
 
 public:
 	void Resize(int32 width, int32 height);
@@ -28,11 +28,9 @@ public:
 	void SetData(const void* data, uint32 size = 0);
 
 	void Bind() const;
-	int32 GetSamples() const { return m_samples; }
+	void GenerateMipmap() const;
 	
 private:
 	Texture();
 	void CreateTexture();
-
-	int32   m_samples{ 1 };
 };

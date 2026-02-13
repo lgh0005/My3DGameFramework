@@ -1,5 +1,6 @@
 ﻿#include "EnginePch.h"
 #include "Material.h"
+#include "Parsers/EngineParsers/MaterialYamlParser.h"
 #include "Resources/Programs/Program.h"
 #include "Resources/Programs/GraphicsProgram.h"
 #include "Resources/Textures/TextureUtils.h"
@@ -7,9 +8,33 @@
 
 DECLARE_DEFAULTS_IMPL(Material)
 
-MaterialUPtr Material::Create()
+MaterialPtr Material::Load(const MaterialDesc& desc)
 {
-    return MaterialUPtr(new Material());
+    // 1. 머티리얼 파일 확장자 확인 (예: .mat, .json, .yaml)
+    auto path = desc.path;
+    std::string ext = std::filesystem::path(path).extension().string();
+    std::transform(ext.begin(), ext.end(), ext.begin(), ::tolower);
+    if (ext != ".yaml")
+    {
+        LOG_ERROR("Material::Load - Invalid extension: {}", path);
+        return nullptr;
+    }
+
+    // 2. 머티리얼 생성
+    MaterialPtr material(new Material());
+    
+    // 3. 머티리얼 파일 파싱
+    MaterialYamlParser parser;
+    if (parser.LoadConfig(desc.path))
+    {
+        if (parser.LoadMaterial(material.get()))
+            LOG_INFO("Material Loaded: {}", desc.path);
+    }
+
+    material->SetName(desc.name);
+    material->SetPath(desc.path);
+
+    return material;
 }
 
 // INFO : 현재 이 SetToProgram은 머티리얼 관련 유니폼 변수를 확정적으로 강제하는

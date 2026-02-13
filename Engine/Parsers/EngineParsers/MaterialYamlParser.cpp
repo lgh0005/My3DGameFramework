@@ -96,6 +96,7 @@ TexturePtr MaterialYamlParser::LoadTextureInternal(std::string_view tokenKey)
 		fs::path texPath = yamlPath.parent_path() / filename;
 
 		// 4. 리소스 매니저 로드
+		// 
 		// return RESOURCE.GetResource<Texture>(texPath.string());
 	}
 

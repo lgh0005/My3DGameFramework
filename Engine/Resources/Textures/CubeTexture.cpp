@@ -8,6 +8,26 @@ CubeTexture::CubeTexture()
 }
 CubeTexture::~CubeTexture() = default;
 
+CubeTexturePtr CubeTexture::Load(const CubeTextureDesc& desc)
+{
+    // 1. 확장자 확인
+    std::string ext = std::filesystem::path(desc.path).extension().string();
+    std::transform(ext.begin(), ext.end(), ext.begin(), ::tolower);
+
+    CubeTextureUPtr textureUPtr = nullptr;
+
+    // 2. KTX 로드 (6면이 포함된 단일 파일)
+    if (ext == ".ktx")
+    {
+        textureUPtr = TextureUtils::LoadCubeMapFromKtx(desc.path);
+    }
+    else
+    {
+        LOG_ERROR("CubeTexture: Unsupported format for single-file load: {}. (Use .ktx)", desc.path);
+        return nullptr;
+    }
+}
+
 /*=========================================//
 //   default cube texture create methods   //
 //=========================================*/

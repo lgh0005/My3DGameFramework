@@ -13,8 +13,7 @@ class EnvironmentMap : public Resource
 
 public:
 	virtual ~EnvironmentMap();
-	static EnvironmentMapUPtr Create(const CubeTexturePtr& cubeTexture);
-	static EnvironmentMapUPtr CreateIBL(const TexturePtr& hdrTexture);
+	static EnvironmentMapPtr Load(const EnvironmentMapDesc& desc);
 
 	CubeTexturePtr GetSkybox() const { return m_skybox; }
 	CubeTexturePtr GetIrradiance() const { return m_irradiance; }
@@ -23,6 +22,8 @@ public:
 
 private:
 	EnvironmentMap();
+	static EnvironmentMapUPtr Create(const CubeTexturePtr& cubeTexture);
+	static EnvironmentMapUPtr CreateIBL(const TexturePtr& hdrTexture);
 
 	CubeTexturePtr m_skybox			{ nullptr };	// 원본(또는 Baked) 스카이박스
 	CubeTexturePtr m_irradiance		{ nullptr };	// Diffuse IBL

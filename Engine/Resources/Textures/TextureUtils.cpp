@@ -17,32 +17,31 @@ TexturePtr TextureUtils::s_blueTex = nullptr;
 /*===========================//
 //   Texture Loading Utils   //
 //===========================*/
-TextureUPtr TextureUtils::LoadTexture(const std::string& path)
+TextureUPtr TextureUtils::LoadTexture(const std::string& path, bool sRGB)
 {
     // 확장자 추출 및 소문자 변환
     std::string ext = std::filesystem::path(path).extension().string();
     std::transform(ext.begin(), ext.end(), ext.begin(), ::tolower);
 
+    // 2. KTX 파일 처리
     if (ext == ".ktx")
     {
         return LoadTextureFromKtx(path);
     }
-    else if (ext == ".hdr")
-    {
-        auto image = Image::LoadHDR(path, true); // Flip Y
-        if (!image) return nullptr;
-        return LoadTextureFromHDR(image.get());
-    }
-    else
-    {
-        // 일반 이미지 (png, jpg, tga...)
-        auto image = Image::Load(path, true); // Flip Y
-        if (!image) return nullptr;
-        return LoadTextureFromImage(image.get());
-    }
+
+    // 3. 이미지 로드
+    ImageDesc imgDesc(path);
+    imgDesc.isFlipY = true;
+
+    auto image = Image::Load(imgDesc);
+    if (!image) return nullptr;
+
+    // 4. 로드된 데이터 타입에 따라 분기 처리
+    if (image->GetBytePerChannel() == 4) return LoadTextureFromHDR(image.get());
+    else return LoadTextureFromImage(image.get(), sRGB);
 }
 
-TextureUPtr TextureUtils::LoadTextureFromImage(const Image* image)
+TextureUPtr TextureUtils::LoadTextureFromImage(const Image* image, bool sRGB)
 {
     // 1. 빈 텍스처 생성
     auto texture = TextureUPtr(new Texture());

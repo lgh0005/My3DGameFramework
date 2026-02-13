@@ -21,11 +21,11 @@ CLASS_PTR(Skeleton)
 CLASS_PTR(Model)
 class Model : public Resource
 {
-	DEFINE_RESOURCE_TYPE(ResourceType::Model, TextureDesc)
+	DEFINE_RESOURCE_TYPE(ResourceType::Model, ModelDesc)
 
 public:
 	virtual ~Model();
-	static ModelUPtr Load(const std::string& filename);
+	static ModelPtr Load(const ModelDesc& desc);
 
 	uint32 GetMeshCount() const { return (uint32)m_meshes.size(); }
 	SkinnedMeshPtr GetSkinnedMesh(int index) const;

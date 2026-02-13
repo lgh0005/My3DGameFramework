@@ -1,5 +1,33 @@
-﻿#include "ResourceManager.h"
-#pragma once
+﻿#pragma once
+
+template<typename T>
+inline std::shared_ptr<T> ResourceManager::Load(const ResourceDesc& desc)
+{
+	// 1. 리소스 매니저 내부에서 사용할 키(Key) 생성
+	// (이전 대화에서 이야기한 GetCacheKey() 가상 함수 활용)
+	std::string key = desc.GetCacheKey();
+
+	// 2. 캐시 검색 (이미 로드된 리소스가 있는지?)
+	auto it = m_resources.find(key);
+	if (it != m_resources.end())
+	{
+		// 부모(Resource) 포인터를 자식(T) 포인터로 변환하여 반환
+		return std::static_pointer_cast<T>(it->second);
+	}
+
+	// 3. 없으면 새로 로드 (부모 Desc -> 자식 Desc로 캐스팅 필요)
+	// T::DescType은 해당 리소스 클래스 안에 정의된 디스크립터 타입 (예: TextureDesc)
+	std::shared_ptr<T> resource = T::Load(static_cast<const typename T::DescType&>(desc));
+
+	// 4. 로드 성공 시 매니저에 등록
+	if (resource)
+	{
+		// 맵에는 Resource 타입(부모)으로 저장됨
+		m_resources[key] = resource;
+	}
+
+	return resource;
+}
 
 template<typename T>
 inline void ResourceManager::AddResource(std::shared_ptr<T> resource,

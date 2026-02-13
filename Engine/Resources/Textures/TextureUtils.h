@@ -14,8 +14,8 @@ class TextureUtils
 //   texture loading utils   //
 //===========================*/
 public:
-	static TextureUPtr LoadTexture(const std::string& path);
-	static TextureUPtr LoadTextureFromImage(const Image* image);
+	static TextureUPtr LoadTexture(const std::string& path, bool sRGB);
+	static TextureUPtr LoadTextureFromImage(const Image* image, bool sRGB);
 	static TextureUPtr LoadTextureFromHDR(const Image* image);
 	static TextureUPtr LoadTextureFromKtx(const std::string& path);
 
@@ -35,6 +35,12 @@ public:
 	static TexturePtr GetBlackTexture();
 	static TexturePtr GetBlueTexture();
 
+/*====================//
+//   public helpers   //
+//====================*/
+public:
+	static void GetFormatsFromImage(const Image* image, GLenum& outInternal, GLenum& outFormat, GLenum& outType);
+
 /*======================//
 //   internal helpers   //
 //======================*/
@@ -42,8 +48,8 @@ private:
 	static TexturePtr Create4x4Texture(const std::vector<uint8>& colorData);
 	static TextureUPtr LoadKtxInternal(const std::string& ktxFilePath);
 	static CubeTextureUPtr LoadKtxCubeInternal(const std::string& ktxFilePath);
-	static void GetFormatsFromImage(const Image* image, GLenum& outInternal, GLenum& outFormat, GLenum& outType);
 
+private:
 	static TexturePtr s_whiteTex;
 	static TexturePtr s_grayTex;
 	static TexturePtr s_blackTex;

@@ -4,24 +4,32 @@
 
 DECLARE_DEFAULTS_IMPL(GraphicsProgram)
 
-GraphicsProgramUPtr GraphicsProgram::Create(const std::vector<ShaderPtr>& shaders)
+GraphicsProgramPtr GraphicsProgram::Load(const GraphicsProgramDesc& desc)
 {
-	// 자식 클래스 인스턴스 생성 (생성자는 private이므로 내부에서 new)
-	auto program = GraphicsProgramUPtr(new GraphicsProgram());
+	// 1. 셰이더 리소스 생성 (Vertex, Fragment)
+	ShaderPtr vs = Shader::CreateFromFile(desc.vsPath, GL_VERTEX_SHADER);
+	ShaderPtr fs = Shader::CreateFromFile(desc.fsPath, GL_FRAGMENT_SHADER);
+	if (!vs || !fs)
+	{
+		LOG_ERROR("GraphicsProgram: Failed to create shaders. VS: {}, FS: {}", desc.vsPath, desc.fsPath);
+		return nullptr;
+	}
 
-	// 부모의 Link 함수 호출
-	if (!program->Link(shaders)) return nullptr;
+	// 2. 프로그램 생성 및 링크
+	GraphicsProgramPtr program = Create({ vs, fs });
+	if (program)
+	{
+		program->SetName(desc.name);
+		// TODO : 이것도 리소스마다 path를 따로 선언하도록 만들 필요가 있음
+		program->SetPath(desc.vsPath + "|" + desc.fsPath);
+	}
 
-	return std::move(program);
+	return program;
 }
 
-GraphicsProgramUPtr GraphicsProgram::Create(const std::string& vertPath, const std::string& fragPath)
+GraphicsProgramPtr GraphicsProgram::Create(const std::vector<ShaderPtr>& shaders)
 {
-	// 1. 셰이더 리소스 로드
-	ShaderPtr vs = Shader::CreateFromFile(vertPath, GL_VERTEX_SHADER);
-	ShaderPtr fs = Shader::CreateFromFile(fragPath, GL_FRAGMENT_SHADER);
-	if (!vs || !fs) return nullptr;
-
-	// 2. 벡터로 묶어서 Link 요청
-	return Create({ vs, fs });
+	auto program = GraphicsProgramPtr(new GraphicsProgram());
+	if (!program->Link(shaders)) return nullptr;
+	return program;
 }

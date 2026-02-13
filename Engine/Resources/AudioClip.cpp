@@ -3,67 +3,66 @@
 
 DECLARE_DEFAULTS_IMPL(AudioClip)
 
-AudioClipUPtr AudioClip::LoadSFX(const std::string& filepath)
+AudioClipPtr AudioClip::Load(const AudioClipDesc& desc)
 {
-	auto sfx = AudioClipUPtr(new AudioClip());
-	if (!sfx->InitSFX(filepath)) return nullptr;
-	return std::move(sfx);
+	// 1. 리소스 생성 및 기본 설정
+	AudioClipPtr audio(new AudioClip());
+	audio->SetPath(desc.path);
+	audio->SetName(desc.name);
+	audio->m_type = desc.type;
+
+	// 2. 타입에 따른 로딩 방식 분기
+	switch (desc.type)
+	{
+		case AudioType::SFX:
+		{
+			if (!audio->LoadIntoMemory(desc.path))
+			{
+				LOG_ERROR("AudioClip::Load - Failed to load SFX: {}", desc.path);
+				return nullptr;
+			}
+			break;
+		}
+
+		case AudioType::BGM:
+		{
+			if (!audio->CheckFileExist(desc.path))
+			{
+				LOG_ERROR("AudioClip::Load - BGM file not found: {}", desc.path);
+				return nullptr;
+			}
+			break;
+		}
+	}
+
+	return audio;
 }
 
-AudioClipUPtr AudioClip::LoadBGM(const std::string& filepath)
+bool AudioClip::LoadIntoMemory(const std::string& filepath)
 {
-	auto bgm = AudioClipUPtr(new AudioClip());
-	if (!bgm->InitBGM(filepath)) return nullptr;
-	return std::move(bgm);
-}
-
-bool AudioClip::InitSFX(const std::string& filepath)
-{
-	m_type = AudioType::SFX;
-	m_path = filepath;
-
 	// 1. 파일을 바이너리 모드, 커서를 맨 끝에 둔 상태로 열기
 	std::ifstream file(filepath, std::ios::binary | std::ios::ate);
 	if (!file.is_open())
-	{
-		LOG_ERROR("Failed to open audio file: {}", filepath);
 		return false;
-	}
 
 	// 2. 파일 크기 측정
 	std::streamsize size = file.tellg();
 	if (size <= 0)
-	{
-		LOG_ERROR("Audio file is empty: {}", filepath);
 		return false;
-	}
 
-	// 3. 커서를 다시 파일의 맨 처음으로 돌립니다.
+	// 3. 커서 초기화
 	file.seekg(0, std::ios::beg);
 
-	// 4. 버퍼 크기 할당 및 데이터 읽기
+	// 4. 버퍼 할당 및 읽기
 	m_audioBuffer.resize(size);
 	if (!file.read((char*)m_audioBuffer.data(), size))
-	{
-		LOG_ERROR("Failed to read audio file: {}", filepath);
 		return false;
-	}
 
 	return true;
 }
 
-bool AudioClip::InitBGM(const std::string& filepath)
+bool AudioClip::CheckFileExist(const std::string& filepath)
 {
-	m_type = AudioType::BGM;
-	m_path = filepath;
-
-	// 파일이 실제로 존재하는지 정도만 체크
 	std::ifstream file(filepath);
-	if (!file.good())
-	{
-		LOG_ERROR("BGM file not found: {}", filepath);
-		return false;
-	}
-
-	return true;
+	return file.good();
 }

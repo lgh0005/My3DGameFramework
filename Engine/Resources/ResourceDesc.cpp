@@ -4,23 +4,23 @@
 /*=========================//
 //   Resource descriptor   //
 //=========================*/
-ResourceDesc::ResourceDesc(const std::string& filePath, const std::string& rscName)
-	: path(filePath), name(rscName) { }
+ResourceDesc::ResourceDesc(const std::string& rscName)
+	: name(rscName) { }
 ResourceDesc::~ResourceDesc() = default;
 
 /*================//
-//   Animation    //
+//    Animation   //
 //================*/
 AnimationDesc::AnimationDesc(const std::string& filePath, const std::string& rscName)
-	: ResourceDesc(filePath, rscName) { }
+	: ResourceDesc(rscName), path(filePath) { }
 AnimationDesc::~AnimationDesc() = default;
 ResourceType AnimationDesc::GetDescType() const { return ResourceType::Animation; }
 
 /*================//
-//   AudioClip    //
+//    AudioClip   //
 //================*/
 AudioClipDesc::AudioClipDesc(const std::string& filePath, const std::string& rscName)
-	: ResourceDesc(filePath, rscName) { }
+	: ResourceDesc(rscName), path(filePath) { }
 AudioClipDesc::~AudioClipDesc() = default;
 ResourceType AudioClipDesc::GetDescType() const { return ResourceType::AudioClip; }
 
@@ -28,15 +28,15 @@ ResourceType AudioClipDesc::GetDescType() const { return ResourceType::AudioClip
 //   CubeTexture  //
 //================*/
 CubeTextureDesc::CubeTextureDesc(const std::string& filePath, const std::string& rscName)
-	: ResourceDesc(filePath, rscName) { }
+	: ResourceDesc(rscName), path(filePath) { }
 CubeTextureDesc::~CubeTextureDesc() = default;
 ResourceType CubeTextureDesc::GetDescType() const { return ResourceType::CubeTexture; }
 
 /*================//
-//     Image      //
+//      Image     //
 //================*/
 ImageDesc::ImageDesc(const std::string& filePath, const std::string& rscName)
-	: ResourceDesc(filePath, rscName) { }
+	: ResourceDesc(rscName), path(filePath) { }
 ImageDesc::~ImageDesc() = default;
 ResourceType ImageDesc::GetDescType() const { return ResourceType::Image; }
 
@@ -44,23 +44,23 @@ ResourceType ImageDesc::GetDescType() const { return ResourceType::Image; }
 //    Material    //
 //================*/
 MaterialDesc::MaterialDesc(const std::string& filePath, const std::string& rscName)
-	: ResourceDesc(filePath, rscName) { }
+	: ResourceDesc(rscName), path(filePath) { }
 MaterialDesc::~MaterialDesc() = default;
 ResourceType MaterialDesc::GetDescType() const { return ResourceType::Material; }
 
 /*================//
-//     Model      //
+//      Model     //
 //================*/
 ModelDesc::ModelDesc(const std::string& filePath, const std::string& rscName)
-	: ResourceDesc(filePath, rscName) { }
+	: ResourceDesc(rscName), path(filePath) { }
 ModelDesc::~ModelDesc() = default;
 ResourceType ModelDesc::GetDescType() const { return ResourceType::Model; }
 
 /*================//
-//    Texture     //
+//     Texture    //
 //================*/
 TextureDesc::TextureDesc(const std::string& filePath, const std::string& rscName)
-	: ResourceDesc(filePath, rscName) { }
+	: ResourceDesc(rscName), path(filePath) { }
 TextureDesc::~TextureDesc() = default;
 ResourceType TextureDesc::GetDescType() const { return ResourceType::Texture; }
 
@@ -68,63 +68,15 @@ ResourceType TextureDesc::GetDescType() const { return ResourceType::Texture; }
 //      Font      //
 //================*/
 FontDesc::FontDesc(const std::string& filePath, const std::string& rscName)
-	: ResourceDesc(filePath, rscName) { }
+	: ResourceDesc(rscName), path(filePath) { }
 FontDesc::~FontDesc() = default;
 ResourceType FontDesc::GetDescType() const { return ResourceType::Font; }
 
 /*================//
-//   StaticMesh   //
-//================*/
-StaticMeshDesc::StaticMeshDesc(const std::string& filePath, const std::string& rscName)
-	: ResourceDesc(filePath, rscName) { }
-StaticMeshDesc::~StaticMeshDesc() = default;
-ResourceType StaticMeshDesc::GetDescType() const { return ResourceType::StaticMesh; }
-
-/*================//
-//  SkinnedMesh   //
-//================*/
-SkinnedMeshDesc::SkinnedMeshDesc(const std::string& filePath, const std::string& rscName)
-	: ResourceDesc(filePath, rscName) { }
-SkinnedMeshDesc::~SkinnedMeshDesc() = default;
-ResourceType SkinnedMeshDesc::GetDescType() const { return ResourceType::SkinnedMesh; }
-
-/*================//
-//   ScreenMesh   //
-//================*/
-ScreenMeshDesc::ScreenMeshDesc(const std::string& filePath, const std::string& rscName)
-	: ResourceDesc(filePath, rscName) { }
-ScreenMeshDesc::~ScreenMeshDesc() = default;
-ResourceType ScreenMeshDesc::GetDescType() const { return ResourceType::ScreenMesh; }
-
-/*================//
-// InstancedMesh  //
-//================*/
-InstancedMeshDesc::InstancedMeshDesc(const std::string& filePath, const std::string& rscName)
-	: ResourceDesc(filePath, rscName) { }
-InstancedMeshDesc::~InstancedMeshDesc() = default;
-ResourceType InstancedMeshDesc::GetDescType() const { return ResourceType::InstancedMesh; }
-
-/*================//
-//     UIMesh     //
-//================*/
-UIMeshDesc::UIMeshDesc(const std::string& filePath, const std::string& rscName)
-	: ResourceDesc(filePath, rscName) { }
-UIMeshDesc::~UIMeshDesc() = default;
-ResourceType UIMeshDesc::GetDescType() const { return ResourceType::UIMesh; }
-
-/*================//
-//   DebugMesh    //
-//================*/
-DebugMeshDesc::DebugMeshDesc(const std::string& filePath, const std::string& rscName)
-	: ResourceDesc(filePath, rscName) { }
-DebugMeshDesc::~DebugMeshDesc() = default;
-ResourceType DebugMeshDesc::GetDescType() const { return ResourceType::DebugMesh; }
-
-/*================//
 // GraphicsProgram//
 //================*/
-GraphicsProgramDesc::GraphicsProgramDesc(const std::string& filePath, const std::string& rscName)
-	: ResourceDesc(filePath, rscName) { }
+GraphicsProgramDesc::GraphicsProgramDesc(const std::string& vsFile, const std::string& fsFile, const std::string& rscName)
+	: ResourceDesc(rscName), vsPath(vsFile), fsPath(fsFile) { }
 GraphicsProgramDesc::~GraphicsProgramDesc() = default;
 ResourceType GraphicsProgramDesc::GetDescType() const { return ResourceType::GraphicsProgram; }
 
@@ -132,7 +84,7 @@ ResourceType GraphicsProgramDesc::GetDescType() const { return ResourceType::Gra
 // ComputeProgram //
 //================*/
 ComputeProgramDesc::ComputeProgramDesc(const std::string& filePath, const std::string& rscName)
-	: ResourceDesc(filePath, rscName) { }
+	: ResourceDesc(rscName), path(filePath) { }
 ComputeProgramDesc::~ComputeProgramDesc() = default;
 ResourceType ComputeProgramDesc::GetDescType() const { return ResourceType::ComputeProgram; }
 
@@ -140,6 +92,6 @@ ResourceType ComputeProgramDesc::GetDescType() const { return ResourceType::Comp
 // EnvironmentMap //
 //================*/
 EnvironmentMapDesc::EnvironmentMapDesc(const std::string& filePath, const std::string& rscName)
-	: ResourceDesc(filePath, rscName) { }
+	: ResourceDesc(rscName), path(filePath) { }
 EnvironmentMapDesc::~EnvironmentMapDesc() = default;
 ResourceType EnvironmentMapDesc::GetDescType() const { return ResourceType::EnvironmentMap; }

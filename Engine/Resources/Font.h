@@ -25,7 +25,7 @@ class Font : public Resource
 
 public:
 	virtual ~Font();
-	static FontUPtr Load(const std::string& path, uint32 fontSize);
+	static FontPtr Load(const FontDesc& desc);
 
 	const GlyphInfo& GetOrLoadGlyph(uint32 codePoint);
 	TexturePtr GetAtlasTexture() const { return m_atlasTexture; }

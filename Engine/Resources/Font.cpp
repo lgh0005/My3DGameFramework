@@ -9,10 +9,10 @@ Font::~Font()
 	if (m_ftLibrary) FT_Done_FreeType(m_ftLibrary);
 }
 
-FontUPtr Font::Load(const std::string& path, uint32 fontSize)
+FontPtr Font::Load(const FontDesc& desc)
 {
-	FontUPtr font(new Font());
-	font->m_fontSize = fontSize;
+	FontPtr font(new Font());
+	font->m_fontSize = desc.fontSize;
 
 	// 1. FreeType 초기화
 	if (FT_Init_FreeType(&font->m_ftLibrary))
@@ -22,19 +22,20 @@ FontUPtr Font::Load(const std::string& path, uint32 fontSize)
 	}
 
 	// 2. 폰트 파일 로드
-	if (FT_New_Face(font->m_ftLibrary, path.c_str(), 0, &font->m_face))
+	if (FT_New_Face(font->m_ftLibrary, desc.path.c_str(), 0, &font->m_face))
 	{
-		LOG_ERROR("Failed to load font: {}", path);
+		LOG_ERROR("Failed to load font: {}", desc.path);
 		return nullptr;
 	}
 
 	// 3. 유니코드 및 사이즈 설정
 	FT_Select_Charmap(font->m_face, FT_ENCODING_UNICODE);
-	FT_Set_Pixel_Sizes(font->m_face, 0, fontSize);
+	FT_Set_Pixel_Sizes(font->m_face, 0, font->m_fontSize);
 
 	// 4. 텍스처 아틀라스 생성 (1채널 R8 포맷 사용)
 	// 초기에는 빈 텍스처(1024x1024)만 생성해둠
-	font->m_atlasTexture = Texture::Create(
+	font->m_atlasTexture = Texture::Create
+	(
 		font->m_atlasWidth,
 		font->m_atlasHeight,
 		GL_R8,				// Internal Format (GPU 저장용)
@@ -42,13 +43,14 @@ FontUPtr Font::Load(const std::string& path, uint32 fontSize)
 		GL_UNSIGNED_BYTE	// Data Type
 	);
 
-	// 텍스처 파라미터 설정
-	// 텍스트는 확대/축소 시 부드러워야 하므로 Linear
+	// 5. 텍스처 파라미터 설정
 	font->m_atlasTexture->SetFilter(GL_LINEAR, GL_LINEAR);
-	// 가장자리가 반복되면 안 되므로 Clamp
 	font->m_atlasTexture->SetWrap(GL_CLAMP_TO_EDGE, GL_CLAMP_TO_EDGE);
 
-	return std::move(font);
+	font->SetName(desc.name);
+	font->SetPath(desc.path);
+
+	return font;
 }
 
 const GlyphInfo& Font::GetOrLoadGlyph(uint32 codePoint)

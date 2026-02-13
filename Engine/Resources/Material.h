@@ -31,7 +31,7 @@ class Material : public Resource
 
 public:
     virtual ~Material();
-    static MaterialUPtr Create();
+    static MaterialPtr Load(const MaterialDesc& desc);
 
     /*=====================//
     //  material textures  //

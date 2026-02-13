@@ -9,9 +9,9 @@ class GraphicsProgram : public Program
 
 public:
 	virtual ~GraphicsProgram();
-	static GraphicsProgramUPtr Create(const std::vector<ShaderPtr>& shaders);
-	static GraphicsProgramUPtr Create(const std::string& vertPath, const std::string& fragPath);
+	static GraphicsProgramPtr Load(const GraphicsProgramDesc& desc);
 
 private:
 	GraphicsProgram();
+	static GraphicsProgramPtr Create(const std::vector<ShaderPtr>& shaders);
 };
