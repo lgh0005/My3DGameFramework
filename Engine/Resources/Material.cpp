@@ -22,6 +22,7 @@ MaterialPtr Material::Load(const MaterialDesc& desc)
 
     // 2. 머티리얼 생성
     MaterialPtr material(new Material());
+    material->m_desc = desc;
     
     // 3. 머티리얼 파일 파싱
     MaterialYamlParser parser;
@@ -31,9 +32,6 @@ MaterialPtr Material::Load(const MaterialDesc& desc)
             LOG_INFO("Material Loaded: {}", desc.path);
     }
 
-    material->SetName(desc.name);
-    material->SetPath(desc.path);
-
     return material;
 }
 
@@ -41,6 +39,11 @@ MaterialPtr Material::Create()
 {
     // 1. 머티리얼 인스턴스 생성 (생성자는 protected이므로 내부에서 new)
     MaterialPtr material(new Material());
+
+    MaterialDesc defaultDesc;
+    defaultDesc.name = "DefaultMaterial";
+    defaultDesc.path = "@BuiltIn/Material/Default";
+    material->m_desc = defaultDesc;
 
     // 2. TextureUtils를 이용한 기본 텍스처 할당
     material->diffuse = TextureUtils::GetWhiteTexture(); // 색상 영향 없음
@@ -57,10 +60,6 @@ MaterialPtr Material::Create()
     material->metallicFactor = 1.0f;
     material->roughnessFactor = 1.0f;
     material->shininess = 32.0f;
-
-    // 4. 이름 및 가상 경로 설정
-    material->SetName("DefaultMaterial");
-    material->SetPath("@BuiltIn/Material/Default");
 
     return material;
 }

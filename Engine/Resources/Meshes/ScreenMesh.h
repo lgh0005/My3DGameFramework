@@ -17,9 +17,11 @@ class ScreenMesh : public Mesh
 public:
 	virtual ~ScreenMesh() override;
 	static ScreenMeshUPtr Create();
+	virtual const ScreenMeshDesc& GetDesc() const override { return m_desc; }
 	virtual void Draw() const override;
 
 private:
 	ScreenMesh();
 	void Init();
+	ScreenMeshDesc m_desc;
 };

@@ -11,6 +11,7 @@ public:
 	virtual ~ComputeProgram() override;
 
 	static ComputeProgramPtr Load(const ComputeProgramDesc& desc);
+	virtual const ComputeProgramDesc& GetDesc() const override { return m_desc; }
 
 	// 실행 (Dispatch)
 	// 컴퓨트 셰이더의 핵심입니다. x, y, z 그룹 개수를 지정합니다.
@@ -22,5 +23,5 @@ public:
 
 private:
 	ComputeProgram();
-	static ComputeProgramUPtr Create(ShaderPtr shader);
+	ComputeProgramDesc m_desc;
 };

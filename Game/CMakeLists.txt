@@ -17,8 +17,8 @@ set(GAME_SOURCES
     "SRPSample/Scripts/PlayerController.h"  "SRPSample/Scripts/PlayerController.cpp"
 
     # Univeral Render Pipeline Sample Scene
-    "URPSample/DevScene/PBRScene.h"    "URPSample/DevScene/PBRScene.cpp"
-    "URPSample/RenderPasses/HDRRenderPass.h"   "URPSample/RenderPasses/HDRRenderPass.cpp"
+    #"URPSample/DevScene/PBRScene.h"    "URPSample/DevScene/PBRScene.cpp"
+    #"URPSample/RenderPasses/HDRRenderPass.h"   "URPSample/RenderPasses/HDRRenderPass.cpp"
 )
 
 # Visual Studio 필터 자동 생성

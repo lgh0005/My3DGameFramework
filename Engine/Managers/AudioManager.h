@@ -1,13 +1,6 @@
 ﻿#pragma once
 #include "miniaudio.h"
 
-enum class AudioType
-{
-	SFX,
-	BGM,
-	MAX
-};
-
 class AudioManager
 {
 	DECLARE_SINGLE(AudioManager)

@@ -23,6 +23,7 @@ public:
         uint32 primitiveType = GL_TRIANGLES
     );
     virtual ~SkinnedMesh() override;
+    virtual const SkinnedMeshDesc& GetDesc() const override { return m_desc; }
     virtual void Draw() const override;
 
 private:
@@ -33,4 +34,5 @@ private:
         const std::vector<uint32>& indices,
         uint32 primitiveType
     );
+    SkinnedMeshDesc m_desc;
 };

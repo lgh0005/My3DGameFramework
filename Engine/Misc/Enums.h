@@ -91,3 +91,10 @@ enum class SceneState
 	Paused,         // (옵션) 일시 정지
 	Unloading       // 씬 종료/전환 중
 };
+
+enum class AudioType
+{
+	SFX,
+	BGM,
+	MAX
+};

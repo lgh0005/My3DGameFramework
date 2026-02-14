@@ -12,43 +12,43 @@ Font::~Font()
 FontPtr Font::Load(const FontDesc& desc)
 {
 	FontPtr font(new Font());
-	font->m_fontSize = desc.fontSize;
 
-	// 1. FreeType 초기화
+	// 1. Desc 저장 (이제 모든 설정은 여기서 관리)
+	font->m_desc = desc;
+
+	// 2. FreeType 초기화
 	if (FT_Init_FreeType(&font->m_ftLibrary))
 	{
 		LOG_ERROR("Could not init FreeType Library");
 		return nullptr;
 	}
 
-	// 2. 폰트 파일 로드
-	if (FT_New_Face(font->m_ftLibrary, desc.path.c_str(), 0, &font->m_face))
+	// 3. 폰트 파일 로드 (m_desc.path 사용)
+	if (FT_New_Face(font->m_ftLibrary, font->m_desc.path.c_str(), 0, &font->m_face))
 	{
-		LOG_ERROR("Failed to load font: {}", desc.path);
+		LOG_ERROR("Failed to load font: {}", font->m_desc.path);
 		return nullptr;
 	}
 
-	// 3. 유니코드 및 사이즈 설정
+	// 4. 유니코드 및 사이즈 설정 (m_desc.fontSize 사용)
 	FT_Select_Charmap(font->m_face, FT_ENCODING_UNICODE);
-	FT_Set_Pixel_Sizes(font->m_face, 0, font->m_fontSize);
+	FT_Set_Pixel_Sizes(font->m_face, 0, font->m_desc.fontSize);
 
-	// 4. 텍스처 아틀라스 생성 (1채널 R8 포맷 사용)
-	// 초기에는 빈 텍스처(1024x1024)만 생성해둠
+	// 5. 텍스처 아틀라스 생성
+	// 폰트 설정에 따라 아틀라스 크기도 유동적으로 바꿀 수 있게 확장 가능합니다.
 	font->m_atlasTexture = Texture::Create
 	(
-		font->m_atlasWidth,
-		font->m_atlasHeight,
-		GL_R8,				// Internal Format (GPU 저장용)
-		GL_RED,				// Data Format (전송용)
-		GL_UNSIGNED_BYTE	// Data Type
+		4096, 4096, // 필요하다면 이 크기도 FontDesc에 넣을 수 있습니다.
+		GL_R8,
+		GL_RED,
+		GL_UNSIGNED_BYTE
 	);
 
-	// 5. 텍스처 파라미터 설정
 	font->m_atlasTexture->SetFilter(GL_LINEAR, GL_LINEAR);
 	font->m_atlasTexture->SetWrap(GL_CLAMP_TO_EDGE, GL_CLAMP_TO_EDGE);
 
-	font->SetName(desc.name);
-	font->SetPath(desc.path);
+	// Resource::GetName()은 이제 m_desc.name을 참조합니다.
+	LOG_INFO("Font Loaded: {} (Size: {})", font->GetName(), font->m_desc.fontSize);
 
 	return font;
 }

@@ -6,6 +6,12 @@ DECLARE_DEFAULTS_IMPL(GraphicsProgram)
 
 GraphicsProgramPtr GraphicsProgram::Load(const GraphicsProgramDesc& desc)
 {
+	// 1. 인스턴스 생성 (이제 'program'이라는 인스턴스가 존재함)
+	auto program = GraphicsProgramPtr(new GraphicsProgram());
+
+	// 2. Desc 주입
+	program->m_desc = desc;
+
 	// 1. 셰이더 리소스 생성 (Vertex, Fragment)
 	ShaderPtr vs = Shader::CreateFromFile(desc.vsPath, GL_VERTEX_SHADER);
 	ShaderPtr fs = Shader::CreateFromFile(desc.fsPath, GL_FRAGMENT_SHADER);
@@ -16,20 +22,11 @@ GraphicsProgramPtr GraphicsProgram::Load(const GraphicsProgramDesc& desc)
 	}
 
 	// 2. 프로그램 생성 및 링크
-	GraphicsProgramPtr program = Create({ vs, fs });
-	if (program)
+	if (!program->Link({ vs, fs }))
 	{
-		program->SetName(desc.name);
-		// TODO : 이것도 리소스마다 path를 따로 선언하도록 만들 필요가 있음
-		program->SetPath(desc.vsPath + "|" + desc.fsPath);
+		LOG_ERROR("GraphicsProgram: Link failed for {}", desc.name);
+		return nullptr;
 	}
 
-	return program;
-}
-
-GraphicsProgramPtr GraphicsProgram::Create(const std::vector<ShaderPtr>& shaders)
-{
-	auto program = GraphicsProgramPtr(new GraphicsProgram());
-	if (!program->Link(shaders)) return nullptr;
 	return program;
 }

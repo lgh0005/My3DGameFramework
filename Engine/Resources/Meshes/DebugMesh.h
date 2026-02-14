@@ -18,6 +18,7 @@ class DebugMesh : public Mesh
 public:
 	virtual ~DebugMesh();
 	static DebugMeshUPtr Create(uint32 primitiveType);
+	virtual const DebugMeshDesc& GetDesc() const override { return m_desc; }
 	virtual void Draw() const override;
 	void UpdateGeometry(const std::vector<GizmoVertex>& vertices);
 
@@ -26,6 +27,7 @@ private:
 	void Init(uint32 primitiveType);
 	void AllocateVertexBuffer(usize vertexCount);
 
+	DebugMeshDesc m_desc;
 	uint32 m_vertexCount = 0;
 	usize m_vertexCapacity = 0;
 };

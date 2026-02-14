@@ -26,18 +26,19 @@ class Font : public Resource
 public:
 	virtual ~Font();
 	static FontPtr Load(const FontDesc& desc);
+	virtual const FontDesc& GetDesc() const override { return m_desc; }
 
 	const GlyphInfo& GetOrLoadGlyph(uint32 codePoint);
 	TexturePtr GetAtlasTexture() const { return m_atlasTexture; }
-	uint32 GetFontSize() const { return m_fontSize; }
+	uint32 GetFontSize() const { return m_desc.fontSize; }
 
 private:
 	Font();
+	FontDesc m_desc;
 
 	// FreeType 관련
 	FT_Library	m_ftLibrary{ nullptr };
 	FT_Face		m_face{ nullptr };
-	uint32		m_fontSize{ 24 };
 
 	// 텍스처 아틀라스 관련
 	TexturePtr	m_atlasTexture;

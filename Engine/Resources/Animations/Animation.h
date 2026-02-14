@@ -20,6 +20,7 @@ class Animation : public Resource
 public:
     virtual ~Animation();
     static AnimationPtr Load(const AnimationDesc& desc);
+    virtual const AnimationDesc& GetDesc() const override { return m_desc; }
     
     const AnimClip& GetAnimClip() const { return m_animClip; }
     void SetGlobalOffset(uint32 offset) { m_globalOffset = offset; }
@@ -36,8 +37,9 @@ public:
 //   keyframe load process methods   //
 //===================================*/
 private:
-    bool LoadByBinary(const std::string& filePath);
+    bool LoadByBinary();
     Animation();
+    AnimationDesc m_desc;
 
     AnimClip m_animClip;
     uint32 m_globalOffset{ 0 };

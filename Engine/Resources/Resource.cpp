@@ -7,3 +7,8 @@ bool Resource::MatchesType(ResourceType type) const
 {
 	return GetResourceType() == type;
 }
+
+const std::string& Resource::GetName() const
+{
+	return GetDesc().name;
+}

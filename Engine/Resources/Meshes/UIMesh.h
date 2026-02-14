@@ -11,6 +11,7 @@ class UIMesh : public Mesh
 public:
 	virtual ~UIMesh();
 	static UIMeshUPtr Create();
+	virtual const UIMeshDesc& GetDesc() const override { return m_desc; }
 	virtual void Draw() const override;
 
 	void SetVertices(const std::vector<UIVertex>& vertices);
@@ -19,4 +20,5 @@ public:
 private:
 	UIMesh();
 	void Init();
+	UIMeshDesc m_desc;
 };

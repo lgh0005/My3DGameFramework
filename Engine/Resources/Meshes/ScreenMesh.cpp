@@ -13,6 +13,8 @@ DECLARE_DEFAULTS_IMPL(ScreenMesh)
 ScreenMeshUPtr ScreenMesh::Create()
 {
 	auto mesh = ScreenMeshUPtr(new ScreenMesh());
+	mesh->m_desc.name = "DefaultScreenMesh";
+	mesh->m_desc.path = "@Virtual/ScreenMesh";
 	mesh->Init();
 	return std::move(mesh);
 }

@@ -12,13 +12,14 @@ public:
 	bool Init();
 	void Clear();
 
-	template<typename T> std::shared_ptr<T> Get(const std::string& name);
+	template<typename T, typename... Args> 
+	std::shared_ptr<T> Get(const std::string& name, Args&&... args);
 	template<typename T> std::shared_ptr<T> Load(const ResourceDesc& desc);
 	template<typename T> void AddResource
 	(
 		std::shared_ptr<T> resource, 
 		const std::string& name, 
-		const std::string& path = ""
+		const std::string& path
 	);
 
 private:

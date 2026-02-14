@@ -7,18 +7,16 @@ AudioClipPtr AudioClip::Load(const AudioClipDesc& desc)
 {
 	// 1. 리소스 생성 및 기본 설정
 	AudioClipPtr audio(new AudioClip());
-	audio->SetPath(desc.path);
-	audio->SetName(desc.name);
-	audio->m_type = desc.type;
+	audio->m_desc = desc;
 
 	// 2. 타입에 따른 로딩 방식 분기
 	switch (desc.type)
 	{
 		case AudioType::SFX:
 		{
-			if (!audio->LoadIntoMemory(desc.path))
+			if (!audio->LoadIntoMemory())
 			{
-				LOG_ERROR("AudioClip::Load - Failed to load SFX: {}", desc.path);
+				LOG_ERROR("AudioClip::Load - Failed to load SFX: {}", audio->m_desc.path);
 				return nullptr;
 			}
 			break;
@@ -26,9 +24,9 @@ AudioClipPtr AudioClip::Load(const AudioClipDesc& desc)
 
 		case AudioType::BGM:
 		{
-			if (!audio->CheckFileExist(desc.path))
+			if (!audio->CheckFileExist())
 			{
-				LOG_ERROR("AudioClip::Load - BGM file not found: {}", desc.path);
+				LOG_ERROR("AudioClip::Load - BGM file not found: {}", audio->m_desc.path);
 				return nullptr;
 			}
 			break;
@@ -38,17 +36,16 @@ AudioClipPtr AudioClip::Load(const AudioClipDesc& desc)
 	return audio;
 }
 
-bool AudioClip::LoadIntoMemory(const std::string& filepath)
+bool AudioClip::LoadIntoMemory()
 {
 	// 1. 파일을 바이너리 모드, 커서를 맨 끝에 둔 상태로 열기
-	std::ifstream file(filepath, std::ios::binary | std::ios::ate);
+	std::ifstream file(m_desc.path, std::ios::binary | std::ios::ate);
 	if (!file.is_open())
 		return false;
 
 	// 2. 파일 크기 측정
 	std::streamsize size = file.tellg();
-	if (size <= 0)
-		return false;
+	if (size <= 0) return false;
 
 	// 3. 커서 초기화
 	file.seekg(0, std::ios::beg);
@@ -61,8 +58,7 @@ bool AudioClip::LoadIntoMemory(const std::string& filepath)
 	return true;
 }
 
-bool AudioClip::CheckFileExist(const std::string& filepath)
+bool AudioClip::CheckFileExist()
 {
-	std::ifstream file(filepath);
-	return file.good();
+	return std::filesystem::exists(m_desc.path);
 }

@@ -11,11 +11,10 @@ EnvironmentMapPtr EnvironmentMap::Load(const EnvironmentMapDesc& desc)
 {
     // 1. 리소스 인스턴스 생성
     EnvironmentMapPtr envMap(new EnvironmentMap());
-    envMap->SetPath(desc.path);
-    envMap->SetName(desc.name);
+    envMap->m_desc = desc;
 
     // 2. 확장자 확인 (.hdr vs .ktx/.dds)
-    // TODO : 역시 확장자를 구체적으로 정해줘야함.
+    // TODO : 이후에는 큐브맵도 전면적으로 ktx로 로딩할 예정
     std::string ext = std::filesystem::path(desc.path).extension().string();
     std::transform(ext.begin(), ext.end(), ext.begin(), ::tolower);
 
@@ -60,7 +59,6 @@ EnvironmentMapPtr EnvironmentMap::Load(const EnvironmentMapDesc& desc)
     {
         LOG_INFO("EnvironmentMap Loaded (Skybox Only): {}", desc.path);
     }
-
 
     return envMap;
 }

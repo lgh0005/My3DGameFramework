@@ -11,7 +11,11 @@ Image::~Image()
 
 ImagePtr Image::Load(const ImageDesc& desc)
 {
-    // 1. 확장자 확인
+    // 1. 객체 생성 및 Desc 주입
+    auto image = ImagePtr(new Image());
+    image->m_desc = desc;
+
+    // 2. 확장자 확인
     std::string ext = std::filesystem::path(desc.path).extension().string();
     std::transform(ext.begin(), ext.end(), ext.begin(), ::tolower);
 
@@ -20,18 +24,12 @@ ImagePtr Image::Load(const ImageDesc& desc)
     auto image = ImagePtr(new Image());
     if (ext == ".hdr")
     {
-        if (!image->LoadWithStbFloat(desc.path, desc.isFlipY))
-            return nullptr;
+        if (!image->LoadWithStbFloat()) return nullptr;
     }
     else
     {
-        if (!image->LoadWithStb(desc.path, desc.isFlipY))
-            return nullptr;
+        if (!image->LoadWithStb()) return nullptr;
     }
-
-    // 3. 리소스 정보 설정
-    image->SetName(desc.name);
-    image->SetPath(desc.path);
 
     return image;
 }
@@ -64,31 +62,31 @@ ImagePtr Image::CreateSingleColorImage(int32 width, int32 height, const glm::vec
 /*==============================//
 //  default image load methods  //
 //==============================*/
-bool Image::LoadWithStb(const std::string& filepath, bool flipVertical)
+bool Image::LoadWithStb()
 {
-    stbi_set_flip_vertically_on_load(flipVertical);
+    stbi_set_flip_vertically_on_load(m_desc.isFlipY);
 
     m_bytePerChannel = 1;
-    m_data = stbi_load(filepath.c_str(), &m_width, &m_height, &m_channelCount, 0);
+    m_data = stbi_load(m_desc.path.c_str(), &m_width, &m_height, &m_channelCount, 0);
     if (!m_data)
     {
-        LOG_ERROR("failed to load image: {}", filepath);
+        LOG_ERROR("failed to load image: {}", m_desc.path);
         return false;
     }
     return true;
 }
 
-bool Image::LoadWithStbFloat(const std::string& filepath, bool flipVertical)
+bool Image::LoadWithStbFloat()
 {
     // [주의] 멀티스레드 로딩 시 이 전역 설정 함수는 위험할 수 있습니다.
     // 추후 필요하다면 stbi_load_from_memory 등을 사용하여 직접 처리하거나 락을 걸어야 합니다.
-    stbi_set_flip_vertically_on_load(flipVertical);
+    stbi_set_flip_vertically_on_load(m_desc.isFlipY);
 
     m_bytePerChannel = 4;
-    m_data = (uint8*)stbi_loadf(filepath.c_str(), &m_width, &m_height, &m_channelCount, 0);
+    m_data = (uint8*)stbi_loadf(m_desc.path.c_str(), &m_width, &m_height, &m_channelCount, 0);
     if (!m_data)
     {
-        LOG_ERROR("failed to load HDR image: {}", filepath);
+        LOG_ERROR("failed to load HDR image: {}", m_desc.path);
         return false;
     }
     return true;

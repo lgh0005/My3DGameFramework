@@ -9,11 +9,12 @@ CLASS_PTR(CubeTexture)
 CLASS_PTR(EnvironmentMap)
 class EnvironmentMap : public Resource
 {
-	DEFINE_RESOURCE_TYPE(ResourceType::EnvironmentMap, EnvironmentMap)
+	DEFINE_RESOURCE_TYPE(ResourceType::EnvironmentMap, EnvironmentMapDesc)
 
 public:
 	virtual ~EnvironmentMap();
 	static EnvironmentMapPtr Load(const EnvironmentMapDesc& desc);
+	virtual const EnvironmentMapDesc& GetDesc() const override { return m_desc; }
 
 	CubeTexturePtr GetSkybox() const { return m_skybox; }
 	CubeTexturePtr GetIrradiance() const { return m_irradiance; }
@@ -22,6 +23,8 @@ public:
 
 private:
 	EnvironmentMap();
+	EnvironmentMapDesc m_desc;
+
 	static EnvironmentMapUPtr Create(const CubeTexturePtr& cubeTexture);
 	static EnvironmentMapUPtr CreateIBL(const TexturePtr& hdrTexture);
 

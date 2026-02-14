@@ -8,6 +8,8 @@ DECLARE_DEFAULTS_IMPL(DebugMesh)
 DebugMeshUPtr DebugMesh::Create(uint32 primitiveType)
 {
 	auto mesh = DebugMeshUPtr(new DebugMesh());
+	mesh->m_desc.name = "DebugMesh_Instance";
+	mesh->m_desc.path = "@Virtual/DebugMesh";
 	mesh->Init(primitiveType);
 	return std::move(mesh);
 }

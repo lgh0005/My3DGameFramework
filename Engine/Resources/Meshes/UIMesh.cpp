@@ -10,6 +10,8 @@ DECLARE_DEFAULTS_IMPL(UIMesh)
 UIMeshUPtr UIMesh::Create()
 {
     UIMeshUPtr mesh = UIMeshUPtr(new UIMesh());
+    mesh->m_desc.name = "UIMesh_Default";
+    mesh->m_desc.path = "@Virtual/UIMesh";
     mesh->Init();
     return mesh;
 }

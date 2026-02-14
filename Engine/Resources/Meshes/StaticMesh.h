@@ -22,6 +22,7 @@ public:
         const std::vector<uint32>& indices,
         uint32 primitiveType = GL_TRIANGLES
     );
+    virtual const StaticMeshDesc& GetDesc() const override { return m_desc; }
     virtual ~StaticMesh() override;
     void ComputeTangents
     (
@@ -38,4 +39,5 @@ private:
         const std::vector<uint32>& indices,
         uint32 primitiveType
     );
+    StaticMeshDesc m_desc;
 };

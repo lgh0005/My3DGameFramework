@@ -1,4 +1,5 @@
 ﻿#pragma once
+#include "Misc/Enums.h"
 
 /*=========================//
 //    Resource descriptor  //
@@ -8,7 +9,7 @@ struct ResourceDesc
 	ResourceDesc(const std::string& rscName = "");
 	virtual ~ResourceDesc();
 	virtual ResourceType GetDescType() const = 0;
-
+	std::string GetCacheKey() const { return name; }
 	std::string name;
 };
 
@@ -18,7 +19,7 @@ struct ResourceDesc
 struct AnimationDesc : public ResourceDesc
 {
 	virtual ~AnimationDesc();
-	AnimationDesc(const std::string& filePath, const std::string& rscName = "");
+	AnimationDesc(const std::string& filePath = "", const std::string& rscName = "");
 	virtual ResourceType GetDescType() const override;
 
 	std::string path;
@@ -30,7 +31,7 @@ struct AnimationDesc : public ResourceDesc
 struct AudioClipDesc : public ResourceDesc
 {
 	virtual ~AudioClipDesc();
-	AudioClipDesc(const std::string& filePath, const std::string& rscName = "");
+	AudioClipDesc(const std::string& filePath = "", const std::string& rscName = "");
 	virtual ResourceType GetDescType() const override;
 
 	std::string path;
@@ -43,7 +44,7 @@ struct AudioClipDesc : public ResourceDesc
 struct CubeTextureDesc : public ResourceDesc
 {
 	virtual ~CubeTextureDesc();
-	CubeTextureDesc(const std::string& filePath, const std::string& rscName = "");
+	CubeTextureDesc(const std::string& filePath = "", const std::string& rscName = "");
 	virtual ResourceType GetDescType() const override;
 
 	std::string path;
@@ -55,7 +56,7 @@ struct CubeTextureDesc : public ResourceDesc
 struct ImageDesc : public ResourceDesc
 {
 	virtual ~ImageDesc();
-	ImageDesc(const std::string& filePath, const std::string& rscName = "");
+	ImageDesc(const std::string& filePath = "", const std::string& rscName = "");
 	virtual ResourceType GetDescType() const override;
 
 	std::string path;
@@ -68,7 +69,7 @@ struct ImageDesc : public ResourceDesc
 struct MaterialDesc : public ResourceDesc
 {
 	virtual ~MaterialDesc();
-	MaterialDesc(const std::string& filePath, const std::string& rscName = "");
+	MaterialDesc(const std::string& filePath = "", const std::string& rscName = "");
 	virtual ResourceType GetDescType() const override;
 
 	std::string path;
@@ -101,7 +102,7 @@ struct MaterialDesc : public ResourceDesc
 struct ModelDesc : public ResourceDesc
 {
 	virtual ~ModelDesc();
-	ModelDesc(const std::string& filePath, const std::string& rscName = "");
+	ModelDesc(const std::string& filePath = "", const std::string& rscName = "");
 	virtual ResourceType GetDescType() const override;
 
 	std::string path;
@@ -113,7 +114,7 @@ struct ModelDesc : public ResourceDesc
 struct TextureDesc : public ResourceDesc
 {
 	virtual ~TextureDesc();
-	TextureDesc(const std::string& filePath, const std::string& rscName = "");
+	TextureDesc(const std::string& filePath = "", const std::string& rscName = "");
 	virtual ResourceType GetDescType() const override;
 
 	std::string path;
@@ -127,7 +128,7 @@ struct TextureDesc : public ResourceDesc
 struct FontDesc : public ResourceDesc
 {
 	virtual ~FontDesc();
-	FontDesc(const std::string& filePath, const std::string& rscName = "");
+	FontDesc(const std::string& filePath = "", const std::string& rscName = "");
 	virtual ResourceType GetDescType() const override;
 
 	std::string path;
@@ -142,8 +143,8 @@ struct GraphicsProgramDesc : public ResourceDesc
 	virtual ~GraphicsProgramDesc();
 	GraphicsProgramDesc
 	(
-		const std::string& vsFile,
-		const std::string& fsFile,
+		const std::string& vsFile = "",
+		const std::string& fsFile = "",
 		const std::string& rscName = ""
 	);
 	virtual ResourceType GetDescType() const override;
@@ -158,7 +159,7 @@ struct GraphicsProgramDesc : public ResourceDesc
 struct ComputeProgramDesc : public ResourceDesc
 {
 	virtual ~ComputeProgramDesc();
-	ComputeProgramDesc(const std::string& filePath, const std::string& rscName = "");
+	ComputeProgramDesc(const std::string& filePath = "", const std::string& rscName = "");
 	virtual ResourceType GetDescType() const override;
 
 	std::string path;
@@ -170,9 +171,95 @@ struct ComputeProgramDesc : public ResourceDesc
 struct EnvironmentMapDesc : public ResourceDesc
 {
 	virtual ~EnvironmentMapDesc();
-	EnvironmentMapDesc(const std::string& filePath, const std::string& rscName = "");
+	EnvironmentMapDesc(const std::string& filePath = "", const std::string& rscName = "");
 	virtual ResourceType GetDescType() const override;
 
 	std::string path;
 	bool createIBL = true;
+};
+
+// =============================================================================================
+
+/*================//
+//    StaticMesh  //
+//================*/
+struct StaticMeshDesc : public ResourceDesc
+{
+	virtual ~StaticMeshDesc() = default;
+	StaticMeshDesc(const std::string& filePath = "", const std::string& rscName = "")
+		: ResourceDesc(rscName), path(filePath) {
+	}
+	virtual ResourceType GetDescType() const override { return ResourceType::StaticMesh; }
+
+	std::string path;
+};
+
+/*================//
+//   SkinnedMesh  //
+//================*/
+struct SkinnedMeshDesc : public ResourceDesc
+{
+	virtual ~SkinnedMeshDesc() = default;
+	SkinnedMeshDesc(const std::string& filePath = "", const std::string& rscName = "")
+		: ResourceDesc(rscName), path(filePath) {
+	}
+	virtual ResourceType GetDescType() const override { return ResourceType::SkinnedMesh; }
+
+	std::string path;
+};
+
+/*================//
+//    ScreenMesh  //
+//================*/
+struct ScreenMeshDesc : public ResourceDesc
+{
+	virtual ~ScreenMeshDesc() = default;
+	ScreenMeshDesc(const std::string& filePath = "", const std::string& rscName = "")
+		: ResourceDesc(rscName), path(filePath) {
+	}
+	virtual ResourceType GetDescType() const override { return ResourceType::ScreenMesh; }
+
+	std::string path;
+};
+
+/*================//
+//     UIMesh     //
+//================*/
+struct UIMeshDesc : public ResourceDesc
+{
+	virtual ~UIMeshDesc() = default;
+	UIMeshDesc(const std::string& filePath = "", const std::string& rscName = "")
+		: ResourceDesc(rscName), path(filePath) {
+	}
+	virtual ResourceType GetDescType() const override { return ResourceType::UIMesh; }
+
+	std::string path;
+};
+
+/*================//
+//  InstancedMesh //
+//================*/
+struct InstancedMeshDesc : public ResourceDesc
+{
+	virtual ~InstancedMeshDesc() = default;
+	InstancedMeshDesc(const std::string& filePath = "", const std::string& rscName = "")
+		: ResourceDesc(rscName), path(filePath) {
+	}
+	virtual ResourceType GetDescType() const override { return ResourceType::InstancedMesh; }
+
+	std::string path;
+};
+
+/*================//
+//    DebugMesh   //
+//================*/
+struct DebugMeshDesc : public ResourceDesc
+{
+	virtual ~DebugMeshDesc() = default;
+	DebugMeshDesc(const std::string& filePath = "", const std::string& rscName = "")
+		: ResourceDesc(rscName), path(filePath) {
+	}
+	virtual ResourceType GetDescType() const override { return ResourceType::DebugMesh; }
+
+	std::string path;
 };

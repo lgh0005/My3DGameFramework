@@ -26,6 +26,7 @@ class Model : public Resource
 public:
 	virtual ~Model();
 	static ModelPtr Load(const ModelDesc& desc);
+	virtual const ResourceDesc& GetDesc() const override { return m_desc; }
 
 	uint32 GetMeshCount() const { return (uint32)m_meshes.size(); }
 	SkinnedMeshPtr GetSkinnedMesh(int index) const;
@@ -53,7 +54,7 @@ private:
 //   .mymodel file load process methods : .mymodel file   //
 //========================================================*/
 private:
-	bool LoadByBinary(const std::string& filename);
+	bool LoadByBinary();
 	bool ReadBinaryModelHeader(std::ifstream& inFile, uint32& outMatCount, uint32& outMeshCount, bool& outHasSkeleton);
 	void ReadBinaryNodes(std::ifstream& inFile);
 	void ReadBinarySkeleton(std::ifstream& inFile);
@@ -61,15 +62,6 @@ private:
 	void ReadBinaryMeshes(std::ifstream& inFile, uint32 meshCount);
 	void CreateBinarySkinnedMesh(const AssetFmt::RawMesh& rawMesh);
 	void CreateBinaryStaticMesh(const AssetFmt::RawMesh& rawMesh);
-
-/*==========================================//
-//   model texture loading helper methods   //
-//==========================================*/
-private:
-	TexturePtr LoadMaterialTexture(aiMaterial* material, aiTextureType type, const std::filesystem::path& parentDir);
-	TexturePtr LoadTexture(const std::string& path, const std::filesystem::path& parentDir);
-	TexturePtr LoadTextureFromKTX(const std::string& filename, const std::filesystem::path& parentDir);
-	TexturePtr LoadTextureFromImage(const std::string& filename, const std::filesystem::path& parentDir);
 
 /*============================//
 //   skeleton helper method   //
@@ -80,6 +72,8 @@ private:
 
 private:
 	Model();
+
+	ModelDesc m_desc;
 	std::vector<MeshPtr> m_meshes;
 	std::vector<MaterialPtr> m_materials;
 	std::vector<uint32> m_meshMaterialIndices;

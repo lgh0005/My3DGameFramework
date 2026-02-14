@@ -14,6 +14,8 @@ SkinnedMeshUPtr SkinnedMesh::Create(const std::vector<SkinnedVertex>& vertices,
                                     uint32 primitiveType)
 {
     auto mesh = SkinnedMeshUPtr(new SkinnedMesh());
+    mesh->m_desc.name = "SkinnedMesh_Material";
+    mesh->m_desc.path = "@Virtual/SkinnedMesh";
     mesh->Init(vertices, indices, primitiveType);
     return std::move(mesh);
 }

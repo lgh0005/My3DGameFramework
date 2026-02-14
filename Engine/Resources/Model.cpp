@@ -35,20 +35,26 @@ StaticMeshPtr Model::GetStaticMesh(int index) const
 
 ModelPtr Model::Load(const ModelDesc& desc)
 {
-    // 1. 파일 확장명 비교 후 로드(.mymodel)
-    auto path = desc.path;
-    std::string ext = fs::path(path).extension().string();
+    // 1. 객체 생성 (기본 생성자 호출)
+    auto model = ModelPtr(new Model());
+
+    // 2. 전달받은 desc를 객체 내부에 저장
+    // 이제 model->GetName() 등을 호출하면 이 데이터가 참조됩니다.
+    model->m_desc = desc;
+
+    // 3. 확장자 체크 (m_desc.path 기반)
+    std::string ext = fs::path(model->m_desc.path).extension().string();
     std::transform(ext.begin(), ext.end(), ext.begin(), ::tolower);
     if (ext != ".mymodel")
     {
-        LOG_ERROR("Model::Load - Invalid extension: {}", path);
+        LOG_ERROR("Model::Load - Invalid extension: {}", model->m_desc.path);
         return nullptr;
     }
 
-    // 2. 모델 로드
-    auto model = ModelPtr(new Model());
-    if (!model->LoadByBinary(path)) return nullptr;
-    return std::move(model);
+    // 4. 바이너리 로드 시작
+    if (!model->LoadByBinary()) return nullptr;
+
+    return model;
 }
 
 /*======================================//
@@ -182,16 +188,16 @@ GameObjectUPtr Model::CreateGameObjectForSingleNode
 /*========================================================//
 //   .mymodel file load process methods : .mymodel file   //
 //========================================================*/
-bool Model::LoadByBinary(const std::string& filename)
+bool Model::LoadByBinary()
 {
-    std::ifstream inFile(filename, std::ios::binary);
+    std::ifstream inFile(m_desc.path, std::ios::binary);
     if (!inFile)
     {
-        LOG_ERROR("Failed to open binary model file (V3): {}", filename);
+        LOG_ERROR("Failed to open binary model file (V3): {}", m_desc.path);
         return false;
     }
 
-    std::filesystem::path modelDir = std::filesystem::path(filename).parent_path();
+    std::filesystem::path modelDir = std::filesystem::path(m_desc.path).parent_path();
 
     // 데이터를 받아올 지역 변수 (참조로 넘겨서 채움)
     uint32 matCount = 0;
@@ -220,7 +226,7 @@ bool Model::LoadByBinary(const std::string& filename)
     // 6. Skeletal Hierarchy Index Write
     LinkSkeletonHierarchy();
 
-    LOG_INFO("Model loaded successfully (Binary): {}", filename);
+    LOG_INFO("Model loaded successfully (Binary): {}", m_desc.path);
     inFile.close();
     return true;
 }
@@ -313,8 +319,16 @@ void Model::ReadBinaryMaterials(std::ifstream& inFile, uint32 matCount, const st
         {
             if (rawTex.fileName.empty()) continue;
 
-            auto texPtr = LoadTexture(rawTex.fileName, modelDir);
-            if (!texPtr) continue;
+            // 1. 파일 이름에서 확장자를 뗀 'Key' 추출
+            std::string texKey = fs::path(rawTex.fileName).stem().string();
+
+            // 2. 리소스 매니저에게 이름으로 요청.
+            auto texPtr = RESOURCE.Get<Texture>(texKey);
+            if (!texPtr)
+            {
+                LOG_WARN("Model: Texture Key '{}' not found in Registry. Using default.", texKey);
+                continue;
+            }
 
             switch (rawTex.type)
             {
@@ -419,92 +433,6 @@ void Model::CreateBinaryStaticMesh(const AssetFmt::RawMesh& rawMesh)
 
     // 5. 등록
     m_meshes.push_back(std::move(mesh));
-}
-
-/*==========================================//
-//   model texture loading helper methods   //
-//==========================================*/
-// TODO : 텍스쳐를 로드하는 부분도 ResourceManager가 수행하도록 바뀌어야 한다.
-TexturePtr Model::LoadMaterialTexture(aiMaterial* material, aiTextureType type, const std::filesystem::path& parentDir)
-{
-    if (material->GetTextureCount(type) <= 0) return nullptr;
-
-    aiString filepath;
-    if (material->GetTexture(type, 0, &filepath) != AI_SUCCESS) return nullptr;
-
-    return LoadTexture(filepath.C_Str(), parentDir);
-}
-
-TexturePtr Model::LoadTexture(const std::string& path, const std::filesystem::path& parentDir)
-{
-    if (path.empty()) return nullptr;
-
-    // 1. 파일 이름만 추출 (예: "texture/diffuse.jpg" -> "diffuse.jpg")
-    std::string filenameOnly = std::filesystem::path(path).filename().string();
-    if (filenameOnly.empty()) return nullptr;
-
-    TexturePtr tex;
-
-    // 2. [최적화] KTX 포맷 로드 시도
-    tex = LoadTextureFromKTX(filenameOnly, parentDir);
-    if (tex) return tex;
-
-    // 3. [기본] 원본 이미지(png, jpg 등) 로드
-    tex = LoadTextureFromImage(filenameOnly, parentDir);
-    if (tex) return tex;
-
-    return nullptr;
-}
-
-TexturePtr Model::LoadTextureFromKTX(const std::string& filename, const std::filesystem::path& parentDir)
-{
-    // 1. KTX 경로 구성
-    std::filesystem::path ktxPath = parentDir / filename;
-    ktxPath.replace_extension(".ktx");
-    std::string ktxFullPath = ktxPath.string();
-
-    // 2. 리소스 매니저 캐시 확인
-    auto cachedTex = RESOURCE.GetResource<Texture>(ktxFullPath);
-    if (cachedTex) return cachedTex;
-
-    // 3. 파일이 실제로 존재하는지 확인 후 로드
-    if (std::filesystem::exists(ktxPath))
-    {
-        auto texture = TextureUtils::LoadTextureFromKtx(ktxFullPath);
-        if (texture)
-        {
-            RESOURCE.AddResource<Texture>(std::move(texture), ktxFullPath);
-            return RESOURCE.GetResource<Texture>(ktxFullPath);
-        }
-    }
-
-    return nullptr;
-}
-
-TexturePtr Model::LoadTextureFromImage(const std::string& filename, const std::filesystem::path& parentDir)
-{
-    // 1. 원본 경로 구성
-    std::filesystem::path originalPath = parentDir / filename;
-    std::string originalFullPath = originalPath.string();
-
-    // 2. 리소스 매니저 캐시 확인
-    auto cachedTex = RESOURCE.GetResource<Texture>(originalFullPath);
-    if (cachedTex) return cachedTex;
-
-    // 3. 이미지 로드 시도 (Image 클래스 사용)
-    auto image = Image::Load(originalFullPath);
-    if (!image)
-    {
-        // 원본조차 없으면 에러 로그 출력
-        LOG_ERROR("Failed to load texture image: {}", originalFullPath);
-        return nullptr;
-    }
-
-    // 4. 텍스처 생성 및 등록
-    auto texture = TextureUtils::LoadTextureFromImage(image.get());
-    RESOURCE.AddResource<Texture>(std::move(texture), originalFullPath);
-
-    return RESOURCE.GetResource<Texture>(originalFullPath);
 }
 
 /*============================//

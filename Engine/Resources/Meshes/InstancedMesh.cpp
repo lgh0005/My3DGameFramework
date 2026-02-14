@@ -11,6 +11,8 @@ InstancedMeshUPtr InstancedMesh::Create(StaticMeshPtr baseMesh, BufferPtr instan
                                         int32 instanceCount, SetupFunc setupFunc)
 {
     auto renderer = InstancedMeshUPtr(new InstancedMesh());
+    renderer->m_desc.name = "InstancedMesh_Instance";
+    renderer->m_desc.path = "@Virtual/InstancedMesh";
     if (!renderer->Init(baseMesh, instanceBuffer, instanceCount, setupFunc)) return nullptr;
     return std::move(renderer);
 }

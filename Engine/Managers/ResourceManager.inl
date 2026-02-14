@@ -1,8 +1,9 @@
 ﻿#pragma once
 #include "ResourceManager.h"
+#include "Misc/Enums.h"
 
-template<typename T>
-inline std::shared_ptr<T> ResourceManager::Get(const std::string& name)
+template<typename T, typename... Args>
+inline std::shared_ptr<T> ResourceManager::Get(const std::string& name, Args&&... args)
 {
     // 1. 캐시 검색
     auto it = m_resources.find(name);
@@ -24,7 +25,7 @@ inline std::shared_ptr<T> ResourceManager::Get(const std::string& name)
     LOG_INFO("ResourceManager: Lazy Loading -> {} ({})", name, vPath);
 
     // 4. 리소스 타입에 맞는 Desc 생성 및 Load 호출
-    typename T::DescType desc(actualPath, name);
+    typename T::DescType desc(actualPath, std::forward<Args>(args)..., name);
 
     // 특수한 추가 설정이 필요한 경우 (예: Texture의 sRGB 등)는 
     // 나중에 .meta 파일이나 정책에 따라 여기에 추가할 수 있습니다.

@@ -18,15 +18,18 @@ TexturePtr Texture::Load(const TextureDesc& desc)
     if (ext == ".ktx")
     {
         auto ktxTexture = TextureUtils::LoadTextureFromKtx(desc.path);
-        if (!ktxTexture) return nullptr;
-
-        // 리소스 정보 주입
-        ktxTexture->SetPath(desc.path);
-        ktxTexture->SetName(desc.name);
-        return ktxTexture;
+        if (ktxTexture)
+        {
+            ktxTexture->m_desc = desc;
+            return ktxTexture;
+        }
+        return nullptr;
     }
 
     // 3. 일반 이미지 로드 (LDR/HDR)
+    auto texture = TexturePtr(new Texture());
+    texture->m_desc = desc;
+
     ImageDesc imgDesc(desc.path);
     imgDesc.isFlipY = true;
 
@@ -37,10 +40,7 @@ TexturePtr Texture::Load(const TextureDesc& desc)
         return nullptr;
     }
 
-    // 4. 텍스처 인스턴스 생성 및 초기화
-    auto texture = TexturePtr(new Texture());
-    texture->SetPath(desc.path);
-    texture->SetName(desc.name);
+    // 4. GPU 텍스처 생성
     texture->CreateTexture();
 
     // 5. 포맷 결정 (TextureUtils의 헬퍼 함수 활용)
@@ -81,6 +81,8 @@ TexturePtr Texture::Load(const TextureDesc& desc)
 TexturePtr Texture::Create(int32 width, int32 height, uint32 internalFormat, uint32 format, uint32 type)
 {
     auto texture = TexturePtr(new Texture());
+    texture->m_desc.name = fmt::format("Procedural_Tex_{}", (uintptr_t)texture.get());
+    texture->m_desc.path = "@Virtual/Texture";
     texture->CreateTexture();
     texture->SetTextureFormat(width, height, internalFormat, format, type);
     texture->SetFilter(GL_LINEAR, GL_LINEAR);

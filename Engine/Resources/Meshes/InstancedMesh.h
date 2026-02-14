@@ -28,6 +28,7 @@ public:
         SetupFunc setupFunc
     );
 	virtual void Draw() const override;
+    virtual const InstancedMeshDesc& GetDesc() const override { return m_desc; }
     int32 GetInstanceCount() const { return m_instanceCount; }
 
 private:
@@ -39,6 +40,7 @@ private:
         int32 instanceCount,
         SetupFunc setupFunc
     );
+    InstancedMeshDesc m_desc;
 
     BufferPtr m_instanceBuffer;
     int32     m_instanceCount    { 0 };

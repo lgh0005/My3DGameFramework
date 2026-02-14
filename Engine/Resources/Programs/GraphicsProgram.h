@@ -10,8 +10,9 @@ class GraphicsProgram : public Program
 public:
 	virtual ~GraphicsProgram();
 	static GraphicsProgramPtr Load(const GraphicsProgramDesc& desc);
+	virtual const GraphicsProgramDesc& GetDesc() const override { return m_desc; }
 
 private:
 	GraphicsProgram();
-	static GraphicsProgramPtr Create(const std::vector<ShaderPtr>& shaders);
+	GraphicsProgramDesc m_desc;
 };

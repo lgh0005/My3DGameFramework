@@ -10,14 +10,15 @@ class AudioClip : public Resource
 public:
 	virtual ~AudioClip();
 	static AudioClipPtr Load(const AudioClipDesc& desc);
-	AudioType GetType() const { return m_type; }
+	virtual const AudioClipDesc& GetDesc() const override { return m_desc; }
+	AudioType GetType() const { return m_desc.type; }
 	const std::vector<uint8>& GetBuffer() const { return m_audioBuffer; }
 
 private:
 	AudioClip();
-	bool LoadIntoMemory(const std::string& filepath);
-	bool CheckFileExist(const std::string& filepath);
+	bool LoadIntoMemory();
+	bool CheckFileExist();
 
-	AudioType		   m_type;
+	AudioClipDesc m_desc;
 	std::vector<uint8> m_audioBuffer;
 };

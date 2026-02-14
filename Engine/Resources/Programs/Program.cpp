@@ -8,21 +8,6 @@ Program::~Program()
     if (m_program) glDeleteProgram(m_program);
 }
 
-//ProgramUPtr Program::Create(const std::vector<ShaderPtr>& shaders)
-//{
-//    auto program = ProgramUPtr(new Program());
-//    if (!program->Link(shaders)) return nullptr;
-//    return move(program);
-//}
-//
-//ProgramUPtr Program::Create(const std::string& vertShaderFilename, const std::string& fragShaderFilename)
-//{
-//    ShaderPtr vs = Shader::CreateFromFile(vertShaderFilename, GL_VERTEX_SHADER);
-//    ShaderPtr fs = Shader::CreateFromFile(fragShaderFilename, GL_FRAGMENT_SHADER);
-//    if (!vs || !fs) return nullptr;
-//    return std::move(Create({ vs, fs }));
-//}
-
 void Program::Use() const
 {
     glUseProgram(m_program);
@@ -35,7 +20,7 @@ bool Program::Link(const std::vector<ShaderPtr>& shaders)
         glAttachShader(m_program, shader->Get());
     glLinkProgram(m_program);
 
-    int success = 0;
+    int32 success = 0;
     glGetProgramiv(m_program, GL_LINK_STATUS, &success);
     if (!success)
     {

@@ -14,6 +14,8 @@ StaticMeshUPtr StaticMesh::Create(const std::vector<StaticVertex>& vertices,
 	                              uint32 primitiveType)
 {
 	auto mesh = StaticMeshUPtr(new StaticMesh());
+    mesh->m_desc.name = "StaticMesh_Material";
+    mesh->m_desc.path = "@Virtual/StaticMesh";
 	mesh->Init(vertices, indices, primitiveType);
 	return std::move(mesh);
 }

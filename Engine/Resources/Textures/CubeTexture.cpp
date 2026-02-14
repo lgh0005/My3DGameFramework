@@ -14,18 +14,21 @@ CubeTexturePtr CubeTexture::Load(const CubeTextureDesc& desc)
     std::string ext = std::filesystem::path(desc.path).extension().string();
     std::transform(ext.begin(), ext.end(), ext.begin(), ::tolower);
 
-    CubeTextureUPtr textureUPtr = nullptr;
+    CubeTextureUPtr texturePtr = nullptr;
 
     // 2. KTX 로드 (6면이 포함된 단일 파일)
     if (ext == ".ktx")
     {
-        textureUPtr = TextureUtils::LoadCubeMapFromKtx(desc.path);
+        texturePtr = TextureUtils::LoadCubeMapFromKtx(desc.path);
+        if (texturePtr) texturePtr->m_desc = desc;
     }
     else
     {
         LOG_ERROR("CubeTexture: Unsupported format for single-file load: {}. (Use .ktx)", desc.path);
         return nullptr;
     }
+
+    return texturePtr;
 }
 
 /*=========================================//
@@ -34,6 +37,8 @@ CubeTexturePtr CubeTexture::Load(const CubeTextureDesc& desc)
 CubeTextureUPtr CubeTexture::Create(int32 width, int32 height, uint32 format, uint32 type)
 {
     auto texture = CubeTextureUPtr(new CubeTexture());
+    texture->m_desc.name = fmt::format("Procedural_Cube_{}", (uintptr_t)texture.get());
+    texture->m_desc.path = "@Virtual/CubeTexture";
     texture->Init(width, height, format, type);
     return std::move(texture);
 }
