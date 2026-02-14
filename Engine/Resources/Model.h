@@ -26,6 +26,7 @@ class Model : public Resource
 public:
 	virtual ~Model();
 	static ModelPtr Load(const ModelDesc& desc);
+	virtual ResourceDesc& GetDesc() override { return m_desc; }
 	virtual const ResourceDesc& GetDesc() const override { return m_desc; }
 
 	uint32 GetMeshCount() const { return (uint32)m_meshes.size(); }

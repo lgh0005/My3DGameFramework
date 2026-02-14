@@ -18,7 +18,8 @@ public:
     virtual ~CubeTexture();
     static CubeTexturePtr Load(const CubeTextureDesc& desc);
     static CubeTextureUPtr Create(int32 width, int32 height, uint32 format, uint32 type = GL_UNSIGNED_BYTE);
-    virtual const CubeTextureDesc& GetDesc() const override { return m_desc; }
+    virtual CubeTextureDesc& GetDesc() override { return m_desc; }
+    virtual const ResourceDesc& GetDesc() const override { return m_desc; }
     void GenerateMipmap() const;
 
 private:

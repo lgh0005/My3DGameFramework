@@ -15,7 +15,8 @@ public:
 	static ImagePtr Create(int32 width, int32 height, int32 channelCount = 4, int32 bytePerChannel = 1);
 	static ImagePtr CreateSingleColorImage(int32 width,
 		int32 height, const glm::vec4& color);
-	virtual const ImageDesc& GetDesc() const override { return m_desc; }
+	virtual ImageDesc& GetDesc() override { return m_desc; }
+	virtual const ResourceDesc& GetDesc() const override { return m_desc; }
 
 	const uint8* GetData() const	{ return m_data; }
 	int32 GetWidth() const			{ return m_width; }

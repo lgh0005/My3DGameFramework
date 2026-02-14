@@ -16,13 +16,15 @@ class StaticMesh : public Mesh
     DEFINE_RESOURCE_TYPE(ResourceType::StaticMesh, StaticMeshDesc)
 
 public:
-    static StaticMeshUPtr Create
+    static StaticMeshPtr Create
     (
         const std::vector<StaticVertex>& vertices,
         const std::vector<uint32>& indices,
         uint32 primitiveType = GL_TRIANGLES
     );
-    virtual const StaticMeshDesc& GetDesc() const override { return m_desc; }
+    static StaticMeshPtr Load(const StaticMeshDesc& desc);
+    virtual StaticMeshDesc& GetDesc() override { return m_desc; }
+    virtual const ResourceDesc& GetDesc() const override { return m_desc; }
     virtual ~StaticMesh() override;
     void ComputeTangents
     (

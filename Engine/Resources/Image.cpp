@@ -11,7 +11,7 @@ Image::~Image()
 
 ImagePtr Image::Load(const ImageDesc& desc)
 {
-    // 1. 객체 생성 및 Desc 주입
+    // 1. 객체 생성 및 Desc 주입 (한 번만 수행)
     auto image = ImagePtr(new Image());
     image->m_desc = desc;
 
@@ -19,17 +19,18 @@ ImagePtr Image::Load(const ImageDesc& desc)
     std::string ext = std::filesystem::path(desc.path).extension().string();
     std::transform(ext.begin(), ext.end(), ext.begin(), ::tolower);
 
-    // 2. 확장자에 따른 로딩 방식 분기
-    // TODO : 이후에 확장명 종류를 더 구체화해야 한다.
-    auto image = ImagePtr(new Image());
+    // 3. 확장자에 따른 로딩 방식 분기
+    bool success = false;
     if (ext == ".hdr")
     {
-        if (!image->LoadWithStbFloat()) return nullptr;
+        success = image->LoadWithStbFloat();
     }
     else
     {
-        if (!image->LoadWithStb()) return nullptr;
+        success = image->LoadWithStb();
     }
+
+    if (!success) return nullptr;
 
     return image;
 }

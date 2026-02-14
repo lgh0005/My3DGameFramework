@@ -13,7 +13,7 @@ class InstancedRenderPass : public GeneralRenderPass
 {
 public:
     virtual ~InstancedRenderPass();
-    static InstancedRenderPassUPtr Create(ProgramUPtr program);
+    static InstancedRenderPassUPtr Create(ProgramPtr program);
     virtual void Render(Scene* scene, Camera* camera) override;
 
     const std::vector<InstancedMeshRenderer*>& GetRenderers() const;
@@ -21,8 +21,8 @@ public:
 
 private:
     InstancedRenderPass();
-    bool Init(ProgramUPtr program);
-    ProgramUPtr m_instanceProgram;
+    bool Init(ProgramPtr program);
+    ProgramPtr m_instanceProgram;
 
     std::vector<InstancedMeshRenderer*> m_renderers;
 };

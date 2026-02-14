@@ -17,7 +17,8 @@ public:
 	virtual ~Texture();
 	static TexturePtr Load(const TextureDesc& desc);
 	static TexturePtr Create(int32 width, int32 height, uint32 internalFormat, uint32 format, uint32 type);
-	virtual const TextureDesc& GetDesc() const override { return m_desc; }
+	virtual TextureDesc& GetDesc() override { return m_desc; }
+	virtual const ResourceDesc& GetDesc() const override { return m_desc; }
 
 public:
 	void Resize(int32 width, int32 height);

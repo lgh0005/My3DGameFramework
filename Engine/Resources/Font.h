@@ -26,7 +26,8 @@ class Font : public Resource
 public:
 	virtual ~Font();
 	static FontPtr Load(const FontDesc& desc);
-	virtual const FontDesc& GetDesc() const override { return m_desc; }
+	virtual FontDesc& GetDesc() override { return m_desc; }
+	virtual const ResourceDesc& GetDesc() const override { return m_desc; }
 
 	const GlyphInfo& GetOrLoadGlyph(uint32 codePoint);
 	TexturePtr GetAtlasTexture() const { return m_atlasTexture; }

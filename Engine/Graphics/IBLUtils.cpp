@@ -14,7 +14,12 @@
 CubeTexturePtr IBLUtils::CreateCubemapFromHDR(Texture* hdrTexture, int32 resolution)
 {
 	// 일회용 유틸성 쉐이더 로드
-	auto sphericalToCubeProgram = RESOURCE.GetResource<GraphicsProgram>("ibl_utils_sphericalToCube");
+	auto sphericalToCubeProgram = RESOURCE.Add<GraphicsProgram>
+	(
+		"ibl_utils_sphericalToCube",
+		"@BuiltInAsset/Shaders/IBLUtils/IBLUtils_Common.vert",
+		"@BuiltInAsset/Shaders/IBLUtils/IBLUtils_Spherical_Map.frag"
+	);
 	if (!sphericalToCubeProgram) return nullptr;
 
 	// 일회용 큐브 메쉬 생성
@@ -69,7 +74,12 @@ CubeTexturePtr IBLUtils::CreateCubemapFromHDR(Texture* hdrTexture, int32 resolut
 CubeTexturePtr IBLUtils::CreateIrradianceMap(CubeTexture* src)
 {
 	// 일회용 유틸성 쉐이더 로드
-	auto convolutionProgram = RESOURCE.GetResource<GraphicsProgram>("ibl_utils_convolution");
+	auto convolutionProgram = RESOURCE.Add<GraphicsProgram>
+	(
+		"ibl_utils_convolution",
+		"@BuiltInAsset/Shaders/IBLUtils/IBLUtils_Common.vert",
+		"@BuiltInAsset/Shaders/IBLUtils/IBLUtils_Diffuse_Irradiance.frag"
+	);
 	if (!convolutionProgram) return nullptr;
 
 	// 일회용 큐브 메쉬 생성
@@ -127,7 +137,12 @@ CubeTexturePtr IBLUtils::CreatePrefilteredMap(CubeTexture* src)
 	glGetIntegerv(GL_VIEWPORT, prevViewport);
 
 	// 일회용 유틸성 쉐이더 로드
-	auto preFilteredProgram = RESOURCE.GetResource<GraphicsProgram>("ibl_utils_prefiltered");
+	auto preFilteredProgram = RESOURCE.Add<GraphicsProgram>
+	(
+		"ibl_utils_prefiltered",
+		"@BuiltInAsset/Shaders/IBLUtils/IBLUtils_Common.vert",
+		"@BuiltInAsset/Shaders/IBLUtils/IBLUtils_Prefiltered_Light.frag"
+	);
 	if (!preFilteredProgram) return nullptr;
 
 	auto cubeMesh = GeometryGenerator::CreateBox();
@@ -189,7 +204,12 @@ TexturePtr IBLUtils::CreateBRDFLUT()
 	glGetIntegerv(GL_VIEWPORT, prevViewport);
 	glViewport(0, 0, resolution, resolution);
 
-	auto brdfProgram = RESOURCE.GetResource<GraphicsProgram>("ibl_utils_brdf_lut");
+	auto brdfProgram = RESOURCE.Add<GraphicsProgram>
+	(
+		"ibl_utils_brdf_lut",
+		"@BuiltInAsset/Shaders/IBLUtils/IBLUtils_BRDF_Lookup.vert",
+		"@BuiltInAsset/Shaders/IBLUtils/IBLUtils_BRDF_Lookup.frag"
+	);
 	if (!brdfProgram) return nullptr;
 
 	auto lookupFramebuffer = BRDFLookUpFramebuffer::Create(resolution, resolution);
@@ -205,7 +225,7 @@ TexturePtr IBLUtils::CreateBRDFLUT()
 	brdfProgram->Use();
 
 	// 스크린 메쉬
-	auto screen = RESOURCE.GetResource<ScreenMesh>("Screen");
+	auto screen = RESOURCE.Get<ScreenMesh>("Screen");
 	screen->Draw();
 
 	// 복구

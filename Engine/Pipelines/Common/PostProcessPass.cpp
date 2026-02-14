@@ -42,7 +42,7 @@ void PostProcessPass::Render(RenderContext* context)
 			(
 				context,
 				m_swapFrameBuffers[sourceIdx].get(), // src
-				m_swapFrameBuffers[destIdx].get(),  // dst
+				m_swapFrameBuffers[destIdx].get(),   // dst
 				m_screen.get()
 			);
 

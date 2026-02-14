@@ -7,9 +7,9 @@ CLASS_PTR(StaticMesh)
 class GeometryGenerator
 {
 public:
-	static StaticMeshUPtr CreateBox();
-	static StaticMeshUPtr CreatePlane();
-	static StaticMeshUPtr CreateSphere
+	static StaticMeshPtr CreateBox();
+	static StaticMeshPtr CreatePlane();
+	static StaticMeshPtr CreateSphere
 	(
 		uint32 latiSegmentCount = 16,
 		uint32 longiSegmentCount = 32

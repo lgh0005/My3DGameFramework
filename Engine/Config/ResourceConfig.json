@@ -1,0 +1,21 @@
+﻿{
+  "ResourceExtensions": {
+
+    ".ktx": "Texture",
+
+    ".png": "Image",
+    ".hdr": "Image",
+    ".jpg": "Image",
+    ".jpeg": "Image",
+
+    ".mymodel": "Model",
+
+    ".myanim": "Animation",
+
+    ".wav": "AudioClip",
+    ".mp3": "AudioClip",
+
+    ".vert": "Shader",
+    ".frag": "Shader"
+  }
+}

@@ -26,8 +26,13 @@ StandardDeferredLightingPassUPtr StandardDeferredLightingPass::Create()
 
 bool StandardDeferredLightingPass::Init()
 {
-	m_deferredLightProgram = RESOURCE.GetResource<GraphicsProgram>("standard_deferred_lighting");
-	m_plane = RESOURCE.GetResource<ScreenMesh>("Screen");
+	m_deferredLightProgram = RESOURCE.Add<GraphicsProgram>
+	(
+		"standard_deferred_lighting",
+		"@BuiltInAsset/Shaders/Standard/Standard_Deferred_LightPass.vert",
+		"@BuiltInAsset/Shaders/Standard/Standard_Deferred_LightPass.frag"
+	);
+	m_plane = RESOURCE.Get<ScreenMesh>("Screen");
 	if (!m_deferredLightProgram || !m_plane) return false;
 
 	// 1. 변하지 않는 샘플러 인덱스는 초기화 시점에 한 번만 전송

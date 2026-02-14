@@ -10,7 +10,8 @@ class AudioClip : public Resource
 public:
 	virtual ~AudioClip();
 	static AudioClipPtr Load(const AudioClipDesc& desc);
-	virtual const AudioClipDesc& GetDesc() const override { return m_desc; }
+	virtual AudioClipDesc& GetDesc() override { return m_desc; }
+	virtual const ResourceDesc& GetDesc() const override { return m_desc; }
 	AudioType GetType() const { return m_desc.type; }
 	const std::vector<uint8>& GetBuffer() const { return m_audioBuffer; }
 

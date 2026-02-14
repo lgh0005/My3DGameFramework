@@ -22,8 +22,12 @@ bool WorldSpaceEffects::Init(int32 priority, int32 width, int32 height)
 	m_priority = priority;
 	m_width = width;
 	m_height = height;
-	m_worldSpaceEffectProgram = RESOURCE.GetResource<GraphicsProgram>("world_space_effects");
-
+	m_worldSpaceEffectProgram = RESOURCE.Add<GraphicsProgram>
+	(
+		"world_space_effects",
+		"@BuiltInAsset/Shaders/PostProcessing/PostProcess_World_Space_Effects.vert",
+		"@BuiltInAsset/Shaders/PostProcessing/PostProcess_World_Space_Effects.frag"
+	);
 	return m_worldSpaceEffectProgram != nullptr;
 }
 

@@ -14,6 +14,8 @@ set(ENGINE_SOURCES
 
    "Parsers/EngineParsers/MaterialYamlParser.h"           "Parsers/EngineParsers/MaterialYamlParser.cpp"
    "Parsers/EngineParsers/SceneYamlParser.h"           "Parsers/EngineParsers/SceneYamlParser.cpp"
+   
+   "Parsers/EngineParsers/ResourceConfigParser.h"    "Parsers/EngineParsers/ResourceConfigParser.cpp"
 
    # Debug
    "Debug/Logger.h"                  "Debug/Logger.cpp"
@@ -140,7 +142,6 @@ set(ENGINE_SOURCES
    "Graphics/Framebuffers/CubeFramebuffer.h"         "Graphics/Framebuffers/CubeFramebuffer.cpp"
    "Graphics/Framebuffers/BRDFLookUpFramebuffer.h"   "Graphics/Framebuffers/BRDFLookUpFramebuffer.cpp"
    "Graphics/Framebuffers/GBufferFramebuffer.h"      "Graphics/Framebuffers/GBufferFramebuffer.cpp"
-   "Graphics/Framebuffers/MSAAFramebuffer.h"         "Graphics/Framebuffers/MSAAFramebuffer.cpp"
    "Graphics/Framebuffers/PostProcessFramebuffer.h"  "Graphics/Framebuffers/PostProcessFramebuffer.cpp"
    "Graphics/Framebuffers/SSAOFramebuffer.h"         "Graphics/Framebuffers/SSAOFramebuffer.cpp"
    "Graphics/Framebuffers/OutlineFramebuffer.h"      "Graphics/Framebuffers/OutlineFramebuffer.cpp"
@@ -231,7 +232,6 @@ set(ENGINE_SOURCES
    "Managers/UIManager.h"           "Managers/UIManager.cpp"
    "Managers/EntityManager.h"           "Managers/EntityManager.cpp"
    "Managers/InstanceManager.h"      "Managers/InstanceManager.cpp"
-   "Managers/FileManager.h"         "Managers/FileManager.cpp"          "Managers/FileManager.inl"
    "Managers/LuaManager.h"      "Managers/LuaManager.cpp"
 )
 
@@ -286,14 +286,9 @@ add_custom_command(TARGET Engine POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E rm -rf "${OUTPUT_DIR}/Config/Engine"
     COMMAND ${CMAKE_COMMAND} -E copy_directory
             "${CMAKE_CURRENT_SOURCE_DIR}/Config"
-            "${OUTPUT_DIR}/Config/Engine"
+            "${OUTPUT_DIR}/Config"
 
-    # 2. Engine boot config (root)
-    COMMAND ${CMAKE_COMMAND} -E copy_if_different
-            "${CMAKE_CURRENT_SOURCE_DIR}/Config/EngineConfig.json"
-            "${OUTPUT_DIR}/Config/EngineConfig.json"
-
-    # 3. Assets (Engine)
+    # 2. Assets (Engine)
     COMMAND ${CMAKE_COMMAND} -E make_directory "${OUTPUT_DIR}/Assets"
     COMMAND ${CMAKE_COMMAND} -E copy_directory
             "${CMAKE_CURRENT_SOURCE_DIR}/BuiltIn"

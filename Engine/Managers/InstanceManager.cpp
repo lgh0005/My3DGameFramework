@@ -18,7 +18,7 @@ void InstanceManager::BuildGlobalAnimBuffer()
 {
 	// 1. 리소스 매니저에서 로드된 모든 애니메이션 가져오기
 	// (구조에 따라 GetAnimations() 같은게 필요함)
-	auto animations = RESOURCE.GetResources<Animation>();
+	auto animations = RESOURCE.GetAll<Animation>();
 
 	if (animations.empty()) return;
 

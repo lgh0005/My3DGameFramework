@@ -22,8 +22,12 @@ bool DisplayMappingEffects::Init(int32 priority, int32 width, int32 height)
 	m_width = width;
 	m_height = height;
 
-	m_compositeProgram = RESOURCE.GetResource<GraphicsProgram>("standard_postprocess_postprocess");
-	m_cameraDirtTexture = RESOURCE.GetResource<Texture>("camera_dirt");
+	m_compositeProgram = RESOURCE.Add<GraphicsProgram>
+	(
+		"standard_postprocess_postprocess",
+		"@BuiltInAsset/Shaders/Standard/Standard_Post_PostProcess.vert",
+		"@BuiltInAsset/Shaders/Standard/Standard_Post_PostProcess.frag"
+	);
 	if (!m_compositeProgram) return false;
 
 	m_compositeProgram->Use();

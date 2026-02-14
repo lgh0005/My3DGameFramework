@@ -9,23 +9,22 @@ DECLARE_DEFAULTS_IMPL(EnvironmentMap)
 
 EnvironmentMapPtr EnvironmentMap::Load(const EnvironmentMapDesc& desc)
 {
-    // 1. 리소스 인스턴스 생성
+    // 1. 리소스 인스턴스 생성 및 이름 설정
     EnvironmentMapPtr envMap(new EnvironmentMap());
     envMap->m_desc = desc;
 
-    // 2. 확장자 확인 (.hdr vs .ktx/.dds)
-    // TODO : 이후에는 큐브맵도 전면적으로 ktx로 로딩할 예정
+    // 2. 확장자 확인
     std::string ext = std::filesystem::path(desc.path).extension().string();
     std::transform(ext.begin(), ext.end(), ext.begin(), ::tolower);
 
     if (ext == ".hdr")
     {
-        TextureDesc hdrDesc(desc.path);
-        auto hdrTexture = RESOURCE.Load<Texture>(hdrDesc);
+        // RESOURCE.Add를 사용하여 HDR 텍스처 로드 (캐싱 및 가상 경로 지원)
+        // 이름은 리소스 구분을 위해 path를 기반으로 생성하거나 별도 규칙 적용
+        auto hdrTexture = RESOURCE.Add<Texture>(desc.path, desc.path);
 
         if (hdrTexture)
         {
-            // 2D 텍스처를 큐브맵으로 변환
             envMap->m_skybox = IBLUtils::CreateCubemapFromHDR(hdrTexture.get());
         }
         else
@@ -36,8 +35,8 @@ EnvironmentMapPtr EnvironmentMap::Load(const EnvironmentMapDesc& desc)
     }
     else
     {
-        CubeTextureDesc cubeDesc(desc.path);
-        envMap->m_skybox = RESOURCE.Load<CubeTexture>(cubeDesc);
+        // .ktx 등 큐브맵 파일 직접 로드
+        envMap->m_skybox = RESOURCE.Add<CubeTexture>(desc.path, desc.path);
 
         if (!envMap->m_skybox)
         {
@@ -55,29 +54,30 @@ EnvironmentMapPtr EnvironmentMap::Load(const EnvironmentMapDesc& desc)
 
         LOG_INFO("EnvironmentMap Loaded (Full IBL): {}", desc.path);
     }
-    else
-    {
-        LOG_INFO("EnvironmentMap Loaded (Skybox Only): {}", desc.path);
-    }
 
     return envMap;
 }
 
-EnvironmentMapUPtr EnvironmentMap::Create(const CubeTexturePtr& cubeTexture)
+EnvironmentMapPtr EnvironmentMap::Create(const CubeTexturePtr& cubeTexture)
 {
-    // 1. 일반 스카이맵 생성
-    auto envMap = EnvironmentMapUPtr(new EnvironmentMap());
+    if (!cubeTexture) return nullptr;
+    EnvironmentMapPtr envMap(new EnvironmentMap());
     envMap->m_skybox = cubeTexture;
-    return std::move(envMap);
+    envMap->m_desc.name = cubeTexture->GetName();
+    return envMap;
 }
 
-EnvironmentMapUPtr EnvironmentMap::CreateIBL(const TexturePtr& hdrTexture)
+EnvironmentMapPtr EnvironmentMap::CreateIBL(const TexturePtr& hdrTexture)
 {
-    // EnvironmentMap 리소스 생성
-    auto envMap = EnvironmentMapUPtr(new EnvironmentMap());
-    envMap->m_skybox      = IBLUtils::CreateCubemapFromHDR(hdrTexture.get());
-    envMap->m_irradiance  = IBLUtils::CreateIrradianceMap(envMap->m_skybox.get());
+    if (!hdrTexture) return nullptr;
+
+    EnvironmentMapPtr envMap(new EnvironmentMap());
+
+    // IBL 베이킹 프로세스
+    envMap->m_skybox = IBLUtils::CreateCubemapFromHDR(hdrTexture.get());
+    envMap->m_irradiance = IBLUtils::CreateIrradianceMap(envMap->m_skybox.get());
     envMap->m_prefiltered = IBLUtils::CreatePrefilteredMap(envMap->m_skybox.get());
-    envMap->m_brdf        = IBLUtils::CreateBRDFLUT();
-    return std::move(envMap);
+    envMap->m_brdf = IBLUtils::CreateBRDFLUT();
+    envMap->m_desc.name = hdrTexture->GetName();
+    return envMap;
 }

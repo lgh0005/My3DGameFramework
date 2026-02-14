@@ -20,15 +20,17 @@ public:
             uint32 instanceAttribStartIndex)>;
 
     virtual ~InstancedMesh();
-    static InstancedMeshUPtr Create
+    static InstancedMeshPtr Create
     (
         StaticMeshPtr baseMesh,           
         BufferPtr     instanceBuffer,  
         int32         instanceCount,
         SetupFunc setupFunc
     );
+    static InstancedMeshPtr Load(const InstancedMeshDesc& desc);
 	virtual void Draw() const override;
-    virtual const InstancedMeshDesc& GetDesc() const override { return m_desc; }
+    virtual InstancedMeshDesc& GetDesc() override { return m_desc; }
+    virtual const ResourceDesc& GetDesc() const override { return m_desc; }
     int32 GetInstanceCount() const { return m_instanceCount; }
 
 private:

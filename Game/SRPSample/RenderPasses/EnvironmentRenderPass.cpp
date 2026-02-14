@@ -15,14 +15,14 @@
 
 DECLARE_DEFAULTS_IMPL(EnvironmentRenderPass)
 
-EnvironmentRenderPassUPtr EnvironmentRenderPass::Create(ProgramUPtr program, CubeTexturePtr cubeTexture)
+EnvironmentRenderPassUPtr EnvironmentRenderPass::Create(ProgramPtr program, CubeTexturePtr cubeTexture)
 {
 	auto pass = EnvironmentRenderPassUPtr(new EnvironmentRenderPass());
 	if (!pass->Init(std::move(program), cubeTexture)) return nullptr;
 	return std::move(pass);
 }
 
-bool EnvironmentRenderPass::Init(ProgramUPtr program, CubeTexturePtr cubeTexture)
+bool EnvironmentRenderPass::Init(ProgramPtr program, CubeTexturePtr cubeTexture)
 {
 	m_envProgram = std::move(program);
 	if (!m_envProgram) return false;

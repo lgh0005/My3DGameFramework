@@ -9,15 +9,22 @@
 
 DECLARE_DEFAULTS_IMPL(SkinnedMesh)
 
-SkinnedMeshUPtr SkinnedMesh::Create(const std::vector<SkinnedVertex>& vertices,
+SkinnedMeshPtr SkinnedMesh::Create(const std::vector<SkinnedVertex>& vertices,
                                     const std::vector<uint32>& indices,
                                     uint32 primitiveType)
 {
-    auto mesh = SkinnedMeshUPtr(new SkinnedMesh());
+    auto mesh = SkinnedMeshPtr(new SkinnedMesh());
     mesh->m_desc.name = "SkinnedMesh_Material";
     mesh->m_desc.path = "@Virtual/SkinnedMesh";
     mesh->Init(vertices, indices, primitiveType);
     return std::move(mesh);
+}
+
+SkinnedMeshPtr SkinnedMesh::Load(const SkinnedMeshDesc& desc)
+{
+    auto mesh = SkinnedMeshPtr(new SkinnedMesh());
+    mesh->m_desc = desc;
+    return mesh;
 }
 
 void SkinnedMesh::Init(const std::vector<SkinnedVertex>& vertices,

@@ -75,7 +75,6 @@ using json = nlohmann::json;
 #include "Managers/UIManager.h"
 #include "Managers/EntityManager.h"
 #include "Managers/InstanceManager.h"
-#include "Managers/FileManager.h"
 #include "Managers/DataManager.h"
 #include "Managers/LuaManager.h"
 
@@ -92,6 +91,5 @@ using json = nlohmann::json;
 #define UI		  UIManager::Instance()
 #define ENTITY	  EntityManager::Instance()
 #define INSTANCE  InstanceManager::Instance()
-#define FILE_MGR  FileManager::Instance()
 #define DATA_MGR  DataManager::Instance()
 #define LUA_MGR   LuaManager::Instance()

@@ -16,7 +16,7 @@ public:
     virtual ~EnvironmentRenderPass();
     static EnvironmentRenderPassUPtr Create
     (
-        ProgramUPtr program,     
+        ProgramPtr program,     
         CubeTexturePtr cubeTexture
     );
 
@@ -29,11 +29,11 @@ private:
     EnvironmentRenderPass();
     bool Init
     (
-        ProgramUPtr program,
+        ProgramPtr program,
         CubeTexturePtr cubeTexture
     );
 
     CubeTexturePtr m_cubeTexture;
-    ProgramUPtr m_envProgram;
+    ProgramPtr m_envProgram;
     std::vector<StaticMeshRenderer*> m_renderers;
 };

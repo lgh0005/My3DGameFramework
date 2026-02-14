@@ -5,13 +5,21 @@
 
 DECLARE_DEFAULTS_IMPL(DebugMesh)
 
-DebugMeshUPtr DebugMesh::Create(uint32 primitiveType)
+DebugMeshPtr DebugMesh::Create(uint32 primitiveType)
 {
-	auto mesh = DebugMeshUPtr(new DebugMesh());
+	auto mesh = DebugMeshPtr(new DebugMesh());
 	mesh->m_desc.name = "DebugMesh_Instance";
 	mesh->m_desc.path = "@Virtual/DebugMesh";
 	mesh->Init(primitiveType);
 	return std::move(mesh);
+}
+
+DebugMeshPtr DebugMesh::Load(const DebugMeshDesc& desc)
+{
+	auto mesh = DebugMeshPtr(new DebugMesh());
+	mesh->m_desc = desc;
+	mesh->Init(GL_LINES);
+	return mesh;
 }
 
 void DebugMesh::Init(uint32 primitiveType)

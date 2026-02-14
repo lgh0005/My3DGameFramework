@@ -37,9 +37,6 @@ ModelPtr Model::Load(const ModelDesc& desc)
 {
     // 1. 객체 생성 (기본 생성자 호출)
     auto model = ModelPtr(new Model());
-
-    // 2. 전달받은 desc를 객체 내부에 저장
-    // 이제 model->GetName() 등을 호출하면 이 데이터가 참조됩니다.
     model->m_desc = desc;
 
     // 3. 확장자 체크 (m_desc.path 기반)
@@ -190,14 +187,15 @@ GameObjectUPtr Model::CreateGameObjectForSingleNode
 //========================================================*/
 bool Model::LoadByBinary()
 {
-    std::ifstream inFile(m_desc.path, std::ios::binary);
+    std::string actualPath = RESOURCE.ResolvePath(m_desc.path);
+    std::ifstream inFile(actualPath, std::ios::binary);
     if (!inFile)
     {
-        LOG_ERROR("Failed to open binary model file (V3): {}", m_desc.path);
+        LOG_ERROR("Failed to open binary model file (V3): {}", actualPath);
         return false;
     }
 
-    std::filesystem::path modelDir = std::filesystem::path(m_desc.path).parent_path();
+    std::filesystem::path modelDir = std::filesystem::path(actualPath).parent_path();
 
     // 데이터를 받아올 지역 변수 (참조로 넘겨서 채움)
     uint32 matCount = 0;
@@ -226,7 +224,7 @@ bool Model::LoadByBinary()
     // 6. Skeletal Hierarchy Index Write
     LinkSkeletonHierarchy();
 
-    LOG_INFO("Model loaded successfully (Binary): {}", m_desc.path);
+    LOG_INFO("Model loaded successfully (Binary): {}", actualPath);
     inFile.close();
     return true;
 }

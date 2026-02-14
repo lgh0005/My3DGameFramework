@@ -13,14 +13,14 @@
 
 DECLARE_DEFAULTS_IMPL(InstancedRenderPass)
 
-InstancedRenderPassUPtr InstancedRenderPass::Create(ProgramUPtr program)
+InstancedRenderPassUPtr InstancedRenderPass::Create(ProgramPtr program)
 {
     auto pass = InstancedRenderPassUPtr(new InstancedRenderPass());
     if (!pass->Init(std::move(program))) return nullptr;
     return std::move(pass);
 }
 
-bool InstancedRenderPass::Init(ProgramUPtr program)
+bool InstancedRenderPass::Init(ProgramPtr program)
 {
     m_instanceProgram = std::move(program);
     if (!m_instanceProgram) return false;

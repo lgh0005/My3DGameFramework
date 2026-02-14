@@ -3,7 +3,7 @@
 #include "Graphics/Layouts/Vertex.h"
 #include "Resources/Meshes/StaticMesh.h"
 
-StaticMeshUPtr GeometryGenerator::CreateBox()
+StaticMeshPtr GeometryGenerator::CreateBox()
 {
     std::vector<StaticVertex> vertices =
     {
@@ -63,7 +63,7 @@ StaticMeshUPtr GeometryGenerator::CreateBox()
     return std::move(mesh);
 }
 
-StaticMeshUPtr GeometryGenerator::CreatePlane()
+StaticMeshPtr GeometryGenerator::CreatePlane()
 {
     std::vector<StaticVertex> vertices =
     {
@@ -90,7 +90,7 @@ StaticMeshUPtr GeometryGenerator::CreatePlane()
     return std::move(mesh);
 }
 
-StaticMeshUPtr GeometryGenerator::CreateSphere
+StaticMeshPtr GeometryGenerator::CreateSphere
 (
     uint32 latiSegmentCount,
     uint32 longiSegmentCount

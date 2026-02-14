@@ -45,7 +45,7 @@ private:
 	ProgramPtr            m_ssaoBlurProgram{ nullptr };
 
 	std::vector<glm::vec3> m_ssaoKernel;
-	TextureUPtr            m_noiseTexture{ nullptr };
+	TexturePtr            m_noiseTexture{ nullptr };
 
 	SSAOFramebufferUPtr    m_ssaoFBO{ nullptr };	 // Raw SSAO
 	SSAOFramebufferUPtr    m_ssaoBlurFBO{ nullptr }; // Blurred SSAO

@@ -38,11 +38,11 @@ target_link_libraries(Game PRIVATE Engine)
 add_custom_command(TARGET Game POST_BUILD
     COMMENT "Deploying Game Centralized Content to Bin..."
 
-    COMMAND ${CMAKE_COMMAND} -E make_directory "${OUTPUT_DIR}/Config"
-    COMMAND ${CMAKE_COMMAND} -E rm -rf "${OUTPUT_DIR}/Config/Game"
-    COMMAND ${CMAKE_COMMAND} -E copy_directory
-            "${CMAKE_CURRENT_SOURCE_DIR}/Config"
-            "${OUTPUT_DIR}/Config/Game"
+    #COMMAND ${CMAKE_COMMAND} -E make_directory "${OUTPUT_DIR}/Config"
+    #COMMAND ${CMAKE_COMMAND} -E rm -rf "${OUTPUT_DIR}/Config/Game"
+    #COMMAND ${CMAKE_COMMAND} -E copy_directory
+    #"${CMAKE_CURRENT_SOURCE_DIR}/Config"
+    #        "${OUTPUT_DIR}/Config/Game"
 
     COMMAND ${CMAKE_COMMAND} -E make_directory "${OUTPUT_DIR}/Assets"
     COMMAND ${CMAKE_COMMAND} -E rm -rf "${OUTPUT_DIR}/Assets/Game"

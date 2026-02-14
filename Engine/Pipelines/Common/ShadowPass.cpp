@@ -32,7 +32,12 @@ bool ShadowPass::Init(int32 resolution)
 	m_resolution = resolution;
 
 	// 1. 그림자 셰이더 프로그램 생성
-	m_meshInstancedDepthProgram = RESOURCE.GetResource<GraphicsProgram>("common_shadow_depth");
+	m_meshInstancedDepthProgram = RESOURCE.Add<GraphicsProgram>
+	(
+		"common_shadow_depth",
+		"@BuiltInAsset/Shaders/Common/Common_Shadow_DepthPass.vert",
+		"@BuiltInAsset/Shaders/Common/Common_Shadow_DepthPass.frag"
+	);
 	m_renderQueue = RenderQueue::Create(1024, 512 * MAX_BONES);
 
 	// 2. 그림자가 드리워지는 최대 조명 개수 만큼 그림자 맵 생성

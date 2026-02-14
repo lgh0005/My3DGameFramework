@@ -33,7 +33,8 @@ public:
     virtual ~Material();
     static MaterialPtr Load(const MaterialDesc& desc);
     static MaterialPtr Create();
-    virtual const MaterialDesc& GetDesc() const override { return m_desc; }
+    virtual MaterialDesc& GetDesc() override { return m_desc; }
+    virtual const ResourceDesc& GetDesc() const override { return m_desc; }
 
     /*=====================//
     //  material textures  //

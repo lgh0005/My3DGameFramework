@@ -30,7 +30,12 @@ UniversalGeometryPassUPtr UniversalGeometryPass::Create(int32 width, int32 heigh
 
 bool UniversalGeometryPass::Init(int32 width, int32 height)
 {
-	m_geometryInstancedProgram = RESOURCE.GetResource<GraphicsProgram>("universal_deferred_geometry");
+	m_geometryInstancedProgram = RESOURCE.AddResource<GraphicsProgram>
+	(
+		"universal_deferred_geometry",
+		"@BuiltInAsset/Shaders/Universal/Universal_Deferred_Geometry.vert",
+		"@BuiltInAsset/Shaders/Universal/Universal_Deferred_Geometry.frag"
+	);
 	m_renderQueue = RenderQueue::Create(1024, 512 * MAX_BONES);
 	m_gBuffer = GBufferFramebuffer::Create(width, height);
 	if (!m_gBuffer || !m_geometryInstancedProgram || !m_gBuffer) return false;

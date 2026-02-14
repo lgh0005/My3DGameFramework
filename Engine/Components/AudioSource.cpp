@@ -158,7 +158,7 @@ bool AudioSource::CreateBGM(ma_engine* engine, ma_sound_group* group, const Audi
 	ma_result result = ma_sound_init_from_file
 	(
 		engine,
-		clip->GetPath().c_str(),
+		clip->GetDesc().path.c_str(),
 		MA_SOUND_FLAG_STREAM,
 		group,
 		NULL,

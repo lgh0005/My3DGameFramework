@@ -7,11 +7,19 @@
 
 DECLARE_DEFAULTS_IMPL(UIMesh)
 
-UIMeshUPtr UIMesh::Create()
+UIMeshPtr UIMesh::Create()
 {
-    UIMeshUPtr mesh = UIMeshUPtr(new UIMesh());
+    UIMeshPtr mesh = UIMeshPtr(new UIMesh());
     mesh->m_desc.name = "UIMesh_Default";
     mesh->m_desc.path = "@Virtual/UIMesh";
+    mesh->Init();
+    return mesh;
+}
+
+UIMeshPtr UIMesh::Load(const UIMeshDesc& desc)
+{
+    auto mesh = UIMeshPtr(new UIMesh());
+    mesh->m_desc = desc;
     mesh->Init();
     return mesh;
 }

@@ -87,7 +87,9 @@ bool StandardRenderPipeline::Init()
 		display->SetToneMappingMode(ToneMappingMode::Exposure);
 		display->SetBloomStrength(1.0f);
 		display->SetExposure(1.0f);
-		display->SetUseCRT(false);
+		display->SetUseCRT(true);
+		// TODO : 이거 로드 시점도 고려해봐야함.
+		display->SetCameraDirtTexture(RESOURCE.Get<Texture>("camera_dirt"));
 		m_postProcessPass->AddEffect(std::move(display));
 	}
 

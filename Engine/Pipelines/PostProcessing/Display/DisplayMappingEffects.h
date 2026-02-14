@@ -11,7 +11,7 @@ CLASS_PTR(Texture)
 enum class ToneMappingMode : uint8
 {
 	Exposure = 0, // SRP용 (기본, 선명함)
-	ACES = 1, // URP용 (필름 느낌, 대비 강함)
+	ACES = 1,     // URP용 (필름 느낌, 대비 강함)
 	Reinhard = 2  // 범용 (차분함, 하이라이트 억제 좋음)
 };
 
@@ -44,6 +44,7 @@ public:
 	void SetBloomStrength(float strength) { m_bloomStrength = strength; }
 	void SetExposure(float exposure) { m_exposure = exposure; }
 	void SetUseCRT(bool use) { m_useCRT = use; }
+	void SetCameraDirtTexture(TexturePtr texture) { m_cameraDirtTexture = texture; }
 
 private:
 	DisplayMappingEffects();

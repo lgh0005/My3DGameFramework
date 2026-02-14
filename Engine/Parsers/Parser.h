@@ -6,7 +6,6 @@ class Parser
 public:
 	virtual ~Parser();
 	virtual bool LoadFromFile(const std::string& path) = 0;
-	virtual bool LoadConfig(const std::string& configPath) = 0;
 	virtual void Clear() = 0;
 
 	bool IsLoaded() const { return m_isLoaded; }

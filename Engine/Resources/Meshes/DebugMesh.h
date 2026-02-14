@@ -17,8 +17,10 @@ class DebugMesh : public Mesh
 
 public:
 	virtual ~DebugMesh();
-	static DebugMeshUPtr Create(uint32 primitiveType);
-	virtual const DebugMeshDesc& GetDesc() const override { return m_desc; }
+	static DebugMeshPtr Create(uint32 primitiveType);
+	static DebugMeshPtr Load(const DebugMeshDesc& desc);
+	virtual DebugMeshDesc& GetDesc() override { return m_desc; }
+	virtual const ResourceDesc& GetDesc() const override { return m_desc; }
 	virtual void Draw() const override;
 	void UpdateGeometry(const std::vector<GizmoVertex>& vertices);
 

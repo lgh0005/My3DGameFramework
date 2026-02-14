@@ -20,7 +20,8 @@ class Animation : public Resource
 public:
     virtual ~Animation();
     static AnimationPtr Load(const AnimationDesc& desc);
-    virtual const AnimationDesc& GetDesc() const override { return m_desc; }
+    virtual AnimationDesc& GetDesc() override { return m_desc; }
+    virtual const ResourceDesc& GetDesc() const override { return m_desc; }
     
     const AnimClip& GetAnimClip() const { return m_animClip; }
     void SetGlobalOffset(uint32 offset) { m_globalOffset = offset; }

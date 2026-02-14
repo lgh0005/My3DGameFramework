@@ -10,7 +10,8 @@ class GraphicsProgram : public Program
 public:
 	virtual ~GraphicsProgram();
 	static GraphicsProgramPtr Load(const GraphicsProgramDesc& desc);
-	virtual const GraphicsProgramDesc& GetDesc() const override { return m_desc; }
+	virtual GraphicsProgramDesc& GetDesc() override { return m_desc; }
+	virtual const ResourceDesc& GetDesc() const override { return m_desc; }
 
 private:
 	GraphicsProgram();

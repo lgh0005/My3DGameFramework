@@ -56,87 +56,121 @@ DevSceneUPtr DevScene::Create()
 
 bool DevScene::LoadSceneResources()
 {
-	// 0-3. 머티리얼 1
+	// 1. 기초 리소스(Texture, Audio, Model 등) 로드
+	RESOURCE.Add<AudioClip>("MyBGM", "@GameAsset/Audios/anubis.wav");
+	RESOURCE.Add<AudioClip>("MySFX", "@GameAsset/Audios/gunshot.mp3");
+
+	RESOURCE.Add<Texture>("container", "@GameAsset/Images/baked/container.ktx");
+	RESOURCE.Add<Texture>("matrix", "@GameAsset/Images/baked/matrix.ktx");
+	RESOURCE.Add<Texture>("container2", "@GameAsset/Images/baked/container2.ktx");
+	RESOURCE.Add<Texture>("container2_specular", "@GameAsset/Images/baked/container2_specular.ktx");
+	RESOURCE.Add<Texture>("marble", "@GameAsset/Images/baked/marble.ktx");
+	RESOURCE.Add<Texture>("brickwall", "@GameAsset/Images/baked/brickwall.ktx");
+	RESOURCE.Add<Texture>("brickwall_normal", "@GameAsset/Images/baked/brickwall_normal.ktx");
+	RESOURCE.Add<Texture>("toybox_diffuse", "@GameAsset/Images/baked/toy_box_diffuse.ktx");
+	RESOURCE.Add<Texture>("toybox_normal", "@GameAsset/Images/baked/toy_box_normal.ktx");
+	RESOURCE.Add<Texture>("toybox_disp", "@GameAsset/Images/baked/toy_box_disp.ktx");
+	RESOURCE.Add<Texture>("grass", "@GameAsset/Images/grass.png");
+	RESOURCE.Add<Texture>("camera_dirt", "@GameAsset/Images/camera_dirt.png");
+
+	RESOURCE.Add<CubeTexture>("SkyboxTexture", "@GameAsset/Images/baked/sky.ktx");
+
+	RESOURCE.Add<Model>("aliensoldier", "@GameAsset/Models/spacesoldier/aliensoldier.mymodel");
+	RESOURCE.Add<Model>("backpack", "@GameAsset/Models/backpack/backpack.mymodel");
+	RESOURCE.Add<Animation>("Idle", "@GameAsset/Models/spacesoldier/Idle_shorten.myanim");
+	RESOURCE.Add<Animation>("Walk", "@GameAsset/Models/spacesoldier/Walking.myanim");
+
+	// ---------------------------------------------------------
+	// 2. 머티리얼 조립 및 시스템 등록 (Desc 직접 수정 패턴)
+
+	// 0-3. 머티리얼 1 (Light)
 	{
-		auto lightMat = Material::Create();
-		lightMat->shininess = 16.0f;
-		lightMat->emissionStrength = 0.0f;
-		lightMat->heightScale = 0.0f;
-		RESOURCE.AddResource<Material>(std::move(lightMat), "LightMat");
+		auto mat = Material::Create();
+		mat->GetDesc().name = "LightMat";
+		mat->GetDesc().path = "@Virtual/Materials/LightMat";
+		mat->shininess = 16.0f;
+		mat->emissionStrength = 0.0f;
+		RESOURCE.Register<Material>(std::move(mat));
 	}
 
-	// 0-4. 머티리얼 2
+	// 0-4. 머티리얼 2 (Box 1)
 	{
-		auto box1Mat = Material::Create();
-		box1Mat->diffuse = RESOURCE.GetResource<Texture>("container");
-		box1Mat->emission = RESOURCE.GetResource<Texture>("matrix");
-		box1Mat->shininess = 16.0f;
-		box1Mat->emissionStrength = 5.0f;
-		box1Mat->heightScale = 0.0f;
-		RESOURCE.AddResource<Material>(std::move(box1Mat), "boxMat1");
+		auto mat = Material::Create();
+		mat->GetDesc().name = "boxMat1";
+		mat->GetDesc().path = "@Virtual/Materials/boxMat1";
+		mat->diffuse = RESOURCE.Get<Texture>("container");
+		mat->emission = RESOURCE.Get<Texture>("matrix");
+		mat->shininess = 16.0f;
+		mat->emissionStrength = 5.0f;
+		RESOURCE.Register<Material>(std::move(mat));
 	}
 
-	// 0-5. 머티리얼 3
+	// 0-5. 머티리얼 3 (Box 2)
 	{
-		auto box2Mat = Material::Create();
-		box2Mat->diffuse = RESOURCE.GetResource<Texture>("container2");
-		box2Mat->specular = RESOURCE.GetResource<Texture>("container2_specular");
-		box2Mat->emission = RESOURCE.GetResource<Texture>("matrix");
-		box2Mat->shininess = 16.0f;
-		box2Mat->emissionStrength = 2.0f;
-		box2Mat->heightScale = 0.0f;
-		RESOURCE.AddResource<Material>(std::move(box2Mat), "boxMat2");
+		auto mat = Material::Create();
+		mat->GetDesc().name = "boxMat2";
+		mat->GetDesc().path = "@Virtual/Materials/boxMat2";
+		mat->diffuse = RESOURCE.Get<Texture>("container2");
+		mat->specular = RESOURCE.Get<Texture>("container2_specular");
+		mat->emission = RESOURCE.Get<Texture>("matrix");
+		mat->shininess = 16.0f;
+		mat->emissionStrength = 2.0f;
+		RESOURCE.Register<Material>(std::move(mat));
 	}
 
-	// 0-6. 머티리얼 4
+	// 0-6. 머티리얼 4 (Box 3)
 	{
-		auto box4Mat = Material::Create();
-		box4Mat->diffuse = RESOURCE.GetResource<Texture>("marble");
-		box4Mat->shininess = 20.0f;
-		box4Mat->emissionStrength = 0.0f;
-		box4Mat->heightScale = 0.0f;
-		RESOURCE.AddResource<Material>(std::move(box4Mat), "boxMat3");
+		auto mat = Material::Create();
+		mat->GetDesc().name = "boxMat3";
+		mat->GetDesc().path = "@Virtual/Materials/boxMat3";
+		mat->diffuse = RESOURCE.Get<Texture>("marble");
+		mat->shininess = 20.0f;
+		RESOURCE.Register<Material>(std::move(mat));
 	}
 
-	// 머티리얼 5
+	// 머티리얼 5 (Box 4)
 	{
-		auto box5Mat = Material::Create();
-		box5Mat->diffuse = RESOURCE.GetResource<Texture>("brickwall");
-		box5Mat->normal = RESOURCE.GetResource<Texture>("brickwall_normal");
-		box5Mat->shininess = 64.0f;
-		box5Mat->emissionStrength = 0.0f;
-		box5Mat->heightScale = 0.0f;
-		RESOURCE.AddResource<Material>(std::move(box5Mat), "boxMat4");
+		auto mat = Material::Create();
+		mat->GetDesc().name = "boxMat4";
+		mat->GetDesc().path = "@Virtual/Materials/boxMat4";
+		mat->diffuse = RESOURCE.Get<Texture>("brickwall");
+		mat->normal = RESOURCE.Get<Texture>("brickwall_normal");
+		mat->shininess = 64.0f;
+		RESOURCE.Register<Material>(std::move(mat));
 	}
 
-	// 머티리얼 6
+	// 머티리얼 6 (Box 5)
 	{
-		auto box6Mat = Material::Create();
-		box6Mat->diffuse = RESOURCE.GetResource<Texture>("toybox_diffuse");
-		box6Mat->normal = RESOURCE.GetResource<Texture>("toybox_normal");
-		box6Mat->height = RESOURCE.GetResource<Texture>("toybox_disp");
-		box6Mat->shininess = 14.0f;
-		box6Mat->emissionStrength = 0.0f;
-		box6Mat->heightScale = 0.065f;
-		RESOURCE.AddResource<Material>(std::move(box6Mat), "boxMat5");
+		auto mat = Material::Create();
+		mat->GetDesc().name = "boxMat5";
+		mat->GetDesc().path = "@Virtual/Materials/boxMat5";
+		mat->diffuse = RESOURCE.Get<Texture>("toybox_diffuse");
+		mat->normal = RESOURCE.Get<Texture>("toybox_normal");
+		mat->height = RESOURCE.Get<Texture>("toybox_disp");
+		mat->shininess = 14.0f;
+		mat->heightScale = 0.065f;
+		RESOURCE.Register<Material>(std::move(mat));
 	}
 
-	// 0-7. 풀떼기
+	// 0-7. 풀떼기 머티리얼
 	{
-		auto grassMat = Material::Create();
-		grassMat->diffuse = RESOURCE.GetResource<Texture>("grass");
-		grassMat->emission = nullptr;
-		grassMat->emissionStrength = 0.0f;
-		RESOURCE.AddResource<Material>(std::move(grassMat), "grassMat");
+		auto mat = Material::Create();
+		mat->GetDesc().name = "grassMat";
+		mat->GetDesc().path = "@Virtual/Materials/grassMat";
+		mat->diffuse = RESOURCE.Get<Texture>("grass");
+		RESOURCE.Register<Material>(std::move(mat));
 	}
 
 	// 8. 하늘 환경맵
 	{
-		RESOURCE.AddResource<EnvironmentMap>
-		(
-			EnvironmentMap::Create(RESOURCE.GetResource<CubeTexture>("SkyboxTexture")), 
-			"StandardSkybox"
-		);
+		auto skyboxTex = RESOURCE.Get<CubeTexture>("SkyboxTexture");
+		if (skyboxTex)
+		{
+			auto envMap = EnvironmentMap::Create(skyboxTex);
+			envMap->GetDesc().name = "StandardSkybox";
+			envMap->GetDesc().path = "@Virtual/Environment/StandardSkybox";
+			RESOURCE.Register<EnvironmentMap>(std::move(envMap));
+		}
 	}
 
 	return true;
@@ -144,48 +178,18 @@ bool DevScene::LoadSceneResources()
 
 bool DevScene::CreateCustomRenderPasses()
 {
-	auto pipeline = RENDER.GetRenderer()->GetPipeline();
+	// 셰이더 로드
+	auto grassProg = RESOURCE.Add<GraphicsProgram>("GrassShader", "@GameAsset/Shaders/grass.vert", "@GameAsset/Shaders/grass.frag");
+	if (grassProg) AddRenderPass("Instanced", InstancedRenderPass::Create(grassProg));
 
-	// 1. Instanced 셰이더 (잔디)
-	// 잔디는 게임 콘텐츠니까 보통 @GameAsset/Shaders 에 위치한다고 가정
-	{
-		std::string vsPath = FILE_MGR.Resolve("@GameAsset/Shaders/grass.vert");
-		std::string fsPath = FILE_MGR.Resolve("@GameAsset/Shaders/grass.frag");
+	auto lightProg = RESOURCE.Add<GraphicsProgram>("LightGizmoShader", "@GameAsset/Shaders/simple.vert", "@GameAsset/Shaders/simple.frag");
+	if (lightProg) AddRenderPass("LightGizmo", SimpleRenderPass::Create(lightProg));
 
-		auto prog = GraphicsProgram::Create(vsPath, fsPath);
-		if (!prog) return false;
+	auto envProg = RESOURCE.Add<GraphicsProgram>("EnvMapShader", "@GameAsset/Shaders/environment.vert", "@GameAsset/Shaders/environment.frag");
+	auto cubeTex = RESOURCE.Get<CubeTexture>("SkyboxTexture");
+	if (envProg && cubeTex)AddRenderPass("EnvMap", EnvironmentRenderPass::Create(envProg, cubeTex));
 
-		AddRenderPass("Instanced", InstancedRenderPass::Create(std::move(prog)));
-	}
-
-	// 2. Simple 셰이더 (조명 기즈모)
-	// 기즈모는 엔진 기능이니까 @Shader (Assets/Engine/Shaders) 에 있다고 가정
-	{
-		std::string vsPath = FILE_MGR.Resolve("@GameAsset/Shaders/simple.vert");
-		std::string fsPath = FILE_MGR.Resolve("@GameAsset/Shaders/simple.frag");
-
-		auto prog = GraphicsProgram::Create(vsPath, fsPath);
-		if (!prog) return false;
-
-		AddRenderPass("LightGizmo", SimpleRenderPass::Create(std::move(prog)));
-	}
-
-	// 3. 환경맵 (Environment)
-	// 이것도 엔진 셰이더(@Shader)라고 가정
-	{
-		std::string vsPath = FILE_MGR.Resolve("@GameAsset/Shaders/environment.vert");
-		std::string fsPath = FILE_MGR.Resolve("@GameAsset/Shaders/environment.frag");
-
-		auto prog = GraphicsProgram::Create(vsPath, fsPath);
-		if (!prog) return false;
-
-		// [참고] 이미 로드된 리소스(Texture)를 가져오는 건 경로가 필요 없음 (Key로 조회)
-		// 이건 아주 잘 되어 있습니다!
-		CubeTexturePtr cubeTex = RESOURCE.GetResource<CubeTexture>("SkyboxTexture");
-		if (!cubeTex) return false;
-
-		AddRenderPass("EnvMap", EnvironmentRenderPass::Create(std::move(prog), cubeTex));
-	}
+	return true;
 }
 
 bool DevScene::OnPlaceActors()
@@ -197,7 +201,7 @@ bool DevScene::OnPlaceActors()
 	// 0. 하늘 GameObject 생성
 	{
 		auto skyObj = GameObject::Create(); if (!skyObj) return false;
-		auto sky = SkyLight::Create(RESOURCE.GetResource<EnvironmentMap>("StandardSkybox"));
+		auto sky = SkyLight::Create(RESOURCE.Get<EnvironmentMap>("StandardSkybox"));
 		skyObj->AddComponent(std::move(sky));
 		AddGameObject(std::move(skyObj));
 	}
@@ -237,7 +241,7 @@ bool DevScene::OnPlaceActors()
 		lightGo->AddComponent(std::move(lightComp));
 
 		auto renderer = StaticMeshRenderer::Create
-		(RESOURCE.GetResource<StaticMesh>("Cube"), RESOURCE.GetResource<Material>("LightMat"));
+		(RESOURCE.Get<StaticMesh>("Cube"), RESOURCE.Get<Material>("LightMat"));
 		renderer->SetRenderStage(RenderStage::Forward);
 		lightPass->AddRenderer(renderer.get());
 
@@ -256,7 +260,7 @@ bool DevScene::OnPlaceActors()
 		lightGo->AddComponent(std::move(lightComp));
 
 		auto renderer = StaticMeshRenderer::Create
-		(RESOURCE.GetResource<StaticMesh>("Cube"), RESOURCE.GetResource<Material>("LightMat"));
+		(RESOURCE.Get<StaticMesh>("Cube"), RESOURCE.Get<Material>("LightMat"));
 		renderer->SetRenderStage(RenderStage::Forward);
 		lightPass->AddRenderer(renderer.get());
 
@@ -274,7 +278,7 @@ bool DevScene::OnPlaceActors()
 		cubeTransform.SetScale(glm::vec3(1.5f, 1.5f, 1.5f));
 
 		auto meshRenderer = StaticMeshRenderer::Create
-		(RESOURCE.GetResource<StaticMesh>("Cube"), RESOURCE.GetResource<Material>("boxMat1"));
+		(RESOURCE.Get<StaticMesh>("Cube"), RESOURCE.Get<Material>("boxMat1"));
 		cubeObj->AddComponent(std::move(meshRenderer));
 		AddGameObject(std::move(cubeObj));
 	}
@@ -289,12 +293,12 @@ bool DevScene::OnPlaceActors()
 		cubeTransform.SetScale(glm::vec3(1.5f, 1.5f, 1.5f));
 
 		auto meshRenderer = StaticMeshRenderer::Create
-		(RESOURCE.GetResource<StaticMesh>("Cube"), RESOURCE.GetResource<Material>("boxMat2"));
+		(RESOURCE.Get<StaticMesh>("Cube"), RESOURCE.Get<Material>("boxMat2"));
 		cubeObj->AddComponent(std::move(meshRenderer));
 
 		// TEMP : BGM 재생
 		// TODO : 이걸 OnBeginPlay에서 실행시킬 방안을 찾아야 함
-		auto audiSourc = AudioSource::Create(RESOURCE.GetResource<AudioClip>("MyBGM"));
+		auto audiSourc = AudioSource::Create(RESOURCE.Get<AudioClip>("MyBGM"));
 		audiSourc->Play();
 		cubeObj->AddComponent(std::move(audiSourc));
 
@@ -315,7 +319,7 @@ bool DevScene::OnPlaceActors()
 		cubeObj->AddComponent(std::move(outline));
 
 		auto meshRenderer = StaticMeshRenderer::Create
-		(RESOURCE.GetResource<StaticMesh>("Cube"), RESOURCE.GetResource<Material>("boxMat4"));
+		(RESOURCE.Get<StaticMesh>("Cube"), RESOURCE.Get<Material>("boxMat4"));
 		cubeObj->AddComponent(std::move(meshRenderer));
 		AddGameObject(std::move(cubeObj));
 	}
@@ -330,7 +334,7 @@ bool DevScene::OnPlaceActors()
 		cubeTransform.SetScale(glm::vec3(3.0f, 3.0f, 3.0f));
 
 		auto meshRenderer = StaticMeshRenderer::Create
-		(RESOURCE.GetResource<StaticMesh>("Cube"), RESOURCE.GetResource<Material>("boxMat5"));
+		(RESOURCE.Get<StaticMesh>("Cube"), RESOURCE.Get<Material>("boxMat5"));
 		cubeObj->AddComponent(std::move(meshRenderer));
 		AddGameObject(std::move(cubeObj));
 	}
@@ -353,7 +357,7 @@ bool DevScene::OnPlaceActors()
 		cubeObj->AddComponent(std::move(rb));
 
 		auto meshRenderer = StaticMeshRenderer::Create
-		(RESOURCE.GetResource<StaticMesh>("Cube"), RESOURCE.GetResource<Material>("boxMat3"));
+		(RESOURCE.Get<StaticMesh>("Cube"), RESOURCE.Get<Material>("boxMat3"));
 		cubeObj->AddComponent(std::move(meshRenderer));
 		AddGameObject(std::move(cubeObj));
 	}
@@ -380,7 +384,7 @@ bool DevScene::OnPlaceActors()
 		cubeObj->AddComponent(std::move(rb));
 
 		auto meshRenderer = StaticMeshRenderer::Create
-		(RESOURCE.GetResource<StaticMesh>("Cube"), RESOURCE.GetResource<Material>("material_SRP"));
+		(RESOURCE.Get<StaticMesh>("Cube"), RESOURCE.Get<Material>("material_SRP"));
 		cubeObj->AddComponent(std::move(meshRenderer));
 		AddGameObject(std::move(cubeObj));
 	}
@@ -407,7 +411,7 @@ bool DevScene::OnPlaceActors()
 		sphereObj->AddComponent(std::move(rb));
 
 		auto meshRenderer = StaticMeshRenderer::Create
-		(RESOURCE.GetResource<StaticMesh>("Sphere"), RESOURCE.GetResource<Material>("material_SRP"));
+		(RESOURCE.Get<StaticMesh>("Sphere"), RESOURCE.Get<Material>("material_SRP"));
 		sphereObj->AddComponent(std::move(meshRenderer));
 		AddGameObject(std::move(sphereObj));
 	}
@@ -422,8 +426,8 @@ bool DevScene::OnPlaceActors()
 
 		auto meshRenderer = StaticMeshRenderer::Create
 		(
-			RESOURCE.GetResource<StaticMesh>("Cube"),
-			RESOURCE.GetResource<Material>("boxMat1") // 임시 재질
+			RESOURCE.Get<StaticMesh>("Cube"),
+			RESOURCE.Get<Material>("boxMat1") // 임시 재질
 		);
 		meshRenderer->SetRenderStage(RenderStage::Forward);
 		envMapPass->AddRenderer(meshRenderer.get());
@@ -434,9 +438,9 @@ bool DevScene::OnPlaceActors()
 	// 7. 모델 (Alien Soldier - Skinned Mesh)
 	{
 		// 1. 리소스 확보
-		auto model = RESOURCE.GetResource<Model>("aliensoldier");
-		auto anim1 = RESOURCE.GetResource<Animation>("Idle");
-		auto anim2 = RESOURCE.GetResource<Animation>("Walk");
+		auto model = RESOURCE.Get<Model>("aliensoldier");
+		auto anim1 = RESOURCE.Get<Animation>("Idle");
+		auto anim2 = RESOURCE.Get<Animation>("Walk");
 
 		// 2. AnimController 생성 및 설정
 		auto animCtrl = AnimController::Create();
@@ -491,7 +495,7 @@ bool DevScene::OnPlaceActors()
 
 	// 가방 (Backpack - Static Mesh)
 	{
-		auto model = RESOURCE.GetResource<Model>("backpack");
+		auto model = RESOURCE.Get<Model>("backpack");
 
 		// 1. Instantiate (애니메이터 없으므로 nullptr 전달)
 		// StaticMeshRenderer는 Animator 인자가 필요 없으므로 안전함.
@@ -533,7 +537,7 @@ bool DevScene::OnPlaceActors()
 		cubeObj->AddComponent(std::move(rb));
 
 		auto meshRenderer = StaticMeshRenderer::Create
-		(RESOURCE.GetResource<StaticMesh>("Cube"), RESOURCE.GetResource<Material>("boxMat4"));
+		(RESOURCE.Get<StaticMesh>("Cube"), RESOURCE.Get<Material>("boxMat4"));
 		cubeObj->AddComponent(std::move(meshRenderer));
 		AddGameObject(std::move(cubeObj));
 	}
@@ -555,9 +559,8 @@ bool DevScene::OnBeginPlay()
 void DevScene::PlantTenThousandGrass(InstancedRenderPass* pass)
 {
 	const int32 grassCount = 10000;
-	auto bladeMesh = std::static_pointer_cast<StaticMesh>
-		(RESOURCE.GetResource<StaticMesh>("Plane"));
-	auto grassMat = RESOURCE.GetResource<Material>("grassMat");
+	auto bladeMesh = RESOURCE.Get<StaticMesh>("Plane");
+	auto grassMat = RESOURCE.Get<Material>("grassMat");
 	if (!bladeMesh || !grassMat) return;
 
 	std::vector<glm::vec3> instanceData;
@@ -612,8 +615,8 @@ void DevScene::ManyCubesForStressTest()
 	const int stressCount = 2500;
 	const float range = 40.0f; // 배치를 퍼뜨릴 범위 (-40 ~ +40)
 
-	auto cubeMesh = RESOURCE.GetResource<StaticMesh>("Cube");
-	auto cubeMat = RESOURCE.GetResource<Material>("boxMat1");
+	auto cubeMesh = RESOURCE.Get<StaticMesh>("Cube");
+	auto cubeMat = RESOURCE.Get<Material>("boxMat1");
 
 	if (cubeMesh && cubeMat)
 	{
@@ -689,8 +692,8 @@ void DevScene::FallRandomCubes()
 			// 4. 렌더러
 			auto meshRenderer = StaticMeshRenderer::Create
 			(
-				RESOURCE.GetResource<StaticMesh>("Cube"),
-				RESOURCE.GetResource<Material>("material_SRP")
+				RESOURCE.Get<StaticMesh>("Cube"),
+				RESOURCE.Get<Material>("material_SRP")
 			);
 			cubeObj->AddComponent(std::move(meshRenderer));
 

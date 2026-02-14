@@ -22,7 +22,12 @@ bool MotionBlurEffect::Init(int32 priority, int32 width, int32 height)
 	m_width = width;
 	m_height = height;
 
-	m_motionBlurProgram = RESOURCE.GetResource<GraphicsProgram>("postprocess_motion_blur");
+	m_motionBlurProgram = RESOURCE.Add<GraphicsProgram>
+	(
+		"postprocess_motion_blur",
+		"@BuiltInAsset/Shaders/PostProcessing/PostProcess_Motion_Blur.vert",
+		"@BuiltInAsset/Shaders/PostProcessing/PostProcess_Motion_Blur.frag"
+	);
 	if (!m_motionBlurProgram) return false;
 
 	m_motionBlurProgram->Use();

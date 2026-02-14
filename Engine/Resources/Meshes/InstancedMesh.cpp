@@ -7,14 +7,21 @@
 
 DECLARE_DEFAULTS_IMPL(InstancedMesh)
 
-InstancedMeshUPtr InstancedMesh::Create(StaticMeshPtr baseMesh, BufferPtr instanceBuffer, 
+InstancedMeshPtr InstancedMesh::Create(StaticMeshPtr baseMesh, BufferPtr instanceBuffer,
                                         int32 instanceCount, SetupFunc setupFunc)
 {
-    auto renderer = InstancedMeshUPtr(new InstancedMesh());
+    auto renderer = InstancedMeshPtr(new InstancedMesh());
     renderer->m_desc.name = "InstancedMesh_Instance";
     renderer->m_desc.path = "@Virtual/InstancedMesh";
     if (!renderer->Init(baseMesh, instanceBuffer, instanceCount, setupFunc)) return nullptr;
     return std::move(renderer);
+}
+
+InstancedMeshPtr InstancedMesh::Load(const InstancedMeshDesc& desc)
+{
+    auto mesh = InstancedMeshPtr(new InstancedMesh());
+    mesh->m_desc = desc;
+    return mesh;
 }
 
 void InstancedMesh::Draw() const

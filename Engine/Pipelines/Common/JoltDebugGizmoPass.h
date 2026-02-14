@@ -29,8 +29,8 @@ private:
 
 	ProgramPtr m_debugProgram;
 
-	DebugMeshUPtr m_lineMesh;
-	DebugMeshUPtr m_triMesh;
+	DebugMeshPtr m_lineMesh;
+	DebugMeshPtr m_triMesh;
 
 	float m_lineWidth	{ 1.5f };
 	std::vector<GizmoVertex> m_lineBatch;

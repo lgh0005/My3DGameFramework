@@ -43,10 +43,11 @@ AnimChannel* Animation::FindChannel(uint32 nameHash)
 //===================================*/
 bool Animation::LoadByBinary()
 {
-	std::ifstream inFile(m_desc.path, std::ios::binary);
+	std::string actualPath = RESOURCE.ResolvePath(m_desc.path);
+	std::ifstream inFile(actualPath, std::ios::binary);
 	if (!inFile)
 	{
-		LOG_ERROR("Failed to open animation file: {}", m_desc.path);
+		LOG_ERROR("Failed to open animation file: {}", actualPath);
 		return false;
 	}
 

@@ -22,8 +22,18 @@ SSAOPassUPtr SSAOPass::Create(int32 width, int32 height)
 
 bool SSAOPass::Init(int32 width, int32 height)
 {
-    m_ssaoProgram = RESOURCE.GetResource<GraphicsProgram>("common_ssao");
-    m_ssaoBlurProgram = RESOURCE.GetResource<GraphicsProgram>("common_ssao_blur");
+    m_ssaoProgram = RESOURCE.Add<GraphicsProgram>
+    (
+        "common_ssao",
+        "@BuiltInAsset/Shaders/Common/Common_SSAO.vert",
+        "@BuiltInAsset/Shaders/Common/Common_SSAO_pass.frag"
+    );
+    m_ssaoBlurProgram = RESOURCE.Add<GraphicsProgram>
+    (
+        "common_ssao_blur",
+        "@BuiltInAsset/Shaders/Common/Common_SSAO.vert",
+        "@BuiltInAsset/Shaders/Common/Common_SSAO_blur.frag"
+    );
     if (!m_ssaoProgram || !m_ssaoBlurProgram) return false;
 
     // FBO 생성 (우리가 추가한 CreateSSAO 사용)
@@ -32,7 +42,7 @@ bool SSAOPass::Init(int32 width, int32 height)
     if (!m_ssaoFBO || !m_ssaoBlurFBO) return false;
 
     // 화면 전체를 덮는 Quad 생성
-    m_screenQuad = RESOURCE.GetResource<ScreenMesh>("Screen");
+    m_screenQuad = RESOURCE.Get<ScreenMesh>("Screen");
     if (!m_screenQuad) return false;
 
     GenerateKernel();

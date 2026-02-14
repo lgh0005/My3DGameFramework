@@ -7,7 +7,7 @@ class MaterialYamlParser : public YamlParser
 public:
 	MaterialYamlParser();
 	virtual ~MaterialYamlParser();
-	virtual bool LoadConfig(const std::string& configPath) override;
+	bool LoadConfig(const std::string& configPath);
 	bool LoadMaterial(Material* outMaterial);
 
 private:

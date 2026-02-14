@@ -13,14 +13,14 @@
 
 DECLARE_DEFAULTS_IMPL(SimpleRenderPass)
 
-SimpleRenderPassUPtr SimpleRenderPass::Create(ProgramUPtr program)
+SimpleRenderPassUPtr SimpleRenderPass::Create(ProgramPtr program)
 {
     auto pass = SimpleRenderPassUPtr(new SimpleRenderPass());
     if (!pass->Init(std::move(program))) return nullptr;
     return std::move(pass);
 }
 
-bool SimpleRenderPass::Init(ProgramUPtr program)
+bool SimpleRenderPass::Init(ProgramPtr program)
 {
     m_simpleProgram = std::move(program);
     if (!m_simpleProgram) return false;

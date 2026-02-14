@@ -38,8 +38,18 @@ bool OutlineEffect::Init
 	m_width = width;
 	m_height = height;
 
-	m_maskInstancedProgram = RESOURCE.GetResource<GraphicsProgram>("postprocess_outline_mask");
-	m_postProgram = RESOURCE.GetResource<GraphicsProgram>("postprocess_outline_post");
+	m_maskInstancedProgram = RESOURCE.Add<GraphicsProgram>
+	(
+		"postprocess_outline_mask",
+		"@BuiltInAsset/Shaders/PostProcessing/PostProcess_Outline_Mask.vert",
+		"@BuiltInAsset/Shaders/PostProcessing/PostProcess_Outline_Mask.frag"
+	);
+	m_postProgram = RESOURCE.Add<GraphicsProgram>
+	(
+		"postprocess_outline_post",
+		"@BuiltInAsset/Shaders/PostProcessing/PostProcess_Outline_Post.vert",
+		"@BuiltInAsset/Shaders/PostProcessing/PostProcess_Outline_Post.frag"
+	);
 	m_maskFBO = OutlineFramebuffer::Create(width, height);
 	m_renderQueue = RenderQueue::Create(1024, 512 * MAX_BONES);
 	if (!m_maskInstancedProgram || !m_postProgram || !m_maskFBO || !m_renderQueue)

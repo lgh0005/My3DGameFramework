@@ -14,13 +14,6 @@ bool Application::Init(int32 width, int32 height, const std::string& title)
 	LOG_INFO("Application Started [Start]");
 	LOG_INFO("Engine Initialization Started...");
 
-	// 0. 엔진이 읽을 기본적인 파일 경로 초기화
-	if (!FILE_MGR.Init())
-	{
-		LOG_ERROR("FileManager Initialization Failed!");
-		return false;
-	}
-
 	// 1. 윈도우 생성 (가장 먼저 되어야 함)
 	if (!WINDOW.Init(width, height, title))
 	{

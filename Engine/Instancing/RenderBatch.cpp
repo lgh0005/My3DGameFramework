@@ -19,7 +19,7 @@ void RenderBatch::Add
     if (!bones.empty())
     {
         finalProp.typeFlag = 1;
-        finalProp.boneOffset = static_cast<uint32_t>(boneData.size());
+        finalProp.boneOffset = static_cast<uint32>(boneData.size());
         boneData.insert(boneData.end(), bones.begin(), bones.end());
     }
 

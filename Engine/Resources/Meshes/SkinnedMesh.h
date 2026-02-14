@@ -16,14 +16,16 @@ class SkinnedMesh : public Mesh
     DEFINE_RESOURCE_TYPE(ResourceType::SkinnedMesh, SkinnedMeshDesc)
 
 public:
-    static SkinnedMeshUPtr Create
+    static SkinnedMeshPtr Create
     (
         const std::vector<SkinnedVertex>& vertices,
         const std::vector<uint32>& indices,
         uint32 primitiveType = GL_TRIANGLES
     );
+    static SkinnedMeshPtr Load(const SkinnedMeshDesc& desc);
     virtual ~SkinnedMesh() override;
-    virtual const SkinnedMeshDesc& GetDesc() const override { return m_desc; }
+    virtual SkinnedMeshDesc& GetDesc() override { return m_desc; }
+    virtual const ResourceDesc& GetDesc() const override { return m_desc; }
     virtual void Draw() const override;
 
 private:

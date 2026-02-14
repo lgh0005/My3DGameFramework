@@ -20,7 +20,12 @@ bool LensFlareEffect::Init(int32 priority, int32 width, int32 height)
 	m_priority = priority;
 	m_width = width;
 	m_height = height;
-	m_lensFlareProgram = RESOURCE.GetResource<GraphicsProgram>("lens_flare");
+	m_lensFlareProgram = RESOURCE.Add<GraphicsProgram>
+	(
+		"lens_flare",
+		"@BuiltInAsset/Shaders/PostProcessing/PostProcess_Lens_Flare.vert",
+		"@BuiltInAsset/Shaders/PostProcessing/PostProcess_Lens_Flare.frag"
+	);
 	return m_lensFlareProgram != nullptr;
 }
 

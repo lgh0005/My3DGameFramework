@@ -20,7 +20,12 @@ bool DOFEffect::Init(int32 priority, int32 width, int32 height)
 	m_priority = priority;
 	m_width = width;
 	m_height = height;
-	m_DepthOfFieldProgram = RESOURCE.GetResource<GraphicsProgram>("dof_effect");
+	m_DepthOfFieldProgram = RESOURCE.Add<GraphicsProgram>
+	(
+		"dof_effect",
+		"@BuiltInAsset/Shaders/PostProcessing/PostProcess_Depth_Of_View_Effect.vert",
+		"@BuiltInAsset/Shaders/PostProcessing/PostProcess_Depth_Of_View_Effect.frag"
+	);
 	return m_DepthOfFieldProgram != nullptr;
 }
 

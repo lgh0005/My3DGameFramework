@@ -22,7 +22,12 @@ bool KawaseBloomEffect::Init(int32 priority, int32 width, int32 height)
 	m_width = width;
 	m_height = height;
 
-	m_bloomProgram = RESOURCE.GetResource<GraphicsProgram>("universal_postprocess_blur");
+	m_bloomProgram = RESOURCE.Add<GraphicsProgram>
+	(
+		"universal_postprocess_blur",
+		"@BuiltInAsset/Shaders/Universal/Universal_Post_Blur.vert",
+		"@BuiltInAsset/Shaders/Universal/Universal_Post_Blur.frag"
+	);
 	m_bloomFBO = EffectFramebuffer::CreateEmpty();
 	if (!m_bloomProgram || !m_bloomFBO) return false;
 

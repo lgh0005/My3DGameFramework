@@ -9,15 +9,22 @@
 
 DECLARE_DEFAULTS_IMPL(StaticMesh)
 
-StaticMeshUPtr StaticMesh::Create(const std::vector<StaticVertex>& vertices,
+StaticMeshPtr StaticMesh::Create(const std::vector<StaticVertex>& vertices,
 	                              const std::vector<uint32>& indices,
 	                              uint32 primitiveType)
 {
-	auto mesh = StaticMeshUPtr(new StaticMesh());
+	auto mesh = StaticMeshPtr(new StaticMesh());
     mesh->m_desc.name = "StaticMesh_Material";
     mesh->m_desc.path = "@Virtual/StaticMesh";
 	mesh->Init(vertices, indices, primitiveType);
 	return std::move(mesh);
+}
+
+StaticMeshPtr StaticMesh::Load(const StaticMeshDesc& desc)
+{
+    auto mesh = StaticMeshPtr(new StaticMesh());
+    mesh->m_desc = desc;
+    return mesh;
 }
 
 void StaticMesh::Init(const std::vector<StaticVertex>& vertices,

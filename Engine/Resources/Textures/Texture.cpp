@@ -10,14 +10,16 @@ Texture::~Texture() = default;
 
 TexturePtr Texture::Load(const TextureDesc& desc)
 {
+    std::string actualPath = RESOURCE.ResolvePath(desc.path);
+
     // 1. 확장자 확인 및 이미지 로드
-    std::string ext = std::filesystem::path(desc.path).extension().string();
+    std::string ext = std::filesystem::path(actualPath).extension().string();
     std::transform(ext.begin(), ext.end(), ext.begin(), ::tolower);
 
     // 2. KTX 파일인 경우 (Image 클래스를 거치지 않고 직접 로드)
     if (ext == ".ktx")
     {
-        auto ktxTexture = TextureUtils::LoadTextureFromKtx(desc.path);
+        auto ktxTexture = TextureUtils::LoadTextureFromKtx(actualPath);
         if (ktxTexture)
         {
             ktxTexture->m_desc = desc;
@@ -30,13 +32,13 @@ TexturePtr Texture::Load(const TextureDesc& desc)
     auto texture = TexturePtr(new Texture());
     texture->m_desc = desc;
 
-    ImageDesc imgDesc(desc.path);
+    ImageDesc imgDesc(actualPath);
     imgDesc.isFlipY = true;
 
     auto image = Image::Load(imgDesc);
     if (!image)
     {
-        LOG_ERROR("Failed to load texture image: {}", desc.path);
+        LOG_ERROR("Failed to load texture image: {}", actualPath);
         return nullptr;
     }
 
@@ -71,7 +73,7 @@ TexturePtr Texture::Load(const TextureDesc& desc)
     }
     texture->SetWrap(GL_REPEAT, GL_REPEAT);
 
-    LOG_INFO("Texture Loaded: {} ({}x{})", desc.path, image->GetWidth(), image->GetHeight());
+    LOG_INFO("Texture Loaded: {} ({}x{})", actualPath, image->GetWidth(), image->GetHeight());
     return texture;
 }
 
