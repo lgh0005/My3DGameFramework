@@ -51,8 +51,10 @@ namespace fs = std::filesystem;
 #include "Converters/AnimationConverter.h"
 #include "Converters/ORMTexturePacker.h"
 #include "Converters/KTXTextureConverter.h"
+#include "Converters/KTXCubeMapConverter.h"
 
-#define CONV_MODEL ModelConverter::Instance()
-#define CONV_ANIM  AnimationConverter::Instance()
-#define CONV_ORM   ORMTexturePacker::Instance()
-#define CONV_KTX   KTXTextureConverter::Instance()
+#define CONV_MODEL		ModelConverter::Instance()
+#define CONV_ANIM		AnimationConverter::Instance()
+#define CONV_ORM		ORMTexturePacker::Instance()
+#define CONV_KTX		KTXTextureConverter::Instance()
+#define CONV_CUBE		KTXCubeMapConverter::Instance()

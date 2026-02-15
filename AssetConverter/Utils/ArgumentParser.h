@@ -1,4 +1,5 @@
 ﻿#pragma once
+#include "Converters/KTXCubeMapConverter.h"
 
 enum class ConversionMode
 {
@@ -6,8 +7,9 @@ enum class ConversionMode
     Verify,     // --check (Python 연동 확인용)     
     Model,      // -m
     Animation,  // -a
-    ORM,        // -orm
-    KTX         // -ktx
+    ORM,        // --orm
+    KTX,        // --ktx
+    CubeMap     // --cubemap
 };
 
 struct ParseResult
@@ -34,6 +36,10 @@ struct ParseResult
     // [KTX Texture]
     std::string ktxFormat = "BC7";
     std::string ktxColorSpace = "sRGB";
+
+    // [CubeMap]
+    std::vector<CubeFaceElement> cubeFaces;
+    bool isSRGB = true;
 
     bool IsValid() const { return mode != ConversionMode::None; }
 };

@@ -67,6 +67,12 @@ int main(int argc, char* argv[])
         );
         break;
 
+    // [KTX CubeMap Mode]
+    case ConversionMode::CubeMap:
+        LOG_INFO(">>> [Mode] KTX CubeMap Conversion Selected");
+        success = CONV_CUBE.Convert(args.cubeFaces, args.outputPath, args.isSRGB);
+        break;
+
     default:
         LOG_ERROR("Unknown conversion mode.");
         success = false;

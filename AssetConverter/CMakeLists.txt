@@ -10,6 +10,7 @@ set(ASSET_CONVERTER_SOURCES
     "Converters/AnimationConverter.h"   "Converters/AnimationConverter.cpp"
     "Converters/ORMTexturePacker.h"     "Converters/ORMTexturePacker.cpp"
     "Converters/KTXTextureConverter.h"  "Converters/KTXTextureConverter.cpp"
+    "Converters/KTXCubeMapConverter.h"  "Converters/KTXCubeMapConverter.cpp"
 
     # AssetTypes
     "AssetTypes/AssetUtils.h"           "AssetTypes/AssetUtils.cpp"

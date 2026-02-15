@@ -101,6 +101,29 @@ ParseResult ArgumentParser::Parse(int argc, char* argv[])
 		}
 	}
 
+	// 6. [CubeMap] --cubemap <px> <f_px> <nx> <f_nx> <py> <f_py> <ny> <f_ny> <pz> <f_pz> <nz> <f_nz> <out>
+	else if (command == "--cubemap")
+	{
+		if (argc < 22) return result;
+
+		result.mode = ConversionMode::CubeMap;
+		result.cubeFaces.reserve(6);
+
+		// 6쌍의 (경로, 플립) 파싱
+		for (int32 i = 0; i < 6; ++i)
+		{
+			CubeFaceElement face;
+			int32 baseIdx = 2 + (i * 3);
+			face.path = argv[baseIdx];
+			face.flipX = (std::string(argv[baseIdx + 1]) == "1");
+			face.flipY = (std::string(argv[baseIdx + 2]) == "1");
+			result.cubeFaces.push_back(face);
+		}
+
+		result.outputPath = argv[20];
+		result.isSRGB = (std::string(argv[21]) == "1");
+	}
+
 	return result;
 }
 
@@ -129,6 +152,11 @@ void ArgumentParser::PrintUsage()
 
 	std::cout << "\n  * Options:\n";
 	std::cout << "    --no-flip : Disable Y-axis flipping (Default: Enabled for OpenGL)\n";
+
+	std::cout << "  6. CubeMap Conversion:\n";
+	std::cout << "     AssetConverter.exe --cubemap <px> <f_px> <nx> <f_nx> ... <nz> <f_nz> <out.ktx> <isSRGB>\n";
+	std::cout << "       - f_px~f_nz: 1 to enable FlipY, 0 to disable.\n";
+	std::cout << "       - Order: PositiveX, NegativeX, PositiveY, NegativeY, PositiveZ, NegativeZ\n";
 
 	std::cout << "\n";
 }

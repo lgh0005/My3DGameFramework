@@ -5,12 +5,13 @@ from gui_context.gui_context_convert_animation import GuiContextConvertAnimation
 from gui_context.gui_context_convert_model import GuiContextConvertModel
 from gui_context.gui_context_convert_orm import GuiContextConvertORMTexture
 from gui_context.gui_context_convert_ktx import GuiContextConvertTextureKTX
+from gui_context.gui_context_convert_cube import GuiContextConvertCubeMapKTX
 
 class Window:
 
     title: str = "My Asset Converter"
-    width: int = 500
-    height: int = 400
+    width: int = 640
+    height: int = 480
     resizeable: bool = False
 
     def __init__(self):
@@ -27,7 +28,8 @@ class Window:
             "animation": GuiContextConvertAnimation,
             "model": GuiContextConvertModel,
             "orm": GuiContextConvertORMTexture,
-            "ktx": GuiContextConvertTextureKTX
+            "ktx": GuiContextConvertTextureKTX,
+            "cube": GuiContextConvertCubeMapKTX
         }
         self._app_data = {
             "exe_path": "",       

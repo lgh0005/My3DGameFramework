@@ -5,6 +5,7 @@ from gui_context.gui_context_base import GUIContextBase
 from gui_process.gui_process_runner import ProcessRunner
 from gui_process.gui_log_window import LogWindow
 
+
 class GuiContextConvertTextureKTX(GUIContextBase):
     def __init__(self, app_context, window):
         self._log_win = None
