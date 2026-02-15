@@ -48,3 +48,27 @@ glm::quat Utils::ConvertToGLMQuat(const aiQuaternion& pOrientation)
 {
 	return glm::quat(pOrientation.w, pOrientation.x, pOrientation.y, pOrientation.z);
 }
+
+/*================================================//
+//   hdr 이미지 메모리를 절반으로 줄이는 유틸 함수   //
+//================================================*/
+uint16 Utils::FloatToHalf(float f)
+{
+	uint32 i = *(uint32*)&f;
+	uint32 s = (i >> 16) & 0x00008000;
+	uint32 e = ((i >> 23) & 0x000000ff) - (127 - 15);
+	uint32 m = i & 0x007fffff;
+
+	if (e <= 0) 
+	{
+		if (e < -10) return (uint16)s;
+		m = (m | 0x00800000) >> (1 - e);
+		return (uint16)(s | (m >> 13));
+	}
+	else if (e >= 0x1f) 
+	{
+		return (uint16)(s | 0x7c00 | (m ? (m >> 13) | 1 : 0));
+	}
+
+	return (uint16)(s | (e << 10) | (m >> 13));
+}

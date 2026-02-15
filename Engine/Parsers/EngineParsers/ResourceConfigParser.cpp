@@ -8,7 +8,6 @@ static const std::unordered_map<std::string, ResourceType> CategoryToType =
 	{ "GraphicShader",      ResourceType::GraphicsProgram },
 	{ "ComputeShader",      ResourceType::ComputeProgram },
 	{ "Texture",			ResourceType::Texture },
-	// { "Image",				ResourceType::Image },
 	{ "CubeTexture",		ResourceType::CubeTexture },
 	{ "Model",				ResourceType::Model },
 	{ "Animation",			ResourceType::Animation },
@@ -103,12 +102,6 @@ ResourceConfigParser::AssetRegistry ResourceConfigParser::ScanDirectory
 				m_assetRegistry[name] = std::make_shared<TextureDesc>(vPath, name);
 				break;
 			}
-
-			/*case ResourceType::Image:
-			{
-				m_assetRegistry[name] = std::make_shared<ImageDesc>(vPath, name);
-				break;
-			}*/
 
 			case ResourceType::Model:
 			{

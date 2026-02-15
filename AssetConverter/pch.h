@@ -3,9 +3,11 @@
 // C++
 #include <iostream>
 #include <cfloat>
+#include <cmath>
 #include <cstdlib>
 #include <vector>
 #include <string>
+#include <algorithm>
 #include <unordered_map>
 #include <unordered_set>
 #include <filesystem>
@@ -27,10 +29,16 @@ namespace fs = std::filesystem;
 #include <glm/gtx/euler_angles.hpp>
 #include <glm/gtx/matrix_decompose.hpp>
 
+// stb & ktx
+#include <stb_image.h>
+#include <stb_image_write.h>
+#include <stb_image_resize2.h>
+#include <ktx.h>
+
 // Utils
-#include "Utils/Utils.h"
 #include "Utils/Types.h"
 #include "Utils/Defines.h"
+#include "Utils/Utils.h"
 #include "Utils/Logger.h"
 
 // AssetUtils
@@ -41,7 +49,9 @@ namespace fs = std::filesystem;
 #include "Converters/ModelConverter.h"
 #include "Converters/AnimationConverter.h"
 #include "Converters/ORMTexturePacker.h"
+#include "Converters/KTXTextureConverter.h"
 
 #define CONV_MODEL ModelConverter::Instance()
 #define CONV_ANIM  AnimationConverter::Instance()
 #define CONV_ORM   ORMTexturePacker::Instance()
+#define CONV_KTX   KTXTextureConverter::Instance()

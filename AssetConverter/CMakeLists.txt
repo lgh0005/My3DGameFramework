@@ -9,6 +9,7 @@ set(ASSET_CONVERTER_SOURCES
     "Converters/ModelConverter.h"       "Converters/ModelConverter.cpp"
     "Converters/AnimationConverter.h"   "Converters/AnimationConverter.cpp"
     "Converters/ORMTexturePacker.h"     "Converters/ORMTexturePacker.cpp"
+    "Converters/KTXTextureConverter.h"  "Converters/KTXTextureConverter.cpp"
 
     # AssetTypes
     "AssetTypes/AssetUtils.h"           "AssetTypes/AssetUtils.cpp"
@@ -39,6 +40,7 @@ target_link_libraries(AssetConverter PRIVATE
     spdlog::spdlog
     assimp::assimp
     glm::glm
+    KTX::ktx
 )
 
 # 출력 경로 개별 설정

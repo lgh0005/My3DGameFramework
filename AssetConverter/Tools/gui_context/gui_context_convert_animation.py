@@ -1,4 +1,4 @@
-import os, subprocess
+import os
 import tkinter as tk
 from tkinter import filedialog, messagebox
 from gui_context.gui_context_base import GUIContextBase

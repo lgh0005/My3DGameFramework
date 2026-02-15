@@ -1,17 +1,5 @@
 ﻿#include "pch.h"
 #include "ORMTexturePacker.h"
-#include <algorithm>
-#include <cmath>
-
-#ifndef STB_IMAGE_IMPLEMENTATION
-#define STB_IMAGE_IMPLEMENTATION
-#include "stb_image.h"
-#endif
-
-#ifndef STB_IMAGE_WRITE_IMPLEMENTATION
-#define STB_IMAGE_WRITE_IMPLEMENTATION
-#include "stb_image_write.h"
-#endif
 
 bool ORMTexturePacker::Convert(const std::string& aoPath, const std::string& roughPath, 
 	const std::string& metalPath, const std::string& outPngPath, bool invertRoughness)

@@ -91,7 +91,6 @@ bool AnimationConverter::LoadReferenceSkeleton(const std::string& path)
 	if (!inFile)
 	{
 		LOG_ERROR("File exists but cannot open (Permission denied?)");
-		LOG_ERROR("Reason : {}", std::strerror(errno));
 		return false;
 	}
 

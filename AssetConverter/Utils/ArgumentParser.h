@@ -6,7 +6,8 @@ enum class ConversionMode
     Verify,     // --check (Python 연동 확인용)     
     Model,      // -m
     Animation,  // -a
-    ORM         // -orm
+    ORM,        // -orm
+    KTX         // -ktx
 };
 
 struct ParseResult
@@ -28,6 +29,10 @@ struct ParseResult
     std::string roughnessMapPath;
     std::string metallicMapPath;
     bool invertRoughness = false;
+
+    // [KTX Texture]
+    std::string ktxFormat = "BC7";
+    std::string ktxColorSpace = "sRGB";
 
     bool IsValid() const { return mode != ConversionMode::None; }
 };

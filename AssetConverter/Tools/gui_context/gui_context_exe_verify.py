@@ -51,7 +51,7 @@ class GuiContextVerifyAssetConverter(GUIContextBase):
             if os.name == 'nt':
                 startupinfo = subprocess.STARTUPINFO()
                 startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW
-                startupinfo.wShowWindow = subprocess.SW_HIDE # 확실하게 숨김
+                startupinfo.wShowWindow = subprocess.SW_HIDE
 
             result = subprocess.run(
                 [exe_path, "--check"],

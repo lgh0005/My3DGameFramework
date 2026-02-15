@@ -4,6 +4,7 @@ from gui_context.gui_context_main import GuiContextConvertMain
 from gui_context.gui_context_convert_animation import GuiContextConvertAnimation
 from gui_context.gui_context_convert_model import GuiContextConvertModel
 from gui_context.gui_context_convert_orm import GuiContextConvertORMTexture
+from gui_context.gui_context_convert_ktx import GuiContextConvertTextureKTX
 
 class Window:
 
@@ -25,7 +26,8 @@ class Window:
             "main": GuiContextConvertMain,
             "animation": GuiContextConvertAnimation,
             "model": GuiContextConvertModel,
-            "orm": GuiContextConvertORMTexture
+            "orm": GuiContextConvertORMTexture,
+            "ktx": GuiContextConvertTextureKTX
         }
         self._app_data = {
             "exe_path": "",       

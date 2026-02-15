@@ -45,7 +45,7 @@ ParseResult ArgumentParser::Parse(int argc, char* argv[])
 		result.outputPath = argv[4];   // 출력 파일
 	}
 
-	// 4. [ORM] exe --orm <ao_or_none> <rough_or_none> <metal_or_none> <out_png> [--invert-roughness]
+	// 4. [ORM] --orm <ao_or_none> <rough_or_none> <metal_or_none> <out_png> [--invert-roughness]
 	else if (command == "--orm")
 	{
 		if (argc < 6) return result;
@@ -79,6 +79,18 @@ ParseResult ArgumentParser::Parse(int argc, char* argv[])
 			result.metallicMapPath.empty()) return ParseResult{};
 	}
 
+	// 5. [KTX] -ktx <in_image> <out_ktx> [format]
+	else if (command == "--ktx")
+	{
+		if (argc < 6) return result;
+
+		result.mode = ConversionMode::KTX;
+		result.inputPath = argv[2];
+		result.outputPath = argv[3];
+		result.ktxFormat = argv[4];
+		result.ktxColorSpace = argv[5];
+	}
+
 	return result;
 }
 
@@ -99,6 +111,11 @@ void ArgumentParser::PrintUsage()
 	std::cout << "       - Use 'none' (or '-') for missing maps.\n";
 	std::cout << "       - At least one of AO/Rough/Metal must be provided.\n";
 	std::cout << "       - Defaults when missing: AO=1.0 (white), Rough=1.0 (white), Metal=0.0 (black)\n";
+
+	std::cout << "  5. KTX Texture Conversion:\n";
+	std::cout << "     AssetConverter.exe --ktx <input.png> <output.ktx> <format>\n";
+	std::cout << "       - Required formats: BC7, BC3, BC1, RGBA8\n";
+	std::cout << "       - Color Spaces: sRGB (for Color/Albedo), Linear (for Normal/Data)\n";
 
 	std::cout << "\n";
 }

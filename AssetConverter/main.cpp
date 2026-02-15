@@ -52,6 +52,16 @@ int main(int argc, char* argv[])
         );
         break;
 
+    // [KTX Texture Mode]
+    case ConversionMode::KTX:
+        LOG_INFO(">>> [Mode] KTX Texture Conversion Selected");
+        success = CONV_KTX.Convert
+        (
+            args.inputPath, args.outputPath, 
+            args.ktxFormat, args.ktxColorSpace
+        );
+        break;
+
     default:
         LOG_ERROR("Unknown conversion mode.");
         success = false;
