@@ -50,11 +50,22 @@ class GuiContextConvertModel(GUIContextBase):
         )
         invert_cb.pack(side="left")
 
+        # Flip Y
+        flip_opt_frame = tk.Frame(self)
+        flip_opt_frame.pack(pady=(5, 10), padx=20, fill="x")
+        self._flip_y = tk.BooleanVar(value=False)
+        flip_y_cb = tk.Checkbutton(
+            flip_opt_frame,
+            text="Flip Y (Texture Coordinates)",
+            variable=self._flip_y
+        )
+        flip_y_cb.pack(side="left")
+
         # back and convert Button context 
         action_frame = tk.Frame(self)
         action_frame.pack(pady=20)
         back_button = tk.Button(action_frame, text="Back", command=self._clicked_back)
-        back_button.pack(side="left", ipadx=10, ipady=5, padx=(0,10))
+        back_button.pack(side="left", ipadx=10, ipady=5, padx=(0, 10))
         self._convert_button = tk.Button(action_frame, text="Convert!", command=self._clicked_convert)
         self._convert_button.pack(side="left", ipadx=10, ipady=5)
 
@@ -105,6 +116,7 @@ class GuiContextConvertModel(GUIContextBase):
         final_output_path = os.path.join(output_folder, f"{file_name_no_ext}.mymodel")
         cmd = [exe_path, "-m", input_path, final_output_path]
         if self._extract_orm.get(): cmd.append("--extract-orm")
+        if self._flip_y.get(): cmd.append("--flip-y")
 
         # --- LogWindow 띄우기 (Convert 누를 때마다 새로) ---
         if self._log_win is not None and self._log_win.winfo_exists():

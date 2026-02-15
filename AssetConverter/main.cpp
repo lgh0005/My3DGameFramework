@@ -32,7 +32,11 @@ int main(int argc, char* argv[])
     // [Model Mode]
     case ConversionMode::Model:
         LOG_INFO(">>> [Mode] Model Conversion Selected");
-        success = CONV_MODEL.Convert(args.inputPath, args.outputPath, args.extractOrm);
+        success = CONV_MODEL.Convert
+        (
+            args.inputPath, args.outputPath, 
+            args.extractOrm, args.flipY
+        );
         break;
 
     // [Animation Mode]
@@ -48,7 +52,7 @@ int main(int argc, char* argv[])
         (
             args.aoMapPath, args.roughnessMapPath, 
             args.metallicMapPath, args.outputPath,
-            args.invertRoughness
+            args.invertRoughness, args.flipY
         );
         break;
 
@@ -58,7 +62,8 @@ int main(int argc, char* argv[])
         success = CONV_KTX.Convert
         (
             args.inputPath, args.outputPath, 
-            args.ktxFormat, args.ktxColorSpace
+            args.ktxFormat, args.ktxColorSpace,
+            args.flipY
         );
         break;
 

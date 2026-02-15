@@ -6,7 +6,8 @@ bool KTXTextureConverter::Convert
 	const std::string& inputPath,
 	const std::string& outputPath,
 	const std::string& formatStr,
-	const std::string& colorSpace
+	const std::string& colorSpace,
+	bool flipY
 )
 {
 	int32 width, height, channels;
@@ -20,7 +21,7 @@ bool KTXTextureConverter::Convert
 	// HDR 처리 경로
 	if (isHDR)
 	{
-		float* basePixels = LoadHDRImage(inputPath, width, height, channels);
+		float* basePixels = LoadHDRImage(inputPath, width, height, channels, flipY);
 		if (!basePixels) return false;
 
 		numLevels = static_cast<uint32>(floor(log2(std::max(width, height)))) + 1;
@@ -32,7 +33,7 @@ bool KTXTextureConverter::Convert
 	// LDR 처리 경로
 	else
 	{
-		uint8* basePixels = LoadLDRImage(inputPath, width, height, channels);
+		uint8* basePixels = LoadLDRImage(inputPath, width, height, channels, flipY);
 		if (!basePixels) return false;
 
 		numLevels = static_cast<uint32>(floor(log2(std::max(width, height)))) + 1;
@@ -66,11 +67,13 @@ bool KTXTextureConverter::ConvertFromMemory
 (
 	uint8* pixels, int32 width, int32 height, 
 	const std::string& outputPath, 
-	const std::string& formatStr, 
-	const std::string& colorSpace
+	const std::string& formatStr,
+	const std::string& colorSpace,
+	bool flipY
 )
 {
 	if (!pixels) return false;
+	if (flipY) FlipImageVertically(pixels, width, height, 4);
 
 	// LDR(8-bit) 변환이므로 isHDR은 항상 false
 	uint32 vkFormat = MapFormatStringToVk(formatStr, false, colorSpace);
@@ -107,10 +110,16 @@ bool KTXTextureConverter::ConvertFromMemory
 /*=================================//
 //          LDR Helpers            //
 //=================================*/
-uint8* KTXTextureConverter::LoadLDRImage(const std::string& path, int32& w, int32& h, int32& ch)
+uint8* KTXTextureConverter::LoadLDRImage(const std::string& path, int32& w, int32& h, int32& ch, bool flipY)
 {
 	uint8* pixels = stbi_load(path.c_str(), &w, &h, &ch, STBI_rgb_alpha);
-	if (!pixels) LOG_ERROR("LDR Load Failed: {}", path);
+	if (!pixels)
+	{
+		LOG_ERROR("LDR Load Failed: {}", path);
+		return nullptr;
+	}
+
+	if (flipY) FlipImageVertically(pixels, w, h, 4);
 	return pixels;
 }
 
@@ -128,7 +137,7 @@ bool KTXTextureConverter::FillMipmapsLDR(ktxTexture2* texture, uint8* basePixels
 		if (res != KTX_SUCCESS)
 		{
 			LOG_ERROR("KTXConverter: SetImageFromMemory failed at LDR level {} (Error: {})", level, (int32)res);
-			if (currentPixels != basePixels) free(currentPixels);
+			if (currentPixels != basePixels) ::free(currentPixels);
 			return false;
 		}
 
@@ -136,26 +145,32 @@ bool KTXTextureConverter::FillMipmapsLDR(ktxTexture2* texture, uint8* basePixels
 		{
 			int32 nextW = std::max(1, currentW / 2);
 			int32 nextH = std::max(1, currentH / 2);
-			uint8* nextPixels = static_cast<uint8*>(malloc(static_cast<usize>(nextW) * nextH * 4));
+			uint8* nextPixels = static_cast<uint8*>(::malloc(static_cast<usize>(nextW) * nextH * 4));
 			stbir_resize_uint8_linear(currentPixels, currentW, currentH, 0, nextPixels, nextW, nextH, 0, STBIR_RGBA);
 
-			if (currentPixels != basePixels) free(currentPixels);
+			if (currentPixels != basePixels) ::free(currentPixels);
 			currentPixels = nextPixels;
 			currentW = nextW;
 			currentH = nextH;
 		}
 	}
-	if (currentPixels != basePixels) free(currentPixels);
+	if (currentPixels != basePixels) ::free(currentPixels);
 	return true;
 }
 
 /*=================================//
 //          HDR Helpers            //
 //=================================*/
-float* KTXTextureConverter::LoadHDRImage(const std::string& path, int32& w, int32& h, int32& ch)
+float* KTXTextureConverter::LoadHDRImage(const std::string& path, int32& w, int32& h, int32& ch, bool flipY)
 {
 	float* pixels = stbi_loadf(path.c_str(), &w, &h, &ch, STBI_rgb_alpha);
-	if (!pixels) LOG_ERROR("HDR Load Failed: {}", path);
+	if (!pixels)
+	{
+		LOG_ERROR("HDR Load Failed: {}", path);
+		return nullptr;
+	}
+
+	if (flipY) FlipImageVerticallyFloat(pixels, w, h, 4);
 	return pixels;
 }
 
@@ -175,7 +190,7 @@ bool KTXTextureConverter::FillMipmapsHDR(ktxTexture2* texture, float* basePixels
 		// 포맷이 RGBA16F(97)라면 32비트 데이터를 16비트로 변환
 		if (targetFormat == 97)
 		{
-			usize numElements = static_cast<size_t>(currentW) * currentH * 4;
+			usize numElements = static_cast<usize>(currentW) * currentH * 4;
 			halfBuffer.resize(numElements);
 
 			for (usize i = 0; i < numElements; ++i)
@@ -202,7 +217,7 @@ bool KTXTextureConverter::FillMipmapsHDR(ktxTexture2* texture, float* basePixels
 		if (res != KTX_SUCCESS)
 		{
 			LOG_ERROR("KTXConverter: SetImageFromMemory failed at HDR level {} (Error: {})", level, (int32)res);
-			if (currentPixels != basePixels) free(currentPixels);
+			if (currentPixels != basePixels) ::free(currentPixels);
 			return false;
 		}
 
@@ -211,20 +226,58 @@ bool KTXTextureConverter::FillMipmapsHDR(ktxTexture2* texture, float* basePixels
 		{
 			int32 nextW = std::max(1, currentW / 2);
 			int32 nextH = std::max(1, currentH / 2);
-			float* nextPixels = static_cast<float*>(malloc(static_cast<usize>(nextW) * nextH * 4 * sizeof(float)));
+			float* nextPixels = static_cast<float*>(::malloc(static_cast<usize>(nextW) * nextH * 4 * sizeof(float)));
 
 			stbir_resize_float_linear(currentPixels, currentW, currentH, 0, nextPixels, nextW, nextH, 0, STBIR_RGBA);
 
-			if (currentPixels != basePixels) free(currentPixels);
+			if (currentPixels != basePixels) ::free(currentPixels);
 			currentPixels = nextPixels;
 			currentW = nextW;
 			currentH = nextH;
 		}
 	}
 
-	if (currentPixels != basePixels) free(currentPixels);
+	if (currentPixels != basePixels) ::free(currentPixels);
 	return true;
 }
+
+void KTXTextureConverter::FlipImageVertically(uint8* data, int32 w, int32 h, int32 ch)
+{
+	if (!data) return;
+
+	usize rowSize = (usize)w * ch;
+	std::vector<uint8> tempRow(rowSize);
+
+	for (int32 y = 0; y < h / 2; ++y)
+	{
+		uint8* top = data + (y * rowSize);
+		uint8* bottom = data + ((h - 1 - y) * rowSize);
+
+		// 상하 로우 스왑
+		memcpy(tempRow.data(), top, rowSize);
+		memcpy(top, bottom, rowSize);
+		memcpy(bottom, tempRow.data(), rowSize);
+	}
+}
+
+void KTXTextureConverter::FlipImageVerticallyFloat(float* data, int32 w, int32 h, int32 ch)
+{
+	if (!data) return;
+
+	size_t rowSize = (size_t)w * ch;
+	std::vector<float> tempRow(rowSize);
+
+	for (int32 y = 0; y < h / 2; ++y)
+	{
+		float* top = data + (y * rowSize);
+		float* bottom = data + ((h - 1 - y) * rowSize);
+
+		memcpy(tempRow.data(), top, rowSize * sizeof(float));
+		memcpy(top, bottom, rowSize * sizeof(float));
+		memcpy(bottom, tempRow.data(), rowSize * sizeof(float));
+	}
+}
+
 /*=================================//
 //          Common Helpers         //
 //=================================*/

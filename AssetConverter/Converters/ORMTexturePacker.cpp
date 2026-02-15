@@ -1,14 +1,17 @@
 ﻿#include "pch.h"
 #include "ORMTexturePacker.h"
 
-bool ORMTexturePacker::Convert(const std::string& aoPath, const std::string& roughPath, 
-	const std::string& metalPath, const std::string& outPngPath, bool invertRoughness)
+bool ORMTexturePacker::Convert
+(
+	const std::string& aoPath, const std::string& roughPath, 
+	const std::string& metalPath, const std::string& outPngPath, 
+	bool invertRoughness, bool flipY
+)
 {
 	AssetFmt::RawImage combined;
-	if (!Pack(aoPath, roughPath, metalPath, combined, invertRoughness))
+	if (!Pack(aoPath, roughPath, metalPath, combined, invertRoughness, flipY))
 		return false;
 
-	// PNG 저장
 	int32 result = stbi_write_png
 	(
 		outPngPath.c_str(),
@@ -26,28 +29,35 @@ bool ORMTexturePacker::Convert(const std::string& aoPath, const std::string& rou
 	return false;
 }
 
-bool ORMTexturePacker::Pack(const std::string& aoPath, const std::string& roughPath, const std::string& metalPath, AssetFmt::RawImage& outImage, bool invertRoughness)
+bool ORMTexturePacker::Pack
+(
+	const std::string& aoPath, const std::string& roughPath, 
+	const std::string& metalPath, AssetFmt::RawImage& outImage, 
+	bool invertRoughness, bool flipY
+)
 {
 	AssetFmt::RawImage ao, roughness, metallic;
 
 	// 1. 이미지 로드
-	LoadImageToRaw(aoPath, ao);
-	LoadImageToRaw(roughPath, roughness);
-	LoadImageToRaw(metalPath, metallic);
-
-	if (!ao.IsValid() && !roughness.IsValid() && !metallic.IsValid()) {
+	LoadImageToRaw(aoPath, ao, flipY);
+	LoadImageToRaw(roughPath, roughness, flipY);
+	LoadImageToRaw(metalPath, metallic, flipY);
+	if (!ao.IsValid() && !roughness.IsValid() && !metallic.IsValid()) 
+	{
 		LOG_ERROR("ORM Packing failed: No valid input textures.");
 		return false;
 	}
 
 	// 2. 최대 해상도 결정
 	int32 finalWidth = 0, finalHeight = 0;
-	auto UpdateSize = [&](const AssetFmt::RawImage& img) {
-		if (img.IsValid()) {
+	auto UpdateSize = [&](const AssetFmt::RawImage& img) 
+	{
+		if (img.IsValid()) 
+		{
 			finalWidth = std::max(finalWidth, img.width);
 			finalHeight = std::max(finalHeight, img.height);
 		}
-		};
+	};
 	UpdateSize(ao); UpdateSize(roughness); UpdateSize(metallic);
 
 	// 3. 출력 이미지 초기화
@@ -101,7 +111,12 @@ bool ORMTexturePacker::Pack(const std::string& aoPath, const std::string& roughP
 	return true;
 }
 
-bool ORMTexturePacker::LoadImageToRaw(const std::string& filepath, AssetFmt::RawImage& outImage)
+bool ORMTexturePacker::LoadImageToRaw
+(
+	const std::string& filepath, 
+	AssetFmt::RawImage& outImage,
+	bool flipY
+)
 {
 	if (filepath.empty()) return false;
 
@@ -113,6 +128,8 @@ bool ORMTexturePacker::LoadImageToRaw(const std::string& filepath, AssetFmt::Raw
 		LOG_ERROR("Error loading image {} : {}", filepath, stbi_failure_reason());
 		return false;
 	}
+
+	if (flipY) FlipImageVertically(data, width, height, channels);
 
 	outImage.width = width;
 	outImage.height = height;
@@ -136,4 +153,20 @@ uint8 ORMTexturePacker::GetPixelChannel(const AssetFmt::RawImage& img, int32 px,
 
 	// 세 채널 값이 모두 같으므로, 첫 번째 채널(R)을 사용
 	return img.pixels[index];
+}
+
+void ORMTexturePacker::FlipImageVertically(uint8* data, int32 w, int32 h, int32 ch)
+{
+	if (!data) return;
+	size_t rowSize = (size_t)w * ch;
+	std::vector<uint8> tempRow(rowSize);
+
+	for (int32 y = 0; y < h / 2; ++y)
+	{
+		uint8* top = data + (y * rowSize);
+		uint8* bottom = data + ((h - 1 - y) * rowSize);
+		memcpy(tempRow.data(), top, rowSize);
+		memcpy(top, bottom, rowSize);
+		memcpy(bottom, tempRow.data(), rowSize);
+	}
 }

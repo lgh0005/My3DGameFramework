@@ -58,9 +58,20 @@ class GuiContextConvertTextureKTX(GUIContextBase):
         self._space_combo.set("sRGB")
         self._space_combo.pack(side="left", ipady=2)
 
-        # 6. Buttons (Back & Convert)
+        # 6. Flip Y
+        opt_frame = tk.Frame(self)
+        opt_frame.pack(pady=10, padx=20, fill="x")
+        self._flip_y = tk.BooleanVar(value=False)
+        flip_y_cb = tk.Checkbutton(
+            opt_frame, 
+            text="Flip Y (Texture Coordinates)", 
+            variable=self._flip_y
+        )
+        flip_y_cb.pack(side="left")
+
+        # 7. Buttons (Back & Convert)
         action_frame = tk.Frame(self)
-        action_frame.pack(pady=40)
+        action_frame.pack(pady=20)
         back_button = tk.Button(action_frame, text="Back", command=self._clicked_back)
         back_button.pack(side="left", ipadx=10, ipady=5, padx=(0, 10))
         self._convert_button = tk.Button(action_frame, text="Convert!", command=self._clicked_convert)
@@ -106,15 +117,15 @@ class GuiContextConvertTextureKTX(GUIContextBase):
         format_str = self._format_combo.get()
         space_str = self._space_combo.get()
 
-        # # 유효성 검사: HDR 파일인데 LDR 전용 압축을 선택한 경우 경고
-        # ext = os.path.splitext(input_path)[1].lower()
-        # ldr_only_formats = ["BC1", "BC3", "BC7"]
-        # if ext == ".hdr" and format_str in ldr_only_formats:
-        #     if not messagebox.askyesno("Warning", 
-        #         f"You are trying to save an HDR file as {format_str}.\n"
-        #         "This will cause significant data loss (clamping to 0-1 range).\n"
-        #         "Continue anyway?"):
-        #         return
+        # 유효성 검사: HDR 파일인데 LDR 전용 압축을 선택한 경우 경고
+        ext = os.path.splitext(input_path)[1].lower()
+        ldr_only_formats = ["BC1", "BC3", "BC7"]
+        if ext == ".hdr" and format_str in ldr_only_formats:
+            if not messagebox.askyesno("Warning", 
+                f"You are trying to save an HDR file as {format_str}.\n"
+                "This will cause significant data loss (clamping to 0-1 range).\n"
+                "Continue anyway?"):
+                return
 
         # 유효성 검사
         if not input_path or not os.path.isfile(input_path):
@@ -138,6 +149,7 @@ class GuiContextConvertTextureKTX(GUIContextBase):
 
         # 명령 인자 조립 (--ktx <in> <out> <format> <space>)
         cmd = [exe_path, "--ktx", input_path, final_output_path, format_str, space_str]
+        if self._flip_y.get(): cmd.append("--flip-y")
 
         # LogWindow 띄우기
         if self._log_win is not None and self._log_win.winfo_exists():

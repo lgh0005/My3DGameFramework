@@ -6,8 +6,16 @@ class ModelConverter
 	DECLARE_SINGLE(ModelConverter)
 
 public:
-	bool Convert(const std::string& inputPath, 
-				 const std::string& outputPath, bool extractORM);
+	bool Convert
+	(
+		const std::string& inputPath, 
+		const std::string& outputPath, 
+		bool extractORM, bool flipY = true
+	);
+
+private:
+	bool m_extractORM	{ false };
+	bool m_flipY		{ true };
 
 /*============================//
 //   main coversion methods   //
@@ -35,7 +43,6 @@ private:
 	void ProcessSkinnedMesh(aiMesh* mesh, AssetFmt::RawMesh& rawMesh);
 	void ProcessStaticMesh(aiMesh* mesh, AssetFmt::RawMesh& rawMesh);
 	AssetFmt::RawMaterial ProcessMaterial(aiMaterial* material, int32 index);
-	bool m_extractORM{ false };
 
 /*=========================================================//
 //   texture helper methods for material and ORM texture   //

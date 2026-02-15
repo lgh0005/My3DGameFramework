@@ -16,6 +16,7 @@ struct ParseResult
 
     // [공통] 출력 경로 (파일 전체 경로)
     std::string outputPath;
+    bool flipY = true;
 
     // [Model]
     std::string inputPath;

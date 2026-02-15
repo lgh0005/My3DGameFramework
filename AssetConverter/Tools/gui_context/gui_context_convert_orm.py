@@ -58,7 +58,7 @@ class GuiContextConvertORMTexture(GUIContextBase):
         browse_output = tk.Button(output_frame, text="Browse...", command=self._browse_output_folder)
         browse_output.pack(side="left", padx=5)
 
-        # invert option checkbox
+        # invert roughness option checkbox
         opt_frame = tk.Frame(self)
         opt_frame.pack(pady=(5, 0), padx=20, fill="x")
         self._invert_rough = tk.BooleanVar(value=False)
@@ -67,14 +67,24 @@ class GuiContextConvertORMTexture(GUIContextBase):
             text="Input is Glossiness (invert to Roughness)",
             variable=self._invert_rough
         )
-        invert_cb.pack(side="left")
+        invert_cb.pack(side="left", padx=(0, 15))
+
+        # 5. Flip Y Option
+        flip_opt_frame = tk.Frame(self)
+        flip_opt_frame.pack(pady=(5, 10), padx=20, fill="x")
+        self._flip_y = tk.BooleanVar(value=False)
+        flip_y_cb = tk.Checkbutton(
+            flip_opt_frame,
+            text="Flip Y (Texture Coordinates)",
+            variable=self._flip_y
+        )
+        flip_y_cb.pack(side="left")
 
         # back and convert Button context
         action_frame = tk.Frame(self)
-        action_frame.pack(pady=20)
+        action_frame.pack(pady=10)
         back_button = tk.Button(action_frame, text="Back", command=self._clicked_back)
         back_button.pack(side="left", ipadx=10, ipady=5, padx=(0, 10))
-
         self._convert_button = tk.Button(action_frame, text="Convert!", command=self._clicked_convert)
         self._convert_button.pack(side="left", ipadx=10, ipady=5)
 
@@ -155,8 +165,8 @@ class GuiContextConvertORMTexture(GUIContextBase):
         metal_arg = metal_path if metal_path else "none"
 
         cmd = [exe_path, "--orm", ao_arg, rough_arg, metal_arg, final_output_path]
-        if self._invert_rough.get():
-            cmd.append("--invert-roughness")
+        if self._invert_rough.get(): cmd.append("--invert-roughness")
+        if self._flip_y.get(): cmd.append("--flip-y")
 
         # --- LogWindow 띄우기 (Convert 누를 때마다 새로) ---
         if self._log_win is not None and self._log_win.winfo_exists():

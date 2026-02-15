@@ -229,14 +229,8 @@ TexturePtr TextureUtils::Create4x4Texture(const std::vector<uint8>& colorData)
 
 TextureUPtr TextureUtils::LoadKtxInternal(const std::string& ktxFilePath)
 {
-    ktxTexture* kTexture;
-    KTX_error_code result;
-    GLuint textureID = 0;
-    GLenum target;
-    GLenum glerror;
-
-    // 1. KTX 로드
-    result = ktxTexture_CreateFromNamedFile(
+    ktxTexture2* kTexture = nullptr; // KTX2 포맷 사용 (BasisU 대응)
+    KTX_error_code result = ktxTexture2_CreateFromNamedFile(
         ktxFilePath.c_str(),
         KTX_TEXTURE_CREATE_LOAD_IMAGE_DATA_BIT,
         &kTexture
@@ -244,35 +238,126 @@ TextureUPtr TextureUtils::LoadKtxInternal(const std::string& ktxFilePath)
 
     if (result != KTX_SUCCESS)
     {
-        LOG_ERROR("TextureUtils: Failed to load KTX texture: {}", ktxFilePath);
+        LOG_ERROR("TextureUtils: KTX2 Create failed ({}): {}", ktxErrorString(result), ktxFilePath);
         return nullptr;
     }
 
-    // 2. GPU 업로드
-    result = ktxTexture_GLUpload(kTexture, &textureID, &target, &glerror);
-    if (result != KTX_SUCCESS)
+    // 1. 트랜스코딩 (Basis Universal 압축인 경우)
+    if (ktxTexture2_NeedsTranscoding(kTexture))
     {
-        ktxTexture_Destroy(kTexture);
-        LOG_ERROR("TextureUtils: Failed to upload KTX texture: {}", ktxFilePath);
-        return nullptr;
+        // 데스크톱 OpenGL 환경에서 가장 품질이 좋은 BC7 포맷으로 변환하도록 지시
+        result = ktxTexture2_TranscodeBasis(kTexture, KTX_TTF_BC7_RGBA, 0);
+        if (result != KTX_SUCCESS)
+        {
+            LOG_ERROR("TextureUtils: Transcoding failed: {}", ktxFilePath);
+            ktxTexture_Destroy(ktxTexture(kTexture));
+            return nullptr;
+        }
     }
 
-    // 3. Texture 객체 생성 및 멤버 주입 (Friend 접근)
+    // 2. 포맷 매핑 (vkFormat -> OpenGL)
+    GLenum internalFormat = GL_RGBA8;
+    bool isCompressed = kTexture->isCompressed;
+    GLenum type = GL_UNSIGNED_BYTE;
+
+    switch (kTexture->vkFormat)
+    {
+    case 146: internalFormat = GL_COMPRESSED_SRGB_ALPHA_BPTC_UNORM; break; // BC7 sRGB
+    case 145: internalFormat = GL_COMPRESSED_RGBA_BPTC_UNORM; break;      // BC7 Linear
+    case 97:  internalFormat = GL_RGBA16F; type = GL_HALF_FLOAT; isCompressed = false; break; // HDR
+    case 43:  internalFormat = GL_SRGB8_ALPHA8; isCompressed = false; break;
+    case 37:  internalFormat = GL_RGBA8; isCompressed = false; break;
+    default:
+        LOG_WARN("TextureUtils: Unknown vkFormat {}, falling back to RGBA8", kTexture->vkFormat);
+        break;
+    }
+
+    // 3. 엔진 Texture 객체 생성
     auto texture = TextureUPtr(new Texture());
-    texture->m_texture = textureID;
+    glGenTextures(1, &texture->m_texture);
     texture->m_width = kTexture->baseWidth;
     texture->m_height = kTexture->baseHeight;
-    texture->m_target = target;
+    texture->m_target = GL_TEXTURE_2D;
+    texture->m_internalFormat = internalFormat;
 
-    // 포맷 쿼리
-    GLint format = 0;
-    glBindTexture(target, textureID);
-    glGetTexLevelParameteriv(target, 0, GL_TEXTURE_INTERNAL_FORMAT, &format);
-    texture->m_format = format;
+    // 4. Immutable Storage 할당
+    texture->Bind();
+    glTexStorage2D(GL_TEXTURE_2D, kTexture->numLevels, internalFormat, texture->m_width, texture->m_height);
 
-    ktxTexture_Destroy(kTexture);
+    // 5. 각 밉맵 레벨 데이터 업로드
+    for (uint32 level = 0; level < kTexture->numLevels; ++level)
+    {
+        ktx_size_t offset;
+        ktxTexture_GetImageOffset(ktxTexture(kTexture), level, 0, 0, &offset);
+        uint8* data = kTexture->pData + offset;
+        uint32 imageSize = static_cast<uint32>(ktxTexture_GetImageSize(ktxTexture(kTexture), level));
+
+        int32 lw = std::max(1, (int)texture->m_width >> level);
+        int32 lh = std::max(1, (int)texture->m_height >> level);
+
+        if (isCompressed)
+        {
+            glCompressedTexSubImage2D(GL_TEXTURE_2D, level, 0, 0, lw, lh, internalFormat, imageSize, data);
+        }
+        else
+        {
+            // HDR(GL_HALF_FLOAT) 혹은 비압축 데이터 처리
+            glTexSubImage2D(GL_TEXTURE_2D, level, 0, 0, lw, lh, GL_RGBA, type, data);
+        }
+    }
+
+    ktxTexture_Destroy(ktxTexture(kTexture));
+    LOG_INFO("Texture loaded from KTX (Immutable): {} ({}x{})", ktxFilePath, texture->m_width, texture->m_height);
+
     return std::move(texture);
 }
+
+//TextureUPtr TextureUtils::LoadKtxInternal(const std::string& ktxFilePath)
+//{
+//    ktxTexture* kTexture;
+//    KTX_error_code result;
+//    GLuint textureID = 0;
+//    GLenum target;
+//    GLenum glerror;
+//
+//    // 1. KTX 로드
+//    result = ktxTexture_CreateFromNamedFile(
+//        ktxFilePath.c_str(),
+//        KTX_TEXTURE_CREATE_LOAD_IMAGE_DATA_BIT,
+//        &kTexture
+//    );
+//
+//    if (result != KTX_SUCCESS)
+//    {
+//        LOG_ERROR("TextureUtils: Failed to load KTX texture: {}", ktxFilePath);
+//        return nullptr;
+//    }
+//
+//    // 2. GPU 업로드
+//    result = ktxTexture_GLUpload(kTexture, &textureID, &target, &glerror);
+//    if (result != KTX_SUCCESS)
+//    {
+//        ktxTexture_Destroy(kTexture);
+//        LOG_ERROR("TextureUtils: Failed to upload KTX texture: {}", ktxFilePath);
+//        return nullptr;
+//    }
+//
+//    // 3. Texture 객체 생성 및 멤버 주입 (Friend 접근)
+//    auto texture = TextureUPtr(new Texture());
+//    texture->m_texture = textureID;
+//    texture->m_width = kTexture->baseWidth;
+//    texture->m_height = kTexture->baseHeight;
+//    texture->m_target = target;
+//
+//    // 포맷 쿼리
+//    GLint format = 0;
+//    glBindTexture(target, textureID);
+//    glGetTexLevelParameteriv(target, 0, GL_TEXTURE_INTERNAL_FORMAT, &format);
+//    texture->m_format = format;
+//
+//    ktxTexture_Destroy(kTexture);
+//    return std::move(texture);
+//}
 
 CubeTextureUPtr TextureUtils::LoadKtxCubeInternal(const std::string& ktxFilePath)
 {

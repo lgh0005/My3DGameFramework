@@ -4,10 +4,14 @@
 /*==========================================//
 //  [Public Entry] 변환 시작 및 상태 초기화   //
 //==========================================*/
-bool ModelConverter::Convert(const std::string& inputPath, 
-                             const std::string& outputPath, bool extractORM)
+bool ModelConverter::Convert
+(
+    const std::string& inputPath, 
+    const std::string& outputPath, 
+    bool extractORM, bool flipY
+)
 {
-    // [중요] 상태 초기화 (State Clear)
+    // 상태 초기화 (State Clear)
     m_rawModel = AssetFmt::RawModel();
     m_boneNameToIdMap.clear();
     m_boneCounter = 0;
@@ -20,6 +24,8 @@ bool ModelConverter::Convert(const std::string& inputPath,
     LOG_INFO(" [ModelConverter] Start Conversion");
     LOG_INFO(" - Input:  {}", inputPath);
     LOG_INFO(" - Output: {}", outputPath);
+    m_extractORM = extractORM;
+    m_flipY = flipY;
     m_inputPath = inputPath;
     m_outputPath = outputPath;
 
@@ -203,8 +209,8 @@ void ModelConverter::CreateORMTextureFromAssimp(aiMaterial* material, AssetFmt::
 
     // 4. 메모리 상에 ORM 이미지 합성
     AssetFmt::RawImage ormRaw;
-    LOG_INFO("[ORM Packer] Packing textures to memory buffer...");
-    if (!CONV_ORM.Pack(aoAbs, finalRoughPath, metalAbs, ormRaw, invertRoughness))
+    LOG_INFO("[ORM Packer] Packing textures to memory buffer... (FlipY: {})", m_flipY);
+    if (!CONV_ORM.Pack(aoAbs, finalRoughPath, metalAbs, ormRaw, invertRoughness, m_flipY))
     {
         LOG_ERROR("[ORM Packer] Failed to pack ORM pixels in memory.");
         return;
@@ -220,7 +226,7 @@ void ModelConverter::CreateORMTextureFromAssimp(aiMaterial* material, AssetFmt::
     bool ktxResult = CONV_KTX.ConvertFromMemory
     (
         ormRaw.pixels.data(), ormRaw.width, ormRaw.height,
-        finalKtxPath.string(), "BC7", "Linear"
+        finalKtxPath.string(), "BC7", "Linear", false
     );
     if (!ktxResult)
     {
@@ -573,10 +579,7 @@ void ModelConverter::ProcessTextureToKTX
     // 1. 결과 파일명 결정 (brick.png -> brick.ktx)
     fs::path srcPath(srcFileName);
     std::string ktxFileName = srcPath.stem().string() + ".ktx";
-
-    // 최종 저장될 절대 경로
-    fs::path outputDir = fs::path(m_outputPath).parent_path();
-    fs::path ktxAbsPath = outputDir / ktxFileName;
+    fs::path ktxAbsPath = fs::path(m_outputPath).parent_path() / ktxFileName;
 
     // 2. 중복 변환 체크
     if (m_convertedTextures.find(ktxFileName) == m_convertedTextures.end())
@@ -591,7 +594,7 @@ void ModelConverter::ProcessTextureToKTX
 
             // 4. KTX 변환 실행 (압축 포맷은 기본적으로 BC7 사용)
             LOG_INFO("  [KTX Export] {} -> {} ({})", srcFileName, ktxFileName, colorSpace);
-            if (!CONV_KTX.Convert(srcAbsPath, ktxAbsPath.string(), "BC7", colorSpace))
+            if (!CONV_KTX.Convert(srcAbsPath, ktxAbsPath.string(), "BC7", colorSpace, m_flipY))
             {
                 LOG_ERROR("  [KTX Export] Failed to convert: {}", srcFileName);
                 return;
