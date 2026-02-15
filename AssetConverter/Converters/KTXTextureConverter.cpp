@@ -62,6 +62,48 @@ bool KTXTextureConverter::Convert
 	return success;
 }
 
+bool KTXTextureConverter::ConvertFromMemory
+(
+	uint8* pixels, int32 width, int32 height, 
+	const std::string& outputPath, 
+	const std::string& formatStr, 
+	const std::string& colorSpace
+)
+{
+	if (!pixels) return false;
+
+	// LDR(8-bit) 변환이므로 isHDR은 항상 false
+	uint32 vkFormat = MapFormatStringToVk(formatStr, false, colorSpace);
+	uint32 numLevels = static_cast<uint32>(floor(log2(std::max(width, height)))) + 1;
+
+	// 8비트 초기 컨테이너 포맷 결정
+	uint32 initialFormat = (colorSpace == "sRGB") ? 43 : 37;
+	ktxTexture2* texture = CreateKTX2Object(width, height, numLevels, initialFormat);
+	if (!texture) return false;
+
+	bool success = false;
+
+	// 밉맵 생성 및 데이터 주입
+	if (FillMipmapsLDR(texture, pixels, width, height, numLevels))
+	{
+		// 압축이 필요한 경우 Basis 압축 진행
+		if (vkFormat != 43 && vkFormat != 37)
+			success = CompressToBasis(texture, formatStr, (colorSpace == "sRGB"));
+		else
+			success = true;
+	}
+
+	// 파일 저장
+	if (success)
+	{
+		success = SaveKTX2ToFile(texture, outputPath);
+		if (success) LOG_INFO("Successfully converted from memory -> {}", outputPath);
+	}
+
+	ktxTexture_Destroy(ktxTexture(texture));
+	return success;
+}
+
 /*=================================//
 //          LDR Helpers            //
 //=================================*/

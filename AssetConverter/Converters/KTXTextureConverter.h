@@ -13,6 +13,14 @@ public:
 		const std::string& colorSpace
 	);
 
+	bool ConvertFromMemory
+	(
+		uint8* pixels, int32 width, int32 height,
+		const std::string& outputPath, 
+		const std::string& formatStr, 
+		const std::string& colorSpace
+	);
+
 /*=================================//
 //   KTXTextureConverter helpers   //
 //=================================*/

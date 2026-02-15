@@ -6,11 +6,23 @@ class ORMTexturePacker
 	DECLARE_SINGLE(ORMTexturePacker)
 
 public:
-    bool Convert(const std::string& aoPath,
-                 const std::string& roughPath,
-                 const std::string& metalPath,
-                 const std::string& outPngPath,
-                 bool invertRoughness = false);
+    bool Convert
+    (
+        const std::string& aoPath,
+        const std::string& roughPath,
+        const std::string& metalPath,
+        const std::string& outPngPath,
+        bool invertRoughness = false
+    );
+
+    bool Pack
+    (
+        const std::string& aoPath,
+        const std::string& roughPath,
+        const std::string& metalPath,
+        AssetFmt::RawImage& outImage,
+        bool invertRoughness = false
+    );
 
 private:
 

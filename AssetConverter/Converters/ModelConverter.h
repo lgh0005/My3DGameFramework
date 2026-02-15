@@ -45,6 +45,9 @@ private:
 	void AddTextureToMaterial(AssetFmt::RawMaterial& rawMat, aiMaterial* aiMat, aiTextureType aiType, AssetFmt::RawTextureType rawType);
 	std::string GetTexturePath(aiMaterial* material, aiTextureType type);
 	void LogFinalMappedTextures(aiMaterial* material, const AssetFmt::RawMaterial& rawMat);
+	void ProcessTextureToKTX(AssetFmt::RawMaterial& rawMat, const std::string& srcFileName, AssetFmt::RawTextureType type);
+
+	std::unordered_set<std::string> m_convertedTextures;
 
 /*==========================================//
 //   skeleton and rigging process methods   //

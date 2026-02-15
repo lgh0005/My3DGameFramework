@@ -4,57 +4,67 @@
 bool ORMTexturePacker::Convert(const std::string& aoPath, const std::string& roughPath, 
 	const std::string& metalPath, const std::string& outPngPath, bool invertRoughness)
 {
+	AssetFmt::RawImage combined;
+	if (!Pack(aoPath, roughPath, metalPath, combined, invertRoughness))
+		return false;
+
+	// PNG 저장
+	int32 result = stbi_write_png
+	(
+		outPngPath.c_str(),
+		combined.width, combined.height, combined.channels,
+		combined.pixels.data(), 0
+	);
+
+	if (result) 
+	{
+		LOG_INFO("Successfully saved ORM PNG to: {}", outPngPath);
+		return true;
+	}
+
+	LOG_ERROR("Failed to write ORM PNG: {}", outPngPath);
+	return false;
+}
+
+bool ORMTexturePacker::Pack(const std::string& aoPath, const std::string& roughPath, const std::string& metalPath, AssetFmt::RawImage& outImage, bool invertRoughness)
+{
 	AssetFmt::RawImage ao, roughness, metallic;
 
-	// 1. 이미지 로드 (각각의 로드 실패가 전체 실패로 이어지지 않게 수정)
+	// 1. 이미지 로드
 	LoadImageToRaw(aoPath, ao);
 	LoadImageToRaw(roughPath, roughness);
 	LoadImageToRaw(metalPath, metallic);
-	if (!ao.IsValid() && !roughness.IsValid() && !metallic.IsValid())
-	{
-		LOG_ERROR("ORM conversion failed: All input paths are invalid or empty.");
+
+	if (!ao.IsValid() && !roughness.IsValid() && !metallic.IsValid()) {
+		LOG_ERROR("ORM Packing failed: No valid input textures.");
 		return false;
 	}
 
-	// 2. 최종 이미지 해상도 결정 (가장 큰 width와 height를 따름)
-	int32 finalWidth = 0;
-	int32 finalHeight = 0;
+	// 2. 최대 해상도 결정
+	int32 finalWidth = 0, finalHeight = 0;
+	auto UpdateSize = [&](const AssetFmt::RawImage& img) {
+		if (img.IsValid()) {
+			finalWidth = std::max(finalWidth, img.width);
+			finalHeight = std::max(finalHeight, img.height);
+		}
+		};
+	UpdateSize(ao); UpdateSize(roughness); UpdateSize(metallic);
 
-	if (ao.IsValid())
-	{
-		finalWidth = std::max(finalWidth, ao.width);
-		finalHeight = std::max(finalHeight, ao.height);
-	}
-	if (roughness.IsValid())
-	{
-		finalWidth = std::max(finalWidth, roughness.width);
-		finalHeight = std::max(finalHeight, roughness.height);
-	}
-	if (metallic.IsValid())
-	{
-		finalWidth = std::max(finalWidth, metallic.width);
-		finalHeight = std::max(finalHeight, metallic.height);
-	}
+	// 3. 출력 이미지 초기화
+	outImage.width = finalWidth;
+	outImage.height = finalHeight;
+	outImage.channels = 4;
+	outImage.pixels.resize((usize)finalWidth * finalHeight * 4);
 
-	// 3. 최종 ORM 이미지 생성
-	AssetFmt::RawImage ormImage;
-	ormImage.width = finalWidth;
-	ormImage.height = finalHeight;
-	ormImage.channels = 3;
-	ormImage.pixels.resize((usize)finalWidth * finalHeight * 3);
-
+	// 4. 픽셀 합성 루프
 	for (int32 y = 0; y < finalHeight; ++y)
 	{
 		for (int32 x = 0; x < finalWidth; ++x)
 		{
-			usize idx = (usize)(y * finalWidth + x) * 3;
+			usize idx = (usize)(y * finalWidth + x) * 4;
 
-			// 해상도 보정 (Scaling)
-			// 현재 픽셀 위치(x, y)를 원본 이미지의 비율에 맞춰 변환합니다.
-			// 예: 1024 캔버스의 512 좌표 -> 512 이미지의 256 좌표로 매핑
-
-			// ambient occlusion
-			uint8 r_val = 255; // Default AO = 255 (no occlusion)
+			// R: AO (Default 255)
+			uint8 r_val = 255;
 			if (ao.IsValid()) 
 			{
 				int32 srcX = (int32)((float)x / finalWidth * ao.width);
@@ -62,18 +72,18 @@ bool ORMTexturePacker::Convert(const std::string& aoPath, const std::string& rou
 				r_val = GetPixelChannel(ao, srcX, srcY);
 			}
 
-			// roughness
-			uint8 g_val = 0; // Default Roughness = 0 (Smooth)
+			// G: Roughness (Default 0)
+			uint8 g_val = 0;
 			if (roughness.IsValid()) 
 			{
 				int32 srcX = (int32)((float)x / finalWidth * roughness.width);
 				int32 srcY = (int32)((float)y / finalHeight * roughness.height);
 				g_val = GetPixelChannel(roughness, srcX, srcY);
-				if (invertRoughness) g_val = (uint8)(255 - g_val); // invert if glossy.
+				if (invertRoughness) g_val = 255 - g_val;
 			}
 
-			// metallic
-			uint8 b_val = 0; // Default Metallic = 0 (Non-metal)
+			// B: Metallic (Default 0)
+			uint8 b_val = 0;
 			if (metallic.IsValid()) 
 			{
 				int32 srcX = (int32)((float)x / finalWidth * metallic.width);
@@ -81,34 +91,14 @@ bool ORMTexturePacker::Convert(const std::string& aoPath, const std::string& rou
 				b_val = GetPixelChannel(metallic, srcX, srcY);
 			}
 
-			// ORM 이미지에 값 할당
-			ormImage.pixels[idx] = r_val;     // R: AO
-			ormImage.pixels[idx + 1] = g_val; // G: Roughness
-			ormImage.pixels[idx + 2] = b_val; // B: Metallic
+			outImage.pixels[idx] = r_val;
+			outImage.pixels[idx + 1] = g_val;
+			outImage.pixels[idx + 2] = b_val;
+			outImage.pixels[idx + 3] = 255;
 		}
 	}
 
-	// 4. 저장
-	int32 result = stbi_write_png
-	(
-		outPngPath.c_str(),
-		ormImage.width,
-		ormImage.height,
-		ormImage.channels,
-		ormImage.pixels.data(),
-		0
-	);
-
-	if (result)
-	{
-		LOG_INFO("Successfully saved ORM texture to: {}", outPngPath);
-		return true;
-	}
-	else
-	{
-		LOG_ERROR("Error writing PNG file: {}", outPngPath);
-		return false;
-	}
+	return true;
 }
 
 bool ORMTexturePacker::LoadImageToRaw(const std::string& filepath, AssetFmt::RawImage& outImage)

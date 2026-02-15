@@ -173,7 +173,7 @@ void ModelConverter::CreateORMTextureFromAssimp(aiMaterial* material, AssetFmt::
     // 0. 옵션이 꺼져있으면 즉시 리턴
     if (!m_extractORM) return;
 
-    // 0. 입력 텍스처 파일명 얻어오기
+    // 1. 입력 텍스처 소스 경로 확보
     std::string aoFile = GetTexturePath(material, aiTextureType_AMBIENT_OCCLUSION);
     std::string roughFile = GetTexturePath(material, aiTextureType_DIFFUSE_ROUGHNESS);
     std::string metalFile = GetTexturePath(material, aiTextureType_METALNESS);
@@ -181,14 +181,12 @@ void ModelConverter::CreateORMTextureFromAssimp(aiMaterial* material, AssetFmt::
     if (aoFile.empty() && roughFile.empty() &&
         metalFile.empty() && glossyFile.empty()) return;
 
-    // 1. 절대 경로 조립 
-    // INFO : 입력 모델 폴더 기준으로 ao, roughness, metallic 텍스쳐가 같이 있다고 가정
     std::string aoAbs    = ResolveTexturePath(aoFile);
     std::string roughAbs = ResolveTexturePath(roughFile);
     std::string metalAbs = ResolveTexturePath(metalFile);
     std::string glossAbs = ResolveTexturePath(glossyFile);
 
-    // 3. Roughness vs Glossiness 결정 로직
+    // 2. Roughness vs Glossiness 결정 및 인버트 여부
     std::string finalRoughPath = roughAbs;
     bool invertRoughness = false;
     if (finalRoughPath.empty() && !glossAbs.empty())
@@ -198,23 +196,43 @@ void ModelConverter::CreateORMTextureFromAssimp(aiMaterial* material, AssetFmt::
         LOG_INFO("  - Roughness map missing. Using Glossiness map instead (Inverted).");
     }
 
-    // 4. ORM 출력 파일명 결정 및 저장 절대 경로 조립
-    // INFO : 출력 파일 포멧은 {ModelName}_{Index}_ORM.png
-    // INFO : 출력 경로는 .mymodel이 출력되는 경로와 동일
-    fs::path outPath(m_outputPath);
-    std::string ormFileName = fmt::format("{}_{}_ORM.png", m_modelName, index);
-    fs::path savePath = outPath.parent_path() / ormFileName;
-    LOG_INFO("[ORM Packer] Baking to: {}", savePath.string());
+    // 3. 최종 KTX 파일명 및 경로 정의
+    std::string ormKtxName = fmt::format("{}_{}_ORM.ktx", m_modelName, index);
+    fs::path outputDir = fs::path(m_outputPath).parent_path();
+    fs::path finalKtxPath = outputDir / ormKtxName;
 
-    // 5. 변환 실행 (마지막 인자로 반전 여부 전달)
-    if (!CONV_ORM.Convert(aoAbs, finalRoughPath, metalAbs, savePath.string(), invertRoughness))
+    // 4. 메모리 상에 ORM 이미지 합성
+    AssetFmt::RawImage ormRaw;
+    LOG_INFO("[ORM Packer] Packing textures to memory buffer...");
+    if (!CONV_ORM.Pack(aoAbs, finalRoughPath, metalAbs, ormRaw, invertRoughness))
     {
-        LOG_ERROR("[ORM Packer] Failed to pack ORM texture.");
+        LOG_ERROR("[ORM Packer] Failed to pack ORM pixels in memory.");
+        return;
+    }
+    if (ormRaw.width <= 0 || ormRaw.height <= 0 || ormRaw.pixels.empty())
+    {
+        LOG_ERROR("[ORM Packer] Invalid baked image size: {}x{}", ormRaw.width, ormRaw.height);
         return;
     }
 
-    // 4) RawMaterial에는 "파일명만" 저장 (엔진 로더 정책과 일치)
-    rawMat.textures.push_back({ ormFileName, AssetFmt::RawTextureType::ORM });
+    // 5. 합성된 메모리 버퍼를 즉시 KTX로 변환
+    LOG_INFO("[ORM Packer] Converting memory buffer to KTX: {}", ormKtxName);
+    bool ktxResult = CONV_KTX.ConvertFromMemory
+    (
+        ormRaw.pixels.data(), ormRaw.width, ormRaw.height,
+        finalKtxPath.string(), "BC7", "Linear"
+    );
+    if (!ktxResult)
+    {
+        LOG_ERROR("[ORM Packer] KTX conversion failed for: {}", ormKtxName);
+        return;
+    }
+
+    // 6. 결과 기록 및 중복 변환 목록에 추가
+    rawMat.textures.push_back({ ormKtxName, AssetFmt::RawTextureType::ORM });
+    m_convertedTextures.insert(ormKtxName);
+
+    LOG_INFO("  [Success] ORM Texture baked and converted to KTX successfully.");
 }
 
 /*====================================//
@@ -426,13 +444,18 @@ AssetFmt::RawMaterial ModelConverter::ProcessMaterial(aiMaterial* material, int3
     AddTextureToMaterial(rawMat, material, aiTextureType_HEIGHT, AssetFmt::RawTextureType::Height);
     AddTextureToMaterial(rawMat, material, aiTextureType_SPECULAR, AssetFmt::RawTextureType::Specular);
     AddTextureToMaterial(rawMat, material, aiTextureType_EMISSIVE, AssetFmt::RawTextureType::Emissive);
-    AddTextureToMaterial(rawMat, material, aiTextureType_AMBIENT_OCCLUSION, AssetFmt::RawTextureType::AmbientOcclusion);
-    AddTextureToMaterial(rawMat, material, aiTextureType_DIFFUSE_ROUGHNESS, AssetFmt::RawTextureType::Roughness);
-    AddTextureToMaterial(rawMat, material, aiTextureType_METALNESS, AssetFmt::RawTextureType::Metallic);
-    AddTextureToMaterial(rawMat, material, aiTextureType_SHININESS, AssetFmt::RawTextureType::Glossiness);
-
-    // 3. 자동 ORM 텍스쳐 생성
-    CreateORMTextureFromAssimp(material, rawMat, index);
+    
+    if (!m_extractORM)
+    {
+        AddTextureToMaterial(rawMat, material, aiTextureType_AMBIENT_OCCLUSION, AssetFmt::RawTextureType::AmbientOcclusion);
+        AddTextureToMaterial(rawMat, material, aiTextureType_DIFFUSE_ROUGHNESS, AssetFmt::RawTextureType::Roughness);
+        AddTextureToMaterial(rawMat, material, aiTextureType_METALNESS, AssetFmt::RawTextureType::Metallic);
+        AddTextureToMaterial(rawMat, material, aiTextureType_SHININESS, AssetFmt::RawTextureType::Glossiness);
+    }
+    else
+    {
+        CreateORMTextureFromAssimp(material, rawMat, index);
+    }
 
     // 4. 텍스쳐 매핑 로깅
     LogFinalMappedTextures(material, rawMat);
@@ -464,14 +487,12 @@ std::string ModelConverter::ResolveTexturePath(const std::string& relativePath)
 
 void ModelConverter::AddTextureToMaterial(AssetFmt::RawMaterial& rawMat, aiMaterial* aiMat, aiTextureType aiType, AssetFmt::RawTextureType rawType)
 {
+    // 1. Assimp 머티리얼에서 텍스처 파일명(경로) 가져오기
     std::string path = GetTexturePath(aiMat, aiType);
+
+    // 2. 파일명이 비어있지 않다면 KTX 변환 및 등록 절차 진행
     if (!path.empty())
-    {
-        AssetFmt::RawTexture tex;
-        tex.fileName = path;
-        tex.type = rawType;
-        rawMat.textures.push_back(tex);
-    }
+        ProcessTextureToKTX(rawMat, path, rawType);
 }
 
 std::string ModelConverter::GetTexturePath(aiMaterial* material, aiTextureType type)
@@ -538,6 +559,48 @@ void ModelConverter::LogFinalMappedTextures(aiMaterial* material, const AssetFmt
         if (material->GetTexture(check.type, 0, &debugPath) == AI_SUCCESS)
             LOG_TRACE("   [Assimp Debug] Found {:<15} : {}", check.name, debugPath.C_Str());
     }
+}
+
+void ModelConverter::ProcessTextureToKTX
+(
+    AssetFmt::RawMaterial& rawMat, 
+    const std::string& srcFileName, 
+    AssetFmt::RawTextureType type
+)
+{
+    if (srcFileName.empty()) return;
+
+    // 1. 결과 파일명 결정 (brick.png -> brick.ktx)
+    fs::path srcPath(srcFileName);
+    std::string ktxFileName = srcPath.stem().string() + ".ktx";
+
+    // 최종 저장될 절대 경로
+    fs::path outputDir = fs::path(m_outputPath).parent_path();
+    fs::path ktxAbsPath = outputDir / ktxFileName;
+
+    // 2. 중복 변환 체크
+    if (m_convertedTextures.find(ktxFileName) == m_convertedTextures.end())
+    {
+        std::string srcAbsPath = ResolveTexturePath(srcFileName);
+        if (!srcAbsPath.empty())
+        {
+            // 3. 타입에 따른 색상 공간 결정
+            std::string colorSpace = "Linear";
+            if (type == AssetFmt::RawTextureType::Albedo || type == AssetFmt::RawTextureType::Emissive)
+                colorSpace = "sRGB";
+
+            // 4. KTX 변환 실행 (압축 포맷은 기본적으로 BC7 사용)
+            LOG_INFO("  [KTX Export] {} -> {} ({})", srcFileName, ktxFileName, colorSpace);
+            if (!CONV_KTX.Convert(srcAbsPath, ktxAbsPath.string(), "BC7", colorSpace))
+            {
+                LOG_ERROR("  [KTX Export] Failed to convert: {}", srcFileName);
+                return;
+            }
+            m_convertedTextures.insert(ktxFileName);
+        }
+    }
+
+    rawMat.textures.push_back({ ktxFileName, type });
 }
 
 /*==============================//
