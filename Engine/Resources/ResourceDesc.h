@@ -187,7 +187,6 @@ struct EnvironmentMapDesc : public ResourceDesc
 	virtual ResourceType GetDescType() const override;
 
 	std::string path;
-	bool createIBL = true;
 };
 
 // =============================================================================================

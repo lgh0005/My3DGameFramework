@@ -11,8 +11,6 @@
 #include "Resources/Meshes/StaticMesh.h"
 #include "Resources/Meshes/SkinnedMesh.h"
 #include "Resources/Material.h"
-#include "Resources/Image.h"
-#include "Resources/Textures/TextureUtils.h"
 #include "Resources/Textures/Texture.h"
 #include "Resources/Animations/Skeleton.h"
 #include "Graphics/Layouts/VertexLayout.h"

@@ -152,7 +152,6 @@ set(ENGINE_SOURCES
    "Resources/Resource.h"           "Resources/Resource.cpp"
    "Resources/ResourceDesc.h"       "Resources/ResourceDesc.cpp"
    "Resources/AudioClip.h"          "Resources/AudioClip.cpp"
-   "Resources/Image.h"              "Resources/Image.cpp"
    "Resources/Model.h"              "Resources/Model.cpp"
    "Resources/Material.h"           "Resources/Material.cpp"
    "Resources/Font.h"               "Resources/Font.cpp"
@@ -172,7 +171,6 @@ set(ENGINE_SOURCES
 
    "Resources/Textures/TextureBase.h"        "Resources/Textures/TextureBase.cpp" 
    "Resources/Textures/Texture.h"            "Resources/Textures/Texture.cpp" 
-   "Resources/Textures/TextureUtils.h"       "Resources/Textures/TextureUtils.cpp" 
    "Resources/Textures/CubeTexture.h"        "Resources/Textures/CubeTexture.cpp"
 
    "Resources/Meshes/Mesh.h"                 "Resources/Meshes/Mesh.cpp"

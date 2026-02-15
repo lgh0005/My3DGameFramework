@@ -11,7 +11,6 @@
 #include "Resources/Material.h"
 #include "Resources/Textures/Texture.h"
 #include "Resources/Textures/CubeTexture.h"
-#include "Resources/Image.h"
 #include "Resources/Animations/Animation.h"
 #include "Resources/Model.h"
 #include "Graphics/Buffers/Buffer.h"
@@ -70,8 +69,7 @@ bool DevScene::LoadSceneResources()
 	RESOURCE.Add<Texture>("toybox_diffuse", "@GameAsset/Images/baked/toy_box_diffuse.ktx");
 	RESOURCE.Add<Texture>("toybox_normal", "@GameAsset/Images/baked/toy_box_normal.ktx");
 	RESOURCE.Add<Texture>("toybox_disp", "@GameAsset/Images/baked/toy_box_disp.ktx");
-	RESOURCE.Add<Texture>("grass", "@GameAsset/Images/grass.png");
-	RESOURCE.Add<Texture>("camera_dirt", "@GameAsset/Images/camera_dirt.png");
+	RESOURCE.Add<Texture>("grass", "@GameAsset/Images/baked/grass.ktx");
 
 	RESOURCE.Add<CubeTexture>("SkyboxTexture", "@GameAsset/Images/baked/sky.ktx");
 

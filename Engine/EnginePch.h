@@ -34,6 +34,7 @@ using json = nlohmann::json;
 // OpenGL
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glad/glad.h>
+#include <GL/glext.h>
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
 #include <glm/common.hpp>

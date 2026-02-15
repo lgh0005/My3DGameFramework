@@ -3,7 +3,6 @@
 #include "Parsers/EngineParsers/MaterialYamlParser.h"
 #include "Resources/Programs/Program.h"
 #include "Resources/Programs/GraphicsProgram.h"
-#include "Resources/Textures/TextureUtils.h"
 #include "Resources/Textures/Texture.h"
 
 DECLARE_DEFAULTS_IMPL(Material)
@@ -46,13 +45,13 @@ MaterialPtr Material::Create()
     material->m_desc = defaultDesc;
 
     // 2. TextureUtils를 이용한 기본 텍스처 할당
-    material->diffuse = TextureUtils::GetWhiteTexture(); // 색상 영향 없음
-    material->specular = TextureUtils::GetBlackTexture(); // 반사 없음
-    material->emission = TextureUtils::GetBlackTexture(); // 발광 없음
-    material->normal = TextureUtils::GetBlueTexture();  // 평평한 노멀 (0, 0, 1)
-    material->ao = TextureUtils::GetWhiteTexture(); // 차폐 없음
-    material->metallic = TextureUtils::GetBlackTexture(); // 비금속
-    material->roughness = TextureUtils::GetGrayTexture();  // 적당한 거칠기 (0.5)
+    material->diffuse = Texture::GetWhiteTexture();
+    material->specular = Texture::GetBlackTexture();
+    material->emission = Texture::GetBlackTexture();
+    material->normal = Texture::GetBlueTexture();
+    material->ao = Texture::GetWhiteTexture();
+    material->metallic = Texture::GetBlackTexture();
+    material->roughness = Texture::GetGrayTexture();
 
     // 3. 기본 팩터 설정
     material->albedoFactor = glm::vec4(1.0f);
@@ -74,28 +73,28 @@ void Material::SetToProgram(const Program* program) const
     glActiveTexture(GL_TEXTURE0 + (int)TextureSlot::SLOT_ALBEDO);
     program->SetUniform("material.diffuse", (int)TextureSlot::SLOT_ALBEDO);
     if (diffuse) diffuse->Bind();
-    else TextureUtils::GetWhiteTexture()->Bind();
+    else Texture::GetWhiteTexture()->Bind();
 
     //// 2. Specular - [Slot 1]
     // 기본값: Black (반사광 없음)
     glActiveTexture(GL_TEXTURE0 + (int)TextureSlot::SLOT_SPECULAR);
     program->SetUniform("material.specular", (int)TextureSlot::SLOT_SPECULAR);
     if (specular) specular->Bind();
-    else TextureUtils::GetBlackTexture()->Bind();
+    else Texture::GetBlackTexture()->Bind();
 
     // 3. Emission - [Slot 2]
     // 기본값: Black (발광 없음)
     glActiveTexture(GL_TEXTURE0 + (int)TextureSlot::SLOT_EMISSION);
     program->SetUniform("material.emission", (int)TextureSlot::SLOT_EMISSION);
     if (emission) emission->Bind();
-    else TextureUtils::GetBlackTexture()->Bind();
+    else Texture::GetBlackTexture()->Bind();
 
     // 4. Normal - [Slot 3]
     // 기본값: Blue (RGB: 128, 128, 255 -> Vector: 0, 0, 1)
     glActiveTexture(GL_TEXTURE0 + (int)TextureSlot::SLOT_NORMAL);
     program->SetUniform("material.normal", (int)TextureSlot::SLOT_NORMAL);
     if (normal) normal->Bind();
-    else TextureUtils::GetBlueTexture()->Bind();
+    else Texture::GetBlueTexture()->Bind();
 
     // 5. Height (Displacement) - [Slot 4]
     // 기본값: Black (높이 변화 없음), 높이 스케일은 0
@@ -108,7 +107,7 @@ void Material::SetToProgram(const Program* program) const
     }
     else
     {
-        TextureUtils::GetWhiteTexture()->Bind();
+        Texture::GetWhiteTexture()->Bind();
         program->SetUniform("material.heightScale", 0.0f);
     }
 
@@ -129,21 +128,21 @@ void Material::SetToProgram(const Program* program) const
         glActiveTexture(GL_TEXTURE0 + (int)TextureSlot::SLOT_AO);
         program->SetUniform("material.ao", (int)TextureSlot::SLOT_AO);
         if (ao) ao->Bind();
-        else TextureUtils::GetWhiteTexture()->Bind();
+        else Texture::GetWhiteTexture()->Bind();
 
         // 7. Metallic - [Slot 6]
         // 기본값: Black (비금속)
         glActiveTexture(GL_TEXTURE0 + (int)TextureSlot::SLOT_METALLIC);
         program->SetUniform("material.metallic", (int)TextureSlot::SLOT_METALLIC);
         if (metallic) metallic->Bind();
-        else TextureUtils::GetBlackTexture()->Bind();
+        else Texture::GetBlackTexture()->Bind();
 
         // 8. Roughness - [Slot 7]
         // 기본값: Gray (0.5 - 적당한 거칠기) 혹은 White (완전 거침)
         glActiveTexture(GL_TEXTURE0 + (int)TextureSlot::SLOT_ROUGHNESS);
         program->SetUniform("material.roughness", (int)TextureSlot::SLOT_ROUGHNESS);
         if (roughness) roughness->Bind();
-        else TextureUtils::GetGrayTexture()->Bind();
+        else Texture::GetGrayTexture()->Bind();
 
         program->SetUniform("material.hasORM", false);
     }

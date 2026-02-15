@@ -3,11 +3,6 @@
 
     ".ktx": "Texture",
 
-    ".png": "Image",
-    ".hdr": "Image",
-    ".jpg": "Image",
-    ".jpeg": "Image",
-
     ".mymodel": "Model",
 
     ".myanim": "Animation",

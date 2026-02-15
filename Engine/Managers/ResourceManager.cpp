@@ -119,7 +119,7 @@ void ResourceManager::AddBuiltInResources()
 	QuickRegister("DefaultMaterial", "@BuiltIn/Material", Material::Create());
 
 	// [TEMP] 카메라 흙 추가
-	TextureDesc dirtDesc("@GameAsset/Images/camera_dirt.png", "camera_dirt");
+	TextureDesc dirtDesc("@GameAsset/Images/baked/camera_dirt.ktx", "camera_dirt");
 	dirtDesc.sRGB = false;
 	auto dirtTex = Texture::Load(dirtDesc);
 	if (dirtTex) QuickRegister("camera_dirt", dirtDesc.path, std::move(dirtTex));

@@ -16,9 +16,12 @@ public:
 	static EnvironmentMapPtr Load(const EnvironmentMapDesc& desc);
 	static EnvironmentMapPtr Create(const CubeTexturePtr& cubeTexture);
 	static EnvironmentMapPtr CreateIBL(const TexturePtr& hdrTexture);
+
+public:
 	virtual EnvironmentMapDesc& GetDesc() override { return m_desc; }
 	virtual const ResourceDesc& GetDesc() const override { return m_desc; }
 
+public:
 	CubeTexturePtr GetSkybox() const { return m_skybox; }
 	CubeTexturePtr GetIrradiance() const { return m_irradiance; }
 	CubeTexturePtr GetPrefiltered() const { return m_prefiltered; }
