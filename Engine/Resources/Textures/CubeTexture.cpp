@@ -17,6 +17,7 @@ CubeTexturePtr CubeTexture::Load(const CubeTextureDesc& desc)
     if (!texture->InitFromKtx(actualPath))
         return nullptr;
 
+    LOG_INFO("Loading Texture: [{}] -> {}", desc.name, actualPath);
     return texture;
 }
 

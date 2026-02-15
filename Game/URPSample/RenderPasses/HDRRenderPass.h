@@ -14,7 +14,7 @@ class HDRRenderPass : public GeneralRenderPass
 {
 public:
 	virtual ~HDRRenderPass();
-	static HDRRenderPassUPtr Create(ProgramUPtr program);
+	static HDRRenderPassUPtr Create(ProgramPtr program);
 	virtual void Render(Scene* scene, Camera* camera) override;
 
 	const std::vector<StaticMeshRenderer*>& GetRenderers() const;
@@ -22,8 +22,8 @@ public:
 
 private:
 	HDRRenderPass();
-	bool Init(ProgramUPtr program);
+	bool Init(ProgramPtr program);
 
-	ProgramUPtr m_simpleProgram;
+	ProgramPtr m_simpleProgram;
 	std::vector<StaticMeshRenderer*> m_renderers;
 };

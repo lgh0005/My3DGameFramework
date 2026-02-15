@@ -1,6 +1,7 @@
 ﻿#include "pch.h"
 #include "My3DGameFramework.h"
 
+// TODO : 이후에는 순수히 데이터 로드 기반의 방식으로 탈환 예정
 // [사용자 정의 컨텐츠 헤더들]
 #pragma region CONTENTS_HEADERS
 #include "Pipelines/SRP/StandardRenderPipeline.h"
@@ -35,11 +36,11 @@ void My3DGameFramework::OnInit()
         "Standard"      // Pipeline Key
     );
 
-    //// 1. URP 전용 씬
-    //RegisterLevel<PBRScene, UniversalRenderPipeline>
-    //(
-    //    "PBRLevel",
-    //    "PBRScene",
-    //    "Universal"
-    //);
+    // 1. URP 전용 씬
+    RegisterLevel<PBRScene, UniversalRenderPipeline>
+    (
+        "PBRLevel",
+        "PBRScene",
+        "Universal"
+    );
 }

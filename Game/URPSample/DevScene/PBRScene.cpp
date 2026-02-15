@@ -8,10 +8,8 @@
 #include "Resources/Meshes/StaticMesh.h"
 #include "Resources/Meshes/SkinnedMesh.h"
 #include "Resources/Material.h"
-#include "Resources/Textures/TextureUtils.h"
 #include "Resources/Textures/Texture.h"
 #include "Resources/Textures/CubeTexture.h"
-#include "Resources/Image.h"
 #include "Resources/Animations/Animation.h"
 #include "Resources/Model.h"
 #include "Resources/Meshes/InstancedMesh.h"
@@ -48,95 +46,88 @@ PBRSceneUPtr PBRScene::Create()
 
 bool PBRScene::LoadSceneResources()
 {
-	// 단색 머티리얼 (이미지 생성은 경로 무관하므로 그대로 유지)
+	// [Texture] Rusted Iron (KTX)
+	RESOURCE.Add<Texture>("rusted_base", "@GameAsset/Images/rustediron/rustediron2_basecolor.ktx");
+	RESOURCE.Add<Texture>("rusted_normal", "@GameAsset/Images/rustediron/rustediron2_normal.ktx");
+	RESOURCE.Add<Texture>("rusted_orm", "@GameAsset/Images/rustediron/rustediron2_ORM.ktx");
+
+	// [Texture] ToyBox (KTX)
+	RESOURCE.Add<Texture>("toybox_diffuse", "@GameAsset/Images/baked/toy_box_diffuse.ktx");
+	RESOURCE.Add<Texture>("toybox_normal", "@GameAsset/Images/baked/toy_box_normal.ktx");
+	RESOURCE.Add<Texture>("toybox_disp", "@GameAsset/Images/baked/toy_box_disp.ktx");
+
+	// [Texture] HDR Source (IBL용)
+	RESOURCE.Add<Texture>("mirrored_hall", "@GameAsset/Images/baked/mirrored_hall_4k.ktx");
+
+	// [Model & Animation]
+	RESOURCE.Add<Model>("aliensoldier", "@GameAsset/Models/spacesoldier/aliensoldier.mymodel");
+	RESOURCE.Add<Model>("backpack", "@GameAsset/Models/backpack/backpack.mymodel");
+	RESOURCE.Add<Animation>("Idle", "@GameAsset/Models/spacesoldier/Idle_shorten.myanim");
+	RESOURCE.Add<Animation>("Walk", "@GameAsset/Models/spacesoldier/Walking.myanim");
+
+	// 1. 단색 머티리얼 (Texture::CreateSolid 사용)
 	{
-		auto solidColorMat = Material::Create();
-		if (!solidColorMat) return false;
-		solidColorMat->diffuse = TextureUtils::LoadTextureFromImage(Image::CreateSingleColorImage
-		(4, 4, glm::vec4(0.75f, 0.1f, 0.2f, 1.0f)).get());
-		solidColorMat->metallic = TextureUtils::LoadTextureFromImage(Image::CreateSingleColorImage
-		(4, 4, glm::vec4(0.85f, 0.85f, 0.85f, 1.0f)).get());
-		solidColorMat->roughness = TextureUtils::LoadTextureFromImage(Image::CreateSingleColorImage
-		(4, 4, glm::vec4(0.25f, 0.35f, 0.25f, 1.0f)).get());
-		RESOURCE.AddResource<Material>(std::move(solidColorMat), "solidColor");
+		auto mat = Material::Create();
+		mat->GetDesc().name = "solidColor";
+		mat->GetDesc().path = "@Virtual/Materials/solidColor";
+		mat->diffuse = Texture::CreateSolid({ 191, 25, 51, 255 });
+		mat->metallic = Texture::CreateSolid({ 217, 217, 217, 255 });
+		mat->roughness = Texture::CreateSolid({ 64, 89, 64, 255 });
+		RESOURCE.Register<Material>(std::move(mat));
 	}
 
-	// 쇠공 머티리얼 #1
+	// 3. 쇠공 머티리얼 #2 (ORM Texture)
 	{
-		auto rustedIronMat = Material::Create();
-		if (!rustedIronMat) return false;
-
-		// [수정] FILE_MGR.Resolve 사용 (@GameAsset/Images 경로)
-		rustedIronMat->diffuse = TextureUtils::LoadTextureFromImage
-		(Image::Load(FILE_MGR.Resolve("@GameAsset/Images/rustediron/rustediron2_basecolor.png")).get());
-
-		rustedIronMat->roughness = TextureUtils::LoadTextureFromImage
-		(Image::Load(FILE_MGR.Resolve("@GameAsset/Images/rustediron/rustediron2_roughness.png")).get());
-
-		rustedIronMat->metallic = TextureUtils::LoadTextureFromImage
-		(Image::Load(FILE_MGR.Resolve("@GameAsset/Images/rustediron/rustediron2_metallic.png")).get());
-
-		rustedIronMat->normal = TextureUtils::LoadTextureFromImage
-		(Image::Load(FILE_MGR.Resolve("@GameAsset/Images/rustediron/rustediron2_normal.png")).get());
-
-		RESOURCE.AddResource<Material>(std::move(rustedIronMat), "Rusted_Iron");
+		auto mat = Material::Create();
+		mat->GetDesc().name = "Rusted_Iron_orm";
+		mat->GetDesc().path = "@Virtual/Materials/Rusted_Iron_orm";
+		mat->diffuse = RESOURCE.Get<Texture>("rusted_base");
+		mat->normal = RESOURCE.Get<Texture>("rusted_normal");
+		mat->orm = RESOURCE.Get<Texture>("rusted_orm");
+		RESOURCE.Register<Material>(std::move(mat));
 	}
 
-	// 쇠공 머티리얼 #2
+	// 4. HDR 큐브맵 확인용 머티리얼
 	{
-		auto rustedIronMat = Material::Create();
-		if (!rustedIronMat) return false;
-
-		rustedIronMat->diffuse = TextureUtils::LoadTextureFromImage
-		(Image::Load(FILE_MGR.Resolve("@GameAsset/Images/rustediron/rustediron2_basecolor.png")).get());
-
-		rustedIronMat->normal = TextureUtils::LoadTextureFromImage
-		(Image::Load(FILE_MGR.Resolve("@GameAsset/Images/rustediron/rustediron2_normal.png")).get());
-
-		rustedIronMat->orm = TextureUtils::LoadTextureFromImage
-		(Image::Load(FILE_MGR.Resolve("@GameAsset/Images/rustediron/rustediron2_ORM.png")).get());
-
-		RESOURCE.AddResource<Material>(std::move(rustedIronMat), "Rusted_Iron_orm");
+		auto mat = Material::Create();
+		mat->GetDesc().name = "hdrCubeMat";
+		mat->GetDesc().path = "@Virtual/Materials/hdrCubeMat";
+		mat->diffuse = RESOURCE.Get<Texture>("mirrored_hall");
+		RESOURCE.Register<Material>(std::move(mat));
 	}
 
-	// HDR 큐브맵 머티리얼
+	// 5. 패럴랙스 매핑용 머티리얼
 	{
-		auto hdrCubeMat = Material::Create();
-		if (!hdrCubeMat) return false;
-
-		// [수정] IBL 폴더 경로 수정
-		hdrCubeMat->diffuse = TextureUtils::LoadTextureFromHDR
-		(Image::LoadHDR(FILE_MGR.Resolve("@GameAsset/Images/IBL/mirrored_hall_4k.hdr")).get());
-
-		RESOURCE.AddResource<Material>(std::move(hdrCubeMat), "hdrCubeMat");
+		auto mat = Material::Create();
+		mat->GetDesc().name = "boxMat5";
+		mat->GetDesc().path = "@Virtual/Materials/boxMat5";
+		mat->diffuse = RESOURCE.Get<Texture>("toybox_diffuse");
+		mat->normal = RESOURCE.Get<Texture>("toybox_normal");
+		mat->height = RESOURCE.Get<Texture>("toybox_disp");
+		mat->shininess = 14.0f;
+		mat->emissionStrength = 0.0f;
+		mat->heightScale = 0.065f;
+		RESOURCE.Register<Material>(std::move(mat));
 	}
 
-	// HDR Skybox 생성 (IBLUtils 사용)
+	// 6. 빈 머티리얼 (Ground)
 	{
-		auto hdrImage = Image::LoadHDR(FILE_MGR.Resolve("@GameAsset/Images/IBL/mirrored_hall_4k.hdr"));
-		auto hdrTex = TextureUtils::LoadTextureFromHDR(hdrImage.get());
-		RESOURCE.AddResource<Texture>(std::move(hdrTex), "hdrImage");
-
-		auto envMap = EnvironmentMap::CreateIBL(RESOURCE.GetResource<Texture>("hdrImage"));
-		RESOURCE.AddResource<EnvironmentMap>(std::move(envMap), "UnviersalSky");
+		auto mat = Material::Create();
+		mat->GetDesc().name = "GroundMat";
+		mat->GetDesc().path = "@Virtual/Materials/GroundMat";
+		RESOURCE.Register<Material>(std::move(mat));
 	}
 
-	// 0-4. 머티리얼 2 (빈 머티리얼)
+	// 7. Environment Map 생성 (UniversalSky)
 	{
-		auto box1Mat = Material::Create();
-		RESOURCE.AddResource<Material>(std::move(box1Mat), "GroundMat");
-	}
-
-	// 머티리얼 6 (이미 로드된 리소스 참조는 수정 불필요)
-	{
-		auto box6Mat = Material::Create();
-		box6Mat->diffuse = RESOURCE.GetResource<Texture>("toybox_diffuse");
-		box6Mat->normal = RESOURCE.GetResource<Texture>("toybox_normal");
-		box6Mat->height = RESOURCE.GetResource<Texture>("toybox_disp");
-		box6Mat->shininess = 14.0f;
-		box6Mat->emissionStrength = 0.0f;
-		box6Mat->heightScale = 0.065f;
-		RESOURCE.AddResource<Material>(std::move(box6Mat), "boxMat5");
+		EnvironmentMapDesc envDesc;
+		envDesc.name = "mirrored_hall";
+		auto envMap = EnvironmentMap::Load(envDesc);
+		if (envMap)
+		{
+			envMap->GetDesc().name = "UniversalSky";
+			RESOURCE.Register<EnvironmentMap>(std::move(envMap));
+		}
 	}
 
 	return true;
@@ -144,19 +135,14 @@ bool PBRScene::LoadSceneResources()
 
 bool PBRScene::CreateCustomRenderPasses()
 {
-	// 간단한 머티리얼 포워드 렌더 패스
-	{
-		// [수정] 셰이더 경로 Resolve
-		// Forward_PBR은 샘플 전용 셰이더로 보이므로 @GameAsset/Shaders 경로 사용
-		// (만약 엔진 공용 셰이더라면 @Shader로 변경하세요)
-		std::string vsPath = FILE_MGR.Resolve("@GameAsset/Shaders/Forward_PBR.vert");
-		std::string fsPath = FILE_MGR.Resolve("@GameAsset/Shaders/Forward_PBR.frag");
+	auto prog = RESOURCE.Add<GraphicsProgram>
+	(
+		"ForwardPBR",
+		"@GameAsset/Shaders/Forward_PBR.vert",
+		"@GameAsset/Shaders/Forward_PBR.frag"
+	);
 
-		auto prog = GraphicsProgram::Create(vsPath, fsPath);
-		if (!prog) return false;
-
-		AddRenderPass("simpleHDR", HDRRenderPass::Create(std::move(prog)));
-	}
+	if (prog) AddRenderPass("simpleHDR", HDRRenderPass::Create(prog));
 
 	return true;
 }
@@ -185,62 +171,35 @@ bool PBRScene::OnPlaceActors()
 		AddGameObject(std::move(cameraObj));
 	}
 
-	// 0. 하늘 GameObject 생성
+	// 2. 하늘 GameObject 생성
 	{
-		auto skyObj = GameObject::Create(); if (!skyObj) return false;
-		auto sky = SkyLight::Create(RESOURCE.GetResource<EnvironmentMap>("UnviersalSky"));
+		auto skyObj = GameObject::Create();
+		auto sky = SkyLight::Create(RESOURCE.Get<EnvironmentMap>("UniversalSky"));
 		skyObj->AddComponent(std::move(sky));
 		AddGameObject(std::move(skyObj));
 	}
 
-	// 2. 조명 추가
+	// 3. 조명 추가 (Point Lights)
 	{
-		// 2. 조명 추가 1
+		// Helper Lambda for creating point lights
+		auto AddPointLight = [&](const std::string& name, glm::vec3 pos) 
 		{
 			auto lightGo = GameObject::Create();
-			lightGo->SetName("PointLight1");
+			lightGo->SetName(name);
 			auto lightComp = PointLight::Create();
-			lightGo->GetTransform().SetPosition(glm::vec3(5.0f, 5.0f, 4.0f));
+			lightGo->GetTransform().SetPosition(pos);
 			lightGo->GetTransform().SetScale(glm::vec3(0.2f));
 			lightGo->AddComponent(std::move(lightComp));
 			AddGameObject(std::move(lightGo));
-		}
+		};
 
-		// 2. 조명 추가 2
-		{
-			auto lightGo = GameObject::Create();
-			lightGo->SetName("PointLight2");
-			auto lightComp = PointLight::Create();
-			lightGo->GetTransform().SetPosition(glm::vec3(-4.0f, 5.0f, 5.0f));
-			lightGo->GetTransform().SetScale(glm::vec3(0.2f));
-			lightGo->AddComponent(std::move(lightComp));
-			AddGameObject(std::move(lightGo));
-		}
-
-		// 2. 조명 추가 3
-		{
-			auto lightGo = GameObject::Create();
-			lightGo->SetName("PointLight3");
-			auto lightComp = PointLight::Create();
-			lightGo->GetTransform().SetPosition(glm::vec3(-4.0f, -6.0f, 6.0f));
-			lightGo->GetTransform().SetScale(glm::vec3(0.2f));
-			lightGo->AddComponent(std::move(lightComp));
-			AddGameObject(std::move(lightGo));
-		}
-
-		// 2. 조명 추가 4
-		{
-			auto lightGo = GameObject::Create();
-			lightGo->SetName("PointLight4");
-			auto lightComp = PointLight::Create();
-			lightGo->GetTransform().SetPosition(glm::vec3(5.0f, -6.0f, 7.0f));
-			lightGo->GetTransform().SetScale(glm::vec3(0.2f));
-			lightGo->AddComponent(std::move(lightComp));
-			AddGameObject(std::move(lightGo));
-		}
+		AddPointLight("PointLight1", glm::vec3(5.0f, 5.0f, 4.0f));
+		AddPointLight("PointLight2", glm::vec3(-4.0f, 5.0f, 5.0f));
+		AddPointLight("PointLight3", glm::vec3(-4.0f, -6.0f, 6.0f));
+		AddPointLight("PointLight4", glm::vec3(5.0f, -6.0f, 7.0f));
 	}
 
-	// 3. 그림자가 있는 조명 추가
+	// 4. 그림자가 있는 SpotLight + 큐브
 	{
 		auto lightGo = GameObject::Create();
 		lightGo->SetName("SpotLight");
@@ -254,13 +213,13 @@ bool PBRScene::OnPlaceActors()
 		lightGo->AddComponent(std::move(lightComp));
 		
 		auto renderer = StaticMeshRenderer::Create
-		(RESOURCE.GetResource<StaticMesh>("Cube"), RESOURCE.GetResource<Material>("solidColor"));
+		(RESOURCE.Get<StaticMesh>("Cube"), RESOURCE.Get<Material>("solidColor"));
 		lightGo->AddComponent(std::move(renderer));
 
 		AddGameObject(std::move(lightGo));
 	}
 
-	// 6. 큐브 생성 #3
+	// 5. 바닥 큐브 (Ground)
 	{
 		auto cubeObj = GameObject::Create();
 		cubeObj->SetName("Ground");
@@ -272,50 +231,47 @@ bool PBRScene::OnPlaceActors()
 		cubeObj->AddComponent(std::move(collider));
 
 		auto rb = Rigidbody::Create();
-		rb->SetMotionType(JPH::EMotionType::Static); // 절대 움직이지 않음 (질량 무한대 취급)
-		rb->SetRestitution(0.5f);					 // 약간 튕기게 설정 (선택)
+		rb->SetMotionType(JPH::EMotionType::Static);
+		rb->SetRestitution(0.5f);
 		rb->SetFriction(0.5f);
 		cubeObj->AddComponent(std::move(rb));
 
 		auto meshRenderer = StaticMeshRenderer::Create
-		(RESOURCE.GetResource<StaticMesh>("Cube"), RESOURCE.GetResource<Material>("GroundMat"));
+		(RESOURCE.Get<StaticMesh>("Cube"), RESOURCE.Get<Material>("GroundMat"));
 		cubeObj->AddComponent(std::move(meshRenderer));
 		AddGameObject(std::move(cubeObj));
 	}
-
 
 	// 6. 패럴랙스 매핑 블록
 	{
 		auto cubeObj = GameObject::Create();
 		cubeObj->SetName("ToyBlock");
-		auto& cubeTransform = cubeObj->GetTransform();
-		cubeTransform.SetPosition(glm::vec3(-3.0f, 3.0f, 1.0f));
-		cubeTransform.SetRotation(glm::vec3(45.0f));
-		cubeTransform.SetScale(glm::vec3(0.75f));
+		auto& transform = cubeObj->GetTransform();
+		transform.SetPosition(glm::vec3(-3.0f, 3.0f, 1.0f));
+		transform.SetRotation(glm::vec3(45.0f));
+		transform.SetScale(glm::vec3(0.75f));
 
 		auto collider = BoxCollider::Create(glm::vec3(0.75f));
 		cubeObj->AddComponent(std::move(collider));
 
 		auto rb = Rigidbody::Create();
-		rb->SetMotionType(JPH::EMotionType::Static); // 절대 움직이지 않음 (질량 무한대 취급)
-		rb->SetRestitution(0.5f);					 // 약간 튕기게 설정 (선택)
+		rb->SetMotionType(JPH::EMotionType::Static);
+		rb->SetRestitution(0.5f);
 		rb->SetFriction(0.5f);
 		cubeObj->AddComponent(std::move(rb));
 
 		auto meshRenderer = StaticMeshRenderer::Create
-		(RESOURCE.GetResource<StaticMesh>("Cube"), RESOURCE.GetResource<Material>("boxMat5"));
+		(RESOURCE.Get<StaticMesh>("Cube"), RESOURCE.Get<Material>("boxMat5"));
 		cubeObj->AddComponent(std::move(meshRenderer));
 		AddGameObject(std::move(cubeObj));
 	}
 
-	// 7. 모델
+	// 7. Alien Soldier 모델
 	{
-		// 1. 리소스 확보
-		auto model = RESOURCE.GetResource<Model>("aliensoldier");
-		auto anim1 = RESOURCE.GetResource<Animation>("Idle");
-		auto anim2 = RESOURCE.GetResource<Animation>("Walk");
+		auto model = RESOURCE.Get<Model>("aliensoldier");
+		auto anim1 = RESOURCE.Get<Animation>("Idle");
+		auto anim2 = RESOURCE.Get<Animation>("Walk");
 
-		// 2. AnimController 생성 및 설정
 		auto animCtrl = AnimController::Create();
 		animCtrl->AddState("Idle", anim1);
 		animCtrl->AddState("Walk", anim2);
@@ -323,18 +279,12 @@ bool PBRScene::OnPlaceActors()
 		animCtrl->SetTransitionDuration("Walk", "Idle", 0.2f);
 		animCtrl->SetStartState("Idle");
 
-		// 3. Animator 컴포넌트 먼저 생성 (의존성 주입을 위해)
-		// 주의: animator UPtr은 나중에 AddComponent로 소유권이 넘어가므로,
-		// Instantiate에 넘겨줄 Raw Pointer를 미리 따놓습니다.
 		auto animator = Animator::Create(model, std::move(animCtrl));
 
-		// 4. 콜라이더
-		// 0.75f, 4.5f, 0.75f
 		auto boxCollider = CapsuleCollider::Create(0.35f, 4.5f);
-		boxCollider->SetTrigger(false); // INFO : true 시 Trigger 역할을 하게 된다.
+		boxCollider->SetTrigger(false);
 		boxCollider->SetOffset(glm::vec3(0.0f, 2.25f, 0.0f));
 
-		// 5. 리지드 바디
 		auto rigidBody = Rigidbody::Create();
 		rigidBody->SetMotionType(JPH::EMotionType::Dynamic);
 		rigidBody->SetUseGravity(true);
@@ -342,32 +292,25 @@ bool PBRScene::OnPlaceActors()
 		rigidBody->FreezeRotation(true, true, true);
 		rigidBody->SetFriction(0.5f);
 
-		// 6. PlayerController
 		auto playerctrl = PlayerController::Create();
 
-		// 4. 모델 인스턴스화 (씬에 등록 + 렌더러 생성 + Animator 주입)
-		// Instantiate 내부에서 SkinnedMeshRenderer들이 animatorPtr를 참조하게 됩니다.
 		GameObjectUPtr rootUPtr = model->Instantiate(this, animator.get());
 		GameObject* rootGO = rootUPtr.get();
 		if (rootGO)
 		{
-			// 5. Root GameObject 설정
 			rootGO->SetName("Soldier");
 			rootGO->GetTransform().SetPosition(glm::vec3(2.0f, 0.0f, -2.0f));
-			rootGO->GetTransform().SetScale(glm::vec3(0.025f)); // 모델 단위에 따라 조절 필요
+			rootGO->GetTransform().SetScale(glm::vec3(0.025f));
 
-			// 6. 핵심 컴포넌트 부착
 			rootGO->AddComponent(std::move(animator));
 			rootGO->AddComponent(std::move(playerctrl));
 			rootGO->AddComponent(std::move(boxCollider));
 			rootGO->AddComponent(std::move(rigidBody));
 		}
-
-		// 이제 씬에 등록합니다!
 		AddGameObject(std::move(rootUPtr));
 	}
 
-		// 3. 구 49개 (ORM 텍스쳐 테스트)
+	// 3. 구 49개 (ORM 텍스쳐 테스트)
 	// TestSpheresForORMTexture(hdrPass);
 	// TestSpheresForPBRChart(hdrPass);
 	TestSpheresForPBRChartDeferred();
@@ -385,11 +328,8 @@ bool PBRScene::OnBeginPlay()
 //==============*/
 void PBRScene::TestSpheresForORMTexture(HDRRenderPass* hdrPass)
 {
-	auto sphereMesh = RESOURCE.GetResource<StaticMesh>("Sphere");
-
-	// [핵심] 미리 로드해둔 'Rusted_Iron_orm' 머티리얼을 가져옵니다.
-	// 이 머티리얼 안에는 이미 Diffuse, Normal, ORM 텍스처가 들어있습니다.
-	auto baseMat = RESOURCE.GetResource<Material>("Rusted_Iron_orm");
+	auto sphereMesh = RESOURCE.Get<StaticMesh>("Sphere");
+	auto baseMat = RESOURCE.Get<Material>("Rusted_Iron_orm");
 
 	const int rows = 7;
 	const int cols = 7;
@@ -442,11 +382,8 @@ void PBRScene::TestSpheresForORMTexture(HDRRenderPass* hdrPass)
 
 void PBRScene::TestSpheresForPBRChart(HDRRenderPass* hdrPass)
 {
-	auto sphereMesh = RESOURCE.GetResource<StaticMesh>("Sphere");
-
-	// [최적화] 모든 구가 공유할 기본 텍스처들 (White)
-	// 텍스처 값(1.0) * 팩터 값(설정값) = 최종 값
-	TexturePtr sharedWhite = TextureUtils::GetWhiteTexture();
+	auto sphereMesh = RESOURCE.Get<StaticMesh>("Sphere");
+	TexturePtr sharedWhite = Texture::GetWhiteTexture();
 
 	const int rows = 7;
 	const int cols = 7;
@@ -496,11 +433,8 @@ void PBRScene::TestSpheresForPBRChart(HDRRenderPass* hdrPass)
 
 void PBRScene::TestSpheresForPBRChartDeferred()
 {
-	auto sphereMesh = RESOURCE.GetResource<StaticMesh>("Sphere");
-
-	// [최적화] 모든 구가 공유할 기본 텍스처들 (White)
-	// 텍스처 값(1.0) * 팩터 값(설정값) = 최종 값
-	TexturePtr sharedWhite = TextureUtils::GetWhiteTexture();
+	auto sphereMesh = RESOURCE.Get<StaticMesh>("Sphere");
+	TexturePtr sharedWhite = Texture::GetWhiteTexture();
 
 	const int rows = 7;
 	const int cols = 7;

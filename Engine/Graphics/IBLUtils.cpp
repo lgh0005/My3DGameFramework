@@ -62,6 +62,7 @@ CubeTexturePtr IBLUtils::CreateCubemapFromHDR(Texture* hdrTexture, int32 resolut
 		cubeMesh->Draw();
 	}
 	glEnable(GL_CULL_FACE);
+	glEnable(GL_DEPTH_TEST);
 	FramebufferBase::BindToDefault();
 	glViewport(prevViewport[0], prevViewport[1], prevViewport[2], prevViewport[3]);
 

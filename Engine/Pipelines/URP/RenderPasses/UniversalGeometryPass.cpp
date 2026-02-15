@@ -30,7 +30,7 @@ UniversalGeometryPassUPtr UniversalGeometryPass::Create(int32 width, int32 heigh
 
 bool UniversalGeometryPass::Init(int32 width, int32 height)
 {
-	m_geometryInstancedProgram = RESOURCE.AddResource<GraphicsProgram>
+	m_geometryInstancedProgram = RESOURCE.Add<GraphicsProgram>
 	(
 		"universal_deferred_geometry",
 		"@BuiltInAsset/Shaders/Universal/Universal_Deferred_Geometry.vert",

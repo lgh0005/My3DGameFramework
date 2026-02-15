@@ -34,6 +34,9 @@ private:
 	template<typename T>
 	std::shared_ptr<T> Load(const ResourceDesc& desc);
 
+	template<typename T>
+	std::shared_ptr<T> TryCastResource(const std::shared_ptr<Resource>& resource);
+
 	bool LoadEngineConfig(const std::string& path);
 	void AddBuiltInResources();
 

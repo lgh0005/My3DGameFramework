@@ -23,6 +23,7 @@ TexturePtr Texture::Load(const TextureDesc& desc)
     // 2. KTX 데이터를 통한 초기화
     if (!texture->InitFromKtx(actualPath)) return nullptr;
 
+    LOG_INFO("Loading Texture: [{}] -> {}", desc.name, actualPath);
     return texture;
 }
 

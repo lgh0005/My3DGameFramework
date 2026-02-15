@@ -7,8 +7,7 @@ inline std::shared_ptr<T> ResourceManager::Get(const std::string& name)
 {
     // 1. 인스턴스 캐시(이미 로드된 것) 확인
     auto it = m_resources.find(name);
-    if (it != m_resources.end())
-        return std::static_pointer_cast<T>(it->second);
+    if (it != m_resources.end()) return TryCastResource<T>(it->second);
 
     // 2. 캐시에 없으면 장부(설계도) 확인
     auto regIt = m_assetRegistry.find(name);
@@ -24,8 +23,8 @@ inline std::vector<std::shared_ptr<T>> ResourceManager::GetAll()
     ResourceType targetType = T::GetStaticResourceType();
     for (auto& [name, resource] : m_resources)
     {
-        if (resource->MatchesType(targetType))
-            results.push_back(std::static_pointer_cast<T>(resource));
+        if (auto casted = TryCastResource<T>(resource))
+            results.push_back(casted);
     }
 
     return results;
@@ -38,10 +37,8 @@ inline std::shared_ptr<T> ResourceManager::Add(const std::string& name, Args&&..
     if (auto resource = Get<T>(name))
         return resource;
 
-    // 2. 가변 인자를 통해 이 자리에서 즉석 설계도(Desc) 생성
+    // 2. 즉석 설계도 생성 및 로드
     typename T::DescType desc(ResolvePath(args)..., name);
-
-    // 4. 로드 및 캐싱
     return Load<T>(desc);
 }
 
@@ -53,7 +50,10 @@ inline std::shared_ptr<T> ResourceManager::Load(const ResourceDesc& desc)
     // 1. 캐시 재확인
     auto it = m_resources.find(key);
     if (it != m_resources.end())
-        return std::static_pointer_cast<T>(it->second);
+    {
+        if (auto resource = TryCastResource<T>(it->second))
+            return resource;
+    }
 
     // 2. 실제 리소스 클래스의 정적 Load 함수 호출
     std::shared_ptr<T> resource = T::Load(static_cast<const typename T::DescType&>(desc));
@@ -83,22 +83,42 @@ inline void ResourceManager::Register(const std::shared_ptr<T>& resource)
     // 1. 리소스 정보 획득
     const auto& desc = resource->GetDesc();
     const std::string& name = desc.name;
-
     if (name.empty())
     {
         LOG_ERROR("ResourceManager: Resource name is empty!");
         return;
     }
 
-    // 2. 인스턴스 캐시 등록
-    m_resources[name] = std::static_pointer_cast<Resource>(resource);
-
-    // 3. 장부(Registry) 업데이트
-    // 수동으로 등록된 리소스도 나중에 '설계도'로서 조회될 수 있도록 포인터로 변환하여 저장
-    if (m_assetRegistry.find(name) == m_assetRegistry.end())
+    // 2. 충돌 검사
+    auto it = m_resources.find(name);
+    if (it != m_resources.end())
     {
-        m_assetRegistry[name] = std::make_shared<typename T::DescType>(
-            static_cast<const typename T::DescType&>(desc)
-        );
+        std::shared_ptr<Resource> existingRes = it->second;
+        if (TryCastResource<T>(existingRes) == nullptr)
+        {
+            LOG_ERROR
+            (
+                "ResourceManager: Name collision with different types! Name: [{}], Existing: [{}], New: [{}]",
+                name,
+                (int32)existingRes->GetResourceType(),
+                (int32)T::GetStaticResourceType()
+            );
+            return;
+        }
+        LOG_WARN("ResourceManager: Overwriting existing resource [{}].", name);
     }
+
+    // 3. 등록
+    m_resources[name] = std::static_pointer_cast<Resource>(resource);
+    m_assetRegistry[name] = std::make_shared<typename T::DescType>(
+        static_cast<const typename T::DescType&>(desc)
+    );
+}
+
+template<typename T>
+inline std::shared_ptr<T> ResourceManager::TryCastResource(const std::shared_ptr<Resource>& resource)
+{
+    if (resource->GetResourceType() == T::GetStaticResourceType())
+        return std::static_pointer_cast<T>(resource);
+    return nullptr;
 }

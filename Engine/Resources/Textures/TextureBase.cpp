@@ -35,31 +35,36 @@ uint32 TextureBase::MapVkFormatToGLInternal(uint32 vkFormat)
     // libktx (Vulkan 포맷 번호) -> OpenGL Internal Format 매핑
     switch (vkFormat)
     {
-        // 1. BC1 (DXT1) - 주로 불투명 텍스처
+    // 1. BC1 (DXT1) - 주로 불투명 텍스처
     case 131: // VK_FORMAT_BC1_RGB_UNORM_BLOCK
         return GL_COMPRESSED_RGB_S3TC_DXT1_EXT;
     case 133: // VK_FORMAT_BC1_RGB_SRGB_BLOCK
         return GL_COMPRESSED_SRGB_S3TC_DXT1_EXT;
 
-        // 2. BC3 (DXT5) - 투명도(Alpha)가 포함된 텍스처
+    case 135: // VK_FORMAT_BC6H_UFLOAT_BLOCK (가장 일반적인 HDR KTX)
+        return GL_COMPRESSED_RGB_BPTC_UNSIGNED_FLOAT;
+    case 136: // VK_FORMAT_BC6H_SFLOAT_BLOCK
+        return GL_COMPRESSED_RGB_BPTC_SIGNED_FLOAT;
+
+    // 2. BC3 (DXT5) - 투명도(Alpha)가 포함된 텍스처
     case 137: // VK_FORMAT_BC3_UNORM_BLOCK
         return GL_COMPRESSED_RGBA_S3TC_DXT5_EXT;
     case 139: // VK_FORMAT_BC3_SRGB_BLOCK
         return GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT5_EXT;
 
-        // 3. BC7 (BPTC) - 고품질 압축 (현세대 표준)
+    // 3. BC7 (BPTC) - 고품질 압축 (현세대 표준)
     case 145: // VK_FORMAT_BC7_UNORM_BLOCK
         return GL_COMPRESSED_RGBA_BPTC_UNORM;
     case 146: // VK_FORMAT_BC7_SRGB_BLOCK
         return GL_COMPRESSED_SRGB_ALPHA_BPTC_UNORM;
 
-        // 4. 비압축 RGBA8
+    // 4. 비압축 RGBA8
     case 37:  // VK_FORMAT_R8G8B8A8_UNORM
         return GL_RGBA8;
     case 43:  // VK_FORMAT_R8G8B8A8_SRGB
         return GL_SRGB8_ALPHA8;
 
-        // 5. HDR (High Dynamic Range)
+    // 5. HDR (High Dynamic Range)
     case 97:  // VK_FORMAT_R16G16B16A16_SFLOAT
         return GL_RGBA16F;
 
@@ -94,6 +99,8 @@ uint32 TextureBase::GetPixelFormatFromInternal(uint32 internalFormat)
     case GL_RGB16F:
     case GL_COMPRESSED_RGB_S3TC_DXT1_EXT:
     case GL_COMPRESSED_SRGB_S3TC_DXT1_EXT:
+    case GL_COMPRESSED_RGB_BPTC_UNSIGNED_FLOAT:
+    case GL_COMPRESSED_RGB_BPTC_SIGNED_FLOAT:
     default:
         return GL_RGB;
     }

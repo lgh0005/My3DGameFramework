@@ -30,7 +30,7 @@ UniversalDeferredLightingPassUPtr UniversalDeferredLightingPass::Create()
 
 bool UniversalDeferredLightingPass::Init()
 {
-	m_deferredLightProgram = RESOURCE.AddResource<GraphicsProgram>
+	m_deferredLightProgram = RESOURCE.Add<GraphicsProgram>
 	(
 		"universal_deferred_lighting",
 		"@BuiltInAsset/Shaders/Universal/Universal_Deferred_LightPass.vert",

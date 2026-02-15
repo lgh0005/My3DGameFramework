@@ -17,14 +17,14 @@
 
 DECLARE_DEFAULTS_IMPL(HDRRenderPass)
 
-HDRRenderPassUPtr HDRRenderPass::Create(ProgramUPtr program)
+HDRRenderPassUPtr HDRRenderPass::Create(ProgramPtr program)
 {
     auto pass = HDRRenderPassUPtr(new HDRRenderPass());
     if (!pass->Init(std::move(program))) return nullptr;
     return std::move(pass);
 }
 
-bool HDRRenderPass::Init(ProgramUPtr program)
+bool HDRRenderPass::Init(ProgramPtr program)
 {
     m_simpleProgram = std::move(program);
     if (!m_simpleProgram) return false;
