@@ -80,6 +80,21 @@ GraphicsProgramDesc::GraphicsProgramDesc(const std::string& vsFile, const std::s
 GraphicsProgramDesc::~GraphicsProgramDesc() = default;
 ResourceType GraphicsProgramDesc::GetDescType() const { return ResourceType::GraphicsProgram; }
 
+void GraphicsProgramDesc::SetTessellationCtrlShader(const std::string& tcFile)
+{
+	tcPath = tcFile;
+}
+
+void GraphicsProgramDesc::SetTessellationEvalSahder(const std::string& teFile)
+{
+	tePath = teFile;
+}
+
+void GraphicsProgramDesc::SetGeometryShader(const std::string& gsFile)
+{
+	gsPath = gsFile;
+}
+
 /*================//
 // ComputeProgram //
 //================*/

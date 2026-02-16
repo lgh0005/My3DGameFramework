@@ -7,7 +7,7 @@ Shader::~Shader()
     if (m_shader) glDeleteShader(m_shader);
 }
 
-ShaderUPtr Shader::CreateFromFile(const std::string& filename,
+ShaderPtr Shader::CreateFromFile(const std::string& filename,
 	GLenum shaderType)
 {
 	auto shader = std::unique_ptr<Shader>(new Shader());

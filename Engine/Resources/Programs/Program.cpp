@@ -16,10 +16,13 @@ void Program::Use() const
 bool Program::Link(const std::vector<ShaderPtr>& shaders)
 {
     m_program = glCreateProgram();
+
+    // 1. Attach shaders to program
     for (auto& shader : shaders)
         glAttachShader(m_program, shader->Get());
     glLinkProgram(m_program);
 
+    // 2. check program
     int32 success = 0;
     glGetProgramiv(m_program, GL_LINK_STATUS, &success);
     if (!success)
@@ -29,6 +32,29 @@ bool Program::Link(const std::vector<ShaderPtr>& shaders)
         LOG_ERROR("failed to link program: {}", infoLog);
         return false;
     }
+
+    // 3. Detach shaders
+    for (auto& shader : shaders)
+        glDetachShader(m_program, shader->Get());
+
+    return true;
+}
+
+bool Program::AddShaderStage
+(
+    const std::string& path, GLenum type, 
+    std::vector<ShaderPtr>& outShaders
+)
+{
+    // 1. 경로가 없으면 그냥 통과
+    if (path.empty()) return true;
+
+    // 2. 셰이더 파일로부터 객체 생성
+    auto shader = Shader::CreateFromFile(path, type);
+    if (!shader) return false;
+
+    // 3. 성공 시 목록에 추가
+    outShaders.push_back(std::move(shader));
     return true;
 }
 

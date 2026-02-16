@@ -8,23 +8,26 @@ ComputeProgramPtr ComputeProgram::Load(const ComputeProgramDesc& desc)
 {
 	// 1. 객체 생성 (기본 생성자)
 	auto program = ComputeProgramPtr(new ComputeProgram());
-
-	// 2. Desc 주입 (Single Source of Truth)
 	program->m_desc = desc;
 
-	// 3. 컴퓨트 셰이더 리소스 생성 (m_desc.path 사용)
-	ShaderPtr shader = Shader::CreateFromFile(program->m_desc.path, GL_COMPUTE_SHADER);
-	if (!shader)
+	// 2. 컴퓨트 셰이더 리소스 생성 (m_desc.path 사용)
+	std::vector<ShaderPtr> shaders;
+	if (program->m_desc.path.empty())
 	{
-		LOG_ERROR("ComputeProgram: Failed to create compute shader: {}", program->m_desc.path);
+		LOG_ERROR("ComputeProgram: Path is empty for {}", desc.name);
 		return nullptr;
 	}
 
-	// 4. 프로그램 링크
-	// 부모 클래스(Program)의 Link는 비정적 함수이므로, 생성된 인스턴스 포인터를 통해 호출합니다.
-	if (!program->Link({ shader }))
+	if (!program->AddShaderStage(program->m_desc.path, GL_COMPUTE_SHADER, shaders))
 	{
-		LOG_ERROR("ComputeProgram: Link failed for {}", program->GetName());
+		LOG_ERROR("ComputeProgram: Failed to load compute shader: {}", program->m_desc.path);
+		return nullptr;
+	}
+
+	// 3. 프로그램 링크
+	if (!program->Link(shaders))
+	{
+		LOG_ERROR("ComputeProgram: Link failed for {}", program->m_desc.name);
 		return nullptr;
 	}
 

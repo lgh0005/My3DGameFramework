@@ -1,15 +1,13 @@
 ﻿{
-  "description": "Core Boot Configuration",
+    "virtualPaths": 
+    {
+        "@Config": "Config",
 
-  "virtualPaths": {
+        "@Assets": "Assets",
+        "@BuiltInAsset": "Assets/BuiltIn",
+        "@GameAsset": "Assets/Game",
 
-    "@Config": "Config",
-
-    "@Assets": "Assets",
-    "@BuiltInAsset": "Assets/BuiltIn",
-    "@GameAsset": "Assets/Game",
-
-    "@Virtual": "@Virtual",
-    "@BuiltIn": "@BuiltIn"
-  }
+        "@Virtual": "@Virtual",
+        "@BuiltIn": "@BuiltIn"
+    }
 }

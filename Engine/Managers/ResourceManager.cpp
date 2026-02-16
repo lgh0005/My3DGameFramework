@@ -21,8 +21,6 @@ bool ResourceManager::Init()
 		return false;
 	}
 
-	// ========================================================================= //
-
 	// 2. ResourceConfigParser를 이용한 에셋 설계도 스캔
 	// TODO : 이쪽도 약간 생각을 해볼 필요는 있음
 	ResourceConfigParser configParser;
@@ -58,48 +56,58 @@ void ResourceManager::Clear()
 
 bool ResourceManager::LoadEngineConfig(const std::string& path)
 {
-	// 0. 기본 JsonParser를 사용하여 EngineConfig.json을 읽습니다.
+	// 1. 스택에 파서 생성 및 로드
 	JsonParser parser;
-	if (!parser.LoadFromFile(path))
+	if (!parser.LoadFromJsonFile(path))
 	{
 		LOG_ERROR("ResourceManager: Failed to load EngineConfig at {}", path);
 		return false;
 	}
 
-	// 1. virtualPaths 섹션 유효성 검사
-	if (!parser.ValidateRoot("virtualPaths")) return false;
-
-	// 2. 가상 경로 매핑 시작
-	auto& pathsNode = parser.GetJsonData()["virtualPaths"];
-	if (pathsNode.is_null() || !pathsNode.is_object())
+	// 2. 가상 경로 섹션 검증
+	if (!parser.HasTypeOf<nlohmann::json::object_t>("virtualPaths"))
 	{
-		LOG_ERROR("ResourceManager: 'virtualPaths' is not a valid JSON object.");
+		LOG_ERROR("ResourceManager: 'virtualPaths' is missing or invalid in {}", path);
 		return false;
 	}
 
+	// 3. 실제 데이터 매핑
+	const auto& root = parser.GetRoot();
+	const auto& pathsNode = root["virtualPaths"];
 	for (auto& [alias, actualPath] : pathsNode.items())
-		m_virtualPaths[alias] = actualPath.get<std::string>();
+	{
+		if (actualPath.is_string())
+			m_virtualPaths[alias] = actualPath.get<std::string>();
+	}
 
+	LOG_INFO("ResourceManager: Successfully mapped {} virtual paths.", m_virtualPaths.size());
 	return true;
 }
 
 std::string ResourceManager::ResolvePath(const std::string& virtualPath) const
 {
-	// TODO : 이거 리졸빙 로직을 확실히 해야함.
-	// 1. 처음 등장한 슬래시 기준, 읽어들인 문자열이 @로 시작하는지 검증
-	// 2. 오로지 @만 있는 경로는 유효하지 않는 가상 경로
-	// 3. 접두어 토큰을 적절히 갈라놓고 m_virtualPaths에서 찾아오도록 수정
-	// 4. substr는 쓰지 않고, find_first_of("/")와 같은 것을 사용
-	// 5. 슬래시('/')의 경우 운영체제마다 경로를 작성 방법이 다를 수 있으니 이에 대한 반영 필요
-	if (virtualPath.empty() || virtualPath[0] != '@') return virtualPath;
+	// 0. 비어있거나 @로 시작하지 않으면 가상 경로가 아님
+	if (virtualPath.empty() || virtualPath[0] != '@') 
+		return virtualPath;
 
-	usize slashPos = virtualPath.find('/');
-	std::string alias = virtualPath.substr(0, slashPos);
-	std::string subPath = (slashPos != std::string::npos) ? virtualPath.substr(slashPos) : "";
+	// 1. fs::path로 변환 및 가상 경로 토큰 획득
+	fs::path p(virtualPath);
+	auto it = p.begin();
+	std::string alias = it->string();
 
-	auto it = m_virtualPaths.find(alias);
-	if (it != m_virtualPaths.end()) return it->second + subPath;
-	return virtualPath;
+	// 2. 가상 경로 매핑 확인
+	auto mapIt = m_virtualPaths.find(alias);
+	if (mapIt == m_virtualPaths.end()) return virtualPath;
+
+	// 3. 매핑된 실제 경로로 시작하는 결과 경로 생성
+	fs::path resolvedPath = mapIt->second;
+
+	// 4. 나머지 조각들을 순차적으로 결합 (하부 경로 조립)
+	for (++it; it != p.end(); ++it)
+		resolvedPath /= *it;
+
+	// 7. 정문화 및 반환
+	return resolvedPath.lexically_normal().string();
 }
 
 // [TEMP]

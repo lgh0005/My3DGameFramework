@@ -37,5 +37,11 @@ public:
 protected:
     Program();
     bool Link(const std::vector<ShaderPtr>& shaders);
+    bool AddShaderStage
+    (
+        const std::string& path, GLenum type, 
+        std::vector<ShaderPtr>& outShaders
+    );
+
     usize m_program  { 0 };
 };

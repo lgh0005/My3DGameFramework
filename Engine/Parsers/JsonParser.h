@@ -12,6 +12,9 @@ public:
 	const nlohmann::json& GetRoot() const { return m_data; }
 
 	template<typename T>
+	bool HasTypeOf(const std::string& key);
+
+	template<typename T>
 	T Get(const std::string& key, const T& defaultValue = T());
 
 private:

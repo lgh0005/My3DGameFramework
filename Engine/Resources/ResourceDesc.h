@@ -158,8 +158,14 @@ struct GraphicsProgramDesc : public ResourceDesc
 		const std::string& rscName = ""
 	);
 	virtual ResourceType GetDescType() const override;
+	void SetTessellationCtrlShader(const std::string& tcFile);
+	void SetTessellationEvalSahder(const std::string& teFile);
+	void SetGeometryShader(const std::string& gsFile);
 
 	std::string vsPath;
+	std::string tcPath; // Tessellation Control Shader
+	std::string tePath; // Tessellation Evaluation Shader
+	std::string gsPath; // Geometry Shader
 	std::string fsPath;
 };
 

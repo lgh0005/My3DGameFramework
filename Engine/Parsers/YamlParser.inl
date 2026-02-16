@@ -25,3 +25,27 @@ inline T YamlParser::Get(const std::string& key, const T& defaultValue)
 
 	return value;
 }
+
+template<typename T>
+inline bool YamlParser::IsTypeOf(const std::string& key) const
+{
+	if (m_tree.empty()) return false;
+
+	ryml::ConstNodeRef root = m_tree.rootref();
+	c4::csubstr k = c4::to_csubstr(key);
+
+	if (!root.has_child(k)) return false;
+
+	ryml::ConstNodeRef node = root[k];
+
+	// 1. 구조적 타입 확인
+	if constexpr (std::is_same_v<T, ryml::ConstNodeRef> || std::is_same_v<T, ryml::NodeRef>)
+		return node.is_map();
+	else if constexpr (std::is_same_v<T, void*>) return node.is_seq();
+
+	// 2. 데이터 타입 확인 (Scalar)
+	if constexpr (std::is_arithmetic_v<T> || std::is_same_v<T, std::string>)
+		return node.is_val();
+
+	return false;
+}

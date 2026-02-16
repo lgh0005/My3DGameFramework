@@ -15,6 +15,9 @@ public:
 	ryml::ConstNodeRef GetRoot() const;
 
 	template<typename T>
+	bool IsTypeOf(const std::string& key) const;
+
+	template<typename T>
 	T Get(const std::string& key, const T& defaultValue = T());
 
 private:
