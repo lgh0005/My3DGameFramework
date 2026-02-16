@@ -19,7 +19,7 @@
     "recastnavigation",
     "freetype",
     "nlohmann-json",
-    "yaml-cpp",
+    "ryml",
     "lua",
     "sol2",
     "stb",

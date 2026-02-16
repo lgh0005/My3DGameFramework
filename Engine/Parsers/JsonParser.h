@@ -1,17 +1,21 @@
 ﻿#pragma once
-#include "Parsers/Parser.h"
 
 CLASS_PTR(JsonParser)
-class JsonParser : public Parser
+class JsonParser
 {
 public:
 	JsonParser();
-	virtual ~JsonParser() override;
-	virtual bool LoadFromFile(const std::string& path) override;
-	virtual void Clear() override;
-	const nlohmann::json& GetJsonData() const { return m_jsonData; }
-	bool ValidateRoot(const std::string& rootKey);
+	~JsonParser();
 
-protected:
-	nlohmann::json m_jsonData;
+	bool LoadFromJsonFile(const std::string& path);
+	bool IsArray(const std::string& key) const;
+	const nlohmann::json& GetRoot() const { return m_data; }
+
+	template<typename T>
+	T Get(const std::string& key, const T& defaultValue = T());
+
+private:
+	nlohmann::json m_data;
 };
+
+#include "Parsers/JsonParser.inl"

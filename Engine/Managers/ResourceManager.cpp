@@ -5,9 +5,9 @@
 #include "Resources/Meshes/ScreenMesh.h"
 #include "Resources/Material.h"
 #include "Parsers/JsonParser.h"
-#include "Parsers/EngineParsers/ResourceConfigParser.h"
-
 #include "Resources/Textures/Texture.h"
+
+// TODO : 몇 가지 하드코딩된 문자열은 이후에 문자열 상수들로 따로 빼야 함
 
 bool ResourceManager::Init()
 {
@@ -21,7 +21,10 @@ bool ResourceManager::Init()
 		return false;
 	}
 
+	// ========================================================================= //
+
 	// 2. ResourceConfigParser를 이용한 에셋 설계도 스캔
+	// TODO : 이쪽도 약간 생각을 해볼 필요는 있음
 	ResourceConfigParser configParser;
 	if (configParser.LoadFromFile(ResolvePath("@Config/ResourceConfig.json")))
 	{
@@ -83,8 +86,11 @@ bool ResourceManager::LoadEngineConfig(const std::string& path)
 std::string ResourceManager::ResolvePath(const std::string& virtualPath) const
 {
 	// TODO : 이거 리졸빙 로직을 확실히 해야함.
-	// 처음 등장한 슬래시 기준, 읽어들인 문자열이 @로 시작하며, 오로지 @만
-	// 있는 경우는 제외해야 한다.
+	// 1. 처음 등장한 슬래시 기준, 읽어들인 문자열이 @로 시작하는지 검증
+	// 2. 오로지 @만 있는 경로는 유효하지 않는 가상 경로
+	// 3. 접두어 토큰을 적절히 갈라놓고 m_virtualPaths에서 찾아오도록 수정
+	// 4. substr는 쓰지 않고, find_first_of("/")와 같은 것을 사용
+	// 5. 슬래시('/')의 경우 운영체제마다 경로를 작성 방법이 다를 수 있으니 이에 대한 반영 필요
 	if (virtualPath.empty() || virtualPath[0] != '@') return virtualPath;
 
 	usize slashPos = virtualPath.find('/');
@@ -96,6 +102,7 @@ std::string ResourceManager::ResolvePath(const std::string& virtualPath) const
 	return virtualPath;
 }
 
+// [TEMP]
 void ResourceManager::AddBuiltInResources()
 {
 	// [도우미 람다] 생성된 리소스에 정체성을 부여하고 등록합니다.

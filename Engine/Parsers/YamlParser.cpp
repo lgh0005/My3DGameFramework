@@ -3,119 +3,53 @@
 
 DECLARE_DEFAULTS_IMPL(YamlParser)
 
-bool YamlParser::LoadFromFile(const std::string& path)
+bool YamlParser::LoadFromYamlFile(const std::string& path)
 {
-	Clear();
-	m_filePath = ResolvePath(path);
+	// 1. 기존 데이터 초기화
+	m_tree.clear();
+	m_source.clear();
 
-	// 1. 파일 존재 여부 확인
-	if (!fs::exists(m_filePath))
-	{
-		m_lastErrorMessage = "File not found: " + m_filePath;
+	// 2. 파일 열기 (바이너리 모드 + 끝 위치로 이동하여 크기 확인)
+	std::ifstream file(path, std::ios::binary | std::ios::ate);
+	if (!file.is_open()) return false;
+
+	// 3. 파일 크기 가져오기
+	std::streamsize size = file.tellg();
+	file.seekg(0, std::ios::beg);
+	if (size <= 0) return false;
+
+	// 4. 버퍼 리사이징 및 읽기
+	m_source.resize(static_cast<usize>(size));
+	if (!file.read(m_source.data(), size)) return false;
+
+	// 5. 파싱 (RapidYAML 핵심)
+	m_tree = ryml::parse_in_place
+	(
+		c4::to_csubstr(path.c_str()),
+		c4::to_substr(m_source)
+	);
+
+	// 6. 유효성 검사 (트리가 비어있지 않고, 루트가 Map/Dict 형태인지)
+	if (m_tree.empty() || !m_tree.rootref().is_map())
 		return false;
-	}
 
-	// 2. YAML 로드
-	m_rootNode = YAML::LoadFile(m_filePath);
-	if (!m_rootNode.IsDefined() || m_rootNode.IsNull())
-	{
-		m_lastErrorMessage = "Failed to parse or empty YAML file: " + m_filePath;
-		return false;
-	}
-
-	m_isLoaded = true;
-	LOG_INFO("YAML Loaded successfully: {}", m_filePath);
 	return true;
 }
 
-void YamlParser::Clear()
+bool YamlParser::IsArray(const std::string& key) const
 {
-	m_rootNode = YAML::Node();
-	m_isLoaded = false;
-	m_filePath.clear();
-	m_lastErrorMessage.clear();
+	if (m_tree.empty()) return false;
+
+	ryml::ConstNodeRef root = m_tree.rootref();
+	c4::csubstr k = c4::to_csubstr(key);
+
+	// 1. 키가 있는지 확인 (has_child)
+	// 2. 해당 노드가 시퀀스(Sequence = Array)인지 확인 (is_seq)
+	return root.has_child(k) && root[k].is_seq();
 }
 
-bool YamlParser::ValidateRoot(const std::string& rootKey)
+ryml::ConstNodeRef YamlParser::GetRoot() const
 {
-	if (!m_rootNode[rootKey])
-	{
-		m_lastErrorMessage = "Invalid format: Missing root key '" + rootKey + "'";
-		return false;
-	}
-	return true;
-}
-
-/*============================//
-//   parsing helper methods   //
-//============================*/
-float YamlParser::LoadFloat(const YAML::Node& node, std::string_view tokenKey, float defaultValue)
-{
-	std::string key = GetToken(Utils::StrHash(tokenKey.data()));
-	if (!key.empty() && node[key]) return node[key].as<float>();
-	return defaultValue;
-}
-
-bool YamlParser::LoadBool(const YAML::Node& node, std::string_view tokenKey, bool defaultValue)
-{
-	std::string key = GetToken(Utils::StrHash(tokenKey.data()));
-	if (!key.empty() && node[key]) return node[key].as<bool>();
-	return defaultValue;
-}
-
-int YamlParser::LoadInt(const YAML::Node& node, std::string_view tokenKey, int defaultValue)
-{
-	std::string key = GetToken(Utils::StrHash(tokenKey.data()));
-	if (!key.empty() && node[key]) return node[key].as<int>();
-	return defaultValue;
-}
-
-std::string YamlParser::LoadStr(const YAML::Node& node, std::string_view tokenKey, const std::string& defaultValue)
-{
-	std::string key = GetToken(Utils::StrHash(tokenKey.data()));
-	if (!key.empty() && node[key]) return node[key].as<std::string>();
-	return defaultValue;
-}
-
-glm::vec2 YamlParser::LoadVec2(const YAML::Node& node, std::string_view tokenKey, const glm::vec2& defaultValue)
-{
-	std::string key = GetToken(Utils::StrHash(tokenKey.data()));
-	if (!key.empty() && node[key] && node[key].IsSequence() && node[key].size() >= 2)
-	{
-		return glm::vec2
-		(
-			node[key][0].as<float>(),
-			node[key][1].as<float>()
-		);
-	}
-	return defaultValue;
-}
-
-glm::vec3 YamlParser::LoadVec3(const YAML::Node& node, std::string_view tokenKey, const glm::vec3& defaultValue)
-{
-	std::string key = GetToken(Utils::StrHash(tokenKey.data()));
-	if (!key.empty() && node[key] && node[key].IsSequence() && node[key].size() >= 3)
-	{
-		return glm::vec3
-		(
-			node[key][0].as<float>(),
-			node[key][1].as<float>(),
-			node[key][2].as<float>()
-		);
-	}
-	return defaultValue;
-}
-
-glm::vec4 YamlParser::LoadVec4(const YAML::Node& node, std::string_view tokenKey, const glm::vec4& defaultValue)
-{
-	std::string key = GetToken(Utils::StrHash(tokenKey.data()));
-	if (!key.empty() && node[key] && node[key].IsSequence() && node[key].size() >= 3)
-	{
-		float r = node[key][0].as<float>();
-		float g = node[key][1].as<float>();
-		float b = node[key][2].as<float>();
-		float a = (node[key].size() > 3) ? node[key][3].as<float>() : defaultValue.a;
-		return glm::vec4(r, g, b, a);
-	}
-	return defaultValue;
+	if (m_tree.empty()) return {};
+	return m_tree.rootref();
 }

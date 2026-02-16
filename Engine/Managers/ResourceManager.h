@@ -41,9 +41,10 @@ private:
 	void AddBuiltInResources();
 
 private:
-	std::unordered_map<std::string, ResourcePtr>     m_resources;      // { name, resource_instance }
-	std::unordered_map<std::string, ResourceDescPtr> m_assetRegistry;  // { name, resource_desc }
-	std::unordered_map<std::string, std::string>     m_virtualPaths;   // { virtual_path, real_path }
+	std::unordered_map<std::string, ResourcePtr>     m_engineResources; // { name, @BuiltIn }
+	std::unordered_map<std::string, ResourcePtr>     m_resources;       // { name, @GameAssets, @Virtauals }
+	std::unordered_map<std::string, ResourceDescPtr> m_assetRegistry;   // { name, resource_desc }
+	std::unordered_map<std::string, std::string>     m_virtualPaths;    // { virtual_path, real_path }
 };
 
 #include "Managers/ResourceManager.inl"

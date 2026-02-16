@@ -8,14 +8,9 @@ set(ENGINE_SOURCES
    "Core/Application.h"             "Core/Application.cpp"
 
    # Parsers
-   "Parsers/Parser.h"               "Parsers/Parser.cpp"
-   "Parsers/YamlParser.h"           "Parsers/YamlParser.cpp"
-   "Parsers/JsonParser.h"           "Parsers/JsonParser.cpp"
-
-   "Parsers/EngineParsers/MaterialYamlParser.h"           "Parsers/EngineParsers/MaterialYamlParser.cpp"
-   "Parsers/EngineParsers/SceneYamlParser.h"           "Parsers/EngineParsers/SceneYamlParser.cpp"
-   
-   "Parsers/EngineParsers/ResourceConfigParser.h"    "Parsers/EngineParsers/ResourceConfigParser.cpp"
+   "Parsers/LuaParser.h"           "Parsers/LuaParser.cpp"
+   "Parsers/YamlParser.h"           "Parsers/YamlParser.cpp"            "Parsers/YamlParser.inl"
+   "Parsers/JsonParser.h"           "Parsers/JsonParser.cpp"            "Parsers/JsonParser.inl"
 
    # Debug
    "Debug/Logger.h"                  "Debug/Logger.cpp"
@@ -257,7 +252,7 @@ target_link_libraries(Engine PUBLIC
     Freetype::Freetype
     Jolt::Jolt
     nlohmann_json::nlohmann_json
-    yaml-cpp::yaml-cpp
+    ryml::ryml
     lua
     sol2::sol2
 

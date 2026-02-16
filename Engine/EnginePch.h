@@ -27,6 +27,7 @@ namespace fs = std::filesystem;
 namespace pmr = std::pmr;
 
 // nlohmann-json
+// TODO : 이후에는 JsonParser에 들어가야 함
 #include <nlohmann/json_fwd.hpp>
 #include <nlohmann/json.hpp> 
 using json = nlohmann::json;
@@ -48,6 +49,7 @@ using json = nlohmann::json;
 #include <glm/gtc/constants.hpp>
 
 // Jolt
+// TODO : 이후에는 Physics에서 필요한 곳에 적절히 추가되어야 함
 #include <Jolt/Jolt.h>
 #include <Jolt/Core/Reference.h>
 #include <Jolt/Physics/Body/BodyID.h>
@@ -61,6 +63,7 @@ using json = nlohmann::json;
 #define IMGUI     ImGuiManager::Instance()
 
 // Logger
+// TODO : 이후에는 디버거 파일에 추가되어야 함
 #include "Debug/Logger.h"
 #define LOGGER	  Logger::Instance()
 

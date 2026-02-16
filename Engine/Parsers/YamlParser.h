@@ -1,30 +1,25 @@
 ﻿#pragma once
-#include "Parsers/Parser.h"
-#include <yaml-cpp/yaml.h>
+#include <c4/yml/yml.hpp>
+#include <c4/yml/std/string.hpp>
+namespace ryml = c4::yml;
 
 CLASS_PTR(YamlParser)
-class YamlParser : public Parser
+class YamlParser
 {
 public:
 	YamlParser();
-	virtual ~YamlParser() override;
-	virtual bool LoadFromFile(const std::string& path) override;
-	virtual void Clear() override;
+	~YamlParser();
 
-	bool ValidateRoot(const std::string& rootKey);
+	bool LoadFromYamlFile(const std::string& path);
+	bool IsArray(const std::string& key) const;
+	ryml::ConstNodeRef GetRoot() const;
 
-/*============================//
-//   parsing helper methods   //
-//============================*/
-protected:
-	float       LoadFloat(const YAML::Node& node, std::string_view tokenKey, float defaultValue = 0.0f);
-	bool        LoadBool(const YAML::Node& node, std::string_view tokenKey, bool defaultValue = false);
-	int         LoadInt(const YAML::Node& node, std::string_view tokenKey, int defaultValue = 0);
-	std::string LoadStr(const YAML::Node& node, std::string_view tokenKey, const std::string& defaultValue = "");
-	glm::vec2   LoadVec2(const YAML::Node& node, std::string_view tokenKey, const glm::vec2& defaultValue = glm::vec2(0.0f));
-	glm::vec3   LoadVec3(const YAML::Node& node, std::string_view tokenKey, const glm::vec3& defaultValue = glm::vec3(0.0f));
-	glm::vec4   LoadVec4(const YAML::Node& node, std::string_view tokenKey, const glm::vec4& defaultValue = glm::vec4(0.0f));
+	template<typename T>
+	T Get(const std::string& key, const T& defaultValue = T());
 
-protected:
-	YAML::Node m_rootNode;
+private:
+	std::string m_source;
+	ryml::Tree m_tree;
 };
+
+#include "Parsers/YamlParser.inl"
