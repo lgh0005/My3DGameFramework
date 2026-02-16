@@ -114,3 +114,13 @@ public:                                                                         
     static constexpr ResourceType GetStaticResourceType() { return TypeEnum; }            \
     static const ResourceType s_ResourceType = TypeEnum;                                  \
     virtual ResourceType GetResourceType() const override { return GetStaticResourceType(); }
+
+/*======================================================//
+//    self-registration macro for resource importers    //
+//======================================================*/
+#define REGISTER_IMPORTER(Ext, ImporterClass)                                              \
+    static bool _reg_##ImporterClass = []()                                                \
+    {                                                                                      \
+        Importer::Register(Ext, std::make_unique<ImporterClass>());                        \
+        return true;                                                                       \
+    }();

@@ -7,6 +7,14 @@ set(ENGINE_SOURCES
    # Core
    "Core/Application.h"             "Core/Application.cpp"
 
+   # Importer
+   "Importers/Importer.h"           "Importers/Importer.cpp"
+   "Importers/TextureImporter.h"           "Importers/TextureImporter.cpp"
+   "Importers/ShaderImporter.h"           "Importers/ShaderImporter.cpp"
+   "Importers/AudioImporter.h"           "Importers/AudioImporter.cpp"
+   "Importers/FontImporter.h"           "Importers/FontImporter.cpp"
+   "Importers/ModelImporter.h"           "Importers/ModelImporter.cpp"
+
    # Parsers
    "Parsers/LuaParser.h"           "Parsers/LuaParser.cpp"
    "Parsers/YamlParser.h"           "Parsers/YamlParser.cpp"            "Parsers/YamlParser.inl"
