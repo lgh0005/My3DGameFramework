@@ -4,6 +4,7 @@ set(GAME_SOURCES
     # Core
     "pch.h"  "pch.cpp" 
     "main.cpp"
+    "AppRegistry.h"
 
     # Application
     "My3DGameFramework.h"       "My3DGameFramework.cpp"

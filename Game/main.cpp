@@ -1,5 +1,6 @@
 ﻿#include "pch.h"
 #include "My3DGameFramework.h"
+#include "AppRegistry.h"
 
 int main()
 {

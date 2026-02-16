@@ -1,15 +1,6 @@
 ﻿#include "pch.h"
 #include "My3DGameFramework.h"
-
-// TODO : 이후에는 순수히 데이터 로드 기반의 방식으로 탈환 예정
-// [사용자 정의 컨텐츠 헤더들]
-#pragma region CONTENTS_HEADERS
-#include "Pipelines/SRP/StandardRenderPipeline.h"
-#include "SRPSample/DevScene/DevScene.h"
-
-#include "Pipelines/URP/UniversalRenderPipeline.h"
-#include "URPSample/DevScene/PBRScene.h"
-#pragma endregion
+#include "AppRegistry.h"
 
 DECLARE_DEFAULTS_IMPL(My3DGameFramework)
 

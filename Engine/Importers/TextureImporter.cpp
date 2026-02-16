@@ -2,7 +2,7 @@
 #include "TextureImporter.h"
 
 DECLARE_DEFAULTS_IMPL(TextureImporter)
-REGISTER_IMPORTER(".ktx", TextureImporter)
+//REGISTER_IMPORTER(".ktx", TextureImporter)
 
 ResourceDescPtr TextureImporter::Import
 (

@@ -1,6 +1,5 @@
 ﻿#include "EnginePch.h"
 #include "Material.h"
-#include "Parsers/EngineParsers/MaterialYamlParser.h"
 #include "Resources/Programs/Program.h"
 #include "Resources/Programs/GraphicsProgram.h"
 #include "Resources/Textures/Texture.h"
@@ -9,29 +8,30 @@ DECLARE_DEFAULTS_IMPL(Material)
 
 MaterialPtr Material::Load(const MaterialDesc& desc)
 {
-    // 1. 머티리얼 파일 확장자 확인 (예: .mat, .json, .yaml)
-    auto path = desc.path;
-    std::string ext = std::filesystem::path(path).extension().string();
-    std::transform(ext.begin(), ext.end(), ext.begin(), ::tolower);
-    if (ext != ".yaml")
-    {
-        LOG_ERROR("Material::Load - Invalid extension: {}", path);
-        return nullptr;
-    }
+    //// 1. 머티리얼 파일 확장자 확인 (예: .mat, .json, .yaml)
+    //auto path = desc.path;
+    //std::string ext = std::filesystem::path(path).extension().string();
+    //std::transform(ext.begin(), ext.end(), ext.begin(), ::tolower);
+    //if (ext != ".yaml")
+    //{
+    //    LOG_ERROR("Material::Load - Invalid extension: {}", path);
+    //    return nullptr;
+    //}
 
-    // 2. 머티리얼 생성
-    MaterialPtr material(new Material());
-    material->m_desc = desc;
-    
-    // 3. 머티리얼 파일 파싱
-    MaterialYamlParser parser;
-    if (parser.LoadConfig(desc.path))
-    {
-        if (parser.LoadMaterial(material.get()))
-            LOG_INFO("Material Loaded: {}", desc.path);
-    }
+    //// 2. 머티리얼 생성
+    //MaterialPtr material(new Material());
+    //material->m_desc = desc;
+    //
+    //// 3. 머티리얼 파일 파싱
+    //MaterialYamlParser parser;
+    //if (parser.LoadConfig(desc.path))
+    //{
+    //    if (parser.LoadMaterial(material.get()))
+    //        LOG_INFO("Material Loaded: {}", desc.path);
+    //}
 
-    return material;
+    //return material;
+    return nullptr;
 }
 
 MaterialPtr Material::Create()

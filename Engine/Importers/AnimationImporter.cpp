@@ -2,7 +2,7 @@
 #include "AnimationImporter.h"
 
 DECLARE_DEFAULTS_IMPL(AnimationImporter)
-REGISTER_IMPORTER(".myanim", AnimationImporter)
+//REGISTER_IMPORTER(".myanim", AnimationImporter)
 
 ResourceDescPtr AnimationImporter::Import
 (

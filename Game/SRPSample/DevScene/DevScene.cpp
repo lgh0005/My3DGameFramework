@@ -69,7 +69,7 @@ bool DevScene::LoadSceneResources()
 	RESOURCE.Add<Texture>("toybox_diffuse", "@GameAsset/Images/baked/toy_box_diffuse.ktx");
 	RESOURCE.Add<Texture>("toybox_normal", "@GameAsset/Images/baked/toy_box_normal.ktx");
 	RESOURCE.Add<Texture>("toybox_disp", "@GameAsset/Images/baked/toy_box_disp.ktx");
-	RESOURCE.Add<Texture>("grass", "@GameAsset/Images/baked/grass.ktx");
+	RESOURCE.Add<Texture>("grass_img", "@GameAsset/Images/baked/grass_img.ktx");
 
 	RESOURCE.Add<CubeTexture>("SkyboxTexture", "@GameAsset/Images/baked/sky.ktx");
 
@@ -155,7 +155,7 @@ bool DevScene::LoadSceneResources()
 		auto mat = Material::Create();
 		mat->GetDesc().name = "grassMat";
 		mat->GetDesc().path = "@Virtual/Materials/grassMat";
-		mat->diffuse = RESOURCE.Get<Texture>("grass");
+		mat->diffuse = RESOURCE.Get<Texture>("grass_img");
 		RESOURCE.Register<Material>(std::move(mat));
 	}
 
@@ -541,7 +541,7 @@ bool DevScene::OnPlaceActors()
 	}
 
 	// 잔디밭
-	// PlantTenThousandGrass(grassPass);
+	PlantTenThousandGrass(grassPass);
 
 	return true;
 }

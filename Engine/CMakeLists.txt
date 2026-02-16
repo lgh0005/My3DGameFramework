@@ -8,12 +8,15 @@ set(ENGINE_SOURCES
    "Core/Application.h"             "Core/Application.cpp"
 
    # Importer
+   "Importers/EngineImporters.h"
+
    "Importers/Importer.h"           "Importers/Importer.cpp"
    "Importers/TextureImporter.h"           "Importers/TextureImporter.cpp"
    "Importers/ShaderImporter.h"           "Importers/ShaderImporter.cpp"
    "Importers/AudioImporter.h"           "Importers/AudioImporter.cpp"
    "Importers/FontImporter.h"           "Importers/FontImporter.cpp"
    "Importers/ModelImporter.h"           "Importers/ModelImporter.cpp"
+   "Importers/AnimationImporter.h"      "Importers/AnimationImporter.cpp"
 
    # Parsers
    "Parsers/LuaParser.h"           "Parsers/LuaParser.cpp"
@@ -216,10 +219,10 @@ set(ENGINE_SOURCES
    "NavMesh/NavMeshFunctors.h"          "NavMesh/NavMeshFunctors.cpp"
 
    # UIs
-   "UIs/UIRenderer.h"               "UIs/UIRenderer.cpp"
-   "UIs/UICanvas.h"                 "UIs/UICanvas.cpp"
-   "UIs/UIImage.h"                  "UIs/UIImage.cpp"
-   "UIs/UIText.h"                   "UIs/UIText.cpp"
+   #"UIs/UIRenderer.h"               "UIs/UIRenderer.cpp"
+   #"UIs/UICanvas.h"                 "UIs/UICanvas.cpp"
+   #"UIs/UIImage.h"                  "UIs/UIImage.cpp"
+   #"UIs/UIText.h"                   "UIs/UIText.cpp"
 
    # Managers
    "Managers/TimeManager.h"         "Managers/TimeManager.cpp"

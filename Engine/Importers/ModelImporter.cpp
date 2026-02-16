@@ -2,7 +2,7 @@
 #include "ModelImporter.h"
 
 DECLARE_DEFAULTS_IMPL(ModelImporter)
-REGISTER_IMPORTER(".mymodel", ModelImporter)
+//REGISTER_IMPORTER(".mymodel", ModelImporter)
 
 ResourceDescPtr ModelImporter::Import
 (

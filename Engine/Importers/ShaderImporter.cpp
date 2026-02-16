@@ -2,12 +2,12 @@
 #include "ShaderImporter.h"
 
 DECLARE_DEFAULTS_IMPL(ShaderImporter)
-REGISTER_IMPORTER(".vert", ShaderImporter)
-REGISTER_IMPORTER(".frag", ShaderImporter)
-REGISTER_IMPORTER(".tesc", ShaderImporter)
-REGISTER_IMPORTER(".tese", ShaderImporter)
-REGISTER_IMPORTER(".geom", ShaderImporter)
-REGISTER_IMPORTER(".comp", ShaderImporter)
+//REGISTER_IMPORTER(".vert", ShaderImporter)
+//REGISTER_IMPORTER(".frag", ShaderImporter)
+//REGISTER_IMPORTER(".tesc", ShaderImporter)
+//REGISTER_IMPORTER(".tese", ShaderImporter)
+//REGISTER_IMPORTER(".geom", ShaderImporter)
+//REGISTER_IMPORTER(".comp", ShaderImporter)
 
 ResourceDescPtr ShaderImporter::Import(const ImportContext& ctx, AssetRegistry& registry)
 {

@@ -2,9 +2,9 @@
 #include "AudioImporter.h"
 
 DECLARE_DEFAULTS_IMPL(AudioImporter)
-REGISTER_IMPORTER(".wav", AudioImporter)
-REGISTER_IMPORTER(".mp3", AudioImporter)
-REGISTER_IMPORTER(".ogg", AudioImporter)
+//REGISTER_IMPORTER(".wav", AudioImporter)
+//REGISTER_IMPORTER(".mp3", AudioImporter)
+//REGISTER_IMPORTER(".ogg", AudioImporter)
 
 ResourceDescPtr AudioImporter::Import
 (

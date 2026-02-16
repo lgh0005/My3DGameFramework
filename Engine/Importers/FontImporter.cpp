@@ -2,8 +2,8 @@
 #include "FontImporter.h"
 
 DECLARE_DEFAULTS_IMPL(FontImporter)
-REGISTER_IMPORTER(".ttf", FontImporter)
-REGISTER_IMPORTER(".otf", FontImporter)
+//REGISTER_IMPORTER(".ttf", FontImporter)
+//REGISTER_IMPORTER(".otf", FontImporter)
 
 ResourceDescPtr FontImporter::Import
 (

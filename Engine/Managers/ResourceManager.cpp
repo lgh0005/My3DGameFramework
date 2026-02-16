@@ -6,6 +6,7 @@
 #include "Resources/Material.h"
 #include "Parsers/JsonParser.h"
 #include "Resources/Textures/Texture.h"
+#include "Importers/Importer.h"
 
 // TODO : 몇 가지 하드코딩된 문자열은 이후에 문자열 상수들로 따로 빼야 함
 
@@ -21,24 +22,11 @@ bool ResourceManager::Init()
 		return false;
 	}
 
-	// 2. ResourceConfigParser를 이용한 에셋 설계도 스캔
+	// 2. Importer를 통한 직접 폴더 스캔
 	// TODO : 이쪽도 약간 생각을 해볼 필요는 있음
-	ResourceConfigParser configParser;
-	if (configParser.LoadFromFile(ResolvePath("@Config/ResourceConfig.json")))
-	{
-		configParser.ParseExtensionMap("ResourceExtensions");
-
-		// 각 루트 폴더를 스캔하여 Desc 정보를 획득하고 장부에 등록
-		auto gameAssets = configParser.ScanDirectory("@GameAsset", ResolvePath("@GameAsset"));
-		auto builtInAssets = configParser.ScanDirectory("@BuiltInAsset", ResolvePath("@BuiltInAsset"));
-		m_assetRegistry.insert(gameAssets.begin(), gameAssets.end());
-		m_assetRegistry.insert(builtInAssets.begin(), builtInAssets.end());
-	}
-	else
-	{
-		LOG_ERROR("ResourceManager: Failed to load ResourceConfig.json");
-		return false;
-	}
+	LOG_INFO("ResourceManager: Scanning for asset blueprints...");
+	ScanDirectory("@GameAsset", ResolvePath("@GameAsset"));
+	ScanDirectory("@BuiltInAsset", ResolvePath("@BuiltInAsset"));
 
 	// 3. 빌트인 리소스 수동 생성
 	AddBuiltInResources();
@@ -52,6 +40,31 @@ void ResourceManager::Clear()
 	m_resources.clear();
 	m_assetRegistry.clear();
 	LOG_INFO("ResourceManager Cleared.");
+}
+
+void ResourceManager::ScanDirectory(const std::string& virtualRoot, const std::string& physicalPath)
+{
+	if (!fs::exists(physicalPath)) return;
+
+	for (const auto& entry : fs::recursive_directory_iterator(physicalPath))
+	{
+		if (entry.is_directory()) continue;
+
+		const fs::path& filePath = entry.path();
+		std::string ext = filePath.extension().string();
+
+		// 컨텍스트 조립
+		ImportContext ctx;
+		ctx.filePath = filePath.generic_string();
+		ctx.assetName = filePath.stem().string();
+
+		// 상대 경로를 이용해 가상 경로 계산
+		std::string relPath = fs::relative(filePath, physicalPath).generic_string();
+		ctx.virtualPath = virtualRoot + "/" + relPath;
+
+		// 등록된 임포터가 있다면 장부(m_assetRegistry)를 알아서 업데이트
+		Importer::ImportAsset(ext, ctx, m_assetRegistry);
+	}
 }
 
 bool ResourceManager::LoadEngineConfig(const std::string& path)
@@ -122,20 +135,10 @@ void ResourceManager::AddBuiltInResources()
 		Register(std::move(resource));
 	};
 
-	// 1. 기본 메쉬 (GeometryGenerator 활용)
 	QuickRegister("Cube", "@BuiltIn/Mesh/Cube", GeometryGenerator::CreateBox());
 	QuickRegister("Plane", "@BuiltIn/Mesh/Plane", GeometryGenerator::CreatePlane());
 	QuickRegister("Sphere", "@BuiltIn/Mesh/Sphere", GeometryGenerator::CreateSphere(32, 32));
-
-	// 2. 특수 메쉬
 	QuickRegister("Screen", "@BuiltIn/Mesh/Screen", ScreenMesh::Create());
-
-	// 3. 기본 머티리얼
 	QuickRegister("DefaultMaterial", "@BuiltIn/Material", Material::Create());
-
-	// [TEMP] 카메라 흙 추가
-	TextureDesc dirtDesc("@GameAsset/Images/baked/camera_dirt.ktx", "camera_dirt");
-	dirtDesc.sRGB = false;
-	auto dirtTex = Texture::Load(dirtDesc);
-	if (dirtTex) QuickRegister("camera_dirt", dirtDesc.path, std::move(dirtTex));
+	Add<Texture>("camera_dirt", "@GameAsset/Images/baked/camera_dirt.ktx");
 }
