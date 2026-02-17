@@ -17,6 +17,8 @@ set(ENGINE_SOURCES
    "Importers/FontImporter.h"           "Importers/FontImporter.cpp"
    "Importers/ModelImporter.h"           "Importers/ModelImporter.cpp"
    "Importers/AnimationImporter.h"      "Importers/AnimationImporter.cpp"
+   "Importers/MaterialImporter.h"       "Importers/MaterialImporter.cpp"
+   "Importers/SceneImporter.h"       "Importers/SceneImporter.cpp"
 
    # Parsers
    "Parsers/LuaParser.h"           "Parsers/LuaParser.cpp"

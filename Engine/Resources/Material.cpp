@@ -3,35 +3,64 @@
 #include "Resources/Programs/Program.h"
 #include "Resources/Programs/GraphicsProgram.h"
 #include "Resources/Textures/Texture.h"
+#include "Parsers/YamlParser.h"
 
 DECLARE_DEFAULTS_IMPL(Material)
 
 MaterialPtr Material::Load(const MaterialDesc& desc)
 {
-    //// 1. 머티리얼 파일 확장자 확인 (예: .mat, .json, .yaml)
-    //auto path = desc.path;
-    //std::string ext = std::filesystem::path(path).extension().string();
-    //std::transform(ext.begin(), ext.end(), ext.begin(), ::tolower);
-    //if (ext != ".yaml")
-    //{
-    //    LOG_ERROR("Material::Load - Invalid extension: {}", path);
-    //    return nullptr;
-    //}
+    // 1. 머티리얼 인스턴스 생성
+    MaterialPtr material(new Material());
+    material->m_desc = desc;
 
-    //// 2. 머티리얼 생성
-    //MaterialPtr material(new Material());
-    //material->m_desc = desc;
-    //
-    //// 3. 머티리얼 파일 파싱
-    //MaterialYamlParser parser;
-    //if (parser.LoadConfig(desc.path))
-    //{
-    //    if (parser.LoadMaterial(material.get()))
-    //        LOG_INFO("Material Loaded: {}", desc.path);
-    //}
+    // 2. YAML 파서 가동
+    YamlParser parser;
+    if (!parser.LoadFromYamlFile(RESOURCE.ResolvePath(desc.path)))
+    {
+        LOG_ERROR("Material: Failed to load YAML at {}", desc.path);
+        return nullptr;
+    }
 
-    //return material;
-    return nullptr;
+    // 3. 해당 yaml 파일이 머티리얼 전용 파일인지 검증
+    if (parser.Get<std::string>("type") != "Material")
+    {
+        LOG_ERROR("Material: Asset type mismatch! Expected 'Material', but got '{}' in {}",
+            parser.Get<std::string>("type"), desc.path);
+        return nullptr;
+    }
+
+    // 리소스를 안전하게 가져오는 람다
+    auto FetchTexture = [](const std::string& key) -> TexturePtr 
+    {
+        if (key.empty()) return nullptr;
+        return RESOURCE.Get<Texture>(key);
+    };
+
+    // 3. 텍스처 할당
+    material->diffuse = FetchTexture(parser.Get<std::string>("diffuse"));
+    material->specular = FetchTexture(parser.Get<std::string>("specular"));
+    material->emission = FetchTexture(parser.Get<std::string>("emission"));
+    material->normal = FetchTexture(parser.Get<std::string>("normal"));
+    material->height = FetchTexture(parser.Get<std::string>("height"));
+    material->ao = FetchTexture(parser.Get<std::string>("ao"));
+    material->metallic = FetchTexture(parser.Get<std::string>("metallic"));
+    material->roughness = FetchTexture(parser.Get<std::string>("roughness"));
+    material->orm = FetchTexture(parser.Get<std::string>("orm"));
+
+    // 4. 수치 데이터 추출 (스칼라 수치)
+    material->shininess = parser.Get<float>("shininess", 32.0f);
+    material->emissionStrength = parser.Get<float>("emissionStrength", 1.0f);
+    material->heightScale = parser.Get<float>("heightScale", 1.0f);
+    material->metallicFactor = parser.Get<float>("metallicFactor", 1.0f);
+    material->roughnessFactor = parser.Get<float>("roughnessFactor", 1.0f);
+    material->useGlossinessAsRoughness = parser.Get<bool>("useGlossiness", false);
+
+    // 5. 벡터 데이터 추출 (Sequence 처리)
+    material->albedoFactor = parser.Get<glm::vec4>("albedoFactor", glm::vec4(1.0f));
+    material->emissiveFactor = parser.Get<glm::vec3>("emissiveFactor", glm::vec3(0.0f));
+
+    LOG_INFO("Material: Successfully loaded [{}] from {}", desc.name, desc.path);
+    return material;
 }
 
 MaterialPtr Material::Create()

@@ -47,9 +47,9 @@ PBRSceneUPtr PBRScene::Create()
 bool PBRScene::LoadSceneResources()
 {
 	// [Texture] Rusted Iron (KTX)
-	RESOURCE.Add<Texture>("rusted_base", "@GameAsset/Images/rustediron/rustediron2_basecolor.ktx");
+	/*RESOURCE.Add<Texture>("rusted_base", "@GameAsset/Images/rustediron/rustediron2_basecolor.ktx");
 	RESOURCE.Add<Texture>("rusted_normal", "@GameAsset/Images/rustediron/rustediron2_normal.ktx");
-	RESOURCE.Add<Texture>("rusted_orm", "@GameAsset/Images/rustediron/rustediron2_ORM.ktx");
+	RESOURCE.Add<Texture>("rusted_orm", "@GameAsset/Images/rustediron/rustediron2_ORM.ktx");*/
 
 	// [Texture] ToyBox (KTX)
 	RESOURCE.Add<Texture>("toybox_diffuse", "@GameAsset/Images/baked/toy_box_diffuse.ktx");
@@ -64,6 +64,9 @@ bool PBRScene::LoadSceneResources()
 	RESOURCE.Add<Model>("backpack", "@GameAsset/Models/backpack/backpack.mymodel");
 	RESOURCE.Add<Animation>("Idle", "@GameAsset/Models/spacesoldier/Idle_shorten.myanim");
 	RESOURCE.Add<Animation>("Walk", "@GameAsset/Models/spacesoldier/Walking.myanim");
+
+	// [Material]
+	RESOURCE.Add<Material>("rusted_iron");
 
 	// 1. 단색 머티리얼 (Texture::CreateSolid 사용)
 	{
@@ -311,9 +314,9 @@ bool PBRScene::OnPlaceActors()
 	}
 
 	// 3. 구 49개 (ORM 텍스쳐 테스트)
-	// TestSpheresForORMTexture(hdrPass);
+	TestSpheresForORMTexture(hdrPass);
 	// TestSpheresForPBRChart(hdrPass);
-	TestSpheresForPBRChartDeferred();
+	// TestSpheresForPBRChartDeferred();
 
 	return true;
 }
@@ -329,7 +332,7 @@ bool PBRScene::OnBeginPlay()
 void PBRScene::TestSpheresForORMTexture(HDRRenderPass* hdrPass)
 {
 	auto sphereMesh = RESOURCE.Get<StaticMesh>("Sphere");
-	auto baseMat = RESOURCE.Get<Material>("Rusted_Iron_orm");
+	auto baseMat = RESOURCE.Get<Material>("rusted_iron");
 
 	const int rows = 7;
 	const int cols = 7;

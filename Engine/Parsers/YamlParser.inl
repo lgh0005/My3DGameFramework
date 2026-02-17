@@ -49,3 +49,69 @@ inline bool YamlParser::IsTypeOf(const std::string& key) const
 
 	return false;
 }
+
+#pragma region OPENGL_SPECIALIZATION
+
+template<>
+inline glm::vec4 YamlParser::Get<glm::vec4>
+(
+	const std::string& key,
+	const glm::vec4& defaultValue
+)
+{
+	if (m_tree.empty()) return defaultValue;
+
+	ryml::ConstNodeRef root = m_tree.rootref();
+	c4::csubstr k = c4::to_csubstr(key);
+
+	// 1. 해당 키가 존재하지 않거나, 시퀀스(배열)가 아니면 기본값 반환
+	if (!root.has_child(k) || !root[k].is_seq())
+		return defaultValue;
+
+	ryml::ConstNodeRef node = root[k];
+	glm::vec4 result = defaultValue;
+
+	// 2. 최대 4개 성분만 안전하게 파싱 (std::min 활용)
+	int32 numElements = static_cast<int32>(node.num_children());
+	int32 count = std::min(numElements, 4);
+
+	for (int32 i = 0; i < count; ++i)
+	{
+		// 각 노드 성분이 값을 가지고 있는지 확인 후 역직렬화
+		if (node[i].has_val())
+			node[i] >> result[i];
+	}
+	return result;
+}
+
+template<>
+inline glm::vec3 YamlParser::Get<glm::vec3>
+(
+	const std::string& key, 
+	const glm::vec3& defaultValue
+)
+{
+	if (m_tree.empty()) return defaultValue;
+
+	ryml::ConstNodeRef root = m_tree.rootref();
+	c4::csubstr k = c4::to_csubstr(key);
+
+	if (!root.has_child(k) || !root[k].is_seq())
+		return defaultValue;
+
+	ryml::ConstNodeRef node = root[k];
+	glm::vec3 result = defaultValue;
+
+	int32 numElements = static_cast<int32>(node.num_children());
+	int32 count = std::min(numElements, 3);
+
+	for (int32 i = 0; i < count; ++i)
+	{
+		if (node[i].has_val())
+			node[i] >> result[i];
+	}
+
+	return result;
+}
+
+#pragma endregion

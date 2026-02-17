@@ -1,0 +1,25 @@
+# MyEngine Asset Definition
+type: "Material"
+
+# texture slots
+diffuse: "rustediron2_basecolor"
+normal: "rustediron2_normal"
+specular: ""
+emission: ""
+orm: "rustediron2_ORM"
+height: ""
+ao: ""
+metallic: ""
+roughness: ""
+
+# numerical value
+shininess: 64.0
+emissionStrength: 2.5
+heightScale: 0.0
+metallicFactor: 1.0
+roughnessFactor: 1.0
+useGlossiness: false
+
+# vector data
+albedoFactor: [1.0, 1.0, 1.0, 1.0]
+emissiveFactor: [1.0, 0.8, 0.5]

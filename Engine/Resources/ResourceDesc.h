@@ -78,18 +78,19 @@ struct MaterialDesc : public ResourceDesc
 	MaterialDesc(const std::string& filePath = "", const std::string& rscName = "");
 	virtual ResourceType GetDescType() const override;
 
+	// Material yaml file path
 	std::string path;
 
 	// PBR Factors & Paths
-	std::string diffusePath;
-	std::string specularPath;
-	std::string normalPath;
-	std::string heightPath;
-	std::string emissionPath;
-	std::string aoPath;
-	std::string metallicPath;
-	std::string roughnessPath;
-	std::string ormPath;
+	std::string diffuseKey;
+	std::string specularKey;
+	std::string normalKey;
+	std::string heightKey;
+	std::string emissionKey;
+	std::string aoKey;
+	std::string metallicKey;
+	std::string roughnessKey;
+	std::string ormKey;
 
 	glm::vec4 albedoFactor = { 1.0f, 1.0f, 1.0f, 1.0f };
 	glm::vec3 emissiveFactor = { 0.0f, 0.0f, 0.0f };

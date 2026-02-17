@@ -5,6 +5,8 @@
 template<typename T>
 inline std::shared_ptr<T> ResourceManager::Get(const std::string& name)
 {
+    // 0. TODO : m_builtIn에 있는 것인지 확인 필요
+
     // 1. 인스턴스 캐시(이미 로드된 것) 확인
     auto it = m_resources.find(name);
     if (it != m_resources.end()) return TryCastResource<T>(it->second);
@@ -12,6 +14,7 @@ inline std::shared_ptr<T> ResourceManager::Get(const std::string& name)
     // 2. 캐시에 없으면 장부(설계도) 확인
     auto regIt = m_assetRegistry.find(name);
     if (regIt != m_assetRegistry.end()) return Load<T>(*regIt->second);
+
     return nullptr;
 }
 

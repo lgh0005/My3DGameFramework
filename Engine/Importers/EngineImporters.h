@@ -20,6 +20,8 @@
 #include "Importers/AudioImporter.h"
 #include "Importers/FontImporter.h"
 #include "Importers/AnimationImporter.h"
+#include "Importers/SceneImporter.h"
+#include "Importers/MaterialImporter.h"
 
 /*==========================================================================//
 //   [STB Style] Engine Default Importer Registration                      //
@@ -28,6 +30,9 @@
 //==========================================================================*/
 
 #ifdef ENGINE_IMPORTERS_IMPLEMENTATION
+
+// 씬 및 머티리얼
+REGISTER_IMPORTER(".mymat", MaterialImporter)
 
 // 텍스처 (다양한 확장자를 하나의 임포터에 매핑)
 REGISTER_IMPORTER(".ktx", TextureImporter)
@@ -40,14 +45,16 @@ REGISTER_IMPORTER(".comp", ShaderImporter)
 REGISTER_IMPORTER(".tesc", ShaderImporter)
 REGISTER_IMPORTER(".tese", ShaderImporter)
 
-// 모델 및 애니메이션 (커스텀 바이너리 포맷)
+// 모델 및 애니메이션
 REGISTER_IMPORTER(".mymodel", ModelImporter)
 REGISTER_IMPORTER(".myanim", AnimationImporter)
 
-// 오디오 및 폰트
+// 오디오
 REGISTER_IMPORTER(".wav", AudioImporter)
 REGISTER_IMPORTER(".mp3", AudioImporter)
 REGISTER_IMPORTER(".ogg", AudioImporter)
+
+// 폰트
 REGISTER_IMPORTER(".ttf", FontImporter)
 REGISTER_IMPORTER(".otf", FontImporter)
 
