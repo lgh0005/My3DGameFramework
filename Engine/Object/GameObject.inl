@@ -73,38 +73,26 @@ inline T* GameObject::AddComponent(std::unique_ptr<T> component)
 template<typename T>
 inline T* GameObject::GetComponent() const
 {
-	// 1. 스크립트인 경우
-	if constexpr (std::is_base_of<Script, T>::value)
-	{
-		ScriptID id = ScriptRegistry::GetID<T>();
-		for (Script* script : m_scripts)
-		{
-			if (script->GetScriptID() == id)
-				return static_cast<T*>(script);
-		}
-		return nullptr;
-	}
+	static_assert(std::is_base_of<Component, T>::value);
 
-	// 2. 그 외 일반적인 컴포넌트인 경우
-	else
-	{
-		usize index = static_cast<usize>(T::s_ComponentType);
+	usize index = static_cast<usize>(T::s_ComponentType);
 
-		// [1차 시도] O(1) 캐시 조회 (Transform 등은 여기서 즉시 리턴됨)
+	// 1. O(1) 캐시 조회
+	if (index < m_componentCache.size())
+	{
 		Component* cached = m_componentCache[index];
 		if (cached != nullptr) return static_cast<T*>(cached);
-
-		// [2차 시도 - 해결책] 캐시에 없다면? (예: Collider 요청했는데 BoxCollider만 있는 경우)
-		// 기존의 O(N) 방식으로 전체를 뒤져서 찾습니다. TODO : 이에 대한 최적화 필요
-		ComponentType type = T::s_ComponentType;
-		for (const auto& comp : m_components)
-		{
-			if (comp->MatchesType(type))
-				return static_cast<T*>(comp.get());
-		}
-
-		return nullptr;
 	}
+
+	// 2. 캐시에 없는 경우
+	ComponentType requestedType = T::s_ComponentType;
+	for (const auto& comp : m_components)
+	{
+		if (comp->MatchesType(requestedType))
+			return static_cast<T*>(comp.get());
+	}
+
+	return nullptr;
 }
 
 template<typename T>

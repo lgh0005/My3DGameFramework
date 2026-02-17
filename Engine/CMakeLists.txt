@@ -19,6 +19,7 @@ set(ENGINE_SOURCES
    "Importers/AnimationImporter.h"      "Importers/AnimationImporter.cpp"
    "Importers/MaterialImporter.h"       "Importers/MaterialImporter.cpp"
    "Importers/SceneImporter.h"       "Importers/SceneImporter.cpp"
+   "Importers/ScriptImporter.h"       "Importers/ScriptImporter.cpp"
 
    # Parsers
    "Parsers/LuaParser.h"           "Parsers/LuaParser.cpp"
@@ -44,7 +45,6 @@ set(ENGINE_SOURCES
    "Object/GameObject.h"              "Object/GameObject.cpp"    "Object/GameObject.inl"
    "Object/Component.h"               "Object/Component.cpp"
    "Object/Prefab.h"                  "Object/Prefab.cpp"
-   "Object/ScriptRegistry.h"          "Object/ScriptRegistry.cpp"
 
    # Common Render Passes
    "Pipelines/Common/CullingPass.h" "Pipelines/Common/CullingPass.cpp"
@@ -164,6 +164,7 @@ set(ENGINE_SOURCES
    "Resources/Material.h"           "Resources/Material.cpp"
    "Resources/Font.h"               "Resources/Font.cpp"
    "Resources/EnvironmentMap.h"     "Resources/EnvironmentMap.cpp"
+   "Resources/LuaScript.h"          "Resources/LuaScript.cpp"
 
    "Resources/Programs/Program.h"            "Resources/Programs/Program.cpp"
    "Resources/Programs/GraphicsProgram.h" "Resources/Programs/GraphicsProgram.cpp" 
@@ -191,7 +192,7 @@ set(ENGINE_SOURCES
 
    # Components
    "Components/Light.h"             "Components/Light.cpp"
-   "Components/Script.h"            "Components/Script.cpp"
+   "Components/Script.h"            "Components/Script.cpp"     "Components/Script.inl"
    "Components/PhysicsComponent.h"  "Components/PhysicsComponent.cpp"
    "Components/MeshRenderer.h"      "Components/MeshRenderer.cpp"
    "Components/Collider.h"          "Components/Collider.cpp"

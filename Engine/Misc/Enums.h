@@ -20,6 +20,8 @@ enum class ResourceType
 	GraphicsProgram,
 	ComputeProgram,
 
+	LuaScript,
+
 	EnvironmentMap
 };
 

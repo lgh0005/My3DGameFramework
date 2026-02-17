@@ -181,6 +181,19 @@ struct ComputeProgramDesc : public ResourceDesc
 };
 
 /*================//
+//      Script    //
+//================*/
+CLASS_PTR(ScriptDesc)
+struct ScriptDesc : public ResourceDesc
+{
+	virtual ~ScriptDesc();
+	ScriptDesc(const std::string& filePath = "", const std::string& rscName = "");
+	virtual ResourceType GetDescType() const override;
+
+	std::string path;
+};
+
+/*================//
 // EnvironmentMap //
 //================*/
 CLASS_PTR(EnvironmentMapDesc)

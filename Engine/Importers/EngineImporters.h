@@ -22,6 +22,7 @@
 #include "Importers/AnimationImporter.h"
 #include "Importers/SceneImporter.h"
 #include "Importers/MaterialImporter.h"
+#include "Importers/ScriptImporter.h"
 
 /*==========================================================================//
 //   [STB Style] Engine Default Importer Registration                      //
@@ -33,6 +34,9 @@
 
 // 씬 및 머티리얼
 REGISTER_IMPORTER(".mymat", MaterialImporter)
+
+// 스크립트
+REGISTER_IMPORTER(".lua", ScriptImporter)
 
 // 텍스처 (다양한 확장자를 하나의 임포터에 매핑)
 REGISTER_IMPORTER(".ktx", TextureImporter)

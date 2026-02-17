@@ -89,6 +89,14 @@ ComputeProgramDesc::~ComputeProgramDesc() = default;
 ResourceType ComputeProgramDesc::GetDescType() const { return ResourceType::ComputeProgram; }
 
 /*================//
+//      Script    //
+//================*/
+ScriptDesc::ScriptDesc(const std::string& filePath, const std::string& rscName)
+	: ResourceDesc(rscName), path(filePath) { }
+ScriptDesc::~ScriptDesc() = default;
+ResourceType ScriptDesc::GetDescType() const { return ResourceType::LuaScript; }
+
+/*================//
 // EnvironmentMap //
 //================*/
 EnvironmentMapDesc::EnvironmentMapDesc(const std::string& filePath, const std::string& rscName)

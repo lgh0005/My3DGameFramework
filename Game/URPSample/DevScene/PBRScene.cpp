@@ -34,8 +34,8 @@
 #include "Components/CapsuleCollider.h"
 
 #include "URPSample/RenderPasses/HDRRenderPass.h"
-#include "SRPSample/Scripts/CameraController.h"
-#include "SRPSample/Scripts/PlayerController.h"
+//#include "SRPSample/Scripts/CameraController.h"
+//#include "SRPSample/Scripts/PlayerController.h"
 
 DECLARE_DEFAULTS_IMPL(PBRScene)
 
@@ -168,8 +168,8 @@ bool PBRScene::OnPlaceActors()
 		cameraObj->AddComponent(std::move(camera));
 
 		// 카메라 컨트롤러 생성 및 추가
-		auto cameraCtrl = CameraController::Create();
-		cameraObj->AddComponent(std::move(cameraCtrl));
+		/*auto cameraCtrl = CameraController::Create();
+		cameraObj->AddComponent(std::move(cameraCtrl));*/
 
 		AddGameObject(std::move(cameraObj));
 	}
@@ -295,7 +295,7 @@ bool PBRScene::OnPlaceActors()
 		rigidBody->FreezeRotation(true, true, true);
 		rigidBody->SetFriction(0.5f);
 
-		auto playerctrl = PlayerController::Create();
+		/*auto playerctrl = PlayerController::Create();*/
 
 		GameObjectUPtr rootUPtr = model->Instantiate(this, animator.get());
 		GameObject* rootGO = rootUPtr.get();
@@ -306,7 +306,7 @@ bool PBRScene::OnPlaceActors()
 			rootGO->GetTransform().SetScale(glm::vec3(0.025f));
 
 			rootGO->AddComponent(std::move(animator));
-			rootGO->AddComponent(std::move(playerctrl));
+			/*rootGO->AddComponent(std::move(playerctrl));*/
 			rootGO->AddComponent(std::move(boxCollider));
 			rootGO->AddComponent(std::move(rigidBody));
 		}

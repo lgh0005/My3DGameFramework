@@ -43,8 +43,8 @@
 #include "SRPSample/RenderPasses/SimpleRenderPass.h"
 #include "SRPSample/RenderPasses/EnvironmentRenderPass.h"
 
-#include "SRPSample/Scripts/CameraController.h"
-#include "SRPSample/Scripts/PlayerController.h"
+//#include "SRPSample/Scripts/CameraController.h"
+//#include "SRPSample/Scripts/PlayerController.h"
 
 DECLARE_DEFAULTS_IMPL(DevScene)
 
@@ -214,9 +214,9 @@ bool DevScene::OnPlaceActors()
 		camera->SetProjection(45.0f, (float)WINDOW_WIDTH / (float)WINDOW_HEIGHT, 0.01f, 100.0f);
 		cameraObj->AddComponent(std::move(camera));
 
-		// 카메라 컨트롤러 생성 및 추가
-		auto cameraCtrl = CameraController::Create();
-		cameraObj->AddComponent(std::move(cameraCtrl));
+		//// 카메라 컨트롤러 생성 및 추가
+		//auto cameraCtrl = CameraController::Create();
+		//cameraObj->AddComponent(std::move(cameraCtrl));
 
 		// 오디오 리스너 생성 및 추가
 		auto audioListener = AudioListener::Create();
@@ -467,7 +467,7 @@ bool DevScene::OnPlaceActors()
 		rigidBody->SetFriction(0.5f);
 
 		// 6. PlayerController
-		auto playerctrl = PlayerController::Create();
+		/*auto playerctrl = PlayerController::Create();*/
 
 		// 4. Instantiate (이제 한 줄로 끝!)
 		// 내부에서 노드 계층 구조 생성 + 자식들 Scene 등록 + 렌더러 부착까지 다 해줍니다.
@@ -483,7 +483,7 @@ bool DevScene::OnPlaceActors()
 
 			// 6. 핵심 컴포넌트 부착
 			rootGO->AddComponent(std::move(animator));
-			rootGO->AddComponent(std::move(playerctrl));
+			/*rootGO->AddComponent(std::move(playerctrl));*/
 			rootGO->AddComponent(std::move(boxCollider));
 			rootGO->AddComponent(std::move(rigidBody));
 		}
