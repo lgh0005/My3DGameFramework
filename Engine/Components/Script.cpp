@@ -5,6 +5,11 @@
 
 DECLARE_DEFAULTS_IMPL(Script)
 
+ScriptUPtr Script::Create()
+{
+    return ScriptUPtr(new Script());
+}
+
 void Script::Bind(LuaScriptPtr scriptResource)
 {
 	if (!scriptResource) return;

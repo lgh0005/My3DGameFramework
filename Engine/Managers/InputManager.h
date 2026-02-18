@@ -72,5 +72,3 @@ private:
 	static bool YieldMouseInputToImGUI();
 #pragma endregion
 };
-
-// #include "Managers/InputManager.inl"

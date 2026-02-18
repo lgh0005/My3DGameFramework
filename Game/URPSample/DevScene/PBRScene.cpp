@@ -13,6 +13,7 @@
 #include "Resources/Animations/Animation.h"
 #include "Resources/Model.h"
 #include "Resources/Meshes/InstancedMesh.h"
+#include "Resources/LuaScript.h"
 #include "Components/SkyLight.h"
 #include "Resources/AudioClip.h"
 #include "Resources/Animations/AnimController.h"
@@ -166,6 +167,10 @@ bool PBRScene::OnPlaceActors()
 		cameraObj->GetTransform().SetPosition(glm::vec3(0.0f, 2.5f, 8.0f));
 		camera->SetProjection(45.0f, (float)WINDOW_WIDTH / (float)WINDOW_HEIGHT, 0.01f, 100.0f);
 		cameraObj->AddComponent(std::move(camera));
+
+		Script* scriptComp = cameraObj->AddComponent<Script>();
+		auto luaResource = RESOURCE.Get<LuaScript>("Test");
+		scriptComp->Bind(luaResource);
 
 		// 카메라 컨트롤러 생성 및 추가
 		/*auto cameraCtrl = CameraController::Create();

@@ -1,6 +1,7 @@
 ﻿#include "EnginePch.h"
 #include "LuaManager.h"
 #include "Resources/LuaScript.h"
+#include "Misc/LuaBindings.h"
 
 void LuaManager::Init()
 {
@@ -45,8 +46,7 @@ void LuaManager::CollectLuaGarbage()
 
 void LuaManager::BindEngineAPI()
 {
-	// Config/LuaScriptingConfig.json에 있는 문자열 토큰들을 이용한 스크립팅을 허용
-	// TODO: 이후 GameObject, Transform, Input 등을 여기에 추가 등록
+	LuaBindings::Bind(m_luaVirtualMachine);
 }
 
 void LuaManager::Clear()

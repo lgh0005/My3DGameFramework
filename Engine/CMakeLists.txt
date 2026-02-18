@@ -80,7 +80,8 @@ set(ENGINE_SOURCES
    "Misc/AssetFormat.h"             "Misc/AssetFormat.cpp"
    "Misc/AssetUtils.h"              "Misc/AssetUtils.cpp"
    "Misc/ResourceJsonFormat.h"      "Misc/ResourceJsonFormat.cpp"
-   "Misc/ResourceFormat.h"          "Misc/ResourceFormat.cpp" 
+   "Misc/ResourceFormat.h"          "Misc/ResourceFormat.cpp"
+   "Misc/LuaBindings.h"             "Misc/LuaBindings.cpp"
 
    # Physics
    "Physics/BPLayerInterface.h"         "Physics/BPLayerInterface.cpp"

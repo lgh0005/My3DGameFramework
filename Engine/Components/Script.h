@@ -16,6 +16,7 @@ class Script : public Component
 public:
 	virtual ~Script();
 
+	static ScriptUPtr Create();
 	void Bind(LuaScriptPtr scriptResource);
 
 /*==========================================//
