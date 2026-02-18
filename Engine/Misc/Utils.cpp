@@ -143,9 +143,9 @@ glm::vec3 Utils::SafeNormalize(const glm::vec3& v)
 	return v * glm::inversesqrt(len2);
 }
 
-/*=======================//
-//   빈 문자열 유틸 함수   //
-//=======================*/
+/*=====================//
+//   문자열 유틸 함수   //
+//=====================*/
 const std::string& Utils::GetEmptyStr()
 {
 	static const std::string empty = []() 
@@ -154,6 +154,18 @@ const std::string& Utils::GetEmptyStr()
 	}();
 
 	return empty;
+}
+
+std::string_view Utils::StripUTF8BOM(std::string_view str)
+{
+	if (str.size() >= 3 &&
+		static_cast<unsigned char>(str[0]) == 0xEF &&
+		static_cast<unsigned char>(str[1]) == 0xBB &&
+		static_cast<unsigned char>(str[2]) == 0xBF)
+	{
+		return str.substr(3);
+	}
+	return str;
 }
 
 /*====================================//

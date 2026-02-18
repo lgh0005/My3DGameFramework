@@ -2,6 +2,7 @@
 #include "Script.h"
 #include "Components/Collider.h"
 #include "Resources/LuaScript.h"
+#include "Misc/Utils.h"
 
 DECLARE_DEFAULTS_IMPL(Script)
 
@@ -16,8 +17,11 @@ void Script::Bind(LuaScriptPtr scriptResource)
 
 	auto& lua = LUA_MGR.GetLuaVM();
 
+    // 1. BOM 제거 후 정제된 코드 획득
+    auto cleanCode = Utils::StripUTF8BOM(scriptResource->GetCode());
+
 	// 1. 루아 파일 실행 (테이블 반환을 기대)
-    sol::protected_function_result result = lua.do_string(scriptResource->GetCode());
+    sol::protected_function_result result = lua.do_string(cleanCode);
     if (!result.valid()) 
     {
         sol::error err = result;

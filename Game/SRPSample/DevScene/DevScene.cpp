@@ -43,9 +43,6 @@
 #include "SRPSample/RenderPasses/SimpleRenderPass.h"
 #include "SRPSample/RenderPasses/EnvironmentRenderPass.h"
 
-//#include "SRPSample/Scripts/CameraController.h"
-//#include "SRPSample/Scripts/PlayerController.h"
-
 DECLARE_DEFAULTS_IMPL(DevScene)
 
 DevSceneUPtr DevScene::Create()

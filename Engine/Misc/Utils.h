@@ -44,10 +44,11 @@ public:
 	static bool HasLength(const glm::vec3& v);
 	static glm::vec3 SafeNormalize(const glm::vec3& v);
 
-	// 문자열 해시 유틸 함수 : FNV-1a Hash
+	// 문자열 유틸 함수 및 FNV-1a Hash 해시 함수
 	static constexpr uint32 StrHash(const char* str);
 	static constexpr uint32 StrHash(const std::string& str);
 	static const std::string& GetEmptyStr();
+	static std::string_view StripUTF8BOM(std::string_view str);
 	
 	// 기본 뼈 행렬 벡터 반환 IIFE 패턴 유틸 함수
 	static const std::vector<glm::mat4>& GetIdentityBones();

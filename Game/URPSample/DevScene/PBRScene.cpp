@@ -35,8 +35,6 @@
 #include "Components/CapsuleCollider.h"
 
 #include "URPSample/RenderPasses/HDRRenderPass.h"
-//#include "SRPSample/Scripts/CameraController.h"
-//#include "SRPSample/Scripts/PlayerController.h"
 
 DECLARE_DEFAULTS_IMPL(PBRScene)
 
@@ -47,11 +45,6 @@ PBRSceneUPtr PBRScene::Create()
 
 bool PBRScene::LoadSceneResources()
 {
-	// [Texture] Rusted Iron (KTX)
-	/*RESOURCE.Add<Texture>("rusted_base", "@GameAsset/Images/rustediron/rustediron2_basecolor.ktx");
-	RESOURCE.Add<Texture>("rusted_normal", "@GameAsset/Images/rustediron/rustediron2_normal.ktx");
-	RESOURCE.Add<Texture>("rusted_orm", "@GameAsset/Images/rustediron/rustediron2_ORM.ktx");*/
-
 	// [Texture] ToyBox (KTX)
 	RESOURCE.Add<Texture>("toybox_diffuse", "@GameAsset/Images/baked/toy_box_diffuse.ktx");
 	RESOURCE.Add<Texture>("toybox_normal", "@GameAsset/Images/baked/toy_box_normal.ktx");
@@ -80,37 +73,12 @@ bool PBRScene::LoadSceneResources()
 		RESOURCE.Register<Material>(std::move(mat));
 	}
 
-	// 3. 쇠공 머티리얼 #2 (ORM Texture)
-	{
-		auto mat = Material::Create();
-		mat->GetDesc().name = "Rusted_Iron_orm";
-		mat->GetDesc().path = "@Virtual/Materials/Rusted_Iron_orm";
-		mat->diffuse = RESOURCE.Get<Texture>("rusted_base");
-		mat->normal = RESOURCE.Get<Texture>("rusted_normal");
-		mat->orm = RESOURCE.Get<Texture>("rusted_orm");
-		RESOURCE.Register<Material>(std::move(mat));
-	}
-
 	// 4. HDR 큐브맵 확인용 머티리얼
 	{
 		auto mat = Material::Create();
 		mat->GetDesc().name = "hdrCubeMat";
 		mat->GetDesc().path = "@Virtual/Materials/hdrCubeMat";
 		mat->diffuse = RESOURCE.Get<Texture>("mirrored_hall");
-		RESOURCE.Register<Material>(std::move(mat));
-	}
-
-	// 5. 패럴랙스 매핑용 머티리얼
-	{
-		auto mat = Material::Create();
-		mat->GetDesc().name = "boxMat5";
-		mat->GetDesc().path = "@Virtual/Materials/boxMat5";
-		mat->diffuse = RESOURCE.Get<Texture>("toybox_diffuse");
-		mat->normal = RESOURCE.Get<Texture>("toybox_normal");
-		mat->height = RESOURCE.Get<Texture>("toybox_disp");
-		mat->shininess = 14.0f;
-		mat->emissionStrength = 0.0f;
-		mat->heightScale = 0.065f;
 		RESOURCE.Register<Material>(std::move(mat));
 	}
 
@@ -269,7 +237,7 @@ bool PBRScene::OnPlaceActors()
 		cubeObj->AddComponent(std::move(rb));
 
 		auto meshRenderer = StaticMeshRenderer::Create
-		(RESOURCE.Get<StaticMesh>("Cube"), RESOURCE.Get<Material>("boxMat5"));
+		(RESOURCE.Get<StaticMesh>("Cube"), RESOURCE.Get<Material>("toy_box"));
 		cubeObj->AddComponent(std::move(meshRenderer));
 		AddGameObject(std::move(cubeObj));
 	}
