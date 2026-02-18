@@ -135,6 +135,21 @@ void GameObject::RegisterComponentToScene(Component* component)
 		SCENE.GetActiveScene()->GetComponentRegistry()->RegisterComponent(component);
 }
 
+Script* GameObject::GetScript(const std::string& scriptName) const
+{
+	for (Script* script : m_scripts)
+	{
+		if (script && script->GetScriptName() == scriptName)
+			return script;
+	}
+	return nullptr;
+}
+
+const std::vector<Script*>& GameObject::GetScripts() const
+{
+	return m_scripts;
+}
+
 /*===================================//
 //   GameObject activation methods   //
 //===================================*/
@@ -265,3 +280,4 @@ void GameObject::EnsureInitialized()
 	if (!IsAwake())	  Awake();
 	if (!IsStarted()) Start();
 }
+

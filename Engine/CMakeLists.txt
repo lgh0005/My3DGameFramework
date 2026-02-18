@@ -231,7 +231,7 @@ set(ENGINE_SOURCES
    # Managers
    "Managers/TimeManager.h"         "Managers/TimeManager.cpp"
    "Managers/WindowManager.h"       "Managers/WindowManager.cpp"
-   "Managers/InputManager.h"        "Managers/InputManager.cpp"          "Managers/InputManager.inl"     
+   "Managers/InputManager.h"        "Managers/InputManager.cpp"    
    "Managers/ResourceManager.h"     "Managers/ResourceManager.cpp"       "Managers/ResourceManager.inl"
    "Managers/SceneManager.h"        "Managers/SceneManager.cpp"           "Managers/SceneManager.inl"
    "Managers/RenderManager.h"       "Managers/RenderManager.cpp"         "Managers/RenderManager.inl"

@@ -23,7 +23,8 @@ void LuaManager::Init()
 	auto globalScript = RESOURCE.Get<LuaScript>("Global");
 	if (globalScript)
 	{
-		sol::protected_function_result result = m_luaVirtualMachine.script(globalScript->GetCode());
+		std::string_view cleanCode = Utils::StripUTF8BOM(globalScript->GetCode());
+		sol::protected_function_result result = m_luaVirtualMachine.script(cleanCode);
 		if (!result.valid())
 		{
 			sol::error err = result;

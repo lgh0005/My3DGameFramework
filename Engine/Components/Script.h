@@ -18,6 +18,9 @@ public:
 
 	static ScriptUPtr Create();
 	void Bind(LuaScriptPtr scriptResource);
+	const std::string& GetScriptName() const;
+	bool MatchesType(uint32 targetHash) const { return m_classHash == targetHash; }
+	uint32 GetClassHash() const { return m_classHash; }
 
 /*==========================================//
 //    Component Life-cycle Overrides        //
@@ -52,8 +55,10 @@ public:
 
 private:
 	Script();
-
+	LuaScriptPtr m_script;
+	uint32 m_classHash	{ 0 };
 	sol::table m_self;
+
 	sol::function m_awakeFunc;
 	sol::function m_startFunc;
 	sol::function m_updateFunc;

@@ -14,13 +14,12 @@ ScriptUPtr Script::Create()
 void Script::Bind(LuaScriptPtr scriptResource)
 {
 	if (!scriptResource) return;
+    m_script = scriptResource;
 
 	auto& lua = LUA_MGR.GetLuaVM();
 
-    // 1. BOM 제거 후 정제된 코드 획득
+    // 1. 루아 파일 실행 (테이블 반환을 기대)
     auto cleanCode = Utils::StripUTF8BOM(scriptResource->GetCode());
-
-	// 1. 루아 파일 실행 (테이블 반환을 기대)
     sol::protected_function_result result = lua.do_string(cleanCode);
     if (!result.valid()) 
     {
@@ -29,17 +28,30 @@ void Script::Bind(LuaScriptPtr scriptResource)
         return;
     }
 
-    // 2. 클래스 정의 획득 및 상속 체인 형성
+    if (result.get_type() != sol::type::table)
+    {
+        LOG_ERROR
+        (
+            "Lua Script Error in '{}': Script must return a class table.", 
+            scriptResource->GetName()
+        );
+        return;
+    }
+
+    // 2. 다형성 지원을 위한 족보(TypeHashes) 캐싱
     sol::table scriptClass = result;
+    m_classHash = scriptClass.get_or("_ClassHash", 0u);
+
+    // 3. 클래스 정의 획득 및 상속 체인 형성
     m_self = lua.create_table();
     m_self[sol::metatable_key] = scriptClass;
 
-    // 3. 엔진 객체 바인딩 (루아에서 self.owner 등으로 접근 가능)
+    // 4. 엔진 객체 바인딩 (루아에서 self.owner 등으로 접근 가능)
     m_self["owner"] = GetOwner();
     m_self["transform"] = &GetTransform();
     m_self["component"] = this; // 스크립트 컴포넌트 자신
 
-    // 4. 라이프사이클 함수 캐싱
+    // 5. 라이프사이클 함수 캐싱
     m_awakeFunc = m_self["Awake"];
     m_startFunc = m_self["Start"];
     m_updateFunc = m_self["Update"];
@@ -49,13 +61,18 @@ void Script::Bind(LuaScriptPtr scriptResource)
     m_onEnableFunc = m_self["OnEnable"];
     m_onDisableFunc = m_self["OnDisable"];
 
-    // 5. 물리 이벤트 함수 캐싱
+    // 6. 물리 이벤트 함수 캐싱
     m_onTriggerEnterFunc = m_self["OnTriggerEnter"];
     m_onTriggerStayFunc = m_self["OnTriggerStay"];
     m_onTriggerExitFunc = m_self["OnTriggerExit"];
     m_onCollisionEnterFunc = m_self["OnCollisionEnter"];
     m_onCollisionStayFunc = m_self["OnCollisionStay"];
     m_onCollisionExitFunc = m_self["OnCollisionExit"];
+}
+
+const std::string& Script::GetScriptName() const
+{
+    return m_script ? m_script->GetDesc().GetName() : Utils::GetEmptyStr();
 }
 
 /*==========================================//

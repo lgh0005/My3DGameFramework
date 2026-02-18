@@ -76,17 +76,8 @@ public:
 	template<typename T> T* GetComponent() const;
 	template<typename T> void GetComponentsInChildren(std::vector<T*>& outComponents);
 	const std::vector<ComponentUPtr>& GetComponents() const { return m_components; }
-	// TODO : GetScript 추가 고려
-	//Script* GameObject::GetScript(const std::string& scriptName) const
-	//{
-	//	for (Script* script : m_scripts)
-	//	{
-	//		// Script 리소스의 이름을 비교하여 검색
-	//		if (script->GetScriptName() == scriptName)
-	//			return script;
-	//	}
-	//	return nullptr;
-	//}
+	Script* GetScript(const std::string& scriptName) const;
+	const std::vector<Script*>& GetScripts() const;
 
 private:
 	void RegisterComponentToScene(Component* component);

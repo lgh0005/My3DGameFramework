@@ -137,12 +137,8 @@ bool PBRScene::OnPlaceActors()
 		cameraObj->AddComponent(std::move(camera));
 
 		Script* scriptComp = cameraObj->AddComponent<Script>();
-		auto luaResource = RESOURCE.Get<LuaScript>("Test");
+		auto luaResource = RESOURCE.Get<LuaScript>("CameraContrller");
 		scriptComp->Bind(luaResource);
-
-		// 카메라 컨트롤러 생성 및 추가
-		/*auto cameraCtrl = CameraController::Create();
-		cameraObj->AddComponent(std::move(cameraCtrl));*/
 
 		AddGameObject(std::move(cameraObj));
 	}

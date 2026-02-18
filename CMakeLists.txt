@@ -19,6 +19,7 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${OUTPUT_DIR}")
 # 컴파일러 옵션
 if (MSVC)
     add_compile_definitions(NOMINMAX)
+    add_compile_options(/bigobj)
     add_compile_options(/utf-8 /W4 /MP /permissive- /Zc:__cplusplus)
 else()
     add_compile_options(-Wall -Wextra -finput-charset=UTF-8 -fexec-charset=UTF-8)
