@@ -103,6 +103,19 @@ struct MaterialDesc : public ResourceDesc
 	bool useGlossinessAsRoughness = false;
 };
 
+/*=============//
+//    Scene    //
+//=============*/
+CLASS_PTR(SceneDesc)
+struct SceneDesc : public SceneDesc
+{
+	virtual ~SceneDesc();
+	SceneDesc(const std::string& filePath = "", const std::string& rscName = "");
+	virtual ResourceType GetDescType() const override;
+
+	std::string path;
+};
+
 /*================//
 //      Model      //
 //================*/

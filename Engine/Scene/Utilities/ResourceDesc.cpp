@@ -48,6 +48,14 @@ MaterialDesc::MaterialDesc(const std::string& filePath, const std::string& rscNa
 MaterialDesc::~MaterialDesc() = default;
 ResourceType MaterialDesc::GetDescType() const { return ResourceType::Material; }
 
+/*=============//
+//    Scene    //
+//=============*/
+SceneDesc::SceneDesc(const std::string& filePath, const std::string& rscName)
+	: ResourceDesc(rscName), path(filePath) { }
+SceneDesc::~SceneDesc() = default;
+ResourceType SceneDesc::GetDescType() const { return ResourceType::Scene; }
+
 /*================//
 //      Model     //
 //================*/

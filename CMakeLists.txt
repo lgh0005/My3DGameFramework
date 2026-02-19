@@ -19,7 +19,7 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${OUTPUT_DIR}")
 # 컴파일러 옵션
 if (MSVC)
     add_compile_definitions(NOMINMAX)
-    add_compile_options(/bigobj)
+    add_compile_options(/bigobj) ### 이후에 비대해진 Engine.lib를 몇 개의 lib로 더 분산시킬 예정
     add_compile_options(/utf-8 /W4 /MP /permissive- /Zc:__cplusplus)
 else()
     add_compile_options(-Wall -Wextra -finput-charset=UTF-8 -fexec-charset=UTF-8)

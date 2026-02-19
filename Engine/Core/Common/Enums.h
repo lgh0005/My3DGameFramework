@@ -7,6 +7,7 @@ enum class ResourceType
 	CubeTexture,
 	Image,
 	Material,
+	Scene,
 	Model,
 	Texture,
 	Font,
