@@ -6,7 +6,6 @@ add_subdirectory(Core)
 # Level 2: Core에 의존하는 기초 시스템들
 add_subdirectory(InputSystem)
 add_subdirectory(Window)
-add_subdirectory(UI)
 
 # Level 3: 윈도우/기초에 의존하는 그래픽 및 AI
 add_subdirectory(Physics)
@@ -15,6 +14,7 @@ add_subdirectory(Graphics)
 add_subdirectory(AI)
 add_subdirectory(Audio)
 add_subdirectory(Editor)
+add_subdirectory(UI)
 
 # Level 4: 모든 시스템을 조립하는 게임 로직 레이어
 add_subdirectory(Scene)

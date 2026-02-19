@@ -7,6 +7,7 @@ set(TARGET_NAME Engine::${MODULE_NAME})
 set(SOURCES
 
     # Common
+    "Common/Aliases.h"
     "Common/Constants.h"
     "Common/Defines.h"
     "Common/Enums.h"
@@ -56,13 +57,17 @@ PRIVATE
 
 # 6. PCH (Precompiled Header) 설정
 # 옵션 A: 이 라이브러리만의 개별 PCH를 사용할 경우
-# target_precompile_headers(${LIB_NAME} PRIVATE "AiPch.h")
+target_precompile_headers(${LIB_NAME} PRIVATE "CorePch.h")
 
+# INFO : 이후에는 다른 lib에서는 이 옵션 B를 이용해서 중복되는
+# 헤더 선언을 피할 수 있도록 만들어야 한다.
 # 옵션 B: CoreLib에 정의된 PCH를 재사용할 경우 (빌드 속도 최적화)
 # target_precompile_headers(${LIB_NAME} REUSE_FROM CoreLib)
 
 # 7. 컴파일 설정
-target_compile_definitions(${LIB_NAME} PUBLIC
+target_compile_definitions(${LIB_NAME} 
+
+PUBLIC
     WINDOW_WIDTH=1200
     WINDOW_HEIGHT=800
     WINDOW_NAME="My3DGameFramework"
