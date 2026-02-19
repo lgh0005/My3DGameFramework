@@ -1,5 +1,5 @@
 ﻿# 0. 라이브러리 이름
-set(MODULE_NAME Audio) 
+set(MODULE_NAME Import) 
 set(LIB_NAME    ${MODULE_NAME}Lib)
 set(TARGET_NAME Engine::${MODULE_NAME})
 
@@ -19,7 +19,9 @@ source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${SOURCES})
 # 4. Include 경로 설정
 target_include_directories(${LIB_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
-# 5. 의존성 링크 : miniaudio.h
+# 5. 의존성 링크
+target_link_libraries(${LIB_NAME} PUBLIC
+)
 
 # 6. PCH (Precompiled Header) 설정
 # 옵션 A: 이 라이브러리만의 개별 PCH를 사용할 경우
