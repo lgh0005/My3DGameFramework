@@ -1,6 +1,7 @@
 ﻿#include "EnginePch.h"
 #include "Utils.h"
 #include <glm/gtx/matrix_decompose.hpp>
+#include "Math.h"
 
 /*============================//
 //   조명 연산 전용 유틸 함수   //
@@ -134,6 +135,11 @@ glm::vec3 Utils::GlmVec3Max(const glm::vec3& a, const glm::vec3& b)
 bool Utils::HasLength(const glm::vec3& v)
 {
 	return glm::length2(v) > epsilon2;
+}
+
+glm::vec3 MGF3D::Math::Normalize(const glm::vec3& v)
+{
+	return glm::vec3();
 }
 
 glm::vec3 Utils::SafeNormalize(const glm::vec3& v)

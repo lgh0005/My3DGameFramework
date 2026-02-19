@@ -8,19 +8,17 @@ set(SOURCES
 
     # Common
     "Common/Aliases.h"
-    "Common/Constants.h"
     "Common/Defines.h"
-    "Common/Enums.h"
     "Common/Types.h"
-
-    # Debug
-    "Debug/Logger.h"       "Debug/Logger.cpp"
-
-    # Interfaces
-    "Interfaces/Importer.h"       "Interfaces/Importer.cpp"
+    "Common/Constants.h"
 
     # Managers
-    "Managers/TimeManager.h"       "Managers/TimeManager.cpp"
+    "Managers/ThreadManager.h"      "Managers/ThreadManager.cpp"
+
+    # Math
+    "Math/Math.h"       "Math/Math.cpp" "Math/Math.inl"
+
+    # Memory
 
     # Runtime
     "Runtime/Application.h"       "Runtime/Application.cpp"   "Runtime/Application.inl"
@@ -44,13 +42,7 @@ target_include_directories(${LIB_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 target_link_libraries(${LIB_NAME} 
 
 PUBLIC
-
-PRIVATE
-    glad::glad
-    glm::glm
-    glfw
-
-    spdlog::spdlog
+        glm::glm  
 )
 
 # 6. PCH (Precompiled Header) 설정
@@ -69,4 +61,17 @@ PUBLIC
     WINDOW_WIDTH=1200
     WINDOW_HEIGHT=800
     WINDOW_NAME="My3DGameFramework"
+)
+
+# 7. 리소스 배포 (Resource Deployment)
+## TODO : 경로는 Engine/BuiltIn, Engine/Config에 있는 걸 배포해야 함.
+add_custom_command(TARGET CoreLib POST_BUILD
+    COMMENT "Deploying Engine Centralized Content to Bin..."
+
+    # 1. Config (Engine)
+    COMMAND ${CMAKE_COMMAND} -E make_directory "${OUTPUT_DIR}/Config"
+    COMMAND ${CMAKE_COMMAND} -E rm -rf "${OUTPUT_DIR}/Config/Engine" ## TODO : 이거 경로도 확인 필요
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+            "${CMAKE_CURRENT_SOURCE_DIR}/Config"
+            "${OUTPUT_DIR}/Config"
 )

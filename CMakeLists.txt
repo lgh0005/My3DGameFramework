@@ -27,7 +27,6 @@ endif()
 
 # 패키지 중앙 관리
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/CMake/Modules")
-
 message(STATUS "Finding Packages...")
 find_package(spdlog CONFIG REQUIRED)
 find_package(assimp CONFIG REQUIRED)
