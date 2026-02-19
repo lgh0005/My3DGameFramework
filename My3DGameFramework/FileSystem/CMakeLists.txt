@@ -1,16 +1,14 @@
 ﻿# 0. 라이브러리 이름
-set(MODULE_NAME AI) 
+set(MODULE_NAME FileSystem) 
 set(LIB_NAME    ${MODULE_NAME}Lib)
 set(TARGET_NAME Engine::${MODULE_NAME})
 
 # 1. 소스 파일 목록 정의
 set(SOURCES
 
-    # NavMesh
-    "NavMesh/NavigationManager.h" "NavMesh/NavigationManager.cpp"
-    "NavMesh/NavMeshFunctors.h" "NavMesh/NavMeshFunctors.cpp"
-
-    # Components
+    # Managers
+    "Managers/FileManager.h"       "Managers/FileManager.cpp"
+    "Managers/PathManager.h"       "Managers/PathManager.cpp"
 )
 
 # 2. 빌드 타겟 생성 및 별칭 등록
@@ -28,12 +26,6 @@ target_link_libraries(${LIB_NAME}
 
 PUBLIC
 
-PRIVATE
-    RecastNavigation::Recast
-    RecastNavigation::Detour
-    RecastNavigation::DetourCrowd
-    RecastNavigation::DetourTileCache
-    RecastNavigation::DebugUtils
 )
 
 # 6. PCH (Precompiled Header) 설정

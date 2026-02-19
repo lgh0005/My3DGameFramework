@@ -95,6 +95,21 @@ set(SOURCES
     "Textures/Texture.h"      "Textures/Texture.cpp"
     "Textures/CubeTexture.h"      "Textures/CubeTexture.cpp"
 
+    # Components
+    "Components/Animator.h"     "Components/Animator.cpp"
+    "Components/Camera.h"     "Components/Camera.cpp"
+    "Components/DirectionalLight.h"     "Components/DirectionalLight.cpp"
+    "Components/Light.h"     "Components/Light.cpp"
+    "Components/SpotLight.h"     "Components/SpotLight.cpp"
+    "Components/PointLight.h"     "Components/PointLight.cpp"
+    "Components/SkyLight.h"     "Components/SkyLight.cpp"
+
+    "Components/MeshOutline.h"     "Components/MeshOutline.cpp"
+    "Components/MeshRenderer.h"     "Components/MeshRenderer.cpp"
+    "Components/StaticMeshRenderer.h"     "Components/StaticMeshRenderer.cpp"
+    "Components/SkinnedMeshRenderer.h"     "Components/SkinnedMeshRenderer.cpp"
+    "Components/InstancedMeshRenderer.h"     "Components/InstancedMeshRenderer.cpp"
+
     # Utilities
     "Utilities/IBLUtils.h"      "Utilities/IBLUtils.cpp"
 )

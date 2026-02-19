@@ -1,16 +1,13 @@
 ﻿# 0. 라이브러리 이름
-set(MODULE_NAME AI) 
+set(MODULE_NAME Serializers) 
 set(LIB_NAME    ${MODULE_NAME}Lib)
 set(TARGET_NAME Engine::${MODULE_NAME})
 
 # 1. 소스 파일 목록 정의
 set(SOURCES
 
-    # NavMesh
-    "NavMesh/NavigationManager.h" "NavMesh/NavigationManager.cpp"
-    "NavMesh/NavMeshFunctors.h" "NavMesh/NavMeshFunctors.cpp"
-
-    # Components
+	"JsonParser.h"		"JsonParser.cpp"    "JsonParser.inl"
+	"YamlParser.h"		"YamlParser.cpp"    "YamlParser.inl"
 )
 
 # 2. 빌드 타겟 생성 및 별칭 등록
@@ -25,15 +22,11 @@ target_include_directories(${LIB_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
 # 5. 의존성 링크
 target_link_libraries(${LIB_NAME} 
-
 PUBLIC
-
+    
 PRIVATE
-    RecastNavigation::Recast
-    RecastNavigation::Detour
-    RecastNavigation::DetourCrowd
-    RecastNavigation::DetourTileCache
-    RecastNavigation::DebugUtils
+    nlohmann_json::nlohmann_json
+    ryml::ryml
 )
 
 # 6. PCH (Precompiled Header) 설정

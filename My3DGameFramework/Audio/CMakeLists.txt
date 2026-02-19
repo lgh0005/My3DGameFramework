@@ -6,9 +6,15 @@ set(TARGET_NAME Engine::${MODULE_NAME})
 # 1. 소스 파일 목록 정의
 set(SOURCES
 
-    ## TODO
+    # Managers
     "Managers/AudioManager.h" "Managers/AudioManager.cpp"
+
+    # Resources
     "Resources/AudioClip.h" "Resources/AudioClip.cpp"
+
+    # Components
+    "Components/AudioListener.h" "Components/AudioListener.cpp"
+    "Components/AudioSource.h" "Components/AudioSource.cpp"
 )
 
 # 2. 빌드 타겟 생성 및 별칭 등록

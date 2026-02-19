@@ -6,11 +6,7 @@ set(TARGET_NAME Engine::${MODULE_NAME})
 # 1. 소스 파일 목록 정의
 set(SOURCES
 
-    # Parsers
-    "Parsers/JsonParser.h"      "Parsers/JsonParser.cpp"    "Parsers/JsonParser.inl"
-    "Parsers/YamlParser.h"      "Parsers/YamlParser.cpp"    "Parsers/YamlParser.inl"
-
-    # Pipelines
+    # Common
     "Pipelines/Common/CullingPass.h"  "Pipelines/Common/CullingPass.cpp"
     "Pipelines/Common/JoltDebugGizmoPass.h"  "Pipelines/Common/JoltDebugGizmoPass.cpp"
     "Pipelines/Common/PostProcessPass.h"  "Pipelines/Common/PostProcessPass.cpp"
@@ -20,18 +16,28 @@ set(SOURCES
     "Pipelines/Common/UIScreenSpacePass.h"  "Pipelines/Common/UIScreenSpacePass.cpp"
     "Pipelines/Common/UIWorldSpacePass.h"  "Pipelines/Common/UIWorldSpacePass.cpp"
 
+    # Post-processing
     "Pipelines/PostProcessing/PostProcessEffect.h"  "Pipelines/PostProcessing/PostProcessEffect.cpp"
-
     "Pipelines/PostProcessing/Bloom/DOFEffect.h"  "Pipelines/PostProcessing/Bloom/DOFEffect.cpp"
     "Pipelines/PostProcessing/Bloom/GaussianBloomEffect.h"  "Pipelines/PostProcessing/Bloom/GaussianBloomEffect.cpp"
     "Pipelines/PostProcessing/Bloom/KawaseBloomEffect.h"  "Pipelines/PostProcessing/Bloom/KawaseBloomEffect.cpp"
     "Pipelines/PostProcessing/Bloom/LensFlareEffect.h"  "Pipelines/PostProcessing/Bloom/LensFlareEffect.cpp"
-
     "Pipelines/PostProcessing/Display/DisplayMappingEffects.h"   "Pipelines/PostProcessing/Display/DisplayMappingEffects.cpp"
-
     "Pipelines/PostProcessing/World/MotionBlurEffect.h"   "Pipelines/PostProcessing/World/MotionBlurEffect.cpp"
     "Pipelines/PostProcessing/World/OutlineEffect.h"   "Pipelines/PostProcessing/World/OutlineEffect.cpp"
     "Pipelines/PostProcessing/World/WorldSpaceEffects.h"   "Pipelines/PostProcessing/World/WorldSpaceEffects.cpp"
+
+    # SRP
+    "Pipelines/SRP/RenderPasses/StandardDeferredLightingPass.h"     "Pipelines/SRP/RenderPasses/StandardDeferredLightingPass.cpp" 
+    "Pipelines/SRP/RenderPasses/StandardGeometryPass.h"     "Pipelines/SRP/RenderPasses/StandardGeometryPass.cpp" 
+    "Pipelines/SRP/StandardGlobalUniforms.h"     "Pipelines/SRP/StandardGlobalUniforms.cpp" 
+    "Pipelines/SRP/StandardRenderPipeline.h"     "Pipelines/SRP/StandardRenderPipeline.cpp" 
+
+    # URP
+    "Pipelines/URP/RenderPasses/UniversalDeferredLightingPass.h"     "Pipelines/URP/RenderPasses/UniversalDeferredLightingPass.cpp" 
+    "Pipelines/URP/RenderPasses/UniversalGeometryPass.h"     "Pipelines/URP/RenderPasses/UniversalGeometryPass.cpp" 
+    "Pipelines/URP/UniversalGlobalUniforms.h"     "Pipelines/URP/UniversalGlobalUniforms.cpp" 
+    "Pipelines/URP/UniversalRenderPipeline.h"     "Pipelines/URP/UniversalRenderPipeline.cpp" 
 
     # Utilities
     "Utilities/LuaBindings.h"       "Utilities/LuaBindings.cpp"
@@ -52,9 +58,6 @@ target_link_libraries(${LIB_NAME}
 
 PUBLIC
 
-PRIVATE
-    nlohmann_json::nlohmann_json
-    ryml::ryml
 )
 
 # 6. PCH (Precompiled Header) 설정

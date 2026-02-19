@@ -22,6 +22,14 @@ set(SOURCES
     "Physics/JoltDebugRenderer.h"             "Physics/JoltDebugRenderer.cpp"
     "Physics/JoltGizmo.h"                     "Physics/JoltGizmo.cpp"
     "Physics/GizmoCommand.h"                  "Physics/GizmoCommand.cpp"
+
+    # Components
+    "Components/Collider.h"          "Components/Collider.cpp"
+    "Components/BoxCollider.h"          "Components/BoxCollider.cpp"
+    "Components/CapsuleCollider.h"          "Components/CapsuleCollider.cpp"
+    "Components/SphereCollider.h"          "Components/SphereCollider.cpp"
+    "Components/PhysicsComponent.h"     "Components/PhysicsComponent.cpp"
+    "Components/Rigidbody.h"     "Components/Rigidbody.cpp"
 )
 
 # 2. 빌드 타겟 생성 및 별칭 등록

@@ -4,8 +4,12 @@
 add_subdirectory(Core)
 
 # Level 2: Core에 의존하는 기초 시스템들
-add_subdirectory(InputSystem)
 add_subdirectory(Window)
+add_subdirectory(Object)
+add_subdirectory(Serializers)
+add_subdirectory(InputSystem)
+add_subdirectory(FileSystem)
+add_subdirectory(ResourceSystem)
 
 # Level 3: 윈도우/기초에 의존하는 그래픽 및 AI
 add_subdirectory(Physics)

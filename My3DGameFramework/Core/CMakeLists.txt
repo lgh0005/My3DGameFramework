@@ -18,8 +18,6 @@ set(SOURCES
 
     # Interfaces
     "Interfaces/Importer.h"       "Interfaces/Importer.cpp"
-    "Interfaces/Object.h"       "Interfaces/Object.cpp"
-    "Interfaces/Resource.h"       "Interfaces/Resource.cpp"
 
     # Managers
     "Managers/TimeManager.h"       "Managers/TimeManager.cpp"
