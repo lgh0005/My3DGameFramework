@@ -7,6 +7,8 @@ set(TARGET_NAME Engine::${MODULE_NAME})
 set(SOURCES
 
     ## TODO
+    "Managers/AudioManager.h" "Managers/AudioManager.cpp"
+    "Resources/AudioClip.h" "Resources/AudioClip.cpp"
 )
 
 # 2. 빌드 타겟 생성 및 별칭 등록

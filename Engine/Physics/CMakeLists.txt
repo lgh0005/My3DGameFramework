@@ -6,7 +6,22 @@ set(TARGET_NAME Engine::${MODULE_NAME})
 # 1. 소스 파일 목록 정의
 set(SOURCES
 
-    ## TODO
+    # Managers
+    "Managers/PhysicsManager.h"               "Managers/PhysicsManager.cpp"
+
+    # Physics Core / Listeners / Interfaces
+    "Physics/BPLayerInterface.h"              "Physics/BPLayerInterface.cpp"
+    "Physics/PhysicsBodyActivationListener.h" "Physics/PhysicsBodyActivationListener.cpp"
+    "Physics/PhysicsContactListener.h"        "Physics/PhysicsContactListener.cpp"
+    "Physics/PhysicsCallbacks.h"              "Physics/PhysicsCallbacks.cpp"
+    "Physics/PhysicsConfig.h"                 "Physics/PhysicsConfig.cpp"
+    "Physics/PhysicsFilters.h"                "Physics/PhysicsFilters.cpp"
+    "Physics/RigidbodyConstraint.h"           "Physics/RigidbodyConstraint.cpp"
+
+    # Jolt Debug / Gizmos
+    "Physics/JoltDebugRenderer.h"             "Physics/JoltDebugRenderer.cpp"
+    "Physics/JoltGizmo.h"                     "Physics/JoltGizmo.cpp"
+    "Physics/GizmoCommand.h"                  "Physics/GizmoCommand.cpp"
 )
 
 # 2. 빌드 타겟 생성 및 별칭 등록
@@ -20,7 +35,10 @@ source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${SOURCES})
 target_include_directories(${LIB_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
 # 5. 의존성 링크
-target_link_libraries(${LIB_NAME} PUBLIC
+target_link_libraries(${LIB_NAME} 
+PUBLIC
+
+PRIVATE
     Jolt::Jolt
 )
 

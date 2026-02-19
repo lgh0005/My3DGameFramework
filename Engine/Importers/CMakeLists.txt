@@ -5,8 +5,15 @@ set(TARGET_NAME Engine::${MODULE_NAME})
 
 # 1. 소스 파일 목록 정의
 set(SOURCES
-
-    ## TODO
+	"AnimationImporter.h" "AnimationImporter.cpp"
+    "AudioImporter.h"     "AudioImporter.cpp"
+    "FontImporter.h"      "FontImporter.cpp"
+    "MaterialImporter.h"  "MaterialImporter.cpp"
+    "ModelImporter.h"     "ModelImporter.cpp"
+    "SceneImporter.h"     "SceneImporter.cpp"
+    "ScriptImporter.h"    "ScriptImporter.cpp"
+    "ShaderImporter.h"    "ShaderImporter.cpp"
+    "TextureImporter.h"   "TextureImporter.cpp"
 )
 
 # 2. 빌드 타겟 생성 및 별칭 등록

@@ -7,7 +7,7 @@ set(TARGET_NAME Engine::${MODULE_NAME})
 set(SOURCES
 
     "NavMesh/NavigationManager.h" "NavMesh/NavigationManager.cpp"
-    "NavMesh/NavMeshFunctor.h" "NavMesh/NavMeshFunctor.cpp"
+    "NavMesh/NavMeshFunctors.h" "NavMesh/NavMeshFunctors.cpp"
 )
 
 # 2. 빌드 타겟 생성 및 별칭 등록
@@ -21,7 +21,11 @@ source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${SOURCES})
 target_include_directories(${LIB_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
 # 5. 의존성 링크
-target_link_libraries(${LIB_NAME} PUBLIC
+target_link_libraries(${LIB_NAME} 
+
+PUBLIC
+
+PRIVATE
     RecastNavigation::Recast
     RecastNavigation::Detour
     RecastNavigation::DetourCrowd

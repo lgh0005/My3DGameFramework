@@ -6,7 +6,12 @@ set(TARGET_NAME Engine::${MODULE_NAME})
 # 1. 소스 파일 목록 정의
 set(SOURCES
 
-    ## TODO
+    # Managers
+    "Managers/LuaManager.h"     "Managers/LuaManager.cpp"
+    "Managers/LuaParser.h"     "Managers/LuaParser.cpp"     "Managers/LuaParser.inl"
+
+    # Resource
+    "Resources/LuaScript.h"     "Resources/LuaScript.cpp"
 )
 
 # 2. 빌드 타겟 생성 및 별칭 등록
@@ -21,6 +26,8 @@ target_include_directories(${LIB_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
 # 5. 의존성 링크
 target_link_libraries(${LIB_NAME} PUBLIC
+
+PRIVATE
     lua
     sol2::sol2
 )
