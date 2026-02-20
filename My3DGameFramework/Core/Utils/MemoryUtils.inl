@@ -1,5 +1,5 @@
 ﻿#pragma once
-#include "Math/Math.h"
+#include "Common/Math.h"
 
 namespace MGF3D
 {
@@ -15,6 +15,6 @@ namespace MGF3D
 
 	constexpr usize MemoryUtils::GetAlignment(usize alignment) noexcept
 	{
-		return Math::Max(alignment, DEFAULT_ALIGNMENT);
+		return Math::Max(alignment, DefaultAlignment);
 	}
 }

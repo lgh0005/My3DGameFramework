@@ -5,10 +5,11 @@
 namespace MGF3D
 {
 	template <typename T>
-	SlabAllocator<T>::SlabAllocator() noexcept : m_pool(nullptr) { }
-
-	template <typename T>
-	SlabAllocator<T>::SlabAllocator(SlabMemoryPool* pool) noexcept : m_pool(pool) { }
+	SlabAllocator<T>::SlabAllocator(SlabMemoryPool* pool) noexcept
+	{
+		if (pool) m_pool = pool;
+		else m_pool = MemoryManager::Instance().GetSlabPool(sizeof(T));
+	}
 
 	template <typename T>
 	template <typename U>

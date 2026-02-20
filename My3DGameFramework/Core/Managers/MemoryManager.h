@@ -17,15 +17,16 @@ namespace MGF3D
 		void* Allocate(usize size) noexcept;
 		void  Deallocate(void* ptr, usize size) noexcept;
 
-		LinearMemoryPool* GetFramePool() const noexcept { return m_framePool; }
+		SlabMemoryPool* GetSlabPool(usize size) const noexcept;
+		LinearMemoryPool* GetFramePool() const noexcept;
 
 	private:
-		// 힙 영역 멤버들
+		// Slab 기반 메모리 풀 영역 멤버들
 		int32 GetPoolIndex(usize size) const noexcept; // 크기에 따른 풀의 인덱스를 계산합니다
 		byte* m_baseBuffer; // 1. 전역 힙 버퍼의 시작 주소
-		SlabMemoryPool* m_pools[SLAB_BUCKET_COUNT]; // 2. 관리 중인 버킷(Slab)들
+		SlabMemoryPool* m_pools[MGF3D::SlabBucketCount]; // 2. 관리 중인 버킷(Slab)들
 
-		// 스택 영역 멤버들
+		// Linear 기반 메모리 풀 영역 멤버들
 		byte* m_frameBuffer;
 		LinearMemoryPool* m_framePool;
 	};

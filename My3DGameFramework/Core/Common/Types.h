@@ -1,4 +1,6 @@
 ﻿#pragma once
+#include <cstdint>
+#include <string_view>
 
 namespace MGF3D
 {
@@ -14,6 +16,19 @@ namespace MGF3D
 	using uint32 = std::uint32_t;
 	using uint64 = std::uint64_t;
 	using usize  = std::size_t;
+	
+	/*====================================//
+	//   default engine charactor types   //
+	//====================================*/
+	using char8  = char;     // 고정 8비트  (UTF-8용)
+	using char16 = char16_t; // 고정 16비트 (UTF-16용)
+	using char32 = char32_t; // 고정 32비트 (UTF-32용)
+
+	/*=================================//
+	//   default engine string types   //
+	//=================================*/
+	using cstr = const char*;
+	using strview = std::string_view;
 
 	/*==============================//
 	//      Memory-related types    //
@@ -22,12 +37,6 @@ namespace MGF3D
 	using uintptr   = std::uintptr_t;
 	using intptr    = std::intptr_t;
 	using alignment = std::align_val_t;
-
-	/*=================================//
-	//   default engine string types   //
-	//=================================*/
-	using cstr = const char*;
-	using strview = std::string_view;
 
 	/*===============================//
 	//   default engine math types   //
@@ -39,10 +48,4 @@ namespace MGF3D
 	using mat4   = glm::mat4;
 	using quat   = glm::quat;
 	using color  = vec4;
-
-	/*=================================//
-	//   default engine thread tools   //
-	//=================================*/
-	using ThreadMutex = std::mutex;
-	using ScopedLock = std::lock_guard<std::mutex>;
 }

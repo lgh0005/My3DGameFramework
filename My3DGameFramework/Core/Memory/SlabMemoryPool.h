@@ -29,7 +29,7 @@ namespace MGF3D
 			void* buffer,
 			usize slabSize,
 			usize slotSize,
-			usize alignment = MGF3D::DEFAULT_ALIGNMENT
+			usize alignment = MGF3D::DefaultAlignment
 		) noexcept;
 		~SlabMemoryPool();
 

@@ -3,26 +3,11 @@
 /*=============================//
 //    C++ standard libraries   //
 //=============================*/
-#include <cstdint>
-#include <climits>
 #include <cmath>
 #include <cstdarg>
-#include <string>
-#include <string_view>
-#include <vector>
-#include <array>
-#include <unordered_map>
-#include <optional>
-#include <memory>
 #include <algorithm>
-#include <functional>
 #include <type_traits>
-#include <thread>
-#include <mutex>
-#include <random>
-#include <filesystem>
-#include <fstream>
-#include <sstream>
+#include <memory>
 
 /*=============================//
 //    External third-parties   //
@@ -44,7 +29,15 @@
 /*============================//
 //    Engine common headers   //
 //============================*/
-#include "Common/Defines.h"   
-#include "Common/Aliases.h"   
+#include "Common/Defines.h"     
 #include "Common/Types.h"     
 #include "Common/Constants.h"
+#include "Common/Math.h"
+
+#include "Common/Pointers.h"
+#include "Common/Nullable.h"
+#include "Common/Delegates.h"
+#include "Common/Sync.h"
+#include "Common/Random.h"
+#include "Common/Time.h"
+

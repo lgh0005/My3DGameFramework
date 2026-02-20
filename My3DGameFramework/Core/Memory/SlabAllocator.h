@@ -19,8 +19,7 @@ namespace MGF3D
 
 	public:
 		// 기본 생성자 및 풀 지정 생성자
-		SlabAllocator() noexcept;
-		SlabAllocator(SlabMemoryPool* pool) noexcept;
+		SlabAllocator(SlabMemoryPool* pool = nullptr) noexcept;
 
 		// 복사 생성자
 		template <typename U>

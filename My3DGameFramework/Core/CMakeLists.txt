@@ -7,23 +7,35 @@ set(TARGET_NAME Engine::${MODULE_NAME})
 set(SOURCES
 
     # Common
-    "Common/Aliases.h"
+    
     "Common/Defines.h"
     "Common/Types.h"
     "Common/Constants.h"
+    "Common/Math.h"       "Common/Math.cpp"     "Common/Math.inl"
 
     # Managers
     "Managers/ThreadManager.h"      "Managers/ThreadManager.cpp"
     "Managers/MemoryManager.h"      "Managers/MemoryManager.cpp"
-
-    # Math
-    "Math/Math.h"       "Math/Math.cpp" "Math/Math.inl"
 
     # Memory
     "Memory/LinearMemoryPool.h"           "Memory/LinearMemoryPool.cpp"
     "Memory/LinearAllocator.h"           "Memory/LinearAllocator.cpp"      "Memory/LinearAllocator.inl" 
     "Memory/SlabMemoryPool.h"           "Memory/SlabMemoryPool.cpp"
     "Memory/SlabAllocator.h"           "Memory/SlabAllocator.cpp"      "Memory/SlabAllocator.inl" 
+
+    # Stream
+    "Stream/Stream.h"            "Stream/Stream.cpp"
+    "Stream/FilePath.h"          "Stream/FilePath.cpp" 
+    "Stream/FileStream.h"        "Stream/FileStream.cpp" 
+
+    # Containers
+    "Containers/IContainer.h"       "Containers/IContainer.cpp"
+    "Containers/Slab/SVector.h"     "Containers/Slab/SVector.cpp"    "Containers/Slab/SVector.inl"
+    "Containers/Slab/SSet.h"     "Containers/Slab/SSet.cpp"    "Containers/Slab/SSet.inl"
+    "Containers/Slab/SMap.h"     "Containers/Slab/SMap.cpp"    "Containers/Slab/SMap.inl"
+
+
+    # String
 
     # Runtime
     #"Runtime/Application.h"       "Runtime/Application.cpp"   "Runtime/Application.inl"

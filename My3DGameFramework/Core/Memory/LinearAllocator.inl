@@ -1,11 +1,16 @@
 ﻿#pragma once
+#include "Managers/MemoryManager.h"
 #include "Utils/MemoryUtils.h"
 
 namespace MGF3D
 {
 	// 생성자
 	template <typename T>
-	LinearAllocator<T>::LinearAllocator(LinearMemoryPool* pool) noexcept : m_pool(pool) {}
+	LinearAllocator<T>::LinearAllocator(LinearMemoryPool* pool) noexcept
+	{
+		if (pool) m_pool = pool;
+		else m_pool = MemoryManager::Instance().GetFramePool();
+	}
 
 	// 템플릿 복사 생성자
 	template <typename T>
@@ -35,7 +40,13 @@ namespace MGF3D
 		if (!p) return;
 
 		// 주소가 우리 풀 영역이 아니라면 힙에서 온 녀석입니다.
-		if (m_pool && !m_pool->IsInPool(p)) ::operator delete(p);
-		else if (!m_pool) ::operator delete(p);
+		if (m_pool)
+		{
+			if (!m_pool->IsInPool(p)) ::operator delete(p);
+		}
+		else
+		{
+			::operator delete(p);
+		}
 	}
 }
