@@ -1,9 +1,9 @@
 ﻿#pragma once
 #include "Containers/TVector.h"
-#include "Memory/SlabAllocator.h"
+#include "Memory/LinearAllocator.h"
 
 namespace MGF3D
 {
     template<typename T>
-    using SVector = TVector<T, SlabAllocator<T>>;
+    using LVector = TVector<T, LinearAllocator<T>>;
 }

@@ -41,9 +41,9 @@ namespace MGF3D
 	public:
 		static void ReportFailure
 		(
-			const char* condition, 
-			const char* message, 
-			const char* file, int32 line
+			cstr* condition, 
+			cstr* message,
+			cstr* file, int32 line
 		);
 	};
 }

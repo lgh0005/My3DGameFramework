@@ -1,10 +1,9 @@
 ﻿#pragma once
 #include "Containers/TSet.h"
-#include "Memory/SlabAllocator.h"
+#include "Memory/LinearAllocator.h"
 
 namespace MGF3D
 {
-    // 중복 없는 리소스 ID나 상태 관리용 Slab Set
     template<typename K, typename Hash = std::hash<K>, typename KeyEqual = std::equal_to<K>>
-    using SSet = TSet<K, SlabAllocator<K>, Hash, KeyEqual>;
+    using LSet = TSet<K, LinearAllocator<K>, Hash, KeyEqual>;
 }

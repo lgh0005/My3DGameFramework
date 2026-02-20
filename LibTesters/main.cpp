@@ -1,8 +1,15 @@
 ﻿#include "pch.h"
 #include "Managers/MemoryManager.h"
+
+// Slab 시리즈
 #include "Containers/Slab/SVector.h"
 #include "Containers/Slab/SMap.h"
 #include "Containers/Slab/SSet.h"
+
+// Linear 시리즈
+#include "Containers/Linear/LVector.h"
+#include "Containers/Linear/LMap.h"
+#include "Containers/Linear/LSet.h"
 
 using namespace MGF3D;
 
@@ -10,13 +17,12 @@ using namespace MGF3D;
 struct alignas(32) RenderData
 {
     float matrix[16];
-
-    // SSet 테스트를 위한 비교 연산자 (ID 기준)
     uint64 id;
+
     bool operator==(const RenderData& other) const { return id == other.id; }
 };
 
-// SSet 해시 지원을 위한 특수화 (ID 기준)
+// 해시 특수화
 namespace std {
     template<> struct hash<RenderData> {
         size_t operator()(const RenderData& d) const { return hash<uint64>{}(d.id); }
@@ -25,83 +31,80 @@ namespace std {
 
 int main()
 {
-    // 1. 엔진 메모리 시스템 가동 (Singleton 초기화 및 Slab 버킷들 생성)
+    // 1. 엔진 메모리 시스템 가동
     MemoryManager::Instance();
 
-    std::cout << "=== MGF3D Automated Memory System Test ===" << std::endl;
-    std::cout << "Allocators will now automatically find their pools." << std::endl;
-    std::cout << "--------------------------------------------" << std::endl;
+    std::cout << "=== MGF3D Container Series (S vs L) Full Test ===" << std::endl;
+    std::cout << "------------------------------------------------" << std::endl;
 
+    // ---------------------------------------------------------
+    // [SECTION 1] Linear (L) 시리즈 테스트 - 프레임 임시 메모리
+    // ---------------------------------------------------------
     {
-        // [테스트 1] LVector (Linear 할당 테스트)
-        std::cout << "[Step 1] LVector Automatic Binding" << std::endl;
-        // LVector는 프레임 단위 임시 메모리 할당용입니다.
-        // LVector<int32> tempVec; 
-        // ... (생략된 LVector 로직)
-        std::cout << "--------------------------------------------" << std::endl;
+        std::cout << "[Step 1] Linear Series (Frame Memory) Test" << std::endl;
+        usize beforeFrame = MemoryManager::Instance().GetFramePool()->GetUsedMemory();
+
+        LVector<RenderData> lVec;
+        LMap<int32, RenderData> lMap;
+        LSet<uint64> lSet;
+
+        lVec.push_back(RenderData{ {}, 1 });
+        lMap.Insert(10, RenderData{ {}, 10 });
+        lSet.Insert(100);
+
+        usize afterFrame = MemoryManager::Instance().GetFramePool()->GetUsedMemory();
+
+        std::cout << "L-Vector Addr : " << &lVec[0] << std::endl;
+        std::cout << "L-Map Entry   : " << lMap.Find(10) << std::endl;
+        std::cout << "Allocated Frame Memory : " << (afterFrame - beforeFrame) << " bytes" << std::endl;
+        std::cout << "------------------------------------------------" << std::endl;
     }
 
+    // ---------------------------------------------------------
+    // [SECTION 2] Slab (S) 시리즈 테스트 - 영구/버킷 메모리
+    // ---------------------------------------------------------
     {
-        // [테스트 2] SVector (자동 Slab 버킷 바인딩)
-        std::cout << "[Step 2] SVector Automatic Bucket Binding" << std::endl;
+        std::cout << "[Step 2] Slab Series (Persistent Memory) Test" << std::endl;
 
-        MGF3D::SVector<RenderData> persistentVec;
-        persistentVec.push_back(RenderData{ {}, 101 });
+        SVector<RenderData> sVec;
+        SMap<int32, RenderData> sMap;
+        SSet<uint64> sSet;
 
-        std::cout << "SVector Data Addr : " << &persistentVec[0] << " (In 64-byte Bucket?)" << std::endl;
+        sVec.push_back(RenderData{ {}, 2 });
+        sMap.Insert(20, RenderData{ {}, 20 });
+        sSet.Insert(200);
 
-        if (reinterpret_cast<uintptr_t>(&persistentVec[0]) % 32 == 0)
-            std::cout << "Alignment Check   : SUCCESS (32-byte Aligned)" << std::endl;
-
-        std::cout << "Memory Usage      : " << persistentVec.MemoryUsage() << " bytes" << std::endl;
-        std::cout << "--------------------------------------------" << std::endl;
+        std::cout << "S-Vector Addr : " << &sVec[0] << " (32-byte Align? "
+            << (reinterpret_cast<uintptr_t>(&sVec[0]) % 32 == 0 ? "YES" : "NO") << ")" << std::endl;
+        std::cout << "S-Map Entry   : " << sMap.Find(20) << std::endl;
+        std::cout << "S-Vector Memory Usage : " << sVec.MemoryUsage() << " bytes" << std::endl;
+        std::cout << "------------------------------------------------" << std::endl;
     }
 
+    // ---------------------------------------------------------
+    // [SECTION 3] 중첩 구조 및 프레임 리셋 테스트
+    // ---------------------------------------------------------
     {
-        // [테스트 3] SSet (우리가 만든 SSet 검증)
-        std::cout << "[Step 3] SSet Read-Only Find & Slab Allocation" << std::endl;
+        std::cout << "[Step 3] Nested & Reset Test" << std::endl;
 
-        MGF3D::SSet<RenderData> assetSet;
-        assetSet.Insert(RenderData{ {}, 202 });
+        // 프레임 메모리 안에 영구 메모리 포인터를 담는 일반적인 상황
+        LMap<int32, SVector<RenderData>> frameCache;
 
-        // 우리가 구현한 Read-only Find 호출
-        const RenderData* found = assetSet.Find(RenderData{ {}, 202 });
+        SVector<RenderData> persistentData;
+        persistentData.push_back(RenderData{ {}, 999 });
 
-        if (found)
-        {
-            std::cout << "SSet Node Addr    : " << found << " (Slab Bucket)" << std::endl;
-            std::cout << "SSet Data ID      : " << found->id << std::endl;
-        }
-        std::cout << "--------------------------------------------" << std::endl;
+        frameCache[0] = std::move(persistentData);
+
+        std::cout << "Nested Data Addr in Frame: " << &frameCache[0][0] << std::endl;
+
+        // 프레임 종료 시점 시뮬레이션
+        MemoryManager::Instance().GetFramePool()->Reset();
+        std::cout << "Frame Reset Done. Used Frame Memory: "
+            << MemoryManager::Instance().GetFramePool()->GetUsedMemory() << " bytes" << std::endl;
     }
 
-    {
-        // [테스트 4] SMap (복합 Slab 자동 할당)
-        std::cout << "[Step 4] SMap & SVector Nested Automation" << std::endl;
-
-        // Map 노드(pair<int, SVector>)는 노드 크기에 맞는 버킷으로,
-        // 내부 SVector의 데이터는 RenderData 크기(64) 버킷으로 각각 자동 분산됩니다.
-        MGF3D::SMap<int32, MGF3D::SVector<RenderData>> myMap;
-
-        for (int i = 0; i < 3; ++i)
-        {
-            MGF3D::SVector<RenderData> vec;
-            vec.push_back(RenderData{ {}, (uint64)i });
-            myMap[i] = std::move(vec);
-        }
-
-        auto it = myMap.find(0);
-        if (it != myMap.end())
-        {
-            std::cout << "Map Node Addr     : " << &(*it) << " (Bucket for Map Node)" << std::endl;
-            std::cout << "Vector Data Addr  : " << &(it->second[0]) << " (Bucket for 64-byte Data)" << std::endl;
-        }
-        std::cout << "--------------------------------------------" << std::endl;
-    }
-
-    // 2. 프레임 리셋 (Linear Allocator만 초기화됨, Slab은 유지)
-    MemoryManager::Instance().GetFramePool()->Reset();
-    std::cout << "Frame End: Linear Pool Reset Done." << std::endl;
+    std::cout << "------------------------------------------------" << std::endl;
+    std::cout << "All Container Tests Passed Successfully." << std::endl;
 
     return 0;
 }

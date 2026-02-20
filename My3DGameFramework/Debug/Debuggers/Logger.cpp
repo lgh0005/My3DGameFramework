@@ -15,7 +15,7 @@ namespace MGF3D
 		spdlog::set_pattern("%^[%T] %n: %v%$");
 		m_logger = spdlog::stdout_color_mt("MGF3D");
 		m_logger->set_level(spdlog::level::trace);
-		LOG_INFO("Logger : Logger Started. [The Beginning]");
+		MGF_LOG_INFO("Logger : Logger Started. [The Beginning]");
 	}
 
 	void Logger::Flush()
@@ -26,7 +26,7 @@ namespace MGF3D
 	void Logger::Clear()
 	{
 		if (!m_logger) return;
-		LOG_INFO("Logger : Logger Cleared. [The End]");
+		MGF_LOG_INFO("Logger : Logger Cleared. [The End]");
 		m_logger.reset();
 		spdlog::shutdown();
 	}

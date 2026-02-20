@@ -11,7 +11,14 @@ set(SOURCES
     "Common/Defines.h"
     "Common/Types.h"
     "Common/Constants.h"
+    "Common/Nullable.h"
+    "Common/Pointers.h"
+    "Common/Random.h"
+    "Common/Sync.h"
+
     "Common/Math.h"       "Common/Math.cpp"     "Common/Math.inl"
+    "Common/Clock.h"    "Common/Clock.cpp"
+    "Common/Random.h"    "Common/Random.cpp"
 
     # Managers
     "Managers/ThreadManager.h"      "Managers/ThreadManager.cpp"
@@ -29,10 +36,18 @@ set(SOURCES
     "Stream/FileStream.h"        "Stream/FileStream.cpp" 
 
     # Containers
-    "Containers/IContainer.h"       "Containers/IContainer.cpp"
-    "Containers/Slab/SVector.h"     "Containers/Slab/SVector.cpp"    "Containers/Slab/SVector.inl"
-    "Containers/Slab/SSet.h"     "Containers/Slab/SSet.cpp"    "Containers/Slab/SSet.inl"
-    "Containers/Slab/SMap.h"     "Containers/Slab/SMap.cpp"    "Containers/Slab/SMap.inl"
+     "Containers/IContainer.h"       "Containers/IContainer.cpp"
+     "Containers/TMap.h"       "Containers/TMap.cpp"   "Containers/TMap.inl"
+     "Containers/TSet.h"       "Containers/TSet.cpp"   "Containers/TSet.inl"
+     "Containers/TVector.h"       "Containers/TVector.cpp"   "Containers/TVector.inl"
+
+    "Containers/Slab/SVector.h"     "Containers/Slab/SVector.cpp"
+    "Containers/Slab/SSet.h"     "Containers/Slab/SSet.cpp"
+    "Containers/Slab/SMap.h"     "Containers/Slab/SMap.cpp"
+
+    "Containers/Linear/LVector.h"     "Containers/Linear/LVector.cpp"
+    "Containers/Linear/LSet.h"     "Containers/Linear/LSet.cpp"
+    "Containers/Linear/LMap.h"     "Containers/Linear/LMap.cpp"
 
 
     # String
