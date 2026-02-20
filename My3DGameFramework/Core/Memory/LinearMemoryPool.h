@@ -2,13 +2,13 @@
 
 namespace MGF3D
 {
-	class StackMemoryPool
+	class LinearMemoryPool
 	{
-		DISABLE_COPY(StackMemoryPool)
+		DISABLE_COPY(LinearMemoryPool)
 
 	public:
-		StackMemoryPool(void* buffer, usize size) noexcept;
-		~StackMemoryPool();
+		LinearMemoryPool(void* buffer, usize size) noexcept;
+		~LinearMemoryPool();
 
 	public:
 		void* Allocate(usize size, usize alignment = 16) noexcept;

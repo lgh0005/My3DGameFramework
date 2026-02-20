@@ -18,9 +18,10 @@ namespace MGF3D
 	/*==============================//
 	//      Memory-related types    //
 	//==============================*/
-	using byte	  = uint8;
-	using uintptr = std::uintptr_t;
-	using intptr  = std::intptr_t;
+	using byte	    = uint8;
+	using uintptr   = std::uintptr_t;
+	using intptr    = std::intptr_t;
+	using alignment = std::align_val_t;
 
 	/*=================================//
 	//   default engine string types   //

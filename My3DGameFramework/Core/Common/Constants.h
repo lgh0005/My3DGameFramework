@@ -5,7 +5,11 @@ namespace MGF3D
 	/*=====================================//
 	//   default engine memory constants   //
 	//=====================================*/
-	static constexpr usize MIN_ALIGNMENT = 16;
+	static constexpr usize DEFAULT_ALIGNMENT = 16;
+
+	static constexpr usize INITIAL_POOL_SIZE = 4 * 1024 * 1024;
+	static constexpr usize SLAB_MAX_SIZE = 4096;
+	static constexpr usize SLAB_BUCKET_COUNT = 9;
 
 	/*===================================//
 	//   default engine math constants   //

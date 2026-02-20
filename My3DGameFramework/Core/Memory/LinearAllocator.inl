@@ -5,16 +5,16 @@ namespace MGF3D
 {
 	// 생성자
 	template <typename T>
-	StackAllocator<T>::StackAllocator(StackMemoryPool* pool) noexcept : m_pool(pool) {}
+	LinearAllocator<T>::LinearAllocator(LinearMemoryPool* pool) noexcept : m_pool(pool) {}
 
 	// 템플릿 복사 생성자
 	template <typename T>
 	template <typename U>
-	StackAllocator<T>::StackAllocator(const StackAllocator<U>& other) noexcept : m_pool(other.m_pool) {}
+	LinearAllocator<T>::LinearAllocator(const LinearAllocator<U>& other) noexcept : m_pool(other.m_pool) {}
 
 	// 메모리 할당
 	template <typename T>
-	T* StackAllocator<T>::allocate(usize n)
+	T* LinearAllocator<T>::allocate(usize n)
 	{
 		const usize size = n * sizeof(T);
 		void* ptr = nullptr;
@@ -30,7 +30,7 @@ namespace MGF3D
 
 	// 메모리 해제
 	template <typename T>
-	void StackAllocator<T>::deallocate(T* p, usize n) noexcept
+	void LinearAllocator<T>::deallocate(T* p, usize n) noexcept
 	{
 		if (!p) return;
 

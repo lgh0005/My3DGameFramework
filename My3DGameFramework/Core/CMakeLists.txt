@@ -20,8 +20,10 @@ set(SOURCES
     "Math/Math.h"       "Math/Math.cpp" "Math/Math.inl"
 
     # Memory
-    "Memory/StackMemoryPool.h"           "Memory/StackMemoryPool.cpp"
-    "Memory/StackAllocator.h"           "Memory/StackAllocator.cpp"      "Memory/StackAllocator.inl" 
+    "Memory/LinearMemoryPool.h"           "Memory/LinearMemoryPool.cpp"
+    "Memory/LinearAllocator.h"           "Memory/LinearAllocator.cpp"      "Memory/LinearAllocator.inl" 
+    "Memory/SlabMemoryPool.h"           "Memory/SlabMemoryPool.cpp"
+    "Memory/SlabAllocator.h"           "Memory/SlabAllocator.cpp"      "Memory/SlabAllocator.inl" 
 
     # Runtime
     #"Runtime/Application.h"       "Runtime/Application.cpp"   "Runtime/Application.inl"

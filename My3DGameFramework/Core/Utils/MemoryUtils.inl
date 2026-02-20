@@ -15,6 +15,6 @@ namespace MGF3D
 
 	constexpr usize MemoryUtils::GetAlignment(usize alignment) noexcept
 	{
-		return Math::Max(alignment, MIN_ALIGNMENT);
+		return Math::Max(alignment, DEFAULT_ALIGNMENT);
 	}
 }

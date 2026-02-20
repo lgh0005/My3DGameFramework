@@ -1,16 +1,16 @@
 ﻿#include "CorePch.h"
-#include "StackMemoryPool.h"
+#include "LinearMemoryPool.h"
 #include "Utils/MemoryUtils.h"
 
 namespace MGF3D
 {
-	StackMemoryPool::StackMemoryPool(void* buffer, usize size) noexcept
-		: m_startAddress(reinterpret_cast<uintptr>(buffer)), m_size(size), m_offset(0)
-	{ }
+	LinearMemoryPool::LinearMemoryPool(void* buffer, usize size) noexcept
+		: m_startAddress(reinterpret_cast<uintptr>(buffer)), 
+		  m_size(size), m_offset(0) { }
 
-	StackMemoryPool::~StackMemoryPool() { }
+	LinearMemoryPool::~LinearMemoryPool() { }
 
-	void* StackMemoryPool::Allocate(usize size, usize alignment) noexcept
+	void* LinearMemoryPool::Allocate(usize size, usize alignment) noexcept
 	{
 		// 현재 오프셋에서 정렬 조건을 만족하는 주소를 계산
 		uintptr currentAddress = m_startAddress + m_offset;
@@ -28,22 +28,22 @@ namespace MGF3D
 		return reinterpret_cast<void*>(alignedAddress);
 	}
 
-	void StackMemoryPool::Reset() noexcept
+	void LinearMemoryPool::Reset() noexcept
 	{
 		m_offset = 0;
 	}
 
-	usize StackMemoryPool::GetUsedMemory() const noexcept 
+	usize LinearMemoryPool::GetUsedMemory() const noexcept
 	{
 		return m_offset; 
 	}
 
-	usize StackMemoryPool::GetRemainingMemory() const noexcept
+	usize LinearMemoryPool::GetRemainingMemory() const noexcept
 	{
 		return m_size - m_offset; 
 	}
 
-	bool StackMemoryPool::IsInPool(void* ptr) const noexcept
+	bool LinearMemoryPool::IsInPool(void* ptr) const noexcept
 	{
 		uintptr addr = reinterpret_cast<uintptr>(ptr);
 		return (addr >= m_startAddress && addr < m_startAddress + m_size);

@@ -7,5 +7,5 @@
 
 // Engine Core Headers
 #include "CorePch.h"
-#include "Memory/StackMemoryPool.h"
-#include "Memory/StackAllocator.h"
+#include "Memory/LinearMemoryPool.h"
+#include "Memory/LinearAllocator.h"
