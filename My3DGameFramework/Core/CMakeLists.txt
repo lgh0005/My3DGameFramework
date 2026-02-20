@@ -14,19 +14,24 @@ set(SOURCES
 
     # Managers
     "Managers/ThreadManager.h"      "Managers/ThreadManager.cpp"
+    "Managers/MemoryManager.h"      "Managers/MemoryManager.cpp"
 
     # Math
     "Math/Math.h"       "Math/Math.cpp" "Math/Math.inl"
 
     # Memory
+    "Memory/StackMemoryPool.h"           "Memory/StackMemoryPool.cpp"
+    "Memory/StackAllocator.h"           "Memory/StackAllocator.cpp"      "Memory/StackAllocator.inl" 
 
     # Runtime
-    "Runtime/Application.h"       "Runtime/Application.cpp"   "Runtime/Application.inl"
+    #"Runtime/Application.h"       "Runtime/Application.cpp"   "Runtime/Application.inl"
 
-    # Utilities
-    "Utilities/AssetFormat.h"       "Utilities/AssetFormat.cpp"
-    "Utilities/AssetUtils.h"       "Utilities/AssetUtils.cpp"
-    "Utilities/Utils.h"       "Utilities/Utils.cpp"    "Utilities/Utils.inl") 
+    # Utils
+    "Utils/MemoryUtils.h"           "Utils/MemoryUtils.cpp"         "Utils/MemoryUtils.inl"
+    #"Utilities/AssetFormat.h"       "Utilities/AssetFormat.cpp"
+    #"Utilities/AssetUtils.h"       "Utilities/AssetUtils.cpp"
+    #"Utilities/Utils.h"       "Utilities/Utils.cpp"    "Utilities/Utils.inl"
+) 
 
 # 2. 빌드 타겟 생성 및 별칭 등록
 add_library(${LIB_NAME} STATIC ${SOURCES})

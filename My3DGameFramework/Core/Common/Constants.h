@@ -2,6 +2,11 @@
 
 namespace MGF3D
 {
+	/*=====================================//
+	//   default engine memory constants   //
+	//=====================================*/
+	static constexpr usize MIN_ALIGNMENT = 16;
+
 	/*===================================//
 	//   default engine math constants   //
 	//===================================*/

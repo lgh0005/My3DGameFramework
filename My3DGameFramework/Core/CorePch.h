@@ -14,7 +14,6 @@
 #include <unordered_map>
 #include <optional>
 #include <memory>
-#include <memory_resource>
 #include <algorithm>
 #include <functional>
 #include <type_traits>
