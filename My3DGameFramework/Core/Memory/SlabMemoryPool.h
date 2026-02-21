@@ -42,6 +42,7 @@ namespace MGF3D
 
 		usize GetSlotSize() const noexcept;
 		usize GetUsedMemory() const noexcept;
+		usize GetTotalMemory() const noexcept;
 
 	/*====================================//
 	//   SlabMemoryPool private helpers   //

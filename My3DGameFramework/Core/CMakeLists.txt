@@ -24,6 +24,7 @@ set(SOURCES
     "Debug/Logger.h"             "Debug/Logger.cpp"      "Debug/Logger.inl" 
     "Debug/ProfileScope.h"        "Debug/ProfileScope.cpp"
     "Debug/RealTimer.h"           "Debug/RealTimer.cpp"
+    "Debug/MemoryProfiler.h"      "Debug/MemoryProfiler.cpp"
 
     # Managers
     "Managers/ThreadManager.h"      "Managers/ThreadManager.cpp"

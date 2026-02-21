@@ -17,6 +17,7 @@ namespace MGF3D
 	public:
 		usize GetUsedMemory() const noexcept;
 		usize GetRemainingMemory() const noexcept;
+		usize GetTotalMemory() const noexcept;
 		bool IsInPool(void* ptr) const noexcept;
 
 	private:

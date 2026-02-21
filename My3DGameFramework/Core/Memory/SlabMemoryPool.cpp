@@ -83,6 +83,14 @@ namespace MGF3D
 		// (전체 슬롯 - 남은 슬롯) * 슬롯 크기 = 실제 객체들이 점유 중인 메모리
 		return GetUsedSlotCount() * m_slotSize;
 	}
+
+	usize SlabMemoryPool::GetTotalMemory() const noexcept
+	{
+		// 전체 슬롯 개수를 한 Slab당 슬롯 개수로 나누면 현재 Slab의 총 개수가 나옵니다.
+		// 여기에 Slab 하나의 물리적 크기(m_slabSize)를 곱합니다.
+		if (m_slotsPerSlab == 0) return 0;
+		return (m_totalSlotCount / m_slotsPerSlab) * m_slabSize;
+	}
 	
 	/*====================================//
 	//    Private Helpers (Slab Logic)    //

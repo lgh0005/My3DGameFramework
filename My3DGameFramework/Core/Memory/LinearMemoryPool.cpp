@@ -33,6 +33,11 @@ namespace MGF3D
 		m_offset = 0;
 	}
 
+	usize LinearMemoryPool::GetTotalMemory() const noexcept
+	{
+		return m_size;
+	}
+
 	usize LinearMemoryPool::GetUsedMemory() const noexcept
 	{
 		return m_offset;
