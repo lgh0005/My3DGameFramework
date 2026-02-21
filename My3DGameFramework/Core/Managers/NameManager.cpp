@@ -10,26 +10,21 @@ namespace MGF3D
     NameManager::NameManager() = default;
     NameManager::~NameManager() = default;
 
-    MGFName NameManager::AddName(cstr name, bool makeUnique)
+    MGFName NameManager::AddName(cstr name)
     {
-        return AddName(strview(name), makeUnique);
+        return AddName(strview(name));
     }
 
-    MGFName NameManager::AddName(strview name, bool makeUnique)
+    MGFName NameManager::AddName(strview name)
     {
         if (name.empty()) return MGFName();
 
         // 해당 문자열 해시 생성
         StringHash hash(name);
 
-        // 중복 체크
+        // 네임 풀에 이미 이름이 존재하는 경우 기존 메모리 주소 반환
         if (m_stringPool.Find(hash))
         {
-            // 1. 고유 옵션이 켜져 있으면 _1, _2를 생성
-            if (makeUnique)
-                return CreateUniqueName(name);
-
-            // 2. 그렇지 않으면 장부에 있는 똑같은(풀링된) 주소를 그대로
             MGFName result;
             result.SetString(m_stringPool.Find(hash)->CStr());
             result.SetStringHash(hash);

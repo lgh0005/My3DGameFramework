@@ -16,8 +16,8 @@ namespace MGF3D
 		~NameManager();
 
 	public:
-		MGFName AddName(cstr name, bool makeUnique);
-		MGFName AddName(strview name, bool makeUnique);
+		MGFName AddName(cstr name);
+		MGFName AddName(strview name);
 		usize GetNameCount() const { return m_stringPool.Count(); }
 
 	private:

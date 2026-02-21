@@ -8,10 +8,9 @@ namespace MGF3D
 		friend class NameManager;
 
 	public:
-		// 1. 생성자 에서는 오로지 문자열만 받도록 만들고,
 		MGFName();
-		MGFName(cstr s, bool makeUnique = false);
-		MGFName(strview sv, bool makeUnique = false);
+		MGFName(cstr s);
+		MGFName(strview sv);
 
 	public:
 		bool IsEmpty() const;
