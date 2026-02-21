@@ -34,6 +34,8 @@ namespace MGF3D
     public:
         using iterator = typename Base::iterator;
         using const_iterator = typename Base::const_iterator;
+        using reverse_iterator = typename Base::reverse_iterator;
+        using const_reverse_iterator = typename Base::const_reverse_iterator;
 
         iterator       begin()        noexcept { return Base::begin(); }
         iterator       end()          noexcept { return Base::end(); }
@@ -41,6 +43,11 @@ namespace MGF3D
         const_iterator end()    const noexcept { return Base::end(); }
         const_iterator cbegin() const noexcept { return Base::cbegin(); }
         const_iterator cend()   const noexcept { return Base::cend(); }
+
+        reverse_iterator       rbegin()        noexcept { return Base::rbegin(); }
+        reverse_iterator       rend()          noexcept { return Base::rend(); }
+        const_reverse_iterator crbegin() const noexcept { return Base::crbegin(); }
+        const_reverse_iterator crend()   const noexcept { return Base::crend(); }
     };
 }
 

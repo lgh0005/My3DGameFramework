@@ -51,8 +51,9 @@ set(SOURCES
     "Containers/Linear/LMap.h"     "Containers/Linear/LMap.cpp"
     "Containers/Linear/LString.h"     "Containers/Linear/LString.cpp"
 
-
-    # String
+    # Hasing
+    "Hashing/IHashFunctor.h"          "Hashing/IHashFunctor.cpp"
+    "Hashing/StringHash.h"            "Hashing/StringHash.cpp"
 
     # Runtime
     #"Runtime/Application.h"       "Runtime/Application.cpp"   "Runtime/Application.inl"

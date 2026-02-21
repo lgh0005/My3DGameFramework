@@ -30,6 +30,12 @@ namespace MGF3D
     }
 
     template<typename Alloc>
+    inline StringHash TString<Alloc>::Hash() const
+    {
+        return StringHash(strview(this->data(), this->size()));
+    }
+
+    template<typename Alloc>
     inline usize TString<Alloc>::Capacity() const
     {
         return this->capacity();

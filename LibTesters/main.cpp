@@ -170,6 +170,44 @@ int main()
         MGF_LOG_INFO("String Tests Completed.");
     }
 
+    // ---------------------------------------------------------
+    // [SECTION 5] StringHash & Map Integration Test
+    // ---------------------------------------------------------
+    {
+        MGF_LOG_TRACE("[Step 5] StringHash & Map Integration - Start");
+        MGF_PROFILE_SCOPE("StringHash_Map_Test");
+
+        // 1. StringHash를 키로 사용하는 Slab 기반 Map 생성
+        // 이제 이 맵은 문자열 비교를 하지 않고, FNV-1a 정수값으로만 데이터를 찾습니다.
+        SMap<StringHash, RenderData> assetMap;
+
+        // 2. 데이터 삽입 (문자열 리터럴 -> StringHash 자동 변환/컴파일 타임 해싱)
+        assetMap.Insert("Warrior_Model", RenderData{ {}, 101 });
+        assetMap.Insert("Dragon_Texture", RenderData{ {}, 202 });
+        assetMap.Insert("Level_01_Base", RenderData{ {}, 303 });
+
+        // 3. 다양한 방식으로 데이터 찾기
+
+        // A. 리터럴로 즉시 찾기 (컴파일 타임 해싱 활용)
+        RenderData* pData1 = assetMap.Find("Warrior_Model");
+
+        // B. SString 객체에서 해시를 뽑아서 찾기 (런타임 해싱 활용)
+        SString searchName = "Dragon_Texture";
+        RenderData* pData2 = assetMap.Find(searchName.Hash());
+
+        // C. 미리 구워진 constexpr 해시로 찾기
+        constexpr StringHash staticKey = "Level_01_Base";
+        RenderData* pData3 = assetMap.Find(staticKey);
+
+        // 4. 검증 및 로그 출력
+        MGF_ASSERT(pData1 && pData1->id == 101, "Find by Literal failed!");
+        MGF_ASSERT(pData2 && pData2->id == 202, "Find by GetHash() failed!");
+        MGF_ASSERT(pData3 && pData3->id == 303, "Find by Constexpr Key failed!");
+
+        MGF_LOG_INFO("StringHash 'Warrior_Model' Value: 0x{0:x}", (uint32)StringHash("Warrior_Model"));
+        MGF_LOG_INFO("StringHash Map Search Successfully Verified. (Integer Comparison Only)");
+    }
+
     // 로그 버퍼 비우기
     MGF_LOG_FLUSH();
 

@@ -28,9 +28,9 @@
 
 /*============================//
 //    Engine common headers   //
-//============================*/
-#include "Common/Defines.h"     
-#include "Common/Types.h"     
+//============================*/     
+#include "Common/Types.h"
+#include "Common/Defines.h"
 #include "Common/Constants.h"
 #include "Common/Math.h"
 
