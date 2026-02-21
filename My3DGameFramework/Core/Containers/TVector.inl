@@ -3,6 +3,12 @@
 namespace MGF3D
 {
     template<typename T, typename Alloc>
+    inline usize TVector<T, Alloc>::Capacity() const
+    {
+        return this->capacity();
+    }
+
+    template<typename T, typename Alloc>
     inline void TVector<T, Alloc>::Assign(usize n, const T& value)
     {
         this->assign(n, value);

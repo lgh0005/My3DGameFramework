@@ -25,6 +25,7 @@ namespace MGF3D
         T* Data() { return this->data(); }
         const T* Data() const { return this->data(); }
 
+        usize Capacity() const;
         void Assign(usize n, const T& value);
         void Reserve(usize n);
         bool Contains(const T& value) const;

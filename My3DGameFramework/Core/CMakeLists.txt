@@ -7,7 +7,6 @@ set(TARGET_NAME Engine::${MODULE_NAME})
 set(SOURCES
 
     # Common
-    
     "Common/Defines.h"
     "Common/Types.h"
     "Common/Constants.h"
@@ -36,18 +35,21 @@ set(SOURCES
     "Stream/FileStream.h"        "Stream/FileStream.cpp" 
 
     # Containers
-     "Containers/IContainer.h"       "Containers/IContainer.cpp"
-     "Containers/TMap.h"       "Containers/TMap.cpp"   "Containers/TMap.inl"
-     "Containers/TSet.h"       "Containers/TSet.cpp"   "Containers/TSet.inl"
-     "Containers/TVector.h"       "Containers/TVector.cpp"   "Containers/TVector.inl"
+    "Containers/IContainer.h"       "Containers/IContainer.cpp"
+    "Containers/TMap.h"       "Containers/TMap.cpp"   "Containers/TMap.inl"
+    "Containers/TSet.h"       "Containers/TSet.cpp"   "Containers/TSet.inl"
+    "Containers/TVector.h"       "Containers/TVector.cpp"   "Containers/TVector.inl"
+    "Containers/TString.h"       "Containers/TString.cpp"   "Containers/TString.inl"
 
     "Containers/Slab/SVector.h"     "Containers/Slab/SVector.cpp"
     "Containers/Slab/SSet.h"     "Containers/Slab/SSet.cpp"
     "Containers/Slab/SMap.h"     "Containers/Slab/SMap.cpp"
+    "Containers/Slab/SString.h"     "Containers/Slab/SString.cpp"
 
     "Containers/Linear/LVector.h"     "Containers/Linear/LVector.cpp"
     "Containers/Linear/LSet.h"     "Containers/Linear/LSet.cpp"
     "Containers/Linear/LMap.h"     "Containers/Linear/LMap.cpp"
+    "Containers/Linear/LString.h"     "Containers/Linear/LString.cpp"
 
 
     # String

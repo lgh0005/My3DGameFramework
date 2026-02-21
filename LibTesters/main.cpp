@@ -11,11 +11,13 @@
 #include "Containers/Slab/SVector.h"
 #include "Containers/Slab/SMap.h"
 #include "Containers/Slab/SSet.h"
+#include "Containers/Slab/SString.h"
 
 // Linear 시리즈
 #include "Containers/Linear/LVector.h"
 #include "Containers/Linear/LMap.h"
 #include "Containers/Linear/LSet.h"
+#include "Containers/Linear/LString.h"
 
 using namespace MGF3D;
 
@@ -127,6 +129,46 @@ int main()
     }
 
     MGF_LOG_INFO("All Container Tests Passed Successfully.");
+
+    // ---------------------------------------------------------
+    // [SECTION 4] String Series (S vs L) 테스트
+    // ---------------------------------------------------------
+    {
+        MGF_LOG_TRACE("[Step 4] String Series (Slab & Linear) Test - Start");
+        MGF_PROFILE_SCOPE("String_Test_Scope");
+
+        // 1. SString (Slab) - 영구 보관용 문자열 테스트
+        {
+            // SSO(Small String Optimization) 테스트: 15자 이하
+            MGF3D::SString shortStr = "Short_SSO";
+            // Heap 할당 테스트: 32자 이상 (SSO 임계값 초과 유도)
+            MGF3D::SString longStr = "This is a very long string that must be allocated in the Slab Pool because it exceeds SSO limits.";
+
+            MGF_LOG_INFO("S-String (Short) Memory: {0} bytes (Expected: Object Size only)", shortStr.MemoryUsage());
+            MGF_LOG_INFO("S-String (Long)  Memory: {0} bytes (Expected: Object Size + Heap)", longStr.MemoryUsage());
+
+            MGF_ASSERT(shortStr.Length() == 9, "SString length mismatch!");
+            MGF_ASSERT(longStr.Contains("Slab Pool"), "SString 'Contains' logic failed!");
+        }
+
+        // 2. LString (Linear) - 프레임 임시 문자열 테스트
+        {
+            usize beforeFrame = MemoryManager::Instance().GetFramePool()->GetUsedMemory();
+
+            MGF3D::LString frameStr = "Frame_Temporary_String_Data";
+            MGF3D::LString frameStr2 = "Another_Frame_String";
+
+            usize afterFrame = MemoryManager::Instance().GetFramePool()->GetUsedMemory();
+
+            MGF_LOG_INFO("L-String Content: {0}", frameStr.CStr());
+            MGF_LOG_INFO("L-Strings Allocated in Frame Pool: {0} bytes", (afterFrame - beforeFrame));
+
+            // Capacity 확인
+            MGF_LOG_INFO("L-String Capacity: {0}", frameStr.Capacity());
+        }
+
+        MGF_LOG_INFO("String Tests Completed.");
+    }
 
     // 로그 버퍼 비우기
     MGF_LOG_FLUSH();

@@ -5,8 +5,7 @@
 namespace MGF3D
 {
     template <typename K, typename Alloc, typename Hash = std::hash<K>, typename KeyEqual = std::equal_to<K>>
-    class TSet : public std::unordered_set<K, Hash, KeyEqual, Alloc>,
-        public IContainer
+    class TSet : public std::unordered_set<K, Hash, KeyEqual, Alloc>, public IContainer
     {
     public:
         using Base = std::unordered_set<K, Hash, KeyEqual, Alloc>;

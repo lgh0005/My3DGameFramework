@@ -1,5 +1,6 @@
 ﻿#pragma once
 #include <cstdint>
+#include <string>
 #include <string_view>
 
 namespace MGF3D
@@ -30,8 +31,9 @@ namespace MGF3D
 	/*=================================//
 	//   default engine string types   //
 	//=================================*/
-	using cstr = const char*;
+	using str     = std::string;
 	using strview = std::string_view;
+	using cstr    = const char*;
 
 	/*==============================//
 	//      Memory-related types    //

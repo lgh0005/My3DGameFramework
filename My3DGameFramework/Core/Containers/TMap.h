@@ -5,8 +5,7 @@
 namespace MGF3D
 {
     template<typename K, typename V, typename Alloc, typename Hash = std::hash<K>, typename KeyEqual = std::equal_to<K>>
-    class TMap : public std::unordered_map<K, V, Hash, KeyEqual, Alloc>,
-        public IContainer
+    class TMap : public std::unordered_map<K, V, Hash, KeyEqual, Alloc>, public IContainer
     {
     public:
         using Base = std::unordered_map<K, V, Hash, KeyEqual, Alloc>;
