@@ -35,8 +35,13 @@ namespace MGF3D
 
 		void* Allocate() noexcept;
 		void Deallocate(void* ptr) noexcept;
+
 		usize GetFreeSlotCount() const noexcept;
+		usize GetUsedSlotCount() const noexcept;
+		usize GetTotalSlotCount() const noexcept;
+
 		usize GetSlotSize() const noexcept;
+		usize GetUsedMemory() const noexcept;
 
 	/*====================================//
 	//   SlabMemoryPool private helpers   //
@@ -46,7 +51,7 @@ namespace MGF3D
 		void* PopFreeSlot() noexcept;
 		void  RegisterSlab(void* buffer, bool isExternal) noexcept;
 		void  InitSlotsInSlab(void* buffer) noexcept;
-		bool Expand() noexcept;
+		bool  Expand() noexcept;
 
 	private:
 		Slot* m_freeList;      // 빈 슬롯들의 헤드
@@ -56,6 +61,7 @@ namespace MGF3D
 		usize m_slabSize;      // Slab 하나의 전체 크기
 		usize m_slotsPerSlab;  // Slab 하나당 들어가는 슬롯 개수
 		usize m_freeSlotCount; // 현재 사용 가능한 총 슬롯 개수
+		usize m_totalSlotCount; // 풀이 보유한 전체 슬롯 개수 추적
 		usize m_alignment;     // 메모리 정렬 기준
 	};
 }

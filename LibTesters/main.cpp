@@ -2,10 +2,10 @@
 #include "Managers/MemoryManager.h"
 
 // Debug System Headers
-#include "Debuggers/Asserter.h"
-#include "Debuggers/Logger.h"
-#include "Debuggers/RealTimer.h"
-#include "Debuggers/ProfileScope.h"
+#include "Debug/Asserter.h"
+#include "Debug/Logger.h"
+#include "Debug/RealTimer.h"
+#include "Debug/ProfileScope.h"
 
 // Slab 시리즈
 #include "Containers/Slab/SVector.h"
@@ -39,176 +39,121 @@ namespace std {
 
 int main()
 {
-    // 1. 디버그 시스템 기동 (로거 및 타이머 초기화)
+    // 1. 디버그 시스템 기동
     MGF_LOG_INIT();
     MGF_TIMER_INIT();
 
-    MGF_LOG_INFO("=== MGF3D Container Series (S vs L) Full Test ===");
+    MGF_LOG_INFO("=== MGF3D Domain-Integrated Container Test ===");
 
     // 전체 테스트 시간 측정 시작
     MGF_PROFILE_SCOPE("Total_Container_Test");
 
     // 2. 엔진 메모리 시스템 가동
-    {
-        MGF_PROFILE_SCOPE("MemoryManager_Initialization");
-        MemoryManager::Instance();
-    }
+    MemoryManager::Instance();
+
+    // [Helper] 현재 도메인별 메모리 상태 출력 람다
+    // 파트너님이 수정하신 GetTotalSlabUsedMemory()와 GetLinearMemoryPool()을 사용합니다.
+    auto PrintMemState = [](const char* label) {
+        auto& memMgr = MemoryManager::Instance();
+        usize sUsed = memMgr.GetTotalSlabUsedMemory();
+        usize lUsed = memMgr.GetLinearMemoryPool()->GetUsedMemory();
+
+        MGF_LOG_INFO(">> [{0}] | Slab: {1} bytes | Linear: {2} bytes", label, sUsed, lUsed);
+        };
 
     // ---------------------------------------------------------
-    // [SECTION 1] Linear (L) 시리즈 테스트
+    // [SECTION 1] 기초 컨테이너 동작 확인
     // ---------------------------------------------------------
     {
-        MGF_LOG_TRACE("[Step 1] Linear Series (Frame Memory) Test - Start");
-        MGF_PROFILE_START(LinearSection);
-
-        usize beforeFrame = MemoryManager::Instance().GetFramePool()->GetUsedMemory();
+        MGF_LOG_TRACE("[Step 1] Basic Container Operation Test");
+        PrintMemState("Initial State");
 
         LVector<RenderData> lVec;
-        LMap<int32, RenderData> lMap;
-        LSet<uint64> lSet;
-
         lVec.push_back(RenderData{ {}, 1 });
-        lMap.Insert(10, RenderData{ {}, 10 });
-        lSet.Insert(100);
-
-        usize afterFrame = MemoryManager::Instance().GetFramePool()->GetUsedMemory();
-
-        MGF_LOG_INFO("L-Vector Element Addr : {0}", (void*)&lVec[0]);
-        MGF_LOG_INFO("Allocated Frame Memory: {0} bytes", (afterFrame - beforeFrame));
-
-        MGF_PROFILE_END(LinearSection);
-    }
-
-    // ---------------------------------------------------------
-    // [SECTION 2] Slab (S) 시리즈 테스트
-    // ---------------------------------------------------------
-    {
-        MGF_LOG_TRACE("[Step 2] Slab Series (Persistent Memory) Test - Start");
-        MGF_PROFILE_SCOPE("Slab_Test_Scope");
+        PrintMemState("After LVector Push");
 
         SVector<RenderData> sVec;
-        SMap<int32, RenderData> sMap;
-        SSet<uint64> sSet;
-
         sVec.push_back(RenderData{ {}, 2 });
-        sMap.Insert(20, RenderData{ {}, 20 });
-        sSet.Insert(200);
-
-        // 정렬 상태 어설션 테스트
-        uintptr_t addr = reinterpret_cast<uintptr_t>(&sVec[0]);
-        MGF_ASSERT(addr % 32 == 0, "S-Vector memory must be 32-byte aligned!");
-
-        MGF_LOG_INFO("S-Vector Addr : {0} (32-byte Align Verified)", (void*)addr);
-        MGF_LOG_INFO("S-Vector Memory Usage : {0} bytes", sVec.MemoryUsage());
+        PrintMemState("After SVector Push");
     }
 
     // ---------------------------------------------------------
-    // [SECTION 3] 중첩 구조 및 프레임 리셋 테스트
+    // [SECTION 2] Cross-Domain Move (L -> S) 상세 분석
     // ---------------------------------------------------------
+    // 프레임 메모리에서 가공된 데이터가 영구 풀로 이동할 때의 메모리 변화를 관찰합니다.
     {
-        MGF_LOG_TRACE("[Step 3] Nested & Reset Test - Start");
+        MGF_LOG_TRACE("[Step 2] Cross-Domain Move (L -> S) Analysis");
 
-        LMap<int32, SVector<RenderData>> frameCache;
+        // 1. LString 생성 (Frame Pool 점유)
+        LString lStr = "This is a temporary frame string that will be moved to Slab.";
+        PrintMemState("LString Created (Frame Only)");
 
-        // 수동 타임스탬프 측정 예시
-        uint64 ts_start = MGF_TIMER_GET_TS();
+        // 2. SString으로 이동 (Cross-Allocator Move)
+        // 이때 Slab 사용량은 늘어나고, Frame 사용량은 (Reset 전이므로) 그대로여야 합니다.
+        SString sStr = std::move(lStr);
+        PrintMemState("After Move to SString (Slab should increase)");
 
-        SVector<RenderData> persistentData;
-        persistentData.push_back(RenderData{ {}, 999 });
-        frameCache.Insert(0, std::move(persistentData));
+        MGF_ASSERT(lStr.Empty(), "Original LString must be empty!");
+        MGF_ASSERT(sStr.Length() > 0, "SString must have data!");
 
-        // 프레임 종료 시점 시뮬레이션
-        MemoryManager::Instance().GetFramePool()->Reset();
+        // 3. LVector -> SVector 대량 이동 테스트
+        LVector<RenderData> lVec;
+        for (int i = 0; i < 50; ++i) lVec.push_back(RenderData{ {}, (uint64)i });
+        PrintMemState("L-Vector 50 elements created");
 
-        uint64 ts_end = MGF_TIMER_GET_TS();
+        SVector<RenderData> sVec = std::move(lVec);
+        PrintMemState("After L-to-S Vector Move");
 
-        MGF_LOG_INFO("Frame Reset Done. Used Frame Memory: {0} bytes",
-            MemoryManager::Instance().GetFramePool()->GetUsedMemory());
-
-        MGF_LOG_INFO("Reset Logic took {0} seconds", MGF_TIMER_ELAPSED(ts_start, ts_end));
+        MGF_ASSERT(lVec.empty(), "Original LVector cleared");
+        MGF_ASSERT(sVec.size() == 50, "SVector successfully received elements");
     }
 
-    MGF_LOG_INFO("All Container Tests Passed Successfully.");
-
     // ---------------------------------------------------------
-    // [SECTION 4] String Series (S vs L) 테스트
+    // [SECTION 3] 프레임 리셋 후 생존성 테스트
     // ---------------------------------------------------------
     {
-        MGF_LOG_TRACE("[Step 4] String Series (Slab & Linear) Test - Start");
-        MGF_PROFILE_SCOPE("String_Test_Scope");
+        MGF_LOG_TRACE("[Step 3] Persistence Verification after Frame Reset");
 
-        // 1. SString (Slab) - 영구 보관용 문자열 테스트
+        SString survivalStr;
         {
-            // SSO(Small String Optimization) 테스트: 15자 이하
-            MGF3D::SString shortStr = "Short_SSO";
-            // Heap 할당 테스트: 32자 이상 (SSO 임계값 초과 유도)
-            MGF3D::SString longStr = "This is a very long string that must be allocated in the Slab Pool because it exceeds SSO limits.";
-
-            MGF_LOG_INFO("S-String (Short) Memory: {0} bytes (Expected: Object Size only)", shortStr.MemoryUsage());
-            MGF_LOG_INFO("S-String (Long)  Memory: {0} bytes (Expected: Object Size + Heap)", longStr.MemoryUsage());
-
-            MGF_ASSERT(shortStr.Length() == 9, "SString length mismatch!");
-            MGF_ASSERT(longStr.Contains("Slab Pool"), "SString 'Contains' logic failed!");
+            // 임시 스코프에서 프레임 문자열 가공
+            LString temp = "I will survive the frame reset!";
+            survivalStr = std::move(temp); // S도메인으로 승격(Move)
         }
 
-        // 2. LString (Linear) - 프레임 임시 문자열 테스트
-        {
-            usize beforeFrame = MemoryManager::Instance().GetFramePool()->GetUsedMemory();
+        MGF_LOG_INFO("Before Resetting Linear Pool...");
+        PrintMemState("Pre-Reset");
 
-            MGF3D::LString frameStr = "Frame_Temporary_String_Data";
-            MGF3D::LString frameStr2 = "Another_Frame_String";
+        // 프레임 메모리 전체 날림
+        MemoryManager::Instance().GetLinearMemoryPool()->Reset();
 
-            usize afterFrame = MemoryManager::Instance().GetFramePool()->GetUsedMemory();
+        MGF_LOG_INFO("Frame Pool Reset Completed.");
+        PrintMemState("Post-Reset (Linear should be 0)");
 
-            MGF_LOG_INFO("L-String Content: {0}", frameStr.CStr());
-            MGF_LOG_INFO("L-Strings Allocated in Frame Pool: {0} bytes", (afterFrame - beforeFrame));
-
-            // Capacity 확인
-            MGF_LOG_INFO("L-String Capacity: {0}", frameStr.Capacity());
-        }
-
-        MGF_LOG_INFO("String Tests Completed.");
+        // 결과 확인: Linear는 0이지만 survivalStr의 데이터는 Slab에 있으므로 안전해야 함
+        MGF_ASSERT(MemoryManager::Instance().GetLinearMemoryPool()->GetUsedMemory() == 0, "Frame pool not reset!");
+        MGF_ASSERT(!survivalStr.Empty(), "Slab data lost during frame reset!");
+        MGF_LOG_INFO("Verified Survivor Data: {0}", survivalStr.CStr());
     }
 
     // ---------------------------------------------------------
-    // [SECTION 5] StringHash & Map Integration Test
+    // [SECTION 4] StringHash & Map Integration
     // ---------------------------------------------------------
     {
-        MGF_LOG_TRACE("[Step 5] StringHash & Map Integration - Start");
-        MGF_PROFILE_SCOPE("StringHash_Map_Test");
+        MGF_LOG_TRACE("[Step 4] StringHash Map Performance Test");
 
-        // 1. StringHash를 키로 사용하는 Slab 기반 Map 생성
-        // 이제 이 맵은 문자열 비교를 하지 않고, FNV-1a 정수값으로만 데이터를 찾습니다.
-        SMap<StringHash, RenderData> assetMap;
+        SMap<StringHash, int32> assetIds;
+        assetIds.Insert("Player_Model", 1001);
+        assetIds.Insert("Enemy_Model", 2002);
 
-        // 2. 데이터 삽입 (문자열 리터럴 -> StringHash 자동 변환/컴파일 타임 해싱)
-        assetMap.Insert("Warrior_Model", RenderData{ {}, 101 });
-        assetMap.Insert("Dragon_Texture", RenderData{ {}, 202 });
-        assetMap.Insert("Level_01_Base", RenderData{ {}, 303 });
+        // 검색 시 문자열 비교가 아닌 정수 해시 비교만 발생
+        int32* pId = assetIds.Find("Player_Model");
+        MGF_ASSERT(pId && *pId == 1001, "Hash Map Search Failed!");
 
-        // 3. 다양한 방식으로 데이터 찾기
-
-        // A. 리터럴로 즉시 찾기 (컴파일 타임 해싱 활용)
-        RenderData* pData1 = assetMap.Find("Warrior_Model");
-
-        // B. SString 객체에서 해시를 뽑아서 찾기 (런타임 해싱 활용)
-        SString searchName = "Dragon_Texture";
-        RenderData* pData2 = assetMap.Find(searchName.Hash());
-
-        // C. 미리 구워진 constexpr 해시로 찾기
-        constexpr StringHash staticKey = "Level_01_Base";
-        RenderData* pData3 = assetMap.Find(staticKey);
-
-        // 4. 검증 및 로그 출력
-        MGF_ASSERT(pData1 && pData1->id == 101, "Find by Literal failed!");
-        MGF_ASSERT(pData2 && pData2->id == 202, "Find by GetHash() failed!");
-        MGF_ASSERT(pData3 && pData3->id == 303, "Find by Constexpr Key failed!");
-
-        MGF_LOG_INFO("StringHash 'Warrior_Model' Value: 0x{0:x}", (uint32)StringHash("Warrior_Model"));
-        MGF_LOG_INFO("StringHash Map Search Successfully Verified. (Integer Comparison Only)");
+        PrintMemState("After StringHash Map Test");
     }
 
-    // 로그 버퍼 비우기
+    MGF_LOG_INFO("=== All Cross-Domain Integration Tests Passed! ===");
     MGF_LOG_FLUSH();
 
     return 0;

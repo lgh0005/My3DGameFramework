@@ -8,7 +8,7 @@ namespace MGF3D
 	SlabAllocator<T>::SlabAllocator(SlabMemoryPool* pool) noexcept
 	{
 		if (pool) m_pool = pool;
-		else m_pool = MemoryManager::Instance().GetSlabPool(sizeof(T));
+		else m_pool = MemoryManager::Instance().GetSlabMemoryPool(sizeof(T));
 	}
 
 	template <typename T>

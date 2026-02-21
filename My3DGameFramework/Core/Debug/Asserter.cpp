@@ -1,6 +1,6 @@
 ﻿#include "CorePch.h"
 #include "Asserter.h"
-#include "Debuggers/Logger.h"
+#include "Debug/Logger.h"
 
 namespace MGF3D 
 {

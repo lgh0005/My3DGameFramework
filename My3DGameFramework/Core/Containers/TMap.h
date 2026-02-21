@@ -15,6 +15,19 @@ namespace MGF3D
         virtual ~TMap() = default;
 
     public:
+        template <typename OtherAlloc>
+        TMap(const TMap<K, V, OtherAlloc, Hash, KeyEqual>& other);
+
+        template <typename OtherAlloc>
+        TMap(TMap<K, V, OtherAlloc, Hash, KeyEqual>&& other) noexcept;
+
+        template <typename OtherAlloc>
+        TMap& operator=(const TMap<K, V, OtherAlloc, Hash, KeyEqual>& other);
+
+        template <typename OtherAlloc>
+        TMap& operator=(TMap<K, V, OtherAlloc, Hash, KeyEqual>&& other) noexcept;
+
+    public:
         usize MemoryUsage() const override;
         usize Count()   const override { return this->size(); }
         bool  Empty()   const override { return this->empty(); }

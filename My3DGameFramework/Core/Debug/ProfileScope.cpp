@@ -1,6 +1,6 @@
-﻿#include "DebugPch.h"
-#include "Debuggers/RealTimer.h"
-#include "Debuggers/Logger.h"
+﻿#include "CorePch.h"
+#include "Debug/RealTimer.h"
+#include "Debug/Logger.h"
 #include "ProfileScope.h"
 
 namespace MGF3D

@@ -16,6 +16,22 @@ namespace MGF3D
         virtual ~TVector() = default;
 
     public:
+        // 1. 다른 할당자를 사용하는 TVector로부터 복사 생성
+        template<typename OtherAlloc>
+        TVector(const TVector<T, OtherAlloc>& other);
+
+        // 2. 다른 할당자를 사용하는 TVector로부터 이동 생성 (Virtual Move)
+        template<typename OtherAlloc>
+        TVector(TVector<T, OtherAlloc>&& other) noexcept;
+
+        // 3. 다른 할당자로부터의 대입 연산자
+        template<typename OtherAlloc>
+        TVector& operator=(const TVector<T, OtherAlloc>& other);
+
+        template<typename OtherAlloc>
+        TVector& operator=(TVector<T, OtherAlloc>&& other) noexcept;
+
+    public:
         usize MemoryUsage() const override { return sizeof(*this) + (this->capacity() * sizeof(T)); }
         usize Count()   const override { return this->size(); }
         bool  Empty()   const override { return this->empty(); }

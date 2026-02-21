@@ -2,7 +2,6 @@
 
 # Level 1: 가장 기초
 add_subdirectory(Core)
-add_subdirectory(Debug)
 #add_subdirectory(Serializers)
 #add_subdirectory(Scripting)
 #add_subdirectory(Bootstrap)

@@ -19,15 +19,25 @@ set(SOURCES
     "Common/Clock.h"    "Common/Clock.cpp"
     "Common/Random.h"    "Common/Random.cpp"
 
+    # Debug
+    "Debug/Asserter.h"           "Debug/Asserter.cpp"
+    "Debug/Logger.h"             "Debug/Logger.cpp"      "Debug/Logger.inl" 
+    "Debug/ProfileScope.h"        "Debug/ProfileScope.cpp"
+    "Debug/RealTimer.h"           "Debug/RealTimer.cpp"
+
     # Managers
     "Managers/ThreadManager.h"      "Managers/ThreadManager.cpp"
     "Managers/MemoryManager.h"      "Managers/MemoryManager.cpp"
+    "Managers/NameManager.h"      "Managers/NameManager.cpp"
 
     # Memory
     "Memory/LinearMemoryPool.h"           "Memory/LinearMemoryPool.cpp"
     "Memory/LinearAllocator.h"           "Memory/LinearAllocator.cpp"      "Memory/LinearAllocator.inl" 
     "Memory/SlabMemoryPool.h"           "Memory/SlabMemoryPool.cpp"
     "Memory/SlabAllocator.h"           "Memory/SlabAllocator.cpp"      "Memory/SlabAllocator.inl" 
+
+    # Naming
+    "Naming/MGFName.h"            "Naming/MGFName.cpp"
 
     # Stream
     "Stream/Stream.h"            "Stream/Stream.cpp"
@@ -59,10 +69,9 @@ set(SOURCES
     #"Runtime/Application.h"       "Runtime/Application.cpp"   "Runtime/Application.inl"
 
     # Utils
+    "Utils/CoreUtils.h"           "Utils/CoreUtils.cpp"         "Utils/CoreUtils.inl"
     "Utils/MemoryUtils.h"           "Utils/MemoryUtils.cpp"         "Utils/MemoryUtils.inl"
-    #"Utilities/AssetFormat.h"       "Utilities/AssetFormat.cpp"
-    #"Utilities/AssetUtils.h"       "Utilities/AssetUtils.cpp"
-    #"Utilities/Utils.h"       "Utilities/Utils.cpp"    "Utilities/Utils.inl"
+    "Utils/StringUtils.h"           "Utils/StringUtils.cpp"         "Utils/StringUtils.inl"
 ) 
 
 # 2. 빌드 타겟 생성 및 별칭 등록
@@ -79,7 +88,8 @@ target_include_directories(${LIB_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 target_link_libraries(${LIB_NAME} 
 
 PUBLIC
-        glm::glm  
+        glm::glm
+        spdlog::spdlog
 )
 
 # 6. PCH (Precompiled Header) 설정

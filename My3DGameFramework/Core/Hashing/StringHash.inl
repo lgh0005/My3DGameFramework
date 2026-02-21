@@ -8,6 +8,9 @@ namespace MGF3D
 
         for (usize i = 0; i < len; ++i)
         {
+            char8 c = str[i];
+            if (c >= 'A' && c <= 'Z') c += 32;
+
             hash ^= static_cast<uint32>(str[i]);
             hash *= PRIME;
         }
@@ -18,9 +21,7 @@ namespace MGF3D
     // 문자열 리터럴 생성자
     inline constexpr StringHash::StringHash(cstr s)
         : IHashFunctor<StringHash>
-        (
-            (s == nullptr) ? 0 : Calculate(s, std::char_traits<char>::length(s))
-        ) { }
+        ((s == nullptr) ? 0 : Calculate(s, std::char_traits<char>::length(s))) { }
 
     // strview 생성자
     inline StringHash::StringHash(strview sv)

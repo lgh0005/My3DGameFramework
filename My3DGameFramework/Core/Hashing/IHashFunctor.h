@@ -23,6 +23,8 @@ namespace MGF3D
 /*==================================//
 //   Default Hash object register   //
 //==================================*/
+#pragma region HASH_OBJECT_REGISTER
+
 #define MGF_REGISTER_HASH(Type)                                                 \
 namespace std                                                                   \
 {                                                                               \
@@ -35,3 +37,5 @@ namespace std                                                                   
         }                                                                       \
     };                                                                          \
 }
+
+#pragma endregion

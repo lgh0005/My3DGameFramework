@@ -4,12 +4,14 @@
 
 namespace MGF3D
 {
-	SlabMemoryPool::SlabMemoryPool(
+	SlabMemoryPool::SlabMemoryPool
+	(
 		void* buffer, usize slabSize,
 		usize slotSize, usize alignment
 	) noexcept
 		: m_freeList(nullptr), m_slabList(nullptr)
-		, m_freeSlotCount(0), m_alignment(alignment) , m_slabSize(slabSize)
+		, m_freeSlotCount(0), m_totalSlotCount(0)
+		, m_alignment(alignment) , m_slabSize(slabSize)
 	{
 		// 1. 슬롯 크기 결정 (최소 포인터 크기 확보 및 정렬)
 		m_slotSize = MemoryUtils::AlignUp(Math::Max(slotSize, sizeof(Slot)), alignment);
@@ -61,9 +63,25 @@ namespace MGF3D
 		return m_freeSlotCount;
 	}
 
+	usize SlabMemoryPool::GetUsedSlotCount() const noexcept
+	{
+		return m_totalSlotCount - m_freeSlotCount;
+	}
+
+	usize SlabMemoryPool::GetTotalSlotCount() const noexcept
+	{
+		return m_totalSlotCount;
+	}
+
 	usize SlabMemoryPool::GetSlotSize() const noexcept
 	{
 		return m_slotSize;
+	}
+
+	usize SlabMemoryPool::GetUsedMemory() const noexcept
+	{
+		// (전체 슬롯 - 남은 슬롯) * 슬롯 크기 = 실제 객체들이 점유 중인 메모리
+		return GetUsedSlotCount() * m_slotSize;
 	}
 	
 	/*====================================//
@@ -102,6 +120,7 @@ namespace MGF3D
 			PushFreeSlot(current);
 			current += m_slotSize;
 		}
+		m_totalSlotCount += m_slotsPerSlab;
 	}
 
 	bool SlabMemoryPool::Expand() noexcept

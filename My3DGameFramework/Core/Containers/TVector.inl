@@ -3,6 +3,40 @@
 namespace MGF3D
 {
     template<typename T, typename Alloc>
+    template<typename OtherAlloc>
+    inline TVector<T, Alloc>::TVector(const TVector<T, OtherAlloc>& other)
+        : Base(other.begin(), other.end(), Alloc()) { }
+
+    template<typename T, typename Alloc>
+    template<typename OtherAlloc>
+    inline TVector<T, Alloc>::TVector(TVector<T, OtherAlloc>&& other) noexcept
+        : Base(Alloc())
+    {
+        this->reserve(other.size());
+        this->assign(std::make_move_iterator(other.begin()), std::make_move_iterator(other.end()));
+        other.clear();
+    }
+
+    template<typename T, typename Alloc>
+    template<typename OtherAlloc>
+    inline TVector<T, Alloc>& TVector<T, Alloc>::operator=(const TVector<T, OtherAlloc>& other)
+    {
+        this->assign(other.begin(), other.end());
+        return *this;
+    }
+
+    template<typename T, typename Alloc>
+    template<typename OtherAlloc>
+    inline TVector<T, Alloc>& TVector<T, Alloc>::operator=(TVector<T, OtherAlloc>&& other) noexcept
+    {
+        this->clear();
+        this->reserve(other.size());
+        this->assign(std::make_move_iterator(other.begin()), std::make_move_iterator(other.end()));
+        other.clear();
+        return *this;
+    }
+
+    template<typename T, typename Alloc>
     inline usize TVector<T, Alloc>::Capacity() const
     {
         return this->capacity();

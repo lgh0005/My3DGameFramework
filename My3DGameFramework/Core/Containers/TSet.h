@@ -15,7 +15,20 @@ namespace MGF3D
         virtual ~TSet() = default;
 
     public:
-        // IContainer 구현
+        template <typename OtherAlloc>
+        TSet(const TSet<K, OtherAlloc, Hash, KeyEqual>& other);
+
+        template <typename OtherAlloc>
+        TSet(TSet<K, OtherAlloc, Hash, KeyEqual>&& other) noexcept;
+
+        template <typename OtherAlloc>
+        TSet& operator=(const TSet<K, OtherAlloc, Hash, KeyEqual>& other);
+
+        template <typename OtherAlloc>
+        TSet& operator=(TSet<K, OtherAlloc, Hash, KeyEqual>&& other) noexcept;
+
+
+    public:
         usize MemoryUsage() const override;
         usize Count()   const override { return this->size(); }
         bool  Empty()   const override { return this->empty(); }

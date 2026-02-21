@@ -40,7 +40,7 @@ namespace MGF3D
 	};
 }
 
-#include "Debuggers/Logger.inl"
+#include "Debug/Logger.inl"
 
 /*=============================//
 //      Logger Macros          //

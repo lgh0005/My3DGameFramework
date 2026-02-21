@@ -1,5 +1,5 @@
 ﻿#pragma once
-#include "Debuggers/RealTimer.h"
+#include "Debug/RealTimer.h"
 
 namespace MGF3D
 {

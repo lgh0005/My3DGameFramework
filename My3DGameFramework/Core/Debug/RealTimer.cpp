@@ -1,4 +1,4 @@
-﻿#include "DebugPch.h"
+﻿#include "CorePch.h"
 #include "RealTimer.h"
 
 namespace MGF3D
