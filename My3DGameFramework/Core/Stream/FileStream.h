@@ -23,8 +23,7 @@ namespace MGF3D
 
 		void Flush() override { m_file.flush(); }
 		void Close() override { if (m_file.is_open()) m_file.close(); }
-		void Reopen() { if (m_file.is_open()) m_file.close(); m_file.open(m_path.GetCStr(), m_openMode); 
-		}
+		void Reopen() { if (m_file.is_open()) m_file.close(); m_file.open(m_path.GetCStr(), m_openMode); }
 
 		usize Read(void* buffer, usize size) override;
 		usize Write(const void* buffer, usize size) override;

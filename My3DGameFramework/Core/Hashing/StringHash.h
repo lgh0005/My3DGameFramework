@@ -21,6 +21,6 @@ namespace MGF3D
 	};
 }
 
-MGF_REGISTER_HASH(MGF3D::StringHash)
+MGF_REGISTER_HASH(StringHash, uint32)
 
 #include "Hashing/StringHash.inl"

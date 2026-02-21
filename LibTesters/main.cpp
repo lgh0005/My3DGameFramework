@@ -184,6 +184,46 @@ int main()
         MGF_ASSERT(currentNameCount == 2, "Name Pool count is incorrect!");
     }
 
+    // ---------------------------------------------------------
+    // [SECTION 6] Container Iteration Test (Range-based for loop)
+    // ---------------------------------------------------------
+    {
+        MGF_LOG_TRACE("[Step 6] Container Iteration Test");
+
+        // 1. Vector 순회 테스트
+        SVector<int32> iterVec;
+        for (int i = 1; i <= 5; ++i)
+        {
+            iterVec.push_back(i * 10); // 10, 20, 30, 40, 50
+        }
+
+        int32 vectorSum = 0;
+        // TVector에 begin(), end()를 직접 구현하지 않았어도 부모(std::vector)의 것을 자동으로 사용합니다!
+        for (const int32& val : iterVec)
+        {
+            vectorSum += val;
+        }
+        MGF_ASSERT(vectorSum == 150, "Vector iteration failed!");
+        MGF_LOG_INFO("SVector Iteration Success! Sum of elements: {0}", vectorSum);
+
+        // 2. Map 순회 테스트
+        SMap<StringHash, int32> iterMap;
+        iterMap.Insert("Sword", 100);
+        iterMap.Insert("Shield", 200);
+        iterMap.Insert("Potion", 50);
+
+        int32 mapSum = 0;
+        // TMap 역시 std::unordered_map을 public 상속받았으므로 std::pair<const K, V> 형태로 순회 가능합니다.
+        for (const auto& pair : iterMap)
+        {
+            mapSum += pair.second;
+        }
+        MGF_ASSERT(mapSum == 350, "Map iteration failed!");
+        MGF_LOG_INFO("SMap Iteration Success! Sum of values: {0}", mapSum);
+
+        PrintMemState("After Iteration Test");
+    }
+
     MGF_LOG_INFO("=== All Cross-Domain Integration Tests Passed! ===");
     MGF_LOG_FLUSH();
 

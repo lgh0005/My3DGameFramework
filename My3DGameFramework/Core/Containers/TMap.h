@@ -34,21 +34,10 @@ namespace MGF3D
         void  Clear()         override { this->clear(); }
 
     public:
-        V* Find(const K& key);
-        const V* Find(const K& key) const;
+        RawPtr<V> Find(const K& key);
+        RawPtr<const V> Find(const K& key) const;
         bool Insert(const K& key, const V& value);
         bool Remove(const K& key);
-
-    public:
-        using iterator = typename Base::iterator;
-        using const_iterator = typename Base::const_iterator;
-
-        iterator       begin()        noexcept { return Base::begin(); }
-        iterator       end()          noexcept { return Base::end(); }
-        const_iterator begin()  const noexcept { return Base::begin(); }
-        const_iterator end()    const noexcept { return Base::end(); }
-        const_iterator cbegin() const noexcept { return Base::cbegin(); }
-        const_iterator cend()   const noexcept { return Base::cend(); }
     };
 }
 

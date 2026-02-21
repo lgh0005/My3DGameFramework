@@ -38,32 +38,14 @@ namespace MGF3D
         void  Clear()         override { this->clear(); }
 
     public:
-        T* Data() { return this->data(); }
-        const T* Data() const { return this->data(); }
+        RawPtr<T> Data() { return this->data(); }
+        RawPtr<const T> Data() const { return this->data(); }
 
         usize Capacity() const;
         void Assign(usize n, const T& value);
         void Reserve(usize n);
         bool Contains(const T& value) const;
         void RemoveSwap(usize index);
-
-    public:
-        using iterator = typename Base::iterator;
-        using const_iterator = typename Base::const_iterator;
-        using reverse_iterator = typename Base::reverse_iterator;
-        using const_reverse_iterator = typename Base::const_reverse_iterator;
-
-        iterator       begin()        noexcept { return Base::begin(); }
-        iterator       end()          noexcept { return Base::end(); }
-        const_iterator begin()  const noexcept { return Base::begin(); }
-        const_iterator end()    const noexcept { return Base::end(); }
-        const_iterator cbegin() const noexcept { return Base::cbegin(); }
-        const_iterator cend()   const noexcept { return Base::cend(); }
-
-        reverse_iterator       rbegin()        noexcept { return Base::rbegin(); }
-        reverse_iterator       rend()          noexcept { return Base::rend(); }
-        const_reverse_iterator crbegin() const noexcept { return Base::crbegin(); }
-        const_reverse_iterator crend()   const noexcept { return Base::crend(); }
     };
 }
 

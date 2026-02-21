@@ -9,4 +9,8 @@ namespace MGF3D
 	{
 		UpdateRawPath();
 	}
+	FilePath::FilePath(const SString& pathStr) : m_path(pathStr.CStr())
+	{
+		UpdateRawPath();
+	}
 }

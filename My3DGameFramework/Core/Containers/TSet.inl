@@ -49,7 +49,7 @@ namespace MGF3D
     }
 
     template <typename K, typename Alloc, typename Hash, typename KeyEqual>
-    inline const K* TSet<K, Alloc, Hash, KeyEqual>::Find(const K& key) const
+    inline RawPtr<const K> TSet<K, Alloc, Hash, KeyEqual>::Find(const K& key) const
     {
         auto it = this->find(key);
         if (it != this->end()) return &(*it);

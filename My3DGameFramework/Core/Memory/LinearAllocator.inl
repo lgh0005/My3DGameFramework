@@ -6,7 +6,7 @@ namespace MGF3D
 {
 	// 생성자
 	template <typename T>
-	LinearAllocator<T>::LinearAllocator(LinearMemoryPool* pool) noexcept
+	LinearAllocator<T>::LinearAllocator(RawPtr<LinearMemoryPool> pool) noexcept
 	{
 		if (pool) m_pool = pool;
 		else m_pool = MemoryManager::Instance().GetLinearMemoryPool();
@@ -19,7 +19,7 @@ namespace MGF3D
 
 	// 메모리 할당
 	template <typename T>
-	T* LinearAllocator<T>::allocate(usize n)
+	RawPtr<T> LinearAllocator<T>::allocate(usize n)
 	{
 		const usize size = n * sizeof(T);
 		const usize alignmentValue = alignof(T);
@@ -33,12 +33,12 @@ namespace MGF3D
 		if (!ptr)
 			ptr = ::operator new(size, MGF3D::alignment(alignmentValue));
 
-		return static_cast<T*>(ptr);
+		return static_cast<RawPtr<T>>(ptr);
 	}
 
 	// 메모리 해제
 	template <typename T>
-	void LinearAllocator<T>::deallocate(T* p, usize n) noexcept
+	void LinearAllocator<T>::deallocate(RawPtr<T> p, usize n) noexcept
 	{
 		if (!p) return;
 		const usize size = n * sizeof(T);

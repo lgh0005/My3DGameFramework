@@ -2,6 +2,7 @@
 #include <mutex>
 #include <thread>
 #include <condition_variable>
+#include <future>
 
 namespace MGF3D
 {
@@ -15,4 +16,19 @@ namespace MGF3D
 
 	using ConditionVariable = std::condition_variable;
 	using Thread = std::thread;
+
+	/*===========================//
+	//   Async Task Aliases      //
+	//===========================*/
+	template<typename T>
+	using Future = std::future<T>;
+
+	template<typename T>
+	using SharedFuture = std::shared_future<T>;
+
+	template<typename T>
+	using Promise = std::promise<T>;
+
+	template<typename Signature>
+	using PackagedTask = std::packaged_task<Signature>;
 }

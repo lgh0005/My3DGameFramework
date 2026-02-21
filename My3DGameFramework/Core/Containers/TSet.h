@@ -36,20 +36,9 @@ namespace MGF3D
 
     public:
         // Set의 특성상 내부 데이터 수정을 방지하기 위해 Read-only Find만 제공
-        const K* Find(const K& key) const;
+        RawPtr<const K> Find(const K& key) const;
         bool Insert(const K& key);
         bool Remove(const K& key);
-
-    public:
-        using iterator = typename Base::iterator;
-        using const_iterator = typename Base::const_iterator;
-
-        iterator       begin()        noexcept { return Base::begin(); }
-        iterator       end()          noexcept { return Base::end(); }
-        const_iterator begin()  const noexcept { return Base::begin(); }
-        const_iterator end()    const noexcept { return Base::end(); }
-        const_iterator cbegin() const noexcept { return Base::cbegin(); }
-        const_iterator cend()   const noexcept { return Base::cend(); }
     };
 }
 

@@ -69,7 +69,7 @@ namespace MGF3D
         MGFName result;
 
         // 셋터를 통해 풀링된 '진짜' 주소와 해시를 직접 주입.
-        auto* pooledSString = m_stringPool.Find(hash);
+        RawPtr<SString> pooledSString = m_stringPool.Find(hash);
         result.SetString(pooledSString->CStr());
         result.SetStringHash(hash);
 

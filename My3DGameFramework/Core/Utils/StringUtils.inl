@@ -13,7 +13,7 @@ namespace MGF3D
 
         // 2. 타입별 최대 버퍼 크기 계산
         // 64비트 정수는 최대 20자, 실수는 넉넉하게 32자면 충분합니다.
-        constexpr usize MaxBufferSize = std::is_floating_point_v<T> ? 64 : 24;
+        constexpr usize MaxBufferSize = CoreUtils::Select(std::is_floating_point_v<T>, 64ULL, 24ULL);
         char8 buffer[MaxBufferSize];
 
         // 3. 변환 수행
@@ -39,7 +39,6 @@ namespace MGF3D
 
     inline constexpr char8 StringUtils::ToUpper(char8 c)
     {
-        // 소문자 'a' ~ 'z' 범위에 있다면 대문자로 변환
         if (CoreUtils::IsBetween(c, static_cast<char8>('a'), static_cast<char8>('z')))
             return c - 32;
         return c;

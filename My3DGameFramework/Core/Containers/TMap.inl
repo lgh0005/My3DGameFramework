@@ -49,7 +49,7 @@ namespace MGF3D
     }
 
     template<typename K, typename V, typename Alloc, typename Hash, typename KeyEqual>
-    inline V* TMap<K, V, Alloc, Hash, KeyEqual>::Find(const K& key)
+    inline RawPtr<V> TMap<K, V, Alloc, Hash, KeyEqual>::Find(const K& key)
     {
         auto it = this->find(key);
         if (it != this->end()) return &it->second;
@@ -57,7 +57,7 @@ namespace MGF3D
     }
 
     template<typename K, typename V, typename Alloc, typename Hash, typename KeyEqual>
-    inline const V* TMap<K, V, Alloc, Hash, KeyEqual>::Find(const K& key) const
+    inline RawPtr<const V> TMap<K, V, Alloc, Hash, KeyEqual>::Find(const K& key) const
     {
         auto it = this->find(key);
         if (it != this->end()) return &it->second;

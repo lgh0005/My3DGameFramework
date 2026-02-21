@@ -5,7 +5,7 @@
 namespace MGF3D
 {
 	template <typename T>
-	SlabAllocator<T>::SlabAllocator(SlabMemoryPool* pool) noexcept
+	SlabAllocator<T>::SlabAllocator(RawPtr<SlabMemoryPool> pool) noexcept
 	{
 		if (pool) m_pool = pool;
 		else m_pool = MemoryManager::Instance().GetSlabMemoryPool(sizeof(T));
@@ -16,7 +16,7 @@ namespace MGF3D
 	SlabAllocator<T>::SlabAllocator(const SlabAllocator<U>& other) noexcept : m_pool(other.m_pool) { }
 
 	template <typename T>
-	[[nodiscard]] T* SlabAllocator<T>::allocate(usize n)
+	[[nodiscard]] RawPtr<T> SlabAllocator<T>::allocate(usize n)
 	{
 		if (n == 0) return nullptr;
 
@@ -27,16 +27,16 @@ namespace MGF3D
 		if (n == 1 && m_pool != nullptr)
 		{
 			if (sizeof(T) <= m_pool->GetSlotSize())
-				return static_cast<T*>(m_pool->Allocate());
+				return static_cast<RawPtr<T>>(m_pool->Allocate());
 		}
 
 		// 3. 그 외의 모든 경우(n > 1 배열 포함)는 전역 MemoryManager의 슬랩 시스템에 위임
 		// 매니저는 totalSize를 보고 최적의 버킷(16~4096)을 골라주거나 시스템 힙으로 폴백합니다.
-		return static_cast<T*>(MemoryManager::Instance().Allocate(totalSize));
+		return static_cast<RawPtr<T>>(MemoryManager::Instance().Allocate(totalSize));
 	}
 
 	template <typename T>
-	void SlabAllocator<T>::deallocate(T* p, usize n) noexcept
+	void SlabAllocator<T>::deallocate(RawPtr<T> p, usize n) noexcept
 	{
 		if (p == nullptr) return;
 

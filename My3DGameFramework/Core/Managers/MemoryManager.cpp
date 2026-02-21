@@ -1,5 +1,6 @@
 ﻿#include "CorePch.h"
 #include "Managers/MemoryManager.h"
+#include "Utils/MemoryUtils.h"
 #include "Memory/SlabMemoryPool.h"
 #include "Memory/LinearMemoryPool.h"
 
@@ -90,7 +91,7 @@ namespace MGF3D
 		m_slabMemoryPools[index]->Deallocate(ptr);
 	}
 
-	SlabMemoryPool* MemoryManager::GetSlabMemoryPool(usize size) const noexcept
+	RawPtr<SlabMemoryPool> MemoryManager::GetSlabMemoryPool(usize size) const noexcept
 	{
 		// 1. 관리 가능한 최대 슬랩 크기(4096)를 넘어가면 풀이 없으므로 nullptr 반환
 		if (size > SlabMaxSize || size == 0)
@@ -106,25 +107,25 @@ namespace MGF3D
 		return nullptr;
 	}
 
-	LinearMemoryPool* MemoryManager::GetLinearMemoryPool() const noexcept
+	RawPtr<LinearMemoryPool> MemoryManager::GetLinearMemoryPool() const noexcept
 	{
 		return m_linearMemoryPool;
 	}
 
 	int32 MemoryManager::GetPoolIndex(usize size) const noexcept
 	{
-		// 16바이트 이하는 무조건 0번 인덱스
+		// 1. 16바이트 이하는 무조건 0번 인덱스
 		if (size <= 16) return 0;
 
-		// 2의 거듭제곱으로 인덱스 찾기
-		usize currentSize = 16;
-		for (int i = 0; i < SlabBucketCount; ++i)
-		{
-			if (size <= currentSize) return i;
-			currentSize <<= 1;
-		}
+		// 2. 비트 연산을 이용한 O(1) 인덱스 계산
+		uint32 msb = MemoryUtils::MostSignificantBit64(static_cast<uint64>(size - 1));
+		int32 index = static_cast<int32>(msb) - 3;
 
-		return SlabBucketCount - 1;
+		// 3. 안전을 위한 클램핑
+		if (index < 0) return 0;
+		if (index >= SlabBucketCount) return SlabBucketCount - 1;
+
+		return index;
 	}
 
 	usize MemoryManager::GetTotalSlabUsedMemory() const noexcept
