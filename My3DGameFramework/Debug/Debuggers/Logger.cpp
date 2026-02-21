@@ -1,14 +1,13 @@
 ﻿#include "DebugPch.h"
 #include "Logger.h"
-#include "spdlog/sinks/stdout_color_sinks.h"
+#include <spdlog/sinks/stdout_color_sinks.h>
+#include <spdlog/sinks/basic_file_sink.h>
 
 namespace MGF3D
 {
 	Logger::SPDLoggerPtr Logger::m_logger = nullptr;
-	Logger::Logger() = default;
-	Logger::~Logger() = default;
 
-	void Logger::Init()
+	void Logger::_Internal_Init()
 	{
 		if (m_logger) return;
 
@@ -18,12 +17,12 @@ namespace MGF3D
 		MGF_LOG_INFO("Logger : Logger Started. [The Beginning]");
 	}
 
-	void Logger::Flush()
+	void Logger::_Internal_Flush()
 	{
 		if (m_logger) m_logger->flush();
 	}
 
-	void Logger::Clear()
+	void Logger::_Internal_Clear()
 	{
 		if (!m_logger) return;
 		MGF_LOG_INFO("Logger : Logger Cleared. [The End]");

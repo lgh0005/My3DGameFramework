@@ -1,24 +1,36 @@
 ﻿#pragma once
+#include "Common/Clock.h"
 
 namespace MGF3D
 {
-	// TODO : Core에 있는 Clock을 적극 이용해서 단순화
-	// 디버그 빌드와 릴리즈 빌드를 서로 격리해야 함
-
 	class RealTimer
 	{
 		DECLARE_UTILITIES(RealTimer)
 
 	public:
-		static void Init();
-		static uint64 GetTimestamp();
-		static double GetElapsedSeconds(uint64 start, uint64 end);
-		static double GetTotalTime();
+		static void   _Internal_Init();
+		static uint64 _Internal_GetTimestamp();
+		static double _Internal_GetElapsedSeconds(uint64 start, uint64 end);
+		static double _Internal_GetTotalTime();
 
+#ifdef _DEBUG
 	private:
-		using Clock = std::chrono::steady_clock;
-		using TimePoint = std::chrono::time_point<Clock>;
-
-		static TimePoint m_startTime;
+		static Clock::TimePoint s_startTime;
+#endif
 	};
 }
+
+/*==========================//
+//    RealTimer Macros      //
+//==========================*/
+#ifdef _DEBUG
+#define MGF_TIMER_INIT()          MGF3D::RealTimer::_Internal_Init()
+#define MGF_TIMER_GET_TS()        MGF3D::RealTimer::_Internal_GetTimestamp()
+#define MGF_TIMER_ELAPSED(s, e)   MGF3D::RealTimer::_Internal_GetElapsedSeconds(s, e)
+#define MGF_TIMER_TOTAL()         MGF3D::RealTimer::_Internal_GetTotalTime()
+#else
+#define MGF_TIMER_INIT()          ((void)0)
+#define MGF_TIMER_GET_TS()        (0ULL)
+#define MGF_TIMER_ELAPSED(s, e)   (0.0)
+#define MGF_TIMER_TOTAL()         (0.0)
+#endif

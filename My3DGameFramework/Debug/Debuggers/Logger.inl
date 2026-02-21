@@ -3,31 +3,31 @@
 namespace MGF3D
 {
 	template<typename ...Args>
-	inline void Logger::LogTrace(fmt::format_string<Args...> fmt, Args && ...args)
+	inline void Logger::_Internal_LogTrace(fmt::format_string<Args...> fmt, Args && ...args)
 	{
 		if (m_logger) m_logger->trace(fmt, std::forward<Args>(args)...);
 	}
 
 	template<typename ...Args>
-	inline void Logger::LogInfo(fmt::format_string<Args...> fmt, Args && ...args)
+	inline void Logger::_Internal_LogInfo(fmt::format_string<Args...> fmt, Args && ...args)
 	{
 		if (m_logger) m_logger->info(fmt, std::forward<Args>(args)...);
 	}
 
 	template<typename ...Args>
-	inline void Logger::LogWarn(fmt::format_string<Args...> fmt, Args && ...args)
+	inline void Logger::_Internal_LogWarn(fmt::format_string<Args...> fmt, Args && ...args)
 	{
 		if (m_logger) m_logger->warn(fmt, std::forward<Args>(args)...);
 	}
 
 	template<typename ...Args>
-	inline void Logger::LogError(fmt::format_string<Args...> fmt, Args && ...args)
+	inline void Logger::_Internal_LogError(fmt::format_string<Args...> fmt, Args && ...args)
 	{
 		if (m_logger) m_logger->error(fmt, std::forward<Args>(args)...);
 	}
 
 	template<typename ...Args>
-	inline void Logger::LogFatal(fmt::format_string<Args...> fmt, Args && ...args)
+	inline void Logger::_Internal_LogFatal(fmt::format_string<Args...> fmt, Args && ...args)
 	{
 		if (m_logger) m_logger->critical(fmt, std::forward<Args>(args)...);
 	}

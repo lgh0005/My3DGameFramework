@@ -5,41 +5,43 @@ namespace MGF3D
 {
     class Clock
     {
+        DECLARE_UTILITIES(Clock)
+
     public:
-        Clock();
-        ~Clock();
         using EngineClock = std::chrono::steady_clock;
         using TimePoint = std::chrono::time_point<EngineClock>;
 
     public:
-        void Init();
-        void Update();
-        bool CheckFixedUpdate();
+        static void Init();
+        static void Update();
+        static bool CheckFixedUpdate();
+        static double ToSeconds(uint64 microseconds);
+        static uint64 ToMicroseconds(double seconds);
 
     public:
-        void SetTimeScale(float scale) { m_timeScale = scale; }
-        void SetPaused(bool paused) { m_isPaused = paused; }
+        static void  SetTimeScale(float scale) { s_timeScale = scale; }
+        static void  SetPaused(bool paused) { s_isPaused = paused; }
 
-        float  GetDeltaTime() const { return m_isPaused ? 0.0f : m_deltaTime * m_timeScale; }
-        float  GetUnscaledDeltaTime() const { return m_deltaTime; }
-        double GetTotalTime() const { return m_totalTime; }
-        float  GetFPS() const { return m_fps; }
-        float  GetFixedDeltaTime() const { return m_fixedDeltaTime; }
+        static float  GetDeltaTime() { return s_isPaused ? 0.0f : s_deltaTime * s_timeScale; }
+        static float  GetUnscaledDeltaTime() { return s_deltaTime; }
+        static double GetTotalTime() { return s_totalTime; }
+        static float  GetFPS() { return s_fps; }
+        static float  GetFixedDeltaTime() { return s_fixedDeltaTime; }
 
     private:
-        TimePoint m_baseTime;      // 초기화 시점
-        TimePoint m_prevTime;      // 이전 프레임 시점
+        static TimePoint s_baseTime;
+        static TimePoint s_prevTime;
 
-        float  m_deltaTime = 0.0f;
-        double m_totalTime = 0.0;
-        float  m_timeScale = 1.0f;
-        bool   m_isPaused = false;
+        static float  s_deltaTime;
+        static double s_totalTime;
+        static float  s_timeScale;
+        static bool   s_isPaused;
 
-        float  m_fixedDeltaTime = 1.0f / 60.0f; // 기본 60Hz
-        float  m_accumulator = 0.0f;
+        static float  s_fixedDeltaTime;
+        static float  s_accumulator;
 
-        float  m_fps = 0.0f;
-        int32  m_frameCount = 0;
-        float  m_fpsTimer = 0.0f;
+        static float  s_fps;
+        static int32  s_frameCount;
+        static float  s_fpsTimer;
     };
 }

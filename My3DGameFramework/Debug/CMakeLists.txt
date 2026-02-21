@@ -6,13 +6,11 @@ set(TARGET_NAME Engine::${MODULE_NAME})
 # 1. 소스 파일 목록 정의
 set(SOURCES
 
-    # Common
-
-
     # Debuggers
     "Debuggers/Asserter.h"     "Debuggers/Asserter.cpp"
     "Debuggers/Logger.h"     "Debuggers/Logger.cpp"    "Debuggers/Logger.inl"
     "Debuggers/RealTimer.h"     "Debuggers/RealTimer.cpp"
+    "Debuggers/ProfileScope.h"  "Debuggers/ProfileScope.cpp"
 )
 
 # 2. 빌드 타겟 생성 및 별칭 등록

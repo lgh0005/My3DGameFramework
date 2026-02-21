@@ -39,11 +39,11 @@ namespace MGF3D
 		DECLARE_UTILITIES(Asserter)
 
 	public:
-		static void ReportFailure
+		static void _Internal_ReportFailure
 		(
-			cstr* condition, 
-			cstr* message,
-			cstr* file, int32 line
+			cstr condition, 
+			cstr message,
+			cstr file, int32 line
 		);
 	};
 }
@@ -53,17 +53,16 @@ namespace MGF3D
 //======================*/
 #pragma region ASSERTION
 
-#define MGF_STATIC_ASSERT(condition, message) static_assert(condition, message)
-
 #ifdef _DEBUG
-#define MGF_ASSERT(condition, message)												 \
-do {																				 \
-        if (!(!!(condition)))														 \
-		{																			 \
-            MGF3D::Asserter::ReportFailure(#condition, message, __FILE__, __LINE__); \
-            MGF_PLATFORM_BREAK();													 \
-        }																			 \
+#define MGF_ASSERT(condition, message)														   \
+    do {																					   \
+        if (!(!!(condition)))																   \
+        {																					   \
+            MGF3D::Asserter::_Internal_ReportFailure(#condition, message, __FILE__, __LINE__); \
+            MGF_PLATFORM_BREAK();															   \
+        }																					   \
     } while (0)
+
 #define MGF_ASSERT_BASE(condition) MGF_ASSERT(condition, "No Message")
 #else
 #define MGF_ASSERT(condition, message) ((void)0)
