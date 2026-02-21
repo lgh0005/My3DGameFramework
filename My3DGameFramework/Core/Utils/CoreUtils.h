@@ -12,6 +12,9 @@ namespace MGF3D
 
 		template<typename T>
 		static constexpr bool IsInRange(T value, T min, T max);
+
+		template<typename T>
+		static constexpr const T& Select(bool condition, const T& a, const T& b);
 	};
 }
 

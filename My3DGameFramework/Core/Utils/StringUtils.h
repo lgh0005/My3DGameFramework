@@ -21,6 +21,11 @@ namespace MGF3D
 
         static constexpr char8 ToLower(char8 c);
         static constexpr char8 ToUpper(char8 c);
+
+        static int32 Compare(cstr s1, cstr s2);
+        static int32 Compare(strview s1, strview s2);
+
+        static bool Equals(strview s1, strview s2);
     };
 }
 

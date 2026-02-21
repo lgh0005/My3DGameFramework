@@ -25,10 +25,15 @@ set(SOURCES
     "Debug/ProfileScope.h"        "Debug/ProfileScope.cpp"
     "Debug/RealTimer.h"           "Debug/RealTimer.cpp"
 
+    # Coroutine
+    "Coroutine/Coroutine.h"         "Coroutine/Coroutine.cpp"
+    "Coroutine/YieldInstructor.h"   "Coroutine/YieldInstructor.cpp"
+
     # Managers
     "Managers/ThreadManager.h"      "Managers/ThreadManager.cpp"
     "Managers/MemoryManager.h"      "Managers/MemoryManager.cpp"
-    "Managers/NameManager.h"      "Managers/NameManager.cpp"
+    "Managers/NameManager.h"        "Managers/NameManager.cpp"
+    "Managers/CoroutineManager.h"   "Managers/CoroutineManager.cpp"
 
     # Memory
     "Memory/LinearMemoryPool.h"           "Memory/LinearMemoryPool.cpp"

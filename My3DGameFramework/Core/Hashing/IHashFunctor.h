@@ -9,6 +9,8 @@ namespace MGF3D
         uint32 value { 0 };
 
         constexpr IHashFunctor() : value(0) {}
+
+        // CRTP면 이 생성자가 호출될 이유는 없어보이긴 함.
         explicit constexpr IHashFunctor(uint32 h) : value(h) {}
 
         bool operator==(const HashFucntor& other) const { return value == other.value; }

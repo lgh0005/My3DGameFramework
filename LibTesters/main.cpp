@@ -1,5 +1,6 @@
 ﻿#include "pch.h"
 #include "Managers/MemoryManager.h"
+#include "Managers/NameManager.h"
 
 // Debug System Headers
 #include "Debug/Asserter.h"
@@ -18,6 +19,12 @@
 #include "Containers/Linear/LMap.h"
 #include "Containers/Linear/LSet.h"
 #include "Containers/Linear/LString.h"
+
+// 이름 시리즈
+#include "Naming/MGFName.h"
+
+// Utils
+#include "Utils/StringUtils.h"
 
 using namespace MGF3D;
 
@@ -151,6 +158,33 @@ int main()
         MGF_ASSERT(pId && *pId == 1001, "Hash Map Search Failed!");
 
         PrintMemState("After StringHash Map Test");
+    }
+
+    // ---------------------------------------------------------
+    // [SECTION 5] MGFName Uniqueness & Pooling Test
+    // ---------------------------------------------------------
+    {
+        MGF_LOG_TRACE("[Step 5] MGFName Uniqueness & Auto-Increment Test");
+
+        // 1. 첫 번째 이름 등록
+        MGFName n1("Actor");
+        MGF_LOG_INFO("Register 1st: {0}", n1.CStr());
+
+        // 2. 고유 옵션을 켜서 중복 등록 시도 (_1이 붙어야 함)
+        MGFName n2("Actor", true);
+        MGF_LOG_INFO("Register 2nd (Unique): {0}", n2.CStr());
+
+        // 3. 고유 옵션을 켜서 한 번 더 중복 등록 (_2가 붙어야 함)
+        MGFName n3("Actor", true);
+        MGF_LOG_INFO("Register 3rd (Unique): {0}", n3.CStr());
+
+        // 4. 일반 모드로 "Actor_1" 등록 요청 (이미 있으므로 풀링되어야 함!)
+        MGFName n2_dup("Actor_1", false);
+        MGF_LOG_INFO("Duplicate Check: n2 is {0}, n2_dup is {1}", n2.CStr(), n2_dup.CStr());
+
+        // 검증 (Assertion)
+        MGF_ASSERT(n2.CStr() == n2_dup.CStr(), "String Pooling failed! Addresses are different!");
+        MGF_LOG_INFO("Success! 'Actor_1' shares the exact same memory address.");
     }
 
     MGF_LOG_INFO("=== All Cross-Domain Integration Tests Passed! ===");

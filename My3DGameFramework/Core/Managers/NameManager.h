@@ -5,6 +5,8 @@
 
 namespace MGF3D
 {
+	struct MGFName;
+
 	class NameManager
 	{
 		DECLARE_SINGLE(NameManager)
@@ -14,10 +16,13 @@ namespace MGF3D
 		~NameManager();
 
 	public:
-		// 문자열을 풀에 등록하고 유일한 주소를 반환
-		cstr Intern(strview sv);
-		cstr CreateUnique(strview baseName);
+		MGFName AddName(cstr name, bool makeUnique);
+		MGFName AddName(strview name, bool makeUnique);
 		usize GetNameCount() const { return m_stringPool.Count(); }
+
+	private:
+		MGFName CreateUniqueName(strview name);
+		MGFName RegisterNewName(strview name, const StringHash& hash);
 
 	private:
 		SMap<StringHash, SString> m_stringPool;

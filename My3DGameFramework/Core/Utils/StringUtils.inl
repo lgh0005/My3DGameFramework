@@ -44,4 +44,22 @@ namespace MGF3D
             return c - 32;
         return c;
     }
+
+    inline int32 StringUtils::Compare(cstr s1, cstr s2)
+    {
+        if (s1 == s2) return 0;
+        if (s1 == nullptr) return -1;
+        if (s2 == nullptr) return 1;
+        return Compare(strview(s1), strview(s2));
+    }
+
+    inline int32 StringUtils::Compare(strview s1, strview s2)
+    {
+        return s1.compare(s2);
+    }
+
+    inline bool StringUtils::Equals(strview s1, strview s2)
+    {
+        return s1 == s2;
+    }
 }
