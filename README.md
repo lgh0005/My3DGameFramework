@@ -15,28 +15,28 @@
 
 # 📺 Development Milestones (Progress Videos)
 현재까지의 주요 핵심 개발 진행 상황을 시각적으로 기록합니다.
-1. PBR (Physically Based Rendering) & Bloom
+### 1. PBR (Physically Based Rendering) & Bloom
 <img width="1976" height="789" alt="pbr_chart_and_model" src="https://github.com/user-attachments/assets/1203d3b6-3744-43e7-a40f-3fee366f2a90" />
 <img width="1191" height="828" alt="pbr_bloom" src="https://github.com/user-attachments/assets/b9c60bfe-c213-4c27-8602-d1eb993eb8b1" />
 모델에 metallic, roughness(또는 glossiness)를 IBL로 인한 재질 표현 및 차트로 PBR의 핵심을 테스트 하였습니다.
 
-2. 여러 가지 Post-Processing
+### 2. 여러 가지 Post-Processing
    
 https://github.com/user-attachments/assets/4dcd0b9c-9887-4605-9beb-d3a686255ce3
 
 다양한 시각 효과를 위해 더블 버퍼링 기반의 포스트 프로세싱 시스템을 구축하였으며, 다음과 같은 효과들을 구현하였습니다.
-구현된 효과 목록 (참고 자료: [3D Game Shaders for Beginners](https://github.com/lettier/3d-game-shaders-for-beginners))
+구현된 효과 목록 (참고 자료: [3D Game Shaders for Beginners](https://github.com/lettier/3d-game-shaders-for-beginners), [OpenGL 한국어 강좌](https://www.youtube.com/watch?v=kEAKvJKnvfA&list=PLvNHCGtd4kh_cYLKMP_E-jwF3YKpDP4hf), [Computer Graphics with Modern OpenGL and C++](https://www.udemy.com/course/graphics-with-modern-opengl/))
 - Color & Tone: ACES / Reinhard / Exposure Tone Mapping
 - Lens & Camera: 가우시안 및 Kawase Bloom, 색수차(Chromatic Aberration), 렌즈 플레이어, DOF(Depth of Field), 모션 블러
 - Artistic & Effects: 픽셀화, 포스터화, 아웃라이닝(Outlining), CRT 화면 왜곡 효과
 - Environment: 포그(Fog), 안티 앨리어싱(FXAA)
 
-3. Jolt-Physics 기반 물리 시뮬레이션
+### 3. Jolt-Physics 기반 물리 시뮬레이션
 충돌과 Rigidbody 컴포넌트를 구현하는데 사용되었습니다.
 
 https://github.com/user-attachments/assets/6ff0dc71-eaa0-495c-8b5f-374010f9bdc5
 
-4. 핵심 아키텍처 및 파이프라인
+### 4. 핵심 아키텍처 및 파이프라인
 엔진의 효율적인 연산을 위해 다음의 렌더링 파이프라인을 설계하였습니다.
 
 > Shadow/Culling → Geometry(G-Buffer) → SSAO → Deferred Lighting → Forward Shading → Skybox → Post-Processing
