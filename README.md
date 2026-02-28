@@ -17,6 +17,7 @@
 현재까지의 주요 핵심 개발 진행 상황을 시각적으로 기록합니다.
 1. PBR (Physically Based Rendering) & Bloom
 <img width="1976" height="789" alt="pbr_chart_and_model" src="https://github.com/user-attachments/assets/1203d3b6-3744-43e7-a40f-3fee366f2a90" />
+<img width="1191" height="828" alt="pbr_bloom" src="https://github.com/user-attachments/assets/b9c60bfe-c213-4c27-8602-d1eb993eb8b1" />
 모델에 metallic, roughness(또는 glossiness)를 IBL로 인한 재질 표현 및 차트로 PBR의 핵심을 테스트 하였습니다.
 
 2. 여러 가지 Post-Processing
