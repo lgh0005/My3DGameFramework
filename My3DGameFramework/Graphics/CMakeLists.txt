@@ -110,8 +110,8 @@ set(SOURCES
     "Components/SkinnedMeshRenderer.h"     "Components/SkinnedMeshRenderer.cpp"
     "Components/InstancedMeshRenderer.h"     "Components/InstancedMeshRenderer.cpp"
 
-    # Utilities
-    "Utilities/IBLUtils.h"      "Utilities/IBLUtils.cpp"
+    # Utils
+    "Utils/IBLUtils.h"      "Utils/IBLUtils.cpp"
 )
 
 # 2. 빌드 타겟 생성 및 별칭 등록

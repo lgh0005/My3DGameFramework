@@ -26,10 +26,23 @@ set(SOURCES
     "Debug/RealTimer.h"           "Debug/RealTimer.cpp"
     "Debug/MemoryProfiler.h"      "Debug/MemoryProfiler.cpp"
 
+    # Entities
+    "Entities/ECS/Archetype.h"      "Entities/ECS/Archetype.cpp"
+    "Entities/ECS/Chunk.h"          "Entities/ECS/Chunk.cpp"
+
+    "Entities/Entity/Object.h"      "Entities/Entity/Object.cpp"
+    "Entities/Entity/Component.h"      "Entities/Entity/Component.cpp"
+    "Entities/Entity/GameObject.h"      "Entities/Entity/GameObject.cpp"      "Entities/Entity/GameObject.inl" 
+    "Entities/Entity/Transform.h"      "Entities/Entity/Transform.cpp"
+
     # Managers
     "Managers/ThreadManager.h"      "Managers/ThreadManager.cpp"
     "Managers/MemoryManager.h"      "Managers/MemoryManager.cpp"
     "Managers/NameManager.h"        "Managers/NameManager.cpp"
+    "Managers/EntityManager.h"        "Managers/EntityManager.cpp"
+    "Managers/FileManager.h"        "Managers/FileManager.cpp"
+    "Managers/PathManager.h"        "Managers/PathManager.cpp"
+    "Managers/ResourceManager.h"        "Managers/ResourceManager.cpp"      "Managers/ResourceManager.inl" 
 
     # Memory
     "Memory/LinearMemoryPool.h"           "Memory/LinearMemoryPool.cpp"
@@ -37,12 +50,18 @@ set(SOURCES
     "Memory/SlabMemoryPool.h"           "Memory/SlabMemoryPool.cpp"
     "Memory/SlabAllocator.h"           "Memory/SlabAllocator.cpp"      "Memory/SlabAllocator.inl" 
 
-    # Naming
-    "Naming/MGFName.h"            "Naming/MGFName.cpp"
+    # Identity
+    "Identity/MGFName.h"            "Identity/MGFName.cpp"
+    "Identity/MGFPath.h"          "Identity/MGFPath.cpp"   
+
+    # Resource
+    "Resource/IResourceDescriptor.h" "Resource/IResourceDescriptor.cpp"
+    "Resource/IResourceLoader.h"    "Resource/IResourceLoader.cpp"
+    "Resource/IResourceParser.h"    "Resource/IResourceParser.cpp"
+    "Resource/Resource.h"           "Resource/Resource.cpp"
 
     # Stream
     "Stream/Stream.h"            "Stream/Stream.cpp"
-    "Stream/FilePath.h"          "Stream/FilePath.cpp" 
     "Stream/FileStream.h"        "Stream/FileStream.cpp" 
 
     # Containers
@@ -66,8 +85,10 @@ set(SOURCES
     "Hashing/IHashFunctor.h"          "Hashing/IHashFunctor.cpp"
     "Hashing/StringHash.h"            "Hashing/StringHash.cpp"
 
-    # Runtime
-    #"Runtime/Application.h"       "Runtime/Application.cpp"   "Runtime/Application.inl"
+    # Thread
+    "Thread/MGFThread.h"            "Thread/MGFThread.cpp"
+    "Thread/MGFFuture.h"            "Thread/MGFFuture.cpp"
+    "Thread/MGFPromise.h"            "Thread/MGFPromise.cpp"
 
     # Utils
     "Utils/CoreUtils.h"           "Utils/CoreUtils.cpp"         "Utils/CoreUtils.inl"

@@ -30,11 +30,12 @@ target_link_libraries(${LIB_NAME} PUBLIC
 PRIVATE
     lua
     sol2::sol2
+    Engine::Core
 )
 
 # 6. PCH (Precompiled Header) 설정
 # 옵션 A: 이 라이브러리만의 개별 PCH를 사용할 경우
-# target_precompile_headers(${LIB_NAME} PRIVATE "AiPch.h")
+target_precompile_headers(${LIB_NAME} PRIVATE "ScriptingPch.h")
 
 # 옵션 B: CoreLib에 정의된 PCH를 재사용할 경우 (빌드 속도 최적화)
 # target_precompile_headers(${LIB_NAME} REUSE_FROM CoreLib)

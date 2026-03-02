@@ -1,5 +1,5 @@
 ﻿#include "CorePch.h"
-#include "ThreadManager.h"
+#include "IResourceLoader.h"
 
 namespace MGF3D
 {

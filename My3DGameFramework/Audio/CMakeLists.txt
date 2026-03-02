@@ -15,6 +15,9 @@ set(SOURCES
     # Components
     "Components/AudioListener.h" "Components/AudioListener.cpp"
     "Components/AudioSource.h" "Components/AudioSource.cpp"
+
+    # Utils
+    "Utils/Enums.h"
 )
 
 # 2. 빌드 타겟 생성 및 별칭 등록
@@ -28,10 +31,15 @@ source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${SOURCES})
 target_include_directories(${LIB_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
 # 5. 의존성 링크 : miniaudio.h
+target_link_libraries(${LIB_NAME} 
+
+PUBLIC
+    Engine::Core
+)
 
 # 6. PCH (Precompiled Header) 설정
 # 옵션 A: 이 라이브러리만의 개별 PCH를 사용할 경우
-# target_precompile_headers(${LIB_NAME} PRIVATE "AiPch.h")
+target_precompile_headers(${LIB_NAME} PRIVATE "AudioPch.h")
 
 # 옵션 B: CoreLib에 정의된 PCH를 재사용할 경우 (빌드 속도 최적화)
 # target_precompile_headers(${LIB_NAME} REUSE_FROM CoreLib)

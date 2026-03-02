@@ -25,6 +25,7 @@ target_link_libraries(${LIB_NAME}
 
 PUBLIC
     glfw
+    Engine::Core
 )
 
 # 6. PCH (Precompiled Header) 설정

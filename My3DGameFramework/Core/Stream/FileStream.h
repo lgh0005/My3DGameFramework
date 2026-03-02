@@ -1,6 +1,7 @@
 ﻿#pragma once
 #include "Stream.h"
-#include "FilePath.h"
+#include "Identity/MGFPath.h"
+#include "Identity/MGFName.h"
 #include <fstream>
 
 namespace MGF3D
@@ -12,12 +13,13 @@ namespace MGF3D
 	{
 	public:
 		virtual ~FileStream();
-		FileStream(const FilePath& path, FileMode mode, FileAccess access);
+		FileStream(const MGFPath& path, FileMode mode, FileAccess access);
 
 	public:
 		bool CanRead() const override { return m_file.is_open(); }
 		bool CanWrite() const override { return m_file.is_open(); }
 
+		uint64 GetLength() const override { return 0; }
 		uint64 GetPosition() const override { return static_cast<uint64>(m_file.tellg()); }
 		void   SetPosition(uint64 pos) override { m_file.seekg(pos); m_file.seekp(pos); }
 
@@ -32,7 +34,7 @@ namespace MGF3D
 		static std::ios_base::openmode CalculateOpenMode(FileMode mode, FileAccess access);
 
 	private:
-		FilePath m_path;
+		MGFPath m_path;
 		std::ios_base::openmode m_openMode;
 		mutable std::fstream m_file;
 	};

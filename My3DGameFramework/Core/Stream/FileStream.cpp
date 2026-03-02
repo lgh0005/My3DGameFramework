@@ -3,7 +3,7 @@
 
 namespace MGF3D
 {
-	FileStream::FileStream(const FilePath& path, FileMode mode, FileAccess access)
+	FileStream::FileStream(const MGFPath& path, FileMode mode, FileAccess access)
 		: m_path(path)
 	{
 		m_openMode = CalculateOpenMode(mode, access);

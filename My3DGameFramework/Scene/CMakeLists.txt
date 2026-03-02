@@ -6,6 +6,9 @@ set(TARGET_NAME Engine::${MODULE_NAME})
 # 1. 소스 파일 목록 정의
 set(SOURCES
 
+     # Scene
+    "Scene.h"       "Scene.cpp"     "Scene.inl"
+
     # Managers
     "Managers/SceneManager.h"      "Managers/SceneManager.cpp"    "Managers/SceneManager.inl"
 
@@ -14,9 +17,8 @@ set(SOURCES
     "Registries/GameObjectRegistry.h"    "Registries/GameObjectRegistry.cpp"
     "Registries/SceneRegistry.h"         "Registries/SceneRegistry.cpp"
 
-    # Scene
-    "Scene.h"       "Scene.cpp"     "Scene.inl"
-    "SceneUtils.h"  "SceneUtils.cpp"
+    # Utils
+    "Utils/SceneUtils.h"  "Utils/SceneUtils.cpp"
 )
 
 # 2. 빌드 타겟 생성 및 별칭 등록
