@@ -1,7 +1,10 @@
 ﻿#pragma once
 
-CLASS_PTR(Chunk)
-class Chunk
+namespace MGF3D
 {
+	CLASS_PTR(Chunk)
+		class Chunk
+	{
 
-};
+	};
+}

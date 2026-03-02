@@ -1,7 +1,10 @@
 ﻿#pragma once
 
-CLASS_PTR(Archetype)
-class Archetype
+namespace MGF3D
 {
+	CLASS_PTR(Archetype)
+		class Archetype
+	{
 
-};
+	};
+}
