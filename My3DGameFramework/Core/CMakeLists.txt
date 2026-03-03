@@ -52,12 +52,16 @@ set(SOURCES
 
     # Identity
     "Identity/MGFName.h"            "Identity/MGFName.cpp"
-    "Identity/MGFPath.h"          "Identity/MGFPath.cpp"   
+    "Identity/MGFPath.h"          "Identity/MGFPath.cpp"
+
+    # Parsers
+    "Parsers/JsonParser.h"          "Parsers/JsonParser.cpp"          "Parsers/JsonParser.inl"
+    "Parsers/YamlParser.h"          "Parsers/YamlParser.cpp"          "Parsers/YamlParser.inl"
 
     # Resource
     "Resource/IResourceDescriptor.h" "Resource/IResourceDescriptor.cpp"
     "Resource/IResourceLoader.h"    "Resource/IResourceLoader.cpp"
-    "Resource/IResourceParser.h"    "Resource/IResourceParser.cpp"
+        
     "Resource/Resource.h"           "Resource/Resource.cpp"
 
     # Stream
@@ -112,6 +116,8 @@ target_link_libraries(${LIB_NAME}
 PUBLIC
         glm::glm
         spdlog::spdlog
+        nlohmann_json::nlohmann_json
+        ryml::ryml
 )
 
 # 6. PCH (Precompiled Header) 설정

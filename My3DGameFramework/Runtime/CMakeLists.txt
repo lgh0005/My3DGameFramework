@@ -39,8 +39,8 @@ set(SOURCES
     "Pipelines/URP/UniversalGlobalUniforms.h"     "Pipelines/URP/UniversalGlobalUniforms.cpp" 
     "Pipelines/URP/UniversalRenderPipeline.h"     "Pipelines/URP/UniversalRenderPipeline.cpp" 
 
-    # Utilities
-    "Utilities/LuaBindings.h"       "Utilities/LuaBindings.cpp"
+    # Utils
+    "Utils/LuaBindings.h"       "Utils/LuaBindings.cpp"
 )
 
 # 2. 빌드 타겟 생성 및 별칭 등록
