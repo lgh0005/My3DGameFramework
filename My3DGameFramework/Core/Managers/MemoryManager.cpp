@@ -91,7 +91,7 @@ namespace MGF3D
 		m_slabMemoryPools[index]->Deallocate(ptr);
 	}
 
-	RawPtr<SlabMemoryPool> MemoryManager::GetSlabMemoryPool(usize size) const noexcept
+	Ptr<SlabMemoryPool> MemoryManager::GetSlabMemoryPool(usize size) const noexcept
 	{
 		// 1. 관리 가능한 최대 슬랩 크기(4096)를 넘어가면 풀이 없으므로 nullptr 반환
 		if (size > SlabMaxSize || size == 0)
@@ -107,7 +107,7 @@ namespace MGF3D
 		return nullptr;
 	}
 
-	RawPtr<LinearMemoryPool> MemoryManager::GetLinearMemoryPool() const noexcept
+	Ptr<LinearMemoryPool> MemoryManager::GetLinearMemoryPool() const noexcept
 	{
 		return m_linearMemoryPool;
 	}

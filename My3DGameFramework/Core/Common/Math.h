@@ -4,7 +4,7 @@ namespace MGF3D
 {
 	class Math
 	{
-		DECLARE_UTILITIES(Math)
+		MGF_DECLARE_UTILITIES(Math)
 
 	public:
 		static float Lerp(float a, float b, float f);

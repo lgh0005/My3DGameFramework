@@ -4,7 +4,7 @@
 /*=========================//
 //    Resource descriptor  //
 //=========================*/
-CLASS_PTR(ResourceDesc)
+MGF_MGF_CLASS_PTR(ResourceDesc)
 struct ResourceDesc
 {
 	ResourceDesc(const std::string& rscName = "");
@@ -17,7 +17,7 @@ struct ResourceDesc
 /*================//
 //    Animation   //
 //================*/
-CLASS_PTR(AnimationDesc)
+MGF_CLASS_PTR(AnimationDesc)
 struct AnimationDesc : public ResourceDesc
 {
 	virtual ~AnimationDesc();
@@ -30,7 +30,7 @@ struct AnimationDesc : public ResourceDesc
 /*================//
 //    AudioClip   //
 //================*/
-CLASS_PTR(AudioClipDesc)
+MGF_CLASS_PTR(AudioClipDesc)
 struct AudioClipDesc : public ResourceDesc
 {
 	virtual ~AudioClipDesc();
@@ -44,7 +44,7 @@ struct AudioClipDesc : public ResourceDesc
 /*================//
 //    CubeTexture //
 //================*/
-CLASS_PTR(CubeTextureDesc)
+MGF_CLASS_PTR(CubeTextureDesc)
 struct CubeTextureDesc : public ResourceDesc
 {
 	virtual ~CubeTextureDesc();
@@ -57,7 +57,7 @@ struct CubeTextureDesc : public ResourceDesc
 /*================//
 //      Image      //
 //================*/
-CLASS_PTR(ImageDesc)
+MGF_CLASS_PTR(ImageDesc)
 struct ImageDesc : public ResourceDesc
 {
 	virtual ~ImageDesc();
@@ -71,7 +71,7 @@ struct ImageDesc : public ResourceDesc
 /*================//
 //    Material    //
 //================*/
-CLASS_PTR(MaterialDesc)
+MGF_CLASS_PTR(MaterialDesc)
 struct MaterialDesc : public ResourceDesc
 {
 	virtual ~MaterialDesc();
@@ -106,7 +106,7 @@ struct MaterialDesc : public ResourceDesc
 /*=============//
 //    Scene    //
 //=============*/
-CLASS_PTR(SceneDesc)
+MGF_CLASS_PTR(SceneDesc)
 struct SceneDesc : public SceneDesc
 {
 	virtual ~SceneDesc();
@@ -119,7 +119,7 @@ struct SceneDesc : public SceneDesc
 /*================//
 //      Model      //
 //================*/
-CLASS_PTR(ModelDesc)
+MGF_CLASS_PTR(ModelDesc)
 struct ModelDesc : public ResourceDesc
 {
 	virtual ~ModelDesc();
@@ -132,7 +132,7 @@ struct ModelDesc : public ResourceDesc
 /*================//
 //     Texture     //
 //================*/
-CLASS_PTR(TextureDesc)
+MGF_CLASS_PTR(TextureDesc)
 struct TextureDesc : public ResourceDesc
 {
 	virtual ~TextureDesc();
@@ -147,7 +147,7 @@ struct TextureDesc : public ResourceDesc
 /*================//
 //      Font       //
 //================*/
-CLASS_PTR(FontDesc)
+MGF_CLASS_PTR(FontDesc)
 struct FontDesc : public ResourceDesc
 {
 	virtual ~FontDesc();
@@ -161,7 +161,7 @@ struct FontDesc : public ResourceDesc
 /*================//
 // GraphicsProgram//
 //================*/
-CLASS_PTR(GraphicsProgramDesc)
+MGF_CLASS_PTR(GraphicsProgramDesc)
 struct GraphicsProgramDesc : public ResourceDesc
 {
 	virtual ~GraphicsProgramDesc();
@@ -183,7 +183,7 @@ struct GraphicsProgramDesc : public ResourceDesc
 /*================//
 // ComputeProgram //
 //================*/
-CLASS_PTR(ComputeProgramDesc)
+MGF_CLASS_PTR(ComputeProgramDesc)
 struct ComputeProgramDesc : public ResourceDesc
 {
 	virtual ~ComputeProgramDesc();
@@ -196,7 +196,7 @@ struct ComputeProgramDesc : public ResourceDesc
 /*================//
 //      Script    //
 //================*/
-CLASS_PTR(ScriptDesc)
+MGF_CLASS_PTR(ScriptDesc)
 struct ScriptDesc : public ResourceDesc
 {
 	virtual ~ScriptDesc();
@@ -209,7 +209,7 @@ struct ScriptDesc : public ResourceDesc
 /*================//
 // EnvironmentMap //
 //================*/
-CLASS_PTR(EnvironmentMapDesc)
+MGF_CLASS_PTR(EnvironmentMapDesc)
 struct EnvironmentMapDesc : public ResourceDesc
 {
 	virtual ~EnvironmentMapDesc();
@@ -222,7 +222,7 @@ struct EnvironmentMapDesc : public ResourceDesc
 /*================//
 //    StaticMesh  //
 //================*/
-CLASS_PTR(StaticMeshDesc)
+MGF_CLASS_PTR(StaticMeshDesc)
 struct StaticMeshDesc : public ResourceDesc
 {
 	virtual ~StaticMeshDesc() = default;
@@ -237,7 +237,7 @@ struct StaticMeshDesc : public ResourceDesc
 /*================//
 //    SkinnedMesh //
 //================*/
-CLASS_PTR(SkinnedMeshDesc)
+MGF_CLASS_PTR(SkinnedMeshDesc)
 struct SkinnedMeshDesc : public ResourceDesc
 {
 	virtual ~SkinnedMeshDesc() = default;
@@ -252,7 +252,7 @@ struct SkinnedMeshDesc : public ResourceDesc
 /*================//
 //    ScreenMesh  //
 //================*/
-CLASS_PTR(ScreenMeshDesc)
+MGF_CLASS_PTR(ScreenMeshDesc)
 struct ScreenMeshDesc : public ResourceDesc
 {
 	virtual ~ScreenMeshDesc() = default;
@@ -267,7 +267,7 @@ struct ScreenMeshDesc : public ResourceDesc
 /*================//
 //      UIMesh     //
 //================*/
-CLASS_PTR(UIMeshDesc)
+MGF_CLASS_PTR(UIMeshDesc)
 struct UIMeshDesc : public ResourceDesc
 {
 	virtual ~UIMeshDesc() = default;
@@ -282,7 +282,7 @@ struct UIMeshDesc : public ResourceDesc
 /*================//
 //   InstancedMesh //
 //================*/
-CLASS_PTR(InstancedMeshDesc)
+MGF_CLASS_PTR(InstancedMeshDesc)
 struct InstancedMeshDesc : public ResourceDesc
 {
 	virtual ~InstancedMeshDesc() = default;
@@ -297,7 +297,7 @@ struct InstancedMeshDesc : public ResourceDesc
 /*================//
 //    DebugMesh    //
 //================*/
-CLASS_PTR(DebugMeshDesc)
+MGF_CLASS_PTR(DebugMeshDesc)
 struct DebugMeshDesc : public ResourceDesc
 {
 	virtual ~DebugMeshDesc() = default;

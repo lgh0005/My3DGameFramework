@@ -5,7 +5,7 @@ namespace MGF3D
 {
 	class RealTimer
 	{
-		DECLARE_UTILITIES(RealTimer)
+		MGF_DECLARE_UTILITIES(RealTimer)
 
 	public:
 		static void   _Internal_Init();

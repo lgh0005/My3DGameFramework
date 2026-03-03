@@ -22,7 +22,7 @@
 #include "Containers/Linear/LString.h"
 
 // 이름 시리즈
-#include "Naming/MGFName.h"
+#include "Identity/MGFName.h"
 
 // Utils
 #include "Utils/StringUtils.h"

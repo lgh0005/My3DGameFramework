@@ -6,7 +6,7 @@ namespace MGF3D
 {
 	class Logger
 	{
-		DECLARE_UTILITIES(Logger)
+		MGF_DECLARE_UTILITIES(Logger)
 		using SPDLoggerPtr = std::shared_ptr<spdlog::logger>;
 
 	public:

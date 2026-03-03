@@ -2,8 +2,7 @@
 #include "NameManager.h"
 #include "Containers/Linear/LString.h"
 #include "Utils/StringUtils.h"
-#include "Utils/CoreUtils.h"
-#include "Naming/MGFName.h"
+#include "Identity/MGFName.h"
 
 namespace MGF3D
 {
@@ -69,7 +68,7 @@ namespace MGF3D
         MGFName result;
 
         // 셋터를 통해 풀링된 '진짜' 주소와 해시를 직접 주입.
-        RawPtr<SString> pooledSString = m_stringPool.Find(hash);
+        Ptr<SString> pooledSString = m_stringPool.Find(hash);
         result.SetString(pooledSString->CStr());
         result.SetStringHash(hash);
 

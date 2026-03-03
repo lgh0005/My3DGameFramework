@@ -2,10 +2,10 @@
 
 namespace MGF3D
 {
-    CLASS_PTR(Program)
-    CLASS_PTR(Mesh)
-    CLASS_PTR(Texture)
-    CLASS_PTR(CubeTexture)
+    MGF_CLASS_PTR(Program)
+    MGF_CLASS_PTR(Mesh)
+    MGF_CLASS_PTR(Texture)
+    MGF_CLASS_PTR(CubeTexture)
 
     class IBLUtils
     {

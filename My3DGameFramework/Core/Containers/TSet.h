@@ -36,7 +36,7 @@ namespace MGF3D
 
     public:
         // Set의 특성상 내부 데이터 수정을 방지하기 위해 Read-only Find만 제공
-        RawPtr<const K> Find(const K& key) const;
+        Ptr<const K> Find(const K& key) const;
         bool Insert(const K& key);
         bool Remove(const K& key);
     };

@@ -2,9 +2,9 @@
 
 namespace MGF3D
 {
-	class CoreUtils
+	class CommonUtils
 	{
-		DECLARE_UTILITIES(CoreUtils)
+		MGF_DECLARE_UTILITIES(CommonUtils)
 
 	public:
 		template<typename T>
@@ -18,4 +18,4 @@ namespace MGF3D
 	};
 }
 
-#include "Utils/CoreUtils.inl"
+#include "Utils/CommonUtils.inl"

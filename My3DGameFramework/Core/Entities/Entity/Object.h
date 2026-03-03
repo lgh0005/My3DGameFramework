@@ -2,8 +2,8 @@
 
 namespace MGF3D
 {
-	CLASS_PTR(Object)
-		class Object
+	MGF_CLASS_PTR(Object)
+	class Object
 	{
 	public:
 		virtual ~Object();

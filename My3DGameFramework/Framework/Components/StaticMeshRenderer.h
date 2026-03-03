@@ -2,25 +2,26 @@
 #include "MeshRenderer.h"
 #include "Instancing/InstanceProperty.h"
 
-#pragma region FORWARD_DECLARATION
-CLASS_PTR(StaticMesh)
-CLASS_PTR(Material)
-CLASS_PTR(Program)
-#pragma endregion
-
-CLASS_PTR(StaticMeshRenderer)
-class StaticMeshRenderer : public MeshRenderer
+namespace MGF3D
 {
-	using Super = MeshRenderer;
-	DEFINE_COMPONENT_TYPE(ComponentType::StaticMeshRenderer)
+	MGF_CLASS_PTR(StaticMesh)
+	MGF_CLASS_PTR(Material)
+	MGF_CLASS_PTR(Program)
 
-public:
-	virtual ~StaticMeshRenderer();
-	static StaticMeshRendererUPtr Create(StaticMeshPtr mesh, MaterialPtr material);
-	virtual RenderBounds GetWorldBounds() const override { return Super::GetWorldBounds(); }
-	virtual void Render(Program* program) const;
+	MGF_CLASS_PTR(StaticMeshRenderer)
+	class StaticMeshRenderer : public MeshRenderer
+	{
+		using Super = MeshRenderer;
+		DEFINE_COMPONENT_TYPE(ComponentType::StaticMeshRenderer)
 
-private:
-	StaticMeshRenderer();
-	bool Init(StaticMeshPtr mesh, MaterialPtr material);
-};
+	public:
+		virtual ~StaticMeshRenderer();
+		static StaticMeshRendererUPtr Create(StaticMeshPtr mesh, MaterialPtr material);
+		virtual RenderBounds GetWorldBounds() const override { return Super::GetWorldBounds(); }
+		virtual void Render(Program* program) const;
+
+	private:
+		StaticMeshRenderer();
+		bool Init(StaticMeshPtr mesh, MaterialPtr material);
+	};
+}

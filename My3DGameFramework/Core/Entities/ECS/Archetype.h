@@ -2,8 +2,8 @@
 
 namespace MGF3D
 {
-	CLASS_PTR(Archetype)
-		class Archetype
+	MGF_CLASS_PTR(Archetype)
+	class Archetype
 	{
 
 	};

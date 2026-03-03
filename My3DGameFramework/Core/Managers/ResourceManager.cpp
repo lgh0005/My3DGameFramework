@@ -10,6 +10,9 @@
 
 namespace MGF3D
 {
+	ResourceManager::ResourceManager() = defualt;
+	ResourceManager::~ResourceManager() = default;
+
 	bool ResourceManager::Init()
 	{
 		// 0. 부트스트랩: 가상 경로 시스템을 가동하기 위한 최소한의 경로를 수동 등록

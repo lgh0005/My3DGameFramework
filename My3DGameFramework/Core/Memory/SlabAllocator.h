@@ -2,7 +2,7 @@
 
 namespace MGF3D
 {
-	CLASS_PTR(SlabMemoryPool)
+	MGF_CLASS_PTR(SlabMemoryPool)
 
 	template <typename T>
 	class SlabAllocator
@@ -10,7 +10,7 @@ namespace MGF3D
 	public:
 		// STL 호환을 위한 필수 타입 정의
 		using value_type = T;
-		using pointer = RawPtr<T>;
+		using pointer = Ptr<T>;
 		using size_type = usize;
 
 		// 다른 타입의 할당자로 변환하기 위한 구조체
@@ -26,17 +26,17 @@ namespace MGF3D
 		SlabAllocator(const SlabAllocator<U>& other) noexcept;
 
 		// 메모리 할당
-		[[nodiscard]] RawPtr<T> allocate(usize n);
+		[[nodiscard]] Ptr<T> allocate(usize n);
 
 		// 메모리 해제
-		void deallocate(RawPtr<T> p, usize n) noexcept;
+		void deallocate(Ptr<T> p, usize n) noexcept;
 
 		// 할당자 비교 연산자
 		bool operator==(const SlabAllocator& other) const noexcept { return m_pool == other.m_pool; }
 		bool operator!=(const SlabAllocator& other) const noexcept { return m_pool != other.m_pool; }
 	
 	public:
-		RawPtr<SlabMemoryPool> m_pool;
+		Ptr<SlabMemoryPool> m_pool;
 	};
 }
 

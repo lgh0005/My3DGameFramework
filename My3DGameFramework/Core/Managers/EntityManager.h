@@ -4,7 +4,11 @@ namespace MGF3D
 {
 	class EntityManager
 	{
-		DECLARE_SINGLE(EntityManager)
+		MGF_DECLARE_SINGLE(EntityManager)
+
+	private:
+		EntityManager();
+		~EntityManager();
 
 	public:
 

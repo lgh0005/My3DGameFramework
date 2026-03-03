@@ -36,7 +36,7 @@ namespace MGF3D
 {
 	class Asserter
 	{
-		DECLARE_UTILITIES(Asserter)
+		MGF_DECLARE_UTILITIES(Asserter)
 
 	public:
 		static void _Internal_ReportFailure

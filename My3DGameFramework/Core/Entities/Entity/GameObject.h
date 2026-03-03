@@ -4,12 +4,12 @@
 
 namespace MGF3D
 {
-	CLASS_PTR(Scene)
-	CLASS_PTR(Transform)
-	CLASS_PTR(Component)
-	CLASS_PTR(Script)
+	MGF_CLASS_PTR(Scene)
+	MGF_CLASS_PTR(Transform)
+	MGF_CLASS_PTR(Component)
+	MGF_CLASS_PTR(Script)
 
-	CLASS_PTR(GameObject)
+	MGF_CLASS_PTR(GameObject)
 	class GameObject : public Object
 	{
 	public:

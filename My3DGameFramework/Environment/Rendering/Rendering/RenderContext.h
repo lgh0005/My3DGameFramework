@@ -2,19 +2,19 @@
 
 namespace MGF3D
 {
-	CLASS_PTR(Scene)
-	CLASS_PTR(ComponentRegistry)
-	CLASS_PTR(Component)
-	CLASS_PTR(Camera)
-	CLASS_PTR(StaticMeshRenderer)
-	CLASS_PTR(SkinnedMeshRenderer)
-	CLASS_PTR(Light)
-	CLASS_PTR(MeshOutline)
-	CLASS_PTR(SkyLight)
-	CLASS_PTR(CubeTexture)
-	CLASS_PTR(Texture)
-	CLASS_PTR(GBufferFramebuffer)
-	CLASS_PTR(Framebuffer)
+	MGF_CLASS_PTR(Scene)
+	MGF_CLASS_PTR(ComponentRegistry)
+	MGF_CLASS_PTR(Component)
+	MGF_CLASS_PTR(Camera)
+	MGF_CLASS_PTR(StaticMeshRenderer)
+	MGF_CLASS_PTR(SkinnedMeshRenderer)
+	MGF_CLASS_PTR(Light)
+	MGF_CLASS_PTR(MeshOutline)
+	MGF_CLASS_PTR(SkyLight)
+	MGF_CLASS_PTR(CubeTexture)
+	MGF_CLASS_PTR(Texture)
+	MGF_CLASS_PTR(GBufferFramebuffer)
+	MGF_CLASS_PTR(Framebuffer)
 
 	enum class RenderSlot : uint8
 	{
@@ -23,7 +23,7 @@ namespace MGF3D
 		MAX
 	};
 
-	CLASS_PTR(RenderContext)
+	MGF_CLASS_PTR(RenderContext)
 	class RenderContext
 	{
 		using ComponentVectorRawPtr = const std::vector<Component*>*;

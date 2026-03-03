@@ -1,12 +1,11 @@
 ﻿#pragma once
 #include <chrono>
-#include "Utils/CoreUtils.h"
 
 namespace MGF3D
 {
     class Clock
     {
-        DECLARE_UTILITIES(Clock)
+        MGF_DECLARE_UTILITIES(Clock)
 
     public:
         using EngineClock = std::chrono::steady_clock;
@@ -23,7 +22,7 @@ namespace MGF3D
         static void  SetTimeScale(float scale) { s_timeScale = scale; }
         static void  SetPaused(bool paused) { s_isPaused = paused; }
 
-        static float  GetDeltaTime() { return CoreUtils::Select(s_isPaused, 0.0f, s_deltaTime * s_timeScale); }
+        static float  GetDeltaTime() { return CommonUtils::Select(s_isPaused, 0.0f, s_deltaTime * s_timeScale); }
         static float  GetUnscaledDeltaTime() { return s_deltaTime; }
         static double GetTotalTime() { return s_totalTime; }
         static float  GetFPS() { return s_fps; }

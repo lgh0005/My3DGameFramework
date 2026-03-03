@@ -4,7 +4,7 @@ namespace MGF3D
 {
 	class LinearMemoryPool
 	{
-		DISABLE_COPY(LinearMemoryPool)
+		MGF_DISABLE_COPY(LinearMemoryPool)
 
 	public:
 		LinearMemoryPool(void* buffer, usize size) noexcept;

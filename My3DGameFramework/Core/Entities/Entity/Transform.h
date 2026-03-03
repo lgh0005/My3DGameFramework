@@ -3,8 +3,8 @@
 
 namespace MGF3D
 {
-	CLASS_PTR(Transform)
-		class Transform : public Component
+	MGF_CLASS_PTR(Transform)
+	class Transform : public Component
 	{
 		DEFINE_COMPONENT_TYPE(ComponentType::Transform)
 

@@ -12,5 +12,5 @@ namespace MGF3D
 	using WeakPtr = std::weak_ptr<T>;
 
 	template <typename T>
-	using RawPtr = T*;
+	using Ptr = T*;
 }

@@ -4,10 +4,10 @@
 
 namespace MGF3D
 {
-	CLASS_PTR(GameObject)
-	CLASS_PTR(Transform)
+	MGF_CLASS_PTR(GameObject)
+	MGF_CLASS_PTR(Transform)
 
-	CLASS_PTR(Component)
+	MGF_CLASS_PTR(Component)
 	class Component : public Object
 	{
 		friend class GameObject;

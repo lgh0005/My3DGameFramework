@@ -2,11 +2,11 @@
 
 namespace MGF3D
 {
-    CLASS_PTR(Scene)
-    CLASS_PTR(Framebuffer)
-    CLASS_PTR(RenderPipeline)
+    MGF_CLASS_PTR(Scene)
+    MGF_CLASS_PTR(Framebuffer)
+    MGF_CLASS_PTR(RenderPipeline)
 
-    CLASS_PTR(Renderer)
+    MGF_CLASS_PTR(Renderer)
     class Renderer
     {
     public:

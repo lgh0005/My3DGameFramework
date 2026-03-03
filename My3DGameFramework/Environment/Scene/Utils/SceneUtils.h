@@ -1,19 +1,20 @@
 ﻿#pragma once
 
-#pragma region FORWARD_DECLARATION
-CLASS_PTR(Scene)
-CLASS_PTR(GameObject)
-#pragma endregion
-
-class SceneUtils
+namespace MGF3D
 {
-    DECLARE_STATIC_CLASS(SceneUtils)
+    MGF_CLASS_PTR(Scene)
+    MGF_CLASS_PTR(GameObject)
 
-public:
-    // static GameObject* FindObject(const std::string& name);
-    static void Destroy(GameObject* obj);
-    // TODO : static GameObject* Instantiate();
+    class SceneUtils
+    {
+        DECLARE_STATIC_CLASS(SceneUtils)
 
-private:
-    static Scene* GetCurrentScene();
-};
+    public:
+        // static GameObject* FindObject(const std::string& name);
+        static void Destroy(GameObject* obj);
+        // TODO : static GameObject* Instantiate();
+
+    private:
+        static Scene* GetCurrentScene();
+    };
+}

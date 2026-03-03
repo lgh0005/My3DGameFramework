@@ -34,8 +34,8 @@ namespace MGF3D
         void  Clear()         override { this->clear(); }
 
     public:
-        RawPtr<V> Find(const K& key);
-        RawPtr<const V> Find(const K& key) const;
+        Ptr<V> Find(const K& key);
+        Ptr<const V> Find(const K& key) const;
         bool Insert(const K& key, const V& value);
         bool Remove(const K& key);
     };

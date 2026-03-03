@@ -3,7 +3,6 @@
 # 1. 소스 파일 목록 정의
 set(LIB_TEST_SOURCE
     "main.cpp"
-    "pch.h"
 )
 
 # 2. Visual Studio 필터 자동 생성
@@ -23,6 +22,7 @@ target_include_directories(LibTester PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 # 6. 라이브러리 링크
 # Engine::Core의 기능을 사용하기 위해 링크합니다.
 target_link_libraries(LibTester 
-    PRIVATE 
+
+PRIVATE 
     Engine::Core
 )

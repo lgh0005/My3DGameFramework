@@ -3,5 +3,6 @@
 
 namespace MGF3D
 {
-
+	PathManager::PathManager() = default;
+	PathManager::~PathManager() = default;
 }

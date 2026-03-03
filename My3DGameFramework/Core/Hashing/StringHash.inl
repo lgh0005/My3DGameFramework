@@ -1,5 +1,4 @@
 ﻿#pragma once
-#include "Utils/CoreUtils.h"
 
 namespace MGF3D
 {
@@ -10,7 +9,7 @@ namespace MGF3D
         for (usize i = 0; i < len; ++i)
         {
             char8 c = str[i];
-            if (CoreUtils::IsBetween<char8>(c, 'A', 'Z'))
+            if (CommonUtils::IsBetween<char8>(c, 'A', 'Z'))
                 c += 32;
 
             hash ^= static_cast<uint32>(c);

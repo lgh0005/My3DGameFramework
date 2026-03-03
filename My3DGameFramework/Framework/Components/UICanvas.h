@@ -1,43 +1,44 @@
 ﻿#pragma once
 #include "Object/Component.h"
 
-#pragma region FORWARD_DECLARATION
-CLASS_PTR(Program)
-CLASS_PTR(UIRenderer)
-#pragma endregion
-
-enum class UIRenderMode
+namespace MGF3D
 {
-    ScreenSpace, // 2D 화면 (Overlay)
-    WorldSpace   // 3D 공간 (Billboarding etc)
-};
+    MGF_CLASS_PTR(Program)
+    MGF_CLASS_PTR(UIRenderer)
 
-CLASS_PTR(UICanvas)
-class UICanvas : public Component
-{
-public:
-    virtual ~UICanvas();
-    static UICanvasUPtr Create(UIRenderMode mode = UIRenderMode::ScreenSpace, int32 sortOrder = 0);
-    static const ComponentType s_ComponentType = ComponentType::UICanvas;
-    virtual ComponentType GetComponentType() const override { return ComponentType::UICanvas; }
-    UIRenderMode GetUIRenderMode() const { return m_renderMode; }
-    void Render(Program* program);
+    enum class UIRenderMode
+    {
+        ScreenSpace, // 2D 화면 (Overlay)
+        WorldSpace   // 3D 공간 (Billboarding etc)
+    };
 
-    void AddUIElement(UIRenderer* ui);
-    void RemoveUIElement(UIRenderer* ui);
-    void SortUIElements();
+    MGF_CLASS_PTR(UICanvas)
+        class UICanvas : public Component
+    {
+    public:
+        virtual ~UICanvas();
+        static UICanvasUPtr Create(UIRenderMode mode = UIRenderMode::ScreenSpace, int32 sortOrder = 0);
+        static const ComponentType s_ComponentType = ComponentType::UICanvas;
+        virtual ComponentType GetComponentType() const override { return ComponentType::UICanvas; }
+        UIRenderMode GetUIRenderMode() const { return m_renderMode; }
+        void Render(Program* program);
 
-    void SetUICanvasSortingOrder(int32 order) { m_canvasSortingOrder = order; }
-    int32 GetUICanvasSortingOrder() const { return m_canvasSortingOrder; }
+        void AddUIElement(UIRenderer* ui);
+        void RemoveUIElement(UIRenderer* ui);
+        void SortUIElements();
 
-private:
-    UICanvas();
-    void Init(UIRenderMode mode, int32 sortOrder);
+        void SetUICanvasSortingOrder(int32 order) { m_canvasSortingOrder = order; }
+        int32 GetUICanvasSortingOrder() const { return m_canvasSortingOrder; }
 
-    // TODO : m_width, m_height 필요
+    private:
+        UICanvas();
+        void Init(UIRenderMode mode, int32 sortOrder);
 
-    UIRenderMode m_renderMode { UIRenderMode::ScreenSpace };
-    std::vector<UIRenderer*> m_uiElements;
-    int32 m_canvasSortingOrder    { 0 };
-    bool m_isUIElementDirtyOrder  { true };
-};
+        // TODO : m_width, m_height 필요
+
+        UIRenderMode m_renderMode{ UIRenderMode::ScreenSpace };
+        std::vector<UIRenderer*> m_uiElements;
+        int32 m_canvasSortingOrder{ 0 };
+        bool m_isUIElementDirtyOrder{ true };
+    };
+}

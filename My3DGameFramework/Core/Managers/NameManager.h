@@ -9,9 +9,9 @@ namespace MGF3D
 
 	class NameManager
 	{
-		DECLARE_SINGLE(NameManager)
+		MGF_DECLARE_SINGLE(NameManager)
 
-	public:
+	private:
 		NameManager();
 		~NameManager();
 

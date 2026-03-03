@@ -1,7 +1,6 @@
 ﻿#pragma once
 #include "StringUtils.h"
 #include "Debug/Asserter.h"
-#include "Utils/CoreUtils.h"
 
 namespace MGF3D
 {
@@ -13,7 +12,7 @@ namespace MGF3D
 
         // 2. 타입별 최대 버퍼 크기 계산
         // 64비트 정수는 최대 20자, 실수는 넉넉하게 32자면 충분합니다.
-        constexpr usize MaxBufferSize = CoreUtils::Select(std::is_floating_point_v<T>, 64ULL, 24ULL);
+        constexpr usize MaxBufferSize = CommonUtils::Select(std::is_floating_point_v<T>, 64ULL, 24ULL);
         char8 buffer[MaxBufferSize];
 
         // 3. 변환 수행
@@ -32,14 +31,14 @@ namespace MGF3D
 
     inline constexpr char8 StringUtils::ToLower(char8 c)
     {
-        if (CoreUtils::IsBetween(c, static_cast<char8>('A'), static_cast<char8>('Z')))
+        if (CommonUtils::IsBetween(c, static_cast<char8>('A'), static_cast<char8>('Z')))
             return c + 32;
         return c;
     }
 
     inline constexpr char8 StringUtils::ToUpper(char8 c)
     {
-        if (CoreUtils::IsBetween(c, static_cast<char8>('a'), static_cast<char8>('z')))
+        if (CommonUtils::IsBetween(c, static_cast<char8>('a'), static_cast<char8>('z')))
             return c - 32;
         return c;
     }

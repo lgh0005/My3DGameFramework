@@ -5,7 +5,7 @@ namespace MGF3D
 {
 	class Random
 	{
-		DECLARE_UTILITIES(Random)
+		MGF_DECLARE_UTILITIES(Random)
 
 	public:
 		static void Init(uint32 seed = 0);

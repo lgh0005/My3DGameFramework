@@ -1,22 +1,23 @@
 ﻿#pragma once
 
-#pragma region FORWARD_DECLARATION
-CLASS_PTR(ComponentRegistry)
-CLASS_PTR(GameObjectRegistry)
-#pragma endregion
-
-CLASS_PTR(SceneRegistry)
-class SceneRegistry
+namespace MGF3D
 {
-public:
-	~SceneRegistry();
-	static SceneRegistryUPtr Create();
-	ComponentRegistry* GetComponentRegistry() const;
-	GameObjectRegistry* GetGameObjectRegistry() const;
+	MGF_CLASS_PTR(ComponentRegistry)
+	MGF_CLASS_PTR(GameObjectRegistry)
 
-private:
-	SceneRegistry();
-	bool Init();
-	ComponentRegistryUPtr   m_componentRegistry;
-	GameObjectRegistryUPtr	m_gameObjectRegistry;
-};
+	MGF_CLASS_PTR(SceneRegistry)
+	class SceneRegistry
+	{
+	public:
+		~SceneRegistry();
+		static SceneRegistryUPtr Create();
+		ComponentRegistry* GetComponentRegistry() const;
+		GameObjectRegistry* GetGameObjectRegistry() const;
+
+	private:
+		SceneRegistry();
+		bool Init();
+		ComponentRegistryUPtr   m_componentRegistry;
+		GameObjectRegistryUPtr	m_gameObjectRegistry;
+	};
+}

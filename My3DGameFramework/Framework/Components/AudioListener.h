@@ -1,16 +1,19 @@
 ﻿#pragma once
 #include "Object/Component.h"
 
-CLASS_PTR(AudioListener)
-class AudioListener : public Component
+namespace MGF3D
 {
-	DEFINE_COMPONENT_TYPE(ComponentType::AudioListener)
+	MGF_CLASS_PTR(AudioListener)
+	class AudioListener : public Component
+	{
+		DEFINE_COMPONENT_TYPE(ComponentType::AudioListener)
 
-public:
-	virtual ~AudioListener();
-	static AudioListenerUPtr Create();
-	virtual void OnUpdate() override;
+	public:
+		virtual ~AudioListener();
+		static AudioListenerUPtr Create();
+		virtual void OnUpdate() override;
 
-private:
-	AudioListener();
-};
+	private:
+		AudioListener();
+	};
+}

@@ -1,42 +1,43 @@
 ﻿#pragma once
 #include "UIs/UIRenderer.h"
 
-#pragma region FORWARD_DECLARATION
-CLASS_PTR(Mesh)
-CLASS_PTR(Material)
-CLASS_PTR(Program)
-CLASS_PTR(Font)
-#pragma endregion
-
-CLASS_PTR(UIText)
-class UIText : public UIRenderer
+namespace MGF3D
 {
-	using Super = UIRenderer;
+	MGF_CLASS_PTR(Mesh)
+	MGF_CLASS_PTR(Material)
+	MGF_CLASS_PTR(Program)
+	MGF_CLASS_PTR(Font)
 
-public:
-	virtual ~UIText();
-	static UITextUPtr Create
-	(
-		FontPtr font, MaterialPtr material,
-		const std::wstring& text = L"", int32 sortingOrder = 0
-	);
-	static const ComponentType s_ComponentType = ComponentType::UIText;
-	virtual ComponentType GetComponentType() const override { return ComponentType::UIText; }
-	virtual void Render(Program* program) override;
+	MGF_CLASS_PTR(UIText)
+	class UIText : public UIRenderer
+	{
+		using Super = UIRenderer;
 
-	// 텍스트 설정 (변경 시 메쉬 재생성)
-	void SetText(const std::wstring& text);
-	const std::wstring& GetText() const { return m_text; }
+	public:
+		virtual ~UIText();
+		static UITextUPtr Create
+		(
+			FontPtr font, MaterialPtr material,
+			const std::wstring& text = L"", int32 sortingOrder = 0
+		);
+		static const ComponentType s_ComponentType = ComponentType::UIText;
+		virtual ComponentType GetComponentType() const override { return ComponentType::UIText; }
+		virtual void Render(Program* program) override;
 
-private:
-	UIText();
-	bool Init
-	(
-		FontPtr font, MaterialPtr material, 
-		const std::wstring& text, int32 sortingOrder
-	);
-	void RebuildMesh();
+		// 텍스트 설정 (변경 시 메쉬 재생성)
+		void SetText(const std::wstring& text);
+		const std::wstring& GetText() const { return m_text; }
 
-	std::wstring m_text;
-	FontPtr      m_font;
-};
+	private:
+		UIText();
+		bool Init
+		(
+			FontPtr font, MaterialPtr material,
+			const std::wstring& text, int32 sortingOrder
+		);
+		void RebuildMesh();
+
+		std::wstring m_text;
+		FontPtr      m_font;
+	};
+}

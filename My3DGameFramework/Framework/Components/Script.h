@@ -3,80 +3,81 @@
 #include "Scene/SceneUtils.h"
 #include <sol/sol.hpp>
 
-#pragma region FORWARD_DECLARATION
-CLASS_PTR(Collider)
-CLASS_PTR(LuaScript)
-#pragma endregion
-
-CLASS_PTR(Script)
-class Script : public Component
+namespace MGF3D
 {
-	DEFINE_COMPONENT_TYPE(ComponentType::Script)
+	MGF_CLASS_PTR(Collider)
+	MGF_CLASS_PTR(LuaScript)
 
-public:
-	virtual ~Script();
+	MGF_CLASS_PTR(Script)
+	class Script : public Component
+	{
+		DEFINE_COMPONENT_TYPE(ComponentType::Script)
 
-	static ScriptUPtr Create();
-	void Bind(LuaScriptPtr scriptResource);
-	const std::string& GetScriptName() const;
-	bool MatchesType(uint32 targetHash) const { return m_classHash == targetHash; }
-	uint32 GetClassHash() const { return m_classHash; }
+	public:
+		virtual ~Script();
 
-/*==========================================//
-//    Component Life-cycle Overrides        //
-//==========================================*/
-protected:
-	virtual void OnAwake() override;
-	virtual void OnStart() override;
-	virtual void OnFixedUpdate() override;
-	virtual void OnUpdate() override;
-	virtual void OnLateUpdate() override;
-	virtual void OnDestroyed() override;
-	virtual void OnEnable() override;
-	virtual void OnDisable() override;
+		static ScriptUPtr Create();
+		void Bind(LuaScriptPtr scriptResource);
+		const std::string& GetScriptName() const;
+		bool MatchesType(uint32 targetHash) const { return m_classHash == targetHash; }
+		uint32 GetClassHash() const { return m_classHash; }
 
-/*==========================================//
-//    Physics & Interaction Events          //
-//==========================================*/
-public:
-	virtual void OnTriggerEnter(Collider* other);
-	virtual void OnTriggerStay(Collider* other);
-	virtual void OnTriggerExit(Collider* other);
+		/*==========================================//
+		//    Component Life-cycle Overrides        //
+		//==========================================*/
+	protected:
+		virtual void OnAwake() override;
+		virtual void OnStart() override;
+		virtual void OnFixedUpdate() override;
+		virtual void OnUpdate() override;
+		virtual void OnLateUpdate() override;
+		virtual void OnDestroyed() override;
+		virtual void OnEnable() override;
+		virtual void OnDisable() override;
 
-	virtual void OnCollisionEnter(Collider* other);
-	virtual void OnCollisionStay(Collider* other);
-	virtual void OnCollisionExit(Collider* other);
+		/*==========================================//
+		//    Physics & Interaction Events          //
+		//==========================================*/
+	public:
+		virtual void OnTriggerEnter(Collider* other);
+		virtual void OnTriggerStay(Collider* other);
+		virtual void OnTriggerExit(Collider* other);
 
-/*===================================//
-//    UI Interaction Events          //
-//===================================*/
-public:
-	// TODO : UI와 관련된 상호작용 메서드가 추가될 수 있음
+		virtual void OnCollisionEnter(Collider* other);
+		virtual void OnCollisionStay(Collider* other);
+		virtual void OnCollisionExit(Collider* other);
 
-private:
-	Script();
-	LuaScriptPtr m_script;
-	uint32 m_classHash	{ 0 };
-	sol::table m_self;
+		/*===================================//
+		//    UI Interaction Events          //
+		//===================================*/
+	public:
+		// TODO : UI와 관련된 상호작용 메서드가 추가될 수 있음
 
-	sol::function m_awakeFunc;
-	sol::function m_startFunc;
-	sol::function m_updateFunc;
-	sol::function m_fixedUpdateFunc;
-	sol::function m_lateUpdateFunc;
-	sol::function m_onDestroyFunc;
-	sol::function m_onEnableFunc;
-	sol::function m_onDisableFunc;
+	private:
+		Script();
+		LuaScriptPtr m_script;
+		uint32 m_classHash{ 0 };
+		sol::table m_self;
 
-	sol::function m_onTriggerEnterFunc;
-	sol::function m_onTriggerStayFunc;
-	sol::function m_onTriggerExitFunc;
-	sol::function m_onCollisionEnterFunc;
-	sol::function m_onCollisionStayFunc;
-	sol::function m_onCollisionExitFunc;
+		sol::function m_awakeFunc;
+		sol::function m_startFunc;
+		sol::function m_updateFunc;
+		sol::function m_fixedUpdateFunc;
+		sol::function m_lateUpdateFunc;
+		sol::function m_onDestroyFunc;
+		sol::function m_onEnableFunc;
+		sol::function m_onDisableFunc;
 
-	template<typename... Args>
-	void InvokeLua(const sol::function& func, Args&&... args);
-};
+		sol::function m_onTriggerEnterFunc;
+		sol::function m_onTriggerStayFunc;
+		sol::function m_onTriggerExitFunc;
+		sol::function m_onCollisionEnterFunc;
+		sol::function m_onCollisionStayFunc;
+		sol::function m_onCollisionExitFunc;
+
+		template<typename... Args>
+		void InvokeLua(const sol::function& func, Args&&... args);
+	};
+}
 
 #include "Components/Script.inl"

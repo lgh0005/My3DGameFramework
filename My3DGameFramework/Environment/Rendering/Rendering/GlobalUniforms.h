@@ -2,7 +2,7 @@
 
 namespace MGF3D
 {
-	CLASS_PTR(RenderContext)
+	MGF_CLASS_PTR(RenderContext)
 
 	class GlobalUniforms
 	{

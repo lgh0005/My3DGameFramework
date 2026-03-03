@@ -4,10 +4,11 @@ namespace MGF3D
 {
 	class PathManager
 	{
-		DECLARE_SINGLE(PathManager)
+		MGF_DECLARE_SINGLE(PathManager)
 
-	public:
-
+	private:
+		PathManager();
+		~PathManager();
 
 	private:
 

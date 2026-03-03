@@ -1,29 +1,30 @@
 ﻿#pragma once
 #include "Object/Component.h"
 
-#pragma region FORWARD_DECLARATION
-CLASS_PTR(Texture)
-CLASS_PTR(CubeTexture)
-CLASS_PTR(EnvironmentMap)
-#pragma endregion
-
-CLASS_PTR(SkyLight)
-class SkyLight : public Component
+namespace MGF3D
 {
-	DEFINE_COMPONENT_TYPE(ComponentType::SkyLight)
+	MGF_CLASS_PTR(Texture)
+	MGF_CLASS_PTR(CubeTexture)
+	MGF_CLASS_PTR(EnvironmentMap)
 
-public:
-	~SkyLight();
-	static SkyLightUPtr Create(const EnvironmentMapPtr& envMap);
+	MGF_CLASS_PTR(SkyLight)
+	class SkyLight : public Component
+	{
+		DEFINE_COMPONENT_TYPE(ComponentType::SkyLight)
 
-public:
-	CubeTexture* GetSkybox() const;
-	CubeTexture* GetIrradianceMap() const;
-	CubeTexture* GetPrefilterMap() const;
-	Texture* GetBRDFLookUp() const;
+	public:
+		~SkyLight();
+		static SkyLightUPtr Create(const EnvironmentMapPtr& envMap);
 
-private:
-	SkyLight();
-	bool Init(const EnvironmentMapPtr& envMap);
-	EnvironmentMapPtr m_environmentMap;
-};
+	public:
+		CubeTexture* GetSkybox() const;
+		CubeTexture* GetIrradianceMap() const;
+		CubeTexture* GetPrefilterMap() const;
+		Texture* GetBRDFLookUp() const;
+
+	private:
+		SkyLight();
+		bool Init(const EnvironmentMapPtr& envMap);
+		EnvironmentMapPtr m_environmentMap;
+	};
+}

@@ -7,15 +7,15 @@ namespace MGF3D
 	 */
 	class SlabMemoryPool
 	{
-		DISABLE_COPY(SlabMemoryPool)
+		MGF_DISABLE_COPY(SlabMemoryPool)
 
 	private:
 
 		// Slab 내부에서 비어 있는 한 칸(Slot)을 가리키는 구조체
-		struct Slot { RawPtr<Slot> next; };
+		struct Slot { Ptr<Slot> next; };
 
 		// 실제 메모리 덩어리인 Slab을 추적하는 구조체
-		struct Slab { void* address; RawPtr<Slab> next; bool isExternal; };
+		struct Slab { void* address; Ptr<Slab> next; bool isExternal; };
 
 	public:
 		/**
@@ -55,8 +55,8 @@ namespace MGF3D
 		bool  Expand() noexcept;
 
 	private:
-		RawPtr<Slot> m_freeList;      // 빈 슬롯들의 헤드
-		RawPtr<Slab> m_slabList;      // 할당된 Slab(덩어리)들의 목록
+		Ptr<Slot> m_freeList;      // 빈 슬롯들의 헤드
+		Ptr<Slab> m_slabList;      // 할당된 Slab(덩어리)들의 목록
 
 		usize m_slotSize;      // 정렬이 반영된 슬롯 한 칸의 크기
 		usize m_slabSize;      // Slab 하나의 전체 크기

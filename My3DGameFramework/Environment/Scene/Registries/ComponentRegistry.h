@@ -1,43 +1,44 @@
 ﻿#pragma once
 
-#pragma region FORWARD_DECLARATION
-CLASS_PTR(GameObject)
-CLASS_PTR(Component)
-CLASS_PTR(GeneralRenderPass)
-#pragma endregion
-
-CLASS_PTR(ComponentRegistry)
-class ComponentRegistry
+namespace MGF3D
 {
-public:
-	~ComponentRegistry();
-	static ComponentRegistryUPtr Create();
+	MGF_CLASS_PTR(GameObject)
+	MGF_CLASS_PTR(Component)
+	MGF_CLASS_PTR(GeneralRenderPass)
 
-	using ComponentCache = std::array<std::vector<Component*>, (usize)ComponentType::MAX>;
-	using CustomPassMap = std::unordered_map<std::string, GeneralRenderPassUPtr>;
+	MGF_CLASS_PTR(ComponentRegistry)
+	class ComponentRegistry
+	{
+	public:
+		~ComponentRegistry();
+		static ComponentRegistryUPtr Create();
 
-	void RegisterComponent(Component* component);
-	void UnregisterComponent(Component* component);
-	template<typename T> const std::vector<Component*>& GetComponents();
+		using ComponentCache = std::array<std::vector<Component*>, (usize)ComponentType::MAX>;
+		using CustomPassMap = std::unordered_map<std::string, GeneralRenderPassUPtr>;
 
-private:
-	void Init();
-	ComponentRegistry();
-	void RemoveComponentFromBaseList(ComponentType baseType, Component* component);
+		void RegisterComponent(Component* component);
+		void UnregisterComponent(Component* component);
+		template<typename T> const std::vector<Component*>& GetComponents();
 
-/*=======================================//
-//   getters and setters of components   //
-//=======================================*/
-public:
-	Camera* GetCamera(uint32 idx) const;
-	SkyLight* GetSkyLight(uint32 idx) const;
-	void AddCustomRenderPass(const std::string& name, GeneralRenderPassUPtr pass);
-	GeneralRenderPass* GetCustomRenderPass(const std::string& name);
-	CustomPassMap& GetCustomRenderPasses();
+	private:
+		void Init();
+		ComponentRegistry();
+		void RemoveComponentFromBaseList(ComponentType baseType, Component* component);
 
-private:
-	ComponentCache m_componentCache;
-	CustomPassMap m_customPasses;
-};
+		/*=======================================//
+		//   getters and setters of components   //
+		//=======================================*/
+	public:
+		Camera* GetCamera(uint32 idx) const;
+		SkyLight* GetSkyLight(uint32 idx) const;
+		void AddCustomRenderPass(const std::string& name, GeneralRenderPassUPtr pass);
+		GeneralRenderPass* GetCustomRenderPass(const std::string& name);
+		CustomPassMap& GetCustomRenderPasses();
+
+	private:
+		ComponentCache m_componentCache;
+		CustomPassMap m_customPasses;
+	};
+}
 
 #include "Scene/ComponentRegistry.inl"

@@ -26,7 +26,7 @@ namespace MGF3D
 
 	class MemoryProfiler
 	{
-		DECLARE_UTILITIES(MemoryProfiler)
+		MGF_DECLARE_UTILITIES(MemoryProfiler)
 
 	public:
 		static void _Internal_Capture() noexcept;

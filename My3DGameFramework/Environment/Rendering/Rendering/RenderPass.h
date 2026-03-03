@@ -2,14 +2,14 @@
 
 namespace MGF3D
 {
-	CLASS_PTR(Scene)
-	CLASS_PTR(Camera)
-	CLASS_PTR(RenderContext)
+	MGF_CLASS_PTR(Scene)
+	MGF_CLASS_PTR(Camera)
+	MGF_CLASS_PTR(RenderContext)
 
 	/*====================================================//
 	//  Base class for all render passes (Common Data)    //
 	//====================================================*/
-		class RenderPass
+	class RenderPass
 	{
 	public:
 		virtual ~RenderPass();
@@ -27,8 +27,8 @@ namespace MGF3D
 	/*===========================================//
 	//   custom extension render pass interface  //
 	//===========================================*/
-	CLASS_PTR(GeneralRenderPass)
-		class GeneralRenderPass : public RenderPass
+	MGF_CLASS_PTR(GeneralRenderPass)
+	class GeneralRenderPass : public RenderPass
 	{
 	public:
 		virtual ~GeneralRenderPass();
@@ -41,8 +41,8 @@ namespace MGF3D
 	/*====================================================//
 	//   RenderContext based core render pass interface   //
 	//====================================================*/
-	CLASS_PTR(ContextRenderPass)
-		class ContextRenderPass : public RenderPass
+	MGF_CLASS_PTR(ContextRenderPass)
+	class ContextRenderPass : public RenderPass
 	{
 	public:
 		virtual ~ContextRenderPass();

@@ -38,8 +38,8 @@ namespace MGF3D
         void  Clear()         override { this->clear(); }
 
     public:
-        RawPtr<T> Data() { return this->data(); }
-        RawPtr<const T> Data() const { return this->data(); }
+        Ptr<T> Data() { return this->data(); }
+        Ptr<const T> Data() const { return this->data(); }
 
         usize Capacity() const;
         void Assign(usize n, const T& value);

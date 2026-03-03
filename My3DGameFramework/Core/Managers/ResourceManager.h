@@ -5,12 +5,16 @@
 
 namespace MGF3D
 {
-	CLASS_PTR(Resource)
-	CLASS_PTR(ResourceDesc)
+	MGF_CLASS_PTR(Resource)
+	MGF_CLASS_PTR(ResourceDesc)
 
 	class ResourceManager
 	{
-		DECLARE_SINGLE(ResourceManager)
+		MGF_DECLARE_SINGLE(ResourceManager)
+
+	private:
+		ResourceManager();
+		~ResourceManager();
 
 	public:
 		bool Init();

@@ -2,7 +2,7 @@
 
 namespace MGF3D
 {
-    CLASS_PTR(RenderPipeline)
+    MGF_CLASS_PTR(RenderPipeline)
     class RenderPipeline
     {
     public:

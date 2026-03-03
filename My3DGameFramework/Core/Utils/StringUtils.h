@@ -6,7 +6,7 @@ namespace MGF3D
 {
     class StringUtils
     {
-        DECLARE_UTILITIES(StringUtils)
+        MGF_DECLARE_UTILITIES(StringUtils)
 
     public:
         template<typename T> static LString ToString(T value);
