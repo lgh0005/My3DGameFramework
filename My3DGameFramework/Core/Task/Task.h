@@ -1,15 +1,17 @@
 ﻿#pragma once
-
-#pragma once
-#include "Common/Delegates.h"
+#include "TaskDeleter.h"
 
 namespace MGF3D
 {
+    using TaskUPtr = std::unique_ptr<Task, TaskDeleter>;
+    using TaskPtr = std::shared_ptr<Task>;
+    using TaskWPtr = std::weak_ptr<Task>;
+
     class Task
     {
     public:
         Task(Action<> work, Action<> onComplete = nullptr);
-        virtual ~Task();
+        ~Task();
 
         // 실제 작업을 수행하는 핵심 함수
         void Execute();

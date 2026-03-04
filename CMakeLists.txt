@@ -19,16 +19,15 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${OUTPUT_DIR}")
 # 컴파일러 옵션
 if (MSVC)
     add_compile_definitions(NOMINMAX)
-    # add_compile_options(/bigobj) ### 이후에 비대해진 Engine.lib를 몇 개의 lib로 더 분산시킬 예정
-    add_compile_options(/utf-8 /W4 /MP /permissive- /Zc:__cplusplus)
+
+    # RTTI 비활성화, 모든 예외 처리 끄기, utf-8
+    add_compile_definitions(_HAS_EXCEPTIONS=0)
+    add_compile_options(/GR- /utf-8 /W4 /MP /permissive- /Zc:__cplusplus)
 
     # CMake가 기본으로 켜두는 /EHsc 옵션을 강제로 문자열 치환해서 제거
     string(REPLACE "/EHsc" "" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
     string(REPLACE "/EHsc" "" CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG}")
     string(REPLACE "/EHsc" "" CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE}")
-    
-    # MSVC STL 내부의 예외 처리 로직 비활성화
-    add_compile_definitions(_HAS_EXCEPTIONS=0)
 
 else()
     add_compile_options(-Wall -Wextra -finput-charset=UTF-8 -fexec-charset=UTF-8)

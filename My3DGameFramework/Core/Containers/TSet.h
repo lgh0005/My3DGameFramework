@@ -10,6 +10,7 @@ namespace MGF3D
     public:
         using Base = std::unordered_set<K, Hash, KeyEqual, Alloc>;
         using Base::unordered_set;
+        using Base::operator=;
 
         TSet() = default;
         virtual ~TSet() = default;

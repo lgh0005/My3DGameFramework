@@ -10,6 +10,7 @@ namespace MGF3D
     public:
         using Base = std::unordered_map<K, V, Hash, KeyEqual, Alloc>;
         using Base::unordered_map;
+        using Base::operator=;
 
         TMap() = default;
         virtual ~TMap() = default;

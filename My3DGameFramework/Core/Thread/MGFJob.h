@@ -5,15 +5,15 @@ namespace MGF3D
     MGF_CLASS_PTR(MGFThread)
     MGF_CLASS_PTR(MGFSignal)
 
-    MGF_CLASS_PTR(MGFThreadContext)
-    class MGFThreadContext
+    MGF_CLASS_PTR(MGFJob)
+    class MGFJob
     {
-        MGF_DISABLE_COPY(MGFThreadContext)
-        MGF_DISABLE_MOVE(MGFThreadContext)
+        MGF_DISABLE_COPY(MGFJob)
+        MGF_DISABLE_MOVE(MGFJob)
 
     public:
-        MGFThreadContext();
-        ~MGFThreadContext();
+        MGFJob();
+        ~MGFJob();
 
     public:
         // 스레드를 실제로 구동합니다.

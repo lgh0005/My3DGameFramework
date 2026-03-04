@@ -37,6 +37,34 @@ namespace MGF3D
     }
 
     template<typename T, typename Alloc>
+    inline T TVector<T, Alloc>::PopBack()
+    {
+        MGF_ASSERT(!this->empty(), "TVector is empty.");
+        T backElement = std::move(this->back());
+        this->pop_back();
+        return backElement;
+    }
+
+    template<typename T, typename Alloc>
+    inline void TVector<T, Alloc>::PushBack(const T& value)
+    {
+        this->push_back(value);
+    }
+
+    template<typename T, typename Alloc>
+    inline void TVector<T, Alloc>::PushBack(T&& value)
+    {
+        this->push_back(std::move(value));
+    }
+
+    template<typename T, typename Alloc>
+    template<typename... Args>
+    inline void TVector<T, Alloc>::EmplaceBack(Args&&... args)
+    {
+        this->emplace_back(std::forward<Args>(args)...);
+    }
+
+    template<typename T, typename Alloc>
     inline usize TVector<T, Alloc>::Capacity() const
     {
         return this->capacity();

@@ -1,6 +1,9 @@
 ﻿#pragma once
 #include "Task/Task.h"
-#include "Containers/Slab/SMap.h"
+#include "Task/TaskPool.h"
+
+// TODO : 지금은 Lock-base management를 택하고 있지만
+// 이후에는 Lock-free 자료구조를 택하는 식으로 바뀌어야 할 것이다.
 
 namespace MGF3D
 {
@@ -12,16 +15,51 @@ namespace MGF3D
         TaskManager();
         ~TaskManager();
 
+    /*================//
+    //  task pooling  //
+    //================*/
     public:
-        // 새로운 태스크를 시스템에 등록하고 비동기 실행을 트리거합니다.
-        void PushTask(Ptr<Task> task);
+        TaskUPtr AcquireTask(Action<> work, Action<> onComplete = nullptr);
 
-        // (추후 확장) 메인 스레드에서 실행되어야 할 콜백들을 처리합니다.
+    /*========================//
+    //  for main thread task  //
+    //========================*/
+    public:
+        // 2. 메인 스레드 전용 (Commit 단계용)
+        // 메인 스레드(OpenGL 컨텍스트 등)에서 실행되어야 할 태스크를 등록합니다.
+        void PushMainTask(TaskUPtr task);
+
+    /*========================//
+    //  for main thread task  //
+    //========================*/
+    public:
+        // 1. 워커 스레드용 (Job 시스템)
+        // 새로운 태스크를 워커 큐에 등록하고 잠든 워커를 깨웁니다.
+        void PushTask(TaskUPtr task);
+
+        // 워커가 일감을 하나 꺼내갑니다.
+        TaskUPtr PopTask();
+
+        // 일감이 없을 때 워커를 대기 상태로 만듭니다.
+        void WaitForTask();
+
+        // 모든 워커를 강제로 깨웁니다. (종료 시 사용)
+        void Broadcast();
+
+        // 메인 루프에서 호출되어 메인 전용 태스크들을 처리합니다.
         void Update();
 
     private:
-        Mutex m_taskMutex;
-        // 현재 실행 중이거나 대기 중인 태스크들을 관리할 수 있습니다.
-        // SMap<uint64, Ptr<Task>> m_activeTasks; 
+        // 태스크 풀
+        TaskPool          m_taskPool;
+
+        // 워커 큐 관련
+        Mutex             m_queueMutex;
+        ConditionVariable m_condition;
+        SDeque<TaskUPtr> m_taskQueue;
+
+        // 메인 큐 관련
+        Mutex             m_mainMutex;
+        SDeque<TaskUPtr> m_mainQueue;
     };
 }

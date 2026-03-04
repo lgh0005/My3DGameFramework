@@ -1,6 +1,8 @@
 ﻿#include "pch.h"
 #include "Managers/MemoryManager.h"
 #include "Managers/NameManager.h"
+#include "Managers/JobManager.h"
+#include "Managers/TaskManager.h"
 
 // Debug System Headers
 #include "Debug/Asserter.h"
@@ -9,161 +11,124 @@
 #include "Debug/ProfileScope.h"
 #include "Debug/MemoryProfiler.h"
 
-// Slab 시리즈
+// Containers
+#include "Containers/Slab/SDeque.h"
 #include "Containers/Slab/SVector.h"
 #include "Containers/Slab/SMap.h"
 #include "Containers/Slab/SSet.h"
 #include "Containers/Slab/SString.h"
-
-// Linear 시리즈
+#include "Containers/Linear/LDeque.h"
 #include "Containers/Linear/LVector.h"
 #include "Containers/Linear/LMap.h"
 #include "Containers/Linear/LSet.h"
 #include "Containers/Linear/LString.h"
 
-// 이름 시리즈
+// Engine Core
 #include "Identity/MGFName.h"
-
-// Utils
+#include "Task/Task.h"
+#include "Thread/MGFJob.h"
+#include "Thread/MGFSignal.h"
 #include "Utils/StringUtils.h"
 
 using namespace MGF3D;
 
-// 테스트용 구조체 (64바이트, 32바이트 정렬)
-struct alignas(32) RenderData
-{
-    float32 matrix[16];
-    uint64 id;
-
-    bool operator==(const RenderData& other) const { return id == other.id; }
-};
-
-// 해시 특수화
-namespace std {
-    template<> struct hash<RenderData> {
-        size_t operator()(const RenderData& d) const { return hash<uint64>{}(d.id); }
-    };
-}
-
 int main()
 {
-    // 1. 디버그 시스템 기동
+    // 1. 기초 시스템 기동
     MGF_LOG_INIT();
     MGF_TIMER_INIT();
 
-    MGF_LOG_INFO("=== MGF3D Domain-Integrated Container Test ===");
+    MGF_LOG_INFO("=== MGF3D Final Integrated System Test (Task Pooling) ===");
 
-    // 전체 테스트 시간 측정 시작
-    MGF_PROFILE_SCOPE("Total_Container_Test");
-
-    // 2. 엔진 메모리 시스템 가동
-    MemoryManager::Instance();
-
-    // [Helper] 프로파일러 캡처 및 로그 출력 매크로 활용
-    auto ReportMemory = [](const char* sectionName) {
-        MGF_LOG_INFO(">>> Memory Report: {0}", sectionName);
-        MGF_MEMORY_PROFILE_CAPTURE();
-        MGF_MEMORY_LOG_STATS();
-        };
-
-    // ---------------------------------------------------------
-    // [SECTION 1] 기초 컨테이너 동작 확인
-    // ---------------------------------------------------------
     {
-        MGF_LOG_TRACE("[Step 1] Basic Container Operation Test");
-        ReportMemory("Initial State");
+        MGF_PROFILE_SCOPE("Full_Engine_Integration_Test");
 
-        LVector<RenderData> lVec;
-        lVec.push_back(RenderData{ {}, 1 });
+        // 2. 엔진 매니저 초기화
+        MemoryManager::Instance();
 
-        SVector<RenderData> sVec;
-        sVec.push_back(RenderData{ {}, 2 });
-
-        ReportMemory("After Basic Push (L/S Vector)");
-    }
-
-    // ---------------------------------------------------------
-    // [SECTION 2] Cross-Domain Move (L -> S) 상세 분석
-    // ---------------------------------------------------------
-    {
-        MGF_LOG_TRACE("[Step 2] Cross-Domain Move (L -> S) Analysis");
-
-        LString lStr = "This is a temporary frame string that will be moved to Slab.";
-        SString sStr = std::move(lStr);
-
-        LVector<RenderData> lVec;
-        for (int i = 0; i < 50; ++i) lVec.push_back(RenderData{ {}, (uint64)i });
-
-        SVector<RenderData> sVec = std::move(lVec);
-
-        ReportMemory("After L-to-S Domain Move");
-    }
-
-    // ---------------------------------------------------------
-    // [SECTION 3] 프레임 리셋 후 생존성 테스트
-    // ---------------------------------------------------------
-    {
-        MGF_LOG_TRACE("[Step 3] Persistence Verification after Frame Reset");
-
-        SString survivalStr;
+        if (!JobManager::Instance().Init())
         {
-            LString temp = "I will survive the frame reset!";
-            survivalStr = std::move(temp);
+            MGF_LOG_FATAL("JobManager Initialization Failed!");
+            return -1;
         }
 
-        MemoryManager::Instance().GetLinearMemoryPool()->Reset();
+        auto ReportMemory = [](const char* sectionName) {
+            MGF_LOG_INFO(">>> Memory Report: {0}", sectionName);
+            MGF_MEMORY_PROFILE_CAPTURE();
+            MGF_MEMORY_LOG_STATS();
+            };
 
-        ReportMemory("After Linear Pool Reset");
-        MGF_LOG_INFO("Verified Survivor Data: {0}", survivalStr.CStr());
+        // [SECTION 1 ~ 8] 기초 테스트 생략...
+
+        // ---------------------------------------------------------
+        // [SECTION 9] Worker Thread Parallel Processing Test (Pooled)
+        // ---------------------------------------------------------
+        {
+            MGF_LOG_TRACE("[Step 9] Parallel Task Execution Test (Pooled)");
+
+            const int32 taskCount = 32;
+            Atomic<int32> completedTasks{ 0 };
+
+            for (int32 i = 0; i < taskCount; ++i)
+            {
+                // [정상화] make_unique 대신 TaskManager의 Pool을 사용합니다.
+                auto task = TaskManager::Instance().AcquireTask([i, &completedTasks]() {
+                    float64 val = 0.0;
+                    for (int j = 0; j < 5000; ++j) val += std::sin(j);
+
+                    MGF_LOG_INFO("[Worker] Parallel Task {0} completed.", i);
+                    completedTasks.fetch_add(1);
+                    });
+
+                TaskManager::Instance().PushTask(std::move(task));
+            }
+
+            while (completedTasks.load() < taskCount) { std::this_thread::yield(); }
+            MGF_LOG_INFO("Successfully processed {0} pooled parallel tasks.", taskCount);
+        }
+
+        // ---------------------------------------------------------
+        // [SECTION 10] Deterministic Relay Test with Polling (Pooled)
+        // ---------------------------------------------------------
+        {
+            MGF_LOG_TRACE("[Step 10] Deterministic Relay Test with Polling (Pooled)");
+
+            MGFSignal renderSync;
+
+            // [정상화] 로딩 태스크도 풀에서 빌려옵니다.
+            auto loadingTask = TaskManager::Instance().AcquireTask([&renderSync]() {
+                MGF_LOG_INFO("[Worker] Resource Data Loading... (CPU)");
+
+                // [정상화] 중첩된 GPU 업로드 태스크 역시 풀에서 빌려옵니다.
+                auto uploadTask = TaskManager::Instance().AcquireTask([&renderSync]() {
+                    MGF_LOG_INFO("[MainThread] Executing GPU Upload Task...");
+                    renderSync.Set();
+                    });
+
+                TaskManager::Instance().PushMainTask(std::move(uploadTask));
+                });
+
+            TaskManager::Instance().PushTask(std::move(loadingTask));
+
+            MGF_LOG_INFO("Main thread processing tasks until signal...");
+
+            while (!renderSync.IsSignaled())
+            {
+                TaskManager::Instance().Update();
+                std::this_thread::yield();
+            }
+
+            MGF_LOG_INFO("Relay test successfully synchronized by MGFSignal!");
+        }
+
+        // 4. 메모리 리포트 (Slab 사용량 중 sizeof(Task) 버킷을 확인하세요)
+        ReportMemory("Final Engine State");
+
+        // 3. 시스템 종료
+        JobManager::Instance().Shutdown();
     }
 
-    // ---------------------------------------------------------
-    // [SECTION 4] StringHash Map Integration
-    // ---------------------------------------------------------
-    {
-        MGF_LOG_TRACE("[Step 4] StringHash Map Performance Test");
-
-        SMap<StringHash, int32> assetIds;
-        assetIds.Insert("Player_Model", 1001);
-        assetIds.Insert("Enemy_Model", 2002);
-
-        ReportMemory("After StringHash Map Test");
-    }
-
-    // ---------------------------------------------------------
-    // [SECTION 5] MGFName Pure String Pooling Test (Refactored)
-    // ---------------------------------------------------------
-    {
-        MGF_LOG_TRACE("[Step 5] MGFName Pure String Pooling Test");
-
-        MGFName n1("Actor");
-        MGFName n2("Actor");
-        MGFName n3("Actor");
-        MGFName n4("Enemy");
-
-        ReportMemory("After MGFName Pooling Test");
-
-        usize currentNameCount = NameManager::Instance().GetNameCount();
-        MGF_LOG_INFO("Current Name Count in Pool: {0}", currentNameCount);
-    }
-
-    // ---------------------------------------------------------
-    // [SECTION 6] Container Iteration Test
-    // ---------------------------------------------------------
-    {
-        MGF_LOG_TRACE("[Step 6] Container Iteration Test");
-
-        SVector<int32> iterVec;
-        for (int i = 1; i <= 5; ++i) iterVec.push_back(i * 10);
-
-        SMap<StringHash, int32> iterMap;
-        iterMap.Insert("Sword", 100);
-        iterMap.Insert("Shield", 200);
-
-        ReportMemory("Final State (After Iteration Test)");
-    }
-
-    MGF_LOG_INFO("=== All Cross-Domain Integration Tests Passed! ===");
+    MGF_LOG_INFO("=== All Engine Systems Passed Integration Test ===");
     MGF_LOG_FLUSH();
 
     return 0;

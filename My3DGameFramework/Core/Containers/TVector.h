@@ -11,6 +11,7 @@ namespace MGF3D
     public:
         using Base = std::vector<T, Alloc>;
         using Base::vector;
+        using Base::operator=;
 
         TVector() = default;
         virtual ~TVector() = default;
@@ -40,6 +41,13 @@ namespace MGF3D
     public:
         Ptr<T> Data() { return this->data(); }
         Ptr<const T> Data() const { return this->data(); }
+
+        T PopBack();
+
+        template<typename... Args>
+        void EmplaceBack(Args&&... args);
+        void PushBack(const T& value);
+        void PushBack(T&& value);
 
         usize Capacity() const;
         void Assign(usize n, const T& value);

@@ -13,15 +13,15 @@ set(SOURCES
     "Common/Nullable.h"
     "Common/Pointers.h"
     "Common/Random.h"
-    "Common/Sync.h"
+    "Common/Threading.h"
 
     "Common/Math.h"       "Common/Math.cpp"     "Common/Math.inl"
-    "Common/Clock.h"    "Common/Clock.cpp"
-    "Common/Random.h"    "Common/Random.cpp"
+    "Common/Clock.h"      "Common/Clock.cpp"
+    "Common/Random.h"     "Common/Random.cpp"
 
     # Debug
-    "Debug/Asserter.h"           "Debug/Asserter.cpp"
-    "Debug/Logger.h"             "Debug/Logger.cpp"      "Debug/Logger.inl" 
+    "Debug/Asserter.h"            "Debug/Asserter.cpp"
+    "Debug/Logger.h"              "Debug/Logger.cpp"      "Debug/Logger.inl" 
     "Debug/ProfileScope.h"        "Debug/ProfileScope.cpp"
     "Debug/RealTimer.h"           "Debug/RealTimer.cpp"
     "Debug/MemoryProfiler.h"      "Debug/MemoryProfiler.cpp"
@@ -35,14 +35,14 @@ set(SOURCES
     #"Entities/Entity/GameObject.h"      "Entities/Entity/GameObject.cpp"      "Entities/Entity/GameObject.inl" 
 
     # Managers
-    "Managers/ThreadManager.h"      "Managers/ThreadManager.cpp"
+    "Managers/JobManager.h"      "Managers/JobManager.cpp"
     "Managers/MemoryManager.h"      "Managers/MemoryManager.cpp"
     "Managers/NameManager.h"        "Managers/NameManager.cpp"
     "Managers/EntityManager.h"        "Managers/EntityManager.cpp"
     "Managers/FileManager.h"        "Managers/FileManager.cpp"
     "Managers/PathManager.h"        "Managers/PathManager.cpp"
     "Managers/TaskManager.h"        "Managers/TaskManager.cpp"
-    # "Managers/ResourceManager.h"        "Managers/ResourceManager.cpp"      "Managers/ResourceManager.inl" 
+    #"Managers/ResourceManager.h"        "Managers/ResourceManager.cpp"      "Managers/ResourceManager.inl" 
 
     # Memory
     "Memory/LinearMemoryPool.h"           "Memory/LinearMemoryPool.cpp"
@@ -60,44 +60,44 @@ set(SOURCES
 
     # Resource
     #"Resource/IResourceDescriptor.h" "Resource/IResourceDescriptor.cpp"
-    #"Resource/IResourceLoader.h"    "Resource/IResourceLoader.cpp"   
-    #"Resource/Resource.h"           "Resource/Resource.cpp"
+    #"Resource/IResourceLoader.h"     "Resource/IResourceLoader.cpp"   
+    #"Resource/Resource.h"            "Resource/Resource.cpp"
 
     # Stream
-    "Stream/Stream.h"            "Stream/Stream.cpp"
-    "Stream/FileStream.h"        "Stream/FileStream.cpp" 
+    "Stream/Stream.h"               "Stream/Stream.cpp"
+    "Stream/FileStream.h"           "Stream/FileStream.cpp" 
 
     # Containers
     "Containers/IContainer.h"       "Containers/IContainer.cpp"
-    "Containers/TMap.h"       "Containers/TMap.cpp"   "Containers/TMap.inl"
-    "Containers/TSet.h"       "Containers/TSet.cpp"   "Containers/TSet.inl"
-    "Containers/TVector.h"       "Containers/TVector.cpp"   "Containers/TVector.inl"
-    "Containers/TString.h"       "Containers/TString.cpp"   "Containers/TString.inl"
+    "Containers/TMap.h"             "Containers/TMap.cpp"   "Containers/TMap.inl"
+    "Containers/TSet.h"             "Containers/TSet.cpp"   "Containers/TSet.inl"
+    "Containers/TVector.h"          "Containers/TVector.cpp"   "Containers/TVector.inl"
+    "Containers/TString.h"          "Containers/TString.cpp"   "Containers/TString.inl"
+    "Containers/TDeque.h"           "Containers/TDeque.cpp"   "Containers/TDeque.inl"
 
     "Containers/Slab/SVector.h"     "Containers/Slab/SVector.cpp"
-    "Containers/Slab/SSet.h"     "Containers/Slab/SSet.cpp"
-    "Containers/Slab/SMap.h"     "Containers/Slab/SMap.cpp"
+    "Containers/Slab/SSet.h"        "Containers/Slab/SSet.cpp"
+    "Containers/Slab/SMap.h"        "Containers/Slab/SMap.cpp"
     "Containers/Slab/SString.h"     "Containers/Slab/SString.cpp"
 
-    "Containers/Linear/LVector.h"     "Containers/Linear/LVector.cpp"
-    "Containers/Linear/LSet.h"     "Containers/Linear/LSet.cpp"
-    "Containers/Linear/LMap.h"     "Containers/Linear/LMap.cpp"
-    "Containers/Linear/LString.h"     "Containers/Linear/LString.cpp"
+    "Containers/Linear/LVector.h"   "Containers/Linear/LVector.cpp"
+    "Containers/Linear/LSet.h"      "Containers/Linear/LSet.cpp"
+    "Containers/Linear/LMap.h"      "Containers/Linear/LMap.cpp"
+    "Containers/Linear/LString.h"   "Containers/Linear/LString.cpp"
 
     # Hasing
-    "Hashing/IHashFunctor.h"          "Hashing/IHashFunctor.cpp"
-    "Hashing/StringHash.h"            "Hashing/StringHash.cpp"
+    "Hashing/IHashFunctor.h"        "Hashing/IHashFunctor.cpp"
+    "Hashing/StringHash.h"          "Hashing/StringHash.cpp"
 
     # Task
-    "Task/AsyncTask.h"            "Task/AsyncTask.cpp"      "Task/AsyncTask.inl"
-    "Task/Task.h"                 "Task/Task.cpp"
-    "Task/MGFFuture.h"            "Task/MGFFuture.cpp"      "Task/MGFFuture.inl"
-    "Task/MGFPromise.h"           "Task/MGFPromise.cpp"     "Task/MGFPromise.inl"
+    "Task/TaskDeleter.h"            "Task/TaskDeleter.cpp"
+    "Task/Task.h"                   "Task/Task.cpp"
+    "Task/TaskPool.h"               "Task/TaskPool.cpp"
 
     # Thread
     "Thread/MGFThread.h"            "Thread/MGFThread.cpp"
     "Thread/MGFSignal.h"            "Thread/MGFSignal.cpp"  
-    "Thread/MGFThreadContext.h"     "Thread/MGFThreadContext.cpp"  
+    "Thread/MGFJob.h"               "Thread/MGFJob.cpp"  
 
     # Utils
     "Utils/CommonUtils.h"           "Utils/CommonUtils.cpp"         "Utils/CommonUtils.inl"

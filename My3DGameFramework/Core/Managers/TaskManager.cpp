@@ -1,30 +1,95 @@
 ﻿#include "CorePch.h"
 #include "TaskManager.h"
-#include "Task/AsyncTask.h"
+#include "JobManager.h"
 
 namespace MGF3D
 {
     TaskManager::TaskManager() = default;
-    TaskManager::~TaskManager() = default;
+    TaskManager::~TaskManager()
+    {
+        // 1. 이미 JobManager에서 스레드 정리가 끝났겠지만, 
+        // 여기서 한 번 더 브로드캐스트를 날려 확실히 잠을 깨워줍니다.
+        Broadcast();
 
-    void TaskManager::PushTask(Ptr<Task> task)
+        // 2. 남은 태스크들을 명시적으로 비웁니다. 
+        // (선언 순서에 따라 자동으로 되지만 코드로 보여주는 것이 의도 파악에 좋습니다.)
+        MGF_LOCK_SCOPE{ Lock lock(m_queueMutex); m_taskQueue.Clear(); }
+        MGF_LOCK_SCOPE{ Lock lock(m_mainMutex); m_mainQueue.Clear(); }
+    }
+
+    TaskUPtr TaskManager::AcquireTask(Action<> work, Action<> onComplete)
+    {
+        return m_taskPool.Acquire(std::move(work), std::move(onComplete));
+    }
+
+    void TaskManager::PushMainTask(TaskUPtr task)
     {
         if (!task) return;
 
         MGF_LOCK_SCOPE
         {
-            Lock lock(m_taskMutex);
-        // 여기서 태스크에 ID를 부여하거나 관리 목록에 추가할 수 있습니다.
+            Lock lock(m_mainMutex);
+            m_mainQueue.PushBack(std::move(task));
+        }
+    }
+
+    void TaskManager::PushTask(TaskUPtr task)
+    {
+        if (!task) return;
+
+        MGF_LOCK_SCOPE
+        {
+            Lock lock(m_queueMutex);
+            m_taskQueue.PushBack(std::move(task));
         }
 
-            // AsyncTask를 통해 실제 스레드 할당 및 실행을 수행합니다.
-            AsyncTask::Run(
-                [task]() { task->Execute(); }
-            );
+        // 대기 중인 워커 중 하나를 깨워 일을 시킵니다.
+        m_condition.notify_one();
+    }
+
+    TaskUPtr TaskManager::PopTask()
+    {
+        MGF_LOCK_SCOPE
+        {
+            Lock lock(m_queueMutex);
+            if (m_taskQueue.Empty())
+                return nullptr;
+
+            return m_taskQueue.PopFront();
+        }
+    }
+
+    void TaskManager::WaitForTask()
+    {
+        UniqueLock lock(m_queueMutex);
+
+        // 큐에 일이 있거나, 엔진이 종료 중이면 깨어납니다.
+        m_condition.wait(lock, [this] { return !m_taskQueue.Empty() || JobManager::Instance().IsShutdown(); });
+    }
+
+    void TaskManager::Broadcast()
+    {
+        // 모든 워커를 깨워 Shutdown 여부를 확인하게 합니다.
+        m_condition.notify_all();
     }
 
     void TaskManager::Update()
     {
-        // 메인 스레드 동기화가 필요한 콜백들이 있다면 여기서 처리하게 됩니다.
+        // 메인 스레드 큐에 쌓인 일감들을 로컬로 옮겨와 처리합니다.
+        // 락 점유 시간을 최소화하기 위함입니다.
+        LDeque<TaskUPtr> localQueue;
+
+        MGF_LOCK_SCOPE
+        {
+            Lock lock(m_mainMutex);
+            if (m_mainQueue.Empty()) return;
+            localQueue = std::move(m_mainQueue);
+        }
+
+        while (!localQueue.Empty())
+        {
+            auto task = localQueue.PopFront();
+            if (task) task->Execute();
+        }
     }
 }

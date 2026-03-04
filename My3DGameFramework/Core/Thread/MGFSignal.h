@@ -17,6 +17,7 @@ namespace MGF3D
     public:
         void Set();   // 신호를 보냄 (대기 중인 스레드를 깨움)
         void Wait();  // 신호가 올 때까지 현재 스레드를 정지
+        bool IsSignaled() const { return m_signaled; }
 
     private:
         ConditionVariable m_cv;
