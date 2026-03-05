@@ -4,24 +4,51 @@
 
 namespace MGF3D
 {
+	// 리소스 로딩 상태 (멀티스레드 동기화용)
+	enum class ResourceState : uint8
+	{
+		Unloaded = 0,
+		Pending,        // 로딩 큐 대기
+		Loading,        // 워커 스레드: OnLoad 실행 중
+		WaitingCommit,  // 메인 스레드: OnCommit 대기 중
+		Ready,          // 사용 가능
+		Failed          // 로딩 실패
+	};
+
 	MGF_CLASS_PTR(Resource)
 	class Resource
 	{
 	public:
+		Resource(StringHash id);
 		virtual ~Resource();
-		virtual ResourceType GetResourceType() const = 0;
-		virtual ResourceDesc& GetDesc() = 0;
-		virtual const ResourceDesc& GetDesc() const = 0;
-		bool MatchesType(ResourceType type) const;
-		const std::string& GetName() const;
 
-		// TODO :
-		// 이후 비동기 리소스 로드를 위해
-		// "순수 CPU 단에서 로드될 수 있고, 여타 다른 API의 스레드 불안정성을 배제한
-		// 로직들"을 따로 구현하여 워커 스레드의 일감으로 떠넘길 수 있는 추상 메서드를
-		// 추가할 필요가 있다.
+	public:
+
+		// 1. [Worker Thread] 순수 CPU 작업 (I/O, 파싱)
+		virtual bool OnLoad() = 0;
+
+		// 2. [Main Thread] API 자원 확정 (GPU 업로드, 전용 등록)
+		virtual bool OnCommit() = 0;
+
+		// 3. [Any Thread] 로딩용 임시 데이터 정리
+		virtual void OnRelease() = 0;
+
+	public:
+		ResourceState GetState() const { return m_state.load(std::memory_order_acquire); }
+		void SetState(ResourceState state) { m_state.store(state, std::memory_order_release); }
+		bool IsReady() const { return GetState() == ResourceState::Ready; }
+
+	public:
+		const StringHash GetTypeID() const { return m_typeID; }
+		const MGFName& GetName() const { return m_name; }
+		const MGFPath& GetPath() const { return m_path; }
 
 	protected:
 		Resource();
+
+		Atomic<ResourceState> m_state { ResourceState::Unloaded };
+		const StringHash m_typeID;
+		MGFName m_name;
+		MGFPath m_path;
 	};
 }

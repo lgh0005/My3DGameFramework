@@ -38,5 +38,3 @@ namespace std                                                                   
         }                                                                            \
     };                                                                               \
 }
-
-#pragma endregion

@@ -42,6 +42,7 @@ set(SOURCES
     "Managers/FileManager.h"        "Managers/FileManager.cpp"
     "Managers/PathManager.h"        "Managers/PathManager.cpp"
     "Managers/TaskManager.h"        "Managers/TaskManager.cpp"
+    "Managers/TypeManager.h"         "Managers/TypeManager.cpp"
     #"Managers/ResourceManager.h"        "Managers/ResourceManager.cpp"      "Managers/ResourceManager.inl" 
 
     # Memory
@@ -49,6 +50,9 @@ set(SOURCES
     "Memory/LinearAllocator.h"           "Memory/LinearAllocator.cpp"      "Memory/LinearAllocator.inl" 
     "Memory/SlabMemoryPool.h"           "Memory/SlabMemoryPool.cpp"
     "Memory/SlabAllocator.h"           "Memory/SlabAllocator.cpp"      "Memory/SlabAllocator.inl" 
+
+    # Module
+    "Module/IModuleUnit.h"          "Module/IModuleUnit.cpp"
 
     # Identity
     "Identity/MGFName.h"            "Identity/MGFName.cpp"
@@ -98,6 +102,9 @@ set(SOURCES
     "Thread/MGFThread.h"            "Thread/MGFThread.cpp"
     "Thread/MGFSignal.h"            "Thread/MGFSignal.cpp"  
     "Thread/MGFJob.h"               "Thread/MGFJob.cpp"  
+
+    # Type
+    "Type/MGFType.h"                "Type/MGFType.cpp"
 
     # Utils
     "Utils/CommonUtils.h"           "Utils/CommonUtils.cpp"         "Utils/CommonUtils.inl"

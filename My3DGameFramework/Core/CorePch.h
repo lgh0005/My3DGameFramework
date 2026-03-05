@@ -73,6 +73,12 @@
 #include "Containers/Linear/LVector.h"
 #include "Containers/Linear/LDeque.h"
 
+/*================================//
+//    Engine resource identities  //
+//================================*/
+#include "Identity/MGFName.h"
+#include "Identity/MGFPath.h"
+
 /*=============================//
 //    Engine container utils   //
 //=============================*/

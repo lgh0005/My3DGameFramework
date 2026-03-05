@@ -2,6 +2,11 @@
 
 namespace MGF3D
 {
+    inline constexpr StringHash operator""_sh(cstr s, usize n) 
+    {
+        return StringHash(s);
+    }
+
     inline constexpr uint32 StringHash::Calculate(cstr str, usize len)
     {
         uint32 hash = OFFSET_BASIS;

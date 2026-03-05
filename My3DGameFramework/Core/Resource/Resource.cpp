@@ -1,14 +1,9 @@
-﻿#include "EnginePch.h"
+﻿#include "CorePch.h"
 #include "Resource.h"
 
-DECLARE_DEFAULTS_IMPL(Resource)
-
-bool Resource::MatchesType(ResourceType type) const
+namespace MGF3D
 {
-	return GetResourceType() == type;
-}
-
-const std::string& Resource::GetName() const
-{
-	return GetDesc().name;
+    Resource::Resource(StringHash id)
+        : typeID(id), m_state(ResourceState::Unloaded) { }
+    Resource::~Resource() = default;
 }

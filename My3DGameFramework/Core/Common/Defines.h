@@ -48,8 +48,9 @@ using className ## WPtr = std::weak_ptr<className>;
 //=============================*/
 #define MGF_STATIC_ASSERT(condition, message) static_assert(condition, message)
 
-
 /*===================================//
 //      Synchronization Helpers      //
 //===================================*/
 #define MGF_LOCK_SCOPE
+
+
