@@ -4,17 +4,20 @@
 #include <spdlog/sinks/stdout_color_sinks.h>
 #include <spdlog/sinks/basic_file_sink.h>
 
-class Logger
+namespace MGF3D
 {
-	DECLARE_SINGLE(Logger)
+	class Logger
+	{
+		DECLARE_SINGLE(Logger)
 
-public:
-	void Init(int argc);
-	std::shared_ptr<spdlog::logger>& GetLogger() { return m_logger; }
+	public:
+		void Init(int argc);
+		std::shared_ptr<spdlog::logger>& GetLogger() { return m_logger; }
 
-private:
-	std::shared_ptr<spdlog::logger> m_logger;
-};
+	private:
+		std::shared_ptr<spdlog::logger> m_logger;
+	};
+}
 
 /*=================//
 //  Logger macros  //

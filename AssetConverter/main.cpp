@@ -4,10 +4,10 @@
 int main(int argc, char* argv[])
 {
     // Logger 초기화
-    LOGGER.Init(argc);
+    MGF3D::LOGGER.Init(argc);
 
     // 2. 인자 파싱 (ArgumentParser 이용)
-    ParseResult args = ArgumentParser::Parse(argc, argv);
+    MGF3D::ParseResult args = MGF3D::ArgumentParser::Parse(argc, argv);
 
     // 3. 파싱 실패 시
     if (!args.IsValid())
@@ -23,16 +23,16 @@ int main(int argc, char* argv[])
     switch (args.mode)
     {
     // [Verify Mode]
-    case ConversionMode::Verify:
+    case MGF3D::ConversionMode::Verify:
 
         // Python GUI가 "--check"를 보냈을 때 "AssetConverter verified" 문자열을 기다림
         std::cout << "AssetConverter verified" << std::endl;
         return 0;
 
     // [Model Mode]
-    case ConversionMode::Model:
-        LOG_INFO(">>> [Mode] Model Conversion Selected");
-        success = CONV_MODEL.Convert
+    case MGF3D::ConversionMode::Model:
+        MGF3D::LOG_INFO(">>> [Mode] Model Conversion Selected");
+        success = MGF3D::CONV_MODEL.Convert
         (
             args.inputPath, args.outputPath, 
             args.extractOrm, args.flipY
@@ -40,15 +40,15 @@ int main(int argc, char* argv[])
         break;
 
     // [Animation Mode]
-    case ConversionMode::Animation:
-        LOG_INFO(">>> [Mode] Animation Conversion Selected");
-        success = CONV_ANIM.Convert(args.inputPath, args.refModelPath, args.outputPath);
+    case MGF3D::ConversionMode::Animation:
+        MGF3D::LOG_INFO(">>> [Mode] Animation Conversion Selected");
+        success = MGF3D::CONV_ANIM.Convert(args.inputPath, args.refModelPath, args.outputPath);
         break;
 
     // [ORM Texture Mode]
-    case ConversionMode::ORM:
-        LOG_INFO(">>> [Mode] ORM Texture Packing Selected");
-        success = CONV_ORM.Convert
+    case MGF3D::ConversionMode::ORM:
+        MGF3D::LOG_INFO(">>> [Mode] ORM Texture Packing Selected");
+        success = MGF3D::CONV_ORM.Convert
         (
             args.aoMapPath, args.roughnessMapPath, 
             args.metallicMapPath, args.outputPath,
@@ -57,9 +57,9 @@ int main(int argc, char* argv[])
         break;
 
     // [KTX Texture Mode]
-    case ConversionMode::KTX:
-        LOG_INFO(">>> [Mode] KTX Texture Conversion Selected");
-        success = CONV_KTX.Convert
+    case MGF3D::ConversionMode::KTX:
+        MGF3D::LOG_INFO(">>> [Mode] KTX Texture Conversion Selected");
+        success = MGF3D::CONV_KTX.Convert
         (
             args.inputPath, args.outputPath, 
             args.ktxFormat, args.ktxColorSpace,
@@ -68,13 +68,13 @@ int main(int argc, char* argv[])
         break;
 
     // [KTX CubeMap Mode]
-    case ConversionMode::CubeMap:
-        LOG_INFO(">>> [Mode] KTX CubeMap Conversion Selected");
-        success = CONV_CUBE.Convert(args.cubeFaces, args.outputPath, args.isSRGB);
+    case MGF3D::ConversionMode::CubeMap:
+        MGF3D::LOG_INFO(">>> [Mode] KTX CubeMap Conversion Selected");
+        success = MGF3D::CONV_CUBE.Convert(args.cubeFaces, args.outputPath, args.isSRGB);
         break;
 
     default:
-        LOG_ERROR("Unknown conversion mode.");
+        MGF3D::LOG_ERROR("Unknown conversion mode.");
         success = false;
         break;
     }
@@ -82,12 +82,12 @@ int main(int argc, char* argv[])
     // 5. 결과 리턴
     if (success)
     {
-        LOG_INFO(">>> [SUCCESS] Processing finished.");
+        MGF3D::LOG_INFO(">>> [SUCCESS] Processing finished.");
         return 0;
     }
     else
     {
-        LOG_ERROR(">>> [FAILED] Processing failed or not implemented.");
+        MGF3D::LOG_ERROR(">>> [FAILED] Processing failed or not implemented.");
         return 1;
     }
 }
