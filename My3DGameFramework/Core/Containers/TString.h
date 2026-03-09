@@ -15,7 +15,7 @@ namespace MGF3D
 		using Base::operator[];
 
 		TString() = default;
-		TString(const str& s, const Alloc& alloc = Alloc());
+		TString(strview sv, const Alloc& alloc = Alloc());
 		virtual ~TString() = default;
 
 	public:

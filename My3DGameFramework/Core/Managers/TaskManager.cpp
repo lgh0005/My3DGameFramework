@@ -13,8 +13,8 @@ namespace MGF3D
 
         // 2. 남은 태스크들을 명시적으로 비웁니다. 
         // (선언 순서에 따라 자동으로 되지만 코드로 보여주는 것이 의도 파악에 좋습니다.)
-        MGF_LOCK_SCOPE{ Lock lock(m_queueMutex); m_taskQueue.Clear(); }
-        MGF_LOCK_SCOPE{ Lock lock(m_mainMutex); m_mainQueue.Clear(); }
+        { MGF_LOCK_SCOPE(m_queueMutex); m_taskQueue.Clear(); }
+        { MGF_LOCK_SCOPE(m_mainMutex); m_mainQueue.Clear(); }
     }
 
     TaskUPtr TaskManager::AcquireTask(Action<> work, Action<> onComplete)
@@ -26,20 +26,16 @@ namespace MGF3D
     {
         if (!task) return;
 
-        MGF_LOCK_SCOPE
-        {
-            Lock lock(m_mainMutex);
-            m_mainQueue.PushBack(std::move(task));
-        }
+        MGF_LOCK_SCOPE(m_mainMutex);
+        m_mainQueue.PushBack(std::move(task));
     }
 
     void TaskManager::PushTask(TaskUPtr task)
     {
         if (!task) return;
 
-        MGF_LOCK_SCOPE
         {
-            Lock lock(m_queueMutex);
+            MGF_LOCK_SCOPE(m_queueMutex);
             m_taskQueue.PushBack(std::move(task));
         }
 
@@ -49,14 +45,12 @@ namespace MGF3D
 
     TaskUPtr TaskManager::PopTask()
     {
-        MGF_LOCK_SCOPE
-        {
-            Lock lock(m_queueMutex);
-            if (m_taskQueue.Empty())
-                return nullptr;
+        MGF_LOCK_SCOPE(m_queueMutex);
 
-            return m_taskQueue.PopFront();
-        }
+        if (m_taskQueue.Empty())
+            return nullptr;
+
+        return m_taskQueue.PopFront();
     }
 
     void TaskManager::WaitForTask()
@@ -79,9 +73,9 @@ namespace MGF3D
         // 락 점유 시간을 최소화하기 위함입니다.
         LDeque<TaskUPtr> localQueue;
 
-        MGF_LOCK_SCOPE
+        // 메인 큐에서 일감을 로컬로 옮겨오는 찰나에만 락을 겁니다.
         {
-            Lock lock(m_mainMutex);
+            MGF_LOCK_SCOPE(m_mainMutex);
             if (m_mainQueue.Empty()) return;
             localQueue = std::move(m_mainQueue);
         }

@@ -13,4 +13,5 @@ namespace MGF3D
 	{
 		UpdateRawPath();
 	}
+	MGFPath::MGFPath(cstr pathStr) : m_path(pathStr), m_rawPath(pathStr) { }
 }

@@ -4,7 +4,7 @@
 namespace MGF3D
 {
     template<typename Alloc>
-    inline TString<Alloc>::TString(const str& s, const Alloc& alloc) : Base(s.c_str(), alloc) { }
+    inline TString<Alloc>::TString(strview sv, const Alloc& alloc) : Base(sv.data(), sv.size(), alloc) { }
 
     template<typename Alloc>
     template<typename OtherAlloc>

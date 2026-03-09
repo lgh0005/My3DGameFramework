@@ -1,23 +1,28 @@
 ﻿#pragma once
+#include <nlohmann/json.hpp>
 
 namespace MGF3D
 {
 	MGF_CLASS_PTR(JsonParser)
-		class JsonParser
+	class JsonParser
 	{
 	public:
 		JsonParser();
 		~JsonParser();
 
-		bool LoadFromJsonFile(const std::string& path);
-		bool IsArray(const std::string& key) const;
+	public:
+		bool LoadFromJsonFile(const MGFPath& path);
+
+	public:
+		bool IsArray(const SString& key) const;
+		bool Contains(const SString& key) const;
 		const nlohmann::json& GetRoot() const { return m_data; }
 
 		template<typename T>
-		bool HasTypeOf(const std::string& key);
+		bool HasTypeOf(const SString& key) const;
 
 		template<typename T>
-		T Get(const std::string& key, const T& defaultValue = T());
+		T Get(const SString& key, const T& defaultValue = T()) const;
 
 	private:
 		nlohmann::json m_data;

@@ -9,8 +9,8 @@ namespace MGF3D
 		IResourceDescriptor(StringHash id);
 		virtual ~IResourceDescriptor();
 
-		const StringHash typeID;
 		MGFName name;
 		MGFPath path;
+		const StringHash typeID;
 	};
 }

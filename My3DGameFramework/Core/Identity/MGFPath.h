@@ -12,6 +12,7 @@ namespace MGF3D
 		MGFPath();
 		MGFPath(const fs::path& path);
 		MGFPath(const SString& pathStr);
+		MGFPath(cstr pathStr);
 		~MGFPath();
 
 	public:

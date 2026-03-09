@@ -51,6 +51,6 @@ using className ## WPtr = std::weak_ptr<className>;
 /*===================================//
 //      Synchronization Helpers      //
 //===================================*/
-#define MGF_LOCK_SCOPE
+#define MGF_LOCK_SCOPE(mtx) Lock lock##__LINE__(mtx)
 
 

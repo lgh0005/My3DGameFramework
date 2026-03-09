@@ -3,7 +3,11 @@
 
 namespace MGF3D
 {
-    Resource::Resource(StringHash id)
-        : typeID(id), m_state(ResourceState::Unloaded) { }
+    Resource::Resource(const IResourceDescriptor& desc)
+        : m_typeID(desc.typeID)
+        , m_name(desc.name)
+        , m_path(desc.path)
+    { }
+
     Resource::~Resource() = default;
 }

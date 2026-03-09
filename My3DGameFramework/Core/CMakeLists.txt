@@ -39,11 +39,11 @@ set(SOURCES
     "Managers/MemoryManager.h"      "Managers/MemoryManager.cpp"
     "Managers/NameManager.h"        "Managers/NameManager.cpp"
     "Managers/EntityManager.h"        "Managers/EntityManager.cpp"
+    "Managers/TaskManager.h"        "Managers/TaskManager.cpp"
+    #"Managers/TypeManager.h"         "Managers/TypeManager.cpp"
+    #"Managers/ResourceManager.h"        "Managers/ResourceManager.cpp"      "Managers/ResourceManager.inl" 
     "Managers/FileManager.h"        "Managers/FileManager.cpp"
     "Managers/PathManager.h"        "Managers/PathManager.cpp"
-    "Managers/TaskManager.h"        "Managers/TaskManager.cpp"
-    "Managers/TypeManager.h"         "Managers/TypeManager.cpp"
-    #"Managers/ResourceManager.h"        "Managers/ResourceManager.cpp"      "Managers/ResourceManager.inl" 
 
     # Memory
     "Memory/LinearMemoryPool.h"           "Memory/LinearMemoryPool.cpp"
@@ -59,13 +59,13 @@ set(SOURCES
     "Identity/MGFPath.h"          "Identity/MGFPath.cpp"
 
     # Parsers
-    #"Parsers/JsonParser.h"          "Parsers/JsonParser.cpp"          "Parsers/JsonParser.inl"
+    "Parsers/JsonParser.h"          "Parsers/JsonParser.cpp"          "Parsers/JsonParser.inl"
     #"Parsers/YamlParser.h"          "Parsers/YamlParser.cpp"          "Parsers/YamlParser.inl"
 
     # Resource
-    #"Resource/IResourceDescriptor.h" "Resource/IResourceDescriptor.cpp"
-    #"Resource/IResourceLoader.h"     "Resource/IResourceLoader.cpp"   
-    #"Resource/Resource.h"            "Resource/Resource.cpp"
+    "Resource/IResourceDescriptor.h" "Resource/IResourceDescriptor.cpp"
+    "Resource/IResourceLoader.h"     "Resource/IResourceLoader.cpp"   
+    "Resource/Resource.h"            "Resource/Resource.cpp"
 
     # Stream
     "Stream/Stream.h"               "Stream/Stream.cpp"

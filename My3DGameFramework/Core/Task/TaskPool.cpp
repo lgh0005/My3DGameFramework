@@ -10,9 +10,9 @@ namespace MGF3D
 
     TaskPool::~TaskPool()
     {
-        MGF_LOCK_SCOPE
+        // 1. 소멸 시 리스트 정리(전체 범위 락)
         {
-            Lock lock(m_lock);
+            MGF_LOCK_SCOPE(m_lock);
             m_freeList.Clear();
         }
     }
@@ -21,16 +21,16 @@ namespace MGF3D
     {
         Task* task = nullptr;
 
-        MGF_LOCK_SCOPE
+        // 2. 프리 리스트에서 꺼내올 때만 짧게 락을 겁니다.
         {
-            Lock lock(m_lock);
+            MGF_LOCK_SCOPE(m_lock);
             if (!m_freeList.Empty())
                 task = m_freeList.PopBack();
         }
 
         if (task)
         {
-            // [정상화] 기존 메모리 영역에 생성자만 다시 호출 (재초기화)
+            // 기존 메모리 영역에 생성자만 다시 호출 (재초기화)
             new (task) Task(std::move(work), std::move(onComplete));
         }
         else
@@ -52,9 +52,9 @@ namespace MGF3D
         // Action<> 내부의 std::function 등이 잡고 있는 자원을 정리하기 위함입니다.
         task->~Task();
 
-        MGF_LOCK_SCOPE
+        // 4. 다시 리스트에 넣을 때만 락을 겁니다.
         {
-            Lock lock(m_lock);
+            MGF_LOCK_SCOPE(m_lock);
             m_freeList.PushBack(task);
         }
     }

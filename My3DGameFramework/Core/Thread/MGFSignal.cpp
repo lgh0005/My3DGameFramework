@@ -11,12 +11,13 @@ namespace MGF3D
 
 	void MGFSignal::Set()
 	{
-		MGF_LOCK_SCOPE
+		// 1. 상태 변경 시에만 짧게 락을 겁니다.
 		{
-			Lock lock(m_mutex);
+			MGF_LOCK_SCOPE(m_mutex);
 			m_signaled = true;
 		}
 
+		// 2. 락을 해제한 후 신호를 보냅니다 (Wait-Wakeup 병목 방지).
 		m_cv.notify_one();
 	}
 

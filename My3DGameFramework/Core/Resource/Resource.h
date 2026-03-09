@@ -1,6 +1,5 @@
 ﻿#pragma once
-#include "Misc/Enums.h"
-#include "Resources/ResourceDesc.h"
+#include "Resource/IResourceDescriptor.h"
 
 namespace MGF3D
 {
@@ -19,7 +18,7 @@ namespace MGF3D
 	class Resource
 	{
 	public:
-		Resource(StringHash id);
+		Resource(const IResourceDescriptor& desc);
 		virtual ~Resource();
 
 	public:
@@ -34,9 +33,9 @@ namespace MGF3D
 		virtual void OnRelease() = 0;
 
 	public:
+		bool IsReady() const { return GetState() == ResourceState::Ready; }
 		ResourceState GetState() const { return m_state.load(std::memory_order_acquire); }
 		void SetState(ResourceState state) { m_state.store(state, std::memory_order_release); }
-		bool IsReady() const { return GetState() == ResourceState::Ready; }
 
 	public:
 		const StringHash GetTypeID() const { return m_typeID; }
