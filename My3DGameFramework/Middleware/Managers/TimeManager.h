@@ -23,18 +23,22 @@ namespace MGF3D
 		void SetFixedDeltaTime(float fixedDt) { m_fixedDeltaTime = fixedDt; }
 		bool CheckFixedUpdate();
 
+		float GetMaxDeltaTime() const { return m_maxDeltaTime; }
+		void SetMaxDeltaTime(float maxDt) { m_maxDeltaTime = maxDt; }
+
 	private:
 		void CalculateFPS();
 
-		double m_lastTime { 0.0 };
-		double m_currentTime { 0.0 };
-		float m_deltaTime { 0.0 };
+		double m_lastTime		{ 0.0 };
+		double m_currentTime	{ 0.0 };
+		float m_deltaTime		{ 0.0 };
 
-		double m_fpsLastTime{ 0.0 };
-		int32 m_frameCount	{ 0 };
-		float m_fps	{ 0.0 };
+		double m_fpsLastTime	{ 0.0 };
+		int32 m_frameCount		{ 0 };
+		float m_fps				{ 0.0 };
 
-		float m_fixedDeltaTime{ 1.0f / 60.0f }; // 기본값 60hz (0.01666...)
-		double m_accumulator{ 0.0 };            // 시간이 쌓이는 누적기
+		float m_fixedDeltaTime	{ 1.0f / 60.0f };	// 기본값 60hz (0.01666...)
+		float m_maxDeltaTime	{ 0.25f };          // 밀린 연산 방어선 (기본 0.25초); 0.25초 / 0.016초(60Hz) = 15
+		double m_accumulator	{ 0.0 };            // 시간이 쌓이는 누적기
 	};
 }

@@ -1,7 +1,6 @@
 ﻿#pragma once
 #include "Platform/Input/MGFInputAction.h"
-#include <GLFW/glfw3.h>
-#include <array>
+#include "Utils/GLFWInputMapper.h"
 
 namespace MGF3D
 {
@@ -19,8 +18,8 @@ namespace MGF3D
 		void Shutdown();
 
 	public:
-		void MapAction(strview actionName, int32 key);
-		void MapMouseAction(strview actionName, int32 button);
+		void MapAction(strview actionName, KeyCode code);
+		void MapMouseAction(strview actionName, MouseCode code);
 		void BindAction(strview actionName, InputEvent event, const MGFInputAction::InputCallback& callback);
 
 		bool GetButton(strview actionName);
@@ -48,8 +47,8 @@ namespace MGF3D
 		SVector<bool> m_currentStates;
 		SVector<bool> m_prevStates;
 
-		std::array<SVector<Ptr<MGFInputAction>>, GLFW_KEY_LAST + 1> m_keyMap;
-		std::array<SVector<Ptr<MGFInputAction>>, GLFW_MOUSE_BUTTON_LAST + 1> m_mouseMap;
+		Array<SVector<Ptr<MGFInputAction>>, GLFW_KEY_LAST + 1> m_keyMap;
+		Array<SVector<Ptr<MGFInputAction>>, GLFW_MOUSE_BUTTON_LAST + 1> m_mouseMap;
 		vec2 m_mousePos{ 0.0f };
 	};
 }

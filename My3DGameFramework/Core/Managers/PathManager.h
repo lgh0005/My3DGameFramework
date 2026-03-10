@@ -22,9 +22,6 @@ namespace MGF3D
 		MGFPath Resolve(const MGFPath& virtualPath) const;
 		void WaitForConfig();
 
-		// [DEBUG]
-		void DebugDumpMap();
-
 	private:
 		MGFPath m_engineRoot;
 		SMap<StringHash, MGFPath> m_virtualPaths;

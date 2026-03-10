@@ -10,6 +10,7 @@ set(SOURCES
     "Common/Defines.h"
     "Common/Types.h"
     "Common/Constants.h"
+    "Common/Array.h"
     "Common/Nullable.h"
     "Common/Pointers.h"
     "Common/Random.h"
@@ -41,7 +42,7 @@ set(SOURCES
     "Managers/EntityManager.h"        "Managers/EntityManager.cpp"
     "Managers/TaskManager.h"        "Managers/TaskManager.cpp"
     #"Managers/TypeManager.h"         "Managers/TypeManager.cpp"
-    #"Managers/ResourceManager.h"        "Managers/ResourceManager.cpp"      "Managers/ResourceManager.inl" 
+    "Managers/ResourceManager.h"        "Managers/ResourceManager.cpp"      "Managers/ResourceManager.inl" 
     "Managers/PathManager.h"        "Managers/PathManager.cpp"
 
     # Memory

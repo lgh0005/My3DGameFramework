@@ -53,9 +53,11 @@ namespace MGF3D
     /*===============================//
     //   mapping & binding actions   //
     //===============================*/
-    void InputManager::MapAction(strview actionName, int32 key)
+    void InputManager::MapAction(strview actionName, KeyCode code)
     {
-        if (!CommonUtils::IsBetween(key, 0, GLFW_KEY_LAST)) return;
+        // 1. 엔진 코드를 GLFW용 정수로 번역
+        int32 key = GLFWInputMapper::ToGLFW(code);
+        if (key == GLFW_KEY_UNKNOWN) return;
 
         Ptr<MGFInputAction> action = FetchAction(actionName);
         if (!action) return;
@@ -65,14 +67,17 @@ namespace MGF3D
             m_keyMap[key].PushBack(action);
     }
 
-    void InputManager::MapMouseAction(strview actionName, int32 button)
+    void InputManager::MapMouseAction(strview actionName, MouseCode code)
     {
-        if (!CommonUtils::IsBetween(button, 0, GLFW_MOUSE_BUTTON_LAST)) return;
+        // 1. 엔진 코드를 GLFW용 정수로 번역
+        int32 button = GLFWInputMapper::ToGLFW(code);
+        if (button < 0) return;
 
         Ptr<MGFInputAction> action = FetchAction(actionName);
         if (!action) return;
 
         action->AddMouseButtonBinding(button);
+
         if (!m_mouseMap[button].Contains(action))
             m_mouseMap[button].PushBack(action);
     }
@@ -114,22 +119,22 @@ namespace MGF3D
     /*===========================//
     //   Input event callbacks   //
     //===========================*/
-    void InputManager::DispatchKey(GLFWwindow* window, int32 key, int32 scancode, int32 action, int32 mods)
+    void InputManager::DispatchKey([[maybe_unused]] GLFWwindow* window, int32 key, int32 scancode, int32 action, int32 mods)
     {
         MGF_INPUT.OnKey(key, scancode, action, mods);
     }
 
-    void InputManager::DispatchMouse(GLFWwindow* window, int32 button, int32 action, int32 mods)
+    void InputManager::DispatchMouse([[maybe_unused]] GLFWwindow* window, int32 button, int32 action, int32 mods)
     {
         MGF_INPUT.OnMouse(button, action, mods);
     }
 
-    void InputManager::DispatchCursorPos(GLFWwindow* window, double xpos, double ypos)
+    void InputManager::DispatchCursorPos([[maybe_unused]] GLFWwindow* window, double xpos, double ypos)
     {
         MGF_INPUT.OnCursorPos(xpos, ypos);
     }
 
-    void InputManager::OnKey(int32 key, int32 scancode, int32 action, int32 mods)
+    void InputManager::OnKey(int32 key, [[maybe_unused]] int32 scancode, int32 action, [[maybe_unused]] int32 mods)
     {
         if (key < 0 || key > GLFW_KEY_LAST) return;
 
@@ -153,7 +158,7 @@ namespace MGF3D
         }
     }
 
-    void InputManager::OnMouse(int32 button, int32 action, int32 mods)
+    void InputManager::OnMouse(int32 button, int32 action, [[maybe_unused]] int32 mods)
     {
         if (button < 0 || button > GLFW_MOUSE_BUTTON_LAST) return;
 

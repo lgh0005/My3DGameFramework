@@ -43,7 +43,7 @@ namespace MGF3D
 		MGF_INIT_SYS(MGF_PATH.Init(), "PathManager");
 
 		// [TODO: 레거시 청산 후 주석 해제]
-		// MGF_INIT_SYS(MGF_RESOURCE, "ResourceManager");
+		MGF_INIT_SYS(MGF_RESOURCE.Init(), "ResourceManager");
 		// MGF_INIT_SYS(MGF_ENTITY,   "EntityManager");
 
 		// 2. System 단 매니저 초기화
@@ -105,7 +105,7 @@ namespace MGF3D
 		// [TODO: 코어 모듈 레거시 청산 후 주석 해제]
 		MGF_TASK.Shutdown();
 		// MGF_ENTITY.Shutdown();
-		// MGF_RESOURCE.Shutdown();
+		MGF_RESOURCE.Shutdown();
 		// MGF_TYPE.Shutdown();
 		MGF_NAME.Shutdown();
 

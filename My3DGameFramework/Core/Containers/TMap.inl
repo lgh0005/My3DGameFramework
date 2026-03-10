@@ -72,10 +72,10 @@ namespace MGF3D
     }
 
     template<typename K, typename V, typename Alloc, typename Hash, typename KeyEqual>
-    inline bool TMap<K, V, Alloc, Hash, KeyEqual>::Insert(const K& key, const V& value)
+    template<typename ArgK, typename ArgV>
+    inline bool TMap<K, V, Alloc, Hash, KeyEqual>::Insert(ArgK&& key, ArgV&& value)
     {
-        // emplace를 사용하여 복사 비용 최적화
-        auto result = this->emplace(key, value);
+        auto result = this->emplace(std::forward<ArgK>(key), std::forward<ArgV>(value));
         return result.second;
     }
 

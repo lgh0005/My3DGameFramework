@@ -1,4 +1,6 @@
 ﻿#pragma once
+#include "Resource/Resource.h"
+#include "Resource/IResourceLoader.h"
 
 namespace MGF3D
 {
@@ -13,28 +15,26 @@ namespace MGF3D
 		ResourceManager();
 		~ResourceManager();
 
-	//public:
-	//	bool Init();
-	//	void Clear();
-	//	std::string ResolvePath(const std::string& virtualPath) const;
+	public:
+		bool Init();
+		void Update(); // [Main Thread] WaitingCommit 상태의 리소스를 OnCommit 시키는 역할
+		void Shutdown();
 
-	//	template<typename T> std::shared_ptr<T> Get(const std::string& name);
-	//	template<typename T> std::vector<std::shared_ptr<T>> GetAll();
-	//	template<typename T, typename... Args> std::shared_ptr<T> Add(const std::string& name, Args&&... args);
-	//	template<typename T> void Register(const std::shared_ptr<T>& resource);
+		// 1. 로더 등록 (예: GraphicsModule에서 TextureLoader를 등록)
+		void RegisterLoader(StringHash typeID, IResourceLoaderUPtr loader);
 
-	//private:
-	//	void ScanDirectory(const std::string& virtualRoot, const std::string& physicalPath);
-	//	template<typename T> std::shared_ptr<T> Load(const ResourceDesc& desc);
-	//	template<typename T> std::shared_ptr<T> TryCastResource(const std::shared_ptr<Resource>& resource);
-	//	bool LoadEngineConfig(const std::string& path);
-	//	void AddBuiltInResources();
+		// 2. 리소스 가져오기 (없으면 등록된 Descriptor를 기반으로 로드 시도)
+		template<typename T> SharedPtr<T> Get(const MGFName& assetName);
 
-	//private:
-	//	std::unordered_map<std::string, ResourcePtr>     m_engineResources; // { name, @BuiltIn }
-	//	std::unordered_map<std::string, ResourcePtr>     m_resources;       // { name, [@GameAssets, @Virtauals] }
-	//	std::unordered_map<std::string, ResourceDescPtr> m_assetRegistry;   // { name, resource_desc }
-	//	std::unordered_map<std::string, std::string>     m_virtualPaths;    // { virtual_path, real_path }
+		// 3. 리소스 수동 등록
+		void AddResource(const SharedPtr<Resource>& resource);
+
+	private:
+		ResourcePtr LoadResourceAsync(const Ptr<IResourceDescriptor> desc);
+
+		SMap<StringHash, IResourceLoaderUPtr> m_loaders;
+		SMap<StringHash, ResourcePtr> m_resources;
+		SMap<StringHash, IResourceDescriptorUPtr> m_assetRegistry;
 	};
 }
 

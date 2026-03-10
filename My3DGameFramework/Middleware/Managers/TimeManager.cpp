@@ -43,13 +43,20 @@ namespace MGF3D
     void TimeManager::Update()
     {
         m_currentTime = MGF_GLFW.GetTime();
-        m_deltaTime = static_cast<float>(m_currentTime - m_lastTime);
+        
+        // 1. 이번 프레임에 걸린 실제 시간 (Real Frame Time)
+        float frameTime = static_cast<float>(m_currentTime - m_lastTime);
 
-        // [Spiral of Death 방지]
-        if (m_deltaTime > 0.25f) m_deltaTime = 0.25f;
+        // 2. 명시적으로 선언된 한계치(MaxDeltaTime)로 클램핑 (Spiral of Death 방지)
+        if (frameTime > m_maxDeltaTime)
+            frameTime = m_maxDeltaTime;
+
+        // 3. 엔진 전체에 뿌려질 안전한 델타 타임
+        m_deltaTime = frameTime;
 
         m_lastTime = m_currentTime;
         m_accumulator += m_deltaTime;
+
         CalculateFPS();
     }
 

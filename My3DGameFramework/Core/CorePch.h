@@ -29,6 +29,7 @@
 /*============================//
 //    Engine common aliases   //
 //============================*/
+#include "Common/Array.h"
 #include "Common/Pointers.h"
 #include "Common/Nullable.h"
 #include "Common/Delegates.h"

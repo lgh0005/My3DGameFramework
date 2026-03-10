@@ -4,6 +4,7 @@
 
 namespace MGF3D
 {
+	MGF_CLASS_PTR(IResourceLoader)
 	class IResourceLoader
 	{
 	public:

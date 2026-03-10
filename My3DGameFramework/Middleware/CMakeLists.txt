@@ -21,6 +21,8 @@ set(SOURCES
 
     # Utils
     "Utils/Defines.h"
+    "Utils/GLFWAllocateHelper.h"        "Utils/GLFWAllocateHelper.cpp"
+    "Utils/GLFWInputMapper.h"           "Utils/GLFWInputMapper.cpp"
 )
 
 # 2. 빌드 타겟 생성 및 별칭 등록

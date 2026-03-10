@@ -38,7 +38,10 @@ namespace MGF3D
     public:
         Ptr<V> Find(const K& key);
         Ptr<const V> Find(const K& key) const;
-        bool Insert(const K& key, const V& value);
+
+        template <typename ArgK, typename ArgV>
+        bool Insert(ArgK&& key, ArgV&& value);
+
         bool Remove(const K& key);
     };
 }

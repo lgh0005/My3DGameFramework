@@ -1,142 +1,148 @@
 ﻿#include "CorePch.h"
 #include "ResourceManager.h"
+#include "Managers/TaskManager.h"
 
 namespace MGF3D
 {
-	ResourceManager::ResourceManager() = defualt;
+	ResourceManager::ResourceManager() = default;
 	ResourceManager::~ResourceManager() = default;
 
-	//bool ResourceManager::Init()
-	//{
-	//	// 0. 부트스트랩: 가상 경로 시스템을 가동하기 위한 최소한의 경로를 수동 등록
-	//	m_virtualPaths["@Config"] = "Config";
+	bool ResourceManager::Init()
+	{
+		// TODO : 여기에 초기 부팅 시 스캔할 가상 경로들을 추가할 수 있습니다.
+		// ex) PathManager를 통해 @Assets 폴더를 스캔하여 m_assetRegistry 채우기
+		return true;
+	}
 
-	//	// 1. 엔진 부트 설정(가상 경로) 로드
-	//	if (!LoadEngineConfig(ResolvePath("@Config/EngineConfig.json")))
-	//	{
-	//		LOG_ERROR("ResourceManager: Failed to load EngineConfig.json");
-	//		return false;
-	//	}
+	void ResourceManager::Update()
+	{
+		// [Main Thread] 
+		// 로딩 스레드에서 작업을 마친 리소스들을 메인 스레드(GPU 컨텍스트 소유)로 확정(Commit)시킵니다.
+		for (auto& pair : m_resources)
+		{
+			ResourcePtr& res = pair.second;
+			if (!res) continue;
 
-	//	// 2. Importer를 통한 직접 폴더 스캔
-	//	// TODO : 이쪽도 약간 생각을 해볼 필요는 있음
-	//	LOG_INFO("ResourceManager: Scanning for asset blueprints...");
-	//	ScanDirectory("@GameAsset", ResolvePath("@GameAsset"));
-	//	ScanDirectory("@BuiltInAsset", ResolvePath("@BuiltInAsset"));
+			// 로딩 스레드에서 OnLoad를 마치고 "Commit 대기" 중인 녀석들을 찾습니다.
+			if (res->GetState() == ResourceState::WaitingCommit)
+			{
+				MGF_LOG_INFO("ResourceManager: Committing resource -> {}", res->GetName().CStr());
 
-	//	// 3. 빌트인 리소스 수동 생성
-	//	AddBuiltInResources();
+				// 1. 메인 스레드에서 자원 확정 (예: GPU 버퍼 생성 및 데이터 업로드)
+				if (res->OnCommit())
+				{
+					// 2. 성공 시 사용 가능 상태로 변경
+					res->SetState(ResourceState::Ready);
 
-	//	LOG_INFO("ResourceManager: Registry built with {} asset blueprints.", m_assetRegistry.size());
-	//	return true;
-	//}
+					// 3. 로딩용 임시 메모리 정리
+					res->OnRelease();
+					MGF_LOG_INFO("ResourceManager: Resource Ready! -> {}", res->GetName().CStr());
+				}
+				else
+				{
+					MGF_LOG_ERROR("ResourceManager: Failed to commit resource -> {}", res->GetName().CStr());
+					res->SetState(ResourceState::Failed);
+				}
+			}
+		}
+	}
 
-	//void ResourceManager::Clear()
-	//{
-	//	m_resources.clear();
-	//	m_assetRegistry.clear();
-	//	LOG_INFO("ResourceManager Cleared.");
-	//}
+	void ResourceManager::Shutdown()
+	{
+		MGF_LOG_INFO("ResourceManager: Shutting down.");
 
-	//void ResourceManager::ScanDirectory(const std::string& virtualRoot, const std::string& physicalPath)
-	//{
-	//	if (!fs::exists(physicalPath)) return;
+		// 순서대로 정리: 리소스 -> 설계도 -> 로더
+		m_resources.Release();
+		m_assetRegistry.Release();
+		m_loaders.Release();
+	}
 
-	//	for (const auto& entry : fs::recursive_directory_iterator(physicalPath))
-	//	{
-	//		if (entry.is_directory()) continue;
+	void ResourceManager::RegisterLoader(StringHash typeID, IResourceLoaderUPtr loader)
+	{
+		if (!loader) return;
 
-	//		const fs::path& filePath = entry.path();
-	//		std::string ext = filePath.extension().string();
+		if (m_loaders.Find(typeID))
+		{
+			MGF_LOG_WARN("ResourceManager: Loader for TypeID {:x} already registered. Overwriting...", (uint32)typeID);
+			m_loaders.Remove(typeID);
+		}
 
-	//		// 컨텍스트 조립
-	//		ImportContext ctx;
-	//		ctx.filePath = filePath.generic_string();
-	//		ctx.assetName = filePath.stem().string();
+		m_loaders.Insert(typeID, std::move(loader));
+	}
 
-	//		// 상대 경로를 이용해 가상 경로 계산
-	//		std::string relPath = fs::relative(filePath, physicalPath).generic_string();
-	//		ctx.virtualPath = virtualRoot + "/" + relPath;
+	void ResourceManager::AddResource(const SharedPtr<Resource>& resource)
+	{
+		if (!resource) return;
 
-	//		// 등록된 임포터가 있다면 장부(m_assetRegistry)를 알아서 업데이트
-	//		Importer::ImportAsset(ext, ctx, m_assetRegistry);
-	//	}
-	//}
+		StringHash key = resource->GetName().GetStringHash();
+		if (m_resources.Find(key))
+		{
+			MGF_LOG_WARN("ResourceManager: Resource '{}' already exists in cache.", resource->GetName().CStr());
+			return;
+		}
 
-	//bool ResourceManager::LoadEngineConfig(const std::string& path)
-	//{
-	//	// 1. 스택에 파서 생성 및 로드
-	//	JsonParser parser;
-	//	if (!parser.LoadFromJsonFile(path))
-	//	{
-	//		LOG_ERROR("ResourceManager: Failed to load EngineConfig at {}", path);
-	//		return false;
-	//	}
+		m_resources.Insert(key, resource);
+	}
 
-	//	// 2. 가상 경로 섹션 검증
-	//	if (!parser.HasTypeOf<nlohmann::json::object_t>("virtualPaths"))
-	//	{
-	//		LOG_ERROR("ResourceManager: 'virtualPaths' is missing or invalid in {}", path);
-	//		return false;
-	//	}
+	ResourcePtr ResourceManager::LoadResourceAsync(const Ptr<IResourceDescriptor> desc)
+	{
+		if (!desc) return nullptr;
 
-	//	// 3. 실제 데이터 매핑
-	//	const auto& root = parser.GetRoot();
-	//	const auto& pathsNode = root["virtualPaths"];
-	//	for (auto& [alias, actualPath] : pathsNode.items())
-	//	{
-	//		if (actualPath.is_string())
-	//			m_virtualPaths[alias] = actualPath.get<std::string>();
-	//	}
+		// 1. 적절한 로더 찾기
+		auto loaderPtr = m_loaders.Find(desc->typeID);
+		if (!loaderPtr)
+		{
+			MGF_LOG_ERROR("ResourceManager: No loader for TypeID {:x}", (uint32)desc->typeID);
+			return nullptr;
+		}
 
-	//	LOG_INFO("ResourceManager: Successfully mapped {} virtual paths.", m_virtualPaths.size());
-	//	return true;
-	//}
+		// [주의] 텍스쳐와 같은 OpenGL 컨텍스트에 종속된 작업은
+		// 이쪽으로 넘기면 절대로 안된다. 순수 CPU 바운드 입출력을 요구하는
+		// 무거운 작업을 이쪽으로 넘겨야 한다.
+		// ex) 나쁜 예시: Texture, CubeTexture 등은 이쪽이 아닌 OnCommit으로,
+		//	   좋은 예시: Material 로드를 위한 파싱, 모델 또는 애니메이션 로드를 위한 파싱 등
 
-	//std::string ResourceManager::ResolvePath(const std::string& virtualPath) const
-	//{
-	//	// 0. 비어있거나 @로 시작하지 않으면 가상 경로가 아님
-	//	if (virtualPath.empty() || virtualPath[0] != '@')
-	//		return virtualPath;
+		// 2. 리소스 객체(껍데기) 생성
+		// 로더의 Load 함수가 내부적으로 Resource 자식 객체를 '생성'만 하도록 설계되어 있어야 합니다.
+		ResourcePtr newResource = nullptr;
 
-	//	// 1. fs::path로 변환 및 가상 경로 토큰 획득
-	//	fs::path p(virtualPath);
-	//	auto it = p.begin();
-	//	std::string alias = it->string();
+		// 임시 Descriptor 전달을 위한 처리 (소유권 주의)
+		if (!(*loaderPtr)->Load(newResource, IResourceDescriptorUPtr(const_cast<IResourceDescriptor*>(desc))))
+			return nullptr;
 
-	//	// 2. 가상 경로 매핑 확인
-	//	auto mapIt = m_virtualPaths.find(alias);
-	//	if (mapIt == m_virtualPaths.end()) return virtualPath;
+		// 3. 상태를 'Pending(대기)'으로 설정하고 캐시에 먼저 등록
+		newResource->SetState(ResourceState::Pending);
+		AddResource(newResource);
 
-	//	// 3. 매핑된 실제 경로로 시작하는 결과 경로 생성
-	//	fs::path resolvedPath = mapIt->second;
+		// 4. [비동기 시작] TaskManager에게 무거운 작업(OnLoad)을 던집니다.
+		auto loadTask = TaskManager::Instance().AcquireTask
+		(
+			// [WORKER THREAD 영역]
+			[newResource]()
+			{
+				newResource->SetState(ResourceState::Loading);
 
-	//	// 4. 나머지 조각들을 순차적으로 결합 (하부 경로 조립)
-	//	for (++it; it != p.end(); ++it)
-	//		resolvedPath /= *it;
+				// 파일 I/O 및 파싱 (무거운 작업)
+				if (newResource->OnLoad())
+					newResource->SetState(ResourceState::WaitingCommit);
+				else
+				{
+					MGF_LOG_ERROR("ResourceManager: Failed to OnLoad -> {}", newResource->GetName().CStr());
+					newResource->SetState(ResourceState::Failed);
+				}
+			},
 
-	//	// 7. 정문화 및 반환
-	//	return resolvedPath.lexically_normal().string();
-	//}
+			// [COMPLETION 콜백 (Main Thread)]
+			[newResource]()
+			{
+				MGF_LOG_INFO("ResourceManager: Async Load Task Finished for {}", newResource->GetName().CStr());
+			}
+		);
 
-	//// [TEMP]
-	//void ResourceManager::AddBuiltInResources()
-	//{
-	//	// [도우미 람다] 생성된 리소스에 정체성을 부여하고 등록합니다.
-	//	auto QuickRegister = [&](const std::string& name, const std::string& vPath, auto resource)
-	//		{
-	//			if (!resource) return;
-	//			resource->GetDesc().name = name;
-	//			resource->GetDesc().path = vPath;
-	//			Register(std::move(resource));
-	//		};
+		// 5. 워커 스레드 큐에 투입
+		TaskManager::Instance().PushTask(std::move(loadTask));
 
-	//	QuickRegister("Cube", "@BuiltIn/Mesh/Cube", GeometryGenerator::CreateBox());
-	//	QuickRegister("Plane", "@BuiltIn/Mesh/Plane", GeometryGenerator::CreatePlane());
-	//	QuickRegister("Sphere", "@BuiltIn/Mesh/Sphere", GeometryGenerator::CreateSphere(32, 32));
-	//	QuickRegister("Screen", "@BuiltIn/Mesh/Screen", ScreenMesh::Create());
-	//	QuickRegister("DefaultMaterial", "@BuiltIn/Material", Material::Create());
-	//	Add<Texture>("camera_dirt", "@GameAsset/Images/baked/camera_dirt.ktx");
-	//}
-
+		// 껍데기 포인터를 즉시 반환 (IsReady()는 아직 false인 상태)
+		return newResource;
+	}
 }

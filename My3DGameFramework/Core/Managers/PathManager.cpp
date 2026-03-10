@@ -137,25 +137,4 @@ namespace MGF3D
 	{
 		m_configSignal.Wait();
 	}
-
-	// [DEBUG]
-	void PathManager::DebugDumpMap()
-	{
-		MGF_LOCK_SCOPE(m_pathMutex);
-
-		MGF_LOG_INFO("==================================================");
-		MGF_LOG_INFO(" [PathManager Debug Dump] Virtual Paths Map Check");
-		MGF_LOG_INFO(" Total Count: {}", m_virtualPaths.size());
-		MGF_LOG_INFO("==================================================");
-
-		int index = 0;
-		for (const auto& pair : m_virtualPaths)
-		{
-			const StringHash& keyHash = pair.first;
-			const MGFPath& path = pair.second;
-			MGF_LOG_INFO(" [{}] KeyHash: {:<10} | Mapped Path: {}",
-				index++, (uint32)keyHash, path.GetCStr());
-		}
-		MGF_LOG_INFO("==================================================");
-	}
 }

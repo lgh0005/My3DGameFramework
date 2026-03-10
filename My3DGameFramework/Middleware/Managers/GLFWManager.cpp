@@ -1,5 +1,6 @@
 #include "MiddlewarePch.h"
 #include "GLFWManager.h"
+#include "Utils/GLFWAllocateHelper.h"
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
@@ -10,6 +11,14 @@ namespace MGF3D
 
 	bool GLFWManager::Init()
 	{
+		// 0. GLFW 커스텀 할당자 등록
+		GLFWallocator allocator;
+		allocator.allocate = GLFWAllocateHelper::GLFW_Allocate;
+		allocator.reallocate = GLFWAllocateHelper::GLFW_Reallocate;
+		allocator.deallocate = GLFWAllocateHelper::GLFW_Deallocate;
+		allocator.user = nullptr;
+		glfwInitAllocator(&allocator);
+
 		// 1. 에러 콜백함수 등록
 		glfwSetErrorCallback(ErrorCallback);
 

@@ -1,7 +1,6 @@
 ﻿#pragma once
 #include "Stream.h"
 #include "Identity/MGFPath.h"
-#include "Identity/MGFName.h"
 #include <fstream>
 
 namespace MGF3D
