@@ -80,7 +80,7 @@ namespace MGF3D
         TaskManager::Instance().Broadcast();
 
         // MGFJob의 소멸자가 호출되면서 내부의 MGFThread가 Join/정리됨
-        m_workers.clear();
+        m_workers.Release();
 
         MGF_LOG_INFO("JobManager: All workers have been shut down.");
     }

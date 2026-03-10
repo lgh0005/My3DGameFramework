@@ -9,6 +9,13 @@ namespace MGF3D
     NameManager::NameManager() = default;
     NameManager::~NameManager() = default;
 
+    void NameManager::Shutdown()
+    {
+        MGF_LOG_INFO("NameManager : Shutting down and clearing maps.");
+        m_stringPool.Release();
+        m_nameCounts.Release();
+    }
+
     MGFName NameManager::AddName(cstr name)
     {
         return AddName(strview(name));

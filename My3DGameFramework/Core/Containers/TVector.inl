@@ -37,6 +37,13 @@ namespace MGF3D
     }
 
     template<typename T, typename Alloc>
+    inline void TVector<T, Alloc>::Release()
+    {
+        Clear();
+        Base().swap(*this);
+    }
+
+    template<typename T, typename Alloc>
     inline T TVector<T, Alloc>::PopBack()
     {
         MGF_ASSERT(!this->empty(), "TVector is empty.");

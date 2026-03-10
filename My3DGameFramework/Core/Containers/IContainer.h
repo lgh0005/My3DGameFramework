@@ -33,5 +33,6 @@ namespace MGF3D
 		virtual usize Count() const = 0;
 		virtual bool Empty() const = 0;
 		virtual void Clear() = 0;
+		virtual void Release() = 0;
 	};
 }

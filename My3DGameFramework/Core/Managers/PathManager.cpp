@@ -24,7 +24,7 @@ namespace MGF3D
 	void PathManager::Shutdown()
 	{
 		MGF_LOCK_SCOPE(m_pathMutex);
-		m_virtualPaths.Clear();
+		m_virtualPaths.Release();
 		MGF_LOG_INFO("PathManager: Shutdown successfully.");
 	}
 

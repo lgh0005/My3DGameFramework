@@ -60,6 +60,13 @@ namespace MGF3D
     }
 
     template<typename Alloc>
+    inline void TString<Alloc>::Release()
+    {
+        Clear();
+        Base().swap(*this);
+    }
+
+    template<typename Alloc>
     inline StringHash TString<Alloc>::Hash() const
     {
         return StringHash(strview(this->data(), this->size()));

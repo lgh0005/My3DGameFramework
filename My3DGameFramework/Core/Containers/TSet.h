@@ -34,6 +34,7 @@ namespace MGF3D
         usize Count()   const override { return this->size(); }
         bool  Empty()   const override { return this->empty(); }
         void  Clear()         override { this->clear(); }
+        void  Release() override;
 
     public:
         // Set의 특성상 내부 데이터 수정을 방지하기 위해 Read-only Find만 제공

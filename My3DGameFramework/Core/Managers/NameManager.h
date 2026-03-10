@@ -3,6 +3,8 @@
 #include "Containers/Slab/SString.h"
 #include "Hashing/StringHash.h"
 
+// TODO : 아마 여기에서도 락이 필요할 수 있음
+
 namespace MGF3D
 {
 	struct MGFName;
@@ -16,6 +18,7 @@ namespace MGF3D
 		~NameManager();
 
 	public:
+		void Shutdown();
 		MGFName AddName(cstr name);
 		MGFName AddName(strview name);
 		usize GetNameCount() const { return m_stringPool.Count(); }

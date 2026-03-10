@@ -39,6 +39,7 @@ namespace MGF3D
 		usize Count()   const override { return this->size(); }
 		bool  Empty()   const override { return this->empty(); }
 		void  Clear()         override { this->clear(); }
+		void  Release() override;
 
 	public:
 		cstr CStr() const { return this->c_str(); }

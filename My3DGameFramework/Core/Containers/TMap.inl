@@ -49,6 +49,13 @@ namespace MGF3D
     }
 
     template<typename K, typename V, typename Alloc, typename Hash, typename KeyEqual>
+    inline void TMap<K, V, Alloc, Hash, KeyEqual>::Release()
+    {
+        Clear();
+        Base().swap(*this);
+    }
+
+    template<typename K, typename V, typename Alloc, typename Hash, typename KeyEqual>
     inline Ptr<V> TMap<K, V, Alloc, Hash, KeyEqual>::Find(const K& key)
     {
         auto it = this->find(key);

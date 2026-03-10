@@ -16,10 +16,7 @@ namespace MGF3D
 			m_slabMemoryPools[i] = nullptr;
 	}
 
-	MemoryManager::~MemoryManager()
-	{
-		Shutdown();
-	}
+	MemoryManager::~MemoryManager() = default;
 
 	bool MemoryManager::Init()
 	{

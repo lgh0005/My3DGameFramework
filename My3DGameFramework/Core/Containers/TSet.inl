@@ -48,6 +48,13 @@ namespace MGF3D
         return usage;
     }
 
+    template<typename K, typename Alloc, typename Hash, typename KeyEqual>
+    inline void TSet<K, Alloc, Hash, KeyEqual>::Release()
+    {
+        Clear();
+        Base().swap(*this);
+    }
+
     template <typename K, typename Alloc, typename Hash, typename KeyEqual>
     inline Ptr<const K> TSet<K, Alloc, Hash, KeyEqual>::Find(const K& key) const
     {

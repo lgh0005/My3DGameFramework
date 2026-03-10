@@ -1,5 +1,7 @@
 #include "MiddlewarePch.h"
 #include "GLFWManager.h"
+#include <glad/glad.h>
+#include <GLFW/glfw3.h>
 
 namespace MGF3D
 {

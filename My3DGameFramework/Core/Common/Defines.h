@@ -30,8 +30,8 @@ private:                                                                        
 public:                                                                         \
     static classType& Instance()                                                \
     {                                                                           \
-        static classType s_instance;                                            \
-        return s_instance;                                                      \
+        static classType* s_instance = new classType();                         \
+        return *s_instance;                                                     \
     }
 
 /*================================//

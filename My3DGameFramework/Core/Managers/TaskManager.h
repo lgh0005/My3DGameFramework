@@ -15,6 +15,9 @@ namespace MGF3D
         TaskManager();
         ~TaskManager();
 
+    public:
+        void Shutdown();
+
     /*================//
     //  task pooling  //
     //================*/

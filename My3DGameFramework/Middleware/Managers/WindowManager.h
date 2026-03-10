@@ -1,4 +1,7 @@
 ﻿#pragma once
+#include "Platform/Window/MGFWindow.h"
+
+struct GLFWwindow;
 
 namespace MGF3D
 {
@@ -11,26 +14,23 @@ namespace MGF3D
 		~WindowManager();
 
 	public:
-		bool Init(int32 width, int32 height, const std::string& title);
-		GLFWwindow* GetWindow() { return m_window; }
-		WindowManager* GetWindowUserPtr();
-		void DestroyWindow();
+		bool Init(int32 width, int32 height, const LString& title);
+		void Shutdown();
+		void Update();
 
-		int32 GetWindowWidth() const { return m_width; }
-		int32 GetWindowHeight() const { return m_height; }
+	public:
+		bool ShouldClose() const;
+		Ptr<MGFWindow> GetMainWindow() const { return m_mainWindow.get(); }
+		Ptr<GLFWwindow> GetNativeWindow() const;
+		int32 GetWindowWidth() const;
+		int32 GetWindowHeight() const;
+		bool IsIconified() const;
 
-		bool IsInconified() { return m_isIconified; }
-		void SetIconified(bool iconified) { m_isIconified = iconified; }
+	public:
+		void SetResizeCallback(const MGFWindow::ResizeCallback& callback);
+		void SetIconifyCallback(const MGFWindow::IconifyCallback& callback);
 
 	private:
-		void RegisterStaticEventCallbacks();
-		static void HandleFramebufferSizeChange(GLFWwindow* window, int32 width, int32 height);
-		static void HandleWindowIconified(GLFWwindow* window, int32 iconified);
-
-	private:
-		GLFWwindow* m_window{ nullptr };
-		bool m_isIconified{ false };
-		int32 m_width{ 0 };
-		int32 m_height{ 0 };
+		UniquePtr<MGFWindow> m_mainWindow{ nullptr };
 	};
 }

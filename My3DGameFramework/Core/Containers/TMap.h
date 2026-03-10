@@ -33,6 +33,7 @@ namespace MGF3D
         usize Count()   const override { return this->size(); }
         bool  Empty()   const override { return this->empty(); }
         void  Clear()         override { this->clear(); }
+        void  Release() override;
 
     public:
         Ptr<V> Find(const K& key);

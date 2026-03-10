@@ -1,5 +1,6 @@
 ﻿#include "CorePch.h"
 #include "TimeManager.h"
+#include "GLFWManager.h"
 
 namespace MGF3D
 {
@@ -9,7 +10,7 @@ namespace MGF3D
     bool TimeManager::Init()
     {
         // 1. GLFW로부터 현재 시간 얻어오기
-        m_lastTime = glfwGetTime();
+        m_lastTime = MGF_GLFW.GetTime();
 
         // 2. [방어적 코드] GLFW 초기화 실패 혹은 내부 타이머 오류 시 0.0을 반환합니다.
         // 이 경우 false를 반환하여 Bootstrapper가 엔진을 안전하게 종료하도록 유도합니다.
@@ -41,7 +42,7 @@ namespace MGF3D
 
     void TimeManager::Update()
     {
-        m_currentTime = glfwGetTime();
+        m_currentTime = MGF_GLFW.GetTime();
         m_deltaTime = static_cast<float>(m_currentTime - m_lastTime);
 
         // [Spiral of Death 방지]

@@ -5,16 +5,17 @@
 namespace MGF3D
 {
     TaskManager::TaskManager() = default;
-    TaskManager::~TaskManager()
+    TaskManager::~TaskManager() = default;
+
+    void TaskManager::Shutdown()
     {
         // 1. 이미 JobManager에서 스레드 정리가 끝났겠지만, 
         // 여기서 한 번 더 브로드캐스트를 날려 확실히 잠을 깨워줍니다.
         Broadcast();
 
         // 2. 남은 태스크들을 명시적으로 비웁니다. 
-        // (선언 순서에 따라 자동으로 되지만 코드로 보여주는 것이 의도 파악에 좋습니다.)
-        { MGF_LOCK_SCOPE(m_queueMutex); m_taskQueue.Clear(); }
-        { MGF_LOCK_SCOPE(m_mainMutex); m_mainQueue.Clear(); }
+        { MGF_LOCK_SCOPE(m_queueMutex); m_taskQueue.Release(); }
+        { MGF_LOCK_SCOPE(m_mainMutex); m_mainQueue.Release(); }
     }
 
     TaskUPtr TaskManager::AcquireTask(Action<> work, Action<> onComplete)

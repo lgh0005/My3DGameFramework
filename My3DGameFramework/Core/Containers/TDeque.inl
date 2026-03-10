@@ -47,6 +47,13 @@ namespace MGF3D
     }
 
     template<typename T, typename Alloc>
+    inline void TDeque<T, Alloc>::Release()
+    {
+        Clear();
+        Base().swap(*this);
+    }
+
+    template<typename T, typename Alloc>
     inline void TDeque<T, Alloc>::PushBack(T&& value)
     {
         this->push_back(std::forward<T>(value));

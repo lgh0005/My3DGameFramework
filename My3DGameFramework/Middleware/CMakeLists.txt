@@ -10,10 +10,14 @@ set(SOURCES
     "Bootstrapper/Bootstrapper.h"     "Bootstrapper/Bootstrapper.cpp"
     
     # Managers
-    "Managers/InputManager.h"   "Managers/InputManager.cpp"
-    "Managers/TimeManager.h"   "Managers/TimeManager.cpp"
-    "Managers/WindowManager.h"   "Managers/WindowManager.cpp"
     "Managers/GLFWManager.h"        "Managers/GLFWManager.cpp"
+    "Managers/WindowManager.h"   "Managers/WindowManager.cpp"
+    #"Managers/InputManager.h"   "Managers/InputManager.cpp"
+    "Managers/TimeManager.h"   "Managers/TimeManager.cpp"
+
+    # Platforms
+    # "Platform/Input/InputAction.h"      "Platform/Input/InputAction.cpp"
+    "Platform/Window/MGFWindow.h"      "Platform/Window/MGFWindow.cpp"
 
     # Utils
     "Utils/Defines.h"
@@ -34,12 +38,13 @@ target_link_libraries(${LIB_NAME}
 
 PUBLIC
     Engine::Core
-    Engine::AI
-    Engine::Audio
-    Engine::Graphics
-    Engine::Physics
-    Engine::Scripting
-    Engine::UI
+    #Engine::AI
+    #Engine::Audio
+    #Engine::Graphics
+    #Engine::Physics
+    #Engine::Scripting
+    #Engine::UI
+    glad::glad
     glfw
 )
 
