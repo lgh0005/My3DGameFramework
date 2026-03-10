@@ -65,9 +65,9 @@ namespace MGF3D
 		MGF_LOG_INFO("Bootstrapper : Initializing platform systems.");
 
 		// [TODO: 레거시 청산 후 주석 해제]
-		// MGF_INIT_SYS(MGF_TIME.Init(), "TimeManager");
+		MGF_INIT_SYS(MGF_TIME.Init(), "TimeManager");
 		MGF_INIT_SYS(MGF_WINDOW.Init(WINDOW_WIDTH, WINDOW_HEIGHT, WINDOW_NAME), "WindowManager");
-		// MGF_INIT_SYS(MGF_INPUT.Init(), "InputManager");
+		MGF_INIT_SYS(MGF_INPUT.Init(MGF_WINDOW.GetNativeWindow()), "InputManager");
 
 		return true;
 	}
@@ -91,9 +91,9 @@ namespace MGF3D
 		MGF_LOG_INFO("Bootstrapper : Shutting down platform systems.");
 
 		// [TODO: 레거시 청산 후 주석 해제]
-		// MGF_INPUT.Shutdown();
+		MGF_INPUT.Shutdown();
 		MGF_WINDOW.Shutdown();
-		// MGF_TIME.Shutdown();
+		MGF_TIME.Shutdown();
 
 		// 3. glfw 종료
 		MGF_LOG_INFO("Bootstrapper : Shutting down glfw.");

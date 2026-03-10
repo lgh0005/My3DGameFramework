@@ -12,12 +12,12 @@ set(SOURCES
     # Managers
     "Managers/GLFWManager.h"        "Managers/GLFWManager.cpp"
     "Managers/WindowManager.h"   "Managers/WindowManager.cpp"
-    #"Managers/InputManager.h"   "Managers/InputManager.cpp"
+    "Managers/InputManager.h"   "Managers/InputManager.cpp"
     "Managers/TimeManager.h"   "Managers/TimeManager.cpp"
 
     # Platforms
-    # "Platform/Input/InputAction.h"      "Platform/Input/InputAction.cpp"
-    "Platform/Window/MGFWindow.h"      "Platform/Window/MGFWindow.cpp"
+    "Platform/Input/MGFInputAction.h"      "Platform/Input/MGFInputAction.cpp"
+    "Platform/Window/MGFWindow.h"          "Platform/Window/MGFWindow.cpp"
 
     # Utils
     "Utils/Defines.h"
