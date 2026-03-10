@@ -3,7 +3,7 @@
 
 namespace MGF3D
 {
-	CLASS_PTR(LuaParser)
+	MGF_CLASS_PTR(LuaParser)
 	class LuaParser
 	{
 	public:

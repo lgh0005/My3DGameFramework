@@ -3,16 +3,16 @@
 
 namespace MGF3D
 {
-	CLASS_PTR(RenderQueue)
-	CLASS_PTR(Mesh)
-	CLASS_PTR(Material)
-	CLASS_PTR(Program)
-	CLASS_PTR(AnimBuffer)
+	MGF_CLASS_PTR(RenderQueue)
+	MGF_CLASS_PTR(Mesh)
+	MGF_CLASS_PTR(Material)
+	MGF_CLASS_PTR(Program)
+	MGF_CLASS_PTR(AnimBuffer)
 
-	CLASS_PTR(InstanceManager)
+	MGF_CLASS_PTR(InstanceManager)
 	class InstanceManager
 	{
-		DECLARE_SINGLE(InstanceManager)
+		MGF_DECLARE_SINGLE(InstanceManager)
 
 	public:
 		bool Init();

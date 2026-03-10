@@ -4,7 +4,7 @@ namespace MGF3D
 {
 	class CoroutineManager
 	{
-		DECLARE_SINGLE(CoroutineManager)
+		MGF_DECLARE_SINGLE(CoroutineManager)
 
 	public:
 		CoroutineManager();

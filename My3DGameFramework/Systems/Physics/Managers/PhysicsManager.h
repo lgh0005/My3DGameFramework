@@ -3,17 +3,17 @@
 
 namespace MGF3D
 {
-	CLASS_PTR(Ray)
-	CLASS_PTR(RaycastHit)
+	MGF_CLASS_PTR(Ray)
+	MGF_CLASS_PTR(RaycastHit)
 
-	CLASS_PTR(BPLayerInterfaceImpl)
-	CLASS_PTR(ObjectVsBroadPhaseLayerFilterImpl)
-	CLASS_PTR(ObjectLayerPairFilterImpl)
-	CLASS_PTR(PhysicsBodyActivationListener)
-	CLASS_PTR(PhysicsContactListener)
+	MGF_CLASS_PTR(BPLayerInterfaceImpl)
+	MGF_CLASS_PTR(ObjectVsBroadPhaseLayerFilterImpl)
+	MGF_CLASS_PTR(ObjectLayerPairFilterImpl)
+	MGF_CLASS_PTR(PhysicsBodyActivationListener)
+	MGF_CLASS_PTR(PhysicsContactListener)
 
-	CLASS_PTR(JoltDebugRenderer)
-	CLASS_PTR(JoltGizmo)
+	MGF_CLASS_PTR(JoltDebugRenderer)
+	MGF_CLASS_PTR(JoltGizmo)
 
 	namespace JPH
 	{
@@ -29,7 +29,7 @@ namespace MGF3D
 
 	class PhysicsManager
 	{
-		DECLARE_SINGLE(PhysicsManager)
+		MGF_DECLARE_SINGLE(PhysicsManager)
 
 	private:
 		PhysicsManager();

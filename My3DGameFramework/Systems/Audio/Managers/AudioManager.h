@@ -5,7 +5,7 @@ namespace MGF3D
 {
 	class AudioManager
 	{
-		DECLARE_SINGLE(AudioManager)
+		MGF_DECLARE_SINGLE(AudioManager)
 
 	private:
 		AudioManager();

@@ -5,8 +5,7 @@ namespace MGF3D
 {
 	class LuaManager
 	{
-		DECLARE_SINGLE(LuaManager)
-		DECLARE_NONINSTANTIABLE(LuaManager)
+		MGF_DECLARE_SINGLE(LuaManager)
 
 	public:
 		void Init();

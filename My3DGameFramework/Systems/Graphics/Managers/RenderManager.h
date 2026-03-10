@@ -6,8 +6,7 @@ namespace MGF3D
 {
 	class RenderManager
 	{
-		DECLARE_SINGLE(RenderManager)
-		DECLARE_NONINSTANTIABLE(RenderManager)
+		MGF_DECLARE_SINGLE(RenderManager)
 		using PipelineFactory = std::function<RenderPipelineUPtr()>;
 
 	public:

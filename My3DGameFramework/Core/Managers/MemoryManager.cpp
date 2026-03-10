@@ -1,4 +1,5 @@
 ﻿#include "CorePch.h"
+#include <new>
 #include "Managers/MemoryManager.h"
 #include "Utils/MemoryUtils.h"
 #include "Memory/SlabMemoryPool.h"
@@ -7,14 +8,42 @@
 namespace MGF3D
 {
 	MemoryManager::MemoryManager()
+		: m_slabMemoryPoolBuffer(nullptr)
+		, m_linearMemoryPoolBuffer(nullptr)
+		, m_linearMemoryPool(nullptr)
 	{
-		/* 힙 영역 메모리 풀 */
+		for (int32 i = 0; i < SlabBucketCount; ++i)
+			m_slabMemoryPools[i] = nullptr;
+	}
+
+	MemoryManager::~MemoryManager()
+	{
+		Shutdown();
+	}
+
+	bool MemoryManager::Init()
+	{
+		// 1. 이중 초기화 방지
+		if (m_slabMemoryPoolBuffer != nullptr || m_linearMemoryPoolBuffer != nullptr)
+		{
+			MGF_LOG_WARN("MemoryManager: Already initialized.");
+			return true;
+		}
+
+		/*=============================//
+		//   힙 영역 메모리 풀 (Slab)   //
+		//=============================*/
 		// 1. 전체 필요한 메모리 계산 (4MB * 9개 버킷 = 36MB)
 		const usize totalRequirement = InitialPoolSize * SlabBucketCount;
 
-		// 2. OS로부터 거대한 전역 버퍼를 단 한 번만 할당
-		m_slabMemoryPoolBuffer = static_cast<byte*>(::operator new(totalRequirement, MGF3D::alignment(DefaultAlignment)));
-	
+		// 2. OS로부터 거대한 전역 버퍼를 단 한 번만 할당 (std::nothrow를 사용하여 실패 시 nullptr 반환)
+		m_slabMemoryPoolBuffer = static_cast<byte*>(::operator new(totalRequirement, MGF3D::alignment(DefaultAlignment), std::nothrow));
+		if (!m_slabMemoryPoolBuffer)
+		{
+			MGF_LOG_FATAL("MemoryManager: Failed to allocate global slab buffer! (Out of memory)");
+			return false;
+		}
+
 		// 3. 버퍼를 쪼개서 각 풀에 할당
 		usize currentSlotSize = 16;
 		byte* currentBufferPtr = m_slabMemoryPoolBuffer;
@@ -28,35 +57,51 @@ namespace MGF3D
 			currentSlotSize <<= 1;
 		}
 
-		/* 스택 영역 메모리 풀 */
-		// 1. 프레임 전용 임시 메모리로 32MB 확보
+		/*=================================//
+		//   스택 영역 메모리 풀 (Linear)   //
+		//=================================*/
 		const usize frameRequirement = 32 * 1024 * 1024;
-		m_linearMemoryPoolBuffer = static_cast<byte*>(::operator new(frameRequirement, MGF3D::alignment(DefaultAlignment)));
+		m_linearMemoryPoolBuffer = static_cast<byte*>(::operator new(frameRequirement, MGF3D::alignment(DefaultAlignment), std::nothrow));
+		if (!m_linearMemoryPoolBuffer)
+		{
+			MGF_LOG_FATAL("MemoryManager: Failed to allocate global linear buffer! (Out of memory)");
+			Shutdown();
+			return false;
+		}
 
 		// 확보한 힙 버퍼를 Stack 전략으로 관리하는 객체 생성
 		m_linearMemoryPool = new LinearMemoryPool(m_linearMemoryPoolBuffer, frameRequirement);
+
+		return true;
 	}
 
-	MemoryManager::~MemoryManager()
+	void MemoryManager::Shutdown()
 	{
-		// 1. Stack 영역 해제
-		if (m_linearMemoryPoolBuffer)
+		// 1. Linear 메모리 영역 해제
+		if (m_linearMemoryPool)
 		{
 			delete m_linearMemoryPool;
 			m_linearMemoryPool = nullptr;
 		}
+
 		if (m_linearMemoryPoolBuffer)
 		{
 			::operator delete(m_linearMemoryPoolBuffer, MGF3D::alignment(DefaultAlignment));
 			m_linearMemoryPoolBuffer = nullptr;
 		}
 
-		// 2. Slab 영역 해제
-		// 풀 객체들 먼저 파괴
+		// 2. Slab 메모리 영역 해제
+		// 2-1. 풀 객체들 먼저 파괴
 		for (int32 i = 0; i < SlabBucketCount; ++i)
-			delete m_slabMemoryPools[i];
+		{
+			if (m_slabMemoryPools[i])
+			{
+				delete m_slabMemoryPools[i];
+				m_slabMemoryPools[i] = nullptr;
+			}
+		}
 
-		// 마지막으로 전역 버퍼 해제
+		// 2-2. 마지막으로 전역 버퍼 해제
 		if (m_slabMemoryPoolBuffer)
 		{
 			::operator delete(m_slabMemoryPoolBuffer, MGF3D::alignment(DefaultAlignment));

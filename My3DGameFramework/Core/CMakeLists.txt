@@ -42,7 +42,6 @@ set(SOURCES
     "Managers/TaskManager.h"        "Managers/TaskManager.cpp"
     #"Managers/TypeManager.h"         "Managers/TypeManager.cpp"
     #"Managers/ResourceManager.h"        "Managers/ResourceManager.cpp"      "Managers/ResourceManager.inl" 
-    "Managers/FileManager.h"        "Managers/FileManager.cpp"
     "Managers/PathManager.h"        "Managers/PathManager.cpp"
 
     # Memory

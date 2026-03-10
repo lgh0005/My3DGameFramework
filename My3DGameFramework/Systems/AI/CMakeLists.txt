@@ -9,6 +9,9 @@ set(SOURCES
     # NavMesh
     "NavMesh/NavigationManager.h" "NavMesh/NavigationManager.cpp"
     "NavMesh/NavMeshFunctors.h" "NavMesh/NavMeshFunctors.cpp"
+
+    # Managers
+    "Managers/AIManager.h"      "Managers/AIManager.cpp"
 )
 
 # 2. 빌드 타겟 생성 및 별칭 등록

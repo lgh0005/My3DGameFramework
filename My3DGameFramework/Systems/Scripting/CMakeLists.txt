@@ -8,7 +8,9 @@ set(SOURCES
 
     # Managers
     "Managers/LuaManager.h"     "Managers/LuaManager.cpp"
-    "Managers/LuaParser.h"     "Managers/LuaParser.cpp"     "Managers/LuaParser.inl"
+
+    # Parsers
+    "Parsers/LuaParser.h"     "Parsers/LuaParser.cpp"     "Parsers/LuaParser.inl"
 
     # Coroutine
     "Coroutine/Coroutine.h"           "Coroutine/Coroutine.cpp"

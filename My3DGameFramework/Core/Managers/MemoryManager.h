@@ -14,6 +14,10 @@ namespace MGF3D
 		~MemoryManager();
 
 	public:
+		bool Init();
+		void Shutdown();
+
+	public:
 		void* Allocate(usize size) noexcept;
 		void  Deallocate(void* ptr, usize size) noexcept;
 

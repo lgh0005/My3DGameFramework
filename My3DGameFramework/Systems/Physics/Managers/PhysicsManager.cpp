@@ -1,8 +1,8 @@
 ﻿#include "PhysicsPch.h"
 #include "PhysicsManager.h"
 
-#include "Graphics/Raycasting/Ray.h"
-#include "Graphics/Raycasting/RaycastHit.h"
+#include "Raycasting/Ray.h"
+#include "Raycasting/RaycastHit.h"
 
 #include "Physics/PhysicsConfig.h"
 #include "Physics/PhysicsCallbacks.h"
