@@ -15,6 +15,7 @@ set(SOURCES
     "Common/Pointers.h"
     "Common/Random.h"
     "Common/Threading.h"
+    "Common/CoreAliases.h"
 
     "Common/Math.h"       "Common/Math.cpp"     "Common/Math.inl"
     "Common/Clock.h"      "Common/Clock.cpp"

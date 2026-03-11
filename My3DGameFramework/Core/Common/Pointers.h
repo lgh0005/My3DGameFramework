@@ -2,6 +2,7 @@
 
 namespace MGF3D
 {
+
 	template <typename T>
 	using UniquePtr = std::unique_ptr<T>;
 

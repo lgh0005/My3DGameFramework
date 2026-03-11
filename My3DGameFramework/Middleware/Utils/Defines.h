@@ -1,17 +1,9 @@
 #pragma once
+#include "Common/CoreAliases.h"
 
 /*======================================================//
 //     Default Core & Platform Manager Alias Macros     //
 //======================================================*/
-#define MGF_MEMORY MGF3D::MemoryManager::Instance()
-#define MGF_JOB	   MGF3D::JobManager::Instance()
-#define MGF_TASK   MGF3D::TaskManager::Instance()
-#define MGF_PATH   MGF3D::PathManager::Instance()
-#define MGF_NAME   MGF3D::NameManager::Instance()
-#define MGF_ENTITY MGF3D::EntityManager::Instance()
-#define MGF_RESOURCE MGF3D::ResourceManager::Instance()
-#define MGF_TYPE   MGF3D::TypeManager::Instance()
-
 #define MGF_AI     MGF3D::AIManager::Instance()
 #define MGF_AUDIO  MGF3D::AudioManager::Instance()
 #define MGF_INSTANCE MGF3D::InstanceManager::Instance()
