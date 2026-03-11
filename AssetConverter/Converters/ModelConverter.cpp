@@ -3,9 +3,12 @@
 
 namespace MGF3D
 {
+    ModelConverter::ModelConverter() = default;
+    ModelConverter::~ModelConverter() = default;
+
     /*==========================================//
-//  [Public Entry] 변환 시작 및 상태 초기화   //
-//==========================================*/
+    //  [Public Entry] 변환 시작 및 상태 초기화   //
+    //==========================================*/
     bool ModelConverter::Convert
     (
         const std::string& inputPath,

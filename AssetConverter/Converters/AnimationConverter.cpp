@@ -3,6 +3,9 @@
 
 namespace MGF3D
 {
+	AnimationConverter::AnimationConverter() = default;
+	AnimationConverter::~AnimationConverter() = default;
+
 	bool AnimationConverter::Convert
 	(
 		const std::string& animPath,

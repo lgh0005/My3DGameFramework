@@ -7,6 +7,10 @@ namespace MGF3D
 	{
 		DECLARE_SINGLE(ModelConverter)
 
+	private:
+		ModelConverter();
+		~ModelConverter();
+
 	public:
 		bool Convert
 		(

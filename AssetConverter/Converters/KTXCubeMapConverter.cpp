@@ -3,6 +3,9 @@
 
 namespace MGF3D
 {
+    KTXCubeMapConverter::KTXCubeMapConverter() = default;
+    KTXCubeMapConverter::~KTXCubeMapConverter() = default;
+
     bool KTXCubeMapConverter::Convert
     (
         const std::vector<CubeFaceElement>& faceConfigs,

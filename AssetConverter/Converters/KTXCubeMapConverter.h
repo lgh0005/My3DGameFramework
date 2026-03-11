@@ -13,6 +13,10 @@ namespace MGF3D
     {
         DECLARE_SINGLE(KTXCubeMapConverter)
 
+    private:
+        KTXCubeMapConverter();
+        ~KTXCubeMapConverter();
+
     public:
         bool Convert
         (

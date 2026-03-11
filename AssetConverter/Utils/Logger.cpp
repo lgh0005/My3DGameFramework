@@ -3,6 +3,9 @@
 
 namespace MGF3D
 {
+    Logger::Logger() = default;
+    Logger::~Logger() = default;
+
     void Logger::Init(int argc)
     {
         // 여러 싱크를 담을 벡터 생성

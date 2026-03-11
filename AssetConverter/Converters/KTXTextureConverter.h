@@ -6,6 +6,10 @@ namespace MGF3D
 	{
 		DECLARE_SINGLE(KTXTextureConverter)
 
+	private:
+		KTXTextureConverter();
+		~KTXTextureConverter();
+
 	public:
 		bool Convert
 		(

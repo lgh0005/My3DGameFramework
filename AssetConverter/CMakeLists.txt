@@ -12,6 +12,9 @@ set(ASSET_CONVERTER_SOURCES
     "Converters/KTXTextureConverter.h"  "Converters/KTXTextureConverter.cpp"
     "Converters/KTXCubeMapConverter.h"  "Converters/KTXCubeMapConverter.cpp"
 
+    # Managers
+    "Managers/ThreadManager.h"          "Managers/ThreadManager.cpp"
+
     # AssetTypes
     "AssetTypes/AssetUtils.h"           "AssetTypes/AssetUtils.cpp"
     "AssetTypes/AssetFormat.h"          "AssetTypes/AssetFormat.cpp"

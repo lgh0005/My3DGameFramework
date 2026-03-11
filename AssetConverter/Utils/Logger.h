@@ -10,6 +10,10 @@ namespace MGF3D
 	{
 		DECLARE_SINGLE(Logger)
 
+	private:
+		Logger();
+		~Logger();
+
 	public:
 		void Init(int argc);
 		std::shared_ptr<spdlog::logger>& GetLogger() { return m_logger; }

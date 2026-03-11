@@ -3,6 +3,9 @@
 
 namespace MGF3D
 {
+	KTXTextureConverter::KTXTextureConverter() = default;
+	KTXTextureConverter::~KTXTextureConverter() = default;
+
 	bool KTXTextureConverter::Convert
 	(
 		const std::string& inputPath,

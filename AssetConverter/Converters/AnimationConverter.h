@@ -7,6 +7,10 @@ namespace MGF3D
 	{
 		DECLARE_SINGLE(AnimationConverter)
 
+	private:
+		AnimationConverter();
+		~AnimationConverter();
+
 	public:
 		bool Convert
 		(

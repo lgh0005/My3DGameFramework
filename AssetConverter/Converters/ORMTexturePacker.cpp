@@ -3,6 +3,9 @@
 
 namespace MGF3D
 {
+	ORMTexturePacker::ORMTexturePacker() = default;
+	ORMTexturePacker::~ORMTexturePacker() = default;
+
 	bool ORMTexturePacker::Convert
 	(
 		const std::string& aoPath, const std::string& roughPath,

@@ -7,6 +7,10 @@ namespace MGF3D
     {
         DECLARE_SINGLE(ORMTexturePacker)
 
+    private:
+        ORMTexturePacker();
+        ~ORMTexturePacker();
+
     public:
         bool Convert
         (

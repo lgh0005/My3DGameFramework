@@ -1,17 +1,25 @@
 ﻿#pragma once
 
+/*===================================//
+//     default class constraints     //
+//===================================*/
+// Copy constructor & assignment blocking
+#define MGF_DISABLE_COPY(classType)                                             \
+    classType(const classType&) = delete;                                       \
+    classType& operator=(const classType&) = delete;
+
+// Move semantic blocking
+#define MGF_DISABLE_MOVE(classType)                                             \
+    classType(classType&&) = delete;                                            \
+    classType& operator=(classType&&) = delete;
+
 /*======================//
 //   declare singleton  //
 //======================*/
 #define DECLARE_SINGLE(classType)                                               \
 private:                                                                        \
-    classType() = default;                                                      \
-    ~classType() = default;                                                     \
-                                                                                \
-    classType(const classType&) = delete;                                       \
-    classType& operator=(const classType&) = delete;                            \
-    classType(classType&&) = delete;                                            \
-    classType& operator=(classType&&) = delete;                                 \
+    MGF_DISABLE_COPY(classType)                                                 \
+    MGF_DISABLE_MOVE(classType)                                                 \
                                                                                 \
 public:                                                                         \
     static classType& Instance()                                                \
@@ -19,3 +27,13 @@ public:                                                                         
         static classType s_instance;                                            \
         return s_instance;                                                      \
     }
+
+/*==========================//
+//   declare utility class  //
+//==========================*/
+#define MGF_DECLARE_UTILITIES(classType)                                        \
+private:                                                                        \
+    classType() = delete;                                                       \
+    ~classType() = delete;                                                      \
+    MGF_DISABLE_COPY(classType)                                                 \
+    MGF_DISABLE_MOVE(classType)
