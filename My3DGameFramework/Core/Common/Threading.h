@@ -18,3 +18,5 @@ namespace MGF3D
 	using ConditionVariable = std::condition_variable;
 	using Thread = std::thread;
 }
+
+#define MGF_LOCK_SCOPE(mtx) Lock lock##__LINE__(mtx)

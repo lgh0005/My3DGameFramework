@@ -51,7 +51,7 @@ namespace MGF3D
 /*======================//
 //    Assertion macro   //
 //======================*/
-#pragma region ASSERTION
+#define MGF_STATIC_ASSERT(condition, message) static_assert(condition, message)
 
 #ifdef _DEBUG
 #define MGF_ASSERT(condition, message)														   \
@@ -68,5 +68,3 @@ namespace MGF3D
 #define MGF_ASSERT(condition, message) ((void)0)
 #define MGF_ASSERT_BASE(condition)     ((void)0)
 #endif
-
-#pragma endregion

@@ -34,23 +34,6 @@ public:                                                                         
         return *s_instance;                                                     \
     }
 
-/*================================//
-//   Class Pointer Declarations   //
-//================================*/
-#define MGF_CLASS_PTR(className)                                                \
-class className;                                                                \
-using className ## UPtr = std::unique_ptr<className>;                           \
-using className ## Ptr = std::shared_ptr<className>;                            \
-using className ## WPtr = std::weak_ptr<className>;
 
-/*=============================//
-//   Default Engine Asserter   //
-//=============================*/
-#define MGF_STATIC_ASSERT(condition, message) static_assert(condition, message)
-
-/*===================================//
-//      Synchronization Helpers      //
-//===================================*/
-#define MGF_LOCK_SCOPE(mtx) Lock lock##__LINE__(mtx)
 
 
