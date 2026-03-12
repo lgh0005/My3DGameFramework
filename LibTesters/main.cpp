@@ -11,6 +11,14 @@
 
 using namespace MGF3D;
 
+class TestActor
+{
+public:
+    int payload[512]; // 4KB (1024 * 4 bytes)
+    TestActor() { MGF_LOG_INFO("TestActor Created! (Memory Allocated in Slab)"); }
+    ~TestActor() { MGF_LOG_INFO("TestActor Destroyed! (Memory Freed to Slab)"); }
+};
+
 int main()
 {
     if (!Bootstrapper::Init())
@@ -53,6 +61,69 @@ int main()
     MGF_MEMORY_PROFILE_CAPTURE();
     MGF_MEMORY_LOG_STATS();
 
+    /*=================================================//
+    // [테스트 2] 커스텀 스마트 포인터 메모리 테스트      //
+    //=================================================*/
+    MGF_LOG_WARN(">> [Memory Test] 1. Before UniquePtr Scope");
+    MGF_MEMORY_PROFILE_CAPTURE();
+    MGF_MEMORY_LOG_STATS();
+
+    {
+        // 중괄호 블록 시작: 여기서 MakeUnique를 호출합니다!
+        MGF_LOG_INFO("--- Entering Scope ---");
+
+        // 우리가 만든 엔진 전용 팩토리 함수를 사용! (Slab 할당)
+        auto myActor = MakeUnique<TestActor>();
+
+        MGF_LOG_WARN(">> [Memory Test] 2. Inside Scope (Actor is Alive!)");
+        MGF_MEMORY_PROFILE_CAPTURE();
+        MGF_MEMORY_LOG_STATS(); // 여기서 Slab 할당량이 정확히 4KB(4096 bytes) 증가해야 합니다!
+
+        MGF_LOG_INFO("--- Exiting Scope ---");
+    } // 중괄호 블록 끝: myActor가 죽으면서 우리가 만든 Deleter가 MemoryManager.Deallocate를 자동 호출합니다!
+
+    MGF_LOG_WARN(">> [Memory Test] 3. After Scope (Actor should be Destroyed)");
+    MGF_MEMORY_PROFILE_CAPTURE();
+    MGF_MEMORY_LOG_STATS();
+
+    /*=================================================//
+    // [테스트 3] 커스텀 SharedPtr 메모리 테스트         //
+    //=================================================*/
+    MGF_LOG_WARN(">> [Memory Test] 4. Before SharedPtr Scope");
+    MGF_MEMORY_PROFILE_CAPTURE();
+    MGF_MEMORY_LOG_STATS();
+
+    {
+        MGF_LOG_INFO("--- Entering SharedPtr Scope ---");
+
+        // 1. 첫 번째 SharedPtr 생성 (여기서 할당 발생)
+        auto sharedActor1 = MakeShared<TestActor>();
+
+        MGF_LOG_WARN(">> [Memory Test] 5. Inside Scope (sharedActor1 is Alive!)");
+        MGF_LOG_INFO("    Current RefCount: {}", sharedActor1.use_count());
+        MGF_MEMORY_PROFILE_CAPTURE();
+        MGF_MEMORY_LOG_STATS();
+
+        // 2. 참조 카운팅 테스트 (내부 스코프)
+        {
+            MGF_LOG_INFO("    --- Entering Nested Scope ---");
+            auto sharedActor2 = sharedActor1; // 복사 발생! (메모리 할당은 없고 카운트만 증가)
+            MGF_LOG_INFO("    sharedActor2 created! Current RefCount: {}", sharedActor1.use_count());
+            MGF_LOG_INFO("    --- Exiting Nested Scope ---");
+        } // sharedActor2 소멸 (카운트 감소, 하지만 1이 남았으므로 파괴 안 됨!)
+
+        MGF_LOG_INFO("    After Nested Scope! Current RefCount: {}", sharedActor1.use_count());
+        MGF_LOG_INFO("--- Exiting SharedPtr Scope ---");
+
+    } // 여기서 최종적으로 RefCount가 0이 되며 TestActor가 파괴되고 메모리 반환!
+
+    MGF_LOG_WARN(">> [Memory Test] 6. After SharedPtr Scope (Memory should be restored)");
+    MGF_MEMORY_PROFILE_CAPTURE();
+    MGF_MEMORY_LOG_STATS();
+
+    /*=================================================//
+    //                 메인 게임 루프                   //
+    //=================================================*/
     while (!MGF_WINDOW.ShouldClose())
     {
         // 0. 시간 업데이트
@@ -63,6 +134,7 @@ int main()
 
         // 2. 인풋 시스템 상태 동기화
         MGF_INPUT.Update(MGF_WINDOW.GetNativeWindow());
+
         // 2-1. 폴링(Polling) 방식 테스트: W키를 꾹 누르고 있을 때 (Level Trigger)
         //if (MGF_INPUT.GetButton("MoveForward"))
         //    MGF_LOG_INFO("Moving Forward... (W key is held down)");

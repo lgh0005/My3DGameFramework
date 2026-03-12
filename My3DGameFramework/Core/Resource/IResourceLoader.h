@@ -13,7 +13,7 @@ namespace MGF3D
 		virtual bool Load
 		(
 			const SharedPtr<Resource>& outResource,
-			UniquePtr<const IResourceDescriptor> desc
+			IResourceDescriptorUPtr desc
 		) = 0;
 	};
 } 

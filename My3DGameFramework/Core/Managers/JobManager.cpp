@@ -50,7 +50,7 @@ namespace MGF3D
 
     bool JobManager::CreateWorker()
     {
-        auto worker = std::make_unique<MGFJob>();
+        auto worker = MakeUnique<MGFJob>();
         if (!worker) return false;
 
         m_workers.push_back(std::move(worker));

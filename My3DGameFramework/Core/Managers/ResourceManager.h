@@ -30,7 +30,7 @@ namespace MGF3D
 		void AddResource(const SharedPtr<Resource>& resource);
 
 	private:
-		ResourcePtr LoadResourceAsync(const Ptr<IResourceDescriptor> desc);
+		ResourcePtr LoadResourceAsync(IResourceDescriptorUPtr desc);
 
 		SMap<StringHash, IResourceLoaderUPtr> m_loaders;
 		SMap<StringHash, ResourcePtr> m_resources;

@@ -6,11 +6,8 @@
 
 namespace MGF3D
 {
-    //template <typename T>
-    //using UniquePtr = std::unique_ptr<T, MGFSmartPtrDeleter<T>>;
-
     template <typename T>
-    using UniquePtr = std::unique_ptr<T>;
+    using UniquePtr = std::unique_ptr<T, MGFSmartPtrDeleter<T>>;
 
     template <typename T>
     using SharedPtr = std::shared_ptr<T>;

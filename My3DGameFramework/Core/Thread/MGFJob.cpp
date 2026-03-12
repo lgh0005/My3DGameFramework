@@ -7,8 +7,8 @@ namespace MGF3D
 {
     MGFJob::MGFJob()
     {
-        m_thread = std::make_unique<MGFThread>();
-        m_readySignal = std::make_unique<MGFSignal>();
+        m_thread = MakeUnique<MGFThread>();
+        m_readySignal = MakeUnique<MGFSignal>();
     }
 
     MGFJob::~MGFJob() = default;

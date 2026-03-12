@@ -12,6 +12,12 @@ namespace MGF3D
     struct MGFSmartPtrAllocator
     {
         using value_type = T;
+
+        template <class U> struct rebind
+        {
+            using other = MGFSmartPtrAllocator<U>;
+        };
+
         MGFSmartPtrAllocator() noexcept = default;
         template <typename U> MGFSmartPtrAllocator(const MGFSmartPtrAllocator<U>&) noexcept {}
 

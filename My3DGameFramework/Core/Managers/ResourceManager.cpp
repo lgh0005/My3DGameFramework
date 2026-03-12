@@ -84,7 +84,7 @@ namespace MGF3D
 		m_resources.Insert(key, resource);
 	}
 
-	ResourcePtr ResourceManager::LoadResourceAsync(const Ptr<IResourceDescriptor> desc)
+	ResourcePtr ResourceManager::LoadResourceAsync(IResourceDescriptorUPtr desc)
 	{
 		if (!desc) return nullptr;
 
@@ -107,7 +107,7 @@ namespace MGF3D
 		ResourcePtr newResource = nullptr;
 
 		// 임시 Descriptor 전달을 위한 처리 (소유권 주의)
-		if (!(*loaderPtr)->Load(newResource, IResourceDescriptorUPtr(const_cast<IResourceDescriptor*>(desc))))
+		if (!(*loaderPtr)->Load(newResource, std::move(desc)))
 			return nullptr;
 
 		// 3. 상태를 'Pending(대기)'으로 설정하고 캐시에 먼저 등록
