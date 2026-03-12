@@ -27,21 +27,26 @@
 #include <glm/gtc/epsilon.hpp>
 
 /*============================//
-//    Engine common aliases   //
-//============================*/
-#include "Common/Array.h"
-#include "Common/Pointers.h"
-#include "Common/Nullable.h"
-#include "Common/Delegates.h"
-#include "Common/Threading.h"
-
-/*============================//
 //    Engine common headers   //
 //============================*/
 #include "Common/Types.h"
 #include "Common/Defines.h"
 #include "Common/Constants.h"
 #include "Utils/CommonUtils.h"
+
+/*============================//
+//    Engine common aliases   //
+//============================*/
+#include "Common/Array.h"
+// #include "Common/Pointers.h"
+#include "Common/Nullable.h"
+#include "Common/Delegates.h"
+#include "Common/Threading.h"
+
+// DEBUG
+#include "Pointer/SmartPtrAliases.h"
+#include "Pointer/SmartPtrCore.h"
+#include "Pointer/SmartPtrFactory.h"
 
 /*==============================//
 //    Engine common debuggers   //

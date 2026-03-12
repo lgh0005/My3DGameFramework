@@ -12,7 +12,7 @@ set(SOURCES
     "Common/Constants.h"
     "Common/Array.h"
     "Common/Nullable.h"
-    "Common/Pointers.h"
+    # "Common/Pointers.h"
     "Common/Random.h"
     "Common/Threading.h"
     "Common/CoreAliases.h"
@@ -62,6 +62,11 @@ set(SOURCES
     # Parsers
     "Parsers/JsonParser.h"          "Parsers/JsonParser.cpp"          "Parsers/JsonParser.inl"
     #"Parsers/YamlParser.h"          "Parsers/YamlParser.cpp"          "Parsers/YamlParser.inl"
+
+    # Pointer
+    "Pointer/SmartPtrCore.h"        "Pointer/SmartPtrCore.cpp"          "Pointer/SmartPtrCore.inl"
+    "Pointer/SmartPtrAliases.h"        "Pointer/SmartPtrAliases.cpp"
+    "Pointer/SmartPtrFactory.h"        "Pointer/SmartPtrFactory.cpp"     "Pointer/SmartPtrFactory.inl"
 
     # Resource
     "Resource/IResourceDescriptor.h" "Resource/IResourceDescriptor.cpp"

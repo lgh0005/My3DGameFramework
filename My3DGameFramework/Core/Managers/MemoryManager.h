@@ -2,8 +2,8 @@
 
 namespace MGF3D
 {
-	MGF_CLASS_PTR(SlabMemoryPool)
-	MGF_CLASS_PTR(LinearMemoryPool)
+	class SlabMemoryPool;
+	class LinearMemoryPool;
 
 	class MemoryManager
 	{
