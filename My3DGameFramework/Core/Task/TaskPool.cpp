@@ -1,4 +1,5 @@
 #include "CorePch.h"
+#include "Managers/MemoryManager.h"
 #include "TaskPool.h"
 
 namespace MGF3D
@@ -36,7 +37,7 @@ namespace MGF3D
         else
         {
             // 풀이 비었으면 Slab에서 새로 할당
-            void* mem = MemoryManager::Instance().Allocate(sizeof(Task));
+            void* mem = MGF_MEMORY.Allocate(sizeof(Task));
             task = new (mem) Task(std::move(work), std::move(onComplete));
         }
 

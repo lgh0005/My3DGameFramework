@@ -18,4 +18,4 @@ namespace MGF3D
 	};
 }
 
-#include "Utils/CommonUtils.inl"
+#include "Common/CommonUtils.inl"

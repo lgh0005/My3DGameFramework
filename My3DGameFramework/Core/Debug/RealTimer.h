@@ -1,5 +1,5 @@
 ﻿#pragma once
-#include "Common/Clock.h"
+#include "Debug/Clock.h"
 
 namespace MGF3D
 {

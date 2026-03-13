@@ -4,8 +4,6 @@
 //    C++ standard libraries   //
 //=============================*/
 #include <cmath>
-#include <cstdarg>
-#include <algorithm>
 #include <type_traits>
 #include <memory>
 
@@ -32,18 +30,20 @@
 #include "Common/Types.h"
 #include "Common/Defines.h"
 #include "Common/Constants.h"
-#include "Utils/CommonUtils.h"
+#include "Common/CommonUtils.h"
 
 /*============================//
 //    Engine common aliases   //
 //============================*/
-#include "Common/Array.h"
-// #include "Common/Pointers.h"
-#include "Common/Nullable.h"
-#include "Common/Delegates.h"
-#include "Common/Threading.h"
+#include "Aliases/ManagerAccess.h"
+#include "Aliases/Array.h"
+#include "Aliases/Nullable.h"
+#include "Aliases/Delegates.h"
+#include "Aliases/Threading.h"
 
-// DEBUG
+/*============================//
+//    Engine smart pointers   //
+//============================*/
 #include "Pointer/SmartPtrAliases.h"
 #include "Pointer/SmartPtrCore.h"
 #include "Pointer/SmartPtrFactory.h"
@@ -54,15 +54,15 @@
 #include "Debug/Logger.h"
 #include "Debug/Asserter.h"
 #include "Debug/MemoryProfiler.h"
-#include "Common/Clock.h"
+#include "Debug/Clock.h"
 #include "Debug/ProfileScope.h"
 #include "Debug/RealTimer.h"
 
 /*==========================//
 //    Engine common utils   //
 //==========================*/
-#include "Common/Math.h"
-#include "Common/Random.h"
+#include "Math/Math.h"
+#include "Math/Random.h"
 
 /*=========================//
 //    Engine common STLs   //

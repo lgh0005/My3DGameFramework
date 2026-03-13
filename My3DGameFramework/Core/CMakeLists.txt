@@ -10,18 +10,21 @@ set(SOURCES
     "Common/Defines.h"
     "Common/Types.h"
     "Common/Constants.h"
-    "Common/Array.h"
-    "Common/Nullable.h"
-    # "Common/Pointers.h"
-    "Common/Random.h"
-    "Common/Threading.h"
-    "Common/CoreAliases.h"
+    "Common/CommonUtils.h"     "Common/CommonUtils.cpp"     "Common/CommonUtils.inl"
 
-    "Common/Math.h"       "Common/Math.cpp"     "Common/Math.inl"
-    "Common/Clock.h"      "Common/Clock.cpp"
-    "Common/Random.h"     "Common/Random.cpp"
+    # Aliases
+    "Aliases/ManagerAccess.h"
+    "Aliases/Array.h"
+    "Aliases/Nullable.h"
+    "Aliases/Delegates.h"
+    "Aliases/Threading.h"
+
+    # Math
+    "Math/Math.h"       "Math/Math.cpp"     "Math/Math.inl"
+    "Math/Random.h"     "Math/Random.cpp"
 
     # Debug
+    "Debug/Clock.h"               "Debug/Clock.cpp"
     "Debug/Asserter.h"            "Debug/Asserter.cpp"
     "Debug/Logger.h"              "Debug/Logger.cpp"      "Debug/Logger.inl" 
     "Debug/ProfileScope.h"        "Debug/ProfileScope.cpp"
@@ -113,7 +116,6 @@ set(SOURCES
     "Type/MGFType.h"                "Type/MGFType.cpp"
 
     # Utils
-    "Utils/CommonUtils.h"           "Utils/CommonUtils.cpp"         "Utils/CommonUtils.inl"
     "Utils/MemoryUtils.h"           "Utils/MemoryUtils.cpp"         "Utils/MemoryUtils.inl"
     "Utils/StringUtils.h"           "Utils/StringUtils.cpp"         "Utils/StringUtils.inl"
 ) 

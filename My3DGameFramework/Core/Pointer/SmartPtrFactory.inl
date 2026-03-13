@@ -8,7 +8,7 @@ namespace MGF3D
     template <typename T, typename... Args>
     inline UniquePtr<T> MakeUnique(Args&&... args)
     {
-        void* allocMem = MemoryManager::Instance().Allocate(sizeof(T));
+        void* allocMem = MGF_MEMORY.Allocate(sizeof(T));
         return UniquePtr<T>(new (allocMem) T(std::forward<Args>(args)...), MGFSmartPtrDeleter<T>());
     }
 

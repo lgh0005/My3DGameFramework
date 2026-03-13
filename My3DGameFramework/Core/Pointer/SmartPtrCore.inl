@@ -10,19 +10,19 @@ namespace MGF3D
 		if (ptr)
 		{
 			ptr->~T();
-			MemoryManager::Instance().Deallocate(ptr, sizeof(T));
+			MGF_MEMORY.Deallocate(ptr, sizeof(T));
 		}
 	}
 
 	template<typename T>
 	inline T* MGFSmartPtrAllocator<T>::allocate(std::size_t n)
 	{
-		return static_cast<T*>(MemoryManager::Instance().Allocate(n * sizeof(T)));
+		return static_cast<T*>(MGF_MEMORY.Allocate(n * sizeof(T)));
 	}
 
 	template<typename T>
 	inline void MGFSmartPtrAllocator<T>::deallocate(T* p, std::size_t n)
 	{
-		if (p) MemoryManager::Instance().Deallocate(p, n * sizeof(T));
+		if (p) MGF_MEMORY.Deallocate(p, n * sizeof(T));
 	}
 }

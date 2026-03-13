@@ -8,7 +8,7 @@ namespace MGF3D
 	SlabAllocator<T>::SlabAllocator(Ptr<SlabMemoryPool> pool) noexcept
 	{
 		if (pool) m_pool = pool;
-		else m_pool = MemoryManager::Instance().GetSlabMemoryPool(sizeof(T));
+		else m_pool = MGF_MEMORY.GetSlabMemoryPool(sizeof(T));
 	}
 
 	template <typename T>
@@ -32,7 +32,7 @@ namespace MGF3D
 
 		// 3. 그 외의 모든 경우(n > 1 배열 포함)는 전역 MemoryManager의 슬랩 시스템에 위임
 		// 매니저는 totalSize를 보고 최적의 버킷(16~4096)을 골라주거나 시스템 힙으로 폴백합니다.
-		return static_cast<Ptr<T>>(MemoryManager::Instance().Allocate(totalSize));
+		return static_cast<Ptr<T>>(MGF_MEMORY.Allocate(totalSize));
 	}
 
 	template <typename T>
@@ -53,6 +53,6 @@ namespace MGF3D
 		}
 
 		// 2. 나머지는 전역 MemoryManager를 통해 반환
-		MemoryManager::Instance().Deallocate(p, totalSize);
+		MGF_MEMORY.Deallocate(p, totalSize);
 	}
 }

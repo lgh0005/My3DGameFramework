@@ -9,7 +9,7 @@ namespace MGF3D
 	LinearAllocator<T>::LinearAllocator(Ptr<LinearMemoryPool> pool) noexcept
 	{
 		if (pool) m_pool = pool;
-		else m_pool = MemoryManager::Instance().GetLinearMemoryPool();
+		else m_pool = MGF_MEMORY.GetLinearMemoryPool();
 	}
 
 	// 템플릿 복사 생성자

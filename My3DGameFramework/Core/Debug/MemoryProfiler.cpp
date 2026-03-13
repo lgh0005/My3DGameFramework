@@ -20,12 +20,11 @@ namespace MGF3D
 
     void MemoryProfiler::GetSlabMemoryUsageData()
     {
-        auto& mm = MemoryManager::Instance();
         usize currentBucketSize = 16;
 
         for (int32 i = 0; i < SlabBucketCount; ++i)
         {
-            auto pool = mm.GetSlabMemoryPool(currentBucketSize);
+            auto pool = MGF_MEMORY.GetSlabMemoryPool(currentBucketSize);
             if (pool)
             {
                 auto& bucket = m_snapshot.slabBuckets[i];
@@ -48,8 +47,7 @@ namespace MGF3D
 
     void MemoryProfiler::GetLinearMemoryUsageData()
     {
-        auto& mm = MemoryManager::Instance();
-        auto linear = mm.GetLinearMemoryPool();
+        auto linear = MGF_MEMORY.GetLinearMemoryPool();
 
         if (linear)
         {
