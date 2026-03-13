@@ -4,12 +4,7 @@
 add_subdirectory(Core)
 
 # Level 2: 미들웨어 시스템들
-add_subdirectory(Systems/AI)
-add_subdirectory(Systems/Audio)
-add_subdirectory(Systems/Graphics)
-add_subdirectory(Systems/Physics)
-add_subdirectory(Systems/Scripting)
-add_subdirectory(Systems/UI)
+add_subdirectory(Systems)
 
 # Leve 3: 미들웨어 초기화 및 glfw 컨텍스트 생성
 add_subdirectory(Middleware)
