@@ -16,7 +16,7 @@ namespace MGF3D
 		~MGFPath();
 
 	public:
-		cstr GetCStr() const { return m_rawPath.c_str(); }
+		cstr GetCStr() const { return m_rawPath.CStr(); }
 		const SString& ToSString() const { return m_rawPath; }
 
 	// 경로 정보 추출

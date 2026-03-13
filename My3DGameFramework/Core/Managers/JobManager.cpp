@@ -15,7 +15,7 @@ namespace MGF3D
 
         // 메인 스레드 및 일부 외부 라이브러리를 위한 공간 제외 나머지를 워커로 잡아둠
         uint32 workerCount = CommonUtils::Select<uint32>((logicalThreads > 1), logicalThreads - 1, 1);
-        m_workers.reserve(workerCount);
+        m_workers.Reserve(workerCount);
 
         // 1. 워커 스레드 생성
         for (uint32 i = 0; i < workerCount; ++i)
@@ -53,7 +53,7 @@ namespace MGF3D
         auto worker = MakeUnique<MGFJob>();
         if (!worker) return false;
 
-        m_workers.push_back(std::move(worker));
+        m_workers.PushBack(std::move(worker));
         return true;
     }
 

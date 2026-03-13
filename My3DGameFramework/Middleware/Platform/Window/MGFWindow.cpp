@@ -36,7 +36,7 @@ namespace MGF3D
 		glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
 		// 2. 윈도우 생성
-		m_window = glfwCreateWindow(width, height, title.c_str(), nullptr, nullptr);
+		m_window = glfwCreateWindow(width, height, title.CStr(), nullptr, nullptr);
 		if (!m_window)
 		{
 			MGF_LOG_FATAL("MGFWindow: Failed to create GLFW window.");

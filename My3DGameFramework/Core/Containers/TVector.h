@@ -6,13 +6,12 @@
 namespace MGF3D
 {
     template<typename T, typename Alloc>
-    class TVector : public std::vector<T, Alloc>, public IContainer
+    class TVector : public IContainer
     {
-    public:
-        using Base = std::vector<T, Alloc>;
-        using Base::vector;
-        using Base::operator=;
+    private:
+        std::vector<T, Alloc> m_vector;
 
+    public:
         TVector() = default;
         virtual ~TVector() = default;
 
@@ -21,32 +20,28 @@ namespace MGF3D
         template<typename OtherAlloc>
         TVector(const TVector<T, OtherAlloc>& other);
 
-        // 2. 다른 할당자를 사용하는 TVector로부터 이동 생성 (Virtual Move)
+        // 2. 다른 할당자를 사용하는 TVector로부터 이동 생성
         template<typename OtherAlloc>
         TVector(TVector<T, OtherAlloc>&& other) noexcept;
 
-        // 3. 다른 할당자로부터의 대입 연산자
+        // 3. 대입 연산자
         template<typename OtherAlloc>
         TVector& operator=(const TVector<T, OtherAlloc>& other);
 
-        template<typename OtherAlloc>
-        TVector& operator=(TVector<T, OtherAlloc>&& other) noexcept;
+    public:
+        usize MemoryUsage() const override { return sizeof(*this) + (m_vector.capacity() * sizeof(T)); }
+        usize Count()   const override { return m_vector.size(); }
+        bool  Empty()   const override { return m_vector.empty(); }
+        void  Clear()         override { m_vector.clear(); }
+        void  Release();
 
     public:
-        usize MemoryUsage() const override { return sizeof(*this) + (this->capacity() * sizeof(T)); }
-        usize Count()   const override { return this->size(); }
-        bool  Empty()   const override { return this->empty(); }
-        void  Clear()         override { this->clear(); }
-        void  Release() override;
-
-    public:
-        Ptr<T> Data() { return this->data(); }
-        Ptr<const T> Data() const { return this->data(); }
+        Ptr<T> Data() { return m_vector.data(); }
+        Ptr<const T> Data() const { return m_vector.data(); }
 
         T PopBack();
 
-        template<typename... Args>
-        void EmplaceBack(Args&&... args);
+        template<typename... Args> void EmplaceBack(Args&&... args);
         void PushBack(const T& value);
         void PushBack(T&& value);
 
@@ -55,6 +50,21 @@ namespace MGF3D
         void Reserve(usize n);
         bool Contains(const T& value) const;
         void RemoveSwap(usize index);
+        void Swap(TVector<T, Alloc>& other) noexcept;
+
+    public:
+        using iterator = typename std::vector<T, Alloc>::iterator;
+        using const_iterator = typename std::vector<T, Alloc>::const_iterator;
+
+        iterator begin() { return m_vector.begin(); }
+        iterator end() { return m_vector.end(); }
+        const_iterator begin() const { return m_vector.begin(); }
+        const_iterator end()   const { return m_vector.end(); }
+
+        using reference = typename std::vector<T, Alloc>::reference;
+        using const_reference = typename std::vector<T, Alloc>::const_reference;
+        reference operator[](usize index) { return m_vector[index]; }
+        const_reference operator[](usize index) const { return m_vector[index]; }
     };
 }
 

@@ -5,13 +5,12 @@
 namespace MGF3D
 {
     template<typename T, typename Alloc>
-    class TDeque : public std::deque<T, Alloc>, public IContainer
+    class TDeque : public IContainer
     {
-    public:
-        using Base = std::deque<T, Alloc>;
-        using Base::deque;
-        using Base::operator=;
+    private:
+        std::deque<T, Alloc> m_deque;
 
+    public:
         TDeque() = default;
         virtual ~TDeque() = default;
 
@@ -30,9 +29,9 @@ namespace MGF3D
 
     public:
         usize MemoryUsage() const override;
-        usize Count()       const override { return this->size(); }
-        bool  Empty()       const override { return this->empty(); }
-        void  Clear()             override { this->clear(); }
+        usize Count()       const override { return m_deque.size(); }
+        bool  Empty()       const override { return m_deque.empty(); }
+        void  Clear()             override { m_deque.clear(); }
         void  Release() override;
 
     public:
@@ -48,6 +47,18 @@ namespace MGF3D
         const T& Front() const { return this->front(); }
         T& Back() { return this->back(); }
         const T& Back() const { return this->back(); }
+
+    public:
+        using iterator = typename std::deque<T, Alloc>::iterator;
+        using const_iterator = typename std::deque<T, Alloc>::const_iterator;
+
+        iterator begin() { return m_deque.begin(); }
+        iterator end() { return m_deque.end(); }
+        const_iterator begin() const { return m_deque.begin(); }
+        const_iterator end()   const { return m_deque.end(); }
+
+        T& operator[](usize index) { return m_deque[index]; }
+        const T& operator[](usize index) const { return m_deque[index]; }
     };
 }
 

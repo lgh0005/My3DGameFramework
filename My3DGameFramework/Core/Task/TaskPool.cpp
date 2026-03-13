@@ -5,7 +5,7 @@ namespace MGF3D
 {
     TaskPool::TaskPool(uint32 initialReserve)
     {
-        m_freeList.reserve(initialReserve);
+        m_freeList.Reserve(initialReserve);
     }
 
     TaskPool::~TaskPool()

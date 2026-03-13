@@ -26,7 +26,7 @@ namespace MGF3D
         if (name.empty()) return MGFName();
 
         // 해당 문자열 해시 생성
-        StringHash hash(name);
+        StringHash hash(name.data());
 
         // 네임 풀에 이미 이름이 존재하는 경우 기존 메모리 주소 반환
         if (m_stringPool.Find(hash))
@@ -42,7 +42,7 @@ namespace MGF3D
 
     MGFName NameManager::CreateUniqueName(strview baseName)
     {
-        StringHash baseHash(baseName);
+        StringHash baseHash(baseName.data());
 
         // 이 기반 이름이 몇 번이나 요청되었는지 장부(m_nameCounts) 확인
         int32* pCount = m_nameCounts.Find(baseHash);
@@ -61,9 +61,9 @@ namespace MGF3D
 
         // 새로운 이름 및 그 이름의 해시 생성
         LString uniqueName = LString(baseName) + "_" + StringUtils::ToString(currentCount);
-        StringHash newHash(uniqueName);
+        StringHash newHash(uniqueName.CStr());
 
-        return RegisterNewName(uniqueName, newHash);
+        return RegisterNewName(uniqueName.CStr(), newHash);
     }
 
     MGFName NameManager::RegisterNewName(strview name, const StringHash& hash)

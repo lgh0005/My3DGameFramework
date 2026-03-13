@@ -30,7 +30,7 @@ namespace MGF3D
         if (!window) return;
 
         // 1. 고속 상태 스왑
-        m_prevStates.swap(m_currentStates);
+        m_prevStates.Swap(m_currentStates);
 
         // 2. 상태 갱신
         for (usize i = 0; i < m_actionList.Count(); ++i)

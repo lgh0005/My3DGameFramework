@@ -115,11 +115,9 @@ namespace MGF3D
 		{
 			MGF_LOCK_SCOPE(m_pathMutex);
 
-			auto mapIt = m_virtualPaths.find(aliasHash);
-			if (mapIt == m_virtualPaths.end())
-				return virtualPath;
-
-			resolvedBase = mapIt->second;
+			auto ptr = m_virtualPaths.Find(aliasHash);
+			if (!ptr) return virtualPath;
+			resolvedBase = *ptr;
 		}
 
 		// 3. 매핑된 실제 경로로 시작하는 결과 경로 생성

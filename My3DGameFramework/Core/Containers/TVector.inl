@@ -5,103 +5,93 @@ namespace MGF3D
     template<typename T, typename Alloc>
     template<typename OtherAlloc>
     inline TVector<T, Alloc>::TVector(const TVector<T, OtherAlloc>& other)
-        : Base(other.begin(), other.end(), Alloc()) { }
+        : m_vector(other.begin(), other.end()) { }
 
     template<typename T, typename Alloc>
     template<typename OtherAlloc>
     inline TVector<T, Alloc>::TVector(TVector<T, OtherAlloc>&& other) noexcept
-        : Base(Alloc())
-    {
-        this->reserve(other.size());
-        this->assign(std::make_move_iterator(other.begin()), std::make_move_iterator(other.end()));
-        other.clear();
-    }
+        : m_vector(std::make_move_iterator(other.begin()), std::make_move_iterator(other.end())) { }
 
     template<typename T, typename Alloc>
     template<typename OtherAlloc>
     inline TVector<T, Alloc>& TVector<T, Alloc>::operator=(const TVector<T, OtherAlloc>& other)
     {
-        this->assign(other.begin(), other.end());
-        return *this;
-    }
-
-    template<typename T, typename Alloc>
-    template<typename OtherAlloc>
-    inline TVector<T, Alloc>& TVector<T, Alloc>::operator=(TVector<T, OtherAlloc>&& other) noexcept
-    {
-        this->clear();
-        this->reserve(other.size());
-        this->assign(std::make_move_iterator(other.begin()), std::make_move_iterator(other.end()));
-        other.clear();
+        m_vector.assign(other.begin(), other.end()); 
         return *this;
     }
 
     template<typename T, typename Alloc>
     inline void TVector<T, Alloc>::Release()
     {
-        Clear();
-        Base().swap(*this);
+        m_vector.clear();
+        m_vector.shrink_to_fit();
     }
 
     template<typename T, typename Alloc>
     inline T TVector<T, Alloc>::PopBack()
     {
-        MGF_ASSERT(!this->empty(), "TVector is empty.");
-        T backElement = std::move(this->back());
-        this->pop_back();
-        return backElement;
+        MGF_ASSERT(!m_vector.empty(), "TVector is empty. Cannot PopBack!");
+        T val = std::move(m_vector.back());
+        m_vector.pop_back();
+        return val;
     }
 
     template<typename T, typename Alloc>
     inline void TVector<T, Alloc>::PushBack(const T& value)
     {
-        this->push_back(value);
+        m_vector.push_back(value);
     }
 
     template<typename T, typename Alloc>
     inline void TVector<T, Alloc>::PushBack(T&& value)
     {
-        this->push_back(std::move(value));
+        m_vector.push_back(std::move(value));
     }
 
     template<typename T, typename Alloc>
     template<typename... Args>
     inline void TVector<T, Alloc>::EmplaceBack(Args&&... args)
     {
-        this->emplace_back(std::forward<Args>(args)...);
+        m_vector.emplace_back(std::forward<Args>(args)...);
     }
 
     template<typename T, typename Alloc>
     inline usize TVector<T, Alloc>::Capacity() const
     {
-        return this->capacity();
+        return m_vector.capacity();
     }
 
     template<typename T, typename Alloc>
     inline void TVector<T, Alloc>::Assign(usize n, const T& value)
     {
-        this->assign(n, value);
+        m_vector.assign(n, value);
     }
 
     template<typename T, typename Alloc>
     inline void TVector<T, Alloc>::Reserve(usize n)
     {
-        this->reserve(n);
+        m_vector.reserve(n);
     }
 
     template<typename T, typename Alloc>
     inline bool TVector<T, Alloc>::Contains(const T& value) const
     {
-        return std::find(this->begin(), this->end(), value) != this->end();
+        return std::find(m_vector.begin(), m_vector.end(), value) != m_vector.end();
     }
 
     template<typename T, typename Alloc>
     inline void TVector<T, Alloc>::RemoveSwap(usize index)
     {
-        if (index < this->size())
+        if (index < m_vector.size())
         {
-            if (index != this->size() - 1) (*this)[index] = std::move(this->back());
-            this->pop_back();
+            m_vector[index] = std::move(m_vector.back());
+            m_vector.pop_back();
         }
+    }
+
+    template<typename T, typename Alloc>
+    inline void TVector<T, Alloc>::Swap(TVector<T, Alloc>& other) noexcept
+    {
+        m_vector.swap(other.m_vector);
     }
 }
