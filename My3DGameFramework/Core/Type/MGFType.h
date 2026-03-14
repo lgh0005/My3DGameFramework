@@ -9,9 +9,9 @@ namespace MGF3D
 		StringHash id;
 		Ptr<const MGFType> parent { nullptr };
 
-		static constexpr uint32 MAX_DEPTH = 16;
+		static constexpr uint32 MAX_DEPTH  { 16 };
+		Array<StringHash, MAX_DEPTH> chain { 0 };
 		uint32 depth = 0;
-		StringHash chain[MAX_DEPTH] = { 0 };
 
 		bool IsA(const MGFType* other) const;
 	};

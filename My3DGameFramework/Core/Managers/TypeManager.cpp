@@ -11,86 +11,6 @@ namespace MGF3D
         m_typeTokenList.PushBack({ name, parentName });
     }
 
-    void TypeManager::BuildHierarchy()
-    {
-        if (m_typeTokenList.Empty()) return;
-
-        // 1. 모든 타입 객체(MGFType)부터 먼저 생성 (UniquePtr로 안전하게 소유)
-        for (const auto& typeToken : m_typeTokenList)
-        {
-            StringHash id = typeToken.name.GetStringHash();
-
-            // 이미 등록된 타입이면 건너뜀
-            if (m_tokenRegistry.Find(id) != nullptr) continue;
-
-            auto newType = std::make_unique<MGFType>();
-            newType->name = typeToken.name;
-            newType->id = id;
-
-            m_tokenRegistry.Insert(id, std::move(newType));
-        }
-
-        // 2. 족보(Chain) 계산 로직 (의존성 해결 루프)
-        bool bChanged = true;
-        while (bChanged)
-        {
-            bChanged = false;
-
-            for (const auto& token : m_typeTokenList)
-            {
-                StringHash id = token.name.GetStringHash();
-
-                // Find를 통해 UniquePtr의 주소를 가져옴
-                auto foundTarget = m_tokenRegistry.Find(id);
-                if (!foundTarget) continue;
-
-                MGFType* target = (*foundTarget).get();
-
-                // 이미 족보가 완성되었거나 루트 클래스인 경우 처리
-                if (target->depth > 0 || token.parentName.IsEmpty())
-                {
-                    if (token.parentName.IsEmpty() && target->chain[0] == 0)
-                    {
-                        target->chain[0] = target->id;
-                        target->depth = 0;
-                        target->parent = nullptr;
-                        bChanged = true;
-                    }
-                    continue;
-                }
-
-                // 부모 타입 정보 찾기
-                StringHash parentID = token.parentName.GetStringHash();
-                auto foundParent = m_tokenRegistry.Find(parentID);
-
-                if (foundParent)
-                {
-                    MGFType* parent = (*foundParent).get();
-
-                    // 부모의 족보가 이미 완성되어 있어야 내 족보를 완성할 수 있음
-                    bool isParentReady = (parent->depth > 0 || (parent->parent == nullptr && parent->chain[0] != 0));
-
-                    if (isParentReady)
-                    {
-                        target->parent = parent;
-                        target->depth = parent->depth + 1;
-
-                        if (target->depth < MGFType::MAX_DEPTH)
-                        {
-                            for (uint32 i = 0; i <= parent->depth; ++i)
-                                target->chain[i] = parent->chain[i];
-
-                            target->chain[target->depth] = target->id;
-                            bChanged = true;
-                        }
-                    }
-                }
-            }
-        }
-
-        m_typeTokenList.Clear();
-    }
-
     Ptr<const MGFType> TypeManager::GetType(StringHash id) const
     {
         // const Find를 사용하여 안전하게 조회
@@ -99,4 +19,102 @@ namespace MGF3D
         return nullptr;
     }
 
+    void TypeManager::BuildHierarchy()
+    {
+        if (m_typeTokenList.Empty()) return;
+
+        // 1단계: 모든 타입 객체를 메모리에 생성
+        InitTypeObjects();
+
+        // 2단계: 부모-자식 관계 및 족보(Chain) 완성
+        ResolveTypeHierarchy();
+
+        m_typeTokenList.Clear();
+    }
+
+    void TypeManager::InitTypeObjects()
+    {
+        for (const auto& typeToken : m_typeTokenList)
+        {
+            StringHash id = typeToken.name.GetStringHash();
+            if (m_tokenRegistry.Find(id) != nullptr) continue;
+
+            auto newType = MakeUnique<MGFType>();
+            newType->name = typeToken.name;
+            newType->id = id;
+
+            m_tokenRegistry.Insert(id, std::move(newType));
+        }
+    }
+
+    void TypeManager::ResolveTypeHierarchy()
+    {
+        bool bChanged = true;
+        uint32 passCount = 0;
+        const uint32 maxPasses = MGFType::MAX_DEPTH + 1;
+
+        while (bChanged && passCount < maxPasses)
+        {
+            bChanged = false;
+            passCount++;
+
+            for (const auto& token : m_typeTokenList)
+            {
+                if (ResolveSpecificType(token))
+                    bChanged = true;
+            }
+        }
+    }
+
+    bool TypeManager::ResolveSpecificType(const TypeToken& token)
+    {
+        StringHash id = token.name.GetStringHash();
+        auto foundTarget = m_tokenRegistry.Find(id);
+        if (!foundTarget) return false;
+
+        Ptr<MGFType> target = (*foundTarget).get();
+
+        // 1. 이미 해결된 타입이면 패스
+        if (target->depth > 0 || (target->chain[0].IsValid())) return false;
+
+        // 2. 루트 클래스 처리
+        if (token.parentName.IsEmpty())
+        {
+            target->parent = nullptr;
+            target->depth = 0;
+            target->chain[0] = target->id;
+            return true;
+        }
+
+        // 3. 자식 클래스 처리
+        StringHash parentID = token.parentName.GetStringHash();
+        auto foundParent = m_tokenRegistry.Find(parentID);
+        if (foundParent)
+        {
+            Ptr<MGFType> parent = (*foundParent).get();
+            bool isParentReady = (parent->depth > 0 || parent->chain[0].IsValid());
+
+            if (isParentReady)
+            {
+                uint32 newDepth = parent->depth + 1;
+                if (newDepth >= MGFType::MAX_DEPTH)
+                {
+                    MGF_LOG_ERROR("Type hierarchy too deep for: {}", token.name.CStr());
+                    return false;
+                }
+
+                target->parent = parent;
+                target->depth = newDepth;
+
+                // 족보 복사
+                for (uint32 i = 0; i <= parent->depth; ++i)
+                    target->chain[i] = parent->chain[i];
+
+                target->chain[target->depth] = target->id;
+                return true;
+            }
+        }
+
+        return false;
+    }
 }

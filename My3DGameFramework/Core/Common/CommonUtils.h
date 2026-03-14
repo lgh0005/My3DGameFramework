@@ -15,6 +15,9 @@ namespace MGF3D
 
 		template<typename T>
 		static constexpr const T& Select(bool condition, const T& a, const T& b);
+
+		template<typename T>
+		static constexpr void Swap(T& a, T& b);
 	};
 }
 

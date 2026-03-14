@@ -19,8 +19,15 @@ namespace MGF3D
 
 	public:
 		void TagType(const MGFName& name, const MGFName& parentName);
-		void BuildHierarchy();
 		Ptr<const MGFType> GetType(StringHash id) const;
+
+	public:
+		void InitTypeObjects();
+		void ResolveTypeHierarchy();
+		void BuildHierarchy();
+
+	private:
+		bool ResolveSpecificType(const TypeToken& token);
 
 	private:
 		SVector<TypeToken> m_typeTokenList;

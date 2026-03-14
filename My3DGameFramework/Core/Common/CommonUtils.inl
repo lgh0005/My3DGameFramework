@@ -19,4 +19,12 @@ namespace MGF3D
 	{
 		return condition ? a : b;
 	}
+
+	template<typename T>
+	inline void Swap(T& a, T& b)
+	{
+		T temp = std::move(a);
+		a = std::move(b);
+		b = std::move(temp);
+	}
 }

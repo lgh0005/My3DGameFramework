@@ -1,10 +1,18 @@
 ﻿#pragma once
+#include "Memory/SlabAllocator.h"
 
 namespace MGF3D
 {
-	MGF_CLASS_PTR(Chunk)
-		class Chunk
+	template<typename T>
+	class Chunk
 	{
+	public:
+		Ptr<T> Allocate();
+		void Deallocate(Ptr<T> ptr);
 
+	private:
+		SlabAllocator<T> m_allocator;
 	};
 }
+
+#include "Entities/ECS/Chunk.inl"

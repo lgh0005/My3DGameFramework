@@ -6,25 +6,29 @@ namespace MGF3D
 {
 	namespace ryml = c4::yml;
 
-	MGF_CLASS_PTR(YamlParser)
 	class YamlParser
 	{
 	public:
 		YamlParser();
 		~YamlParser();
 
-		bool LoadFromYamlFile(const std::string& path);
-		bool IsArray(const std::string& key) const;
+	public:
+		bool LoadFromYamlFile(const MGFPath& path);
+
+		ryml::ConstNodeRef GetNode(const SString& key) const;
+		bool Contains(const SString& key) const;
+		bool IsArray(const SString& key) const;
 		ryml::ConstNodeRef GetRoot() const;
 
+	public:
 		template<typename T>
-		bool IsTypeOf(const std::string& key) const;
+		bool HasTypeOf(const SString& key) const;
 
 		template<typename T>
-		T Get(const std::string& key, const T& defaultValue = T());
+		T Get(const SString& key, const T& defaultValue = T()) const;
 
 	private:
-		std::string m_source;
+		str m_source;
 		ryml::Tree m_tree;
 	};
 }

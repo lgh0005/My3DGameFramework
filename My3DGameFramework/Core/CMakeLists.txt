@@ -32,8 +32,9 @@ set(SOURCES
     "Debug/MemoryProfiler.h"      "Debug/MemoryProfiler.cpp"
 
     # Entities
-    #"Entities/ECS/Archetype.h"      "Entities/ECS/Archetype.cpp"
-    #"Entities/ECS/Chunk.h"          "Entities/ECS/Chunk.cpp"
+    #"Entities/ECS/IStorage.h"      "Entities/ECS/IStorage.cpp"  
+    #"Entities/ECS/Storage.h"      "Entities/ECS/Storage.cpp"   "Entities/ECS/Storage.inl"
+    #"Entities/ECS/Chunk.h"          "Entities/ECS/Chunk.cpp"   "Entities/ECS/Chunk.inl"
 
     #"Entities/Entity/Object.h"      "Entities/Entity/Object.cpp"
     #"Entities/Entity/Component.h"      "Entities/Entity/Component.cpp"
@@ -45,7 +46,7 @@ set(SOURCES
     "Managers/NameManager.h"        "Managers/NameManager.cpp"
     "Managers/EntityManager.h"        "Managers/EntityManager.cpp"
     "Managers/TaskManager.h"        "Managers/TaskManager.cpp"
-    #"Managers/TypeManager.h"         "Managers/TypeManager.cpp"
+    "Managers/TypeManager.h"         "Managers/TypeManager.cpp"
     "Managers/ResourceManager.h"        "Managers/ResourceManager.cpp"      "Managers/ResourceManager.inl" 
     "Managers/PathManager.h"        "Managers/PathManager.cpp"
 
@@ -60,11 +61,11 @@ set(SOURCES
 
     # Identity
     "Identity/MGFName.h"            "Identity/MGFName.cpp"
-    "Identity/MGFPath.h"          "Identity/MGFPath.cpp"
+    "Identity/MGFPath.h"            "Identity/MGFPath.cpp"
 
     # Parsers
     "Parsers/JsonParser.h"          "Parsers/JsonParser.cpp"          "Parsers/JsonParser.inl"
-    #"Parsers/YamlParser.h"          "Parsers/YamlParser.cpp"          "Parsers/YamlParser.inl"
+    "Parsers/YamlParser.h"          "Parsers/YamlParser.cpp"          "Parsers/YamlParser.inl"
 
     # Pointer
     "Pointer/SmartPtrCore.h"        "Pointer/SmartPtrCore.cpp"          "Pointer/SmartPtrCore.inl"
