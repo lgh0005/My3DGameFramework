@@ -78,6 +78,12 @@ set(SOURCES
     "Resource/Resource.h"            "Resource/Resource.cpp"
 
     # Spatial
+    "Spatial/Position.h"            "Spatial/Position.cpp"
+    "Spatial/Rotation.h"            "Spatial/Rotation.cpp"
+    "Spatial/Scale.h"               "Spatial/Scale.cpp"
+    "Spatial/CoordFrame.h"          "Spatial/CoordFrame.cpp"
+    "Spatial/SpatialAxes.h"         "Spatial/SpatialAxes.cpp"
+    "Spatial/ViewProjection.h"      "Spatial/ViewProjection.cpp"
 
     # Containers
     "Containers/IContainer.h"       "Containers/IContainer.cpp"

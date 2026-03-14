@@ -20,7 +20,7 @@ namespace MGF3D
 	static constexpr float HalfPi = Pi / 2.0f;
 	static constexpr float TwoPi = Pi * 2.0f;
 	static constexpr float DegToRad = Pi / 180.0f;
-	static constexpr float RadToDeg = 180.0f / Pi; // 내부 변수명 변경 시 참조 주의
+	static constexpr float RadToDeg = 180.0f / Pi;
 	static constexpr float Epsilon = glm::epsilon<float>();
 	static constexpr float Epsilon2 = Epsilon * Epsilon;
 
