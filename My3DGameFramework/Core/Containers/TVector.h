@@ -65,6 +65,9 @@ namespace MGF3D
         using const_reference = typename std::vector<T, Alloc>::const_reference;
         reference operator[](usize index) { return m_vector[index]; }
         const_reference operator[](usize index) const { return m_vector[index]; }
+
+        reference Back() { return m_vector.back(); }
+        const_reference Back() const { return m_vector.back(); }
     };
 }
 

@@ -1,8 +1,10 @@
 ﻿#pragma once
-#include "miniaudio.h"
 
 namespace MGF3D
 {
+	MGF_CLASS_PTR(AudioEngine)
+	MGF_CLASS_PTR(AudioMixer)
+
 	class AudioManager
 	{
 		MGF_DECLARE_SINGLE(AudioManager)
@@ -13,16 +15,15 @@ namespace MGF3D
 
 	public:
 		bool Init();
-		void Clear();
-		ma_engine* GetEngine() { return &m_audioEngine; }
+		void Shutdown();
 
-		// TODO : 그룹 : sfx, bgm 별로 음향 통제
-		ma_sound_group* GetGroup(AudioType type);
-		void SetGroupVolume(AudioType type, float volume);
-		void SetMasterVolume(float volume);
+	public:
+		bool CreateChannel(const SString& name);
+		Ptr<AudioMixer> GetMixer(const SString& name);
+		void SetChannelVolume(const SString& name, float volume);
 
 	private:
-		ma_engine m_audioEngine;
-		ma_sound_group m_groups[(int32)AudioType::MAX];
+		AudioEngineUPtr m_engine;
+		SMap<SString, AudioMixerUPtr> m_channels;
 	};
 }

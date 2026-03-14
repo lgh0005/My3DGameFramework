@@ -1,8 +1,7 @@
 ﻿#include "AudioPch.h"
-#define MINIAUDIO_IMPLEMENTATION
-#include "miniaudio.h"
 #include "AudioManager.h"
-#include "Debug/Logger.h"
+#include "Core/AudioEngine.h"
+#include "Core/AudioMixer.h"
 
 namespace MGF3D
 {
@@ -11,71 +10,86 @@ namespace MGF3D
 
 	bool AudioManager::Init()
 	{
-		// 1. 엔진 초기화
-		ma_result result;
-		result = ma_engine_init(NULL, &m_audioEngine);
-		if (result != MA_SUCCESS)
+		// 1. 오디오 엔진(miniaudio) 생성 및 초기화
+		m_engine = MakeUnique<AudioEngine>();
+		if (!m_engine->Init())
 		{
-			MGF_LOG_ERROR("Failed to initialize audio engine.");
+			MGF_LOG_ERROR("AudioManager: Failed to initialize AudioEngine.");
 			return false;
 		}
 
-		// 2. 사운드 그룹 초기화
-		for (int i = 0; i < (int32)AudioType::MAX; ++i)
-		{
-			result = ma_sound_group_init
-			(
-				&m_audioEngine,
-				0,    // flags
-				NULL, // parent group (NULL = Engine Endpoint)
-				&m_groups[i]
-			);
+		// 2. 기본 채널들 생성 (Master, BGM, SFX 정도는 기본으로 지원)
+		CreateChannel("Master");
+		CreateChannel("BGM");
+		CreateChannel("SFX");
 
-			if (result != MA_SUCCESS)
-			{
-				MGF_LOG_ERROR("Failed to initialize sound group index: {}", i);
-				return false;
-			}
-		}
-
+		MGF_LOG_INFO("AudioManager: System initialized with dynamic channels.");
 		return true;
 	}
 
-	void AudioManager::Clear()
+	void AudioManager::Shutdown()
 	{
-		ma_engine_stop(&m_audioEngine);
-
-		for (int i = 0; i < (int)AudioType::MAX; ++i)
+		// 1. 모든 채널(Mixer) 해제
+		for (auto& pair : m_channels)
 		{
-			// 초기화된 적이 있는 그룹만 해제 (혹시 모를 안전장치)
-			// miniaudio는 uninit을 여러 번 호출해도 내부적으로 체크하지 않을 수 있으니
-			// Init에서 성공했을 때만 확실히 해제하는 로직이면 더 좋습니다.
-			// 여기선 그냥 순서대로 다 해제합니다.
-			ma_sound_group_uninit(&m_groups[i]);
+			if (pair.second)
+				pair.second->Shutdown();
+		}
+		m_channels.Release();
+
+		// 2. 엔진 종료
+		if (m_engine)
+		{
+			m_engine->Shutdown();
+			m_engine.reset();
 		}
 
-		ma_engine_uninit(&m_audioEngine);
-		MGF_LOG_INFO("AudioManager Cleared.");
+		MGF_LOG_INFO("AudioManager: Dynamic system shutdown complete.");
 	}
 
-	ma_sound_group* AudioManager::GetGroup(AudioType type)
+	bool AudioManager::CreateChannel(const SString& name)
 	{
-		return &m_groups[(int32)type];
-	}
-
-	void AudioManager::SetGroupVolume(AudioType type, float volume)
-	{
-		ma_sound_group* group = GetGroup(type);
-		if (group)
+		// 이미 존재하는 채널인지 확인
+		if (m_channels.Find(name) != nullptr)
 		{
-			ma_sound_group_set_volume(group, volume);
+			MGF_LOG_WARN("AudioManager: Channel '{}' already exists.", name.CStr());
+			return false;
 		}
+
+		// 새로운 믹서 생성 (엔진의 네이티브 포인터 전달)
+		auto newMixer = MakeUnique<AudioMixer>(*m_engine->GetNativeEngine());
+		if (!newMixer->Init())
+		{
+			MGF_LOG_ERROR("AudioManager: Failed to init Mixer for channel '{}'", name.CStr());
+			return false;
+		}
+
+		// 3. 기본 볼륨 초기화
+		newMixer->SetVolume(1.0f);
+
+		// 4. 맵에 등록 (소유권 이전)
+		bool result = m_channels.Insert(name, std::move(newMixer));
+
+		if (result)
+			MGF_LOG_INFO("AudioManager: New channel '{}' created with default volume (100%%).", name.CStr());
+		
+		return result;
 	}
 
-	void AudioManager::SetMasterVolume(float volume)
+	Ptr<AudioMixer> AudioManager::GetMixer(const SString& name)
 	{
-		ma_engine_set_volume(&m_audioEngine, volume);
+		auto pMixerUPtr = m_channels.Find(name);
+
+		// 내부의 실제 AudioMixer 포인터를 반환
+		if (pMixerUPtr && *pMixerUPtr)
+			return (*pMixerUPtr).get();
+
+		return nullptr;
 	}
 
-
+	void AudioManager::SetChannelVolume(const SString& name, float volume)
+	{
+		auto pMixer = GetMixer(name);
+		if (pMixer) pMixer->SetVolume(volume);
+	}
 }

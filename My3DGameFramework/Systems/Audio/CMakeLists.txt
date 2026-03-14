@@ -6,11 +6,23 @@ set(TARGET_NAME Engine::${MODULE_NAME})
 # 1. 소스 파일 목록 정의
 set(SOURCES
 
+    # Aliases
+    "Aliases/ManagerAccess.h"
+
+    # Core
+    "Core/AudioEmitter.h"    "Core/AudioEmitter.cpp"
+    "Core/AudioEar.h"        "Core/AudioEar.cpp"
+    "Core/AudioMixer.h"      "Core/AudioMixer.cpp"
+    "Core/AudioEngine.h"      "Core/AudioEngine.cpp"  
+    "Core/VolumeController.h"    "Core/VolumeController.cpp"
+
+    # Data
+    "Data/AudioDataSource.h"    "Data/AudioDataSource.cpp"
+    "Data/AudioBuffer.h"        "Data/AudioBuffer.cpp"
+    "Data/AudioStream.h"        "Data/AudioStream.cpp"
+       
     # Managers
     "Managers/AudioManager.h" "Managers/AudioManager.cpp"
-
-    # Utils
-    "Utils/Enums.h"
 )
 
 # 2. 빌드 타겟 생성 및 별칭 등록

@@ -77,9 +77,7 @@ set(SOURCES
     "Resource/IResourceLoader.h"     "Resource/IResourceLoader.cpp"   
     "Resource/Resource.h"            "Resource/Resource.cpp"
 
-    # Stream
-    "Stream/Stream.h"               "Stream/Stream.cpp"
-    "Stream/FileStream.h"           "Stream/FileStream.cpp" 
+    # Spatial
 
     # Containers
     "Containers/IContainer.h"       "Containers/IContainer.cpp"
