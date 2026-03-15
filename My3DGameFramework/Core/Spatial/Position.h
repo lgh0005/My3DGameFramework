@@ -16,5 +16,7 @@ namespace MGF3D
 		void operator-=(const vec3& delta);
 		
 		operator vec3() const;
+
+		vec3 AsVec3() const;
 	};
 }

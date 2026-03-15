@@ -18,6 +18,8 @@ namespace MGF3D
 
 		operator vec3() const;
 
+		vec3 AsVec3() const;
+
 	private:
 		bool IsValid(float val);
 	};

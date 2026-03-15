@@ -78,6 +78,17 @@ set(SOURCES
     "Resource/Resource.h"            "Resource/Resource.cpp"
 
     # Spatial
+    "Spatial/AABB.h"                "Spatial/AABB.cpp"
+
+    "Spatial/IBounding.h"         "Spatial/IBounding.cpp"
+    "Spatial/BoundingBox.h"         "Spatial/BoundingBox.cpp"
+    "Spatial/CullingPlane.h"         "Spatial/CullingPlane.cpp"
+    "Spatial/BoundingSphere.h"         "Spatial/BoundingSphere.cpp"
+    "Spatial/Frustum.h"             "Spatial/Frustum.cpp"
+    "Spatial/Ray.h"                 "Spatial/Ray.cpp"
+    "Spatial/RaycastHit.h"                 "Spatial/RaycastHit.cpp"
+    "Spatial/IRaycastTarget.h"      "Spatial/IRaycastTarget.cpp"
+
     "Spatial/Position.h"            "Spatial/Position.cpp"
     "Spatial/Rotation.h"            "Spatial/Rotation.cpp"
     "Spatial/Scale.h"               "Spatial/Scale.cpp"

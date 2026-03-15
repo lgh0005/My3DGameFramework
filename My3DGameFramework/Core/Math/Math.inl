@@ -58,6 +58,12 @@ namespace MGF3D
 		return glm::abs(v);
 	}
 
+	template<typename T>
+	inline constexpr T Math::Square(const T& v) noexcept
+	{
+		return v * v;
+	}
+
 	/*==========================//
 	//   Safe math operations   //
 	//==========================*/

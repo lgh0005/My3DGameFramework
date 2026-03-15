@@ -25,7 +25,7 @@
 https://github.com/user-attachments/assets/4dcd0b9c-9887-4605-9beb-d3a686255ce3
 
 다양한 시각 효과를 위해 더블 버퍼링 기반의 포스트 프로세싱 시스템을 구축하였으며, 다음과 같은 효과들을 구현하였습니다.
-구현된 효과 목록 (참고 자료: [3D Game Shaders for Beginners](https://github.com/lettier/3d-game-shaders-for-beginners), [OpenGL 한국어 강좌](https://www.youtube.com/watch?v=kEAKvJKnvfA&list=PLvNHCGtd4kh_cYLKMP_E-jwF3YKpDP4hf), [Computer Graphics with Modern OpenGL and C++](https://www.udemy.com/course/graphics-with-modern-opengl/))
+구현된 효과 목록 (참고 자료: [3D Game Shaders for Beginners](https://github.com/lettier/3d-game-shaders-for-beginners))
 - Color & Tone: ACES / Reinhard / Exposure Tone Mapping
 - Lens & Camera: 가우시안 및 Kawase Bloom, 색수차(Chromatic Aberration), 렌즈 플레이어, DOF(Depth of Field), 모션 블러
 - Artistic & Effects: 픽셀화, 포스터화, 아웃라이닝(Outlining), CRT 화면 왜곡 효과
@@ -42,7 +42,7 @@ https://github.com/user-attachments/assets/6ff0dc71-eaa0-495c-8b5f-374010f9bdc5
 > Shadow/Culling → Geometry(G-Buffer) → SSAO → Deferred Lighting → Forward Shading → Skybox → Post-Processing
 
 - 애니메이션 시스템: 상태 머신 기반의 애니메이션 블렌딩 및 본(Bone) 트랜스폼 연산 
-- 구현레이캐스팅(Raycasting): 마우스 피킹 및 물리 상호작용을 위한 레이-오브젝트 충돌 시스템
+- 레이캐스팅(Raycasting): 마우스 피킹 및 물리 상호작용을 위한 레이-오브젝트 충돌 시스템
 - 메모리 최적화를 위하여 AssetConverter를 통한 3D 모델 파일을 바이너리 파일인 .mymodel, 애니메이션은 .myanim으로 구울 수 있도록 하였고 텍스쳐는 .ktx 포멧으로 변환하는 기능을 추가하였습니다. 추가로 AO, Roughness(또는 Glossiness), Metallic 텍스쳐를 한 데 모아서 ORM 텍스쳐 패킹 시스템을 도입하였습니다.
 
 ---
@@ -60,5 +60,5 @@ https://github.com/user-attachments/assets/6ff0dc71-eaa0-495c-8b5f-374010f9bdc5
 9. Thread-Management 및 메모리 풀링 커스텀 STL 컨테이너
 10. Particle System
 11. Lua 스크립팅 연동
-12. Archetype 기반 ECS 시스템
-12. 기타 기능들 (Cloth, 오브젝트 모션 블러, GPU-Driving 등)
+12. 희소 배열 기반 ECS 시스템
+13. 기타 기능들 (Cloth, 오브젝트 모션 블러, GPU-Driving 등)

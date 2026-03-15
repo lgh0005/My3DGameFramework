@@ -3,6 +3,14 @@
 
 namespace MGF3D
 {
+	/*=================//
+	//   Simple Math   //
+	//=================*/
+	float Math::Sqrt(float v) noexcept
+	{
+		return glm::sqrt(v);
+	}
+
 	/*==========================//
 	//   Safe math operations   //
 	//==========================*/
@@ -11,6 +19,9 @@ namespace MGF3D
 		return glm::length2(v) > Epsilon2;
 	}
 
+	/*==========================//
+	//   Vector Operations      //
+	//==========================*/
 	vec3 Math::Normalize(const vec3& v)
 	{
 		float len2 = glm::length2(v);
@@ -21,6 +32,72 @@ namespace MGF3D
 	quat Math::Normalize(const quat& q)
 	{
 		return glm::normalize(q);
+	}
+
+	/*==========================//
+	//   Matrix Operations      //
+	//==========================*/
+	mat4 Math::Inverse(const mat4& m) noexcept
+	{
+		return glm::inverse(m);
+	}
+
+	mat3 Math::Inverse(const mat3& m) noexcept
+	{
+		return glm::inverse(m);
+	}
+
+	mat4 Math::Transpose(const mat4& m) noexcept
+	{
+		return glm::transpose(m);
+	}
+
+	mat3 Math::Transpose(const mat3& m) noexcept
+	{
+		return glm::transpose(m);
+	}
+
+	vec4 Math::GetRow(const mat4& m, int index) noexcept
+	{
+		return vec4(m[0][index], m[1][index], m[2][index], m[3][index]);
+	}
+
+	vec4 Math::GetColumn(const mat4& m, int index) noexcept
+	{
+		return m[index];
+	}
+
+	/*==========================//
+	//   Vector Operations      //
+	//==========================*/
+	float Math::Dot(const vec3& a, const vec3& b) noexcept
+	{
+		return glm::dot(a, b);
+	}
+
+	vec3 Math::Cross(const vec3& a, const vec3& b) noexcept
+	{
+		return glm::cross(a, b);
+	}
+
+	float Math::Length(const vec3& v) noexcept
+	{
+		return glm::length(v);
+	}
+
+	float Math::LengthSquared(const vec3& v) noexcept
+	{
+		return glm::length2(v);
+	}
+
+	float Math::Distance(const vec3& a, const vec3& b) noexcept
+	{
+		return glm::distance(a, b);
+	}
+
+	float Math::DistanceSquared(const vec3& a, const vec3& b) noexcept
+	{
+		return glm::distance2(a, b);
 	}
 
 	/*===============//

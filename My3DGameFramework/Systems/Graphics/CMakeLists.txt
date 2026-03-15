@@ -31,12 +31,6 @@ set(SOURCES
     "Framebuffers/PostProcessFrameBuffer.h"      "Framebuffers/PostProcessFrameBuffer.cpp"
     "Framebuffers/SSAOFramebuffer.h"      "Framebuffers/SSAOFramebuffer.cpp"
 
-    # Geometry
-    "Geometry/CullingPlane.h"      "Geometry/CullingPlane.cpp"
-    "Geometry/Frustum.h"      "Geometry/Frustum.cpp"
-    "Geometry/GeometryGenerator.h"      "Geometry/GeometryGenerator.cpp"
-    "Geometry/RenderBounds.h"      "Geometry/RenderBounds.cpp"
-
     # Instancing
     "Instancing/AnimBuffer.h"      "Instancing/AnimBuffer.cpp"
     "Instancing/InstanceBuffer.h"      "Instancing/InstanceBuffer.cpp"
@@ -52,6 +46,9 @@ set(SOURCES
     # Managers
     "Managers/InstanceManager.h"      "Managers/InstanceManager.cpp"
     "Managers/RenderManager.h"      "Managers/RenderManager.cpp"  "Managers/RenderManager.inl"
+
+    # Utils
+    "Utils/GeometryGenerator.h"      "Utils/GeometryGenerator.cpp"
 )
 
 # 2. 빌드 타겟 생성 및 별칭 등록

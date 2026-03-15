@@ -18,10 +18,6 @@ set(SOURCES
     "Physics/PhysicsFilters.h"                "Physics/PhysicsFilters.cpp"
     "Physics/RigidbodyConstraint.h"           "Physics/RigidbodyConstraint.cpp"
 
-    # Raycasting
-    "Raycasting/Ray.h"                  "Raycasting/Ray.cpp"
-    "Raycasting/RaycastHit.h"           "Raycasting/RaycastHit.cpp"
-
     # Utils
     "Utils/Defines.h"
 )

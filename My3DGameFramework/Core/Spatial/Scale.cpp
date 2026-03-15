@@ -29,6 +29,11 @@ namespace MGF3D
 		return vec3(x, y, z);
 	}
 
+	vec3 Scale::AsVec3() const
+	{
+		return vec3(x, y, z);
+	}
+
 	bool Scale::IsValid(float val)
 	{
 		if (Math::HasValue(val)) return val;

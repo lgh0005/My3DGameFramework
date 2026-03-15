@@ -2,7 +2,7 @@
 
 namespace MGF3D
 {
-	class Rotation
+	struct Rotation
 	{
 		quat value{ 1.0f, 0.0f, 0.0f, 0.0f };
 

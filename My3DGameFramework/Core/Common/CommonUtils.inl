@@ -21,7 +21,7 @@ namespace MGF3D
 	}
 
 	template<typename T>
-	inline void Swap(T& a, T& b)
+	inline constexpr void CommonUtils::Swap(T& a, T& b)
 	{
 		T temp = std::move(a);
 		a = std::move(b);
