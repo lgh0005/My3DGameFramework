@@ -1,3 +1,4 @@
+#pragma once
 #include "Containers/TDeque.h"
 #include "Memory/SlabAllocator.h"
 

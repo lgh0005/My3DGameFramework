@@ -9,9 +9,11 @@ set(SOURCES
     # Aliases
     "Aliases/ManagerAccess.h"
 
-    # Core
-    "Core/JoltCallbacks.h"              "Core/JoltCallbacks.cpp"
-    "Core/JoltConfig.h"                 "Core/JoltConfig.cpp"
+    # Common
+    "Common/Types.h"
+    "Common/JPHMath.h"         "Common/JPHMath.cpp"        "Common/JPHMath.inl"
+    "Common/JoltCallbacks.h"   "Common/JoltCallbacks.cpp"
+    "Common/JoltConfig.h"      "Common/JoltConfig.cpp"
 
     # Debug
     "Debug/JoltDiagnostic.h"                 "Debug/JoltDiagnostic.cpp"
@@ -22,6 +24,7 @@ set(SOURCES
 
     # Managers
     "Managers/PhysicsManager.h"               "Managers/PhysicsManager.cpp"
+    "Managers/CollisionManager.h"               "Managers/CollisionManager.cpp"
     "Managers/JoltJobManager.h"               "Managers/JoltJobManager.cpp"
     "Managers/JoltMemoryManager.h"            "Managers/JoltMemoryManager.cpp"
 
@@ -46,10 +49,6 @@ set(SOURCES
     # Events
     "Events/JoltActiveListener.h"           "Events/JoltActiveListener.cpp"
     "Events/JoltContactListener.h"          "Events/JoltContactListener.cpp"
-
-    # Utils
-    "Utils/Types.h"
-    "Utils/JPHMath.h"         "Utils/JPHMath.cpp"        "Utils/JPHMath.inl"
 )
 
 # 2. 빌드 타겟 생성 및 별칭 등록
