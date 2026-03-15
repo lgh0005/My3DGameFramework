@@ -45,6 +45,9 @@ namespace MGF3D
         void PushBack(const T& value);
         void PushBack(T&& value);
 
+        void Resize(usize n) { m_vector.resize(n); }
+        void Resize(usize n, const T& value) { m_vector.resize(n, value); }
+
         usize Capacity() const;
         void Assign(usize n, const T& value);
         void Reserve(usize n);

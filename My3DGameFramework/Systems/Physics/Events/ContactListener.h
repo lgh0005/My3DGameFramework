@@ -1,5 +1,7 @@
 ﻿#pragma once
-#include <Jolt/Physics/Collision/ContactListener.h>
+
+// INFO : 리팩토링할 때 GameObject와 Component가 어느 정도 안정화가 되어야
+// 가능함
 
 namespace MGF3D
 {
@@ -17,8 +19,8 @@ namespace MGF3D
 		uint64 body2UserData;
 	};
 
-	CLASS_PTR(PhysicsContactListener)
-		class PhysicsContactListener final : public JPH::ContactListener
+	MGF_CLASS_PTR(PhysicsContactListener)
+	class PhysicsContactListener final : public JPH::ContactListener
 	{
 	public:
 		PhysicsContactListener();

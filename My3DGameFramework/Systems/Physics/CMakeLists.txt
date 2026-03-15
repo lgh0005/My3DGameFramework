@@ -12,8 +12,7 @@ set(SOURCES
     # Common
     "Common/Types.h"
     "Common/JPHMath.h"         "Common/JPHMath.cpp"        "Common/JPHMath.inl"
-    "Common/JoltCallbacks.h"   "Common/JoltCallbacks.cpp"
-    "Common/JoltConfig.h"      "Common/JoltConfig.cpp"
+    "Common/JoltConstants.h"   "Common/JoltConstants.cpp"
 
     # Debug
     "Debug/JoltDiagnostic.h"                 "Debug/JoltDiagnostic.cpp"
@@ -33,7 +32,7 @@ set(SOURCES
     "Memory/JoltMemoryPool.h"         "Memory/JoltMemoryPool.cpp"
 
     # Query
-    "Query/PhysicsQuery.h"         "Query/PhysicsQuery.cpp"
+    "Query/JoltQuery.h"         "Query/JoltQuery.cpp"
 
     # Raycast
     "Raycast/JoltRay.h"                "Raycast/JoltRay.cpp"
@@ -43,12 +42,12 @@ set(SOURCES
     "Body/RigidbodyConstraint.h"              "Body/RigidbodyConstraint.cpp"
 
     # Collision
-    "Collision/JoltBPLayerInterface.h"              "Collision/JoltBPLayerInterface.cpp"
-    "Collision/JoltPhysicsFilters.h"                "Collision/JoltPhysicsFilters.cpp"
+    "Collision/CollisionBulider.h"              "Collision/CollisionBulider.cpp"
+    "Collision/JoltFilterSet.h"              "Collision/JoltFilterSet.cpp"
 
     # Events
-    "Events/JoltActiveListener.h"           "Events/JoltActiveListener.cpp"
-    "Events/JoltContactListener.h"          "Events/JoltContactListener.cpp"
+    "Events/ActiveListener.h"           "Events/ActiveListener.cpp"
+    "Events/ContactListener.h"          "Events/ContactListener.cpp"
 )
 
 # 2. 빌드 타겟 생성 및 별칭 등록

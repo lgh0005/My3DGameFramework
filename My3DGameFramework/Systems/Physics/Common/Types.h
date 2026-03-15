@@ -16,9 +16,9 @@ namespace MGF3D
     /*================================//
     //      Jolt Core Aliases         //
     //================================*/
-    using PhysicsSystemUPtr     = UniquePtr<::JPH::PhysicsSystem>;
-    using TempAllocatorImplUPtr = UniquePtr<::JPH::TempAllocatorImpl>;
-    using JobSystemUPtr         = UniquePtr<::JPH::JobSystem>;
+    using PhysicsSystemUPtr = UniquePtr<::JPH::PhysicsSystem>;
+    using TempAllocatorUPtr = UniquePtr<::JPH::TempAllocatorImpl>;
+    using JobSystemUPtr     = UniquePtr<::JPH::JobSystem>;
 
     /*================================//
     //      Common Physics Types      //

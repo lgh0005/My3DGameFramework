@@ -37,6 +37,7 @@ namespace MGF3D
     public:
         Ptr<V> Find(const K& key);
         Ptr<const V> Find(const K& key) const;
+        bool Contains(const K& key) const { return m_map.find(key) != m_map.end(); }
 
         template <typename ArgK, typename ArgV>
         bool Insert(ArgK&& key, ArgV&& value);
