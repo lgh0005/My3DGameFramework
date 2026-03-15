@@ -1,4 +1,9 @@
 ﻿#pragma once
+
+#ifdef _DEBUG
+	#define JPH_ENABLE_ASSERTS
+#endif
+
 #include <Jolt/Physics/Collision/ObjectLayer.h>
 #include <Jolt/Physics/Collision/BroadPhase/BroadPhaseLayer.h>
 

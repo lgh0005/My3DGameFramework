@@ -6,20 +6,50 @@ set(TARGET_NAME Engine::${MODULE_NAME})
 # 1. 소스 파일 목록 정의
 set(SOURCES
 
+    # Aliases
+    "Aliases/ManagerAccess.h"
+
+    # Core
+    "Core/JoltCallbacks.h"              "Core/JoltCallbacks.cpp"
+    "Core/JoltConfig.h"                 "Core/JoltConfig.cpp"
+
+    # Debug
+    "Debug/JoltDiagnostic.h"                 "Debug/JoltDiagnostic.cpp"
+
+    # Job
+    "Job/JoltJob.h"               "Job/JoltJob.cpp"
+    "Job/JoltJobSystem.h"         "Job/JoltJobSystem.cpp"
+
     # Managers
     "Managers/PhysicsManager.h"               "Managers/PhysicsManager.cpp"
+    "Managers/JoltJobManager.h"               "Managers/JoltJobManager.cpp"
+    "Managers/JoltMemoryManager.h"            "Managers/JoltMemoryManager.cpp"
 
-    # Jolt Implements
-    "Physics/BPLayerInterface.h"              "Physics/BPLayerInterface.cpp"
-    "Physics/PhysicsBodyActivationListener.h" "Physics/PhysicsBodyActivationListener.cpp"
-    "Physics/PhysicsContactListener.h"        "Physics/PhysicsContactListener.cpp"
-    "Physics/PhysicsCallbacks.h"              "Physics/PhysicsCallbacks.cpp"
-    "Physics/PhysicsConfig.h"                 "Physics/PhysicsConfig.cpp"
-    "Physics/PhysicsFilters.h"                "Physics/PhysicsFilters.cpp"
-    "Physics/RigidbodyConstraint.h"           "Physics/RigidbodyConstraint.cpp"
+    # Memory
+    "Memory/JoltAllocator.h"         "Memory/JoltAllocator.cpp"
+    "Memory/JoltMemoryPool.h"         "Memory/JoltMemoryPool.cpp"
+
+    # Query
+    "Query/PhysicsQuery.h"         "Query/PhysicsQuery.cpp"
+
+    # Raycast
+    "Raycast/JoltRay.h"                "Raycast/JoltRay.cpp"
+    "Raycast/JoltRaycastHit.h"         "Raycast/JoltRaycastHit.cpp"
+
+    # Body
+    "Body/RigidbodyConstraint.h"              "Body/RigidbodyConstraint.cpp"
+
+    # Collision
+    "Collision/JoltBPLayerInterface.h"              "Collision/JoltBPLayerInterface.cpp"
+    "Collision/JoltPhysicsFilters.h"                "Collision/JoltPhysicsFilters.cpp"
+
+    # Events
+    "Events/JoltActiveListener.h"           "Events/JoltActiveListener.cpp"
+    "Events/JoltContactListener.h"          "Events/JoltContactListener.cpp"
 
     # Utils
-    "Utils/Defines.h"
+    "Utils/Types.h"
+    "Utils/JPHMath.h"         "Utils/JPHMath.cpp"        "Utils/JPHMath.inl"
 )
 
 # 2. 빌드 타겟 생성 및 별칭 등록
