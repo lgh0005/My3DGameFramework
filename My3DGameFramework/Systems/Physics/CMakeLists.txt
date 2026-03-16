@@ -28,11 +28,11 @@ set(SOURCES
     "Memory/JoltAllocator.h"         "Memory/JoltAllocator.cpp"
     "Memory/JoltMemoryPool.h"         "Memory/JoltMemoryPool.cpp"
 
-    # Query
-    "Query/IPhysicsQuery.h"         "Query/IPhysicsQuery.cpp"
-    "Query/OverlapQuery.h"         "Query/OverlapQuery.cpp"
-    "Query/RaycastQuery.h"         "Query/RaycastQuery.cpp"
-    "Query/ShapeCastQuery.h"         "Query/ShapeCastQuery.cpp"
+    # Queries
+    "Queries/IPhysicsQuery.h"         "Queries/IPhysicsQuery.cpp"
+    "Queries/OverlapQuery.h"         "Queries/OverlapQuery.cpp"
+    "Queries/RaycastQuery.h"         "Queries/RaycastQuery.cpp"
+    "Queries/ShapeCastQuery.h"         "Queries/ShapeCastQuery.cpp"
 
     # Raycast
     "Raycast/JoltRay.h"                "Raycast/JoltRay.cpp"
