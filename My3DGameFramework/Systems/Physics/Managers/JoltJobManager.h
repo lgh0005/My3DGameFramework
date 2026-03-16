@@ -6,10 +6,16 @@ namespace MGF3D
 	{
 		MGF_DECLARE_SINGLE(JoltJobManager)
 
-	public:
+	private:
+		JoltJobManager();
+		~JoltJobManager();
 
+	public:
+		bool Init();
+		void Shutdown();
+		Ptr<JPH::JobSystem> GetJobSystem() const;
 
 	private:
-
+		JobSystemThreadPoolUPtr m_jobSystem;
 	};
 }

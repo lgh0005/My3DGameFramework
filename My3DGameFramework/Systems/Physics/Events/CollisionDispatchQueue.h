@@ -2,7 +2,7 @@
 
 namespace MGF3D
 {
-	class JoltQuery
+	class CollisionDispatchQueue
 	{
 
 	};

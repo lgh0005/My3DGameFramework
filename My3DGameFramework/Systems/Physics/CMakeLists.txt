@@ -17,13 +17,10 @@ set(SOURCES
     # Debug
     "Debug/JoltDiagnostic.h"                 "Debug/JoltDiagnostic.cpp"
 
-    # Job
-    "Job/JoltJob.h"               "Job/JoltJob.cpp"
-    "Job/JoltJobSystem.h"         "Job/JoltJobSystem.cpp"
-
     # Managers
     "Managers/PhysicsManager.h"               "Managers/PhysicsManager.cpp"
     "Managers/CollisionManager.h"               "Managers/CollisionManager.cpp"
+    "Managers/RaycastManager.h"               "Managers/RaycastManager.cpp"
     "Managers/JoltJobManager.h"               "Managers/JoltJobManager.cpp"
     "Managers/JoltMemoryManager.h"            "Managers/JoltMemoryManager.cpp"
 
@@ -31,10 +28,8 @@ set(SOURCES
     "Memory/JoltAllocator.h"         "Memory/JoltAllocator.cpp"
     "Memory/JoltMemoryPool.h"         "Memory/JoltMemoryPool.cpp"
 
-    # Query
-    "Query/JoltQuery.h"         "Query/JoltQuery.cpp"
-
     # Raycast
+    "Raycast/JoltRayQuery.h"           "Raycast/JoltRayQuery.cpp"
     "Raycast/JoltRay.h"                "Raycast/JoltRay.cpp"
     "Raycast/JoltRaycastHit.h"         "Raycast/JoltRaycastHit.cpp"
 
@@ -46,8 +41,13 @@ set(SOURCES
     "Collision/JoltFilterSet.h"              "Collision/JoltFilterSet.cpp"
 
     # Events
+    "Events/CollisionEvent.h"           "Events/CollisionEvent.cpp"
+    "Events/CollisionDispatchQueue.h"   "Events/CollisionDispatchQueue.cpp"
     "Events/ActiveListener.h"           "Events/ActiveListener.cpp"
     "Events/ContactListener.h"          "Events/ContactListener.cpp"
+
+    # Utils
+    "Utils/JoltMathBridge.h"            "Utils/JoltMathBridge.cpp"        "Utils/JoltMathBridge.inl"
 )
 
 # 2. 빌드 타겟 생성 및 별칭 등록

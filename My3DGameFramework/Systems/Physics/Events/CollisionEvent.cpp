@@ -1,5 +1,5 @@
 #include "PhysicsPch.h"
-#include "JoltQuery.h"
+#include "CollisionEvent.h"
 
 namespace MGF3D
 {

@@ -8,6 +8,8 @@ namespace MGF3D
 	/*=====================================//
 	//    default engine memory constants  //
 	//=====================================*/
+	// TODO : 이것도 Constant로 들어가야 할 것이 아니라 MemoryUtils에 들어가야 할 중요한
+	// 메모리와 관련된 상수들의 모음들임.
 	static constexpr usize DefaultAlignment = 16;
 	static constexpr usize InitialPoolSize = 4 * 1024 * 1024;
 	static constexpr usize SlabMaxSize = 4096;

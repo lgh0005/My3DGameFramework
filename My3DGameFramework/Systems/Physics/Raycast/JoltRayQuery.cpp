@@ -1,5 +1,5 @@
 #include "PhysicsPch.h"
-#include "JoltThreadPool.h"
+#include "JoltRayQuery.h"
 
 namespace MGF3D
 {

@@ -29,6 +29,7 @@
 #include <Jolt/Physics/Collision/ContactListener.h>
 #include <Jolt/Physics/Collision/ObjectLayer.h>
 #include <Jolt/Physics/Collision/BroadPhase/BroadPhaseLayer.h>
+#include <Jolt/Physics/Collision/NarrowPhaseQuery.h>
 #include <Jolt/Physics/Collision/RayCast.h>
 #include <Jolt/Physics/Collision/CastResult.h>
 #include <Jolt/Physics/Collision/Shape/Shape.h>
@@ -48,3 +49,8 @@
 //=============================*/
 #include "Common/Types.h"
 #include "Common/JPHMath.h"
+
+/*===========================//
+//    Physics common utils   //
+//===========================*/
+#include "Utils/JoltMathBridge.h"
