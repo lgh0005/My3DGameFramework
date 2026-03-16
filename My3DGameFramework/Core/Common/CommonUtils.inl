@@ -27,15 +27,4 @@ namespace MGF3D
 		a = std::move(b);
 		b = std::move(temp);
 	}
-
-	template<typename T>
-	inline void CommonUtils::MemZero(T& value)
-	{
-		std::memset(&value, 0, sizeof(T));
-	}
-
-	inline void CommonUtils::Memset(void* dest, int value, size_t size)
-	{
-		std::memset(dest, value, size);
-	}
 }

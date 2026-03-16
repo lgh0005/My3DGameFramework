@@ -1,38 +1,32 @@
 #include "MiddlewarePch.h"
 #include "GLFWAllocateHelper.h"
 #include "Managers/MemoryManager.h"
-#include <GLFW/glfw3.h>
+#include "Utils/MemoryUtils.h"
 
 namespace MGF3D
 {
 	void* GLFWAllocateHelper::GLFW_Allocate(usize size, void*)
 	{
 		// 1. 헤더 크기만큼 더 할당
-		usize totalSize = size + sizeof(GLFWMemHeader);
+		usize totalSize = MemoryUtils::GetRequiredSizeWithHeader(size, DefaultAlignment);
 
 		// 2. MemoryManager에서 할당 (4096 이하면 Slab, 넘으면 System)
 		void* ptr = MGF_MEMORY.Allocate(totalSize);
 		if (!ptr) return nullptr;
 
-		// 3. 앞부분에 크기 기록하고 실제 데이터 시작 주소 반환
-		GLFWMemHeader* header = static_cast<GLFWMemHeader*>(ptr);
-		header->size = totalSize;
-
-		// 4. 헤더 바로 뒤의 주소(사용자가 쓸 실제 데이터 영역)를 반환
-		// 포인터 연산에 의해 header + 1은 sizeof(GLFWMemHeader)만큼 뒤를 가리킵니다.
-		return header + 1;
+		// 3. 헤더 패킹 및 사용자가 쓸 완벽하게 정렬된 주소 반환
+		return MemoryUtils::PackHeader(ptr, totalSize, DefaultAlignment);
 	}
 
 	void GLFWAllocateHelper::GLFW_Deallocate(void* block, void* user)
 	{
 		if (!block) return;
 
-		// 1. 사용자 데이터 주소에서 헤더 크기만큼 뒤로 이동하여 헤더 위치 탐색
-		GLFWMemHeader* header = static_cast<GLFWMemHeader*>(block) - 1;
+		// 1. 숨겨진 엔진 표준 헤더 언패킹
+		MemoryHeader* header = MemoryUtils::UnpackHeader(block);
 
-		// 2. 헤더에 적혀있던 '할당 당시 전체 크기'를 인자로 넘겨 MemoryManager가 버킷을 찾게 함
-		// 이로써 GLFW의 메모리도 완벽하게 Slab Pool로 반환되거나 시스템 해제됩니다.
-		MGF_MEMORY.Deallocate(header, header->size);
+		// 2. 헤더에 보존된 원본 주소(rawPtr)와 원본 크기(size)로 완벽한 해제
+		MGF_MEMORY.Deallocate(header->rawPtr, header->size);
 	}
 
 	void* GLFWAllocateHelper::GLFW_Reallocate(void* block, usize size, void* user)
@@ -49,11 +43,12 @@ namespace MGF3D
 		void* newBlock = GLFW_Allocate(size, user);
 		if (newBlock) 
 		{
-			// 2. 기존 블록의 헤더에서 원본 크기 획득
-			GLFWMemHeader* oldHeader = static_cast<GLFWMemHeader*>(block) - 1;
-			usize oldDataSize = oldHeader->size - sizeof(GLFWMemHeader);
+			// 3. 기존 블록의 헤더에서 정보 획득
+			// 기존 데이터의 순수 크기 역산 : (전체 크기 - 헤더 크기 - 정렬 패딩)
+			Ptr<MemoryHeader> oldHeader = MemoryUtils::UnpackHeader(block);
+			usize oldDataSize = oldHeader->size - sizeof(MemoryHeader) - DefaultAlignment;
 
-			// 3. 기존 데이터와 새 데이터 크기 중 작은 쪽을 선택하여 안전하게 복사
+			// 4. 기존 데이터와 새 데이터 크기 중 작은 쪽을 선택하여 안전하게 복사
 			usize copySize = CommonUtils::Select
 			(
 				(oldDataSize < size),
@@ -61,9 +56,9 @@ namespace MGF3D
 				size
 			);
 
-			std::memcpy(newBlock, block, copySize);
+			MemoryUtils::Memcpy(newBlock, block, copySize);
 
-			// 4. 복사가 끝났으니 기존 블록은 제거
+			// 5. 복사가 끝났으니 기존 블록은 제거
 			GLFW_Deallocate(block, user);
 		}
 		return newBlock;

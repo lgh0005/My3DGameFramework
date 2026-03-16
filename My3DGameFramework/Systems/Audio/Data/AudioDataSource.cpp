@@ -1,4 +1,5 @@
 #include "AudioPch.h"
+#include "Utils/MemoryUtils.h"
 #include "AudioDataSource.h"
 
 namespace MGF3D
@@ -6,7 +7,7 @@ namespace MGF3D
 	AudioDataSource::AudioDataSource(ma_engine& engine)
 		: m_audioEngine(engine)
 	{
-		CommonUtils::MemZero(m_dataSource);
+		MemoryUtils::MemZero(m_dataSource);
 	}
 
 	AudioDataSource::~AudioDataSource()

@@ -1,4 +1,5 @@
 #include "AudioPch.h"
+#include "Utils/MemoryUtils.h"
 #include "AudioEmitter.h"
 
 namespace MGF3D
@@ -6,7 +7,7 @@ namespace MGF3D
 	AudioEmitter::AudioEmitter(ma_engine& engine)
 		: m_audioEngine(engine)
 	{
-		CommonUtils::MemZero(m_sound);
+		MemoryUtils::MemZero(m_sound);
 	}
 
 	AudioEmitter::~AudioEmitter()

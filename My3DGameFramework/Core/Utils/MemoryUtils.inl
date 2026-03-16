@@ -3,6 +3,25 @@
 
 namespace MGF3D
 {
+	template<typename T>
+	inline void MemoryUtils::MemZero(T& value) noexcept
+	{
+		MGF_STATIC_ASSERT(std::is_trivially_copyable_v<T>, "MemZero must be used with trivially copyable types!");
+		std::memset(&value, 0, sizeof(T));
+	}
+
+	inline void MemoryUtils::Memset(void* dest, int value, size_t size) noexcept
+	{
+		MGF_ASSERT(dest != nullptr && size > 0, "Memset: Invalid pointer or size!");
+		std::memset(dest, value, size);
+	}
+
+	inline void MemoryUtils::Memcpy(void* dest, const void* src, usize size) noexcept
+	{
+		MGF_ASSERT(dest != nullptr && src != nullptr && size > 0, "Memcpy: Invalid pointers or size!");
+		std::memcpy(dest, src, size);
+	}
+
 	// INFO : 쉽게 말해서 우리가 구현한 메모리 풀에 메모리를 할당할 때는
 	// MIN_ALIGNMENT의 배수 크기로 할당이 되어야 하는데 37, 52 바이트와 같은 크기의
 	// 메모리 할당을 할 때 이들은 어쩔 수 없이 패딩 값을 둬서 가장 근접한 MIN_ALIGNMENT의
@@ -43,5 +62,48 @@ namespace MGF3D
 		if (value & 0x2U) { result += 1; }
 
 		return result;
+	}
+
+	template<typename T>
+	inline T* MemoryUtils::PtrAdd(void* ptr, usize offset) noexcept
+	{
+		return reinterpret_cast<T*>(reinterpret_cast<uintptr>(ptr) + offset);
+	}
+
+	template<typename T>
+	inline T* MemoryUtils::PtrSub(void* ptr, usize offset) noexcept
+	{
+		return reinterpret_cast<T*>(reinterpret_cast<uintptr>(ptr) - offset);
+	}
+
+	inline constexpr usize MemoryUtils::GetRequiredSizeWithHeader(usize requestedSize, usize alignment) noexcept
+	{
+		return requestedSize + sizeof(MemoryHeader) + alignment;
+	}
+
+	inline void* MemoryUtils::PackHeader(void* rawPtr, usize totalSize, usize alignment) noexcept
+	{
+		if (!rawPtr) return nullptr;
+
+		// 1. 헤더가 들어갈 공간만큼 포인터 전진
+		void* headerEndPtr = PtrAdd(rawPtr, sizeof(MemoryHeader));
+
+		// 2. 정렬된 주소 계산
+		uintptr alignedAddr = AlignUp(reinterpret_cast<uintptr>(headerEndPtr), alignment);
+		void* alignedPtr = reinterpret_cast<void*>(alignedAddr);
+
+		// 3. 정렬된 주소에서 헤더 크기만큼 뒤로 물러나서 정보 기록
+		Ptr<MemoryHeader> header = PtrSub<MemoryHeader>(alignedPtr, sizeof(MemoryHeader));
+		header->rawPtr = rawPtr;
+		header->size = totalSize;
+
+		// 4. 사용자가 쓸 깨끗하게 정렬된 주소 반환
+		return alignedPtr;
+	}
+
+	inline Ptr<MemoryHeader> MemoryUtils::UnpackHeader(void* userPtr) noexcept
+	{
+		if (!userPtr) return nullptr;
+		return PtrSub<MemoryHeader>(userPtr, sizeof(MemoryHeader));
 	}
 }
