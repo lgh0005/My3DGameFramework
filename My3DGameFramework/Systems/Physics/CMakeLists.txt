@@ -19,8 +19,8 @@ set(SOURCES
 
     # Managers
     "Managers/PhysicsManager.h"               "Managers/PhysicsManager.cpp"
+    "Managers/PhysicsQueryManager.h"               "Managers/PhysicsQueryManager.cpp"
     "Managers/CollisionManager.h"               "Managers/CollisionManager.cpp"
-    "Managers/RaycastManager.h"               "Managers/RaycastManager.cpp"
     "Managers/JoltJobManager.h"               "Managers/JoltJobManager.cpp"
     "Managers/JoltMemoryManager.h"            "Managers/JoltMemoryManager.cpp"
 
@@ -28,8 +28,13 @@ set(SOURCES
     "Memory/JoltAllocator.h"         "Memory/JoltAllocator.cpp"
     "Memory/JoltMemoryPool.h"         "Memory/JoltMemoryPool.cpp"
 
+    # Query
+    "Query/IPhysicsQuery.h"         "Query/IPhysicsQuery.cpp"
+    "Query/OverlapQuery.h"         "Query/OverlapQuery.cpp"
+    "Query/RaycastQuery.h"         "Query/RaycastQuery.cpp"
+    "Query/ShapeCastQuery.h"         "Query/ShapeCastQuery.cpp"
+
     # Raycast
-    "Raycast/JoltRayQuery.h"           "Raycast/JoltRayQuery.cpp"
     "Raycast/JoltRay.h"                "Raycast/JoltRay.cpp"
     "Raycast/JoltRaycastHit.h"         "Raycast/JoltRaycastHit.cpp"
 
