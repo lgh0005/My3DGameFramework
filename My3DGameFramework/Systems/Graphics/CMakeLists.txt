@@ -6,6 +6,9 @@ set(TARGET_NAME Engine::${MODULE_NAME})
 # 1. 소스 파일 목록 정의
 set(SOURCES
 
+    # Module
+    "GraphicsModule.h"              "GraphicsModule.cpp"
+
     # Animation
     "Animation/AnimChannel.h"       "Animation/AnimChannel.cpp"
     "Animation/AnimClip.h"          "Animation/AnimClip.cpp"
@@ -13,11 +16,11 @@ set(SOURCES
     "Animation/Skeleton.h"          "Animation/Skeleton.cpp"
 
     # Buffers
-    "Buffers/Buffer.h"      "Buffers/Buffer.cpp"
-    "Buffers/IndexBuffer.h"      "Buffers/IndexBuffer.cpp"
-    "Buffers/ShaderStorageBuffer.h"      "Buffers/ShaderStorageBuffer.cpp"
-    "Buffers/UniformBuffer.h"      "Buffers/UniformBuffer.cpp"
-    "Buffers/VertexBuffer.h"      "Buffers/VertexBuffer.cpp"
+    "Buffers/GLBufferHandle.h"          "Buffers/GLBufferHandle.cpp"
+    "Buffers/GLIndexBuffer.h"           "Buffers/GLIndexBuffer.cpp"
+    "Buffers/GLShaderStorageBuffer.h"   "Buffers/GLShaderStorageBuffer.cpp"
+    "Buffers/GLUniformBuffer.h"         "Buffers/GLUniformBuffer.cpp"
+    "Buffers/GLVertexBuffer.h"          "Buffers/GLVertexBuffer.cpp"
 
     # Framebuffers
     "Framebuffers/FramebufferBase.h"      "Framebuffers/FramebufferBase.cpp"
@@ -32,11 +35,11 @@ set(SOURCES
     "Framebuffers/SSAOFramebuffer.h"      "Framebuffers/SSAOFramebuffer.cpp"
 
     # Instancing
-    "Instancing/AnimBuffer.h"      "Instancing/AnimBuffer.cpp"
-    "Instancing/InstanceBuffer.h"      "Instancing/InstanceBuffer.cpp"
-    "Instancing/InstanceProperty.h"      "Instancing/InstanceProperty.cpp"
-    "Instancing/RenderBatch.h"      "Instancing/RenderBatch.cpp"
-    "Instancing/RenderQueue.h"      "Instancing/RenderQueue.cpp"
+    "Instancing/AnimBuffer.h"           "Instancing/AnimBuffer.cpp"
+    "Instancing/InstanceBuffer.h"       "Instancing/InstanceBuffer.cpp"
+    "Instancing/InstanceProperty.h"     "Instancing/InstanceProperty.cpp"
+    "Instancing/RenderBatch.h"          "Instancing/RenderBatch.cpp"
+    "Instancing/RenderQueue.h"          "Instancing/RenderQueue.cpp"
 
     # Layouts
     "Layouts/Uniform.h"      "Layouts/Uniform.cpp"
@@ -65,14 +68,16 @@ target_include_directories(${LIB_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 target_link_libraries(${LIB_NAME} PUBLIC
 
 PRIVATE
-    KTX::ktx
-    assimp::assimp
+    # KTX::ktx
+    # assimp::assimp
+    glad::glad
+    glfw
     Engine::Core
 )
 
 # 6. PCH (Precompiled Header) 설정
 # 옵션 A: 이 라이브러리만의 개별 PCH를 사용할 경우
-target_precompile_headers(${LIB_NAME} PRIVATE "RenderingPch.h")
+target_precompile_headers(${LIB_NAME} PRIVATE "GraphicsPch.h")
 
 # 옵션 B: CoreLib에 정의된 PCH를 재사용할 경우 (빌드 속도 최적화)
 # target_precompile_headers(${LIB_NAME} REUSE_FROM CoreLib)

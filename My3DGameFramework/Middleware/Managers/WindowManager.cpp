@@ -45,6 +45,7 @@ namespace MGF3D
         return glfwWindowShouldClose(GetNativeWindow());
     }
 
+    // TODO : 런타임 전용 CommonUtils::Select도 필요하다.
     Ptr<GLFWwindow> WindowManager::GetNativeWindow() const
     {
         return m_mainWindow ? m_mainWindow->GetHandle() : nullptr;

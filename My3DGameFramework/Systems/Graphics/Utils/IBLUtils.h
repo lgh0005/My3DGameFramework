@@ -1,5 +1,9 @@
 ﻿#pragma once
 
+// TODO : 지금은 이렇게 정적 메서드로 담아뒀지만
+// 그냥 렌더링 파이프라인처럼 IBL을 뽑아내는 그러한
+// 일련의 클래스로 둬도 괜찮음.
+
 namespace MGF3D
 {
     MGF_CLASS_PTR(Program)
