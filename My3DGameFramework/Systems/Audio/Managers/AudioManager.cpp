@@ -38,19 +38,19 @@ namespace MGF3D
 		m_channels.Release();
 
 		// 2. 엔진 종료
-		if (m_engine)
-		{
+		if (m_engine) 
 			m_engine->Shutdown();
-			m_engine.reset();
-		}
 
 		MGF_LOG_INFO("AudioManager: Dynamic system shutdown complete.");
 	}
 
 	bool AudioManager::CreateChannel(const SString& name)
 	{
+		// 이름 해시값 추출
+		StringHash nameHash = name.Hash();
+
 		// 이미 존재하는 채널인지 확인
-		if (m_channels.Find(name) != nullptr)
+		if (m_channels.Find(nameHash) != nullptr)
 		{
 			MGF_LOG_WARN("AudioManager: Channel '{}' already exists.", name.CStr());
 			return false;
@@ -68,17 +68,17 @@ namespace MGF3D
 		newMixer->SetVolume(1.0f);
 
 		// 4. 맵에 등록 (소유권 이전)
-		bool result = m_channels.Insert(name, std::move(newMixer));
+		bool result = m_channels.Insert(nameHash, std::move(newMixer));
 
 		if (result)
-			MGF_LOG_INFO("AudioManager: New channel '{}' created with default volume (100%%).", name.CStr());
+			MGF_LOG_INFO("AudioManager: New channel '{}' created with default volume (100%).", name.CStr());
 		
 		return result;
 	}
 
 	Ptr<AudioMixer> AudioManager::GetMixer(const SString& name)
 	{
-		auto pMixerUPtr = m_channels.Find(name);
+		auto pMixerUPtr = m_channels.Find(name.Hash());
 
 		// 내부의 실제 AudioMixer 포인터를 반환
 		if (pMixerUPtr && *pMixerUPtr)

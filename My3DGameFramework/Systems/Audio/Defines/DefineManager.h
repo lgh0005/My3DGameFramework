@@ -3,4 +3,4 @@
 /*==============================================//
 //     Default Audio library manager aliases    //
 //==============================================*/
-#define MGF_AUDIO AudioManager::Instnace()
+#define MGF_AUDIO AudioManager::Instance()

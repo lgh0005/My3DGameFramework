@@ -11,7 +11,7 @@ namespace MGF3D
 		~PhysicsManager();
 
 	public:
-		void Init();
+		bool Init();
 		void Update(float deltaTime);
 		void Shutdown();
 

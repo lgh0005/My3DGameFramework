@@ -6,8 +6,11 @@ set(TARGET_NAME Engine::${MODULE_NAME})
 # 1. 소스 파일 목록 정의
 set(SOURCES
 
-    # Aliases
-    "Aliases/ManagerAccess.h"
+    # Module    
+    "PhysicsModule.h"       "PhysicsModule.cpp"
+
+    # Defines
+    "Defines/DefineManager.h"
 
     # Common
     "Common/Types.h"
@@ -29,27 +32,27 @@ set(SOURCES
     "Memory/JoltMemoryPool.h"         "Memory/JoltMemoryPool.cpp"
 
     # Queries
-    "Queries/IPhysicsQuery.h"         "Queries/IPhysicsQuery.cpp"
-    "Queries/OverlapQuery.h"         "Queries/OverlapQuery.cpp"
-    "Queries/RaycastQuery.h"         "Queries/RaycastQuery.cpp"
-    "Queries/ShapeCastQuery.h"         "Queries/ShapeCastQuery.cpp"
+    # "Queries/IPhysicsQuery.h"         "Queries/IPhysicsQuery.cpp"
+    # "Queries/OverlapQuery.h"         "Queries/OverlapQuery.cpp"
+    # "Queries/RaycastQuery.h"         "Queries/RaycastQuery.cpp"
+    # "Queries/ShapeCastQuery.h"         "Queries/ShapeCastQuery.cpp"
 
     # Raycast
     "Raycast/JoltRay.h"                "Raycast/JoltRay.cpp"
     "Raycast/JoltRaycastHit.h"         "Raycast/JoltRaycastHit.cpp"
 
     # Body
-    "Body/RigidbodyConstraint.h"              "Body/RigidbodyConstraint.cpp"
+    # "Body/RigidbodyConstraint.h"              "Body/RigidbodyConstraint.cpp"
 
     # Collision
     "Collision/CollisionBulider.h"              "Collision/CollisionBulider.cpp"
     "Collision/JoltFilterSet.h"              "Collision/JoltFilterSet.cpp"
 
     # Events
-    "Events/CollisionEvent.h"           "Events/CollisionEvent.cpp"
-    "Events/CollisionDispatchQueue.h"   "Events/CollisionDispatchQueue.cpp"
-    "Events/ActiveListener.h"           "Events/ActiveListener.cpp"
-    "Events/ContactListener.h"          "Events/ContactListener.cpp"
+    # "Events/CollisionEvent.h"           "Events/CollisionEvent.cpp"
+    # "Events/CollisionDispatchQueue.h"   "Events/CollisionDispatchQueue.cpp"
+    # "Events/ActiveListener.h"           "Events/ActiveListener.cpp"
+    # "Events/ContactListener.h"          "Events/ContactListener.cpp"
 
     # Utils
     "Utils/JoltMathBridge.h"            "Utils/JoltMathBridge.cpp"        "Utils/JoltMathBridge.inl"

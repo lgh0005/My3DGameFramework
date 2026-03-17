@@ -26,17 +26,22 @@
 #include <glm/gtc/epsilon.hpp>
 
 /*============================//
+//    Engine common defines   //
+//============================*/
+#include "Defines/DefineClass.h"
+#include "Defines/DefineSingleton.h"
+#include "Defines/DefineManager.h"
+
+/*============================//
 //    Engine common headers   //
 //============================*/
 #include "Common/Types.h"
-#include "Common/Defines.h"
 #include "Common/Constants.h"
 #include "Common/CommonUtils.h"
 
 /*============================//
 //    Engine common aliases   //
 //============================*/
-#include "Aliases/ManagerAccess.h"
 #include "Aliases/Array.h"
 #include "Aliases/Nullable.h"
 #include "Aliases/Delegates.h"
@@ -58,6 +63,12 @@
 #include "Debug/Clock.h"
 #include "Debug/ProfileScope.h"
 #include "Debug/RealTimer.h"
+
+/*===============================//
+//    Engine lifecycle defines   //
+//===============================*/
+#include "Defines/DefineSystem.h"
+#include "Defines/DefineModule.h"
 
 /*==========================//
 //    Engine common utils   //

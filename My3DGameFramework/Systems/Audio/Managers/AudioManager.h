@@ -24,6 +24,6 @@ namespace MGF3D
 
 	private:
 		AudioEngineUPtr m_engine;
-		SMap<SString, AudioMixerUPtr> m_channels;
+		SMap<StringHash, AudioMixerUPtr> m_channels;
 	};
 }

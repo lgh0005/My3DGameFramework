@@ -7,11 +7,13 @@ namespace MGF3D
 	PhysicsQueryManager::PhysicsQueryManager() = default;
 	PhysicsQueryManager::~PhysicsQueryManager() = default;
 
-	void PhysicsQueryManager::Init()
+	bool PhysicsQueryManager::Init()
 	{
-		m_querySystem = &PhysicsManager::Instance().GetNarrowPhaseQuery();
+		m_querySystem = &MGF_PHYSICS.GetNarrowPhaseQuery();
 		MGF_ASSERT(m_querySystem != nullptr, "Failed to hook NarrowPhaseQuery! PhysicsManager must be initialized BEFORE PhysicsQueryManager.");
+		
 		MGF_LOG_INFO("[Physics] PhysicsQueryManager Initialized (NarrowPhaseQuery Hooked).");
+		return true;
 	}
 
 	void PhysicsQueryManager::Shutdown()

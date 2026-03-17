@@ -40,9 +40,9 @@
 #include "Common/JoltConstants.h"
 
 /*=============================//
-//    Physics common aliases   //
+//    Physics common defines   //
 //=============================*/
-#include "Aliases/ManagerAccess.h"
+#include "Defines/DefineManager.h"
 
 /*=============================//
 //    Physics common headers   //

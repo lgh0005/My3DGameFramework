@@ -6,8 +6,14 @@ set(TARGET_NAME Engine::${MODULE_NAME})
 # 1. 소스 파일 목록 정의
 set(SOURCES
 
+    # Module
+    "MiddlewareModule.h"     "MiddlewareModule.cpp"
+
     # Bootstrapper
     "Bootstrapper/Bootstrapper.h"     "Bootstrapper/Bootstrapper.cpp"
+
+    # Define
+    "Defines/DefineManager.h"
     
     # Managers
     "Managers/GLFWManager.h"        "Managers/GLFWManager.cpp"
@@ -41,9 +47,9 @@ target_link_libraries(${LIB_NAME}
 PUBLIC
     Engine::Core
     #Engine::AI
-    #Engine::Audio
+    Engine::Audio
     #Engine::Graphics
-    #Engine::Physics
+    Engine::Physics
     #Engine::Scripting
     #Engine::UI
     glad::glad

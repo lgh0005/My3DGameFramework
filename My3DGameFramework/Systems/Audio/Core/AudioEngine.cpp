@@ -24,8 +24,8 @@ namespace MGF3D
 		}
 
 		// 2. 제어기 부품들 생성
-		m_volumeController = MakeUnique<VolumeController>(&m_audioEngine);
-		m_ear = MakeUnique<AudioEar>(&m_audioEngine, 0);
+		m_volumeController = MakeUnique<VolumeController>(m_audioEngine);
+		m_ear = MakeUnique<AudioEar>(m_audioEngine, 0);
 
 		MGF_LOG_INFO("AudioEngine: System initialized successfully.");
 		return true;

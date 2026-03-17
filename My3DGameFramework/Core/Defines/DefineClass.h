@@ -1,5 +1,3 @@
-﻿#pragma once
-
 /*===================================//
 //     Default Class Constraints     //
 //===================================*/
@@ -20,20 +18,3 @@ private:                                                                        
     ~classType() = delete;                                                      \
     MGF_DISABLE_COPY(classType)                                                 \
     MGF_DISABLE_MOVE(classType)
-
-// Singleton declaration (Meyers' Singleton)
-#define MGF_DECLARE_SINGLE(classType)                                           \
-private:                                                                        \
-    MGF_DISABLE_COPY(classType)                                                 \
-    MGF_DISABLE_MOVE(classType)                                                 \
-                                                                                \
-public:                                                                         \
-    static classType& Instance()                                                \
-    {                                                                           \
-        static classType* s_instance = new classType();                         \
-        return *s_instance;                                                     \
-    }
-
-
-
-

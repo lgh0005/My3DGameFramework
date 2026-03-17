@@ -6,6 +6,6 @@
 #include "CorePch.h"
 
 /*===========================//
-//    Audio common aliases   //
+//    Audio common defines   //
 //===========================*/
-#include "Aliases/ManagerAccess.h"
+#include "Defines/DefineManager.h"

@@ -10,5 +10,7 @@ namespace MGF3D
 
 		static void* AlignedAllocate(usize inSize, usize inAlignment);
 		static void  AlignedFree(void* inBlock);
+
+		static void* Reallocate(void* inBlock, usize inOldSize, usize inNewSize);
 	};
 }

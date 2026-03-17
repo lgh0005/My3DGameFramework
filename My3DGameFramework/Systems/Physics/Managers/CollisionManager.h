@@ -14,7 +14,7 @@ namespace MGF3D
 		~CollisionManager();
 
 	public:
-		void Init();
+		bool Init();
 		void Clear();
 		void Shutdown();
 

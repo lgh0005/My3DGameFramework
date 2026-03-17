@@ -6,7 +6,8 @@
 #include "CorePch.h"
 
 /*================================//
-//    Middleware common headers   //
+//    Middleware common defines   //
 //================================*/
+#include "Defines/DefineManager.h"
 #include "Utils/Defines.h"
 

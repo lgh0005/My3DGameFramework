@@ -20,14 +20,14 @@ namespace MGF3D
 	template<typename Alloc>
 	inline void TBitset<Alloc>::Set(usize inIndex, bool inValue)
 	{
-		MGF_STATIC_ASSERT(inIndex < m_bits.Count(), "Index out of range in TBitset::Set!");
+		MGF_ASSERT(inIndex < m_bits.Count(), "Index out of range in TBitset::Set!");
 		m_bits[inIndex] = inValue;
 	}
 
 	template<typename Alloc>
 	inline bool TBitset<Alloc>::Test(usize inIndex) const
 	{
-		MGF_STATIC_ASSERT(inIndex < m_bits.Count(), "Index out of range in TBitset::Set!");
+		MGF_ASSERT(inIndex < m_bits.Count(), "Index out of range in TBitset::Set!");
 		return m_bits[inIndex];
 	}
 

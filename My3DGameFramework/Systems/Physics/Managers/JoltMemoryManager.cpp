@@ -22,6 +22,7 @@ namespace MGF3D
 		JPH::Free = JoltAllocator::Free;
 		JPH::AlignedAllocate = JoltAllocator::AlignedAllocate;
 		JPH::AlignedFree = JoltAllocator::AlignedFree;
+		JPH::Reallocate = JoltAllocator::Reallocate;
 
 		// 3. 임시 할당자 생성 (Raw Pointer 명시적 할당)
 		m_tempPool = new JoltMemoryPool(inTempCapacity);

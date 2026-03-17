@@ -6,8 +6,11 @@ set(TARGET_NAME Engine::${MODULE_NAME})
 # 1. 소스 파일 목록 정의
 set(SOURCES
 
-    # Aliases
-    "Aliases/ManagerAccess.h"
+    # Module
+    "AudioModule.h"     "AudioModule.cpp"
+
+    # Defines
+    "Defines/DefineManager.h"
 
     # Core
     "Core/AudioEmitter.h"    "Core/AudioEmitter.cpp"

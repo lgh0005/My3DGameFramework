@@ -11,7 +11,7 @@ namespace MGF3D
 		~PhysicsQueryManager();
 
 	public:
-		void Init();
+		bool Init();
 		void Shutdown();
 
 	public:

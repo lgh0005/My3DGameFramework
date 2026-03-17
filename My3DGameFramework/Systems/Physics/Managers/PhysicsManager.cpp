@@ -10,26 +10,15 @@ namespace MGF3D
 	PhysicsManager::PhysicsManager() = default;
 	PhysicsManager::~PhysicsManager() = default;
 
-	void PhysicsManager::Init()
+	bool PhysicsManager::Init()
 	{
-		// 1. JPH_MEMORY & JPH_JOB 초기화
-		if (!JPH_MEMORY.Init())
-		{
-			MGF_LOG_FATAL("Failed to init JPH_MEMORY!");
-			return;
-		}
-		if (!JPH_JOB.Init())
-		{
-			MGF_LOG_FATAL("Failed to init JPH_JOB!");
-			return;
-		}
-
-		// 2. 물리 우주 본체 생성
+		// 1. 물리 우주 본체 생성
 		m_physicsSystem = MakeUnique<::JPH::PhysicsSystem>();
+		MGF_ASSERT(m_physicsSystem != nullptr, "PhysicsManager: Failed to allocate JPH::PhysicsSystem memory!");
 
-		// 3. Jolt 필터 세팅
+		// 2. Jolt 필터 세팅
 		Ptr<JoltFilterSet> filter = MGF_COLLISION.GetFilter();
-		MGF_ASSERT(filter != nullptr, "CollisionManager must be initialized BEFORE PhysicsManager!");
+		MGF_ASSERT(filter != nullptr, "PhysicsManager: CollisionManager must be initialized BEFORE PhysicsManager!");
 
 		m_physicsSystem->Init
 		(
@@ -45,6 +34,8 @@ namespace MGF3D
 		// 4. 전역 물리 설정 적용
 		m_physicsSystem->SetGravity(JoltMathBridge::ToJoltVec3(m_gravity));
 		MGF_LOG_INFO("[Physics] PhysicsManager Initialized Successfully.");
+
+		return true;
 	}
 
 	void PhysicsManager::Update(float deltaTime)
@@ -58,8 +49,8 @@ namespace MGF3D
 		(
 			deltaTime,
 			cCollisionSteps,
-			JPH_MEMORY.GetTempAllocator(),
-			JPH_JOB.GetJobSystem()
+			JOLT_MEMORY.GetTempAllocator(),
+			JOLT_JOB.GetJobSystem()
 		);
 	}
 
@@ -67,11 +58,6 @@ namespace MGF3D
 	{
 		// 1. Jolt 자원 해제
 		if (m_physicsSystem) m_physicsSystem.reset();
-
-		// 2. 하위 인프라 철거
-		JPH_JOB.Shutdown();
-		JPH_MEMORY.Shutdown();
-
 		MGF_LOG_INFO("[Physics] PhysicsManager Shutdown.");
 	}
 

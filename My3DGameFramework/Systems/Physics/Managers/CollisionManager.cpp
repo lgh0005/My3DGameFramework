@@ -7,10 +7,14 @@ namespace MGF3D
 	CollisionManager::CollisionManager()  = default;
 	CollisionManager::~CollisionManager() = default;
 
-	void CollisionManager::Init()
+	bool CollisionManager::Init()
 	{
 		// 통합 필터 생성
 		m_filter = MakeUnique<JoltFilterSet>();
+		MGF_ASSERT(m_filter != nullptr, "CollisionManager: Failed to allocate JoltFilterSet memory!");
+		
+		MGF_LOG_INFO("[Collision] CollisionManager Initialized Successfully.");
+		return true;
 	}
 
 	void CollisionManager::Shutdown()
@@ -78,7 +82,12 @@ namespace MGF3D
 		}
 		else
 		{
-			MGF_LOG_WARN("[Physics] Failed to find layers for SetLayerCollision: {0}, {1}", inLayerA, inLayerB);
+			MGF_LOG_WARN
+			(
+				"[Physics] Failed to find layers for SetLayerCollision: {0}, {1}", 
+				inLayerA.CStr(),
+				inLayerB.CStr()
+			);
 		}
 	}
 
@@ -95,7 +104,12 @@ namespace MGF3D
 		}
 		else
 		{
-			MGF_LOG_WARN("[Physics] Failed to find layers for SetBroadPhaseCollision: {0}, {1}", inLayer, inBP);
+			MGF_LOG_WARN
+			(
+				"[Physics] Failed to find layers for SetBroadPhaseCollision: {0}, {1}", 
+				inLayer.CStr(),
+				inBP.CStr()
+			);
 		}
 	}
 }

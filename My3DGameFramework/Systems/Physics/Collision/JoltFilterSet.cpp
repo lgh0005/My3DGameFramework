@@ -38,6 +38,6 @@ namespace MGF3D
 
 	cstr JoltFilterSet::GetBroadPhaseLayerName(JPH::BroadPhaseLayer inLayer) const
 	{
-		return cstr();
+		return MGF_COLLISION.GetBroadPhaseName(inLayer);
 	}
 }

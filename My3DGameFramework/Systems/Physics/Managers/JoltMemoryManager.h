@@ -15,7 +15,7 @@ namespace MGF3D
 	public:
 
 		// TODO : 메모리와 관련된 상수들은 따로 빼둘 필요가 있음
-		bool Init(usize inTempCapacity = 10 * 1024 * 1024);
+		bool Init(usize inTempCapacity = JoltConfig::cTempAllocatorSize);
 		void Shutdown();
 		Ptr<JPH::TempAllocator> GetTempAllocator() const;
 

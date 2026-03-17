@@ -2,11 +2,17 @@
 
 namespace MGF3D
 {
+	template <typename Module>
 	class IModuleUnit
 	{
-	public:
+	protected:
+		IModuleUnit();
 		virtual ~IModuleUnit();
-		virtual void OnModuleInit() = 0;
-		virtual void OnShutDown() = 0;
+
+	public:
+		static bool Init();
+		static void Shutdown();
 	};
 }
+
+#include "Module/IModuleUnit.inl"

@@ -6,14 +6,22 @@ set(TARGET_NAME Engine::${MODULE_NAME})
 # 1. 소스 파일 목록 정의
 set(SOURCES
 
+    # Module
+    "CoreModule.h"           "CoreModule.cpp"
+
+    # Defines
+    "Defines/DefineClass.h"
+    "Defines/DefineSystem.h"
+    "Defines/DefineManager.h"
+    "Defines/DefineSingleton.h"
+    "Defines/DefineModule.h"
+
     # Common
-    "Common/Defines.h"
     "Common/Types.h"
     "Common/Constants.h"
     "Common/CommonUtils.h"     "Common/CommonUtils.cpp"     "Common/CommonUtils.inl"
 
     # Aliases
-    "Aliases/ManagerAccess.h"
     "Aliases/Array.h"
     "Aliases/Nullable.h"
     "Aliases/Delegates.h"
@@ -57,7 +65,7 @@ set(SOURCES
     "Memory/SlabAllocator.h"           "Memory/SlabAllocator.cpp"      "Memory/SlabAllocator.inl" 
 
     # Module
-    "Module/IModuleUnit.h"          "Module/IModuleUnit.cpp"
+    "Module/IModuleUnit.h"          "Module/IModuleUnit.cpp"        "Module/IModuleUnit.inl" 
 
     # Identity
     "Identity/MGFName.h"            "Identity/MGFName.cpp"

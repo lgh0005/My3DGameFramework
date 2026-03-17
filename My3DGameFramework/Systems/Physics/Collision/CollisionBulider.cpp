@@ -13,7 +13,7 @@ namespace MGF3D
 				MGF_LOG_WARN
                 (
                     "[Physics] BroadPhase layer '{0}' is already registered. Skipping duplicate entry.", 
-                    inName
+                    inName.CStr()
                 );
 				return;
 			}
