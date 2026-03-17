@@ -1,60 +1,50 @@
 ﻿#pragma once
-#include "Misc/AssetFormat.h"
+#include "Utils/AssetFormat.h"
 #include "Animation/Pose.h"
 
 namespace MGF3D
 {
-    CLASS_PTR(AnimChannel)
+    MGF_CLASS_PTR(AnimChannel)
     class AnimChannel
     {
     public:
-        virtual ~AnimChannel();
-        static AnimChannelUPtr Create
+        AnimChannel
         (
-            const std::string& name,
-            std::vector<AssetFmt::RawKeyPosition>&& positions,
-            std::vector<AssetFmt::RawKeyRotation>&& rotations,
-            std::vector<AssetFmt::RawKeyScale>&& scales
+            const SString& name,
+            SVector<AssetFmt::RawKeyPosition>&& positions,
+            SVector<AssetFmt::RawKeyRotation>&& rotations,
+            SVector<AssetFmt::RawKeyScale>&& scales
         );
+        ~AnimChannel();
 
         Pose GetPose(float time) const;
 
-        /*==============================================//
-        //   animation channel default getter methods   //
-        //==============================================*/
+    /*==============================================//
+    //   animation channel default getter methods   //
+    //==============================================*/
     public:
         uint32 GetPositionIndex(float animationTime) const;
         uint32 GetRotationIndex(float animationTime) const;
         uint32 GetScaleIndex(float animationTime) const;
         uint32 GetNameHash() const;
-        std::string GetBoneName() const;
-        glm::mat4 GetLocalTransform(float animationTime) const;
+        const SString& GetBoneName() const;
+        mat4 GetLocalTransform(float animationTime) const;
 
-        /*===========================//
-        //   interpolation methods   //
-        //===========================*/
+    /*===========================//
+    //   interpolation methods   //
+    //===========================*/
     private:
         float GetScaleFactor(float lastTimeStamp, float nextTimeStamp, float animationTime) const;
-        glm::vec3 InterpolatePosition(float animationTime) const;
-        glm::quat InterpolateRotation(float animationTime) const;
-        glm::vec3 InterpolateScaling(float animationTime) const;
+        vec3 InterpolatePosition(float animationTime) const;
+        quat InterpolateRotation(float animationTime) const;
+        vec3 InterpolateScaling(float animationTime) const;
 
     private:
-        AnimChannel();
-        void Init
-        (
-            const std::string& name,
-            std::vector<AssetFmt::RawKeyPosition>&& positions,
-            std::vector<AssetFmt::RawKeyRotation>&& rotations,
-            std::vector<AssetFmt::RawKeyScale>&& scales
-        );
+        SString m_name;
 
-        uint32 m_nameHash{ 0 };
-        std::string m_name;
-
-        std::vector<AssetFmt::RawKeyPosition> m_positions;
-        std::vector<AssetFmt::RawKeyRotation> m_rotations;
-        std::vector<AssetFmt::RawKeyScale>    m_scales;
+        SVector<AssetFmt::RawKeyPosition> m_positions;
+        SVector<AssetFmt::RawKeyRotation> m_rotations;
+        SVector<AssetFmt::RawKeyScale>    m_scales;
 
         uint32 m_numPositions;
         uint32 m_numRotations;

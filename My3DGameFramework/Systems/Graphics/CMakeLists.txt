@@ -25,14 +25,14 @@ set(SOURCES
     # Framebuffers
     "Framebuffers/FramebufferBase.h"      "Framebuffers/FramebufferBase.cpp"
 
-    "Framebuffers/Framebuffer.h"      "Framebuffers/Framebuffer.cpp"
+    "Framebuffers/Framebuffer.h"                "Framebuffers/Framebuffer.cpp"
     "Framebuffers/BRDFLookUpFramebuffer.h"      "Framebuffers/BRDFLookUpFramebuffer.cpp"
-    "Framebuffers/CubeFramebuffer.h"      "Framebuffers/CubeFramebuffer.cpp"
-    "Framebuffers/EffectFramebuffer.h"      "Framebuffers/EffectFramebuffer.cpp"
-    "Framebuffers/GBufferFramebuffer.h"      "Framebuffers/GBufferFramebuffer.cpp"
-    "Framebuffers/OutlineFramebuffer.h"      "Framebuffers/OutlineFramebuffer.cpp"
-    "Framebuffers/PostProcessFrameBuffer.h"      "Framebuffers/PostProcessFrameBuffer.cpp"
-    "Framebuffers/SSAOFramebuffer.h"      "Framebuffers/SSAOFramebuffer.cpp"
+    "Framebuffers/CubeFramebuffer.h"            "Framebuffers/CubeFramebuffer.cpp"
+    "Framebuffers/EffectFramebuffer.h"          "Framebuffers/EffectFramebuffer.cpp"
+    "Framebuffers/GBufferFramebuffer.h"         "Framebuffers/GBufferFramebuffer.cpp"
+    "Framebuffers/OutlineFramebuffer.h"         "Framebuffers/OutlineFramebuffer.cpp"
+    "Framebuffers/PostProcessFrameBuffer.h"     "Framebuffers/PostProcessFrameBuffer.cpp"
+    "Framebuffers/SSAOFramebuffer.h"            "Framebuffers/SSAOFramebuffer.cpp"
 
     # Instancing
     "Instancing/AnimBuffer.h"           "Instancing/AnimBuffer.cpp"
@@ -52,6 +52,8 @@ set(SOURCES
 
     # Utils
     "Utils/GeometryGenerator.h"      "Utils/GeometryGenerator.cpp"
+    # "Utils/IBLUtils.h"               "Utils/IBLUtils.cpp"
+    "Utils/AssetFormat.h"            "Utils/AssetFormat.cpp"
 )
 
 # 2. 빌드 타겟 생성 및 별칭 등록

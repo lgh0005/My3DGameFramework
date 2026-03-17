@@ -14,4 +14,5 @@
 /*===============================//
 //    Rendering common headers   //
 //===============================*/
+#include "Utils/GraphicsUtils.h"
 #include "Defines/DefineManager.h"

@@ -1,27 +1,24 @@
-﻿#include "RenderingPch.h"
+﻿#include "GraphicsPch.h"
 #include "Animation/AnimChannel.h"
 
 namespace MGF3D
 {
-    AnimChannel::AnimChannel() = default;
-    AnimChannel::~AnimChannel() = default;
-
-    AnimChannelUPtr AnimChannel::Create
+    AnimChannel::AnimChannel
     (
-        const std::string& name,
-        std::vector<AssetFmt::RawKeyPosition>&& positions,
-        std::vector<AssetFmt::RawKeyRotation>&& rotations,
-        std::vector<AssetFmt::RawKeyScale>&& scales
-    )
+        const SString& name,
+        SVector<AssetFmt::RawKeyPosition>&& positions,
+        SVector<AssetFmt::RawKeyRotation>&& rotations,
+        SVector<AssetFmt::RawKeyScale>&& scales
+    )   : m_name(name)
+        , m_positions(std::move(positions))
+        , m_rotations(std::move(rotations))
+        , m_scales(std::move(scales))
     {
-        auto animChannel = AnimChannelUPtr(new AnimChannel());
-        animChannel->Init
-        (
-            name,
-            std::move(positions), std::move(rotations), std::move(scales)
-        );
-        return std::move(animChannel);
+        m_numPositions = (uint32)m_positions.Count();
+        m_numRotations = (uint32)m_rotations.Count();
+        m_numScalings = (uint32)m_scales.Count();
     }
+    AnimChannel::~AnimChannel() = default;
 
     Pose AnimChannel::GetPose(float time) const
     {
@@ -31,32 +28,12 @@ namespace MGF3D
         return Pose(translation, rotation, scale);
     }
 
-    void AnimChannel::Init
-    (
-        const std::string& name,
-        std::vector<AssetFmt::RawKeyPosition>&& positions,
-        std::vector<AssetFmt::RawKeyRotation>&& rotations,
-        std::vector<AssetFmt::RawKeyScale>&& scales
-    )
-    {
-        m_name = name;
-        m_nameHash = Utils::StrHash(name);
-
-        m_positions = std::move(positions);
-        m_rotations = std::move(rotations);
-        m_scales = std::move(scales);
-
-        m_numPositions = (uint32)m_positions.size();
-        m_numRotations = (uint32)m_rotations.size();
-        m_numScalings = (uint32)m_scales.size();
-    }
-
     /*==============================================//
     //   animation channel default getter methods   //
     //==============================================*/
-    uint32 AnimChannel::GetNameHash() const { return m_nameHash; }
+    uint32 AnimChannel::GetNameHash() const { return m_name.Hash(); }
 
-    std::string AnimChannel::GetBoneName() const { return m_name; }
+    const SString& AnimChannel::GetBoneName() const { return m_name; }
 
     glm::mat4 AnimChannel::GetLocalTransform(float animationTime) const
     {
@@ -125,11 +102,17 @@ namespace MGF3D
 
         int p0Index = GetRotationIndex(animationTime);
         int p1Index = p0Index + 1;
-        float scaleFactor = GetScaleFactor(m_rotations[p0Index].time,
-            m_rotations[p1Index].time, animationTime);
+        float scaleFactor = GetScaleFactor
+        (
+            m_rotations[p0Index].time,
+            m_rotations[p1Index].time, animationTime
+        );
 
-        glm::quat finalRotation = glm::slerp(m_rotations[p0Index].quat,
-            m_rotations[p1Index].quat, scaleFactor);
+        glm::quat finalRotation = glm::slerp
+        (
+            m_rotations[p0Index].quat,
+            m_rotations[p1Index].quat, scaleFactor
+        );
 
         return glm::normalize(finalRotation);
     }
@@ -140,11 +123,13 @@ namespace MGF3D
 
         int p0Index = GetScaleIndex(animationTime);
         int p1Index = p0Index + 1;
-        float scaleFactor = GetScaleFactor(m_scales[p0Index].time,
-            m_scales[p1Index].time, animationTime);
+        float scaleFactor = GetScaleFactor
+        (
+            m_scales[p0Index].time,
+            m_scales[p1Index].time, animationTime
+        );
 
         return glm::mix(m_scales[p0Index].vec3, m_scales[p1Index].vec3, scaleFactor);
     }
 }
-
 

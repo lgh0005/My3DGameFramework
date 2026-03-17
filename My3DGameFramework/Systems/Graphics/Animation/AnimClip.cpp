@@ -1,4 +1,4 @@
-﻿#include "RenderingPch.h"
+﻿#include "GraphicsPch.h"
 #include "Animation/AnimClip.h"
 
 namespace MGF3D
@@ -33,12 +33,12 @@ namespace MGF3D
 
 	bool AnimClip::IsValid() const
 	{
-		return !localMatrices.empty() && frameCount > 0;
+		return !localMatrices.Empty() && frameCount > 0;
 	}
 
 	void AnimClip::Clear()
 	{
-		localMatrices.clear();
+		localMatrices.Clear();
 		frameCount = 0;
 		boneCount = 0;
 		frameRate = 0.0f;

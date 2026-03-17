@@ -1,4 +1,4 @@
-﻿#include "RenderingPch.h"
+﻿#include "GraphicsPch.h"
 #include "Animation/Skeleton.h"
 
 namespace MGF3D
@@ -6,18 +6,14 @@ namespace MGF3D
 	Skeleton::Skeleton() = default;
 	Skeleton::~Skeleton() = default;
 
-	SkeletonUPtr Skeleton::Create()
+	int32 Skeleton::AddBone(const SString& name, const glm::mat4& offset)
 	{
-		return SkeletonUPtr(new Skeleton());
-	}
-
-	int32 Skeleton::AddBone(const std::string& name, const glm::mat4& offset)
-	{
-		uint32 nameHash = Utils::StrHash(name);
+		// 0. 뼈 이름 해시값
+		StringHash nameHash = name.Hash();
 
 		// 1. 이미 등록된 뼈인지 확인
-		auto it = m_boneInfoMap.find(nameHash);
-		if (it != m_boneInfoMap.end()) return it->second.id;
+		auto infoPtr = m_boneInfoMap.Find(nameHash);
+		if (infoPtr != nullptr) return infoPtr->id;
 
 		// 2. 새로운 뼈 등록
 		AssetFmt::RawBoneInfo newBoneInfo;
@@ -26,9 +22,9 @@ namespace MGF3D
 		m_boneInfoMap[nameHash] = newBoneInfo;
 
 		// 3. 벡터 캐시에 오프셋 행렬 및 Hash ID 캐시 저장 (인덱스 = ID)
-		if (m_boneOffsets.size() <= m_boneCounter) m_boneOffsets.resize(m_boneCounter + 1);
+		if (m_boneOffsets.Count() <= m_boneCounter) m_boneOffsets.Resize(m_boneCounter + 1);
 		m_boneOffsets[m_boneCounter] = offset;
-		if (m_boneHashByID.size() <= m_boneCounter) m_boneHashByID.resize(m_boneCounter + 1);
+		if (m_boneHashByID.Count() <= m_boneCounter) m_boneHashByID.Resize(m_boneCounter + 1);
 		m_boneHashByID[m_boneCounter] = nameHash;
 
 		// ID 반환 후 카운터 증가
@@ -57,7 +53,7 @@ namespace MGF3D
 			}
 		}
 
-		LOG_WARN("Vertex has too many bone influences. Limit is {}", MAX_BONE_INFLUENCE);
+		MGF_LOG_WARN("Vertex has too many bone influences. Limit is {}", MAX_BONE_INFLUENCE);
 	}
 
 	void Skeleton::SetData(const BoneMap& map, int32 count)
@@ -66,10 +62,10 @@ namespace MGF3D
 		m_boneCounter = count;
 
 		// 맵 데이터를 기반으로 벡터 캐시 재구축
-		m_boneOffsets.assign(count, glm::mat4(1.0f));
-		m_boneHashByID.assign(count, 0);
+		m_boneOffsets.Assign(count, glm::mat4(1.0f));
+		m_boneHashByID.Assign(count, 0);
 
-		m_parentIndices.assign(count, -1);
+		m_parentIndices.Assign(count, -1);
 		for (const auto& [hash, info] : m_boneInfoMap)
 		{
 			if (info.id >= 0 && info.id < count)
@@ -86,20 +82,21 @@ namespace MGF3D
 
 	int32 Skeleton::GetBoneID(uint32 nameHash) const
 	{
-		auto it = m_boneInfoMap.find(nameHash);
-		if (it != m_boneInfoMap.end()) return it->second.id;
+		auto infoPtr = m_boneInfoMap.Find(nameHash);
+		if (infoPtr != nullptr) return infoPtr->id;
 		return -1;
 	}
 
-	int32 Skeleton::GetBoneID(const std::string& name) const
+	int32 Skeleton::GetBoneID(const SString& name) const
 	{
-		return GetBoneID(Utils::StrHash(name));
+		return GetBoneID(name.Hash());
 	}
 
 	const glm::mat4& Skeleton::GetBoneOffset(int32 boneID) const
 	{
-		if (boneID >= 0 && boneID < m_boneOffsets.size()) return m_boneOffsets[boneID];
-		return Utils::GetIdentityBone();
+		if (CommonUtils::IsInRange<usize>(boneID, 0, m_boneOffsets.Count()))
+			return m_boneOffsets[boneID];
+		return GraphicsUtils::GetIdentityMatrix();
 	}
 
 	/*========================================//
@@ -107,7 +104,8 @@ namespace MGF3D
 	//========================================*/
 	uint32 Skeleton::GetBoneHash(int32 id) const
 	{
-		if (id >= 0 && id < m_boneHashByID.size()) return m_boneHashByID[id];
+		if (CommonUtils::IsInRange<usize>(id, 0, m_boneHashByID.Count()))
+			return m_boneHashByID[id];
 		return 0;
 	}
 }
