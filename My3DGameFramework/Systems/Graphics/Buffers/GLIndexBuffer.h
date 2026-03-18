@@ -12,7 +12,7 @@ namespace MGF3D
 		(
 			const void* data,
 			usize		byteSize,
-			uint32		flags = 0
+			VRAMAllocation::PoolType poolType = VRAMAllocation::PoolType::Static
 		);
 
 	public:
@@ -25,7 +25,7 @@ namespace MGF3D
 		(
 			const void* data,
 			usize		byteSize,
-			uint32		flags = 0
+			VRAMAllocation::PoolType poolType
 		);
 	};
 }

@@ -8,7 +8,11 @@ namespace MGF3D
     {
     public:
         virtual ~GLUniformBuffer() override;
-        static GLUniformBufferUPtr Create(usize byteSize, uint32 flags);
+        static GLUniformBufferUPtr Create
+        (
+            usize byteSize, 
+            VRAMAllocation::PoolType poolType = VRAMAllocation::PoolType::Dynamic
+        );
 
     public:
         virtual void Bind() const override;
@@ -17,6 +21,10 @@ namespace MGF3D
 
     private:
         GLUniformBuffer();
-        bool Init(usize byteSize, uint32 flags);
+        bool Init
+        (
+            usize byteSize, 
+            VRAMAllocation::PoolType poolType
+        );
     };
 }

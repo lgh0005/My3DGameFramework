@@ -44,7 +44,7 @@ namespace MGF3D
 
     void VertexLayout::SetAttrib
     (
-        uint32 vbo,
+        const GLVertexBuffer& vertexBuffer,
         uint32 attribIndex, int32 count, uint32 type, bool normalized, usize stride, 
         uint64 relativeOffset, uint64 bufferOffset
     )   const
@@ -52,12 +52,21 @@ namespace MGF3D
         glEnableVertexArrayAttrib(m_vertexArrayObject, attribIndex);
         glVertexArrayAttribFormat(m_vertexArrayObject, attribIndex, count, type, normalized, relativeOffset);
         glVertexArrayAttribBinding(m_vertexArrayObject, attribIndex, attribIndex);
-        glVertexArrayVertexBuffer(m_vertexArrayObject, attribIndex, vbo, static_cast<GLintptr>(bufferOffset), stride);
+        
+        const uint64 finalOffset = vertexBuffer.GetOffset() + bufferOffset;
+        glVertexArrayVertexBuffer
+        (
+            m_vertexArrayObject, 
+            attribIndex, 
+            vertexBuffer.GetAllocation().GetBufferHandle(),
+            static_cast<GLintptr>(finalOffset),
+            static_cast<GLsizei>(stride)
+        );
     }
 
     void VertexLayout::SetAttribI
     (
-        uint32 vbo,
+        const GLVertexBuffer& vertexBuffer,
         uint32 attribIndex, int32 count, uint32 type, usize stride, 
         uint64 relativeOffset, uint64 bufferOffset
     )   const
@@ -65,7 +74,16 @@ namespace MGF3D
         glEnableVertexArrayAttrib(m_vertexArrayObject, attribIndex);
         glVertexArrayAttribIFormat(m_vertexArrayObject, attribIndex, count, type, relativeOffset);
         glVertexArrayAttribBinding(m_vertexArrayObject, attribIndex, attribIndex);
-        glVertexArrayVertexBuffer(m_vertexArrayObject, attribIndex, vbo, static_cast<GLintptr>(bufferOffset), stride);
+        
+        const uint64 finalOffset = vertexBuffer.GetOffset() + bufferOffset;
+        glVertexArrayVertexBuffer
+        (
+            m_vertexArrayObject, 
+            attribIndex, 
+            vertexBuffer.GetAllocation().GetBufferHandle(),
+            static_cast<GLintptr>(finalOffset),
+            static_cast<GLsizei>(stride)
+        );
     }
 
     void VertexLayout::SetAttribDivisor(uint32 bindingIndex, uint32 divisor) const
@@ -78,8 +96,8 @@ namespace MGF3D
         glDisableVertexArrayAttrib(m_vertexArrayObject, attribIndex);
     }
 
-    void VertexLayout::SetIndexBuffer(uint32 ibo) const
+    void VertexLayout::SetIndexBuffer(const GLIndexBuffer& indexBuffer) const
     {
-        glVertexArrayElementBuffer(m_vertexArrayObject, ibo);
+        glVertexArrayElementBuffer(m_vertexArrayObject, indexBuffer.GetAllocation().GetBufferHandle());
     }
 }

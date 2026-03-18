@@ -8,7 +8,11 @@ namespace MGF3D
     {
     public:
         virtual ~GLShaderStorageBuffer() override;
-        static GLShaderStorageBufferUPtr Create(usize byteSize, uint32 flags);
+        static GLShaderStorageBufferUPtr Create
+        (
+            usize byteSize,
+            VRAMAllocation::PoolType poolType = VRAMAllocation::PoolType::Dynamic
+        );
 
     public:
         virtual void Bind() const override;
@@ -17,6 +21,6 @@ namespace MGF3D
 
     private:
         GLShaderStorageBuffer();
-        bool Init(usize byteSize, uint32 flags);
+        bool Init(usize byteSize, VRAMAllocation::PoolType poolType);
     };
 }

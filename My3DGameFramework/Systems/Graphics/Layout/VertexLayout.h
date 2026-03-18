@@ -1,4 +1,6 @@
 ﻿#pragma once
+#include "Buffers/GLVertexBuffer.h"
+#include "Buffers/GLIndexBuffer.h"
 
 namespace MGF3D
 {
@@ -21,14 +23,14 @@ namespace MGF3D
     public:
         void SetAttrib
         (
-            uint32 vbo,
+            const GLVertexBuffer& vertexBuffer,
             uint32 attribIndex, int32 count, uint32 type, bool normalized, usize stride, 
             uint64 relativeOffset, uint64 bufferOffset = 0
         ) const;
 
         void SetAttribI
         (
-            uint32 vbo,
+            const GLVertexBuffer& vertexBuffer,
             uint32 attribIndex, int32 count, uint32 type, usize stride, 
             uint64 relativeOffset, uint64 bufferOffset = 0
         ) const;
@@ -37,7 +39,7 @@ namespace MGF3D
         void DisableAttrib(uint32 attribIndex) const;
 
     public:
-        void SetIndexBuffer(uint32 ibo) const;
+        void SetIndexBuffer(const GLIndexBuffer& indexBuffer) const;
 
     private:
         VertexLayout();
