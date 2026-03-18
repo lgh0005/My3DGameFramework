@@ -1,5 +1,6 @@
 #include "GraphicsPch.h"
 #include "GraphicsModule.h"
+#include "Managers/VRAMManager.h"
 
 namespace MGF3D
 {
@@ -8,16 +9,16 @@ namespace MGF3D
 
 	bool GraphicsModule::OnModuleInit()
 	{
-		// 1. 함수 포인터 자체가 유효한지 먼저 체크
+		// 0. 함수 포인터 자체가 유효한지 먼저 체크
 		MGF_ASSERT
 		(
 			glGetString != nullptr, 
 			"Graphics: GLAD function pointers are null! Check MGFWindow initialization."
 		);
 
-		// 2. 드라이버로부터 실제 정보를 획득
-		cstr glVersion = (const char*)glGetString(GL_VERSION);
-		cstr glRenderer = (const char*)glGetString(GL_RENDERER);
+		// 1. 드라이버로부터 실제 정보를 획득
+		cstr glVersion = (cstr)glGetString(GL_VERSION);
+		cstr glRenderer = (cstr)glGetString(GL_RENDERER);
 		if (glVersion && glRenderer)
 		{
 			MGF_LOG_INFO("GraphicsModule: OpenGL Context Verified.");
@@ -30,11 +31,14 @@ namespace MGF3D
 			return false;
 		}
 
+		// 2. VRAMManager 초기화
+		MGF_INIT_SYS(MGF_VRAM.Init(StaticPoolSize, DynamicPoolSize), "VRAMManager");
+
 		return true;
 	}
 
 	void GraphicsModule::OnShutDown()
 	{
-
+		MGF_VRAM.Shutdown();
 	}
 }

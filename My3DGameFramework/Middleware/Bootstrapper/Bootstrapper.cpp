@@ -5,6 +5,7 @@
 #include "CoreModule.h"
 #include "PhysicsModule.h"
 #include "AudioModule.h"
+#include "GraphicsModule.h"
 #include "MiddlewareModule.h"
 
 namespace MGF3D
@@ -14,12 +15,13 @@ namespace MGF3D
 		// 1. Core Module
 		MGF_MODULE_INIT(CoreModule::Init(), "CoreModule");
 
-		// 2. System Modules
-		MGF_MODULE_INIT(PhysicsModule::Init(), "PhysicsModule");
-		MGF_MODULE_INIT(AudioModule::Init(), "AudioModule");
-
 		// 3. Middleware Module
 		MGF_MODULE_INIT(MiddlewareModule::Init(), "MiddlewareModule");
+
+		// 2. System Modules
+		MGF_MODULE_INIT(GraphicsModule::Init(), "GraphicsModule");
+		MGF_MODULE_INIT(PhysicsModule::Init(), "PhysicsModule");
+		MGF_MODULE_INIT(AudioModule::Init(), "AudioModule");
 
 		MGF_LOG_INFO("[BOOT] MGF3D Engine is now fully operational.");
 		return true;
@@ -29,12 +31,13 @@ namespace MGF3D
 	{
 		MGF_LOG_INFO("[EXIT] Initiating Engine Shutdown Sequence...");
 
-		// 1. 플랫폼 레이어 정리 (윈도우 닫기 등)
-		MGF_MODULE_SHUTDOWN(MiddlewareModule::Shutdown(), "MiddlewareModule");
-
 		// 2. 시스템 레이어 정리
 		MGF_MODULE_SHUTDOWN(AudioModule::Shutdown(), "AudioModule");
 		MGF_MODULE_SHUTDOWN(PhysicsModule::Shutdown(), "PhysicsModule");
+		MGF_MODULE_SHUTDOWN(GraphicsModule::Shutdown(), "GraphicsModule");
+
+		// 1. 플랫폼 레이어 정리 (윈도우 닫기 등)
+		MGF_MODULE_SHUTDOWN(MiddlewareModule::Shutdown(), "MiddlewareModule");
 
 		// 3. 최하위 기초 레이어 정리 (메모리 해제 등)
 		MGF_MODULE_SHUTDOWN(CoreModule::Shutdown(), "CoreModule");

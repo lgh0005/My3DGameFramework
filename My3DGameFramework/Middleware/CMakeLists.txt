@@ -48,7 +48,7 @@ PUBLIC
     Engine::Core
     #Engine::AI
     Engine::Audio
-    #Engine::Graphics
+    Engine::Graphics
     Engine::Physics
     #Engine::Scripting
     #Engine::UI

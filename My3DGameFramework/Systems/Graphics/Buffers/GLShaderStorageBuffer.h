@@ -1,5 +1,5 @@
 #pragma once
-#include "Graphics/Buffers/GLBufferHandle.h"
+#include "Buffers/GLBufferHandle.h"
 
 namespace MGF3D
 {
@@ -8,7 +8,7 @@ namespace MGF3D
     {
     public:
         virtual ~GLShaderStorageBuffer() override;
-        static GLShaderStorageBuffer Create(usize byteSize, uint32 flags);
+        static GLShaderStorageBufferUPtr Create(usize byteSize, uint32 flags);
 
     public:
         virtual void Bind() const override;
@@ -18,5 +18,5 @@ namespace MGF3D
     private:
         GLShaderStorageBuffer();
         bool Init(usize byteSize, uint32 flags);
-    }
+    };
 }

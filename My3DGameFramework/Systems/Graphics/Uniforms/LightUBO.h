@@ -2,7 +2,7 @@
 
 namespace MGF3D
 {
-    struct alignas(GL_MEMORY_ALIGNMENT) LightUBO
+    struct alignas(OPENGL_MEMORY_ALIGNMENT) LightUBO
     {
         vec3  position;          float pad0;
         vec3  direction;         float pad1;

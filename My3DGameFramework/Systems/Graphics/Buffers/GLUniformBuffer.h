@@ -1,10 +1,10 @@
 #pragma once
-#include "Graphics/Buffers/GLBufferHandle.h"
+#include "Buffers/GLBufferHandle.h"
 
 namespace MGF3D
 {
     MGF_CLASS_PTR(GLUniformBuffer)
-    class GLUniformBuffer : public GLBufferHandle
+        class GLUniformBuffer : public GLBufferHandle
     {
     public:
         virtual ~GLUniformBuffer() override;
@@ -18,5 +18,5 @@ namespace MGF3D
     private:
         GLUniformBuffer();
         bool Init(usize byteSize, uint32 flags);
-    }
+    };
 }

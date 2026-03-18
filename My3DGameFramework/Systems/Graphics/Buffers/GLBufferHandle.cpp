@@ -4,15 +4,7 @@
 
 namespace MGF3D
 {
-	void* GLBufferHandle::operator new(usize size)
-	{
-		return MGF_MEMORY.Allocate(size);
-	}
-
-	void GLBufferHandle::operator delete(void* ptr, usize size)
-	{
-		MGF_MEMORY.Deallocate(ptr, size);
-	}
+	MGF_IMPLEMENT_CUSTOM_ALLOCATORS(GLBufferHandle)
 
 	GLBufferHandle::GLBufferHandle()
 	{

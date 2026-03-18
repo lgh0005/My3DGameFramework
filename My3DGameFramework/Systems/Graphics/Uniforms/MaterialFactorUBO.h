@@ -9,7 +9,7 @@ namespace MGF3D
         UseGlossiness = 1 << 1  // 1: (1.0 - 값) 반전 적용, 0: 그대로 사용
     };
 
-	struct alignas(GL_MEMORY_ALIGNMENT) MaterialFactorsUBO
+	struct alignas(OPENGL_MEMORY_ALIGNMENT) MaterialFactorsUBO
 	{
         vec4   albedoFactor;
         vec3   emissiveFactor;

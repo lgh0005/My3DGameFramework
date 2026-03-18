@@ -51,6 +51,6 @@ namespace MGF3D
 	bool LinearMemoryPool::IsInPool(void* ptr) const noexcept
 	{
 		uintptr addr = reinterpret_cast<uintptr>(ptr);
-		return (addr >= m_startAddress && addr < m_startAddress + m_size);
+		return CommonUtils::IsInRange(addr, m_startAddress, m_startAddress + m_size);
 	}
 }

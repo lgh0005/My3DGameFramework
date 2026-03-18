@@ -143,7 +143,7 @@ namespace MGF3D
 		int32 index = GetPoolIndex(size);
 
 		// 3. 인덱스 유효성 검사 후 해당 풀 포인터 반환
-		if (index >= 0 && index < SlabBucketCount)
+		if (CommonUtils::IsInRange<usize>(index, 0, SlabBucketCount))
 			return m_slabMemoryPools[index];
 
 		return nullptr;

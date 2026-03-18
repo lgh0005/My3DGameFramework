@@ -2,7 +2,7 @@
 
 namespace MGF3D
 {
-    struct alignas(GL_MEMORY_ALIGNMENT) SkinnedVertex
+    struct alignas(OPENGL_MEMORY_ALIGNMENT) SkinnedVertex
     {
         vec3  position                      { 0.0f };
         vec3  normal                        { 0.0f, 1.0f, 0.0f };

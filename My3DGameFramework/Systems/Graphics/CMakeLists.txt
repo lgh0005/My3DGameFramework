@@ -14,20 +14,25 @@ set(SOURCES
     "Common/AssetFormat.h"          "Common/AssetFormat.cpp"
 
     # Core
-    "Core/GlobalUniforms.h"         "Core/GlobalUniforms.cpp"
-    "Core/RenderContext.h"          "Core/RenderContext.cpp"
-    "Core/Renderer.h"               "Core/Renderer.cpp"
-    "Core/RenderPass.h"             "Core/RenderPass.cpp"
-    "Core/RenderPipeline.h"         "Core/RenderPipeline.cpp"
+    # "Core/GlobalUniforms.h"         "Core/GlobalUniforms.cpp"
+    # "Core/RenderContext.h"          "Core/RenderContext.cpp"
+    # "Core/Renderer.h"               "Core/Renderer.cpp"
+    # "Core/RenderPass.h"             "Core/RenderPass.cpp"
+    # "Core/RenderPipeline.h"         "Core/RenderPipeline.cpp"
+
+    # Debug
+    "Debug/VRAMProfiler.h"          "Debug/VRAMProfiler.cpp"
 
     # Defines
     "Defines/DefineManager.h"
+    "Defines/DefineMemoryAlignment.h"
+    "Defines/DefineOperators.h"
 
     # Animation
-    "Animation/AnimChannel.h"       "Animation/AnimChannel.cpp"
-    "Animation/AnimClip.h"          "Animation/AnimClip.cpp"
-    "Animation/Pose.h"              "Animation/Pose.cpp"
-    "Animation/Skeleton.h"          "Animation/Skeleton.cpp"
+    # "Animation/AnimChannel.h"       "Animation/AnimChannel.cpp"
+    # "Animation/AnimClip.h"          "Animation/AnimClip.cpp"
+    # "Animation/Pose.h"              "Animation/Pose.cpp"
+    # "Animation/Skeleton.h"          "Animation/Skeleton.cpp"
 
     # Uniforms
     "Uniforms/CameraUBO.h"           "Uniforms/CameraUBO.cpp"
@@ -55,37 +60,40 @@ set(SOURCES
 
 
     # Framebuffers
-    "Framebuffers/FramebufferBase.h"            "Framebuffers/FramebufferBase.cpp"
+    # "Framebuffers/FramebufferBase.h"            "Framebuffers/FramebufferBase.cpp"
 
-    "Framebuffers/Framebuffer.h"                "Framebuffers/Framebuffer.cpp"
-    "Framebuffers/BRDFLookUpFramebuffer.h"      "Framebuffers/BRDFLookUpFramebuffer.cpp"
-    "Framebuffers/CubeFramebuffer.h"            "Framebuffers/CubeFramebuffer.cpp"
-    "Framebuffers/EffectFramebuffer.h"          "Framebuffers/EffectFramebuffer.cpp"
-    "Framebuffers/GBufferFramebuffer.h"         "Framebuffers/GBufferFramebuffer.cpp"
-    "Framebuffers/OutlineFramebuffer.h"         "Framebuffers/OutlineFramebuffer.cpp"
-    "Framebuffers/PostProcessFrameBuffer.h"     "Framebuffers/PostProcessFrameBuffer.cpp"
-    "Framebuffers/SSAOFramebuffer.h"            "Framebuffers/SSAOFramebuffer.cpp"
+    # "Framebuffers/Framebuffer.h"                "Framebuffers/Framebuffer.cpp"
+    # "Framebuffers/BRDFLookUpFramebuffer.h"      "Framebuffers/BRDFLookUpFramebuffer.cpp"
+    # "Framebuffers/CubeFramebuffer.h"            "Framebuffers/CubeFramebuffer.cpp"
+    # "Framebuffers/EffectFramebuffer.h"          "Framebuffers/EffectFramebuffer.cpp"
+    # "Framebuffers/GBufferFramebuffer.h"         "Framebuffers/GBufferFramebuffer.cpp"
+    # "Framebuffers/OutlineFramebuffer.h"         "Framebuffers/OutlineFramebuffer.cpp"
+    # "Framebuffers/PostProcessFrameBuffer.h"     "Framebuffers/PostProcessFrameBuffer.cpp"
+    # "Framebuffers/SSAOFramebuffer.h"            "Framebuffers/SSAOFramebuffer.cpp"
 
     # Instancing
-    "Instancing/AnimBuffer.h"           "Instancing/AnimBuffer.cpp"
-    "Instancing/InstanceBuffer.h"       "Instancing/InstanceBuffer.cpp"
-    "Instancing/InstanceProperty.h"     "Instancing/InstanceProperty.cpp"
-    "Instancing/RenderBatch.h"          "Instancing/RenderBatch.cpp"
-    "Instancing/RenderQueue.h"          "Instancing/RenderQueue.cpp"
+    # "Instancing/AnimBuffer.h"           "Instancing/AnimBuffer.cpp"
+    # "Instancing/InstanceBuffer.h"       "Instancing/InstanceBuffer.cpp"
+    # "Instancing/InstanceProperty.h"     "Instancing/InstanceProperty.cpp"
+    # "Instancing/RenderBatch.h"          "Instancing/RenderBatch.cpp"
+    # "Instancing/RenderQueue.h"          "Instancing/RenderQueue.cpp"
 
     # Layouts
     "Layout/VertexLayout.h"      "Layout/VertexLayout.cpp"
 
     # VRAM
+    "VRAM/VRAMAllocation.h"           "VRAM/VRAMAllocation.cpp"       
+    "VRAM/VRAMFreeList.h"           "VRAM/VRAMFreeList.cpp"
+    "VRAM/VRAMNode.h"               "VRAM/VRAMNode.cpp"
     "VRAM/VRAMPool.h"               "VRAM/VRAMPool.cpp"
 
     # Managers
     "Managers/VRAMManager.h"          "Managers/VRAMManager.cpp"
-    "Managers/InstanceManager.h"      "Managers/InstanceManager.cpp"
-    "Managers/RenderManager.h"        "Managers/RenderManager.cpp"    "Managers/RenderManager.inl"
+    # "Managers/InstanceManager.h"      "Managers/InstanceManager.cpp"
+    # "Managers/RenderManager.h"        "Managers/RenderManager.cpp"    "Managers/RenderManager.inl"
 
     # Utils
-    "Utils/GeometryGenerator.h"        "Utils/GeometryGenerator.cpp"
+    # "Utils/GeometryGenerator.h"        "Utils/GeometryGenerator.cpp"
     # "Utils/IBLUtils.h"               "Utils/IBLUtils.cpp"
 )
 

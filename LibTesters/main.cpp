@@ -1,6 +1,7 @@
 ﻿#include "pch.h"
 #include "Bootstrapper/Bootstrapper.h"
 #include "Debug/MemoryProfiler.h"
+#include "Debug/VRAMProfiler.h"
 
 #include "Managers/TimeManager.h"
 #include "Managers/WindowManager.h"
@@ -8,6 +9,7 @@
 #include "Managers/TaskManager.h"
 #include "Managers/PathManager.h"
 #include "Managers/InputManager.h"
+#include "Managers/VRAMManager.h"
 
 using namespace MGF3D;
 
@@ -120,6 +122,30 @@ int main()
     MGF_LOG_WARN(">> [Memory Test] 6. After SharedPtr Scope (Memory should be restored)");
     MGF_MEMORY_PROFILE_CAPTURE();
     MGF_MEMORY_LOG_STATS();
+
+    /*=================================================//
+    // [테스트 4] VRAM 직접 할당 및 프로파일링 테스트     //
+    //=================================================*/
+    MGF_LOG_WARN(">> [VRAM Test] 1. Before VRAM Allocation");
+    MGF_VRAM_PROFILE_CAPTURE();
+    MGF_VRAM_LOG_STATS();
+
+    {
+        MGF_LOG_INFO("--- Allocating 16MB from Static VRAM Pool ---");
+        // 16MB 크기, 256 바이트 정렬로 Static Pool에 할당 요청
+        VRAMAllocation testVramAlloc = VRAMManager::Instance().Allocate(VRAMAllocation::PoolType::Static, 16 * 1024 * 1024, 256);
+
+        MGF_LOG_WARN(">> [VRAM Test] 2. After Allocation (Static Pool usage should increase)");
+        MGF_VRAM_PROFILE_CAPTURE();
+        MGF_VRAM_LOG_STATS();
+
+        MGF_LOG_INFO("--- Deallocating 16MB from Static VRAM Pool ---");
+        VRAMManager::Instance().Deallocate(testVramAlloc);
+    }
+
+    MGF_LOG_WARN(">> [VRAM Test] 3. After Deallocation (VRAM should be restored)");
+    MGF_VRAM_PROFILE_CAPTURE();
+    MGF_VRAM_LOG_STATS();
 
     /*=================================================//
     //                 메인 게임 루프                   //

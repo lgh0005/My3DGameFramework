@@ -4,10 +4,9 @@ namespace MGF3D
 {
 	class GLBufferHandle
 	{
-	public:
-		static void* operator new(usize size);
-		static void operator delete(void* ptr, usize size);
+		MGF_DECLARE_CUSTOM_ALLOCATORS();
 
+	public:
 		virtual void Bind() const = 0;
 		virtual void Unbind() const = 0;
 

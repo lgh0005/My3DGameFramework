@@ -1,5 +1,4 @@
 ﻿#pragma once
-#include "Utils/AssetFormat.h"
 #include "Animation/Pose.h"
 
 namespace MGF3D
