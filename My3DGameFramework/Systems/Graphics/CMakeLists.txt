@@ -9,11 +9,40 @@ set(SOURCES
     # Module
     "GraphicsModule.h"              "GraphicsModule.cpp"
 
+    # Common
+    "Common/GraphicsConstants.h"
+    "Common/AssetFormat.h"          "Common/AssetFormat.cpp"
+
+    # Core
+    "Core/GlobalUniforms.h"         "Core/GlobalUniforms.cpp"
+    "Core/RenderContext.h"          "Core/RenderContext.cpp"
+    "Core/Renderer.h"               "Core/Renderer.cpp"
+    "Core/RenderPass.h"             "Core/RenderPass.cpp"
+    "Core/RenderPipeline.h"         "Core/RenderPipeline.cpp"
+
+    # Defines
+    "Defines/DefineManager.h"
+
     # Animation
     "Animation/AnimChannel.h"       "Animation/AnimChannel.cpp"
     "Animation/AnimClip.h"          "Animation/AnimClip.cpp"
     "Animation/Pose.h"              "Animation/Pose.cpp"
     "Animation/Skeleton.h"          "Animation/Skeleton.cpp"
+
+    # Uniforms
+    "Uniforms/CameraUBO.h"           "Uniforms/CameraUBO.cpp"
+    "Uniforms/LightUBO.h"            "Uniforms/LightUBO.cpp"
+    "Uniforms/LightArrayUBO.h"       "Uniforms/LightArrayUBO.cpp"
+    "Uniforms/MaterialFactorUBO.h"   "Uniforms/MaterialFactorUBO.cpp"
+
+    # Vertices
+    "Vertices/ScreenVertex.h"        "Vertices/ScreenVertex.cpp"
+    "Vertices/SkinnedVertex.h"       "Vertices/SkinnedVertex.cpp"
+    "Vertices/StaticVertex.h"        "Vertices/StaticVertex.cpp"
+    "Vertices/UIVertex.h"            "Vertices/UIVertex.cpp"
+
+    # Shaders
+
 
     # Buffers
     "Buffers/GLBufferHandle.h"          "Buffers/GLBufferHandle.cpp"
@@ -22,8 +51,11 @@ set(SOURCES
     "Buffers/GLUniformBuffer.h"         "Buffers/GLUniformBuffer.cpp"
     "Buffers/GLVertexBuffer.h"          "Buffers/GLVertexBuffer.cpp"
 
+    # Textures
+
+
     # Framebuffers
-    "Framebuffers/FramebufferBase.h"      "Framebuffers/FramebufferBase.cpp"
+    "Framebuffers/FramebufferBase.h"            "Framebuffers/FramebufferBase.cpp"
 
     "Framebuffers/Framebuffer.h"                "Framebuffers/Framebuffer.cpp"
     "Framebuffers/BRDFLookUpFramebuffer.h"      "Framebuffers/BRDFLookUpFramebuffer.cpp"
@@ -42,18 +74,19 @@ set(SOURCES
     "Instancing/RenderQueue.h"          "Instancing/RenderQueue.cpp"
 
     # Layouts
-    "Layouts/Uniform.h"      "Layouts/Uniform.cpp"
-    "Layouts/Vertex.h"      "Layouts/Vertex.cpp"
-    "Layouts/VertexLayout.h"      "Layouts/VertexLayout.cpp"
+    "Layout/VertexLayout.h"      "Layout/VertexLayout.cpp"
+
+    # VRAM
+    "VRAM/VRAMPool.h"               "VRAM/VRAMPool.cpp"
 
     # Managers
+    "Managers/VRAMManager.h"          "Managers/VRAMManager.cpp"
     "Managers/InstanceManager.h"      "Managers/InstanceManager.cpp"
-    "Managers/RenderManager.h"      "Managers/RenderManager.cpp"  "Managers/RenderManager.inl"
+    "Managers/RenderManager.h"        "Managers/RenderManager.cpp"    "Managers/RenderManager.inl"
 
     # Utils
-    "Utils/GeometryGenerator.h"      "Utils/GeometryGenerator.cpp"
+    "Utils/GeometryGenerator.h"        "Utils/GeometryGenerator.cpp"
     # "Utils/IBLUtils.h"               "Utils/IBLUtils.cpp"
-    "Utils/AssetFormat.h"            "Utils/AssetFormat.cpp"
 )
 
 # 2. 빌드 타겟 생성 및 별칭 등록

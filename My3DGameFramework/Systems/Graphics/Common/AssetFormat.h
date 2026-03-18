@@ -1,5 +1,4 @@
 ﻿#pragma once
-#define MAX_BONE_INFLUENCE 4
 
 namespace MGF3D
 {
@@ -131,8 +130,8 @@ namespace MGF3D
             std::vector<AssetFmt::RawBoneInfo> boneOffsetInfos;
             bool hasSkeleton = false;
             std::vector<AssetFmt::RawNode> nodes;
-            vec3 globalAABBMin = vec3(FLT_MAX);
-            vec3 globalAABBMax = vec3(-FLT_MAX);
+            vec3 globalAABBMin = vec3(FloatMax);
+            vec3 globalAABBMax = vec3(FloatLowest);
         };
     }
 }

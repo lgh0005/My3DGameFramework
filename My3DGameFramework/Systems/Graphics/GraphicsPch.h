@@ -11,8 +11,20 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
-/*===============================//
-//    Rendering common headers   //
-//===============================*/
-#include "Utils/GraphicsUtils.h"
+/*==============================//
+//    Graphics common headers   //
+//==============================*/
+#include "Common/GraphicsConstants.h"
+#include "Common/AssetFormat.h"
+
+/*==============================//
+//    Graphics common defines   //
+//==============================*/
 #include "Defines/DefineManager.h"
+#include "Defines/DefineOperators.h"
+#include "Defines/DefineMemoryAlignment.h"
+
+/*============================//
+//    Graphics common utils   //
+//============================*/
+#include "Utils/GraphicsUtils.h"
