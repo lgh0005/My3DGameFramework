@@ -46,8 +46,11 @@ set(SOURCES
     "Vertices/StaticVertex.h"        "Vertices/StaticVertex.cpp"
     "Vertices/UIVertex.h"            "Vertices/UIVertex.cpp"
 
-    # Shaders
+    # Meshes
+    "Meshes/Mesh.h"                  "Meshes/Mesh.cpp"
+    "Meshes/SubMesh.h"               "Meshes/SubMesh.cpp"
 
+    # Shaders
 
     # Buffers
     "Buffers/GLBufferHandle.h"          "Buffers/GLBufferHandle.cpp"
@@ -92,6 +95,7 @@ set(SOURCES
     # Utils
     # "Utils/GeometryGenerator.h"        "Utils/GeometryGenerator.cpp"
     # "Utils/IBLUtils.h"               "Utils/IBLUtils.cpp"
+    "Utils/SubMeshBuilder.h"             "Utils/SubMeshBuilder.cpp"     "Utils/SubMeshBuilder.inl"
 )
 
 # 2. 빌드 타겟 생성 및 별칭 등록

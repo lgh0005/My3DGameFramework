@@ -49,6 +49,7 @@ set(SOURCES
     #"Entities/Entity/GameObject.h"      "Entities/Entity/GameObject.cpp"      "Entities/Entity/GameObject.inl" 
 
     # Managers
+    "Managers/AssetManager.h"       "Managers/AssetManager.cpp"
     "Managers/JobManager.h"      "Managers/JobManager.cpp"
     "Managers/MemoryManager.h"      "Managers/MemoryManager.cpp"
     "Managers/NameManager.h"        "Managers/NameManager.cpp"
@@ -84,6 +85,11 @@ set(SOURCES
     "Resource/IResourceDescriptor.h" "Resource/IResourceDescriptor.cpp"
     "Resource/IResourceLoader.h"     "Resource/IResourceLoader.cpp"   
     "Resource/Resource.h"            "Resource/Resource.cpp"
+
+    # Asset
+    "Asset/Asset.h"            "Asset/Asset.cpp"
+    "Asset/IAssetDescriptor.h"            "Asset/IAssetDescriptor.cpp"
+    "Asset/IAssetLoader.h"            "Asset/IAssetLoader.cpp"
 
     # Spatial
     "Spatial/AABB.h"                "Spatial/AABB.cpp"
