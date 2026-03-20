@@ -1,2 +1,2 @@
 #include "GraphicsPch.h"
-#include "Framebuffer.h"
+#include "Texture2D.h"

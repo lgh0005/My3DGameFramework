@@ -57,19 +57,16 @@ set(SOURCES
     "Buffers/GLVertexBuffer.h"          "Buffers/GLVertexBuffer.cpp"
 
     # Textures
-
+    "Textures/Texture.h"                 "Textures/Texture.cpp"
+    "Textures/TextureCube.h"             "Textures/TextureCube.cpp"
+    "Textures/Texture2D.h"               "Textures/Texture2D.cpp"
+    "Textures/Texture3D.h"               "Textures/Texture3D.cpp"
 
     # Framebuffers
-    # "Framebuffers/FramebufferBase.h"            "Framebuffers/FramebufferBase.cpp"
-
-    # "Framebuffers/Framebuffer.h"                "Framebuffers/Framebuffer.cpp"
-    # "Framebuffers/BRDFLookUpFramebuffer.h"      "Framebuffers/BRDFLookUpFramebuffer.cpp"
-    # "Framebuffers/CubeFramebuffer.h"            "Framebuffers/CubeFramebuffer.cpp"
-    # "Framebuffers/EffectFramebuffer.h"          "Framebuffers/EffectFramebuffer.cpp"
-    # "Framebuffers/GBufferFramebuffer.h"         "Framebuffers/GBufferFramebuffer.cpp"
-    # "Framebuffers/OutlineFramebuffer.h"         "Framebuffers/OutlineFramebuffer.cpp"
-    # "Framebuffers/PostProcessFrameBuffer.h"     "Framebuffers/PostProcessFrameBuffer.cpp"
-    # "Framebuffers/SSAOFramebuffer.h"            "Framebuffers/SSAOFramebuffer.cpp"
+    "Framebuffers/Framebuffer.h"        "Framebuffers/Framebuffer.cpp"
+    "Framebuffers/FramebufferCube.h"    "Framebuffers/FramebufferCube.cpp"
+    "Framebuffers/Framebuffer2D.h"      "Framebuffers/Framebuffer2D.cpp"
+    "Framebuffers/Framebuffer3D.h"      "Framebuffers/Framebuffer3D.cpp"
 
     # Instancing
     # "Instancing/AnimBuffer.h"           "Instancing/AnimBuffer.cpp"
@@ -79,7 +76,7 @@ set(SOURCES
     # "Instancing/RenderQueue.h"          "Instancing/RenderQueue.cpp"
 
     # Layouts
-    "Layout/VertexLayout.h"      "Layout/VertexLayout.cpp"
+    "Layout/VertexLayout.h"             "Layout/VertexLayout.cpp"
 
     # VRAM
     "VRAM/VRAMAllocation.h"           "VRAM/VRAMAllocation.cpp"       

@@ -2,8 +2,5 @@
 
 namespace MGF3D
 {
-	class Framebuffer
-	{
 
-	};
 }
