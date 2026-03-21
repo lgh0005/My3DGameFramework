@@ -1,6 +1,6 @@
 # 1. 하위 개별 모듈들 추가
 # add_subdirectory(Mechanics)
-# add_subdirectory(Resources)
+add_subdirectory(Resources)
 # add_subdirectory(Assets)
 # add_subdirectory(Components)
 

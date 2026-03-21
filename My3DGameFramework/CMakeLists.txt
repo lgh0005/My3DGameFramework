@@ -9,14 +9,8 @@ add_subdirectory(Systems)
 # Leve 3: 미들웨어 초기화 및 glfw 컨텍스트 생성
 add_subdirectory(Middleware)
 
-# Level 3: Core와 glfw에 의존하는 기초 시스템들
-#add_subdirectory(Window)
-#add_subdirectory(InputSystem)
-#add_subdirectory(Time)
-
 # Level 4: 컴포넌트와 리소스 모듈
-#add_subdirectory(Resources)
-#add_subdirectory(Components)
+add_subdirectory(Framework)
 
 # Level 5: 컴포넌트와 리소스 모듈 활성화
 #add_subdirectory(Bootstrap/Modules)

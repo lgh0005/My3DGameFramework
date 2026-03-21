@@ -2,20 +2,13 @@
 
 namespace MGF3D
 {
-	class MiddlewareBootstrapper
+	class ModuleBootstrapper
 	{
 	public:
 
 		// TODO
-		// 0. 디버거 초기화
-		// 1. Core 단에 있는 여러 매니저들을 모두 초기화
-		// 2. Core와 Boostrap 사이 계층 매니저들을 초기화 : LuaManager, AudioManager
-		// 3. glfw 콘텍스트 생성
-		// 4. 이 lib에서 Core 매니저들의 별칭들 inline 함수로 두거나 inline 전역 변수 선언을
-		// 고려해볼 필요가 있다.
-
-	private:
-
-
+		// Framework 단에서 선언한 모듈 내부의 리소스, 컴포넌트 등의 타입 계층 구조를
+		// 여기서 한 번 초기화를 한다.
+		// 즉, RTTI 회피를 위해서 런타임에 Core단의 TypeManager의 정보가 여기에서 전부 채워질 예정이다.
 	};
 }

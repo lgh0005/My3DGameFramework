@@ -1,5 +1,5 @@
 ﻿#include "BootstrapPch.h"
-#include "MiddlewareBootstrapper.h"
+#include "ModuleBootstrapper.h"
 
 namespace MGF3D
 {

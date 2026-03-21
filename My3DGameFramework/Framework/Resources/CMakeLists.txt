@@ -6,7 +6,17 @@ set(TARGET_NAME Engine::${MODULE_NAME})
 # 1. 소스 파일 목록 정의
 set(SOURCES
 
+    # 0. Module
+    "ResourceModule.h"          "ResourceModule.cpp"  
 
+    # 1. Descriptors
+
+    # 2. Loaders
+
+    # 3. Framebuffers
+
+    # 4. Meshes
+    "Meshes/StaticMesh.h"       "Meshes/StaticMesh.cpp"
 )
 
 # 2. 빌드 타겟 생성 및 별칭 등록
