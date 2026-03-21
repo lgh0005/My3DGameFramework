@@ -44,9 +44,12 @@ set(SOURCES
     #"Entities/ECS/Storage.h"      "Entities/ECS/Storage.cpp"   "Entities/ECS/Storage.inl"
     #"Entities/ECS/Chunk.h"          "Entities/ECS/Chunk.cpp"   "Entities/ECS/Chunk.inl"
 
-    #"Entities/Entity/Object.h"      "Entities/Entity/Object.cpp"
-    #"Entities/Entity/Component.h"      "Entities/Entity/Component.cpp"
-    #"Entities/Entity/GameObject.h"      "Entities/Entity/GameObject.cpp"      "Entities/Entity/GameObject.inl" 
+    #"Entities/Entity/Object.h"                             "Entities/Entity/Object.cpp"
+    #"Entities/Entity/Mechanic/Mechanic.h"                  "Entities/Entity/Mechanic/Mechanic.cpp"
+    #"Entities/Entity/Mechanic/IMechanicDescriptor.h"       "Entities/Entity/Mechanic/IMechanicDescriptor.cpp"
+    #"Entities/Entity/Component/Component.h"                "Entities/Entity/Component/Component.cpp"
+    #"Entities/Entity/Component/IComponentDescriptor.h"     "Entities/Entity/Component/IComponentDescriptor.cpp"
+    #"Entities/Entity/GameObject/GameObject.h"              "Entities/Entity/GameObject/GameObject.cpp"      "Entities/Entity/GameObject/GameObject.inl" 
 
     # Managers
     "Managers/AssetManager.h"       "Managers/AssetManager.cpp"

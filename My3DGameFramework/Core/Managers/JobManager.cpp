@@ -63,10 +63,10 @@ namespace MGF3D
 
         while (!m_isShutdown.load())
         {
-            auto task = TaskManager::Instance().PopTask();
+            auto task = MGF_TASK.PopTask();
             
             if (task) task->Execute();
-            else TaskManager::Instance().WaitForTask();
+            else MGF_TASK.WaitForTask();
         }
     }
 
@@ -77,7 +77,7 @@ namespace MGF3D
         m_isShutdown = true;
 
         // 잠자고 있는 모든 워커들을 강제로 깨워 루프를 탈출하게 함
-        TaskManager::Instance().Broadcast();
+        MGF_TASK.Broadcast();
 
         // MGFJob의 소멸자가 호출되면서 내부의 MGFThread가 Join/정리됨
         m_workers.Release();
