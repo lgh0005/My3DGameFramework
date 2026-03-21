@@ -26,6 +26,7 @@ set(SOURCES
     # Defines
     "Defines/DefineManager.h"
     "Defines/DefineMemoryAlignment.h"
+    "Defines/DefineGLExtension.h"
 
     # Animation
     # "Animation/AnimChannel.h"       "Animation/AnimChannel.cpp"
@@ -59,16 +60,16 @@ set(SOURCES
     "Buffers/GLVertexBuffer.h"          "Buffers/GLVertexBuffer.cpp"
 
     # Textures
-    "Textures/Texture.h"                 "Textures/Texture.cpp"
-    "Textures/TextureCube.h"             "Textures/TextureCube.cpp"
-    "Textures/Texture2D.h"               "Textures/Texture2D.cpp"
-    "Textures/Texture3D.h"               "Textures/Texture3D.cpp"
+    "Textures/GLTexture.h"                 "Textures/GLTexture.cpp"
+    "Textures/GLTextureCube.h"             "Textures/GLTextureCube.cpp"
+    "Textures/GLTexture2D.h"               "Textures/GLTexture2D.cpp"
+    "Textures/GLTexture3D.h"               "Textures/GLTexture3D.cpp"
 
     # Framebuffers
-    "Framebuffers/Framebuffer.h"        "Framebuffers/Framebuffer.cpp"
-    "Framebuffers/FramebufferCube.h"    "Framebuffers/FramebufferCube.cpp"
-    "Framebuffers/Framebuffer2D.h"      "Framebuffers/Framebuffer2D.cpp"
-    "Framebuffers/Framebuffer3D.h"      "Framebuffers/Framebuffer3D.cpp"
+    "Framebuffers/GLFramebuffer.h"        "Framebuffers/GLFramebuffer.cpp"
+    "Framebuffers/GLFramebufferCube.h"    "Framebuffers/GLFramebufferCube.cpp"
+    "Framebuffers/GLFramebuffer2D.h"      "Framebuffers/GLFramebuffer2D.cpp"
+    "Framebuffers/GLFramebuffer3D.h"      "Framebuffers/GLFramebuffer3D.cpp"
 
     # Instancing
     # "Instancing/AnimBuffer.h"           "Instancing/AnimBuffer.cpp"
@@ -93,8 +94,9 @@ set(SOURCES
 
     # Utils
     # "Utils/GeometryGenerator.h"        "Utils/GeometryGenerator.cpp"
-    # "Utils/IBLUtils.h"               "Utils/IBLUtils.cpp"
+    # "Utils/IBLUtils.h"                 "Utils/IBLUtils.cpp"
     "Utils/SubMeshBuilder.h"             "Utils/SubMeshBuilder.cpp"     "Utils/SubMeshBuilder.inl"
+    "Utils/TextureUtils.h"               "Utils/TextureUtils.cpp"
 )
 
 # 2. 빌드 타겟 생성 및 별칭 등록

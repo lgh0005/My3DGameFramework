@@ -2,7 +2,7 @@
 
 namespace MGF3D
 {
-	class Framebuffer2D
+	class GLFramebufferCube
 	{
 
 	};

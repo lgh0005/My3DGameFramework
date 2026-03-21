@@ -2,7 +2,7 @@
 
 namespace MGF3D
 {
-	class Texture
+	class GLFramebuffer
 	{
 
 	};

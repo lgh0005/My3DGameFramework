@@ -20,8 +20,8 @@
 /*==============================//
 //    Graphics common defines   //
 //==============================*/
+#include "Defines/DefineGLExtension.h"
 #include "Defines/DefineManager.h"
-#include "Defines/DefineOperators.h"
 #include "Defines/DefineMemoryAlignment.h"
 
 /*============================//

@@ -2,5 +2,8 @@
 
 namespace MGF3D
 {
+	class GLFramebuffer3D
+	{
 
+	};
 }

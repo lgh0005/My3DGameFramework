@@ -1,7 +1,6 @@
 #include "GraphicsPch.h"
 #include "GLBufferHandle.h"
 #include "Managers/VRAMManager.h"
-#include "Managers/MemoryManager.h"
 
 namespace MGF3D
 {
@@ -23,6 +22,7 @@ namespace MGF3D
     {
         return m_allocation.GetSize();
     }
+
     const VRAMAllocation& GLBufferHandle::GetAllocation() const
     {
         return m_allocation;
