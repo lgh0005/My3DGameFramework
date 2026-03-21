@@ -3,10 +3,14 @@
 namespace MGF3D
 {
 	MGF_CLASS_PTR(IResourceDescriptor)
-	class IResourceDescriptor
+	struct IResourceDescriptor
 	{
-	public:
-		IResourceDescriptor(StringHash id);
+		IResourceDescriptor
+		(
+			StringHash id,
+			const MGFName& n, 
+			const MGFPath& p
+		);
 		virtual ~IResourceDescriptor();
 
 		MGFName name;

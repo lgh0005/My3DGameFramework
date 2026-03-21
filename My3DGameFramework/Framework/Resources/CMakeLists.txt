@@ -10,17 +10,29 @@ set(SOURCES
     "ResourceModule.h"          "ResourceModule.cpp"  
 
     # 1. Descriptors
+    "Descriptors/StaticMeshDescriptor.h"        "Descriptors/StaticMeshDescriptor.cpp"
+    "Descriptors/SkinnedMeshDescriptor.h"       "Descriptors/SkinnedMeshDescriptor.cpp"
+    "Descriptors/ScreenMeshDescriptor.h"        "Descriptors/ScreenMeshDescriptor.cpp"
+    "Descriptors/UIMeshDescriptor.h"            "Descriptors/UIMeshDescriptor.cpp"
 
     # 2. Loaders
+    "Loaders/StaticMeshLoader.h"                "Loaders/StaticMeshLoader.cpp"
+    "Loaders/SkinnedMeshLoader.h"               "Loaders/SkinnedMeshLoader.cpp"
+    "Loaders/UIMeshLoader.h"                    "Loaders/UIMeshLoader.cpp"
+    "Loaders/ScreenMeshLoader.h"                "Loaders/ScreenMeshLoader.cpp"
 
     # 3. Framebuffers
 
+
     # 4. Meshes
     "Meshes/StaticMesh.h"       "Meshes/StaticMesh.cpp"
+    "Meshes/SkinnedMesh.h"      "Meshes/SkinnedMesh.cpp"
+    "Meshes/UIMesh.h"           "Meshes/UIMesh.cpp"
+    "Meshes/ScreenMesh.h"       "Meshes/ScreenMesh.cpp"
 )
 
 # 2. 빌드 타겟 생성 및 별칭 등록
-add_library(${LIB_NAME} STATIC ${SOURCES})
+add_library(${LIB_NAME} STATIC ${SOURCES} "Descriptors/UIMeshDescriptor.cpp")
 add_library(${TARGET_NAME} ALIAS ${LIB_NAME})
 
 # 3. Visual Studio 필터 설정
@@ -33,7 +45,8 @@ target_include_directories(${LIB_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 target_link_libraries(${LIB_NAME} 
 
 PUBLIC
-    # Engine::Core
+    Engine::Core
+    Engine::Graphics
 )
 
 # 6. PCH (Precompiled Header) 설정

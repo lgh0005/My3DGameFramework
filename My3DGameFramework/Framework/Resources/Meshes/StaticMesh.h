@@ -1,6 +1,6 @@
 #pragma once
 #include "Meshes/Mesh.h"
-#include "Vertices/StaticVertex.h"
+#include "Descriptors/StaticMeshDescriptor.h"
 
 namespace MGF3D
 {
@@ -8,35 +8,22 @@ namespace MGF3D
 	class StaticMesh : public Mesh
 	{
 		using Super = Mesh;
-		MGF_DECLARE_CUSTOM_ALLOCATORS()
+		MGF_DECLARE_CUSTOM_ALLOCATORS;
 
 	public:
-		static StaticMeshPtr Create
-		(
-			const IResourceDescriptor& desc,
-			SVector<StaticVertex>&& vertices,
-			SVector<uint32>&& indices
-		);
-
+		static StaticMeshPtr Create(StaticMeshDescriptor&& desc);
 		virtual ~StaticMesh() override;
 
-	protected:
+	public:
 		virtual bool OnLoad() override;
 		virtual bool OnCommit() override;
 		virtual void OnRelease() override;
 
 	private:
-		StaticMesh(const IResourceDescriptor& desc);
-		bool Init
-		(
-			const IResourceDescriptor& desc,
-			SVector<StaticVertex>&& vertices,
-			SVector<uint32>&& indices
-		);
-		void ComputeTangents();
+		StaticMesh(StaticMeshDescriptor& desc);
+		bool Init(StaticMeshDescriptor&& desc);
 
-	private:
-		SVector<StaticVertex> m_vertices;
-		SVector<uint32>       m_indices;
+		void ComputeTangents();
+		SVector<StaticGeometryData> m_meshData;
 	};
 }

@@ -5,7 +5,7 @@ namespace MGF3D
 {
 	class GLBufferHandle
 	{
-		MGF_DECLARE_CUSTOM_ALLOCATORS();
+		MGF_DECLARE_CUSTOM_ALLOCATORS;
 
 	public:
 		virtual void Bind() const = 0;

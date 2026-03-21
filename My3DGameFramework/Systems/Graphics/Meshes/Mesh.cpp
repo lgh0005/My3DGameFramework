@@ -3,7 +3,7 @@
 
 namespace MGF3D
 {
-	Mesh::Mesh() = default;
+	Mesh::Mesh(const IResourceDescriptor& desc) : Super(desc) { }
 	Mesh::~Mesh() = default;
 
 	void Mesh::AddSubMesh(SubMesh&& subMesh)

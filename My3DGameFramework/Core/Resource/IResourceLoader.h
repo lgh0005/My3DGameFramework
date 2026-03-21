@@ -8,11 +8,13 @@ namespace MGF3D
 	class IResourceLoader
 	{
 	public:
-		virtual ~IResourceLoader() = default;
-		
+		IResourceLoader();
+		virtual ~IResourceLoader();
+
+	public:
 		virtual bool Load
 		(
-			const SharedPtr<Resource>& outResource,
+			ResourcePtr& outResource,
 			IResourceDescriptorUPtr desc
 		) = 0;
 	};

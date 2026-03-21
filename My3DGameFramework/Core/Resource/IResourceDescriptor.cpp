@@ -3,6 +3,11 @@
 
 namespace MGF3D
 {
-	IResourceDescriptor::IResourceDescriptor(StringHash id) : typeID(id) { }
+	IResourceDescriptor::IResourceDescriptor
+	(
+		StringHash id, 
+		const MGFName& n, 
+		const MGFPath& p
+	) { }
 	IResourceDescriptor::~IResourceDescriptor() = default;
 }

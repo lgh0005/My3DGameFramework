@@ -15,6 +15,7 @@ set(SOURCES
     "Defines/DefineManager.h"
     "Defines/DefineSingleton.h"
     "Defines/DefineModule.h"
+    "Defines/DefineOperators.h"
 
     # Common
     "Common/Types.h"

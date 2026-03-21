@@ -1,62 +1,76 @@
 #include "ResourcePch.h"
-#include "StaticMesh.h"
+#include "SkinnedMesh.h"
 #include "Utils/SubMeshBuilder.h"
 
 namespace MGF3D
 {
-	MGF_IMPLEMENT_CUSTOM_ALLOCATORS(StaticMesh)
+	MGF_IMPLEMENT_CUSTOM_ALLOCATORS(SkinnedMesh)
 
-	StaticMesh::StaticMesh(StaticMeshDescriptor& desc) : Super(desc) {}
-	StaticMesh::~StaticMesh() = default;
+	SkinnedMesh::SkinnedMesh(SkinnedMeshDescriptor& desc) : Super(desc) {}
+	SkinnedMesh::~SkinnedMesh() = default;
 
-	StaticMeshPtr StaticMesh::Create(StaticMeshDescriptor&& desc)
+	SkinnedMeshPtr SkinnedMesh::Create(SkinnedMeshDescriptor&& desc)
 	{
-		auto mesh = StaticMeshPtr(new StaticMesh(desc));
+		auto mesh = SkinnedMeshPtr(new SkinnedMesh(desc));
 		if (!mesh->Init(std::move(desc))) return nullptr;
 		return mesh;
 	}
 
-	bool StaticMesh::Init(StaticMeshDescriptor&& desc)
+	bool SkinnedMesh::Init(SkinnedMeshDescriptor&& desc)
 	{
-		// 데이터가 비어있는지 확인
 		if (desc.geometryList.Count() == 0)
 		{
-			MGF_LOG_ERROR("[StaticMesh] Geometry list is empty in Descriptor.");
+			MGF_LOG_ERROR("[SkinnedMesh] Geometry list is empty in Descriptor.");
 			return false;
 		}
-
-		// Descriptor로부터 데이터 소유권 이전
 		m_meshData = std::move(desc.geometryList);
 		return true;
 	}
 
-	bool StaticMesh::OnLoad()
-	{
-		if (m_meshData.Count() == 0)
-		{
-			MGF_LOG_ERROR("[StaticMesh] No geometry data available for Load.");
-			return false;
-		}
-
-		ComputeTangents();
-		return true;
-	}
-
-	bool StaticMesh::OnCommit()
+	bool SkinnedMesh::OnLoad()
 	{
 		if (m_meshData.Count() == 0) return false;
 
-		// 1. 모든 기하 데이터를 순회하며 SubMesh 생성
+		// 1. 컨버터에서 탄젠트가 베이킹되었는지 확인
+		bool bNeedCompute = false;
+		for (const auto& geo : m_meshData)
+		{
+			if (geo.vertices.Count() > 0)
+			{
+				// 첫 번째 정점의 탄젠트가 유효하지 않으면 계산이 필요한 것으로 간주
+				if (!Math::HasLength(geo.vertices[0].tangent))
+				{
+					bNeedCompute = true;
+					break;
+				}
+			}
+		}
+
+		// 2. 필요 시 워커 스레드에서 탄젠트 연산 수행
+		if (bNeedCompute)
+		{
+			MGF_LOG_INFO("[SkinnedMesh] Computing missing tangents in background...");
+			ComputeTangents();
+		}
+
+		return true;
+	}
+
+	bool SkinnedMesh::OnCommit()
+	{
+		if (m_meshData.Count() == 0) return false;
+
+		// 메인 스레드에서 GPU 버퍼 생성 및 데이터 업로드
 		bool bSuccess = false;
 		for (auto& geoData : m_meshData)
 		{
 			if (geoData.vertices.Count() == 0 || geoData.indices.Count() == 0) continue;
 
-			// VRAM 버퍼 및 레이아웃 생성
-			SubMesh subMesh = SubMeshBuilder::BuildSubMesh<StaticVertex>(geoData.vertices, geoData.indices);
+			// SubMeshBuilder에서 이전에 작성한 SkinnedVertex 전용 레이아웃 설정을 호출합니다.
+			SubMesh subMesh = SubMeshBuilder::BuildSubMesh<SkinnedVertex>(geoData.vertices, geoData.indices);
 			if (!subMesh.vertexBuffer || !subMesh.indexBuffer)
 			{
-				MGF_LOG_ERROR("[StaticMesh] Failed to create VRAM buffers for a submesh.");
+				MGF_LOG_ERROR("[SkinnedMesh] Failed to create VRAM buffers for a submesh.");
 				return false;
 			}
 
@@ -71,12 +85,12 @@ namespace MGF3D
 		return bSuccess;
 	}
 
-	void StaticMesh::OnRelease()
+	void SkinnedMesh::OnRelease()
 	{
 		m_meshData.Clear();
 	}
 
-	void StaticMesh::ComputeTangents()
+	void SkinnedMesh::ComputeTangents()
 	{
 		// 1. 모든 서브 메쉬(GeometryData)를 순회
 		for (auto& geoData : m_meshData)
@@ -96,9 +110,9 @@ namespace MGF3D
 				uint32 i1 = indices[i + 1];
 				uint32 i2 = indices[i + 2];
 
-				StaticVertex& v0 = vertices[i0];
-				StaticVertex& v1 = vertices[i1];
-				StaticVertex& v2 = vertices[i2];
+				SkinnedVertex& v0 = vertices[i0];
+				SkinnedVertex& v1 = vertices[i1];
+				SkinnedVertex& v2 = vertices[i2];
 
 				// 위치 차이 (Edge 벡터)
 				vec3 edge1 = v1.position - v0.position;
@@ -108,9 +122,10 @@ namespace MGF3D
 				vec2 deltaUV1 = v1.texCoord - v0.texCoord;
 				vec2 deltaUV2 = v2.texCoord - v0.texCoord;
 
+				// Math 유틸리티를 이용한 2x2 행렬식 계산
 				mat2 uvMat(deltaUV1, deltaUV2);
 				float det = Math::Determinant(uvMat);
-			
+
 				vec3 t;
 				if (!Math::IsNearlyZero(det))
 				{
@@ -134,8 +149,8 @@ namespace MGF3D
 			// 4. 누적된 탄젠트를 정규화하고 노멀과 직교화
 			for (usize i = 0; i < vertices.Count(); ++i)
 			{
-				const glm::vec3& n = vertices[i].normal;
-				const glm::vec3& t = tangents[i];
+				const vec3& n = vertices[i].normal;
+				const vec3& t = tangents[i];
 
 				if (Math::HasLength(t))
 				{

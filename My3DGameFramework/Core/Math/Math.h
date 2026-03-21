@@ -34,6 +34,9 @@ namespace MGF3D
 		static mat3 Transpose(const mat3& m) noexcept;
 		static vec4 GetRow(const mat4& m, int index) noexcept;
 		static vec4 GetColumn(const mat4& m, int index) noexcept;
+		static float Determinant(const mat2& m) noexcept;
+		static float Determinant(const mat3& m) noexcept;
+		static float Determinant(const mat4& m) noexcept;
 
 	/*==========================//
 	//   Vector Operations      //

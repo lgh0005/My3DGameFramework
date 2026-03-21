@@ -26,7 +26,6 @@ set(SOURCES
     # Defines
     "Defines/DefineManager.h"
     "Defines/DefineMemoryAlignment.h"
-    "Defines/DefineOperators.h"
 
     # Animation
     # "Animation/AnimChannel.h"       "Animation/AnimChannel.cpp"

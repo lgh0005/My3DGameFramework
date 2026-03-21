@@ -1,13 +1,16 @@
 #pragma once
 #include "SubMesh.h"
+#include "Resource/Resource.h"
 
 namespace MGF3D
 {
 	MGF_CLASS_PTR(Mesh)
-	class Mesh
+	class Mesh : public Resource
 	{
+		using Super = Resource;
+
 	public:
-		Mesh();
+		Mesh(const IResourceDescriptor& desc);
 		~Mesh();
 
 	public:

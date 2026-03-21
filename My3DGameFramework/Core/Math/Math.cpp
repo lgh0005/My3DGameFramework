@@ -67,6 +67,21 @@ namespace MGF3D
 		return m[index];
 	}
 
+	float Math::Determinant(const mat2& m) noexcept
+	{
+		return glm::determinant(m);
+	}
+
+	float Math::Determinant(const mat3& m) noexcept
+	{
+		return glm::determinant(m);
+	}
+
+	float Math::Determinant(const mat4& m) noexcept
+	{
+		return glm::determinant(m);
+	}
+
 	/*==========================//
 	//   Vector Operations      //
 	//==========================*/

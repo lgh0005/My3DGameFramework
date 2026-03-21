@@ -69,6 +69,7 @@
 //===============================*/
 #include "Defines/DefineSystem.h"
 #include "Defines/DefineModule.h"
+#include "Defines/DefineOperators.h"
 
 /*==========================//
 //    Engine common utils   //

@@ -1,9 +1,9 @@
 #pragma once
 
-/*==============//
-//    CorePch   //
-//==============*/
-#include "CorePch.h"
+/*=====================//
+//    Nessesary Pchs   //
+//=====================*/
+#include "GraphicsPch.h"
 
 /*===============================//
 //    Resources common defines   //

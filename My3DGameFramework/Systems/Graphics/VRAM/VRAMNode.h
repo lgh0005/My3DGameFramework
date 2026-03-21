@@ -5,7 +5,7 @@ namespace MGF3D
     MGF_CLASS_PTR(VRAMNode)
 	class VRAMNode
 	{
-        MGF_DECLARE_CUSTOM_ALLOCATORS();
+        MGF_DECLARE_CUSTOM_ALLOCATORS;
 
         VRAMNode(uint64 _offset, uint64 _size, bool _free);
         ~VRAMNode();
