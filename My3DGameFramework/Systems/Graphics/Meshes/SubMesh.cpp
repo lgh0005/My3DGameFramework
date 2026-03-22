@@ -2,7 +2,7 @@
 #include "SubMesh.h"
 #include "Buffers/GLVertexBuffer.h"
 #include "Buffers/GLIndexBuffer.h"
-#include "Layout/VertexLayout.h"
+#include "Layouts/VertexLayout.h"
 
 namespace MGF3D
 {

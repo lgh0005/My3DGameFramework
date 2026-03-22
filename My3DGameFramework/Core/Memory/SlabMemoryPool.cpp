@@ -1,5 +1,5 @@
 ﻿#include "CorePch.h"
-#include "SlabMemoryPool.h"
+#include "Memory/SlabMemoryPool.h"
 #include "Utils/MemoryUtils.h"
 
 namespace MGF3D

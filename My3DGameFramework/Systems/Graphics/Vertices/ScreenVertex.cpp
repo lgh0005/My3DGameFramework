@@ -1,7 +1,7 @@
 #include "GraphicsPch.h"
 #include "ScreenVertex.h"
 #include "Utils/SubMeshBuilder.h"
-#include "Layout/VertexLayout.h"
+#include "Layouts/VertexLayout.h"
 
 namespace MGF3D
 {

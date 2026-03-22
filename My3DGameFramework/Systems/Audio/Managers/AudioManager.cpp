@@ -82,7 +82,7 @@ namespace MGF3D
 
 		// 내부의 실제 AudioMixer 포인터를 반환
 		if (pMixerUPtr && *pMixerUPtr)
-			return (*pMixerUPtr).get();
+			return (*pMixerUPtr).Get();
 
 		return nullptr;
 	}

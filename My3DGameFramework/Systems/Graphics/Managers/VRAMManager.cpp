@@ -16,8 +16,8 @@ namespace MGF3D
 
 	void VRAMManager::Shutdown()
 	{
-		m_staticVRAMPool.reset();
-		m_dynamicVRAMPool.reset();
+		m_staticVRAMPool.Reset();
+		m_dynamicVRAMPool.Reset();
 		MGF_LOG_INFO("VRAMManager Shutdown complete.");
 	}
 
@@ -31,10 +31,10 @@ namespace MGF3D
         switch (type)
         {
             case VRAMAllocation::PoolType::Static:
-                return AllocateFromPool(m_staticVRAMPool.get(), type, size, alignment);
+                return AllocateFromPool(m_staticVRAMPool.Get(), type, size, alignment);
 
             case VRAMAllocation::PoolType::Dynamic:
-                return AllocateFromPool(m_dynamicVRAMPool.get(), type, size, alignment);
+                return AllocateFromPool(m_dynamicVRAMPool.Get(), type, size, alignment);
 
             default:
                 MGF_LOG_ERROR("VRAMManager Allocation failed. Unknown PoolType.");
@@ -49,11 +49,11 @@ namespace MGF3D
         switch (alloc.GetPoolType())
         {
             case VRAMAllocation::PoolType::Static:
-                DeallocateFromPool(m_staticVRAMPool.get(), alloc.GetOffset());
+                DeallocateFromPool(m_staticVRAMPool.Get(), alloc.GetOffset());
                 break;
 
             case VRAMAllocation::PoolType::Dynamic:
-                DeallocateFromPool(m_dynamicVRAMPool.get(), alloc.GetOffset());
+                DeallocateFromPool(m_dynamicVRAMPool.Get(), alloc.GetOffset());
                 break;
 
             default:
@@ -70,11 +70,11 @@ namespace MGF3D
         switch (alloc.GetPoolType())
         {
             case VRAMAllocation::PoolType::Static:
-                UploadToPool(m_staticVRAMPool.get(), alloc.GetOffset(), data, alloc.GetSize());
+                UploadToPool(m_staticVRAMPool.Get(), alloc.GetOffset(), data, alloc.GetSize());
                 break;
 
             case VRAMAllocation::PoolType::Dynamic:
-                UploadToPool(m_dynamicVRAMPool.get(), alloc.GetOffset(), data, alloc.GetSize());
+                UploadToPool(m_dynamicVRAMPool.Get(), alloc.GetOffset(), data, alloc.GetSize());
                 break;
 
             default:

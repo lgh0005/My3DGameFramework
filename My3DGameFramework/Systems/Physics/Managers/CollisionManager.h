@@ -20,7 +20,7 @@ namespace MGF3D
 
 		usize GetObjectLayerCount() const { return m_ObjectNameToID.Count(); }
 		usize GetBPLayerCount()     const { return m_BroadPhaseNameToID.Count(); }
-		Ptr<JoltFilterSet> GetFilter() const { return m_filter.get(); }
+		Ptr<JoltFilterSet> GetFilter() const { return m_filter.Get(); }
 
 		bool ShouldCollideObjects(JPH::ObjectLayer inL1, JPH::ObjectLayer inL2) const;
 		bool ShouldCollideBroadPhase(JPH::ObjectLayer inLayer, JPH::BroadPhaseLayer inBP) const;

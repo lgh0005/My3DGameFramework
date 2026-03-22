@@ -28,7 +28,7 @@ namespace MGF3D
         if (m_mainWindow)
         {
             m_mainWindow->Destroy();
-            m_mainWindow.reset();
+            m_mainWindow.Reset();
             MGF_LOG_INFO("WindowManager : Main window shutdown.");
         }
     }

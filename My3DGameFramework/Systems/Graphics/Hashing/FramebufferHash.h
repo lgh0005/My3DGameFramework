@@ -15,8 +15,8 @@ namespace MGF3D
 		FramebufferHash(const FramebufferLayout& desc);
 
 	private:
-		static constexpr usize Calculate(const FramebufferLayout& desc);
-		static constexpr void Combine(usize& seed, uint32 v);
+		static usize Calculate(const FramebufferLayout& desc);
+		static void Combine(usize& seed, uint32 v);
 	};
 }
 

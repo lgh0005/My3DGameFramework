@@ -19,7 +19,7 @@ namespace MGF3D
 
 	void CollisionManager::Shutdown()
 	{
-		m_filter.reset();
+		m_filter.Reset();
 		m_ObjectNameToID.Release();
 		m_BroadPhaseNameToID.Release();
 		m_BroadPhaseIDToName.Release();

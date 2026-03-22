@@ -34,8 +34,8 @@ namespace MGF3D
 	void AudioEngine::Shutdown()
 	{
 		// 1. 부품들 먼저 해제
-		m_volumeController.reset();
-		m_ear.reset();
+		m_volumeController.Reset();
+		m_ear.Reset();
 
 		// 2. 네이티브 엔진 해제
 		ma_engine_uninit(&m_audioEngine);
@@ -50,12 +50,12 @@ namespace MGF3D
 
 	Ptr<VolumeController> AudioEngine::GetVolumeController() const
 	{
-		return m_volumeController.get();
+		return m_volumeController.Get();
 	}
 
 	Ptr<AudioEar> AudioEngine::GetEar() const
 	{
-		return m_ear.get();
+		return m_ear.Get();
 	}
 
 

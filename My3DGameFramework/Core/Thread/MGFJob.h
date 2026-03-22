@@ -25,7 +25,7 @@ namespace MGF3D
         // 외부(주로 메인 스레드)에서 이 스레드가 준비될 때까지 기다립니다.
         void WaitUntilReady();
 
-        Ptr<MGFThread> GetThread() const { return m_thread.get(); }
+        Ptr<MGFThread> GetThread() const { return m_thread.Get(); }
 
     private:
         MGFThreadUPtr m_thread;      // 실제 스레드 객체

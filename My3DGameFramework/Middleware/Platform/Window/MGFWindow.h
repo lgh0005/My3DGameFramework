@@ -1,11 +1,12 @@
 #pragma once
+#include "Pointer/PoolAlloc.h"
 
 struct GLFWwindow;
 
 namespace MGF3D
 {
 	MGF_CLASS_PTR(MGFWindow)
-	class MGFWindow
+	class MGFWindow : public PoolAlloc
 	{
 	public:
 		using ResizeCallback = Action<int32, int32>;

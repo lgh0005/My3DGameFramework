@@ -18,7 +18,6 @@ namespace MGF3D
 	bool AudioEmitter::Init(Ptr<ma_data_source> pDataSource, Ptr<ma_sound_group> pGroup)
 	{
 		Shutdown();
-
 		if (!pDataSource) return false;
 
 		// 이미 로드된 pDataSource(Buffer 혹은 Stream)를 연결

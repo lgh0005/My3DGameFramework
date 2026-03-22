@@ -57,7 +57,7 @@ namespace MGF3D
 	void PhysicsManager::Shutdown()
 	{
 		// 1. Jolt 자원 해제
-		if (m_physicsSystem) m_physicsSystem.reset();
+		if (m_physicsSystem) m_physicsSystem.Reset();
 		MGF_LOG_INFO("[Physics] PhysicsManager Shutdown.");
 	}
 
@@ -78,7 +78,7 @@ namespace MGF3D
 
 	Ptr<JPH::PhysicsSystem> PhysicsManager::GetSystem() const
 	{
-		return m_physicsSystem.get();
+		return m_physicsSystem.Get();
 	}
 
 	/*==========================//

@@ -1,5 +1,4 @@
 ﻿#pragma once
-#include "LinearMemoryPool.h"
 
 namespace MGF3D
 {
@@ -16,7 +15,7 @@ namespace MGF3D
 		LinearAllocator(Ptr<LinearMemoryPool> pool = nullptr) noexcept;
 
 		// 템플릿 복사 생성자 (STL 필수 규격: 다른 타입의 할당자로 변환 가능해야 함)
-		template <typename U>
+		template<typename U>
 		LinearAllocator(const LinearAllocator<U>& other) noexcept;
 
 		// 메모리 할당과 해제

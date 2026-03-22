@@ -3,7 +3,7 @@
 #include "SubMeshBuilder.h"
 #include "Buffers/GLVertexBuffer.h"
 #include "Buffers/GLIndexBuffer.h"
-#include "Layout/VertexLayout.h"
+#include "Layouts/VertexLayout.h"
 
 namespace MGF3D
 {
@@ -39,7 +39,7 @@ namespace MGF3D
 		subMesh.vertexLayout = VertexLayout::Create();
 		if (subMesh.vertexLayout)
 		{
-			SetupVertexLayout<TVertex>(subMesh.vertexLayout.get(), *subMesh.vertexBuffer);
+			SetupVertexLayout<TVertex>(subMesh.vertexLayout.Get(), *subMesh.vertexBuffer);
 			subMesh.vertexLayout->SetIndexBuffer(*subMesh.indexBuffer);
 		}
 

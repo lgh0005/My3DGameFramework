@@ -9,18 +9,17 @@ namespace MGF3D
 
 		// 1. 이미 로드된 캐시 확인
 		auto value = m_resources.Find(key);
-		if (value) return std::static_pointer_cast<T>(*value);
+		if (value) return StaticSharedCast<T>(*value);
 
 		// 2. 캐시에 없으면 m_assetRegistry 확인
 		auto descriptorPtr = m_assetRegistry.Find(key);
 		if (descriptorPtr)
 		{
-			auto resource = LoadResourceAsync((*descriptorPtr).get());
-			return std::static_pointer_cast<T>(resource);
+			auto resource = LoadResourceAsync((*descriptorPtr).Get());
+			return StaticSharedCast<T>(resource);
 		}
 
 		MGF_LOG_WARN("ResourceManager: Resource not found in registry: {}", assetName.CStr());
 		return nullptr;
 	}
-
 }

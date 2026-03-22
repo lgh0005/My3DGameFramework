@@ -15,7 +15,7 @@ namespace MGF3D
     {
         // const Find를 사용하여 안전하게 조회
         auto found = m_tokenRegistry.Find(id);
-        if (found) return (*found).get();
+        if (found) return (*found).Get();
         return nullptr;
     }
 
@@ -72,7 +72,7 @@ namespace MGF3D
         auto foundTarget = m_tokenRegistry.Find(id);
         if (!foundTarget) return false;
 
-        Ptr<MGFType> target = (*foundTarget).get();
+        Ptr<MGFType> target = (*foundTarget).Get();
 
         // 1. 이미 해결된 타입이면 패스
         if (target->depth > 0 || (target->chain[0].IsValid())) return false;
@@ -91,7 +91,7 @@ namespace MGF3D
         auto foundParent = m_tokenRegistry.Find(parentID);
         if (foundParent)
         {
-            Ptr<MGFType> parent = (*foundParent).get();
+            Ptr<MGFType> parent = (*foundParent).Get();
             bool isParentReady = (parent->depth > 0 || parent->chain[0].IsValid());
 
             if (isParentReady)

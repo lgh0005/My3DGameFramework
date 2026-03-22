@@ -1,20 +1,25 @@
 #pragma once
-#include <utility>
-#include "Pointer/SmartPtrAliases.h"
 #include "Managers/MemoryManager.h"
+#include "Pointer/SharedPtr.h"
+#include "Pointer/UniquePtr.h"
 
 namespace MGF3D
 {
     template <typename T, typename... Args>
-    inline UniquePtr<T> MakeUnique(Args&&... args)
+    inline SharedPtr<T> MakeShared(Args&&... args)
     {
-        void* allocMem = MGF_MEMORY.Allocate(sizeof(T));
-        return UniquePtr<T>(new (allocMem) T(std::forward<Args>(args)...), MGFSmartPtrDeleter<T>());
+        void* mem = MGF_MEMORY.Allocate(sizeof(T));
+        MGF_ASSERT(mem != nullptr, "MakeShared: Allocation failed.");
+        T* rawPtr = ::new (mem) T(std::forward<Args>(args)...);
+        return SharedPtr<T>(rawPtr);
     }
 
     template <typename T, typename... Args>
-    inline SharedPtr<T> MakeShared(Args&&... args)
+    inline UniquePtr<T> MakeUnique(Args&&... args)
     {
-        return std::allocate_shared<T>(MGFSmartPtrAllocator<T>(), std::forward<Args>(args)...);
+        void* mem = MGF_MEMORY.Allocate(sizeof(T));
+        MGF_ASSERT(mem != nullptr, "MakeUnique: Allocation failed.");
+        T* rawPtr = ::new (mem) T(std::forward<Args>(args)...);
+        return UniquePtr<T>(rawPtr);
     }
 }

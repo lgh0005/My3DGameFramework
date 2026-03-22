@@ -2,26 +2,24 @@
 
 namespace MGF3D
 {
-	/*==============================//
-	//   SharedPtr casting methods  //
-	//==============================*/
-	template<typename T, typename U>
-	SharedPtr<T> StaticPtrCast(const SharedPtr<U>& ptr);
+	/*==========================================//
+	//      SharedPtr Casting Utilities         //
+	//==========================================*/
+	template <typename T, typename U>
+	[[nodiscard]] inline SharedPtr<T> StaticSharedCast(const SharedPtr<U>& ptr) noexcept;
 
-	template<typename T, typename U>
-	SharedPtr<T> ConstPtrCast(const SharedPtr<U>& ptr);
+	template <typename T, typename U>
+	[[nodiscard]] inline SharedPtr<T> ReinterpretSharedCast(const SharedPtr<U>& ptr) noexcept;
 
-	template<typename T, typename U>
-	SharedPtr<T> ReinterpretPtrCast(const SharedPtr<U>& ptr);
+	template <typename T, typename U>
+	[[nodiscard]] inline SharedPtr<T> ConstSharedCast(const SharedPtr<U>& ptr) noexcept;
 
-	/*==============================//
-	//   UniquePtr casting methods  //
-	//==============================*/
-	template<typename T, typename U>
-	UniquePtr<T> StaticPtrCast(UniquePtr<U>&& ptr);
-
-	template<typename T, typename U>
-	UniquePtr<T> ReinterpretPtrCast(UniquePtr<U>&& ptr);
+	/*===========================================//
+	//      Pointer Type Casting Utilities       //
+	//===========================================*/
+	template <typename T> constexpr std::remove_reference_t<T>&& Move(T&& arg) noexcept;
+	template <typename T> constexpr T&& Forward(std::remove_reference_t<T>& arg) noexcept;
+	template <typename T> constexpr T&& Forward(std::remove_reference_t<T>&& arg) noexcept;
 }
 
 #include "Pointer/SmartPtrCast.inl"

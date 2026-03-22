@@ -15,7 +15,7 @@ set(SOURCES
     "Defines/DefineManager.h"
     "Defines/DefineSingleton.h"
     "Defines/DefineModule.h"
-    "Defines/DefineOperators.h"
+    "Defines/DefinePointers.h"
 
     # Common
     "Common/Types.h"
@@ -81,10 +81,12 @@ set(SOURCES
     "Parsers/YamlParser.h"          "Parsers/YamlParser.cpp"          "Parsers/YamlParser.inl"
 
     # Pointer
-    "Pointer/SmartPtrCore.h"        "Pointer/SmartPtrCore.cpp"          "Pointer/SmartPtrCore.inl"
-    "Pointer/SmartPtrAliases.h"        "Pointer/SmartPtrAliases.cpp"
-    "Pointer/SmartPtrFactory.h"        "Pointer/SmartPtrFactory.cpp"     "Pointer/SmartPtrFactory.inl"
-    "Pointer/SmartPtrCast.h"        "Pointer/SmartPtrCast.cpp"          "Pointer/SmartPtrCast.inl"
+    "Pointer/PoolAlloc.h"             "Pointer/PoolAlloc.cpp"
+    "Pointer/RefCount.h"             "Pointer/RefCount.cpp"
+    "Pointer/SharedPtr.h"            "Pointer/SharedPtr.cpp"           "Pointer/SharedPtr.inl"
+    "Pointer/UniquePtr.h"            "Pointer/UniquePtr.cpp"           "Pointer/UniquePtr.inl"
+    "Pointer/SmartPtrCast.h"         "Pointer/SmartPtrCast.cpp"        "Pointer/SmartPtrCast.inl"
+    "Pointer/SmartPtrFactory.h"      "Pointer/SmartPtrFactory.cpp"     "Pointer/SmartPtrFactory.inl"
 
     # Resource
     "Resource/IResourceDescriptor.h" "Resource/IResourceDescriptor.cpp"
@@ -92,9 +94,9 @@ set(SOURCES
     "Resource/Resource.h"            "Resource/Resource.cpp"
 
     # Asset
-    "Asset/Asset.h"            "Asset/Asset.cpp"
-    "Asset/IAssetDescriptor.h"            "Asset/IAssetDescriptor.cpp"
-    "Asset/IAssetLoader.h"            "Asset/IAssetLoader.cpp"
+    "Asset/Asset.h"                  "Asset/Asset.cpp"
+    "Asset/IAssetDescriptor.h"       "Asset/IAssetDescriptor.cpp"
+    "Asset/IAssetLoader.h"           "Asset/IAssetLoader.cpp"
 
     # Spatial
     "Spatial/AABB.h"                "Spatial/AABB.cpp"

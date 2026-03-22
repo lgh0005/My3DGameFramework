@@ -1,12 +1,11 @@
 #pragma once
+#include "Pointer/PoolAlloc.h"
 #include "VRAM/VRAMAllocation.h"
 
 namespace MGF3D
 {
-	class GLBufferHandle
+	class GLBufferHandle : public PoolAlloc
 	{
-		MGF_DECLARE_CUSTOM_ALLOCATORS;
-
 	public:
 		virtual void Bind() const = 0;
 		virtual void Unbind() const = 0;

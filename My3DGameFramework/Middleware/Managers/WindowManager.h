@@ -20,7 +20,7 @@ namespace MGF3D
 
 	public:
 		bool ShouldClose() const;
-		Ptr<MGFWindow> GetMainWindow() const { return m_mainWindow.get(); }
+		Ptr<MGFWindow> GetMainWindow() const { return m_mainWindow.Get(); }
 		Ptr<GLFWwindow> GetNativeWindow() const;
 		int32 GetWindowWidth() const;
 		int32 GetWindowHeight() const;

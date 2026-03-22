@@ -47,13 +47,6 @@
 #include "Aliases/Delegates.h"
 #include "Aliases/Threading.h"
 
-/*============================//
-//    Engine smart pointers   //
-//============================*/
-#include "Pointer/SmartPtrAliases.h"
-#include "Pointer/SmartPtrCore.h"
-#include "Pointer/SmartPtrFactory.h"
-
 /*==============================//
 //    Engine common debuggers   //
 //==============================*/
@@ -64,12 +57,21 @@
 #include "Debug/ProfileScope.h"
 #include "Debug/RealTimer.h"
 
+/*============================//
+//    Engine smart pointers   //
+//============================*/
+#include "Pointer/RefCount.h"
+#include "Pointer/SharedPtr.h"
+#include "Pointer/UniquePtr.h"
+#include "Pointer/SmartPtrFactory.h"
+#include "Pointer/SmartPtrCast.h"
+#include "Defines/DefinePointers.h"
+
 /*===============================//
 //    Engine lifecycle defines   //
 //===============================*/
 #include "Defines/DefineSystem.h"
 #include "Defines/DefineModule.h"
-#include "Defines/DefineOperators.h"
 
 /*==========================//
 //    Engine common utils   //

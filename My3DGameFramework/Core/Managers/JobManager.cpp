@@ -33,7 +33,7 @@ namespace MGF3D
         {
             SString workerName = threadNamePrefix + SString(StringUtils::ToString(i));
 
-            auto workerLoop = [this, i]() { this->WorkerLoop(m_workers[i].get()); };
+            auto workerLoop = [this, i]() { this->WorkerLoop(m_workers[i].Get()); };
 
             if (!m_workers[i]->Launch(workerName, workerLoop))
             {

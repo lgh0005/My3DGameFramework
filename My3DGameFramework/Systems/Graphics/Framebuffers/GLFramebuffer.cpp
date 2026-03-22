@@ -3,8 +3,6 @@
 
 namespace MGF3D
 {
-	MGF_IMPLEMENT_CUSTOM_ALLOCATORS(GLFramebuffer)
-
 	GLFramebuffer::GLFramebuffer() = default;
 	GLFramebuffer::~GLFramebuffer() = default;
 

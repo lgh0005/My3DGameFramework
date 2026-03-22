@@ -16,7 +16,7 @@ namespace MGF3D
 		void Deallocate(uint64 offset);
 
 	private:
-		void SplitPaddingNode(Ptr<VRAMNode> target, uint64 padding);
+		bool SplitPaddingNode(Ptr<VRAMNode> target, uint64 padding);
 
 	private:
 		Ptr<VRAMNode> FindNode(uint64 offset);

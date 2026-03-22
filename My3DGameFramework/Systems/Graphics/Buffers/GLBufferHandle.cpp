@@ -4,8 +4,6 @@
 
 namespace MGF3D
 {
-	MGF_IMPLEMENT_CUSTOM_ALLOCATORS(GLBufferHandle)
-
 	GLBufferHandle::GLBufferHandle() = default;
     GLBufferHandle::~GLBufferHandle()
     {

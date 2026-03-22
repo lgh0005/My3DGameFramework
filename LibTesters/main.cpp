@@ -2,6 +2,7 @@
 #include "Bootstrapper/Bootstrapper.h"
 #include "Debug/MemoryProfiler.h"
 #include "Debug/VRAMProfiler.h"
+#include "Pointer/RefCount.h"
 
 #include "Managers/TimeManager.h"
 #include "Managers/WindowManager.h"
@@ -13,7 +14,7 @@
 
 using namespace MGF3D;
 
-class TestActor
+class TestActor : public RefCount
 {
 public:
     int payload[512]; // 4KB (1024 * 4 bytes)
@@ -102,7 +103,7 @@ int main()
         auto sharedActor1 = MakeShared<TestActor>();
 
         MGF_LOG_WARN(">> [Memory Test] 5. Inside Scope (sharedActor1 is Alive!)");
-        MGF_LOG_INFO("    Current RefCount: {}", sharedActor1.use_count());
+        MGF_LOG_INFO("    Current RefCount: {}", sharedActor1->GetRefCount());
         MGF_MEMORY_PROFILE_CAPTURE();
         MGF_MEMORY_LOG_STATS();
 
@@ -110,11 +111,11 @@ int main()
         {
             MGF_LOG_INFO("    --- Entering Nested Scope ---");
             auto sharedActor2 = sharedActor1; // 복사 발생! (메모리 할당은 없고 카운트만 증가)
-            MGF_LOG_INFO("    sharedActor2 created! Current RefCount: {}", sharedActor1.use_count());
+            MGF_LOG_INFO("    sharedActor2 created! Current RefCount: {}", sharedActor1->GetRefCount());
             MGF_LOG_INFO("    --- Exiting Nested Scope ---");
         } // sharedActor2 소멸 (카운트 감소, 하지만 1이 남았으므로 파괴 안 됨!)
 
-        MGF_LOG_INFO("    After Nested Scope! Current RefCount: {}", sharedActor1.use_count());
+        MGF_LOG_INFO("    After Nested Scope! Current RefCount: {}", sharedActor1->GetRefCount());
         MGF_LOG_INFO("--- Exiting SharedPtr Scope ---");
 
     } // 여기서 최종적으로 RefCount가 0이 되며 TestActor가 파괴되고 메모리 반환!

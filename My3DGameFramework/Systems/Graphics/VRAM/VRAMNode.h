@@ -1,12 +1,11 @@
 #pragma once
+#include "Pointer/PoolAlloc.h"
 
 namespace MGF3D
 {
-    MGF_CLASS_PTR(VRAMNode)
-	class VRAMNode
+    MGF_STRUCT_PTR(VRAMNode)
+	struct VRAMNode : public PoolAlloc
 	{
-        MGF_DECLARE_CUSTOM_ALLOCATORS;
-
         VRAMNode(uint64 _offset, uint64 _size, bool _free);
         ~VRAMNode();
 

@@ -18,7 +18,7 @@ namespace MGF3D
 	template<typename T>
 	inline constexpr T Rect<T>::GetHeight() const
 	{
-		return y1 - y0
+		return y1 - y0;
 	}
 
 	template<typename T>

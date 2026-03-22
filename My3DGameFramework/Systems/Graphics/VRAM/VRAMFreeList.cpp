@@ -64,13 +64,18 @@ namespace MGF3D
 		return static_cast<uint64>(-1);
 	}
 	
-	void VRAMFreeList::SplitPaddingNode(Ptr<VRAMNode> target, uint64 padding)
+	bool VRAMFreeList::SplitPaddingNode(Ptr<VRAMNode> target, uint64 padding)
 	{
 		MGF_ASSERT(target != nullptr, "SplitPaddingNode: target is nullptr");
 		MGF_ASSERT(target->isFree, "SplitPaddingNode: target node must be free");
 
 		// 1. 새로운 패딩 노드 생성 (기존 target의 시작 위치와 패딩 크기 사용)
 		Ptr<VRAMNode> paddingNode = new VRAMNode(target->offset, padding, true);
+		if (paddingNode == nullptr)
+		{
+			MGF_LOG_ERROR("VRAMFreeList: Failed to allocate VRAMNode for padding.");
+			return false;
+		}
 
 		// 리스트 연결 수정: paddingNode를 target의 앞에 삽입
 		paddingNode->prev = target->prev;
@@ -86,6 +91,8 @@ namespace MGF3D
 		// target 노드의 정보 갱신
 		target->offset += padding;
 		target->size -= padding;
+
+		return true;
 	}
 
 	void VRAMFreeList::Deallocate(uint64 offset)
@@ -123,6 +130,13 @@ namespace MGF3D
 				target->size - size, 
 				true
 			);
+			if (newNode == nullptr)
+			{
+				MGF_LOG_WARN("VRAMFreeList: Failed to allocate VRAMNode for remainder. Internal fragmentation occurred.");
+				target->isFree = false;
+				return;
+			}
+
 			newNode->prev = target;
 			newNode->next = target->next;
 			if (target->next != nullptr)

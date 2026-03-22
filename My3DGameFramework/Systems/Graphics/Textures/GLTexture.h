@@ -1,12 +1,11 @@
 #pragma once
+#include "Pointer/RefCount.h"
 #include "Hashing/TextureHash.h"
 
 namespace MGF3D
 {
-	class GLTexture
+	class GLTexture : public RefCount
 	{
-		MGF_DECLARE_CUSTOM_ALLOCATORS;
-
 	public:
 		virtual ~GLTexture();
 		virtual void Bind(uint32 slot) const = 0;

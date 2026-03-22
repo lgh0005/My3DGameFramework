@@ -1,5 +1,6 @@
 #include "GraphicsPch.h"
 #include "GLFramebuffer2D.h"
+#include "Textures/GLTexture2D.h"
 #include "Hashing/FramebufferHash.h"
 
 namespace MGF3D
@@ -169,7 +170,7 @@ namespace MGF3D
 		if (rect) return *rect;
 
 		// 1. GLFramebuffer2D 획득
-		auto fbo2D = std::static_pointer_cast<GLFramebuffer2D>(fbo);
+		auto fbo2D = StaticSharedCast<GLFramebuffer2D>(fbo);
 		MGF_ASSERT
 		(
 			fbo2D != nullptr, 

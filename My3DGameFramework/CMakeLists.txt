@@ -10,7 +10,7 @@ add_subdirectory(Systems)
 add_subdirectory(Middleware)
 
 # Level 4: 컴포넌트와 리소스 모듈
-add_subdirectory(Framework)
+# add_subdirectory(Framework)
 
 # Level 5: 컴포넌트와 리소스 모듈 활성화
 #add_subdirectory(Bootstrap/Modules)

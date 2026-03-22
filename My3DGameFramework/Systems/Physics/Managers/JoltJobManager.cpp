@@ -39,12 +39,12 @@ namespace MGF3D
 
 	void JoltJobManager::Shutdown()
 	{
-		if (m_jobSystem) m_jobSystem.reset();
+		if (m_jobSystem) m_jobSystem.Reset();
 		MGF_LOG_INFO("[Physics] JoltJobManager Shutdown.");
 	}
 
 	Ptr<JPH::JobSystem> JoltJobManager::GetJobSystem() const
 	{
-		return m_jobSystem.get();
+		return m_jobSystem.Get();
 	}
 }

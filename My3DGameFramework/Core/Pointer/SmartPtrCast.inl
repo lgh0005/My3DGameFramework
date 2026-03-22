@@ -3,39 +3,50 @@
 
 namespace MGF3D
 {
-	/*==============================//
-	//   SharedPtr casting methods  //
-	//==============================*/
+	/*==========================================//
+	//      SharedPtr Casting Utilities         //
+	//==========================================*/
 	template<typename T, typename U>
-	inline SharedPtr<T> StaticPtrCast(const SharedPtr<U>& ptr)
+	inline SharedPtr<T> StaticSharedCast(const SharedPtr<U>& ptr) noexcept
 	{
-		return SharedPtr<T>();
+		return SharedPtr<T>(static_cast<T*>(ptr.Get()));
 	}
 
 	template<typename T, typename U>
-	inline SharedPtr<T> ConstPtrCast(const SharedPtr<U>& ptr)
+	inline SharedPtr<T> ReinterpretSharedCast(const SharedPtr<U>& ptr) noexcept
 	{
-		return SharedPtr<T>();
+		return SharedPtr<T>(reinterpret_cast<T*>(ptr.Get()));
 	}
 
 	template<typename T, typename U>
-	inline SharedPtr<T> ReinterpretPtrCast(const SharedPtr<U>& ptr)
+	inline SharedPtr<T> ConstSharedCast(const SharedPtr<U>& ptr) noexcept
 	{
-		return SharedPtr<T>();
+		return SharedPtr<T>(const_cast<T*>(ptr.Get()));
 	}
 
-	/*==============================//
-	//   UniquePtr casting methods  //
-	//==============================*/
-	template<typename T, typename U>
-	inline UniquePtr<T> StaticPtrCast(UniquePtr<U>&& ptr)
+	/*===========================================//
+	//      Pointer Type Casting Utilities       //
+	//===========================================*/
+	template<typename T>
+	constexpr std::remove_reference_t<T>&& Move(T&& arg) noexcept
 	{
-		return UniquePtr<T>();
+		return static_cast<std::remove_reference_t<T>&&>(arg);
 	}
 
-	template<typename T, typename U>
-	inline UniquePtr<T> ReinterpretPtrCast(UniquePtr<U>&& ptr)
+	template<typename T>
+	constexpr T&& Forward(std::remove_reference_t<T>& arg) noexcept
 	{
-		return UniquePtr<T>();
+		return static_cast<T&&>(arg);
+	}
+
+	template<typename T>
+	constexpr T&& Forward(std::remove_reference_t<T>&& arg) noexcept
+	{
+		MGF_STATIC_ASSERT
+		(
+			!std::is_lvalue_reference_v<T>, 
+			"MGF3D::Forward: Cannot forward an rvalue as an lvalue."
+		);
+		return static_cast<T&&>(arg);
 	}
 }

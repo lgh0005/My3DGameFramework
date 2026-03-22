@@ -14,9 +14,9 @@ namespace MGF3D
 		VRAMAllocation::PoolType poolType
 	)
 	{
-		auto indexBuffer = GLIndexBufferUPtr(new GLIndexBuffer());
-		if (!indexBuffer->Init(data, byteSize, poolType)) return nullptr;
-		return std::move(indexBuffer);
+		auto buffer = GLIndexBufferUPtr(new GLIndexBuffer());
+		if (!buffer->Init(data, byteSize, poolType)) return nullptr;
+		return buffer;
 	}
 
 	bool GLIndexBuffer::Init(const void* data, usize byteSize, VRAMAllocation::PoolType poolType)

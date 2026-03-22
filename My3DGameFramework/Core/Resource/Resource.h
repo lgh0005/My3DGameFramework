@@ -1,4 +1,5 @@
 ﻿#pragma once
+#include "Pointer/RefCount.h"
 #include "Resource/IResourceDescriptor.h"
 
 namespace MGF3D
@@ -15,7 +16,7 @@ namespace MGF3D
 	};
 
 	MGF_CLASS_PTR(Resource)
-	class Resource
+	class Resource : public RefCount
 	{
 	public:
 		Resource(const IResourceDescriptor& desc);

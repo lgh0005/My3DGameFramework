@@ -1,13 +1,12 @@
 #pragma once
+#include "Pointer/RefCount.h"
 #include "Spatial/Rect.h"
 
 namespace MGF3D
 {
 	MGF_CLASS_PTR(GLFramebuffer)
-	class GLFramebuffer
+	class GLFramebuffer : public RefCount
 	{
-		MGF_DECLARE_CUSTOM_ALLOCATORS;
-
 	public:
 		virtual ~GLFramebuffer();
 		virtual void Bind() const = 0;

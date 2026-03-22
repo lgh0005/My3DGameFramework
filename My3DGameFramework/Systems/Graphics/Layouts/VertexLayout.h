@@ -1,16 +1,13 @@
 ﻿#pragma once
+#include "Pointer/PoolAlloc.h"
 #include "Buffers/GLVertexBuffer.h"
 #include "Buffers/GLIndexBuffer.h"
 
 namespace MGF3D
 {
     MGF_CLASS_PTR(VertexLayout)
-    class VertexLayout
+    class VertexLayout : public PoolAlloc
     {
-    public:
-        static void* operator new(usize size);
-        static void operator delete(void* ptr, usize size);
-
     public:
         ~VertexLayout();
         static VertexLayoutUPtr Create();

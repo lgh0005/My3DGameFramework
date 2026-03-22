@@ -34,7 +34,7 @@ namespace MGF3D
 
         // 2. 상태 갱신
         for (usize i = 0; i < m_actionList.Count(); ++i)
-            m_currentStates[i] = CheckActionState(m_actionList[i].get(), window);
+            m_currentStates[i] = CheckActionState(m_actionList[i].Get(), window);
     }
 
     void InputManager::Shutdown()
@@ -193,11 +193,11 @@ namespace MGF3D
         int32* pIndex = m_actionIndexMap.Find(hash);
 
         // 1. 이미 있으면 기존 것 반환
-        if (pIndex) return m_actionList[*pIndex].get();
+        if (pIndex) return m_actionList[*pIndex].Get();
 
         // 2. 없으면 새로 생성 및 배열 확장
         MGFInputActionUPtr newAction = MGFInputActionUPtr(new MGFInputAction(SString(name)));
-        Ptr<MGFInputAction> actionPtr = newAction.get();
+        Ptr<MGFInputAction> actionPtr = newAction.Get();
         int32 newIndex = static_cast<int32>(m_actionList.Count());
 
         m_actionList.PushBack(std::move(newAction));
@@ -216,7 +216,7 @@ namespace MGF3D
         StringHash hash(name);
         const int32* pIndex = m_actionIndexMap.Find(hash);
         
-        if (pIndex) return m_actionList[*pIndex].get();
+        if (pIndex) return m_actionList[*pIndex].Get();
         return nullptr;
     }
 

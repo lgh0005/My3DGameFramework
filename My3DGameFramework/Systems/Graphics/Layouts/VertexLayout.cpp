@@ -4,15 +4,6 @@
 
 namespace MGF3D
 {
-    void* VertexLayout::operator new(usize size)
-    {
-        return MGF_MEMORY.Allocate(size);
-    }
-    void VertexLayout::operator delete(void* ptr, usize size)
-    {
-        MGF_MEMORY.Deallocate(ptr, size);
-    }
-
     VertexLayout::VertexLayout() = default;
     VertexLayout::~VertexLayout()
     {
@@ -23,7 +14,7 @@ namespace MGF3D
     {
         auto vertexLayout = VertexLayoutUPtr(new VertexLayout());
         if (!vertexLayout->Init()) return nullptr;
-        return move(vertexLayout);
+        return vertexLayout;
     }
 
     bool VertexLayout::Init()

@@ -40,6 +40,7 @@ namespace MGF3D
 	//==============================*/
 	template <typename T> using Ptr = T*;
 	using byte	    = uint8;
+	using null      = std::nullptr_t;
 	using uintptr   = std::uintptr_t;
 	using intptr    = std::intptr_t;
 	using alignment = std::align_val_t;
