@@ -32,7 +32,8 @@ namespace MGF3D
 		if (event >= InputEvent::MAX) return;
 		for (const auto& callback : m_callbacks[(int32)event])
 		{
-			if (callback) callback();
+			if (callback) 
+				callback();
 		}
 	}
 

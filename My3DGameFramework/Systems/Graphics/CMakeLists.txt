@@ -52,6 +52,10 @@ set(SOURCES
 
     # Shaders
 
+    # Hashing
+    "Hashing/TextureHash.h"             "Hashing/TextureHash.cpp"           "Hashing/TextureHash.inl"
+    "Hashing/FramebufferHash.h"         "Hashing/FramebufferHash.cpp"       "Hashing/FramebufferHash.inl"
+
     # Buffers
     "Buffers/GLBufferHandle.h"          "Buffers/GLBufferHandle.cpp"
     "Buffers/GLIndexBuffer.h"           "Buffers/GLIndexBuffer.cpp"
@@ -79,7 +83,8 @@ set(SOURCES
     # "Instancing/RenderQueue.h"          "Instancing/RenderQueue.cpp"
 
     # Layouts
-    "Layout/VertexLayout.h"             "Layout/VertexLayout.cpp"
+    "Layouts/FramebufferLayout.h"        "Layouts/FramebufferLayout.cpp"
+    "Layouts/VertexLayout.h"             "Layouts/VertexLayout.cpp"
 
     # VRAM
     "VRAM/VRAMAllocation.h"           "VRAM/VRAMAllocation.cpp"       
@@ -89,6 +94,8 @@ set(SOURCES
 
     # Managers
     "Managers/VRAMManager.h"          "Managers/VRAMManager.cpp"
+    "Managers/TextureManager.h"       "Managers/TextureManager.cpp"
+    "Managers/FramebufferManager.h"   "Managers/FramebufferManager.cpp"
     # "Managers/InstanceManager.h"      "Managers/InstanceManager.cpp"
     # "Managers/RenderManager.h"        "Managers/RenderManager.cpp"    "Managers/RenderManager.inl"
 

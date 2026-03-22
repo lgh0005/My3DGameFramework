@@ -19,8 +19,8 @@ namespace MGF3D
 		);
 
 	public:
-		virtual void Bind(uint32 slot) override;
-		virtual void Unbind(uint32 slot) override;
+		virtual void Bind(uint32 slot) const override;
+		virtual void Unbind(uint32 slot) const override;
 		void GenerateMipmap();
 		uint32 GetSize() const { return m_size; }
 

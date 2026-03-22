@@ -68,11 +68,14 @@ namespace MGF3D
 		glTexParameteri(m_target, GL_TEXTURE_MIN_FILTER, minFilter);
 		glTexParameteri(m_target, GL_TEXTURE_MAG_FILTER, magFilter);
 
+		// 자식 클래스에서 해시 생성 및 저장
+		m_hash = TextureHash(m_target, internalFormat, m_width, m_height);
+
 		glBindTexture(m_target, 0);
 		return true;
 	}
 
-	void GLTexture3D::Bind(uint32 slot)
+	void GLTexture3D::Bind(uint32 slot) const
 	{
 		if (m_handle)
 		{
@@ -81,7 +84,7 @@ namespace MGF3D
 		}
 	}
 
-	void GLTexture3D::Unbind(uint32 slot)
+	void GLTexture3D::Unbind(uint32 slot) const
 	{
 		glActiveTexture(GL_TEXTURE0 + slot);
 		glBindTexture(m_target, 0);

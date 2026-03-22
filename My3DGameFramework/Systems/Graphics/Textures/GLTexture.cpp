@@ -1,6 +1,5 @@
 #include "GraphicsPch.h"
 #include "GLTexture.h"
-#include "Managers/VRAMManager.h"
 
 namespace MGF3D
 {
@@ -21,6 +20,11 @@ namespace MGF3D
 		return m_target;
 	}
 
+	const TextureHash& GLTexture::GetHash() const
+	{
+		return m_hash;
+	}
+
 	uint32 GLTexture::GetHandle() const
 	{
 		return m_handle;
@@ -30,6 +34,7 @@ namespace MGF3D
 	{
 		uint32 handle = m_handle;
 		m_handle = 0;
+		m_hash   = 0;
 		return handle;
 	}
 }

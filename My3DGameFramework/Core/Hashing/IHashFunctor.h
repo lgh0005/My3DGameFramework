@@ -26,7 +26,6 @@ namespace MGF3D
 //   Default Hash object register   //
 //==================================*/
 #define MGF_REGISTER_HASH(Type, ValueType)                                           \
-                                                                                     \
 namespace std                                                                        \
 {                                                                                    \
     template<>                                                                       \

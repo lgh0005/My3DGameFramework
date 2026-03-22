@@ -1,6 +1,7 @@
 #include "GraphicsPch.h"
 #include "GLTexture2D.h"
 #include "Utils/TextureUtils.h"
+#include "Hashing/TextureHash.h"
 
 namespace MGF3D
 {
@@ -67,17 +68,20 @@ namespace MGF3D
 				glTexSubImage2D(m_target, 0, 0, 0, m_width, m_height, format, type, pixels);
 		}
 
-		// 4. 파라미터 설정
+		// 3. 파라미터 설정
 		glTexParameteri(m_target, GL_TEXTURE_WRAP_S, wrapS);
 		glTexParameteri(m_target, GL_TEXTURE_WRAP_T, wrapT);
 		glTexParameteri(m_target, GL_TEXTURE_MIN_FILTER, minFilter);
 		glTexParameteri(m_target, GL_TEXTURE_MAG_FILTER, magFilter);
 
+		// 4. 자식 클래스에서 해시 생성 및 저장
+		m_hash = TextureHash(m_target, internalFormat, m_width, m_height);
+
 		glBindTexture(m_target, 0);
 		return true;
 	}
 
-	void GLTexture2D::Bind(uint32 slot)
+	void GLTexture2D::Bind(uint32 slot) const
 	{
 		if (m_handle)
 		{
@@ -86,7 +90,7 @@ namespace MGF3D
 		}
 	}
 
-	void GLTexture2D::Unbind(uint32 slot)
+	void GLTexture2D::Unbind(uint32 slot) const
 	{
 		glActiveTexture(GL_TEXTURE0 + slot);
 		glBindTexture(m_target, 0);

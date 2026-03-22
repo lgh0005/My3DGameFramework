@@ -84,6 +84,7 @@ set(SOURCES
     "Pointer/SmartPtrCore.h"        "Pointer/SmartPtrCore.cpp"          "Pointer/SmartPtrCore.inl"
     "Pointer/SmartPtrAliases.h"        "Pointer/SmartPtrAliases.cpp"
     "Pointer/SmartPtrFactory.h"        "Pointer/SmartPtrFactory.cpp"     "Pointer/SmartPtrFactory.inl"
+    "Pointer/SmartPtrCast.h"        "Pointer/SmartPtrCast.cpp"          "Pointer/SmartPtrCast.inl"
 
     # Resource
     "Resource/IResourceDescriptor.h" "Resource/IResourceDescriptor.cpp"
@@ -97,6 +98,7 @@ set(SOURCES
 
     # Spatial
     "Spatial/AABB.h"                "Spatial/AABB.cpp"
+    "Spatial/Rect.h"                "Spatial/Rect.cpp"              "Spatial/Rect.inl"
 
     "Spatial/IBounding.h"         "Spatial/IBounding.cpp"
     "Spatial/BoundingBox.h"         "Spatial/BoundingBox.cpp"

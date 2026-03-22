@@ -78,11 +78,14 @@ namespace MGF3D
 		// TODO : 이건 최초 윈도우 생성 시 같이 설정을 해보는 걸 고려할 수 있음
 		glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS); 
 
+		// 자식 클래스에서 해시 생성 및 저장
+		m_hash = TextureHash(m_target, internalFormat, m_size, m_size);
+
 		glBindTexture(m_target, 0);
 		return true;
 	}
 
-	void GLTextureCube::Bind(uint32 slot)
+	void GLTextureCube::Bind(uint32 slot) const
 	{
 		if (m_handle)
 		{
@@ -91,7 +94,7 @@ namespace MGF3D
 		}
 	}
 
-	void GLTextureCube::Unbind(uint32 slot)
+	void GLTextureCube::Unbind(uint32 slot) const
 	{
 		glActiveTexture(GL_TEXTURE0 + slot);
 		glBindTexture(m_target, 0);
