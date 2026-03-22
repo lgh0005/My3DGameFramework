@@ -54,56 +54,47 @@ namespace MGF3D
 		if (!handle)
 		{
 			// 2-1. 새 텍스처 생성 및 메모리 할당
-			glGenTextures(1, &m_handle);
+			glCreateTextures(m_target, 1, &m_handle);
 			if (m_handle == 0) return false;
-			glBindTexture(m_target, m_handle);
-			glTexImage2D(m_target, 0, internalFormat, m_width, m_height, 0, format, type, pixels);
+			glTextureStorage2D(m_handle, 1, internalFormat, m_width, m_height);
+			if (pixels)
+				glTextureSubImage2D(m_handle, 0, 0, 0, m_width, m_height, format, type, pixels);
 		}
 		else
 		{
 			// 2-2. 기존 핸들 재사용 및 데이터 덮어쓰기
 			m_handle = handle;
-			glBindTexture(m_target, m_handle);
 			if (pixels)
-				glTexSubImage2D(m_target, 0, 0, 0, m_width, m_height, format, type, pixels);
+				glTextureSubImage2D(m_handle, 0, 0, 0, m_width, m_height, format, type, pixels);
 		}
 
 		// 3. 파라미터 설정
-		glTexParameteri(m_target, GL_TEXTURE_WRAP_S, wrapS);
-		glTexParameteri(m_target, GL_TEXTURE_WRAP_T, wrapT);
-		glTexParameteri(m_target, GL_TEXTURE_MIN_FILTER, minFilter);
-		glTexParameteri(m_target, GL_TEXTURE_MAG_FILTER, magFilter);
+		glTextureParameteri(m_handle, GL_TEXTURE_WRAP_S, wrapS);
+		glTextureParameteri(m_handle, GL_TEXTURE_WRAP_T, wrapT);
+		glTextureParameteri(m_handle, GL_TEXTURE_MIN_FILTER, minFilter);
+		glTextureParameteri(m_handle, GL_TEXTURE_MAG_FILTER, magFilter);
 
 		// 4. 자식 클래스에서 해시 생성 및 저장
 		m_hash = TextureHash(m_target, internalFormat, m_width, m_height);
 
-		glBindTexture(m_target, 0);
 		return true;
 	}
 
 	void GLTexture2D::Bind(uint32 slot) const
 	{
-		if (m_handle)
-		{
-			glActiveTexture(GL_TEXTURE0 + slot);
-			glBindTexture(m_target, m_handle);
-		}
+		if (m_handle) glBindTextureUnit(slot, m_handle);
 	}
 
 	void GLTexture2D::Unbind(uint32 slot) const
 	{
-		glActiveTexture(GL_TEXTURE0 + slot);
-		glBindTexture(m_target, 0);
+		glBindTextureUnit(slot, 0);
 	}
 
 	void GLTexture2D::GenerateMipmap()
 	{
 		if (m_handle == 0) return;
-
-		Bind(0);
-		glTexParameteri(m_target, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-		glGenerateMipmap(m_target);
-		Unbind(0);
+		glGenerateTextureMipmap(m_handle);
+		glTextureParameteri(m_handle, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 	}
 
 	void GLTexture2D::UpdateSubData
@@ -114,9 +105,6 @@ namespace MGF3D
 	)
 	{
 		if (m_handle == 0 || pixels == nullptr) return;
-
-		Bind(0);
-		glTexSubImage2D(m_target, 0, offsetX, offsetY, width, height, format, type, pixels);
-		Unbind(0);
+		glTextureSubImage2D(m_handle, 0, offsetX, offsetY, width, height, format, type, pixels);
 	}
 }

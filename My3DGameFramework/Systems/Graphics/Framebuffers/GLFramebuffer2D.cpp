@@ -2,6 +2,7 @@
 #include "GLFramebuffer2D.h"
 #include "Textures/GLTexture2D.h"
 #include "Hashing/FramebufferHash.h"
+#include "Managers/TextureManager.h"
 
 namespace MGF3D
 {
@@ -30,7 +31,7 @@ namespace MGF3D
 		// 1. 재사용 핸들 여부 검사
 		if (handle == 0)
 		{
-			glGenFramebuffers(1, &m_handle);
+			glCreateFramebuffers(1, &m_handle);
 			if (m_handle == 0) return false;
 		}
 		else m_handle = handle;
@@ -84,17 +85,13 @@ namespace MGF3D
 		Recti d = GetBlitArea(dst, dstRect);
 
 		// 3. 실제 OpenGL Blit 수행
-		glBindFramebuffer(GL_READ_FRAMEBUFFER, src->GetHandle());
-		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, dst->GetHandle());
-		glBlitFramebuffer
+		glBlitNamedFramebuffer
 		(
+			src->GetHandle(), dst->GetHandle(),
 			s.x0, s.y0, s.x1, s.y1,
 			d.x0, d.y0, d.x1, d.y1,
 			mask, filter
 		);
-
-		// 4. 상태 복구
-		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	}
 
 	GLTexture2DPtr GLFramebuffer2D::GetColorAttachment(uint32 index) const
@@ -111,8 +108,6 @@ namespace MGF3D
 	void GLFramebuffer2D::RefreshAttachments()
 	{
 		if (m_handle == 0) return;
-
-		Bind();
 
 		// 1. 기존 어태치먼트 정리 (TextureManager 풀로 반납되도록 유도)
 		m_colorTextures.Clear();
@@ -134,13 +129,13 @@ namespace MGF3D
 		// 3. MRT 활성화
 		if (!drawBuffers.Empty())
 		{
-			glDrawBuffers(static_cast<GLsizei>(drawBuffers.Count()), drawBuffers.Data());
+			glNamedFramebufferDrawBuffers(m_handle, (GLsizei)drawBuffers.Count(), drawBuffers.Data());
 		}
 		else
 		{
 			// 컬러 어태치먼트가 없는 경우 (Shadow Map 등)
-			glDrawBuffer(GL_NONE);
-			glReadBuffer(GL_NONE);
+			glNamedFramebufferDrawBuffer(m_handle, GL_NONE);
+			glNamedFramebufferReadBuffer(m_handle, GL_NONE);
 		}
 
 		// 3. 깊이/스텐실 어태치먼트 부착
@@ -156,9 +151,11 @@ namespace MGF3D
 		}
 
 		// 상태 검증
-		// glCheckFramebufferStatus(GL_FRAMEBUFFER)...
-
-		Unbind();
+		//GLenum status = glCheckNamedFramebufferStatus(m_handle, GL_FRAMEBUFFER);
+		//if (status != GL_FRAMEBUFFER_COMPLETE)
+		//{
+		//	MGF_LOG_ERROR("Framebuffer DSA Check Failed! Handle: {0}, Status: 0x{1:X}", m_handle, status);
+		//}
 	}
 	Recti GLFramebuffer2D::GetBlitArea
 	(

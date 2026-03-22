@@ -49,55 +49,47 @@ namespace MGF3D
 
 		if (!handle)
 		{
-			glGenTextures(1, &m_handle);
+			glCreateTextures(m_target, 1, &m_handle);
 			if (m_handle == 0) return false;
-			glBindTexture(m_target, m_handle);
-			glTexImage3D(m_target, 0, internalFormat, m_width, m_height, m_depth, 0, format, type, pixels);
+			glTextureStorage3D(m_handle, 1, internalFormat, m_width, m_height, m_depth);
+			if (pixels)
+				glTextureSubImage3D(m_handle, 0, 0, 0, 0, m_width, m_height, m_depth, format, type, pixels);
 		}
 		else
 		{
 			m_handle = handle;
 			glBindTexture(m_target, m_handle);
 			if (pixels)
-				glTexSubImage3D(m_target, 0, 0, 0, 0, m_width, m_height, m_depth, format, type, pixels);
+				glTextureSubImage3D(m_handle, 0, 0, 0, 0, m_width, m_height, m_depth, format, type, pixels);
 		}
 
-		glTexParameteri(m_target, GL_TEXTURE_WRAP_S, wrapS);
-		glTexParameteri(m_target, GL_TEXTURE_WRAP_T, wrapT);
-		glTexParameteri(m_target, GL_TEXTURE_WRAP_R, wrapR);
-		glTexParameteri(m_target, GL_TEXTURE_MIN_FILTER, minFilter);
-		glTexParameteri(m_target, GL_TEXTURE_MAG_FILTER, magFilter);
+		glTextureParameteri(m_handle, GL_TEXTURE_WRAP_S, wrapS);
+		glTextureParameteri(m_handle, GL_TEXTURE_WRAP_T, wrapT);
+		glTextureParameteri(m_handle, GL_TEXTURE_WRAP_R, wrapR);
+		glTextureParameteri(m_handle, GL_TEXTURE_MIN_FILTER, minFilter);
+		glTextureParameteri(m_handle, GL_TEXTURE_MAG_FILTER, magFilter);
 
 		// 자식 클래스에서 해시 생성 및 저장
 		m_hash = TextureHash(m_target, internalFormat, m_width, m_height);
 
-		glBindTexture(m_target, 0);
 		return true;
 	}
 
 	void GLTexture3D::Bind(uint32 slot) const
 	{
-		if (m_handle)
-		{
-			glActiveTexture(GL_TEXTURE0 + slot);
-			glBindTexture(m_target, m_handle);
-		}
+		if (m_handle) glBindTextureUnit(slot, m_handle);
 	}
 
 	void GLTexture3D::Unbind(uint32 slot) const
 	{
-		glActiveTexture(GL_TEXTURE0 + slot);
-		glBindTexture(m_target, 0);
+		glBindTextureUnit(slot, 0);
 	}
 
 	void GLTexture3D::GenerateMipmap()
 	{
 		if (m_handle == 0) return;
-
-		Bind(0);
-		glTexParameteri(m_target, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-		glGenerateMipmap(m_target);
-		Unbind(0);
+		glGenerateTextureMipmap(m_handle);
+		glTextureParameteri(m_handle, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 	}
 
 	void GLTexture3D::UpdateSubData
@@ -109,9 +101,15 @@ namespace MGF3D
 	)
 	{
 		if (m_handle == 0 || pixels == nullptr) return;
-
-		Bind(0);
-		glTexSubImage3D(m_target, 0, offsetX, offsetY, offsetZ, width, height, depth, format, type, pixels);
-		Unbind(0);
+		glTextureSubImage3D
+		(
+			m_handle, 
+			0, 
+			offsetX, offsetY, offsetZ, 
+			width, height, depth, 
+			format, 
+			type, 
+			pixels
+		);
 	}
 }
