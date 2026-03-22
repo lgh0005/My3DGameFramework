@@ -50,6 +50,30 @@ namespace MGF3D
 	}
 
 	template<typename Alloc>
+	inline int32 TBitset<Alloc>::FindFirstSet() const
+	{
+		usize count = m_bits.Count();
+		for (usize i = 0; i < count; ++i)
+		{
+			if (m_bits[i]) 
+				return static_cast<int32>(i);
+		}
+		return -1;
+	}
+
+	template<typename Alloc>
+	inline int32 TBitset<Alloc>::FindFirstUnset() const
+	{
+		usize count = m_bits.Count();
+		for (usize i = 0; i < count; ++i)
+		{
+			if (!m_bits[i]) 
+				return static_cast<int32>(i);
+		}
+		return -1;
+	}
+
+	template<typename Alloc>
 	inline typename TBitset<Alloc>::reference TBitset<Alloc>::operator[](usize inIndex)
 	{
 		MGF_ASSERT(inIndex < m_bits.Count(), "Index out of range!");

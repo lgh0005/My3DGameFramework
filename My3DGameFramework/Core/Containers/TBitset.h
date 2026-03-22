@@ -10,12 +10,18 @@ namespace MGF3D
 		TBitset();
 		TBitset(usize inBitCount);
 
+		// TODO : MemoryUsage는 이건 다르게 계산되어야 함.
+
 		void Resize(usize inBitCount);
 		void Set(usize inIndex, bool inValue);
 		bool Test(usize inIndex) const;
 		void Clear();
 		usize Size() const;
 		void  Release();
+
+	public:
+		int32 FindFirstSet() const;
+		int32 FindFirstUnset() const;
 
 	public:
 		using reference = typename TVector<bool, Alloc>::reference;

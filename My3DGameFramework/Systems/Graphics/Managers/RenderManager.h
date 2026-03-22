@@ -1,31 +1,19 @@
 ﻿#pragma once
-#include "Graphics/Rendering/Renderer.h"
-#include "Graphics/Rendering/RenderPipeline.h"
 
 namespace MGF3D
 {
 	class RenderManager
 	{
 		MGF_DECLARE_SINGLE(RenderManager)
-		using PipelineFactory = std::function<RenderPipelineUPtr()>;
+
+	private:
+		RenderManager();
+		~RenderManager();
 
 	public:
 		bool Init();
-		void Render(Scene* scene);
-		void OnResize(int32 width, int32 height);
-		void Clear();
-
-		template<typename T>
-		void RegisterPipeline(const std::string& name);
-
-		void SetPipeline(const std::string& name);
-		Renderer* GetRenderer() const { return m_renderer.get(); }
-		void UpdateViewport(int32* outWidth, int32* outHeight);
+		void Shutdown();
 
 	private:
-		std::unordered_map<std::string, PipelineFactory> m_pipelines;
-		RendererUPtr m_renderer;
 	};
 }
-
-#include "Managers/RenderManager.inl"

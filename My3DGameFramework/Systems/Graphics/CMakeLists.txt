@@ -96,8 +96,8 @@ set(SOURCES
     "Managers/VRAMManager.h"          "Managers/VRAMManager.cpp"
     "Managers/TextureManager.h"       "Managers/TextureManager.cpp"
     "Managers/FramebufferManager.h"   "Managers/FramebufferManager.cpp"
+    "Managers/RenderManager.h"        "Managers/RenderManager.cpp"    # "Managers/RenderManager.inl"
     # "Managers/InstanceManager.h"      "Managers/InstanceManager.cpp"
-    # "Managers/RenderManager.h"        "Managers/RenderManager.cpp"    "Managers/RenderManager.inl"
 
     # Utils
     # "Utils/GeometryGenerator.h"        "Utils/GeometryGenerator.cpp"

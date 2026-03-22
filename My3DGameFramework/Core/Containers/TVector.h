@@ -36,9 +36,13 @@ namespace MGF3D
         void  Release();
 
     public:
+        template<typename U = T, std::enable_if_t<!std::is_same_v<U, bool>, int> = 0>
         Ptr<T> Data() { return m_vector.data(); }
+
+        template<typename U = T, std::enable_if_t<!std::is_same_v<U, bool>, int> = 0>
         Ptr<const T> Data() const { return m_vector.data(); }
 
+    public:
         T PopBack();
 
         template<typename... Args> void EmplaceBack(Args&&... args);

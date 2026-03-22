@@ -88,6 +88,7 @@
 #include "Containers/Slab/SVector.h"
 #include "Containers/Slab/SDeque.h"
 #include "Containers/Slab/SBitset.h"
+#include "Containers/Slab/SStaticLinkedList.h"
 
 #include "Containers/Linear/LMap.h"
 #include "Containers/Linear/LSet.h"
@@ -95,6 +96,7 @@
 #include "Containers/Linear/LVector.h"
 #include "Containers/Linear/LDeque.h"
 #include "Containers/Linear/LBitset.h"
+#include "Containers/Linear/LStaticLinkedList.h"
 
 /*================================//
 //    Engine resource identities  //
