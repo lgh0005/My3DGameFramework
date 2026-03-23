@@ -1,6 +1,5 @@
 #pragma once
 #include "Framebuffers/GLFramebuffer.h"
-#include "Layouts/FramebufferLayout.h"
 
 namespace MGF3D
 {
@@ -11,12 +10,19 @@ namespace MGF3D
 	{
 	public:
 		virtual ~GLFramebuffer2D() override;
-		static GLFramebuffer2DPtr Create(const FramebufferLayout& layout, uint32 handle = 0);
+		static GLFramebuffer2DPtr Create
+		(
+			uint32 width, uint32 height,
+			const SVector<uint32>& colorFormats,
+			uint32 depthStencilFormat = 0,
+			uint32 samples = 1,
+			uint32 handle = 0
+		);
+		void Resize(uint32 w, uint32 h);
 
 	public:
 		virtual void Bind() const override;
 		virtual void Unbind() const override;
-		virtual void Resize(uint32 w, uint32 h) override;
 
 	public:
 		virtual void Blit
@@ -32,17 +38,29 @@ namespace MGF3D
 	public:
 		GLTexture2DPtr GetColorAttachment(uint32 index) const;
 		GLTexture2DPtr GetDepthStencilAttachment() const;
-
-		uint32 GetWidth() const { return m_layout.width; }
-		uint32 GetHeight() const { return m_layout.height; }
+		uint32 GetWidth()  const { return m_width; }
+		uint32 GetHeight() const { return m_height; }
+		bool IsMultiSampled() const { return m_samples > 1; }
 
 	private:
 		GLFramebuffer2D();
-		bool Init(const FramebufferLayout& layout, uint32 handle);
+		bool Init
+		(
+			uint32 width, uint32 height,
+			const SVector<uint32>& colorFormats,
+			uint32 depthStencilFormat,
+			uint32 samples,
+			uint32 handle
+		);
 		void RefreshAttachments();
 		Recti GetBlitArea(const GLFramebufferPtr& fbo, const Ptr<Recti>& rect) const;
 
-		FramebufferLayout m_layout;
+		uint32 m_width{ 0 };
+		uint32 m_height{ 0 };
+		uint32 m_samples{ 1 };
+		uint32 m_depthStencilFormat{ 0 };
+		SVector<uint32> m_colorFormats;
+
 		SVector<GLTexture2DPtr> m_colorTextures;
 		GLTexture2DPtr m_depthStencilTexture;
 	};

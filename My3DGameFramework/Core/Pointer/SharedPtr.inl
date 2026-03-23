@@ -1,5 +1,4 @@
 #pragma once
-#include "Managers/MemoryManager.h"
 
 namespace MGF3D
 {
@@ -42,11 +41,32 @@ namespace MGF3D
 		return *this;
 	}
 
+	template<typename T>
+	template<typename U>
+	inline SharedPtr<T>::SharedPtr(const SharedPtr<U>& other) : m_ptr(other.m_ptr) noexcept // 파생 클래스 포인터에서 기반 클래스 포인터로의 암시적 변환
+	{
+		if (m_ptr) m_ptr->IncRef();
+	}
+
+	template<typename T>
+	template<typename U>
+	inline SharedPtr<T>& SharedPtr<T>::operator=(const SharedPtr<U>& other) noexcept
+	{
+		// 같은 객체를 가리키고 있지 않은 경우에만 처리
+		if (m_ptr != other.m_ptr)
+		{
+			if (m_ptr) m_ptr->DecRef(); // 기존 소유 자원 해제 및 카운트 감소
+			m_ptr = other.m_ptr;
+			if (m_ptr) m_ptr->IncRef();
+		}
+		return *this;
+	}
+
 	/*=========================================//
 	//   default SharedPtr move constructors   //
 	//=========================================*/
 	template<typename T>
-	inline SharedPtr<T>::SharedPtr(SharedPtr&& other) : m_ptr(other.m_ptr)
+	inline SharedPtr<T>::SharedPtr(SharedPtr&& other) : m_ptr(other.m_ptr) noexcept
 	{
 		other.m_ptr = nullptr;
 	}
@@ -55,6 +75,27 @@ namespace MGF3D
 	inline SharedPtr<T>& SharedPtr<T>::operator=(SharedPtr&& other) noexcept
 	{
 		if (this != &other)
+		{
+			if (m_ptr) m_ptr->DecRef();
+			m_ptr = other.m_ptr;
+			other.m_ptr = nullptr;
+		}
+		return *this;
+	}
+
+	template<typename T>
+	template<typename U>
+	inline SharedPtr<T>::SharedPtr(SharedPtr<U>&& other) noexcept
+		: m_ptr(other.m_ptr)
+	{
+		other.m_ptr = nullptr; // 카운트 조작 없이 소유권(참조)만 훔쳐옵니다.
+	}
+
+	template<typename T>
+	template<typename U>
+	inline SharedPtr<T>& SharedPtr<T>::operator=(SharedPtr<U>&& other) noexcept
+	{
+		if (m_ptr != other.m_ptr)
 		{
 			if (m_ptr) m_ptr->DecRef();
 			m_ptr = other.m_ptr;

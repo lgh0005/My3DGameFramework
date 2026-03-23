@@ -1,5 +1,4 @@
 #pragma once
-#include "Managers/MemoryManager.h"
 
 namespace MGF3D
 {
@@ -34,12 +33,23 @@ namespace MGF3D
 	template<typename T>
 	inline UniquePtr<T>& UniquePtr<T>::operator=(UniquePtr&& other) noexcept
 	{
-		if (this != &other)
-		{
-			Reset();
-			m_ptr = other.m_ptr;
-			other.m_ptr = nullptr;
-		}
+		if (this != &other) Reset(other.Release());
+		return *this;
+	}
+
+
+	template<typename T>
+	template<typename U> // U* 에서 T* 로의 암시적 업캐스팅 발생 
+	inline UniquePtr<T>::UniquePtr(UniquePtr<U>&& other) noexcept
+		: m_ptr(other.Release()) { }
+
+	template<typename T>
+	template<typename U>
+	inline UniquePtr<T>& UniquePtr<T>::operator=(UniquePtr<U>&& other) noexcept
+	{
+		// 템플릿 타입이 다르므로 자기 자신인지(this != &other) 비교할 필요가 사실상 없으나, 
+		// 소유권 이전의 명확성을 위해 Reset을 활용합니다.
+		Reset(other.Release());
 		return *this;
 	}
 
@@ -95,11 +105,10 @@ namespace MGF3D
 	template<typename T>
 	inline void UniquePtr<T>::Reset(T* ptr)
 	{
-		if (m_ptr)
+		if (m_ptr != ptr)
 		{
-			m_ptr->~T();
-			MGF_MEMORY.Deallocate(m_ptr, sizeof(T));
+			if (m_ptr) delete m_ptr;
+			m_ptr = ptr;
 		}
-		m_ptr = ptr;
 	}
 }

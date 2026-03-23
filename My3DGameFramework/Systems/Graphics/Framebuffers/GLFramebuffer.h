@@ -11,7 +11,6 @@ namespace MGF3D
 		virtual ~GLFramebuffer();
 		virtual void Bind() const = 0;
 		virtual void Unbind() const = 0;
-		virtual void Resize(uint32 w, uint32 h) = 0;
 
 	public:
 		virtual void Blit

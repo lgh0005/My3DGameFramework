@@ -9,6 +9,19 @@ namespace MGF3D
 	GLFramebuffer2D::GLFramebuffer2D() = default;
 	GLFramebuffer2D::~GLFramebuffer2D()
 	{
+		// 1. 부착되어 있던 색상 텍스쳐들을 풀로 반납
+		for (auto& tex : m_colorTextures)
+			MGF_TEXTURE.Release(tex);
+		m_colorTextures.Clear();
+
+		// 2. 부착되어 있던 깊이/스텐실 텍스쳐를 풀로 반납
+		if (m_depthStencilTexture != nullptr)
+		{
+			MGF_TEXTURE.Release(m_depthStencilTexture);
+			m_depthStencilTexture = nullptr;
+		}
+
+		// 3. 프레임버퍼 핸들 파괴
 		if (m_handle)
 		{
 			glDeleteFramebuffers(1, &m_handle);
@@ -16,17 +29,35 @@ namespace MGF3D
 		}
 	}
 
-	GLFramebuffer2DPtr GLFramebuffer2D::Create(const FramebufferLayout& layout, uint32 handle)
+	GLFramebuffer2DPtr GLFramebuffer2D::Create
+	(
+		uint32 width, uint32 height,
+		const SVector<uint32>& colorFormats,
+		uint32 depthStencilFormat,
+		uint32 samples,
+		uint32 handle
+	)
 	{
 		auto fbo = GLFramebuffer2DPtr(new GLFramebuffer2D());
-		if (!fbo->Init(layout, handle)) return nullptr;
+		if (!fbo->Init(width, height, colorFormats, depthStencilFormat, samples, handle)) return nullptr;
 		return fbo;
 	}
 
-	bool GLFramebuffer2D::Init(const FramebufferLayout& layout, uint32 handle)
+	bool GLFramebuffer2D::Init
+	(
+		uint32 width, uint32 height,
+		const SVector<uint32>& colorFormats,
+		uint32 depthStencilFormat,
+		uint32 samples,
+		uint32 handle
+	)
 	{
 		// 0. 레이아웃 정보 저장
-		m_layout = layout;
+		m_width = width;
+		m_height = height;
+		m_colorFormats = colorFormats;
+		m_depthStencilFormat = depthStencilFormat;
+		m_samples = samples;
 
 		// 1. 재사용 핸들 여부 검사
 		if (handle == 0)
@@ -37,7 +68,7 @@ namespace MGF3D
 		else m_handle = handle;
 
 		// 2. 레이아웃 기반 해시 생성
-		m_hash = FramebufferHash(m_layout);
+		m_hash = FramebufferHash(m_width, m_height, m_colorFormats, m_depthStencilFormat, m_samples);
 
 		// 3. 텍스처 구성 시작
 		RefreshAttachments();
@@ -49,7 +80,7 @@ namespace MGF3D
 		if (m_handle)
 		{
 			glBindFramebuffer(GL_FRAMEBUFFER, m_handle);
-			glViewport(0, 0, (GLsizei)m_layout.width, (GLsizei)m_layout.height);
+			glViewport(0, 0, (GLsizei)m_width, (GLsizei)m_height);
 		}
 	}
 
@@ -60,11 +91,11 @@ namespace MGF3D
 
 	void GLFramebuffer2D::Resize(uint32 w, uint32 h)
 	{
-		if (m_layout.width == w && m_layout.height == h) return;
+		if (m_width == w && m_height == h) return;
 
-		m_layout.width = w;
-		m_layout.height = h;
-		m_hash = FramebufferHash(m_layout);
+		m_width = w;
+		m_height = h;
+		m_hash = FramebufferHash(m_width, m_height, m_colorFormats, m_depthStencilFormat, m_samples);
 
 		RefreshAttachments();
 	}
@@ -110,20 +141,26 @@ namespace MGF3D
 		if (m_handle == 0) return;
 
 		// 1. 기존 어태치먼트 정리 (TextureManager 풀로 반납되도록 유도)
+		for (auto& tex : m_colorTextures) MGF_TEXTURE.Release(tex);
 		m_colorTextures.Clear();
-		m_depthStencilTexture = nullptr;
+
+		if (m_depthStencilTexture != nullptr)
+		{
+			MGF_TEXTURE.Release(m_depthStencilTexture);
+			m_depthStencilTexture = nullptr;
+		}
 
 		// 2. 컬러 어태치먼트 생성 및 부착
 		LVector<uint32> drawBuffers;
-		for (uint32 i = 0; i < m_layout.colorFormats.Count(); ++i)
+		for (uint32 i = 0; i < m_colorFormats.Count(); ++i)
 		{
-			//// TextureManager를 통해 텍스처 요청
-			//auto tex = MGF_TEXTURE->Request2D(m_layout.Width, m_layout.Height, m_layout.ColorFormats[i]);
-			//m_colorTextures.push_back(tex);
+			// TextureManager를 통해 텍스처 요청
+			auto tex = MGF_TEXTURE.RequestTexture2D(m_width, m_height, m_colorFormats[i]);
+			m_colorTextures.PushBack(tex);
 
-			//uint32 attachmentSlot = GL_COLOR_ATTACHMENT0 + i;
-			//glFramebufferTexture2D(GL_FRAMEBUFFER, attachmentSlot, GL_TEXTURE_2D, tex->GetHandle(), 0);
-			//drawBuffers.PushBack(attachmentSlot);
+			uint32 attachmentSlot = GL_COLOR_ATTACHMENT0 + i;
+			glNamedFramebufferTexture(m_handle, attachmentSlot, tex->GetHandle(), 0);
+			drawBuffers.PushBack(attachmentSlot);
 		}
 
 		// 3. MRT 활성화
@@ -138,25 +175,19 @@ namespace MGF3D
 			glNamedFramebufferReadBuffer(m_handle, GL_NONE);
 		}
 
-		// 3. 깊이/스텐실 어태치먼트 부착
-		if (m_layout.depthStencilFormat)
+		// 4. 깊이/스텐실 어태치먼트 부착
+		if (m_depthStencilFormat)
 		{
-			//m_depthStencilTexture = MGF_TEXTURE->Request2D(m_layout.Width, m_layout.Height, m_layout.DepthStencilFormat);
-			
-			// 포맷에 따라 적절한 슬롯 선택
-			// GLenum attachmentType = GL_DEPTH_STENCIL_ATTACHMENT;
-			// 만약 순수 Depth 포맷인 경우 처리 로직을 확장할 수 있음
-
-			//glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_TEXTURE_2D, m_depthStencilTexture->GetHandle(), 0);
+			m_depthStencilTexture = MGF_TEXTURE.RequestTexture2D(m_width, m_height, m_depthStencilFormat);
+			uint32 attachmentType = GL_DEPTH_STENCIL_ATTACHMENT;
+			glNamedFramebufferTexture(m_handle, attachmentType, m_depthStencilTexture->GetHandle(), 0);
 		}
 
-		// 상태 검증
-		//GLenum status = glCheckNamedFramebufferStatus(m_handle, GL_FRAMEBUFFER);
-		//if (status != GL_FRAMEBUFFER_COMPLETE)
-		//{
-		//	MGF_LOG_ERROR("Framebuffer DSA Check Failed! Handle: {0}, Status: 0x{1:X}", m_handle, status);
-		//}
+		// 5. 프레임버퍼 완성 상태 검증
+		uint32 status = glCheckNamedFramebufferStatus(m_handle, GL_FRAMEBUFFER);
+		MGF_ASSERT(status == GL_FRAMEBUFFER_COMPLETE, "Framebuffer DSA Check Failed!");
 	}
+
 	Recti GLFramebuffer2D::GetBlitArea
 	(
 		const GLFramebufferPtr& fbo, 
@@ -166,7 +197,21 @@ namespace MGF3D
 		// 0. 사용자 정의 영역이 있으면 그것을 즉시 반환
 		if (rect) return *rect;
 
-		// 1. GLFramebuffer2D 획득
+		// 1. fbo가 nullptr인 경우 기본 화면(Default Framebuffer)으로 간주
+		if (fbo == nullptr)
+		{
+			// TODO: 엔진의 WindowManager나 Application 클래스가 있다면 
+			// 윈도우의 해상도를 가져오는 것이 가장 정확합니다.
+			// (예: return Recti(0, 0, MGF_WINDOW.GetWidth(), MGF_WINDOW.GetHeight());)
+
+			// 전역 접근자가 아직 없다면, 현재 설정된 OpenGL 뷰포트를 읽어올 수 있습니다.
+			//int32 viewport[4];
+			//glGetIntegerv(GL_VIEWPORT, viewport);
+			//return Recti(0, 0, viewport[2], viewport[3]);
+			return Recti();
+		}
+
+		// 2. GLFramebuffer2D 획득
 		auto fbo2D = StaticSharedCast<GLFramebuffer2D>(fbo);
 		MGF_ASSERT
 		(
@@ -174,6 +219,7 @@ namespace MGF3D
 			"GetBlitArea: Failed to cast GLFramebuffer to GLFramebuffer2D."
 		);
 
+		// 3. Blit 영역 반환
 		return Recti
 		(
 			0, 0,

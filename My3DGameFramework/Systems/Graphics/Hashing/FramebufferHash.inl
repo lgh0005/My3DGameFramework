@@ -1,4 +1,3 @@
-#include "FramebufferHash.h"
 #pragma once
 
 namespace MGF3D
@@ -9,18 +8,33 @@ namespace MGF3D
 		return *this;
 	}
 
-	inline MGF3D::FramebufferHash::FramebufferHash(const FramebufferLayout& desc)
-		: IHashFunctor<FramebufferHash, usize>(Calculate(desc)) { }
+	inline FramebufferHash::FramebufferHash
+	(
+		uint32 width, uint32 height,
+		const SVector<uint32>& colorFormats,
+		uint32 depthStencilFormat,
+		uint32 samples,
+		uint32 depth
+	)
+		: IHashFunctor<FramebufferHash, usize>(Calculate(width, height, colorFormats, depthStencilFormat, samples, depth)) {}
 
-	inline usize FramebufferHash::Calculate(const FramebufferLayout& desc)
+	inline usize FramebufferHash::Calculate
+	(
+		uint32 width, uint32 height,
+		const SVector<uint32>& colorFormats,
+		uint32 depthStencilFormat,
+		uint32 samples,
+		uint32 depth
+	)
 	{
 		usize seed = 0;
-		Combine(seed, desc.width);
-		Combine(seed, desc.height);
-		Combine(seed, desc.samples);
-		Combine(seed, desc.depthStencilFormat);
+		Combine(seed, width);
+		Combine(seed, height);
+		Combine(seed, depth); // 3D 프레임버퍼를 위한 깊이값 해시 조합 추가
+		Combine(seed, samples);
+		Combine(seed, depthStencilFormat);
 
-		for (uint32 format : desc.colorFormats)
+		for (uint32 format : colorFormats)
 			Combine(seed, format);
 
 		return seed;

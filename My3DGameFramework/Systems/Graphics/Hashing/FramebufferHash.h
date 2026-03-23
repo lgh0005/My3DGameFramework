@@ -1,6 +1,5 @@
 #pragma once
 #include "Hashing/IHashFunctor.h"
-#include "Layouts/FramebufferLayout.h"
 
 namespace MGF3D
 {
@@ -12,10 +11,24 @@ namespace MGF3D
 		FramebufferHash& operator=(usize h);
 
 	public:
-		FramebufferHash(const FramebufferLayout& desc);
+		FramebufferHash
+		(
+			uint32 width, uint32 height,
+			const SVector<uint32>& colorFormats,
+			uint32 depthStencilFormat,
+			uint32 samples,
+			uint32 depth = 1
+		);
 
 	private:
-		static usize Calculate(const FramebufferLayout& desc);
+		static usize Calculate
+		(
+			uint32 width, uint32 height,
+			const SVector<uint32>& colorFormats,
+			uint32 depthStencilFormat,
+			uint32 samples,
+			uint32 depth
+		);
 		static void Combine(usize& seed, uint32 v);
 	};
 }

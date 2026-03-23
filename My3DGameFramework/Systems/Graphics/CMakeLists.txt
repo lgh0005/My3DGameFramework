@@ -83,7 +83,6 @@ set(SOURCES
     # "Instancing/RenderQueue.h"          "Instancing/RenderQueue.cpp"
 
     # Layouts
-    "Layouts/FramebufferLayout.h"        "Layouts/FramebufferLayout.cpp"
     "Layouts/VertexLayout.h"             "Layouts/VertexLayout.cpp"
 
     # VRAM

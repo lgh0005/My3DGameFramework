@@ -25,6 +25,8 @@ namespace MGF3D
 	public:
 		UniquePtr(UniquePtr&& other) noexcept;
 		UniquePtr& operator=(UniquePtr&& other) noexcept;
+		template<typename U> UniquePtr(UniquePtr<U>&& other) noexcept;
+		template<typename U> UniquePtr& operator=(UniquePtr<U>&& other) noexcept;
 
 	/*==========================================//
 	//   default UniquePtr pointer operations   //
@@ -40,12 +42,6 @@ namespace MGF3D
 		explicit operator bool() const;
 		bool operator==(const UniquePtr& other) const;
 		bool operator!=(const UniquePtr& other) const;
-
-	/*====================================================//
-	//   default UniquePtr memory allocation operations   //
-	//====================================================*/
-	public:
-
 
 	/*==========================================//
 	//      default UniquePtr management        //
