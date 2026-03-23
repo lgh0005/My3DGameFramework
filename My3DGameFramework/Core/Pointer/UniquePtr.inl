@@ -108,6 +108,10 @@ namespace MGF3D
 		if (m_ptr != ptr)
 		{
 			if (m_ptr) delete m_ptr;
+			//{
+			//	if constexpr (std::is_base_of_v<PoolAlloc, T>) delete m_ptr;
+			//	else ::delete m_ptr;
+			//}
 			m_ptr = ptr;
 		}
 	}

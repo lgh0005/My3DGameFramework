@@ -12,5 +12,8 @@ namespace MGF3D
 	public:
 		static bool OnModuleInit();
 		static void OnShutDown();
+
+	private:
+		static bool VerifyOpenGLContext();
 	};
 }

@@ -1,13 +1,14 @@
 #pragma once
+#include "Pointer/PoolAlloc.h"
 #include "VRAMFreeList.h"
 
 namespace MGF3D
 {
-	class VRAMPool
+	class VRAMPool : public PoolAlloc
 	{
 	public:
 		VRAMPool(uint64 poolSize);
-		~VRAMPool();
+		virtual ~VRAMPool() override;
 
 	public:
 		uint64 Allocate(uint64 size, uint32 alignment);

@@ -32,7 +32,7 @@ namespace MGF3D
 	//   default SharedPtr move constructors   //
 	//=========================================*/
 	public:
-		SharedPtr(SharedPtr&& other);
+		SharedPtr(SharedPtr&& other) noexcept;
 		SharedPtr& operator=(SharedPtr&& other) noexcept;
 		template<typename U> SharedPtr(SharedPtr<U>&& other) noexcept;
 		template<typename U> SharedPtr& operator=(SharedPtr<U>&& other) noexcept;

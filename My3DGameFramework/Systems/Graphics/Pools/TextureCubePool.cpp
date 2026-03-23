@@ -1,6 +1,5 @@
 #include "GraphicsPch.h"
 #include "TextureCubePool.h"
-#include "Textures/GLTextureCube.h"
 #include "Utils/TextureUtils.h"
 #include "Hashing/TextureHash.h"
 

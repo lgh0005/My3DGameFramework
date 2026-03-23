@@ -1,6 +1,7 @@
 ﻿#include "CorePch.h"
 #include "JobManager.h"
 #include "TaskManager.h"
+#include "Thread/MGFJob.h"
 
 namespace MGF3D
 {
@@ -50,7 +51,8 @@ namespace MGF3D
 
     bool JobManager::CreateWorker()
     {
-        auto worker = MakeUnique<MGFJob>();
+        auto worker = MGFJobUPtr(new MGFJob());
+        // auto worker = MakeUnique<MGFJob>();
         if (!worker) return false;
 
         m_workers.PushBack(std::move(worker));
@@ -80,7 +82,11 @@ namespace MGF3D
         MGF_TASK.Broadcast();
 
         // MGFJob의 소멸자가 호출되면서 내부의 MGFThread가 Join/정리됨
+        for (auto& worker : m_workers)
+            worker.Reset();
         m_workers.Release();
+
+        // m_workers.Release(); // INFO : 현재 여기에서 is_block_type_valid 오류를 일으키고 있음
 
         MGF_LOG_INFO("JobManager: All workers have been shut down.");
     }

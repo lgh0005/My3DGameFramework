@@ -1,8 +1,9 @@
 ﻿#pragma once
-#include "Thread/MGFJob.h"
 
 namespace MGF3D
 {
+    MGF_CLASS_PTR(MGFJob)
+
     class JobManager
     {
         MGF_DECLARE_SINGLE(JobManager)

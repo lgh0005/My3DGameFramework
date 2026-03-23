@@ -19,7 +19,7 @@ namespace MGF3D
 
 	protected:
 		GLTexture();
-		uint32		 m_target{ 0 };
+		uint32		 m_target	{ 0 };
 		uint32		 m_handle	{ 0 };
 		TextureHash  m_hash		{ 0 };
 	};

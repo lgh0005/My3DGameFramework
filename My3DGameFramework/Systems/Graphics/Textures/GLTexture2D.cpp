@@ -30,7 +30,7 @@ namespace MGF3D
 
 	bool GLTexture2D::Init
 	(
-		int32  width, int32 height,
+		int32  width, int32 height, // TODO : uint로 차라리 통일을
 		uint32 vkFormat, const void* pixels,
 		uint32 wrapS, uint32 wrapT,
 		uint32 minFilter, uint32 magFilter,

@@ -1,14 +1,15 @@
 #pragma once
 #include <miniaudio.h>
+#include "Pointer/PoolAlloc.h"
 
 namespace MGF3D
 {
 	MGF_CLASS_PTR(AudioEar)
-	class AudioEar
+	class AudioEar : public PoolAlloc
 	{
 	public:
 		AudioEar(ma_engine& engine, uint32 idx = 0);
-		~AudioEar();
+		virtual ~AudioEar() override;
 
 	public:
 

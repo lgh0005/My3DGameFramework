@@ -31,6 +31,9 @@ set(SOURCES
     "Memory/JoltAllocator.h"         "Memory/JoltAllocator.cpp"
     "Memory/JoltMemoryPool.h"         "Memory/JoltMemoryPool.cpp"
 
+    # Pointer
+    "Pointer/JoltRefFactory.h"      "Pointer/JoltRefFactory.cpp"        "Pointer/JoltRefFactory.inl"
+
     # Queries
     # "Queries/IPhysicsQuery.h"         "Queries/IPhysicsQuery.cpp"
     # "Queries/OverlapQuery.h"         "Queries/OverlapQuery.cpp"

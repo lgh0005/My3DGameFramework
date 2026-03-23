@@ -50,6 +50,11 @@
 #include "Common/Types.h"
 #include "Common/JPHMath.h"
 
+/*=============================//
+//    Physics common pointer   //
+//=============================*/
+#include "Pointer/JoltRefFactory.h"
+
 /*===========================//
 //    Physics common utils   //
 //===========================*/

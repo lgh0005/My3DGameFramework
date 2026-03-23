@@ -4,6 +4,14 @@
 
 namespace MGF3D
 {
+	enum class FramebufferType : uint32
+	{
+		NONE			 = 0,
+		FRAMEBUFFER_2D   = 1,
+		FRAMEBUFFER_3D   = 2,
+		FRAMEBUFFER_CUBE = 3
+	};
+
 	MGF_CLASS_PTR(GLFramebuffer)
 	class GLFramebuffer : public RefCount
 	{
@@ -24,13 +32,15 @@ namespace MGF3D
 		) = 0;
 
 	public:
-		uint32 GetHandle() const;
-		uint32 GetHash() const;
-		uint32 ReleaseHandle();
+		FramebufferType GetTarget() const;
+		uint32			GetHandle() const;
+		uint32			GetHash() const;
+		uint32			ReleaseHandle();
 
 	protected:
 		GLFramebuffer();
-		uint32 m_handle	{ 0 };
-		uint32 m_hash	{ 0 };
+		FramebufferType m_type	     { FramebufferType::NONE };
+		uint32	        m_handle	 { 0 };
+		uint32	        m_hash		 { 0 };
 	};
 }

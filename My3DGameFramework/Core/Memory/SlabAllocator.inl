@@ -13,7 +13,10 @@ namespace MGF3D
 
 	template <typename T>
 	template <typename U>
-	SlabAllocator<T>::SlabAllocator(const SlabAllocator<U>& other) noexcept : m_pool(other.m_pool) { }
+	SlabAllocator<T>::SlabAllocator(const SlabAllocator<U>& other) noexcept
+	{
+		m_pool = MGF_MEMORY.GetSlabMemoryPool(sizeof(T));
+	}
 
 	template <typename T>
 	[[nodiscard]] Ptr<T> SlabAllocator<T>::allocate(usize n)

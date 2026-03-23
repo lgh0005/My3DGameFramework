@@ -1,6 +1,5 @@
 #include "GraphicsPch.h"
 #include "GLFramebuffer2D.h"
-#include "Textures/GLTexture2D.h"
 #include "Hashing/FramebufferHash.h"
 #include "Managers/TextureManager.h"
 
@@ -53,6 +52,7 @@ namespace MGF3D
 	)
 	{
 		// 0. 레이아웃 정보 저장
+		m_type = FramebufferType::FRAMEBUFFER_2D;
 		m_width = width;
 		m_height = height;
 		m_colorFormats = colorFormats;

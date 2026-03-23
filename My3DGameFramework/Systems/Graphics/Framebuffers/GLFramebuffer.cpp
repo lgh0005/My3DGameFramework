@@ -6,6 +6,11 @@ namespace MGF3D
 	GLFramebuffer::GLFramebuffer() = default;
 	GLFramebuffer::~GLFramebuffer() = default;
 
+	FramebufferType GLFramebuffer::GetTarget() const
+	{
+		return m_type;
+	}
+
 	uint32 GLFramebuffer::GetHandle() const
 	{
 		return m_handle;

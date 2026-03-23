@@ -15,10 +15,10 @@ namespace MGF3D
 		// 1. Core Module
 		MGF_MODULE_INIT(CoreModule::Init(), "CoreModule");
 
-		// 3. Middleware Module
+		// 2. Middleware Module
 		MGF_MODULE_INIT(MiddlewareModule::Init(), "MiddlewareModule");
 
-		// 2. System Modules
+		// 3. System Modules
 		MGF_MODULE_INIT(GraphicsModule::Init(), "GraphicsModule");
 		MGF_MODULE_INIT(PhysicsModule::Init(), "PhysicsModule");
 		MGF_MODULE_INIT(AudioModule::Init(), "AudioModule");

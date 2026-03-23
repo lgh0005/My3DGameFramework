@@ -1,14 +1,15 @@
 #pragma once
 #include <miniaudio.h>
+#include "Pointer/PoolAlloc.h"
 
 namespace MGF3D
 {
 	MGF_CLASS_PTR(AudioMixer)
-	class AudioMixer
+	class AudioMixer : public PoolAlloc
 	{
 	public:
 		AudioMixer(ma_engine& engine);
-		~AudioMixer();
+		virtual ~AudioMixer() override;
 
 	public:
 		bool Init();

@@ -1,10 +1,9 @@
 #pragma once
 #include "Pools/TexturePool.h"
+#include "Textures/GLTextureCube.h"
 
 namespace MGF3D
 {
-	MGF_CLASS_PTR(GLTextureCube)
-
 	class TextureCubePool : public TexturePool<GLTextureCube>
 	{
 		using Super = TexturePool<GLTextureCube>;

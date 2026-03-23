@@ -1,18 +1,19 @@
 ﻿#pragma once
+#include "Pointer/PoolAlloc.h"
 
 namespace MGF3D
 {
     // INFO : 윈도우의 Event 기반 순서 제어 동기화 도구
     // 와 유사한 순서 제어 동기화 도구를 구현
     MGF_CLASS_PTR(MGFSignal)
-    class MGFSignal
+    class MGFSignal : public PoolAlloc
     {
         MGF_DISABLE_COPY(MGFSignal)
         MGF_DISABLE_MOVE(MGFSignal)
 
     public:
         MGFSignal();
-        ~MGFSignal();
+        virtual ~MGFSignal() override;
 
     public:
         void Set();   // 신호를 보냄 (대기 중인 스레드를 깨움)

@@ -1,6 +1,5 @@
 #include "GraphicsPch.h"
 #include "GLFramebufferCube.h"
-#include "Textures/GLTextureCube.h"
 #include "Hashing/FramebufferHash.h"
 #include "Managers/TextureManager.h"
 
@@ -48,6 +47,7 @@ namespace MGF3D
 		uint32 handle
 	)
 	{
+		m_type = FramebufferType::FRAMEBUFFER_CUBE;
 		m_size = size;
 		m_colorFormats = colorFormats;
 		m_depthStencilFormat = depthStencilFormat;

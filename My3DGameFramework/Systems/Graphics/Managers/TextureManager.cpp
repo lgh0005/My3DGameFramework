@@ -1,6 +1,9 @@
 #include "GraphicsPch.h"
 #include "TextureManager.h"
 #include "Textures/GLTexture.h"
+#include "Textures/GLTexture2D.h"
+#include "Textures/GLTexture3D.h"
+#include "Textures/GLTextureCube.h"
 
 namespace MGF3D
 {
@@ -17,6 +20,11 @@ namespace MGF3D
 		glGetIntegerv(GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS, &m_maxTextureUnits);
 		m_textureHandleCache.Resize(static_cast<usize>(m_maxTextureUnits));
 		m_textureSlotUsage.Resize(static_cast<usize>(m_maxTextureUnits));
+
+		// 3. 텍스처 하드웨어 크기 한계치 쿼리 및 캐싱
+		glGetIntegerv(GL_MAX_TEXTURE_SIZE, &m_maxTextureSize);
+		glGetIntegerv(GL_MAX_3D_TEXTURE_SIZE, &m_max3DTextureSize);
+		glGetIntegerv(GL_MAX_CUBE_MAP_TEXTURE_SIZE, &m_maxCubeMapTextureSize);
 
 		return true;
 	}

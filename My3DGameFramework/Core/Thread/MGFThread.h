@@ -1,18 +1,19 @@
 ﻿#pragma once
+#include "Pointer/PoolAlloc.h"
 #include <thread>
 #include "Containers/Slab/SString.h"
 
 namespace MGF3D
 {
 	MGF_CLASS_PTR(MGFThread)
-	class MGFThread
+	class MGFThread : public PoolAlloc
 	{
 		MGF_DISABLE_COPY(MGFThread)
 		MGF_DISABLE_MOVE(MGFThread)
 
 	public:
 		MGFThread();
-		~MGFThread();
+		virtual ~MGFThread() override;
 
 	public:
 		bool Start(const SString& name, Action<> work);

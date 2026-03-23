@@ -37,7 +37,8 @@ namespace MGF3D
         const T& operator[](int32 inIndex) const { return GetData(inIndex); }
 
     private:
-        TVector<Node, Alloc> m_nodes;
+        using NodeAllocator = typename Alloc::template rebind<Node>::other;
+        TVector<Node, NodeAllocator> m_nodes;
         int32 m_head{ -1 };
         int32 m_tail{ -1 };
     };

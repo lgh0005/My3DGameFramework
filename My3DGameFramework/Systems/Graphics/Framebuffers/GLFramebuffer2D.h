@@ -1,10 +1,9 @@
 #pragma once
 #include "Framebuffers/GLFramebuffer.h"
+#include "Textures/GLTexture2D.h"
 
 namespace MGF3D
 {
-	MGF_CLASS_PTR(GLTexture2D)
-
 	MGF_CLASS_PTR(GLFramebuffer2D)
 	class GLFramebuffer2D : public GLFramebuffer
 	{

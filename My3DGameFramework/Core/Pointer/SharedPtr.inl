@@ -41,9 +41,10 @@ namespace MGF3D
 		return *this;
 	}
 
+	// 파생 클래스 포인터에서 기반 클래스 포인터로의 암시적 변환
 	template<typename T>
 	template<typename U>
-	inline SharedPtr<T>::SharedPtr(const SharedPtr<U>& other) : m_ptr(other.m_ptr) noexcept // 파생 클래스 포인터에서 기반 클래스 포인터로의 암시적 변환
+	inline SharedPtr<T>::SharedPtr(const SharedPtr<U>& other) : m_ptr(other.m_ptr)
 	{
 		if (m_ptr) m_ptr->IncRef();
 	}
@@ -66,7 +67,7 @@ namespace MGF3D
 	//   default SharedPtr move constructors   //
 	//=========================================*/
 	template<typename T>
-	inline SharedPtr<T>::SharedPtr(SharedPtr&& other) : m_ptr(other.m_ptr) noexcept
+	inline SharedPtr<T>::SharedPtr(SharedPtr&& other) noexcept : m_ptr(other.m_ptr)
 	{
 		other.m_ptr = nullptr;
 	}

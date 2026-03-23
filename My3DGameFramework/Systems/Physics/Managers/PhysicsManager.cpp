@@ -13,7 +13,7 @@ namespace MGF3D
 	bool PhysicsManager::Init()
 	{
 		// 1. 물리 우주 본체 생성
-		m_physicsSystem = MakeUnique<::JPH::PhysicsSystem>();
+		m_physicsSystem = UniquePtr<::JPH::PhysicsSystem>(new ::JPH::PhysicsSystem());
 		MGF_ASSERT(m_physicsSystem != nullptr, "PhysicsManager: Failed to allocate JPH::PhysicsSystem memory!");
 
 		// 2. Jolt 필터 세팅

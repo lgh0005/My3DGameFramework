@@ -8,7 +8,7 @@ namespace MGF3D
 
 	bool RenderManager::Init()
 	{
-
+		// 1. 전역 그래픽 설정
 		glEnable(GL_DEPTH_TEST);
 		glDepthFunc(GL_LESS);
 		glEnable(GL_STENCIL_TEST);

@@ -1,6 +1,5 @@
 #include "GraphicsPch.h"
 #include "GLFramebuffer3D.h"
-#include "Textures/GLTexture3D.h"
 #include "Hashing/FramebufferHash.h"
 #include "Managers/TextureManager.h"
 
@@ -48,6 +47,7 @@ namespace MGF3D
 		uint32 handle
 	)
 	{
+		m_type = FramebufferType::FRAMEBUFFER_3D;
 		m_width = width;
 		m_height = height;
 		m_depth = depth;

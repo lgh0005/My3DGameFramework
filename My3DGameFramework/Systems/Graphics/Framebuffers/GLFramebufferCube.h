@@ -1,10 +1,9 @@
 #pragma once
 #include "Framebuffers/GLFramebuffer.h"
+#include "Textures/GLTextureCube.h"
 
 namespace MGF3D
 {
-	MGF_CLASS_PTR(GLTextureCube)
-
 	MGF_CLASS_PTR(GLFramebufferCube)
 	class GLFramebufferCube : public GLFramebuffer
 	{

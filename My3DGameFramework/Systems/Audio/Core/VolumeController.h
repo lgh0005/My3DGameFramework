@@ -1,14 +1,15 @@
 #pragma once
 #include <miniaudio.h>
+#include "Pointer/PoolAlloc.h"
 
 namespace MGF3D
 {
 	MGF_CLASS_PTR(VolumeController)
-	class VolumeController
+	class VolumeController : public PoolAlloc
 	{
 	public:
 		VolumeController(ma_engine& engine);
-		~VolumeController();
+		virtual ~VolumeController() override;
 
 	public:
 		void SetVolume(float volume);

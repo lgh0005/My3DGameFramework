@@ -43,10 +43,10 @@ namespace MGF3D
         T PopFront();
         T PopBack();
 
-        T& Front() { return this->front(); }
-        const T& Front() const { return this->front(); }
-        T& Back() { return this->back(); }
-        const T& Back() const { return this->back(); }
+        T& Front() { return m_deque.front(); }
+        const T& Front() const { return m_deque.front(); }
+        T& Back() { return m_deque.back(); }
+        const T& Back() const { return m_deque.back(); }
 
     public:
         using iterator = typename std::deque<T, Alloc>::iterator;

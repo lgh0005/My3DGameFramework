@@ -1,5 +1,6 @@
 #pragma once
 #include <miniaudio.h>
+#include "Pointer/PoolAlloc.h"
 
 namespace MGF3D
 {
@@ -7,11 +8,11 @@ namespace MGF3D
 	MGF_CLASS_PTR(AudioEar)
 
 	MGF_CLASS_PTR(AudioEngine)
-	class AudioEngine
+	class AudioEngine : public PoolAlloc
 	{
 	public:
 		AudioEngine();
-		~AudioEngine();
+		virtual ~AudioEngine() override;
 
 	public:
 		bool Init();

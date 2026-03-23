@@ -16,11 +16,14 @@ namespace MGF3D
 		}
 
 		// 2. Jolt의 순정 Lock-free 스레드 풀 생성
-		m_jobSystem = MakeUnique<::JPH::JobSystemThreadPool>
+		m_jobSystem = UniquePtr<::JPH::JobSystemThreadPool>
 		(
-			::JPH::cMaxPhysicsJobs,
-			::JPH::cMaxPhysicsBarriers,
-			-1
+			new ::JPH::JobSystemThreadPool
+			(
+				::JPH::cMaxPhysicsJobs,
+				::JPH::cMaxPhysicsBarriers,
+				-1
+			)
 		);
 		if (!m_jobSystem)
 		{

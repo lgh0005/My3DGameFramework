@@ -92,6 +92,11 @@ set(SOURCES
     "VRAM/VRAMPool.h"               "VRAM/VRAMPool.cpp"
 
     # Pools
+    "Pools/FramebufferPool.h"           "Pools/FramebufferPool.cpp"         "Pools/FramebufferPool.inl"
+    "Pools/Framebuffer2DPool.h"           "Pools/Framebuffer2DPool.cpp" 
+    "Pools/Framebuffer3DPool.h"           "Pools/Framebuffer3DPool.cpp" 
+    "Pools/FramebufferCubePool.h"           "Pools/FramebufferCubePool.cpp"
+
     "Pools/TexturePool.h"           "Pools/TexturePool.cpp"         "Pools/TexturePool.inl"
     "Pools/Texture2DPool.h"           "Pools/Texture2DPool.cpp" 
     "Pools/Texture3DPool.h"           "Pools/Texture3DPool.cpp" 

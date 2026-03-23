@@ -1,6 +1,10 @@
 #include "GraphicsPch.h"
 #include "GraphicsModule.h"
+
 #include "Managers/VRAMManager.h"
+//#include "Managers/TextureManager.h"
+//#include "Managers/FramebufferManager.h"
+//#include "Managers/RenderManager.h"
 
 namespace MGF3D
 {
@@ -9,10 +13,32 @@ namespace MGF3D
 
 	bool GraphicsModule::OnModuleInit()
 	{
+		// 1. OpenGL 컨텍스트 및 드라이버 정보 확인
+		if (!VerifyOpenGLContext()) return false;
+
+		// 2. 매니저 초기화
+		MGF_INIT_SYS(MGF_VRAM.Init(StaticPoolSize, DynamicPoolSize), "VRAMManager");
+		//MGF_INIT_SYS(MGF_RENDER.Init(), "RenderManager");
+		//MGF_INIT_SYS(MGF_TEXTURE.Init(), "TextureManager");
+		//MGF_INIT_SYS(MGF_FRAMEBUFFER.Init(), "FramebufferManager");
+
+		return true;
+	}
+
+	void GraphicsModule::OnShutDown()
+	{
+		//MGF_RENDER.Shutdown();
+		//MGF_FRAMEBUFFER.Shutdown();
+		//MGF_TEXTURE.Shutdown();
+		MGF_VRAM.Shutdown();
+	}
+
+	bool GraphicsModule::VerifyOpenGLContext()
+	{
 		// 0. 함수 포인터 자체가 유효한지 먼저 체크
 		MGF_ASSERT
 		(
-			glGetString != nullptr, 
+			glGetString != nullptr,
 			"Graphics: GLAD function pointers are null! Check MGFWindow initialization."
 		);
 
@@ -24,21 +50,10 @@ namespace MGF3D
 			MGF_LOG_INFO("GraphicsModule: OpenGL Context Verified.");
 			MGF_LOG_INFO(" - Version : {0}", glVersion);
 			MGF_LOG_INFO(" - Renderer: {0}", glRenderer);
-		}
-		else
-		{
-			MGF_LOG_ERROR("Graphics: Failed to retrieve OpenGL strings. Context might not be current.");
-			return false;
+			return true;
 		}
 
-		// 2. VRAMManager 초기화
-		MGF_INIT_SYS(MGF_VRAM.Init(StaticPoolSize, DynamicPoolSize), "VRAMManager");
-
-		return true;
-	}
-
-	void GraphicsModule::OnShutDown()
-	{
-		MGF_VRAM.Shutdown();
+		MGF_LOG_ERROR("Graphics: Failed to retrieve OpenGL strings. Context might not be current.");
+		return false;
 	}
 }

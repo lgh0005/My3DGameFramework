@@ -17,21 +17,21 @@ namespace JPH
 namespace MGF3D
 {
     /*================================//
-    //      Jolt Core Aliases         //
-    //================================*/
-    using PhysicsSystemUPtr = UniquePtr<::JPH::PhysicsSystem>;
-    using TempAllocatorUPtr = UniquePtr<::JPH::TempAllocatorImpl>;
-    using JobSystemUPtr     = UniquePtr<::JPH::JobSystem>;
-    using JobSystemThreadPoolUPtr = UniquePtr<::JPH::JobSystemThreadPool>;
-
-    /*================================//
     //      Common Physics Types      //
     //================================*/
+    template<typename T> using Ref = ::JPH::Ref<T>;
     using BodyID        = ::JPH::BodyID;
     using BodyInterface = ::JPH::BodyInterface;
-    
-    template <typename T>
-    using Ref = ::JPH::Ref<T>;
 
-    using ShapePtr = Ref<::JPH::Shape>;
+    /*================================//
+    //      Jolt Core Aliases         //
+    //================================*/
+    using ShapePtr                = Ref<::JPH::Shape>;
+    using PhysicsMaterialPtr      = Ref<::JPH::PhysicsMaterial>;
+    using GroupFilterPtr          = Ref<::JPH::GroupFilter>;
+
+    using JobSystemUPtr           = UniquePtr<::JPH::JobSystem>;
+    using PhysicsSystemUPtr       = UniquePtr<::JPH::PhysicsSystem>;
+    using JobSystemThreadPoolUPtr = UniquePtr<::JPH::JobSystemThreadPool>;
+    using TempAllocatorUPtr       = UniquePtr<::JPH::TempAllocatorImpl>;
 }

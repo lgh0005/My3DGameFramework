@@ -6,6 +6,9 @@
 namespace MGF3D
 {
 	MGF_CLASS_PTR(GLTexture);
+	MGF_CLASS_PTR(GLTexture2D);
+	MGF_CLASS_PTR(GLTexture3D);
+	MGF_CLASS_PTR(GLTextureCube);
 
 	struct TextureSlotState
 	{
@@ -65,18 +68,26 @@ namespace MGF3D
 			uint32 wrapR = GL_CLAMP_TO_EDGE
 		);
 
+	public:
+		int32 GetMaxTextureSize() const { return m_maxTextureSize; }
+		int32 GetMax3DTextureSize() const { return m_max3DTextureSize; }
+		int32 GetMaxCubeMapTextureSize() const { return m_maxCubeMapTextureSize; }
+
 	private:
 		int32 FindEmptySlot() const;
 		void  ClearSlots();
 
 	private:
-		int32 m_maxTextureUnits	{ 0 };
 		SStaticLinkedList<TextureSlotState> m_textureHandleCache;
 		SBitset m_textureSlotUsage;
 
-		// 타입별 인스턴스 풀
 		Texture2DPool   m_pool2D;
 		Texture3DPool   m_pool3D;
 		TextureCubePool m_poolCube;
+
+		int32 m_maxTextureUnits{ 0 };
+		int32 m_maxTextureSize{ 0 };
+		int32 m_max3DTextureSize{ 0 };
+		int32 m_maxCubeMapTextureSize{ 0 };
 	};
 }

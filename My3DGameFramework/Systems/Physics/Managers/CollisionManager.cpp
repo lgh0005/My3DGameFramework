@@ -10,7 +10,7 @@ namespace MGF3D
 	bool CollisionManager::Init()
 	{
 		// 통합 필터 생성
-		m_filter = MakeUnique<JoltFilterSet>();
+		m_filter = JoltFilterSetUPtr(new JoltFilterSet());
 		MGF_ASSERT(m_filter != nullptr, "CollisionManager: Failed to allocate JoltFilterSet memory!");
 		
 		MGF_LOG_INFO("[Collision] CollisionManager Initialized Successfully.");
@@ -20,6 +20,9 @@ namespace MGF3D
 	void CollisionManager::Shutdown()
 	{
 		m_filter.Reset();
+
+		Clear();
+
 		m_ObjectNameToID.Release();
 		m_BroadPhaseNameToID.Release();
 		m_BroadPhaseIDToName.Release();

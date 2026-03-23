@@ -1,6 +1,5 @@
 #include "GraphicsPch.h"
 #include "Texture2DPool.h"
-#include "Textures/GLTexture2D.h"
 #include "Utils/TextureUtils.h"
 #include "Hashing/TextureHash.h"
 
