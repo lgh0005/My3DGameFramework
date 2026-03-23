@@ -1,4 +1,7 @@
 #pragma once
+#include "Pools/Texture2DPool.h"
+#include "Pools/Texture3DPool.h"
+#include "Pools/TextureCubePool.h"
 
 namespace MGF3D
 {
@@ -26,13 +29,41 @@ namespace MGF3D
 		int32  Bind(GLTexturePtr texture);
 		void   Unbind(GLTexturePtr texture);
 		void   UnbindSlot(uint32 slot);
+		void   Release(GLTexturePtr texture);
 		void   Flush();
 		
+	/*=============================//
+	//   Texture request methods   //
+	//=============================*/
 	public:
-		// TODO:
-		// 1. RequestTexture2D
-		// 2. RequestTexture3D
-		// 3. RequestTextureCube
+		// 1. Texture2D 요청
+		GLTexture2DPtr RequestTexture2D
+		(
+			uint32 w, uint32 h, uint32 vkFormat,
+			uint32 minF = GL_LINEAR, uint32 magF = GL_LINEAR,
+			uint32 wrapS = GL_CLAMP_TO_EDGE, 
+			uint32 wrapT = GL_CLAMP_TO_EDGE
+		);
+
+		// 2. Texture3D 요청
+		GLTexture3DPtr RequestTexture3D
+		(
+			uint32 w, uint32 h, uint32 d, uint32 vkFormat,
+			uint32 minF = GL_LINEAR, uint32 magF = GL_LINEAR,
+			uint32 wrapS = GL_CLAMP_TO_EDGE, 
+			uint32 wrapT = GL_CLAMP_TO_EDGE, 
+			uint32 wrapR = GL_CLAMP_TO_EDGE
+		);
+
+		// 3. TextureCube 요청
+		GLTextureCubePtr RequestTextureCube
+		(
+			uint32 size, uint32 vkFormat,
+			uint32 minF = GL_LINEAR, uint32 magF = GL_LINEAR,
+			uint32 wrapS = GL_CLAMP_TO_EDGE, 
+			uint32 wrapT = GL_CLAMP_TO_EDGE, 
+			uint32 wrapR = GL_CLAMP_TO_EDGE
+		);
 
 	private:
 		int32 FindEmptySlot() const;
@@ -43,13 +74,9 @@ namespace MGF3D
 		SStaticLinkedList<TextureSlotState> m_textureHandleCache;
 		SBitset m_textureSlotUsage;
 
-		// 1. Texture2D 실제 GPU 상으로 적재된 인스턴스 풀
-		// 크기별로 256, 512, 1024, 2048, 4096을 미리 풀에다가 생성해둠. 개수는 고려 필요
-	
-		// 2. Texture3D 실제 GPU 상으로 적재된 인스턴스 풀
-		
-
-		// 3. TextureCube 실제 GPU 상으로 적재된 인스턴스 풀
-		// 대체로 한 개는 미리 만들어두는 것이 좋을 듯 함
+		// 타입별 인스턴스 풀
+		Texture2DPool   m_pool2D;
+		Texture3DPool   m_pool3D;
+		TextureCubePool m_poolCube;
 	};
 }

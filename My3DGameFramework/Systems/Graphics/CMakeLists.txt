@@ -92,6 +92,12 @@ set(SOURCES
     "VRAM/VRAMNode.h"               "VRAM/VRAMNode.cpp"
     "VRAM/VRAMPool.h"               "VRAM/VRAMPool.cpp"
 
+    # Pools
+    "Pools/TexturePool.h"           "Pools/TexturePool.cpp"         "Pools/TexturePool.inl"
+    "Pools/Texture2DPool.h"           "Pools/Texture2DPool.cpp" 
+    "Pools/Texture3DPool.h"           "Pools/Texture3DPool.cpp" 
+    "Pools/TextureCubePool.h"           "Pools/TextureCubePool.cpp"
+
     # Managers
     "Managers/VRAMManager.h"          "Managers/VRAMManager.cpp"
     "Managers/TextureManager.h"       "Managers/TextureManager.cpp"
