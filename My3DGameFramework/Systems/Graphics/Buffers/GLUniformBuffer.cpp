@@ -14,14 +14,30 @@ namespace MGF3D
 		return buffer;
 	}
 
+	void GLUniformBuffer::Bind(uint32 uboSlot) const
+	{
+		if (m_allocation.IsValid())
+		{
+			// 서브 할당된 VRAM 구간(오프셋과 사이즈)만 정확하게 셰이더 슬롯에 바인딩
+			glBindBufferRange
+			(
+				GL_UNIFORM_BUFFER,
+				uboSlot,
+				m_allocation.GetBufferHandle(),
+				static_cast<GLintptr>(m_allocation.GetOffset()),
+				static_cast<GLsizeiptr>(m_allocation.GetSize())
+			);
+		}
+	}
+
+	void GLUniformBuffer::Unbind(uint32 uboSlot) const
+	{
+		glBindBufferBase(GL_UNIFORM_BUFFER, uboSlot, 0);
+	}
+
 	bool GLUniformBuffer::Init(usize byteSize, VRAMAllocation::PoolType poolType)
 	{
 		if (byteSize == 0) return false;
-
-		// TODO : 이건 모듈 실행 초기에 어딘가에서 받아와서 전역적으로 사용할 수 있도록
-		// 보장을 해줘야 함.
-		//GLint minUboAlignment = 0;
-		//glGetIntegerv(GL_UNIFORM_BUFFER_OFFSET_ALIGNMENT, &minUboAlignment);
 
 		m_allocation = MGF_VRAM.Allocate(poolType, byteSize, 256);
 		if (!m_allocation.IsValid())
@@ -31,31 +47,5 @@ namespace MGF3D
 		}
 
 		return true;
-	}
-
-	void GLUniformBuffer::Bind() const
-	{
-		if (m_allocation.IsValid())
-			glBindBuffer(GL_UNIFORM_BUFFER, m_allocation.GetBufferHandle());
-	}
-
-	void GLUniformBuffer::BindBase(uint32 slot) const
-	{
-		if (m_allocation.IsValid())
-		{
-			glBindBufferRange
-			(
-				GL_UNIFORM_BUFFER,
-				slot,
-				m_allocation.GetBufferHandle(),
-				m_allocation.GetOffset(),
-				m_allocation.GetSize()
-			);
-		}
-	}
-
-	void GLUniformBuffer::Unbind() const
-	{
-		glBindBuffer(GL_UNIFORM_BUFFER, 0);
 	}
 }

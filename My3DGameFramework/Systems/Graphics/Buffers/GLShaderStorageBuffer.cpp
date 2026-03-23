@@ -28,29 +28,24 @@ namespace MGF3D
         return true;
     }
 
-    void GLShaderStorageBuffer::Bind() const 
+    void GLShaderStorageBuffer::Bind(uint32 ssboSlot) const
     {
         if (m_allocation.IsValid())
-            glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_allocation.GetBufferHandle());
-    }
-
-    void GLShaderStorageBuffer::BindBase(uint32 slot) const 
-    { 
-        if (m_allocation.IsValid())
         {
+            // 서브 할당된 VRAM 구간을 셰이더 스토리지 슬롯에 바인딩
             glBindBufferRange
             (
                 GL_SHADER_STORAGE_BUFFER,
-                slot,
+                ssboSlot,
                 m_allocation.GetBufferHandle(),
-                m_allocation.GetOffset(),
-                m_allocation.GetSize()
+                static_cast<GLintptr>(m_allocation.GetOffset()),
+                static_cast<GLsizeiptr>(m_allocation.GetSize())
             );
         }
     }
 
-    void GLShaderStorageBuffer::Unbind() const 
+    void GLShaderStorageBuffer::Unbind(uint32 ssboSlot) const
     {
-        glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0); 
+        glBindBufferBase(GL_SHADER_STORAGE_BUFFER, ssboSlot, 0);
     }
 }

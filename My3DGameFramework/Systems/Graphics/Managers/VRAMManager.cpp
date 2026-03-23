@@ -9,6 +9,11 @@ namespace MGF3D
 
 	bool VRAMManager::Init(uint64 staticPoolSize, uint64 dynamicPoolSize)
 	{
+        // TODO : 이건 모듈 실행 초기에 어딘가에서 받아와서 전역적으로 사용할 수 있도록
+        // 보장을 해줘야 함.
+        //GLint minUboAlignment = 0;
+        //glGetIntegerv(GL_UNIFORM_BUFFER_OFFSET_ALIGNMENT, &minUboAlignment);
+
 		m_staticVRAMPool = MakeUnique<VRAMPool>(staticPoolSize);
 		m_dynamicVRAMPool = MakeUnique<VRAMPool>(dynamicPoolSize);
 		return (m_staticVRAMPool && m_dynamicVRAMPool);

@@ -34,14 +34,14 @@ namespace MGF3D
 		return true;
 	}
 
-	void GLIndexBuffer::Bind() const
+	void GLIndexBuffer::Bind(uint32 vaoHandle) const
 	{
 		if (m_allocation.IsValid())
-			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_allocation.GetBufferHandle());
+			glVertexArrayElementBuffer(vaoHandle, m_allocation.GetBufferHandle());
 	}
 
-	void GLIndexBuffer::Unbind() const
+	void GLIndexBuffer::Unbind(uint32 vaoHandle) const
 	{
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+		glVertexArrayElementBuffer(vaoHandle, 0);
 	}
 }

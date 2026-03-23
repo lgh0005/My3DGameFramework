@@ -1,6 +1,7 @@
 ﻿#include "CorePch.h"
 #include "VertexLayout.h"
-#include "Managers/MemoryManager.h"
+#include "Buffers/GLVertexBuffer.h"
+#include "Buffers/GLIndexBuffer.h"
 
 namespace MGF3D
 {
@@ -44,15 +45,8 @@ namespace MGF3D
         glVertexArrayAttribFormat(m_vertexArrayObject, attribIndex, count, type, normalized, relativeOffset);
         glVertexArrayAttribBinding(m_vertexArrayObject, attribIndex, attribIndex);
         
-        const uint64 finalOffset = vertexBuffer.GetOffset() + bufferOffset;
-        glVertexArrayVertexBuffer
-        (
-            m_vertexArrayObject, 
-            attribIndex, 
-            vertexBuffer.GetAllocation().GetBufferHandle(),
-            static_cast<GLintptr>(finalOffset),
-            static_cast<GLsizei>(stride)
-        );
+        // VBO 객체 스스로 VAO의 해당 슬롯에 자신을 부착하도록 위임
+        vertexBuffer.Bind(m_vertexArrayObject, attribIndex, static_cast<uint32>(stride), static_cast<uint32>(bufferOffset));
     }
 
     void VertexLayout::SetAttribI
@@ -66,15 +60,8 @@ namespace MGF3D
         glVertexArrayAttribIFormat(m_vertexArrayObject, attribIndex, count, type, relativeOffset);
         glVertexArrayAttribBinding(m_vertexArrayObject, attribIndex, attribIndex);
         
-        const uint64 finalOffset = vertexBuffer.GetOffset() + bufferOffset;
-        glVertexArrayVertexBuffer
-        (
-            m_vertexArrayObject, 
-            attribIndex, 
-            vertexBuffer.GetAllocation().GetBufferHandle(),
-            static_cast<GLintptr>(finalOffset),
-            static_cast<GLsizei>(stride)
-        );
+        // VBO 객체 스스로 VAO의 해당 슬롯에 자신을 부착하도록 위임
+        vertexBuffer.Bind(m_vertexArrayObject, attribIndex, static_cast<uint32>(stride), static_cast<uint32>(bufferOffset));
     }
 
     void VertexLayout::SetAttribDivisor(uint32 bindingIndex, uint32 divisor) const
@@ -89,6 +76,6 @@ namespace MGF3D
 
     void VertexLayout::SetIndexBuffer(const GLIndexBuffer& indexBuffer) const
     {
-        glVertexArrayElementBuffer(m_vertexArrayObject, indexBuffer.GetAllocation().GetBufferHandle());
+        indexBuffer.Bind(m_vertexArrayObject);
     }
 }

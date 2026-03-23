@@ -29,14 +29,18 @@ namespace MGF3D
 		return true;
 	}
 
-	void GLVertexBuffer::Bind() const
+	void GLVertexBuffer::Bind(uint32 vaoHandle, uint32 bindingIndex, uint32 stride, uint32 offset) const
 	{
 		if (m_allocation.IsValid())
-			glBindBuffer(GL_ARRAY_BUFFER, m_allocation.GetBufferHandle());
+		{
+			uint64 totalOffset = m_allocation.GetOffset() + static_cast<uint64>(offset);
+			glVertexArrayVertexBuffer(vaoHandle, bindingIndex, m_allocation.GetBufferHandle(), static_cast<GLintptr>(totalOffset), static_cast<GLsizei>(stride));
+		}
+
 	}
 
-	void GLVertexBuffer::Unbind() const
+	void GLVertexBuffer::Unbind(uint32 vaoHandle, uint32 bindingIndex) const
 	{
-		glBindBuffer(GL_ARRAY_BUFFER, 0);
+		glVertexArrayVertexBuffer(vaoHandle, bindingIndex, 0, 0, 0);
 	}
 }

@@ -16,8 +16,8 @@ namespace MGF3D
 		);
 
 	public:
-		virtual void Bind() const override;
-		virtual void Unbind() const override;
+		void Bind(uint32 vaoHandle) const;
+		void Unbind(uint32 vaoHandle) const;
 
 	private:
 		GLIndexBuffer();

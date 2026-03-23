@@ -15,9 +15,8 @@ namespace MGF3D
         );
 
     public:
-        virtual void Bind() const override;
-        void BindBase(uint32 slot) const;
-        virtual void Unbind() const override;
+        void Bind(uint32 ssboSlot) const;
+        void Unbind(uint32 ssboSlot) const;
 
     private:
         GLShaderStorageBuffer();

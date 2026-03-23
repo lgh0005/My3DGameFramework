@@ -16,8 +16,8 @@ namespace MGF3D
 		);
 
 	public:
-		virtual void Bind() const override;
-		virtual void Unbind() const override;
+		void Bind(uint32 vaoHandle, uint32 bindingIndex, uint32 stride, uint32 offset = 0) const;
+		void Unbind(uint32 vaoHandle, uint32 bindingIndex) const;
 
 	private:
 		GLVertexBuffer();
