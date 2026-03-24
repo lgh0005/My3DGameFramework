@@ -3,6 +3,8 @@
 
 namespace MGF3D
 {
+	MGF_STRUCT_PTR(MGFType)
+
 	class TypeManager
 	{
 		MGF_DECLARE_SINGLE(TypeManager)
@@ -31,6 +33,6 @@ namespace MGF3D
 
 	private:
 		SVector<TypeToken> m_typeTokenList;
-		SMap<StringHash, UniquePtr<MGFType>> m_tokenRegistry;
+		SMap<StringHash, MGFTypeUPtr> m_tokenRegistry;
 	};
 }

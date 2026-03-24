@@ -1,10 +1,15 @@
 #pragma once
+#include "Pointer/PoolAlloc.h"
 #include "Identity/MGFName.h"
 
 namespace MGF3D
 {
-	struct MGFType
+	MGF_STRUCT_PTR(MGFType)
+	struct MGFType : public PoolAlloc
 	{
+		MGFType();
+		virtual ~MGFType() override;
+
 		MGFName name;
 		StringHash id;
 		Ptr<const MGFType> parent { nullptr };

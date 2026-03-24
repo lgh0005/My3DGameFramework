@@ -13,5 +13,5 @@
 //=================================*/
 #define MGF_STRUCT_PTR(StructName)                                              \
     struct StructName;                                                          \
-    using StructName##Shared = MGF3D::SharedPtr<StructName>;                    \
-    using StructName##Unique = MGF3D::UniquePtr<StructName>;
+    using StructName ## Ptr  = MGF3D::SharedPtr<StructName>;                    \
+    using StructName ## UPtr = MGF3D::UniquePtr<StructName>;

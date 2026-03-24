@@ -3,6 +3,9 @@
 
 namespace MGF3D
 {
+	MGFType::MGFType() = default;
+	MGFType::~MGFType() = default;
+
 	bool MGFType::IsA(const MGFType* other) const
 	{
 		if (!other) return false;
