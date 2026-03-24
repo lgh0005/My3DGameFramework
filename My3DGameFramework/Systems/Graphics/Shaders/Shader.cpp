@@ -1,45 +1,73 @@
-﻿#include "EnginePch.h"
+﻿#include "GraphicsPch.h"
 #include "Shader.h"
 
-Shader::Shader() = default;
-Shader::~Shader()
+namespace MGF3D
 {
-    if (m_shader) glDeleteShader(m_shader);
-}
-
-ShaderPtr Shader::CreateFromFile(const std::string& filename,
-	GLenum shaderType)
-{
-	auto shader = std::unique_ptr<Shader>(new Shader());
-	if (!shader->LoadFile(filename, shaderType)) return nullptr;
-	return shader;
-}
-
-bool Shader::LoadFile(const std::string& filename, GLenum shaderType)
-{
-    auto result = Utils::LoadTextFile(filename);
-    if (!result.has_value())
-        return false;
-
-    auto& code = result.value();
-    const char* codePtr = code.c_str();
-    int32 codeLength = (int32)code.length();
-
-    // create and compile shader
-    m_shader = glCreateShader(shaderType);
-    glShaderSource(m_shader, 1, (const GLchar* const*)&codePtr, &codeLength);
-    glCompileShader(m_shader);
-
-    // check compile error
-    int success = 0;
-    glGetShaderiv(m_shader, GL_COMPILE_STATUS, &success);
-    if (!success)
+    Shader::Shader() = default;
+    Shader::~Shader()
     {
-        char infoLog[1024];
-        glGetShaderInfoLog(m_shader, 1024, nullptr, infoLog);
-        LOG_ERROR("failed to compile shader: \"{}\"", filename);
-        LOG_ERROR("reason: {}", infoLog);
+        if (m_shader)
+        {
+            glDeleteShader(m_shader);
+            m_shader = 0;
+        }
+    }
+
+    ShaderPtr Shader::CreateFromTextFile(const SString& filename, GLenum shaderType)
+    {
+        auto shader = ShaderPtr(new Shader());
+        if (!shader->InitFromTextFile(filename, shaderType)) return nullptr;
+        return shader;
+    }
+
+    ShaderPtr Shader::CreateFromSPIRV(const SString& filename, GLenum shaderType, strview entryPoint)
+    {
+        auto shader = ShaderPtr(new Shader());
+        if (!shader->InitFromSPIRV(filename, shaderType, entryPoint)) return nullptr;
+        return shader;
+    }
+
+    Nullable<SString> Shader::LoadTextFile(const SString& filename)
+    {
+        return Nullable<SString>();
+    }
+
+    Nullable<SVector<uint8>> Shader::LoadBinaryFile(const SString& filename)
+    {
+        return Nullable<SVector<uint8>>();
+    }
+
+    bool Shader::InitFromTextFile(const SString& filename, GLenum shaderType)
+    {
+        auto result = LoadTextFile(filename);
+        if (!result.IsValid())
+            return false;
+
+        auto& code = result.Get();
+        cstr codePtr = code.CStr();
+        int32 codeLength = (int32)code.Length();
+
+        // create and compile shader
+        m_shader = glCreateShader(shaderType);
+        glShaderSource(m_shader, 1, (const GLchar* const*)&codePtr, &codeLength);
+        glCompileShader(m_shader);
+
+        // check compile error
+        int success = 0;
+        glGetShaderiv(m_shader, GL_COMPILE_STATUS, &success);
+        if (!success)
+        {
+            char infoLog[1024];
+            glGetShaderInfoLog(m_shader, 1024, nullptr, infoLog);
+            MGF_LOG_ERROR("failed to compile shader: \"{}\"", filename);
+            MGF_LOG_ERROR("reason: {}", infoLog);
+            return false;
+        }
+        return true;
+    }
+
+    bool Shader::InitFromSPIRV(const SString& filename, GLenum shaderType, strview entryPoint)
+    {
         return false;
     }
-    return true;
 }

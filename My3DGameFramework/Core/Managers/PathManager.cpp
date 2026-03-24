@@ -1,7 +1,7 @@
 ﻿#include "CorePch.h"
 #include "PathManager.h"
 #include "Parsers/JsonParser.h"
-#include "Managers/TaskManager.h"
+#include "Managers/StreamManager.h"
 
 namespace MGF3D
 {
@@ -38,42 +38,43 @@ namespace MGF3D
 			return false;
 		}
 
-		// 1. TaskManager로부터 태스크 하나를 빌려옵니다.
-		auto loadTask = TaskManager::Instance().AcquireTask
+		// StreamManager를 통해 비동기로 읽기 시작
+		MGF_STREAM.ReadFileAsync<bool>
 		(
-			// [WORKER THREAD 영역]
-			[this, configPath]()
+			/* [Worker Thread] */
+			configPath, 
+			[this](FileStreamPtr file) -> Nullable<bool>
 			{
 				JsonParser parser;
-				if (!parser.LoadFromJsonFile(configPath))
-				{
-					MGF_LOG_ERROR("PathManager: Failed to parse config async: {}", configPath.GetCStr());
-					return;
-				}
+
+				// FileStream에서 직접 데이터를 읽으며 파싱
+				if (!parser.LoadFromStream(file))
+					return None;
 
 				const auto& root = parser.GetRoot();
 				if (root.contains("virtualPaths"))
 				{
 					const auto& pathNode = root["virtualPaths"];
-
-					// JSON 데이터를 순회하며 가상 경로 등록
 					for (auto& [alias, physical] : pathNode.items())
+					{
+						// 아까 확인한 대로 내부에서 락을 걸어주니 안전합니다!
 						AddVirtualPath(alias.c_str(), physical.get<std::string>().c_str());
-
-					MGF_LOG_INFO("PathManager: Successfully loaded config from {}", configPath.GetCStr());
+					}
 				}
+
+				return true;
 			},
 
-			// [완료 시 콜백]
-			[this]
+			/* [Main Thread] */
+			[this](Nullable<bool> result)
 			{
-				m_configSignal.Set();
-				MGF_LOG_INFO("PathManager: Config loading signal set.");
+				if (result.IsValid() && *result)
+				{
+					m_configSignal.Set();
+					MGF_LOG_INFO("PathManager: Config stream-parsed and registered in background.");
+				}
 			}
 		);
-
-		// 2. 워커 스레드 큐에 태스크 투입
-		TaskManager::Instance().PushTask(std::move(loadTask));
 
 		return true;
 	}

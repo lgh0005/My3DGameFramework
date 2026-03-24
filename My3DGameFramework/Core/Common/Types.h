@@ -2,6 +2,7 @@
 #include <cstdint>
 #include <string>
 #include <string_view>
+#include <optional>
 
 namespace MGF3D
 {
@@ -44,6 +45,12 @@ namespace MGF3D
 	using uintptr   = std::uintptr_t;
 	using intptr    = std::intptr_t;
 	using alignment = std::align_val_t;
+
+	/*================================//
+	//      Optional-related types    //
+	//================================*/
+	using none_t = std::nullopt_t;
+	inline constexpr none_t None = std::nullopt;
 
 	/*===============================//
 	//   default engine math types   //

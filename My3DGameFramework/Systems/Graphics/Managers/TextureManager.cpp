@@ -26,6 +26,7 @@ namespace MGF3D
 		glGetIntegerv(GL_MAX_3D_TEXTURE_SIZE, &m_max3DTextureSize);
 		glGetIntegerv(GL_MAX_CUBE_MAP_TEXTURE_SIZE, &m_maxCubeMapTextureSize);
 
+
 		return true;
 	}
 

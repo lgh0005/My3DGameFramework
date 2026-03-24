@@ -2,9 +2,9 @@
 #include "GraphicsModule.h"
 
 #include "Managers/VRAMManager.h"
-//#include "Managers/TextureManager.h"
-//#include "Managers/FramebufferManager.h"
-//#include "Managers/RenderManager.h"
+#include "Managers/TextureManager.h"
+#include "Managers/FramebufferManager.h"
+#include "Managers/RenderManager.h"
 
 namespace MGF3D
 {
@@ -18,19 +18,19 @@ namespace MGF3D
 
 		// 2. 매니저 초기화
 		MGF_INIT_SYS(MGF_VRAM.Init(StaticPoolSize, DynamicPoolSize), "VRAMManager");
-		//MGF_INIT_SYS(MGF_RENDER.Init(), "RenderManager");
-		//MGF_INIT_SYS(MGF_TEXTURE.Init(), "TextureManager");
-		//MGF_INIT_SYS(MGF_FRAMEBUFFER.Init(), "FramebufferManager");
+		MGF_INIT_SYS(MGF_RENDER.Init(), "RenderManager");
+		MGF_INIT_SYS(MGF_TEXTURE.Init(), "TextureManager");
+		MGF_INIT_SYS(MGF_FRAMEBUFFER.Init(), "FramebufferManager");
 
 		return true;
 	}
 
 	void GraphicsModule::OnShutDown()
 	{
-		//MGF_RENDER.Shutdown();
-		//MGF_FRAMEBUFFER.Shutdown();
-		//MGF_TEXTURE.Shutdown();
-		MGF_VRAM.Shutdown();
+		MGF_SHUTDOWN_SYS(MGF_RENDER.Shutdown(), "RenderManager");
+		MGF_SHUTDOWN_SYS(MGF_FRAMEBUFFER.Shutdown(), "FramebufferManager");
+		MGF_SHUTDOWN_SYS(MGF_TEXTURE.Shutdown(), "TextureManager");
+		MGF_SHUTDOWN_SYS(MGF_VRAM.Shutdown(), "VRAMManager");
 	}
 
 	bool GraphicsModule::VerifyOpenGLContext()

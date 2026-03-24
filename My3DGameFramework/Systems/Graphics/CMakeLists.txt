@@ -51,6 +51,10 @@ set(SOURCES
     "Meshes/SubMesh.h"               "Meshes/SubMesh.cpp"
 
     # Shaders
+    # "Shaders/Shader.h"              "Shaders/Shader.cpp"
+
+    # Programs
+    # "Programs/Program.h"             "Programs/Program.cpp"
 
     # Hashing
     "Hashing/TextureHash.h"             "Hashing/TextureHash.cpp"           "Hashing/TextureHash.inl"

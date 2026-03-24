@@ -3,6 +3,8 @@
 
 namespace MGF3D
 {
+	MGF_CLASS_PTR(Stream)
+
 	MGF_CLASS_PTR(JsonParser)
 	class JsonParser
 	{
@@ -12,6 +14,7 @@ namespace MGF3D
 
 	public:
 		bool LoadFromJsonFile(const MGFPath& path);
+		bool LoadFromStream(StreamPtr stream);
 
 	public:
 		bool IsArray(const SString& key) const;

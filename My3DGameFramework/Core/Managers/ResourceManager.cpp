@@ -115,7 +115,7 @@ namespace MGF3D
 		AddResource(newResource);
 
 		// 4. [비동기 시작] TaskManager에게 무거운 작업(OnLoad)을 던집니다.
-		auto loadTask = TaskManager::Instance().AcquireTask
+		auto loadTask = MGF_TASK.AcquireTask
 		(
 			// [WORKER THREAD 영역]
 			[newResource]()
@@ -140,7 +140,7 @@ namespace MGF3D
 		);
 
 		// 5. 워커 스레드 큐에 투입
-		TaskManager::Instance().PushTask(std::move(loadTask));
+		MGF_TASK.PushTask(std::move(loadTask));
 
 		// 껍데기 포인터를 즉시 반환 (IsReady()는 아직 false인 상태)
 		return newResource;

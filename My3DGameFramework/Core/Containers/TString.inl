@@ -50,6 +50,18 @@ namespace MGF3D
     }
 
     template<typename Alloc>
+    inline void TString<Alloc>::Resize(usize n)
+    {
+        m_string.resize(n);
+    }
+
+    template<typename Alloc>
+    inline void TString<Alloc>::Resize(usize n, byte c)
+    {
+        m_string.resize(n, c);
+    }
+
+    template<typename Alloc>
     inline StringHash TString<Alloc>::Hash() const 
     {
         return StringHash(m_string.c_str());

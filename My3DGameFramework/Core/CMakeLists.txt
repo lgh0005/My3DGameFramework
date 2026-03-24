@@ -24,7 +24,7 @@ set(SOURCES
 
     # Aliases
     "Aliases/Array.h"
-    "Aliases/Nullable.h"
+    "Aliases/Nullable.h"       "Aliases/Nullable.cpp"        "Aliases/Nullable.inl"
     "Aliases/Delegates.h"
     "Aliases/Threading.h"
 
@@ -62,6 +62,7 @@ set(SOURCES
     "Managers/TypeManager.h"         "Managers/TypeManager.cpp"
     "Managers/ResourceManager.h"        "Managers/ResourceManager.cpp"      "Managers/ResourceManager.inl" 
     "Managers/PathManager.h"        "Managers/PathManager.cpp"
+    "Managers/StreamManager.h"        "Managers/StreamManager.cpp"      "Managers/StreamManager.inl" 
 
     # Memory
     "Memory/LinearMemoryPool.h"           "Memory/LinearMemoryPool.cpp"
@@ -118,6 +119,11 @@ set(SOURCES
     "Spatial/SpatialAxes.h"         "Spatial/SpatialAxes.cpp"
     "Spatial/ViewProjection.h"      "Spatial/ViewProjection.cpp"
 
+    # Stream
+    "Stream/Stream.h"               "Stream/Stream.cpp"
+    "Stream/FileStream.h"           "Stream/FileStream.cpp"
+    "Stream/MemoryStream.h"         "Stream/MemoryStream.cpp"
+
     # Containers
     "Containers/IContainer.h"       "Containers/IContainer.cpp"
     "Containers/TMap.h"             "Containers/TMap.cpp"   "Containers/TMap.inl"
@@ -149,6 +155,7 @@ set(SOURCES
     "Hashing/StringHash.h"          "Hashing/StringHash.cpp"
 
     # Task
+    "Task/MGFAsyncResult.h"         "Task/MGFAsyncResult.cpp"          "Task/MGFAsyncResult.inl"
     "Task/TaskDeleter.h"            "Task/TaskDeleter.cpp"
     "Task/Task.h"                   "Task/Task.cpp"
     "Task/TaskPool.h"               "Task/TaskPool.cpp"

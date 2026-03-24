@@ -49,6 +49,12 @@ namespace MGF3D
 		void  Release()			  override;
 
 	public:
+		void Resize(usize n);
+		void Resize(usize n, byte c);
+		char8* Data() { return m_string.data(); }
+		const char8* Data() const { return m_string.data(); }
+
+	public:
 		cstr CStr() const { return m_string.c_str(); }
 		StringHash Hash() const;
 

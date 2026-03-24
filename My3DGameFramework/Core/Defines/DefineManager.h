@@ -7,6 +7,7 @@
 #define MGF_JOB		 MGF3D::JobManager::Instance()
 #define MGF_TASK	 MGF3D::TaskManager::Instance()
 #define MGF_PATH	 MGF3D::PathManager::Instance()
+#define MGF_STREAM   MGF3D::StreamManager::Instance()
 #define MGF_NAME	 MGF3D::NameManager::Instance()
 #define MGF_ENTITY	 MGF3D::EntityManager::Instance()
 #define MGF_RESOURCE MGF3D::ResourceManager::Instance()
