@@ -1,4 +1,5 @@
 #pragma once
+#include "Pointer/PoolAlloc.h"
 
 namespace MGF3D
 {
@@ -10,12 +11,12 @@ namespace MGF3D
 	};
 
 	MGF_CLASS_PTR(MGFInputAction)
-	class MGFInputAction
+	class MGFInputAction : public PoolAlloc
 	{
 	public:
 		using InputCallback = Action<>;
 		MGFInputAction(const SString& name);
-		~MGFInputAction();
+		virtual ~MGFInputAction() override;
 
 	public:
 		void AddKeyBinding(int32 keyCode);

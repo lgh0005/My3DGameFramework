@@ -2,7 +2,16 @@
 
 namespace MGF3D
 {
-	template <typename T>
+	template<typename T>
+	struct DefaultDeleter
+	{
+		void operator()(T* ptr) const
+		{
+			if (ptr) delete ptr;
+		}
+	};
+
+	template<typename T, typename Deleter = DefaultDeleter<T>>
 	class UniquePtr
 	{
 	/*====================================//
@@ -12,6 +21,7 @@ namespace MGF3D
 		UniquePtr();
 		UniquePtr(null);
 		explicit UniquePtr(T* ptr);
+		UniquePtr(T* ptr, const Deleter& deleter);
 		~UniquePtr();
 
 	/*=========================================//
@@ -25,8 +35,8 @@ namespace MGF3D
 	public:
 		UniquePtr(UniquePtr&& other) noexcept;
 		UniquePtr& operator=(UniquePtr&& other) noexcept;
-		template<typename U> UniquePtr(UniquePtr<U>&& other) noexcept;
-		template<typename U> UniquePtr& operator=(UniquePtr<U>&& other) noexcept;
+		template<typename U, typename E> UniquePtr(UniquePtr<U, E>&& other) noexcept;
+		template<typename U, typename E> UniquePtr& operator=(UniquePtr<U, E>&& other) noexcept;
 
 	/*==========================================//
 	//   default UniquePtr pointer operations   //
@@ -48,11 +58,14 @@ namespace MGF3D
 	//==========================================*/
 	public:
 		T* Get() const { return m_ptr; }
+		Deleter& GetDeleter() { return m_deleter; }
+		const Deleter& GetDeleter() const { return m_deleter; }
 		T* Release();
 		void Reset(T* ptr = nullptr);
 
 	private:
-		T* m_ptr{ nullptr };
+		T* m_ptr	{ nullptr };
+		Deleter m_deleter;
 	};
 }
 

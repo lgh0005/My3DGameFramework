@@ -1,17 +1,17 @@
 ﻿#pragma once
+#include "Pointer/PoolAlloc.h"
 #include "TaskDeleter.h"
 
 namespace MGF3D
 {
-    using TaskUPtr = std::unique_ptr<Task, TaskDeleter>;
-    using TaskPtr = std::shared_ptr<Task>;
-    using TaskWPtr = std::weak_ptr<Task>;
+    class Task;
+    using TaskUPtr = UniquePtr<Task, TaskDeleter>;
 
-    class Task
+    class Task : public PoolAlloc
     {
     public:
         Task(Action<> work, Action<> onComplete = nullptr);
-        ~Task();
+        virtual ~Task() override;
 
         // 실제 작업을 수행하는 핵심 함수
         void Execute();
