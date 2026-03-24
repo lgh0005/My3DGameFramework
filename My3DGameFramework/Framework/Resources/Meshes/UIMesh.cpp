@@ -4,8 +4,6 @@
 
 namespace MGF3D
 {
-	MGF_IMPLEMENT_CUSTOM_ALLOCATORS(UIMesh)
-
 	UIMesh::UIMesh(UIMeshDescriptor& desc) : Super(desc) {}
 	UIMesh::~UIMesh() = default;
 

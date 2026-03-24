@@ -3,10 +3,7 @@
 
 namespace MGF3D
 {
-	SkinnedMeshDescriptor::SkinnedMeshDescriptor
-	(
-		const MGFName& name, 
-		const MGFPath& path
-	) : Super("SkinnedMesh"_sh, name, path) { }
+	SkinnedMeshDescriptor::SkinnedMeshDescriptor(const Ptr<MGFType> _type, const MGFName& _name)
+		: Super(_type, _name) { }
 	SkinnedMeshDescriptor::~SkinnedMeshDescriptor() = default;
 }

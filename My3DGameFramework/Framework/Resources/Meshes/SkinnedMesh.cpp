@@ -4,8 +4,6 @@
 
 namespace MGF3D
 {
-	MGF_IMPLEMENT_CUSTOM_ALLOCATORS(SkinnedMesh)
-
 	SkinnedMesh::SkinnedMesh(SkinnedMeshDescriptor& desc) : Super(desc) {}
 	SkinnedMesh::~SkinnedMesh() = default;
 

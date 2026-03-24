@@ -3,23 +3,24 @@
 namespace MGF3D
 {
 	template<typename T>
-	inline SharedPtr<T> ResourceManager::Get(const MGFName& assetName)
+	inline SharedPtr<T> ResourceManager::Get(const MGFName& resourceName)
 	{
-		StringHash key = assetName.GetStringHash();
+		StringHash key = resourceName.GetStringHash();
+		auto resPtr = m_resources.Find(key);
 
 		// 1. 이미 로드된 캐시 확인
 		auto value = m_resources.Find(key);
 		if (value) return StaticSharedCast<T>(*value);
 
-		// 2. 캐시에 없으면 m_assetRegistry 확인
-		auto descriptorPtr = m_assetRegistry.Find(key);
-		if (descriptorPtr)
+		// 2. 타입 검사 및 캐스팅 후 반환
+		if (resPtr)
 		{
-			auto resource = LoadResourceAsync((*descriptorPtr).Get());
-			return StaticSharedCast<T>(resource);
+			//ResourcePtr res = *resPtr;
+			//if (res->GetType().IsA(T::StaticType()))
+			//	return StaticPointerCast<T>(res);
+			//MGF_LOG_ERROR("ResourceManager: Type mismatch for resource '{}'", resourceName.CStr());
 		}
 
-		MGF_LOG_WARN("ResourceManager: Resource not found in registry: {}", assetName.CStr());
 		return nullptr;
 	}
 }

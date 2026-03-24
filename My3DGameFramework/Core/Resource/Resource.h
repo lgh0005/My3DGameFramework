@@ -15,6 +15,8 @@ namespace MGF3D
 		Failed          // 로딩 실패
 	};
 
+	MGF_CLASS_PTR(MGFType)
+
 	MGF_CLASS_PTR(Resource)
 	class Resource : public RefCount
 	{
@@ -39,16 +41,12 @@ namespace MGF3D
 		void SetState(ResourceState state) { m_state.store(state, std::memory_order_release); }
 
 	public:
-		const StringHash GetTypeID() const { return m_typeID; }
+		const Ptr<MGFType> GetType() const { return m_type; }
 		const MGFName& GetName() const { return m_name; }
-		const MGFPath& GetPath() const { return m_path; }
 
 	protected:
-		Resource();
-
 		Atomic<ResourceState> m_state { ResourceState::Unloaded };
-		const StringHash m_typeID;
+		const Ptr<MGFType> m_type;
 		MGFName m_name;
-		MGFPath m_path;
 	};
 }

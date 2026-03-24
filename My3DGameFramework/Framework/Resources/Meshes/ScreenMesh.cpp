@@ -4,8 +4,6 @@
 
 namespace MGF3D
 {
-	MGF_IMPLEMENT_CUSTOM_ALLOCATORS(ScreenMesh)
-
     ScreenMesh::ScreenMesh(ScreenMeshDescriptor& desc) : Super(desc) { }
     ScreenMesh::~ScreenMesh() = default;
 

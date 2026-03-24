@@ -2,19 +2,21 @@
 
 namespace MGF3D
 {
-	MGF_CLASS_PTR(IResourceDescriptor)
+	MGF_CLASS_PTR(MGFType)
+
+	MGF_STRUCT_PTR(IResourceDescriptor)
 	struct IResourceDescriptor
 	{
+		using TypeID = StringHash;
+
 		IResourceDescriptor
 		(
-			StringHash id,
-			const MGFName& n, 
-			const MGFPath& p
+			const Ptr<MGFType> _type,
+			const MGFName& _name
 		);
 		virtual ~IResourceDescriptor();
 
+		const Ptr<MGFType> const type;
 		MGFName name;
-		MGFPath path;
-		const StringHash typeID;
 	};
 }

@@ -18,8 +18,8 @@ namespace MGF3D
 		SVector<StaticGeometryData> geometryList;
 		StaticMeshDescriptor
 		(
-			const MGFName& name,
-			const MGFPath& path
+			const Ptr<MGFType> _type,
+			const MGFName& _name
 		);
 		virtual ~StaticMeshDescriptor() override;
 	};

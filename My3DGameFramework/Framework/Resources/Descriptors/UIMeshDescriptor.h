@@ -18,8 +18,8 @@ namespace MGF3D
 		SVector<UIGeometryData> geometryList;
 		UIMeshDescriptor
 		(
-			const MGFName& name,
-			const MGFPath& path
+			const Ptr<MGFType> _type,
+			const MGFName& _name
 		);
 		virtual ~UIMeshDescriptor() override;
 	};

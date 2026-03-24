@@ -11,4 +11,5 @@
 #define MGF_NAME	 MGF3D::NameManager::Instance()
 #define MGF_ENTITY	 MGF3D::EntityManager::Instance()
 #define MGF_RESOURCE MGF3D::ResourceManager::Instance()
+#define MGF_ASSET    MGF3D::AssetManager::Instance()
 #define MGF_TYPE	 MGF3D::TypeManager::Instance()

@@ -16,7 +16,7 @@ namespace MGF3D
 
 		static constexpr uint32 MAX_DEPTH  { 16 };
 		Array<StringHash, MAX_DEPTH> chain { 0 };
-		uint32 depth = 0;
+		uint32 depth					   { 0 };
 
 		bool IsA(const MGFType* other) const;
 	};

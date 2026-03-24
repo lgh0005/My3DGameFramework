@@ -1,9 +1,21 @@
 #pragma once
+#include "Asset/Asset.h"
+#include "Asset/IAssetDescriptor.h"
 
 namespace MGF3D
 {
-	class IAssetLoader
-	{
+	MGF_CLASS_PTR(Asset)
 
-	};
+    MGF_STRUCT_PTR(IAssetLoader)
+    struct IAssetLoader
+    {
+        IAssetLoader();
+        virtual ~IAssetLoader();
+
+        virtual bool Load
+        (
+            AssetPtr& outAsset, 
+            IAssetDescriptorUPtr desc
+        ) = 0;
+    };
 }

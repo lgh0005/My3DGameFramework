@@ -8,7 +8,6 @@ namespace MGF3D
 	class UIMesh : public Mesh
 	{
 		using Super = Mesh;
-		MGF_DECLARE_CUSTOM_ALLOCATORS;
 
 	public:
 		static UIMeshPtr Create(UIMeshDescriptor&& desc);

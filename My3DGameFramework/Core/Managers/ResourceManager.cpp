@@ -7,42 +7,36 @@ namespace MGF3D
 	ResourceManager::ResourceManager() = default;
 	ResourceManager::~ResourceManager() = default;
 
-	bool ResourceManager::Init()
-	{
-		// TODO : 여기에 초기 부팅 시 스캔할 가상 경로들을 추가할 수 있습니다.
-		// ex) PathManager를 통해 @Assets 폴더를 스캔하여 m_assetRegistry 채우기
-		return true;
-	}
+	bool ResourceManager::Init() { return true; }
 
 	void ResourceManager::Update()
 	{
-		// [Main Thread] 
-		// 로딩 스레드에서 작업을 마친 리소스들을 메인 스레드(GPU 컨텍스트 소유)로 확정(Commit)시킵니다.
-		for (auto& pair : m_resources)
+		// 1. 메인 스레드 전용 로컬 바구니
+		SVector<ResourcePtr> readyToCommit;
+
 		{
-			ResourcePtr& res = pair.second;
+			// 2. 최소화한 임계 영역(Critical Section) : 포인터 교체
+			MGF_LOCK_SCOPE(m_commitMutex);
+			if (m_commitQueue.Empty()) return;
+			readyToCommit.Swap(m_commitQueue);
+		}
+
+		// 3. 이제 락이 없는 상태에서 마음껏 OpenGL API를 호출합니다.
+		for (auto& res : readyToCommit)
+		{
 			if (!res) continue;
 
-			// 로딩 스레드에서 OnLoad를 마치고 "Commit 대기" 중인 녀석들을 찾습니다.
-			if (res->GetState() == ResourceState::WaitingCommit)
+			// OnCommit은 반드시 메인 스레드(GL Context)에서 실행됨이 보장됩니다.
+			if (res->OnCommit())
 			{
-				MGF_LOG_INFO("ResourceManager: Committing resource -> {}", res->GetName().CStr());
-
-				// 1. 메인 스레드에서 자원 확정 (예: GPU 버퍼 생성 및 데이터 업로드)
-				if (res->OnCommit())
-				{
-					// 2. 성공 시 사용 가능 상태로 변경
-					res->SetState(ResourceState::Ready);
-
-					// 3. 로딩용 임시 메모리 정리
-					res->OnRelease();
-					MGF_LOG_INFO("ResourceManager: Resource Ready! -> {}", res->GetName().CStr());
-				}
-				else
-				{
-					MGF_LOG_ERROR("ResourceManager: Failed to commit resource -> {}", res->GetName().CStr());
-					res->SetState(ResourceState::Failed);
-				}
+				res->SetState(ResourceState::Ready);
+				res->OnRelease();
+				MGF_LOG_INFO("ResourceManager: '{}' is now Ready.", res->GetName().CStr());
+			}
+			else
+			{
+				res->SetState(ResourceState::Failed);
+				MGF_LOG_ERROR("ResourceManager: Failed to commit '{}'.", res->GetName().CStr());
 			}
 		}
 	}
@@ -53,21 +47,20 @@ namespace MGF3D
 
 		// 순서대로 정리: 리소스 -> 설계도 -> 로더
 		m_resources.Release();
-		m_assetRegistry.Release();
 		m_loaders.Release();
 	}
 
-	void ResourceManager::RegisterLoader(StringHash typeID, IResourceLoaderUPtr loader)
+	void ResourceManager::RegisterLoader(const Ptr<MGFType> type, IResourceLoaderUPtr loader)
 	{
 		if (!loader) return;
 
-		if (m_loaders.Find(typeID))
+		if (m_loaders.Find(type))
 		{
-			MGF_LOG_WARN("ResourceManager: Loader for TypeID {:x} already registered. Overwriting...", (uint32)typeID);
-			m_loaders.Remove(typeID);
+			MGF_LOG_WARN("ResourceManager: Loader for '{}' already registered. Overwriting...", type->name.CStr());
+			m_loaders.Remove(type);
 		}
 
-		m_loaders.Insert(typeID, std::move(loader));
+		m_loaders.Insert(type, std::move(loader));
 	}
 
 	void ResourceManager::AddResource(const SharedPtr<Resource>& resource)
@@ -89,10 +82,10 @@ namespace MGF3D
 		if (!desc) return nullptr;
 
 		// 1. 적절한 로더 찾기
-		auto loaderPtr = m_loaders.Find(desc->typeID);
+		auto loaderPtr = m_loaders.Find(desc->type);
 		if (!loaderPtr)
 		{
-			MGF_LOG_ERROR("ResourceManager: No loader for TypeID {:x}", (uint32)desc->typeID);
+			MGF_LOG_ERROR("ResourceManager: No loader for TypeID {:x}", desc->type->name.CStr());
 			return nullptr;
 		}
 

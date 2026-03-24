@@ -4,8 +4,6 @@
 
 namespace MGF3D
 {
-	MGF_IMPLEMENT_CUSTOM_ALLOCATORS(StaticMesh)
-
 	StaticMesh::StaticMesh(StaticMeshDescriptor& desc) : Super(desc) {}
 	StaticMesh::~StaticMesh() = default;
 

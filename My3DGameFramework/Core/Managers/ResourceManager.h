@@ -21,7 +21,7 @@ namespace MGF3D
 		void Shutdown();
 
 		// 1. 로더 등록 (예: GraphicsModule에서 TextureLoader를 등록)
-		void RegisterLoader(StringHash typeID, IResourceLoaderUPtr loader);
+		void RegisterLoader(const Ptr<MGFType> type, IResourceLoaderUPtr loader);
 
 		// 2. 리소스 가져오기 (없으면 등록된 Descriptor를 기반으로 로드 시도)
 		template<typename T> SharedPtr<T> Get(const MGFName& assetName);
@@ -32,9 +32,11 @@ namespace MGF3D
 	private:
 		ResourcePtr LoadResourceAsync(IResourceDescriptorUPtr desc);
 
-		SMap<StringHash, IResourceLoaderUPtr> m_loaders;
+		SMap<Ptr<MGFType>, IResourceLoaderUPtr> m_loaders;
 		SMap<StringHash, ResourcePtr> m_resources;
-		SMap<StringHash, IResourceDescriptorUPtr> m_assetRegistry;
+
+		Mutex m_commitMutex;
+		SVector<ResourcePtr> m_commitQueue;
 	};
 }
 

@@ -3,10 +3,7 @@
 
 namespace MGF3D
 {
-	ScreenMeshDescriptor::ScreenMeshDescriptor
-	(
-		const MGFName& name,
-		const MGFPath& path
-	) : Super("ScreenMesh"_sh, name, path) { }
+	ScreenMeshDescriptor::ScreenMeshDescriptor(const Ptr<MGFType> _type, const MGFName& _name)
+		: Super(_type, _name) { }
 	ScreenMeshDescriptor::~ScreenMeshDescriptor() = default;
 }

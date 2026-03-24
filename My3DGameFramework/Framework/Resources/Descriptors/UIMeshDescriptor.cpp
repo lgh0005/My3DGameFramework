@@ -3,10 +3,7 @@
 
 namespace MGF3D
 {
-	UIMeshDescriptor::UIMeshDescriptor
-	(
-		const MGFName& name,
-		const MGFPath& path
-	) : Super("UIMesh"_sh, name, path) { }
+	UIMeshDescriptor::UIMeshDescriptor(const Ptr<MGFType> _type, const MGFName& _name)
+		: Super(_type, _name) { }
 	UIMeshDescriptor::~UIMeshDescriptor() = default;
 }

@@ -1,5 +1,5 @@
 #pragma once
-#include "Type/MGFType.h"
+#include "Identity/MGFType.h"
 
 namespace MGF3D
 {

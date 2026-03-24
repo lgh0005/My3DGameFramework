@@ -3,5 +3,6 @@
 
 namespace MGF3D
 {
-
+	IAssetLoader::IAssetLoader() = default;
+	IAssetLoader::~IAssetLoader() = default;
 }

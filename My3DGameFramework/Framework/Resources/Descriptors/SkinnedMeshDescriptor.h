@@ -18,8 +18,8 @@ namespace MGF3D
 		SVector<SkinnedGeometryData> geometryList;
 		SkinnedMeshDescriptor
 		(
-			const MGFName& name, 
-			const MGFPath& path
+			const Ptr<MGFType> _type,
+			const MGFName& _name
 		);
 		virtual ~SkinnedMeshDescriptor() override;
 	};

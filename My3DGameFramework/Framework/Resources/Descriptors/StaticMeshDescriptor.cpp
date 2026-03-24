@@ -3,10 +3,7 @@
 
 namespace MGF3D
 {
-	StaticMeshDescriptor::StaticMeshDescriptor
-	(
-		const MGFName& name,
-		const MGFPath& path
-	) : Super("StaticMesh"_sh, name, path) { }
+	StaticMeshDescriptor::StaticMeshDescriptor(const Ptr<MGFType> _type, const MGFName& _name)
+		: Super(_type, _name) { }
 	StaticMeshDescriptor::~StaticMeshDescriptor() = default;
 }

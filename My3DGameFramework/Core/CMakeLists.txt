@@ -76,6 +76,7 @@ set(SOURCES
     # Identity
     "Identity/MGFName.h"            "Identity/MGFName.cpp"
     "Identity/MGFPath.h"            "Identity/MGFPath.cpp"
+    "Identity/MGFType.h"            "Identity/MGFType.cpp"
 
     # Parsers
     "Parsers/JsonParser.h"          "Parsers/JsonParser.cpp"          "Parsers/JsonParser.inl"
@@ -166,9 +167,6 @@ set(SOURCES
     "Thread/MGFThread.h"            "Thread/MGFThread.cpp"
     "Thread/MGFSignal.h"            "Thread/MGFSignal.cpp"  
     "Thread/MGFJob.h"               "Thread/MGFJob.cpp"  
-
-    # Type
-    "Type/MGFType.h"                "Type/MGFType.cpp"
 
     # Utils
     "Utils/MemoryUtils.h"           "Utils/MemoryUtils.cpp"         "Utils/MemoryUtils.inl"

@@ -17,8 +17,8 @@ namespace MGF3D
 		SVector<ScreenGeometryData> geometryList;
 		ScreenMeshDescriptor
 		(
-			const MGFName& name, 
-			const MGFPath& path
+			const Ptr<MGFType> _type,
+			const MGFName& _name
 		);
 		virtual ~ScreenMeshDescriptor() override;
 	};
