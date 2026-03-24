@@ -26,8 +26,6 @@ namespace MGF3D
 		SharedPtr<T> LoadAsync(const MGFPath& path, const MGFName& name);
 
 	private:
-		AssetPtr InternalLoadAsync(IAssetDescriptorUPtr desc);
-
 		SMap<Ptr<MGFType>, IAssetLoaderUPtr> m_loaders;
 		SMap<StringHash, AssetPtr> m_assets;
 	};
