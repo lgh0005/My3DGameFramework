@@ -1,6 +1,8 @@
 #include "CorePch.h"
 #include "StreamManager.h"
-#include "Managers/TaskManager.h"
+#include "Stream/MemoryStream.h"
+#include "Stream/MemoryStreamBufferPool.h"
+#include "Stream/MemoryStreamBuffer.h"
 
 namespace MGF3D
 {
@@ -9,14 +11,22 @@ namespace MGF3D
 
 	bool StreamManager::Init()
 	{
-		// TODO : 메모리 스트림 버퍼 인스턴스 생성 및 대입
-		// 그리고 검증성 체크
-		return false;
+		// 메모리 스트림 버퍼 풀 생성
+		m_memoryStreamBufferPool = MakeUnique<MemoryStreamBufferPool>();
+		if (!m_memoryStreamBufferPool)
+		{
+			MGF_LOG_ERROR("StreamManager: Failed to initialize MemoryStreamBufferPool.");
+			return false;
+		}
+
+		MGF_LOG_INFO("StreamManager: Initialized successfully with BufferPool.");
+		return true;
 	}
 
 	void StreamManager::Shutdown()
 	{
-		// TODO : 메모리 스트림 버퍼 정리
+		if (m_memoryStreamBufferPool) m_memoryStreamBufferPool.Reset();
+		MGF_LOG_INFO("StreamManager: Shutdown successfully.");
 	}
 
 	/*==================================//
@@ -43,20 +53,22 @@ namespace MGF3D
 		uint64 length = file->GetLength();
 		if (length == 0) return None;
 
-		MemoryStreamPtr memStream = MakeShared<MemoryStream>(static_cast<usize>(length));
-
-		// 파일의 모든 내용을 메모리 스트림으로 전송
-		// TODO : 이후에 메모리 스트림 풀을 만들 필요가 있음
-		SVector<byte> tempBuffer;
-		tempBuffer.Resize(static_cast<usize>(length));
-
-		if (file->Read(tempBuffer.Data(), static_cast<usize>(length)) == length)
+		// 풀에서 규격화된 버퍼를 가져와 직접 Read 수행
+		auto buffer = m_memoryStreamBufferPool->Acquire(static_cast<usize>(length));
+		if (file->Read(buffer->GetPtr(), static_cast<usize>(length)) == length)
 		{
-			memStream->Write(tempBuffer.Data(), static_cast<usize>(length));
+			// MemoryStream이 해당 버퍼를 소유하며, 소멸 시 자동으로 풀에 반납
+			auto memStream = MakeShared<MemoryStream>(std::move(buffer), static_cast<usize>(length));
 			memStream->SetPosition(0);
 			return memStream;
 		}
 
+		MGF_LOG_ERROR("StreamManager: Failed to read all bytes from: {}", path.GetCStr());
 		return None;
+	}
+
+	MemoryStreamBufferPool* StreamManager::GetBufferPool() const
+	{
+		return m_memoryStreamBufferPool.Get();
 	}
 }

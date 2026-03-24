@@ -41,8 +41,9 @@ namespace MGF3D
 		// StreamManager를 통해 비동기로 읽기 시작
 		MGF_STREAM.ReadFileAsync<bool>
 		(
-			/* [Worker Thread] */
-			configPath, 
+			configPath,
+
+			/* Processor */
 			[this](FileStreamPtr file) -> Nullable<bool>
 			{
 				JsonParser parser;
@@ -65,7 +66,7 @@ namespace MGF3D
 				return true;
 			},
 
-			/* [Main Thread] */
+			/* On Complete */
 			[this](Nullable<bool> result)
 			{
 				if (result.IsValid() && *result)

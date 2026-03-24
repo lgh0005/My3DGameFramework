@@ -123,6 +123,8 @@ set(SOURCES
     "Stream/Stream.h"               "Stream/Stream.cpp"
     "Stream/FileStream.h"           "Stream/FileStream.cpp"
     "Stream/MemoryStream.h"         "Stream/MemoryStream.cpp"
+    "Stream/MemoryStreamBuffer.h"         "Stream/MemoryStreamBuffer.cpp"
+    "Stream/MemoryStreamBufferPool.h"         "Stream/MemoryStreamBufferPool.cpp"
 
     # Containers
     "Containers/IContainer.h"       "Containers/IContainer.cpp"

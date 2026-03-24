@@ -5,6 +5,7 @@
 #include "Managers/PathManager.h"
 #include "Managers/ResourceManager.h"
 #include "Managers/TaskManager.h"
+#include "Managers/StreamManager.h"
 #include "Managers/NameManager.h"
 
 namespace MGF3D
@@ -22,6 +23,7 @@ namespace MGF3D
 		// 1. Core 단 매니저 초기화
 		MGF_INIT_SYS(MGF_MEMORY.Init(), "MemoryManager");
 		MGF_INIT_SYS(MGF_JOB.Init(), "JobManager");
+		MGF_INIT_SYS(MGF_STREAM.Init(), "StreamManager");
 		MGF_INIT_SYS(MGF_PATH.Init(), "PathManager");
 		MGF_INIT_SYS(MGF_RESOURCE.Init(), "ResourceManager");
 		// [TODO: 레거시 청산 후 주석 해제]
@@ -44,6 +46,7 @@ namespace MGF3D
 		// MGF_SHUTDOWN_SYS(MGF_TYPE.Shutdown(), "TypeManager");
 
 		MGF_SHUTDOWN_SYS(MGF_PATH.Shutdown(), "PathManager");
+		MGF_SHUTDOWN_SYS(MGF_STREAM.Shutdown(), "StreamManager");
 		MGF_SHUTDOWN_SYS(MGF_JOB.Shutdown(), "JobManager");
 		MGF_SHUTDOWN_SYS(MGF_MEMORY.Shutdown(), "MemoryManager");
 

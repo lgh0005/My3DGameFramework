@@ -1,10 +1,12 @@
 #pragma once
 #include "Stream/FileStream.h"
-#include "Stream/MemoryStream.h"
 #include "Identity/MGFPath.h"
 
 namespace MGF3D
 {
+	MGF_CLASS_PTR(MemoryStream)
+	MGF_CLASS_PTR(MemoryStreamBufferPool)
+
 	class StreamManager
 	{
 		MGF_DECLARE_SINGLE(StreamManager)
@@ -23,6 +25,7 @@ namespace MGF3D
 	public:
 		Nullable<FileStreamPtr> OpenRead(const MGFPath& path);
 		Nullable<MemoryStreamPtr> ReadAllBytes(const MGFPath& path);
+		MemoryStreamBufferPool* GetBufferPool() const;
 
 	/*==================================//
 	//      Asynchronous Operations     //
@@ -45,8 +48,7 @@ namespace MGF3D
 		);
 
 	private:
-		// TODO : 메모리 스트림과 관련해서는 여기에 해당 버퍼 풀을 
-		// 만들어 두는 것도 좋은 방향이 될 수 있음
+		MemoryStreamBufferPoolUPtr m_memoryStreamBufferPool;
 	};
 }
 
