@@ -5,9 +5,7 @@
 
 namespace MGF3D
 {
-#ifdef _DEBUG
 	VRAMSnapshot VRAMProfiler::m_snapshot = {};
-#endif
 
     void VRAMProfiler::_Internal_Capture() noexcept
     {

@@ -33,10 +33,8 @@ namespace MGF3D
 		template<typename... Args>
 		static void _Internal_LogFatal(fmt::format_string<Args...> fmt, Args&&... args);
 
-#ifdef _DEBUG
 	private:
 		static SPDLoggerPtr m_logger;
-#endif
 	};
 }
 

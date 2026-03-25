@@ -13,10 +13,8 @@ namespace MGF3D
 		static double _Internal_GetElapsedSeconds(uint64 start, uint64 end);
 		static double _Internal_GetTotalTime();
 
-#ifdef _DEBUG
 	private:
 		static Clock::TimePoint s_startTime;
-#endif
 	};
 }
 

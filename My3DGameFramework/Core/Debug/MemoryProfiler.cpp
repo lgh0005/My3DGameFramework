@@ -7,9 +7,7 @@
 
 namespace MGF3D
 {
-#ifdef _DEBUG
 	MemorySnapshot MemoryProfiler::m_snapshot = {};
-#endif
 
     void MemoryProfiler::_Internal_Capture() noexcept
     {

@@ -26,3 +26,15 @@ target_link_libraries(LibTester
 PRIVATE 
     Engine::MiddlewareBootstrapper
 )
+
+# 7. 리소스 배포 (Resource Deployment)
+## TODO : 경로는 Engine/BuiltIn, Engine/Config에 있는 걸 배포해야 함.
+add_custom_command(TARGET LibTester POST_BUILD
+    COMMENT "Deploying Engine Centralized Content to Bin..."
+
+    COMMAND ${CMAKE_COMMAND} -E make_directory "${OUTPUT_DIR}/Assets"
+    COMMAND ${CMAKE_COMMAND} -E rm -rf "${OUTPUT_DIR}/Assets/Game"
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+            "${CMAKE_CURRENT_SOURCE_DIR}/Assets"
+            "${OUTPUT_DIR}/Assets/Game"
+)

@@ -31,10 +31,8 @@ namespace MGF3D
         static void GetPoolUsageData();
         static void LogPoolState();
 
-#ifdef _DEBUG
     private:
         static VRAMSnapshot m_snapshot;
-#endif
     };
 }
 

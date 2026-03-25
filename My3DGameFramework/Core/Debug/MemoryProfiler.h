@@ -39,10 +39,8 @@ namespace MGF3D
 		static void LogSlabMemoryPoolState();
 		static void LogLinearMemoryPoolState();
 
-#ifdef _DEBUG
 	private:
 		static MemorySnapshot m_snapshot;
-#endif
 	};
 }
 

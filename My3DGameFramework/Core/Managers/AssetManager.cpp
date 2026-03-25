@@ -173,7 +173,7 @@ namespace MGF3D
 				m_extensionMap.Insert
 				(
 					StringHash(ext.c_str()),
-					SString(typeName.get<std::string>().c_str())
+					SString(typeName.get<str>().c_str())
 				);
 			}
 		}
