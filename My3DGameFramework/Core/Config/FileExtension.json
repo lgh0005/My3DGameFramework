@@ -1,0 +1,22 @@
+{
+    "extensionMap": 
+    {
+        ".mymodel": "ModelAsset",
+        ".myanim": "AnimationAsset",
+
+        ".vert": "ShaderAsset",
+        ".frag": "ShaderAsset",
+        ".comp": "ShaderAsset",
+
+        ".ktx": "TextureAsset",
+
+        ".wav": "AudioAsset",
+        ".mp3": "AudioAsset",
+        ".ogg": "AudioAsset",
+        ".flac": "AudioAsset",
+        
+        ".yaml": "YamlAsset",
+
+        ".lua": "ScriptAsset"
+    }
+}

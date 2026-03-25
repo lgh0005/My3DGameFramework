@@ -1,13 +1,12 @@
 ﻿#include "CorePch.h"
 #include "ResourceManager.h"
 #include "Managers/TaskManager.h"
+#include "Identity/MGFType.h"
 
 namespace MGF3D
 {
 	ResourceManager::ResourceManager() = default;
 	ResourceManager::~ResourceManager() = default;
-
-	bool ResourceManager::Init() { return true; }
 
 	void ResourceManager::Update()
 	{

@@ -3,9 +3,6 @@
     {
         "@Assets": "Assets",
         "@BuiltInAsset": "BuiltIn",
-        "@GameAsset": "Assets/Game",
-
-        "@Virtual": "@Virtual",
-        "@BuiltIn": "@BuiltIn"
+        "@GameAsset": "Game"
     }
 }

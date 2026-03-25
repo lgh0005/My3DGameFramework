@@ -66,22 +66,3 @@ PUBLIC
 
 # 옵션 B: CoreLib에 정의된 PCH를 재사용할 경우 (빌드 속도 최적화)
 # target_precompile_headers(${LIB_NAME} REUSE_FROM CoreLib)
-
-# 7. 리소스 배포 (Resource Deployment)
-## TODO : 경로는 Engine/BuiltIn, Engine/Config에 있는 걸 배포해야 함.
-add_custom_command(TARGET AppFrameworkLib POST_BUILD
-    COMMENT "Deploying Engine Centralized Content to Bin..."
-
-    # 1. Config (Engine)
-    COMMAND ${CMAKE_COMMAND} -E make_directory "${OUTPUT_DIR}/Config"
-    COMMAND ${CMAKE_COMMAND} -E rm -rf "${OUTPUT_DIR}/Config/Engine" ## TODO : 이거 경로도 확인 필요
-    COMMAND ${CMAKE_COMMAND} -E copy_directory
-            "${CMAKE_CURRENT_SOURCE_DIR}/Config"
-            "${OUTPUT_DIR}/Config"
-
-    # 2. Assets (Engine)
-    COMMAND ${CMAKE_COMMAND} -E make_directory "${OUTPUT_DIR}/Assets"
-    COMMAND ${CMAKE_COMMAND} -E copy_directory
-            "${CMAKE_CURRENT_SOURCE_DIR}/BuiltIn"
-            "${OUTPUT_DIR}/Assets/BuiltIn"
-)

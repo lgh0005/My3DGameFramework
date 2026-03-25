@@ -18,7 +18,12 @@ namespace MGF3D
     /*===================================//
     //   Shader loading asynchronously   //
     //===================================*/
-    void Shader::CreateFromTextFileAsync(const MGFPath& filepath, GLenum shaderType, Action<ShaderPtr> onComplete)
+    void Shader::CreateFromTextFileAsync
+    (
+        const MGFPath& filepath, 
+        GLenum shaderType, 
+        Action<ShaderPtr> onComplete
+    )
     {
         // 1. 비동기 파일 읽기 시작
         MGF_STREAM.ReadFileAsync<SString>
@@ -51,7 +56,13 @@ namespace MGF3D
         );
     }
 
-    void Shader::CreateFromSPIRVAsync(const MGFPath& filepath, GLenum shaderType, strview entryPoint, Action<ShaderPtr> onComplete)
+    void Shader::CreateFromSPIRVAsync
+    (
+        const MGFPath& filepath, 
+        GLenum shaderType, 
+        strview entryPoint, 
+        Action<ShaderPtr> onComplete
+    )
     {
         MGF_STREAM.ReadFileAsync<SVector<byte>>
         (   
@@ -110,8 +121,6 @@ namespace MGF3D
         if (!result.IsValid())
             return false;
 
-        // 여기에 wait을 걸긴 해야 할 것 같은데 그러면 멀티스레드 의미가 있는걸까?
-
         const auto& code = result.Get();
         cstr codePtr = code.CStr();
         int32 codeLength = (int32)code.Length();
@@ -123,11 +132,11 @@ namespace MGF3D
         glCompileShader(m_shader);
 
         // check compile error
-        int success = 0;
+        int32 success = 0;
         glGetShaderiv(m_shader, GL_COMPILE_STATUS, &success);
         if (!success)
         {
-            char infoLog[1024];
+            char8 infoLog[1024];
             glGetShaderInfoLog(m_shader, 1024, nullptr, infoLog);
             MGF_LOG_ERROR("failed to compile shader: \"{}\"", filepath);
             MGF_LOG_ERROR("reason: {}", infoLog);
@@ -142,8 +151,6 @@ namespace MGF3D
         if (!result.IsValid())
             return false;
 
-        // 여기에 wait을 걸긴 해야 할 것 같은데 그러면 멀티스레드 의미가 있는걸까?
-
         const auto& binary = result.Get();
         m_shader = glCreateShader(shaderType);
         m_type = shaderType;
@@ -156,11 +163,11 @@ namespace MGF3D
         glSpecializeShader(m_shader, (const GLchar*)entryPoint.data(), 0, nullptr, nullptr);
 
         // 3. 상태 체크
-        int success = 0;
+        int32 success = 0;
         glGetShaderiv(m_shader, GL_COMPILE_STATUS, &success);
         if (!success)
         {
-            char infoLog[1024];
+            char8 infoLog[1024];
             glGetShaderInfoLog(m_shader, 1024, nullptr, infoLog);
             MGF_LOG_ERROR("failed to specialize SPIR-V shader: \"{}\"", filepath);
             MGF_LOG_ERROR("reason: {}", infoLog);

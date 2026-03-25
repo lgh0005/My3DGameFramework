@@ -11,12 +11,14 @@ namespace MGF3D
 		(
 			const Ptr<MGFType> _type,
 			const MGFName& _name,
-			const MGFPath& _path
+			const MGFPath& _path,
+			const SString& _ext
 		);
 		virtual ~IAssetDescriptor();
 
 		const Ptr<MGFType> const type;
 		MGFName name;
 		MGFPath path;
+		SString ext;
 	};
 }

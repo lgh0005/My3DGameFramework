@@ -17,8 +17,12 @@ namespace MGF3D
 		{
 			//ResourcePtr res = *resPtr;
 			//if (res->GetType().IsA(T::StaticType()))
-			//	return StaticPointerCast<T>(res);
-			//MGF_LOG_ERROR("ResourceManager: Type mismatch for resource '{}'", resourceName.CStr());
+			//	return StaticSharedCast<T>(res);
+			//MGF_LOG_ERROR
+			//(
+			//	"ResourceManager: Type mismatch for resource '{}'", 
+			//	resourceName.CStr()
+			//);
 		}
 
 		return nullptr;

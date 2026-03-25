@@ -20,7 +20,6 @@ namespace MGF3D
 		bool LoadConfig(const MGFPath& configFileName = "EngineConfig.json");
 		void AddVirtualPath(const MGFName& alias, const MGFPath& actualPath);
 		MGFPath Resolve(const MGFPath& virtualPath) const;
-		void WaitForConfig();
 
 	private:
 		MGFPath m_engineRoot;

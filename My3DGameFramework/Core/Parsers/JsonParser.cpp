@@ -11,26 +11,6 @@ namespace MGF3D
 
 	bool JsonParser::LoadFromJsonFile(const MGFPath& path)
 	{
-        //// 1. 파일 스트림 열기
-        //std::ifstream file(path.GetCStr());
-        //if (!file.is_open())
-        //{
-        //    MGF_LOG_ERROR("JsonParser: Failed to open file: {}", path.GetCStr());
-        //    return false;
-        //}
-
-        //// 2. 예외 없이 파싱 수행 (callback: nullptr, allow_exceptions: false)
-        //m_data = nlohmann::json::parse(file, nullptr, false);
-
-        //// 3. 파싱 결과 유효성 체크
-        //if (m_data.is_discarded())
-        //{
-        //    MGF_LOG_ERROR("JsonParser: Syntax error in JSON: {}", path.GetCStr());
-        //    return false;
-        //}
-
-        //return true;
-        // 
         // 파일 존재 여부 먼저 체크
         if (!path.Exists()) return false;
 

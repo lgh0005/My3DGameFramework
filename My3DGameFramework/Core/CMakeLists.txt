@@ -98,7 +98,7 @@ set(SOURCES
     # Asset
     "Asset/Asset.h"                  "Asset/Asset.cpp"
     "Asset/IAssetDescriptor.h"       "Asset/IAssetDescriptor.cpp"
-    "Asset/IAssetLoader.h"           "Asset/IAssetLoader.cpp"
+    "Asset/IAssetImporter.h"           "Asset/IAssetImporter.cpp"
 
     # Spatial
     "Spatial/AABB.h"                "Spatial/AABB.cpp"
@@ -222,4 +222,10 @@ add_custom_command(TARGET CoreLib POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_directory
             "${CMAKE_CURRENT_SOURCE_DIR}/Config"
             "${OUTPUT_DIR}/Config"
+
+    # 2. Assets (Engine)
+    COMMAND ${CMAKE_COMMAND} -E make_directory "${OUTPUT_DIR}/Assets"
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+            "${CMAKE_CURRENT_SOURCE_DIR}/BuiltIn"
+            "${OUTPUT_DIR}/Assets/BuiltIn"
 )

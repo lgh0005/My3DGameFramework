@@ -32,8 +32,18 @@ namespace MGF3D
 	//   Shader loading synchronously   //
 	//==================================*/
 	public:
-		static ShaderPtr CreateFromTextFile(const MGFPath& filepath, GLenum shaderType);
-		static ShaderPtr CreateFromSPIRV(const MGFPath& filepath, GLenum shaderType, strview entryPoint = "main");
+		static ShaderPtr CreateFromTextFile
+		(
+			const MGFPath& filepath, 
+			GLenum shaderType
+		);
+
+		static ShaderPtr CreateFromSPIRV
+		(
+			const MGFPath& filepath, 
+			GLenum shaderType, 
+			strview entryPoint = "main"
+		);
 
 	public:
 		usize GetShader() const { return m_shader; }
@@ -43,8 +53,18 @@ namespace MGF3D
 	//===================================*/
 	private:
 		Shader();
-		bool InitFromTextFile(const MGFPath& filepath, GLenum shaderType);
-		bool InitFromSPIRV(const MGFPath& filepath, GLenum shaderType, strview entryPoint);
+		bool InitFromTextFile
+		(
+			const MGFPath& filepath, 
+			GLenum shaderType
+		);
+
+		bool InitFromSPIRV
+		(
+			const MGFPath& filepath, 
+			GLenum shaderType, 
+			strview entryPoint
+		);
 		
 		uint32	m_shader	{ 0 };
 		GLenum  m_type		{ GL_NONE };

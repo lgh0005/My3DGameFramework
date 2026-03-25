@@ -26,7 +26,6 @@ namespace MGF3D
 		MGF_INIT_SYS(MGF_JOB.Init(), "JobManager");
 		MGF_INIT_SYS(MGF_STREAM.Init(), "StreamManager");
 		MGF_INIT_SYS(MGF_PATH.Init(), "PathManager");
-		MGF_INIT_SYS(MGF_RESOURCE.Init(), "ResourceManager");
 		MGF_INIT_SYS(MGF_ASSET.Init(), "AssetManager");
 		// [TODO: 레거시 청산 후 주석 해제]
 		// MGF_INIT_SYS(MGF_ENTITY,   "EntityManager");

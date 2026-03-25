@@ -22,7 +22,7 @@ namespace MGF3D
 	{
 	public:
 		Resource(const IResourceDescriptor& desc);
-		virtual ~Resource();
+		virtual ~Resource() override;
 
 	public:
 

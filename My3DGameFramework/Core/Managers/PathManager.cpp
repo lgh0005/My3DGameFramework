@@ -14,8 +14,11 @@ namespace MGF3D
 		AddVirtualPath("@Config", "Config");
 
 		// 2. 비동기 EngineConfig.json 파싱
-		if (!LoadConfig()) return false;
-		WaitForConfig();
+		if (!LoadConfig())
+		{
+			MGF_LOG_ERROR("PathManager: Failed to load EngineConfig.json");
+			return false;
+		}
 
 		MGF_LOG_INFO("PathManager: All configurations loaded and verified.");
 		return true;
@@ -30,52 +33,28 @@ namespace MGF3D
 
 	bool PathManager::LoadConfig(const MGFPath& configFileName)
 	{
-		// 2. Config 파일을 불러오기
 		MGFPath configPath = Resolve("@Config") / configFileName;
+
 		if (!configPath.Exists())
 		{
-			MGF_LOG_ERROR("PathManager: Config file not found: {}", configPath.GetCStr());
+			MGF_LOG_ERROR("PathManager: Config file not found at {}", configPath.GetCStr());
 			return false;
 		}
 
-		// StreamManager를 통해 비동기로 읽기 시작
-		MGF_STREAM.ReadFileAsync<bool>
-		(
-			configPath,
+		JsonParser parser;
+		if (!parser.LoadFromJsonFile(configPath))
+		{
+			MGF_LOG_ERROR("PathManager: Failed to parse JSON at {}", configPath.GetCStr());
+			return false;
+		}
 
-			/* Processor */
-			[this](FileStreamPtr file) -> Nullable<bool>
-			{
-				JsonParser parser;
-
-				// FileStream에서 직접 데이터를 읽으며 파싱
-				if (!parser.LoadFromStream(file))
-					return None;
-
-				const auto& root = parser.GetRoot();
-				if (root.contains("virtualPaths"))
-				{
-					const auto& pathNode = root["virtualPaths"];
-					for (auto& [alias, physical] : pathNode.items())
-					{
-						// 아까 확인한 대로 내부에서 락을 걸어주니 안전합니다!
-						AddVirtualPath(alias.c_str(), physical.get<std::string>().c_str());
-					}
-				}
-
-				return true;
-			},
-
-			/* On Complete */
-			[this](Nullable<bool> result)
-			{
-				if (result.IsValid() && *result)
-				{
-					m_configSignal.Set();
-					MGF_LOG_INFO("PathManager: Config stream-parsed and registered in background.");
-				}
-			}
-		);
+		const auto& root = parser.GetRoot();
+		if (root.contains("virtualPaths"))
+		{
+			const auto& pathNode = root["virtualPaths"];
+			for (auto& [alias, physical] : pathNode.items())
+				AddVirtualPath(alias.c_str(), physical.get<std::string>().c_str());
+		}
 
 		return true;
 	}
@@ -131,10 +110,5 @@ namespace MGF3D
 
 		// 5. 정문화(lexically_normal) 및 반환
 		return MGFPath(resolvedPath.lexically_normal());
-	}
-
-	void PathManager::WaitForConfig()
-	{
-		m_configSignal.Wait();
 	}
 }

@@ -6,11 +6,11 @@ namespace MGF3D
 {
 	MGF_CLASS_PTR(Asset)
 
-    MGF_STRUCT_PTR(IAssetLoader)
-    struct IAssetLoader
+    MGF_STRUCT_PTR(IAssetImporter)
+    struct IAssetImporter
     {
-        IAssetLoader();
-        virtual ~IAssetLoader();
+        IAssetImporter();
+        virtual ~IAssetImporter();
 
         virtual bool Load
         (
