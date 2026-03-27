@@ -47,13 +47,13 @@ namespace MGF3D
 			// OnCommit은 반드시 메인 스레드(GL Context)에서 실행됨이 보장됩니다.
 			if (res->OnCommit())
 			{
-				res->SetState(AssetState::Ready);
+				res->SetState(WaitableObjectState::Ready);
 				res->OnRelease();
 				MGF_LOG_INFO("AssetManager: '{}' is now Ready.", res->GetName().CStr());
 			}
 			else
 			{
-				res->SetState(AssetState::Failed);
+				res->SetState(WaitableObjectState::Failed);
 				MGF_LOG_ERROR("AssetManager: Failed to commit '{}'.", res->GetName().CStr());
 			}
 		}
@@ -122,7 +122,7 @@ namespace MGF3D
 			return nullptr;
 
 		// 3. 상태를 'Pending(대기)'으로 설정하고 캐시에 먼저 등록
-		newAsset->SetState(AssetState::Pending);
+		newAsset->SetState(WaitableObjectState::Pending);
 		AddAsset(newAsset);
 
 		// 4. [비동기 시작] TaskManager에게 무거운 작업(OnLoad)을 던집니다.
@@ -131,15 +131,15 @@ namespace MGF3D
 			// [WORKER THREAD 영역]
 			[newAsset]()
 			{
-				newAsset->SetState(AssetState::Loading);
+				newAsset->SetState(WaitableObjectState::Loading);
 
 				// 파일 I/O 및 파싱 (무거운 작업)
 				if (newAsset->OnLoad())
-					newAsset->SetState(AssetState::WaitingCommit);
+					newAsset->SetState(WaitableObjectState::WaitingCommit);
 				else
 				{
 					MGF_LOG_ERROR("ResourceManager: Failed to OnLoad -> {}", newAsset->GetName().CStr());
-					newAsset->SetState(AssetState::Failed);
+					newAsset->SetState(WaitableObjectState::Failed);
 				}
 			},
 

@@ -5,6 +5,6 @@
 namespace MGF3D
 {
     Resource::Resource(const IResourceDescriptor& desc)
-        : m_type(desc.type), m_name(desc.name) { }
+        : Super(desc.type, desc.name) { }
     Resource::~Resource() = default;
 }
