@@ -47,6 +47,7 @@ target_link_libraries(${LIB_NAME}
 PUBLIC
     Engine::Core
     Engine::Graphics
+    Engine::Audio
 )
 
 # 6. PCH (Precompiled Header) 설정

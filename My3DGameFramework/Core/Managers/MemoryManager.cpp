@@ -108,6 +108,8 @@ namespace MGF3D
 
 	void* MemoryManager::Allocate(usize size) noexcept
 	{
+		MGF_LOCK_SCOPE(m_memMutex);
+
 		// 1. 관리 범위를 벗어나는 거대 할당은 시스템 힙으로 폴백
 		if (size > SlabMaxSize)
 			return ::operator new(size, MGF3D::alignment(MGF3D::DefaultAlignment));
@@ -119,6 +121,8 @@ namespace MGF3D
 
 	void MemoryManager::Deallocate(void* ptr, usize size) noexcept
 	{
+		MGF_LOCK_SCOPE(m_memMutex);
+
 		if (ptr == nullptr) return;
 
 		// 1. 관리 범위를 벗어나는 거대 할당 해제

@@ -1,13 +1,17 @@
 ﻿# 0. 라이브러리 이름
-set(MODULE_NAME ModulewareBootstrapper) 
+set(MODULE_NAME Initializer) 
 set(LIB_NAME    ${MODULE_NAME}Lib)
 set(TARGET_NAME Engine::${MODULE_NAME})
 
 # 1. 소스 파일 목록 정의
 set(SOURCES
 
-    # Bootstrapper
-    "ModuleBootstrapper.h"     "ModuleBootstrapper.cpp"
+    # Module
+    "InitializerModule.h"     "InitializerModule.cpp"
+
+    # Configurators
+    "Configurators/CollisionPhaseConfigurator.h"  "Configurators/CollisionPhaseConfigurator.cpp" 
+    "Configurators/ScriptBindingsInitializer.h"  "Configurators/ScriptBindingsInitializer.cpp" 
 )
 
 # 2. 빌드 타겟 생성 및 별칭 등록
@@ -26,11 +30,15 @@ target_link_libraries(${LIB_NAME}
 PUBLIC
     glfw
     Engine::Core
+    Engine::Physics
+    Engine::Graphics
+    # Engine::Scripting
+    Engine::Framework
 )
 
 # 6. PCH (Precompiled Header) 설정
 # 옵션 A: 이 라이브러리만의 개별 PCH를 사용할 경우
-target_precompile_headers(${LIB_NAME} PRIVATE "ModuleBootstrapper.h")
+target_precompile_headers(${LIB_NAME} PRIVATE "InitializerPch.h")
 
 # 옵션 B: CoreLib에 정의된 PCH를 재사용할 경우 (빌드 속도 최적화)
 # target_precompile_headers(${LIB_NAME} REUSE_FROM CoreLib)

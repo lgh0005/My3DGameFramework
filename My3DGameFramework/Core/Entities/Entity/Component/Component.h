@@ -28,9 +28,9 @@ namespace MGF3D
 		Transform& GetTransform();				// reference transform getter
 		const Transform& GetTransform() const;  // read-only transform getter
 
-		/*============================================//
-		//   component life-cycle methods by engine   //
-		//============================================*/
+	/*============================================//
+	//   component life-cycle methods by engine   //
+	//============================================*/
 	public:
 		virtual void Awake()		override final;
 		virtual void Start()		override final;
@@ -39,9 +39,9 @@ namespace MGF3D
 		virtual void LateUpdate()	override final;
 		virtual void OnDestroy()	override final;
 
-		/*==========================================//
-		//   component life-cycle methods by user   //
-		//==========================================*/
+	/*==========================================//
+	//   component life-cycle methods by user   //
+	//==========================================*/
 	protected:
 		virtual void OnAwake();
 		virtual void OnStart();
@@ -52,18 +52,18 @@ namespace MGF3D
 		virtual void OnEnable();
 		virtual void OnDisable();
 
-		/*===================================//
-		//   component state checking API    //
-		//===================================*/
+	/*===================================//
+	//   component state checking API    //
+	//===================================*/
 	public:
 		void SetComponentState(ComponentState state) { m_state = state; }
 		bool IsAwake() const { return m_state >= ComponentState::Awake; }
 		bool IsStarted() const { return m_state >= ComponentState::Started; }
 		bool IsDead() const { return m_state == ComponentState::Dead; }
 
-		/*===========================================================//
-		//   owner and self(this component) state checking methods   //
-		//===========================================================*/
+	/*===========================================================//
+	//   owner and self(this component) state checking methods   //
+	//===========================================================*/
 	public:
 		void SetEnable(bool enable);	// 컴포넌트 자체적인 활성화 스위치
 		bool IsEnabled() const;			// I) 컴포넌트 자체적으로 enable한가?

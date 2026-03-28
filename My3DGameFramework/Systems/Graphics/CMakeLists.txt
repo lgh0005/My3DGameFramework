@@ -50,8 +50,10 @@ set(SOURCES
     "Meshes/Mesh.h"                  "Meshes/Mesh.cpp"
     "Meshes/SubMesh.h"               "Meshes/SubMesh.cpp"
 
-    # Shaders
-    # "Shaders/Shader.h"              "Shaders/Shader.cpp"
+    # Shader
+    "Shader/Shader.h"                "Shader/Shader.cpp"
+    "Shader/ShaderDescriptor.h"      "Shader/ShaderDescriptor.cpp"
+    "Shader/ShaderImporter.h"        "Shader/ShaderImporter.cpp"
 
     # Programs
     # "Programs/Program.h"             "Programs/Program.cpp"

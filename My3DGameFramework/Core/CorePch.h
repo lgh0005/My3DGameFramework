@@ -103,6 +103,7 @@
 //================================*/
 #include "Identity/MGFName.h"
 #include "Identity/MGFPath.h"
+#include "Identity/MGFType.h"
 
 /*=============================//
 //    Engine container utils   //

@@ -24,7 +24,9 @@ target_include_directories(LibTester PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 target_link_libraries(LibTester 
 
 PRIVATE 
+    Engine::Core
     Engine::MiddlewareBootstrapper
+    Engine::Initializer
 )
 
 # 7. 리소스 배포 (Resource Deployment)

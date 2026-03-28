@@ -9,6 +9,14 @@ namespace MGF3D
 	{
 		using Super = Resource;
 
+	/*==================================//
+	//         Type System              //
+	//==================================*/
+	public:
+		static UniquePtr<MGFType> s_type;
+		static void InitializeType();
+		virtual const MGFType* GetType() const override;
+
 	public:
 		Mesh(const IResourceDescriptor& desc);
 		~Mesh();

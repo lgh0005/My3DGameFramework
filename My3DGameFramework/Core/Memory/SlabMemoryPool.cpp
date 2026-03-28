@@ -41,6 +41,8 @@ namespace MGF3D
 
 	void* SlabMemoryPool::Allocate() noexcept
 	{
+		MGF_LOCK_SCOPE(m_mutex);
+
 		// 사용 가능한 블록이 없으면 확장 시도
 		if (m_freeList == nullptr)
 		{
@@ -55,6 +57,7 @@ namespace MGF3D
 	void SlabMemoryPool::Deallocate(void* ptr) noexcept
 	{
 		if (ptr == nullptr) return;
+		MGF_LOCK_SCOPE(m_mutex);
 		PushFreeSlot(ptr);
 	}
 

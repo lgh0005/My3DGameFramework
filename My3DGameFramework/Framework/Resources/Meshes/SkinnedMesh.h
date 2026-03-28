@@ -9,6 +9,14 @@ namespace MGF3D
 	{
 		using Super = Mesh;
 
+	/*==================================//
+	//         Type System              //
+	//==================================*/
+	public:
+		static UniquePtr<MGFType> s_type;
+		static void InitializeType();
+		virtual const MGFType* GetType() const override;
+
 	public:
 		static SkinnedMeshPtr Create(SkinnedMeshDescriptor&& desc);
 		virtual ~SkinnedMesh() override;

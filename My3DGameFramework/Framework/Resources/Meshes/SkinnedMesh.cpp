@@ -7,6 +7,35 @@ namespace MGF3D
 	SkinnedMesh::SkinnedMesh(SkinnedMeshDescriptor& desc) : Super(desc) {}
 	SkinnedMesh::~SkinnedMesh() = default;
 
+	/*==================================//
+	//         Type System              //
+	//==================================*/
+	UniquePtr<MGFType> SkinnedMesh::s_type = nullptr;
+
+	void SkinnedMesh::InitializeType()
+	{
+		s_type = MakeUnique<MGFType>();
+		s_type->name = MGFName("SkinnedMesh");
+		s_type->id = StringHash("SkinnedMesh");
+
+		// 부모인 Mesh의 타입 상속
+		const MGFType* parentType = Mesh::s_type.Get();
+		if (parentType)
+		{
+			s_type->parent = parentType;
+			s_type->depth = parentType->depth + 1;
+
+			for (uint32 i = 0; i <= parentType->depth; ++i)
+				s_type->chain[i] = parentType->chain[i];
+		}
+		s_type->chain[s_type->depth] = s_type->id;
+	}
+
+	const MGFType* SkinnedMesh::GetType() const
+	{
+		return s_type.Get();
+	}
+
 	SkinnedMeshPtr SkinnedMesh::Create(SkinnedMeshDescriptor&& desc)
 	{
 		auto mesh = SkinnedMeshPtr(new SkinnedMesh(desc));

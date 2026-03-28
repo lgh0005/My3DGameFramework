@@ -19,10 +19,14 @@ namespace MGF3D
 		subMesh.indexCount = static_cast<uint32>(indices.Count());
 
 		// 1. AABB 바운딩 박스 계산
-		AABB localBounds(vec3(FloatMax), vec3(FloatLowest));
-		for (const auto& v : vertices)
-			localBounds.Encapsulate(v.position);
-		subMesh.bounds = BoundingBox(localBounds.min, localBounds.max);
+		MGF3D::AABB localBounds{ vec3(FloatLowest), vec3(FloatMax) };
+		for (const auto& v : vertices) localBounds.Encapsulate(v.position);
+		subMesh.bounds = BoundingBox{ localBounds.min, localBounds.max };
+
+		//AABB localBounds(vec3(FloatLowest), vec3(FloatMax));
+		//for (const auto& v : vertices)
+		//	localBounds.Encapsulate(v.position);
+		//subMesh.bounds = BoundingBox(localBounds.min, localBounds.max);
 
 		// 2. VRAM 할당
 		usize vbSize = vertices.Count() * sizeof(TVertex);

@@ -29,10 +29,11 @@ namespace MGF3D
 		// 3. 리소스 수동 등록
 		void AddResource(const ResourcePtr& resource);
 
-	private:
+		// 4. 비동기 리소스 로드 요청
 		ResourcePtr LoadResourceAsync(IResourceDescriptorUPtr desc);
 
-		SMap<Ptr<MGFType>, IResourceLoaderUPtr> m_loaders;
+	private:
+		SMap<Ptr<const MGFType>, IResourceLoaderUPtr> m_loaders;
 		SMap<StringHash, ResourcePtr> m_resources;
 
 		Mutex m_commitMutex;

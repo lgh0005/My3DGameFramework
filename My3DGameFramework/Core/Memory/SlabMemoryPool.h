@@ -64,5 +64,7 @@ namespace MGF3D
 		usize m_freeSlotCount; // 현재 사용 가능한 총 슬롯 개수
 		usize m_totalSlotCount; // 풀이 보유한 전체 슬롯 개수 추적
 		usize m_alignment;     // 메모리 정렬 기준
+
+		Mutex m_mutex;
 	};
 }

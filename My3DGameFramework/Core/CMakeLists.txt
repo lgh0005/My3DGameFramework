@@ -42,11 +42,11 @@ set(SOURCES
 
     # Entities
     #"Entities/ECS/IStorage.h"      "Entities/ECS/IStorage.cpp"  
-    #"Entities/ECS/Storage.h"      "Entities/ECS/Storage.cpp"   "Entities/ECS/Storage.inl"
-    #"Entities/ECS/Chunk.h"          "Entities/ECS/Chunk.cpp"   "Entities/ECS/Chunk.inl"
+    #"Entities/ECS/Storage.h"       "Entities/ECS/Storage.cpp"    "Entities/ECS/Storage.inl"
+    #"Entities/ECS/Chunk.h"         "Entities/ECS/Chunk.cpp"      "Entities/ECS/Chunk.inl"
 
     "Entities/Entity/Waitables/IWaitable.h"           "Entities/Entity/Waitables/IWaitable.cpp"
-    #"Entities/Entity/Object.h"                             "Entities/Entity/Object.cpp"
+    "Entities/Entity/Object.h"                             "Entities/Entity/Object.cpp"
     #"Entities/Entity/Mechanic/Mechanic.h"                  "Entities/Entity/Mechanic/Mechanic.cpp"
     #"Entities/Entity/Mechanic/IMechanicDescriptor.h"       "Entities/Entity/Mechanic/IMechanicDescriptor.cpp"
     #"Entities/Entity/Component/Component.h"                "Entities/Entity/Component/Component.cpp"

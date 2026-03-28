@@ -14,6 +14,7 @@ namespace MGF3D
     public:
         TVector() = default;
         virtual ~TVector() = default;
+        TVector(std::initializer_list<T> init);
 
     public:
         // 1. 다른 할당자를 사용하는 TVector로부터 복사 생성
@@ -27,6 +28,7 @@ namespace MGF3D
         // 3. 대입 연산자
         template<typename OtherAlloc>
         TVector& operator=(const TVector<T, OtherAlloc>& other);
+        TVector& operator=(std::initializer_list<T> init);
 
     public:
         usize MemoryUsage() const override { return sizeof(*this) + (m_vector.capacity() * sizeof(T)); }

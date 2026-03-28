@@ -1,11 +1,10 @@
 ﻿#pragma once
+#include "Pointer/PoolAlloc.h"
 
 namespace MGF3D
 {
-	MGF_CLASS_PTR(MGFType)
-
 	MGF_STRUCT_PTR(IResourceDescriptor)
-	struct IResourceDescriptor
+	struct IResourceDescriptor : public PoolAlloc
 	{
 		using TypeID = StringHash;
 
@@ -16,7 +15,7 @@ namespace MGF3D
 		);
 		virtual ~IResourceDescriptor();
 
-		const Ptr<MGFType> const type;
+		const Ptr<MGFType> type;
 		MGFName name;
 	};
 }

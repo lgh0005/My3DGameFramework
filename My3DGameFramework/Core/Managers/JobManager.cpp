@@ -81,7 +81,11 @@ namespace MGF3D
         MGF_TASK.Broadcast();
 
         // MGFJob의 소멸자가 호출되면서 내부의 MGFThread가 Join/정리됨
-        // for (auto& worker : m_workers) worker.Reset();
+        for (auto& worker : m_workers)
+        {
+            if (worker) 
+                worker->Join();
+        }
         m_workers.Release();
 
         // m_workers.Release(); // INFO : 현재 여기에서 is_block_type_valid 오류를 일으키고 있음

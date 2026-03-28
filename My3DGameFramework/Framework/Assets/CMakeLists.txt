@@ -7,7 +7,7 @@ set(TARGET_NAME Engine::${MODULE_NAME})
 set(SOURCES
 
     # 0. Module
-    "AssetMoudule.h"          "AssetMoudule.cpp"  
+    "AssetModule.h"          "AssetModule.cpp"  
 
     # 1. Descriptors
 
@@ -16,25 +16,25 @@ set(SOURCES
     # 3. Scene
 
     # 4. Model
-    "Model/Model.h"                 "Model/Model.cpp"
+    # "Model/Model.h"                 "Model/Model.cpp"
 
     # 5. Animation
-    "Animation/Animation.h"         "Animation/Animation.cpp"
+    # "Animation/Animation.h"         "Animation/Animation.cpp"
 
     # 6. Audios
 
     # 7. Material
-    "Material/Material.h"         "Material/Material.cpp"
+    # "Material/Material.h"         "Material/Material.cpp"
 
     # 8. Programs
 
     # 9. Textures
 
     # 10. Script
-    "Script/LuaScript.h"         "Script/LuaScript.cpp"
+    # "Script/LuaScript.h"         "Script/LuaScript.cpp"
 
     # 11. Font
-    "Fonts/Font.h"              "Fonts/Font.cpp"
+    # "Fonts/Font.h"              "Fonts/Font.cpp"
 
 )
 
@@ -52,7 +52,8 @@ target_include_directories(${LIB_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 target_link_libraries(${LIB_NAME} 
 
 PUBLIC
-    # Engine::Core
+    Engine::Core
+    Engine::Graphics
 )
 
 # 6. PCH (Precompiled Header) 설정

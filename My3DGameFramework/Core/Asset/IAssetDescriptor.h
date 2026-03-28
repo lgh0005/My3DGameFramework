@@ -1,11 +1,10 @@
 #pragma once
+#include "Pointer/PoolAlloc.h"
 
 namespace MGF3D
 {
-	MGF_CLASS_PTR(MGFType)
-
 	MGF_STRUCT_PTR(IAssetDescriptor)
-	struct IAssetDescriptor
+	struct IAssetDescriptor : public PoolAlloc
 	{
 		IAssetDescriptor
 		(
@@ -16,7 +15,7 @@ namespace MGF3D
 		);
 		virtual ~IAssetDescriptor();
 
-		const Ptr<MGFType> const type;
+		const Ptr<MGFType> type;
 		MGFName name;
 		MGFPath path;
 		SString ext;

@@ -28,6 +28,8 @@ namespace MGF3D
 
         Ptr<MGFThread> GetThread() const { return m_thread.Get(); }
 
+        void Join();
+
     private:
         MGFThreadUPtr m_thread;      // 실제 스레드 객체
         MGFSignalUPtr m_readySignal; // 부팅 완료를 알리는 시그널

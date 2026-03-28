@@ -11,7 +11,10 @@ namespace MGF3D
         m_readySignal = MakeUnique<MGFSignal>();
     }
 
-    MGFJob::~MGFJob() = default;
+    MGFJob::~MGFJob()
+    {
+        Join();
+    }
 
     bool MGFJob::Launch(const SString& name, Action<> work)
     {
@@ -27,5 +30,10 @@ namespace MGF3D
     void MGFJob::WaitUntilReady()
     {
         if (m_readySignal) m_readySignal->Wait();
+    }
+
+    void MGFJob::Join()
+    {
+        if (m_thread) m_thread->Join();
     }
 }

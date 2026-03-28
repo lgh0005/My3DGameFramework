@@ -8,6 +8,10 @@
 #include "GraphicsModule.h"
 #include "MiddlewareModule.h"
 
+// [Debug]
+#include "Managers/AssetManager.h"
+#include "Managers/ResourceManager.h"
+
 namespace MGF3D
 {
 	bool Bootstrapper::Init()
@@ -30,6 +34,10 @@ namespace MGF3D
 	void Bootstrapper::Shutdown()
 	{
 		MGF_LOG_INFO("[EXIT] Initiating Engine Shutdown Sequence...");
+
+		// [Debug]
+		MGF_SHUTDOWN_SYS(MGF_ASSET.Shutdown(), "AssetManager");
+		MGF_SHUTDOWN_SYS(MGF_RESOURCE.Shutdown(), "ResourceManager");
 
 		// 2. 시스템 레이어 정리
 		MGF_MODULE_SHUTDOWN(AudioModule::Shutdown(), "AudioModule");

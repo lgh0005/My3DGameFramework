@@ -5,8 +5,27 @@ namespace MGF3D
 	template<typename T>
 	struct DefaultDeleter
 	{
+		DefaultDeleter() = default;
+
+		// 1. [복사 생성] 다른 타입(U)의 Deleter로부터 생성 허용
+		template <typename U>
+		DefaultDeleter(const DefaultDeleter<U>&) noexcept {}
+
+		// 2. [이동 생성] rvalue로 넘어오는 Deleter 대응 (inl 56라인 대응)
+		template <typename U>
+		DefaultDeleter(DefaultDeleter<U>&&) noexcept {}
+
+		// 3. [복사 대입] 
+		template <typename U>
+		DefaultDeleter& operator=(const DefaultDeleter<U>&) noexcept { return *this; }
+
+		// 4. [이동 대입]
+		template <typename U>
+		DefaultDeleter& operator=(DefaultDeleter<U>&&) noexcept { return *this; }
+
 		void operator()(T* ptr) const
 		{
+			// 부모 소멸자가 virtual이어야 자식까지 안전하게 죽습니다.
 			if (ptr) delete ptr;
 		}
 	};

@@ -13,10 +13,20 @@ namespace MGF3D
         : m_vector(std::make_move_iterator(other.begin()), std::make_move_iterator(other.end())) { }
 
     template<typename T, typename Alloc>
+    inline TVector<T, Alloc>::TVector(std::initializer_list<T> init) : m_vector(init) { }
+
+    template<typename T, typename Alloc>
     template<typename OtherAlloc>
     inline TVector<T, Alloc>& TVector<T, Alloc>::operator=(const TVector<T, OtherAlloc>& other)
     {
         m_vector.assign(other.begin(), other.end()); 
+        return *this;
+    }
+
+    template<typename T, typename Alloc>
+    inline TVector<T, Alloc>& TVector<T, Alloc>::operator=(std::initializer_list<T> init)
+    {
+        m_vector = init;
         return *this;
     }
 

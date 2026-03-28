@@ -7,9 +7,10 @@ namespace MGF3D
 	{
 	public:
 		virtual ~Object();
-		/*===============================//
-		//   common life-cycle methods   //
-		//===============================*/
+
+	/*===============================//
+	//   common life-cycle methods   //
+	//===============================*/
 	public:
 		virtual void Awake();
 		virtual void Start();

@@ -7,6 +7,35 @@ namespace MGF3D
 	StaticMesh::StaticMesh(StaticMeshDescriptor& desc) : Super(desc) {}
 	StaticMesh::~StaticMesh() = default;
 
+	/*==================================//
+	//         Type System              //
+	//==================================*/
+	UniquePtr<MGFType> StaticMesh::s_type = nullptr;
+
+	void StaticMesh::InitializeType()
+	{
+		s_type = MakeUnique<MGFType>();
+		s_type->name = MGFName("StaticMesh");
+		s_type->id = StringHash("StaticMesh");
+
+		// 부모인 Mesh의 타입 상속
+		const MGFType* parentType = Mesh::s_type.Get();
+		if (parentType)
+		{
+			s_type->parent = parentType;
+			s_type->depth = parentType->depth + 1;
+
+			for (uint32 i = 0; i <= parentType->depth; ++i)
+				s_type->chain[i] = parentType->chain[i];
+		}
+		s_type->chain[s_type->depth] = s_type->id;
+	}
+
+	const MGFType* StaticMesh::GetType() const
+	{
+		return s_type.Get();
+	}
+
 	StaticMeshPtr StaticMesh::Create(StaticMeshDescriptor&& desc)
 	{
 		auto mesh = StaticMeshPtr(new StaticMesh(desc));

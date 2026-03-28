@@ -12,29 +12,24 @@ namespace MGF3D
 
 	bool AssetManager::Init()
 	{
-		// TODO
-		// 0. 에셋 확장명을 파싱한다
+		// 에셋 확장명을 파싱한다
 		if (!LoadExtensionMap())
 		{
 			MGF_LOG_ERROR("AssetManager: Failed to load FileExtension.json");
 			return false;
 		}
 
-		// 2. 에셋 경로 폴더 디렉터리를 보면서 비동기로 모든 에셋을
-		ScanDirectoryAsync("@BuiltInAsset");
-		ScanDirectoryAsync("@GameAsset");
-
 		return true;
 	}
 
 	void AssetManager::Update()
 	{
-		// 1. 메인 스레드 전용 로컬 바구닝
+		// 1. 메인 스레드 전용 로컬 바구니
 		SVector<AssetPtr> readyToCommit;
 
 		{
 			// 2. 최소화한 임계 영역(Critical Section) : 포인터 교체
-			MGF_LOCK_SCOPE(m_mutex);
+			MGF_LOCK_SCOPE(m_commitMutex);
 			if (m_commitQueue.Empty()) return;
 			readyToCommit.Swap(m_commitQueue);
 		}
@@ -84,7 +79,7 @@ namespace MGF3D
 	{
 		if (!asset) return;
 
-		MGF_LOCK_SCOPE(m_mutex);
+		MGF_LOCK_SCOPE(m_commitMutex);
 		StringHash key = asset->GetName().GetStringHash();
 		if (m_assets.Find(key))
 		{
@@ -129,13 +124,17 @@ namespace MGF3D
 		auto loadTask = MGF_TASK.AcquireTask
 		(
 			// [WORKER THREAD 영역]
-			[newAsset]()
+			[this, newAsset]()
 			{
 				newAsset->SetState(WaitableObjectState::Loading);
 
 				// 파일 I/O 및 파싱 (무거운 작업)
 				if (newAsset->OnLoad())
+				{
 					newAsset->SetState(WaitableObjectState::WaitingCommit);
+					MGF_LOCK_SCOPE(m_commitMutex);
+					m_commitQueue.PushBack(newAsset);
+				}
 				else
 				{
 					MGF_LOG_ERROR("ResourceManager: Failed to OnLoad -> {}", newAsset->GetName().CStr());
@@ -159,7 +158,6 @@ namespace MGF3D
 	
 	bool AssetManager::LoadExtensionMap(const MGFPath& configFileName)
 	{
-		// 그 다음에 비동기 로드
 		MGFPath extConfig = MGF_PATH.Resolve("@Config") / configFileName;
 
 		JsonParser parser;
@@ -180,39 +178,5 @@ namespace MGF3D
 
 		MGF_LOG_INFO("AssetManager: Registered {} extension mapping pairs.", m_extensionMap.Count());
 		return true;
-	}
-
-	void AssetManager::ScanDirectoryAsync(const MGFPath& virtualPath)
-	{
-		// 디렉터리 스캔 자체를 워커 스레드로 던져 메인 스레드 정체를 방지합니다.
-		auto scanTask = MGF_TASK.AcquireTask([this, virtualPath]()
-		{
-			MGFPath physicalRoot = MGF_PATH.Resolve(virtualPath);
-			if (!physicalRoot.Exists()) return;
-
-			MGF_LOG_INFO("AssetManager: Scanning -> {}", physicalRoot.GetCStr());
-
-			for (const auto& entry : fs::recursive_directory_iterator((const fs::path&)physicalRoot))
-			{
-				if (entry.is_directory()) continue;
-
-				MGFPath filePath(entry.path());
-				SString ext = filePath.GetExtension();
-
-				//// 확장자를 통해 어떤 로더(Importer)를 사용할지 '힌트'를 얻습니다.
-				//auto extension = m_extensionMap.Find(ext);
-				//if (extension)
-				//{
-				//	const MGFType* assetType = *it;
-				//	MGFName assetName = MGFName(filePath.GetFileName().CStr());
-
-				//	// 명시적으로 Descriptor를 생성하여 비동기 로드 요청을 보냅니다.
-				//	auto desc = MakeUnique<IAssetDescriptor>(assetType, assetName, filePath);
-				//	this->LoadAssetAsync(std::move(desc));
-				//}
-			}
-		});
-
-		MGF_TASK.PushTask(std::move(scanTask));
 	}
 }

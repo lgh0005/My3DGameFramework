@@ -13,8 +13,6 @@ namespace MGF3D
 		Failed            // 로딩 또는 확정 실패
 	};
 
-	MGF_CLASS_PTR(MGFType)
-
 	MGF_CLASS_PTR(IWaitable)
 	class IWaitable : public RefCount
 	{

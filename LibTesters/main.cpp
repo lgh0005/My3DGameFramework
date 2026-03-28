@@ -1,4 +1,6 @@
 ﻿#include "pch.h"
+#include <glad/glad.h>
+
 #include "Bootstrapper/Bootstrapper.h"
 #include "Debug/MemoryProfiler.h"
 #include "Debug/VRAMProfiler.h"
@@ -8,35 +10,83 @@
 #include "Managers/WindowManager.h"
 #include "Managers/GLFWManager.h"
 #include "Managers/TaskManager.h"
-#include "Managers/PathManager.h"
 #include "Managers/InputManager.h"
 #include "Managers/VRAMManager.h"
 
-using namespace MGF3D;
+// [에셋 및 리소스 시스템 연동 헤더]
+#include "Layouts/VertexLayout.h"
 
-class TestActor : public RefCount
-{
-public:
-    int payload[512]; // 4KB (1024 * 4 bytes)
-    TestActor() { MGF_LOG_INFO("TestActor Created! (Memory Allocated in Slab)"); }
-    ~TestActor() { MGF_LOG_INFO("TestActor Destroyed! (Memory Freed to Slab)"); }
-};
+#include "Managers/AssetManager.h"
+#include "Managers/ResourceManager.h"
+#include "Shader/Shader.h"
+#include "Shader/ShaderDescriptor.h"
+#include "Shader/ShaderImporter.h"
+#include "Meshes/StaticMesh.h"
+#include "Loaders/StaticMeshLoader.h"
+#include "Descriptors/StaticMeshDescriptor.h"
+
+// [타입 베이킹]
+#include "InitializerModule.h"
+
+
+using namespace MGF3D;
 
 int main()
 {
+    // 0. 부트 스트래핑
     if (!Bootstrapper::Init())
     {
         MGF_LOG_FATAL("Engine Bootstrapping Failed!");
         return -1;
     }
 
+    // 1. 엔진 기본 요소 초기화 (타입 베이킹)
+    if (!InitializerModule::Init())
+    {
+        MGF_LOG_FATAL("Engine Initialization Failed!");
+        return -1;
+    }
+
+    /*=================================================//
+    // [경합 테스트] SlabMemoryPool 스트레스 테스트         //
+    //=================================================*/
+    {
+        MGF_LOG_INFO("Starting SlabMemoryPool Stress Test...");
+
+        // 1. 특정 사이즈(예: 32바이트)의 전역 슬랩 풀을 가져옵니다.
+        // SlabAllocator가 내부적으로 사용하는 것과 동일한 풀입니다.
+        auto* targetPool = MGF_MEMORY.GetSlabMemoryPool(32);
+
+        const int threadCount = 8;        // 8개의 스레드가 동시에 공격
+        const int iterations = 100000;    // 각 스레드당 10만 번씩 할당/해제 반복
+        SVector<std::thread> testers;
+
+        for (int i = 0; i < threadCount; ++i)
+        {
+            testers.PushBack(std::thread([targetPool, iterations]()
+                {
+                    for (int j = 0; j < iterations; ++j)
+                    {
+                        void* ptr = targetPool->Allocate();
+                        if (ptr)
+                        {
+                            // 할당받자마자 즉시 해제
+                            targetPool->Deallocate(ptr);
+                        }
+                    }
+                }));
+        }
+
+        // 모든 스레드가 작업을 마칠 때까지 대기
+        for (auto& t : testers)
+        {
+            if (t.joinable()) t.join();
+        }
+
+        MGF_LOG_INFO("SlabMemoryPool Stress Test Finished!");
+    }
+
     MGF_LOG_INFO("=== MGF3D Integrated System & Window Test ===");
-
-    // [체크포인트 A] 엔진 초기화 직후 메모리 상태
-    MGF_LOG_WARN(">> [Checkpoint A] Engine Base Memory (After Init)");
-    MGF_MEMORY_PROFILE_CAPTURE();
-    MGF_MEMORY_LOG_STATS();
-
     /*=================================================//
     // [테스트 1] 입력 매핑 및 콜백 바인딩 (초기화 단계)  //
     //=================================================*/
@@ -50,131 +100,119 @@ int main()
 
     // 2. 마우스 좌클릭 시 공격 로그 출력
     MGF_INPUT.MapMouseAction("Fire", MouseCode::Left);
-    MGF_INPUT.BindAction("Fire", InputEvent::Pressed, []()
-    {
-        MGF_LOG_INFO("Pew Pew! Left Mouse Button Pressed!");
-    });
+    MGF_INPUT.BindAction("Fire", InputEvent::Pressed, []() { MGF_LOG_INFO("Pew Pew! Left Mouse Button Pressed!"); });
 
     // 3. W키 매핑 (이건 아래 폴링 루프에서 지속적으로 검사할 예정입니다)
     MGF_INPUT.MapAction("MoveForward", KeyCode::W);
 
-    // [체크포인트 B] 윈도우 생성 및 루프 진입 전
-    // (이 시점에서 GLFW가 내부적으로 창 객체, 모니터 정보 등을 Slab에 할당했을 것입니다)
-    MGF_LOG_WARN(">> [Checkpoint B] After Window & Input Mapping");
-    MGF_MEMORY_PROFILE_CAPTURE();
-    MGF_MEMORY_LOG_STATS();
-
     /*=================================================//
-    // [테스트 2] 커스텀 스마트 포인터 메모리 테스트      //
+    //   [테스트] 비동기 에셋 및 리소스 로딩 파이프라인   //
     //=================================================*/
-    MGF_LOG_WARN(">> [Memory Test] 1. Before UniquePtr Scope");
-    MGF_MEMORY_PROFILE_CAPTURE();
-    MGF_MEMORY_LOG_STATS();
-
+    // TODO : 이젠 이 스코프가 없어도 알아서 정리가 되도록 수정해야 함.
     {
-        // 중괄호 블록 시작: 여기서 MakeUnique를 호출합니다!
-        MGF_LOG_INFO("--- Entering Scope ---");
+        // TODO : 지금 이게 로더를 가져오는 방식이라서 지금 이렇게하면 당연히 로드가 안됨. "로더"를 넣어줘야함.
+        auto vsDesc = MakeUnique<ShaderDescriptor>(Shader::s_type.Get(), "BasicVS", "@GameAsset/Shaders/test.vert", ".vert", GL_VERTEX_SHADER);
+        auto fsDesc = MakeUnique<ShaderDescriptor>(Shader::s_type.Get(), "BasicFS", "@GameAsset/Shaders/test.frag", ".frag", GL_FRAGMENT_SHADER);
+        auto vsAsset = MGF3D::StaticSharedCast<Shader>(MGF_ASSET.LoadAssetAsync(Move(vsDesc)));
+        auto fsAsset = MGF3D::StaticSharedCast<Shader>(MGF_ASSET.LoadAssetAsync(Move(fsDesc)));
 
-        // 우리가 만든 엔진 전용 팩토리 함수를 사용! (Slab 할당)
-        auto myActor = MakeUnique<TestActor>();
+        // 2. 메쉬 비동기 로드 요청
+        auto meshDesc = MakeUnique<StaticMeshDescriptor>(StaticMesh::s_type.Get(), "TriangleMesh");
+        StaticGeometryData triGeo;
 
-        MGF_LOG_WARN(">> [Memory Test] 2. Inside Scope (Actor is Alive!)");
-        MGF_MEMORY_PROFILE_CAPTURE();
-        MGF_MEMORY_LOG_STATS(); // 여기서 Slab 할당량이 정확히 4KB(4096 bytes) 증가해야 합니다!
+        // 정점 세팅: Position, Normal, UV, Tangent 순서
+        // UV 값을 다르게 주어 프래그먼트 셰이더에서 색상으로 활용합니다.
+        triGeo.vertices.PushBack({ vec3(0.0f,  0.5f, 0.0f), vec3(0,0,1), vec2(0.5f, 1.0f), vec3(1,0,0) }); // Top
+        triGeo.vertices.PushBack({ vec3(-0.5f, -0.5f, 0.0f), vec3(0,0,1), vec2(0.0f, 0.0f), vec3(1,0,0) }); // Bottom Left
+        triGeo.vertices.PushBack({ vec3(0.5f, -0.5f, 0.0f), vec3(0,0,1), vec2(1.0f, 0.0f), vec3(1,0,0) });  // Bottom Right
+        triGeo.indices = { 0, 1, 2 };
 
-        MGF_LOG_INFO("--- Exiting Scope ---");
-    } // 중괄호 블록 끝: myActor가 죽으면서 우리가 만든 Deleter가 MemoryManager.Deallocate를 자동 호출합니다!
+        meshDesc->geometryList.PushBack(triGeo);
+        auto triMesh = MGF3D::StaticSharedCast<StaticMesh>(MGF_RESOURCE.LoadResourceAsync(Move(meshDesc)));
 
-    MGF_LOG_WARN(">> [Memory Test] 3. After Scope (Actor should be Destroyed)");
-    MGF_MEMORY_PROFILE_CAPTURE();
-    MGF_MEMORY_LOG_STATS();
+        // 렌더링 상태 변수
+        uint32 shaderProgram = 0;
+        bool isLinked = false;
 
-    /*=================================================//
-    // [테스트 3] 커스텀 SharedPtr 메모리 테스트         //
-    //=================================================*/
-    MGF_LOG_WARN(">> [Memory Test] 4. Before SharedPtr Scope");
-    MGF_MEMORY_PROFILE_CAPTURE();
-    MGF_MEMORY_LOG_STATS();
-
-    {
-        MGF_LOG_INFO("--- Entering SharedPtr Scope ---");
-
-        // 1. 첫 번째 SharedPtr 생성 (여기서 할당 발생)
-        auto sharedActor1 = MakeShared<TestActor>();
-
-        MGF_LOG_WARN(">> [Memory Test] 5. Inside Scope (sharedActor1 is Alive!)");
-        MGF_LOG_INFO("    Current RefCount: {}", sharedActor1->GetRefCount());
-        MGF_MEMORY_PROFILE_CAPTURE();
-        MGF_MEMORY_LOG_STATS();
-
-        // 2. 참조 카운팅 테스트 (내부 스코프)
+        /*=================================================//
+        //                 메인 게임 루프                   //
+        //=================================================*/
+        while (!MGF_WINDOW.ShouldClose())
         {
-            MGF_LOG_INFO("    --- Entering Nested Scope ---");
-            auto sharedActor2 = sharedActor1; // 복사 발생! (메모리 할당은 없고 카운트만 증가)
-            MGF_LOG_INFO("    sharedActor2 created! Current RefCount: {}", sharedActor1->GetRefCount());
-            MGF_LOG_INFO("    --- Exiting Nested Scope ---");
-        } // sharedActor2 소멸 (카운트 감소, 하지만 1이 남았으므로 파괴 안 됨!)
+            // 0. 시간 업데이트
+            MGF_TIME.Update();
 
-        MGF_LOG_INFO("    After Nested Scope! Current RefCount: {}", sharedActor1->GetRefCount());
-        MGF_LOG_INFO("--- Exiting SharedPtr Scope ---");
+            // 1. OS 이벤트 처리
+            MGF_GLFW.Update();
 
-    } // 여기서 최종적으로 RefCount가 0이 되며 TestActor가 파괴되고 메모리 반환!
+            // 2. 인풋 시스템 상태 동기화
+            MGF_INPUT.Update(MGF_WINDOW.GetNativeWindow());
+            if (MGF_INPUT.GetButtonDown("MoveForward"))
+                MGF_LOG_INFO("W key JUST PRESSED this frame!");
 
-    MGF_LOG_WARN(">> [Memory Test] 6. After SharedPtr Scope (Memory should be restored)");
-    MGF_MEMORY_PROFILE_CAPTURE();
-    MGF_MEMORY_LOG_STATS();
+            // 2. 메인 스레드 일감 작업
+            MGF_TASK.Update();
 
-    /*=================================================//
-    // [테스트 4] VRAM 직접 할당 및 프로파일링 테스트     //
-    //=================================================*/
-    MGF_LOG_WARN(">> [VRAM Test] 1. Before VRAM Allocation");
-    MGF_VRAM_PROFILE_CAPTURE();
-    MGF_VRAM_LOG_STATS();
+            // 3. 대기 중인 로딩 완료 객체들의 OnCommit을 메인 스레드에서 GPU로 전송
+            MGF_ASSET.Update();
+            MGF_RESOURCE.Update();
 
-    {
-        MGF_LOG_INFO("--- Allocating 16MB from Static VRAM Pool ---");
-        // 16MB 크기, 256 바이트 정렬로 Static Pool에 할당 요청
-        VRAMAllocation testVramAlloc = VRAMManager::Instance().Allocate(VRAMAllocation::PoolType::Static, 16 * 1024 * 1024, 256);
+            // [DEBUG]
+            {
+                glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
+                glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        MGF_LOG_WARN(">> [VRAM Test] 2. After Allocation (Static Pool usage should increase)");
-        MGF_VRAM_PROFILE_CAPTURE();
-        MGF_VRAM_LOG_STATS();
+                // 4. 로딩이 모두 완료되면 단 한 번만 셰이더 프로그램 링크
+                if (!isLinked && vsAsset->IsReady() && fsAsset->IsReady() && triMesh->IsReady())
+                {
+                    shaderProgram = glCreateProgram();
+                    glAttachShader(shaderProgram, vsAsset->GetShader());
+                    glAttachShader(shaderProgram, fsAsset->GetShader());
+                    glLinkProgram(shaderProgram);
 
-        MGF_LOG_INFO("--- Deallocating 16MB from Static VRAM Pool ---");
-        VRAMManager::Instance().Deallocate(testVramAlloc);
-    }
+                    isLinked = true;
+                    MGF_LOG_INFO("All Assets Loaded & Shader Linked! Rendering Started.");
+                }
 
-    MGF_LOG_WARN(">> [VRAM Test] 3. After Deallocation (VRAM should be restored)");
-    MGF_VRAM_PROFILE_CAPTURE();
-    MGF_VRAM_LOG_STATS();
+                // 5. 링크가 완료되었다면 삼각형 렌더링
+                if (isLinked)
+                {
+                    glUseProgram(shaderProgram);
 
-    /*=================================================//
-    //                 메인 게임 루프                   //
-    //=================================================*/
-    while (!MGF_WINDOW.ShouldClose())
-    {
-        // 0. 시간 업데이트
-        MGF_TIME.Update();
+                    // StaticMesh 내부의 서브 메쉬를 순회하며 그리기
+                    const auto& subMeshes = triMesh->GetSubMeshes();
+                    for (const auto& subMesh : subMeshes)
+                    {
+                        // VertexLayout(VAO)과 IndexBuffer(IBO)가 정상적으로 존재하는지 확인
+                        if (subMesh.vertexLayout && subMesh.indexBuffer)
+                        {
+                            // 1. VAO 바인딩
+                            // 이 안에 이미 DSA로 VBO(오프셋 포함)와 IBO 핸들이 세팅되어 있습니다.
+                            subMesh.vertexLayout->Bind();
 
-        // 1. OS 이벤트 처리
-        MGF_GLFW.Update();
+                            // 2. 인덱스 버퍼의 VRAM 서브 할당 오프셋 가져오기
+                            // (GLBufferHandle을 상속받았으므로 GetOffset() 사용 가능)
+                            uint64 indexOffset = subMesh.indexBuffer->GetOffset();
 
-        // 2. 인풋 시스템 상태 동기화
-        MGF_INPUT.Update(MGF_WINDOW.GetNativeWindow());
+                            // 3. 그리기 명령 (마지막 인자에 인덱스 오프셋을 캐스팅해서 전달!)
+                            glDrawElements
+                            (
+                                GL_TRIANGLES,
+                                subMesh.indexCount,
+                                GL_UNSIGNED_INT,
+                                reinterpret_cast<const void*>(indexOffset)
+                            );
 
-        // 2-1. 폴링(Polling) 방식 테스트: W키를 꾹 누르고 있을 때 (Level Trigger)
-        //if (MGF_INPUT.GetButton("MoveForward"))
-        //    MGF_LOG_INFO("Moving Forward... (W key is held down)");
+                            // 4. 언바인딩 (선택 사항이지만 안전을 위해 추가 가능)
+                            subMesh.vertexLayout->Unbind();
+                        }
+                    }
+                }
+            }
 
-        // 2-2. 이번 프레임에 막 눌렸을 때만 반응하는지 테스트
-        if (MGF_INPUT.GetButtonDown("MoveForward"))
-            MGF_LOG_INFO("W key JUST PRESSED this frame!");
-
-        // 2. 엔진 시스템 업데이트
-        MGF_TASK.Update();
-
-        // 3. 렌더링 결과 출력 (SwapBuffers)
-        MGF_WINDOW.Update();
+            // 3. 렌더링 결과 출력 (SwapBuffers)
+            MGF_WINDOW.Update();
+        }
     }
 
     // [체크포인트 C] 엔진 종료 직전 (메모리가 모두 반환되었는지 확인 가능)
@@ -182,6 +220,8 @@ int main()
     MGF_MEMORY_PROFILE_CAPTURE();
     MGF_MEMORY_LOG_STATS();
 
+    // 최종 정리
+    InitializerModule::Shutdown();
     Bootstrapper::Shutdown();
 
     return 0;

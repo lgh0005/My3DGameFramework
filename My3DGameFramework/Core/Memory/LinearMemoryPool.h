@@ -23,6 +23,8 @@ namespace MGF3D
 	private:
 		uintptr m_startAddress;  // 풀의 시작 주소
 		usize m_size;			 // 전체 크기
-		usize m_offset;			 // 현재까지 사용된 크기
+		Atomic<usize> m_offset;  // 현재까지 사용된 크기
+
+		Mutex m_mutex;
 	};
 }

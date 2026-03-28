@@ -2,9 +2,6 @@
 #include "Misc/Enums.h"
 #include "Object.h"
 
-// TODO : Transform을 어떻게 할 것인가?
-// 개인적으로는 GameObject에 박아두고 싶은데..
-
 namespace MGF3D
 {
 	MGF_CLASS_PTR(Scene)

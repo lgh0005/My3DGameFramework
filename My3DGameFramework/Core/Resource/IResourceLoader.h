@@ -1,11 +1,12 @@
 ﻿#pragma once
+#include "Pointer/PoolAlloc.h"
 #include "Resource/Resource.h"
 #include "Resource/IResourceDescriptor.h"
 
 namespace MGF3D
 {
 	MGF_CLASS_PTR(IResourceLoader)
-	class IResourceLoader
+	class IResourceLoader : public PoolAlloc
 	{
 	public:
 		IResourceLoader();

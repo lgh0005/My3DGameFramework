@@ -83,9 +83,8 @@ namespace MGF3D
 		if (raw.Empty() || raw.CStr()[0] != '@')
 			return virtualPath;
 
-		// 1. fs::path로 변환 및 가상 경로 토큰(Alias) 획득
-		// MGFPath가 내부적으로 fs::path를 들고 있으므로 캐스팅을 활용합니다.
-		const fs::path& p = (const fs::path&)virtualPath;
+		// 1. 가상 경로 토큰(Alias) 획득
+		const fs::path& p = virtualPath;
 		auto it = p.begin();
 
 		// 첫 번째 토큰이 Alias입니다. (@Assets 등)

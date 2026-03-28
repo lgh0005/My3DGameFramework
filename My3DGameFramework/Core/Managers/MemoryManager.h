@@ -34,5 +34,7 @@ namespace MGF3D
 		// Linear 기반 메모리 풀 영역 멤버들
 		byte* m_linearMemoryPoolBuffer;
 		Ptr<LinearMemoryPool> m_linearMemoryPool;
+
+		mutable Mutex m_memMutex;
 	};
 }

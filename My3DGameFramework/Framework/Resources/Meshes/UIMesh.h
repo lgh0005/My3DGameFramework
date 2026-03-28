@@ -9,6 +9,14 @@ namespace MGF3D
 	{
 		using Super = Mesh;
 
+	/*==================================//
+	//         Type System              //
+	//==================================*/
+	public:
+		static UniquePtr<MGFType> s_type;
+		static void InitializeType();
+		virtual const MGFType* GetType() const override;
+
 	public:
 		static UIMeshPtr Create(UIMeshDescriptor&& desc);
 		virtual ~UIMesh() override;

@@ -1,8 +1,10 @@
 #include "CorePch.h"
 #include "StreamManager.h"
+#include "Managers/PathManager.h"
 #include "Stream/MemoryStream.h"
 #include "Stream/MemoryStreamBufferPool.h"
 #include "Stream/MemoryStreamBuffer.h"
+#include "Utils/MemoryUtils.h"
 
 namespace MGF3D
 {
@@ -25,6 +27,7 @@ namespace MGF3D
 
 	void StreamManager::Shutdown()
 	{
+		MGF_LOCK_SCOPE(m_streamMutex);
 		if (m_memoryStreamBufferPool) m_memoryStreamBufferPool.Reset();
 		MGF_LOG_INFO("StreamManager: Shutdown successfully.");
 	}
@@ -34,10 +37,11 @@ namespace MGF3D
 	//==================================*/
 	Nullable<FileStreamPtr> StreamManager::OpenRead(const MGFPath& path)
 	{
-		auto fileStream = MakeShared<FileStream>(path, FileMode::Open, FileAccess::Read);
+		MGFPath physicalPath = MGF_PATH.Resolve(path); // TODO : path가 가상경로인지 아닌지에 대해서 처리 필요?
+		auto fileStream = MakeShared<FileStream>(physicalPath, FileMode::Open, FileAccess::Read);
 		if (!fileStream->CanRead())
 		{
-			MGF_LOG_ERROR("StreamManager: Failed to open file for read: {}", path.GetCStr());
+			MGF_LOG_ERROR("StreamManager: Failed to open file for read: {}", physicalPath.GetCStr());
 			return None;
 		}
 
@@ -53,15 +57,23 @@ namespace MGF3D
 		uint64 length = file->GetLength();
 		if (length == 0) return None;
 
-		// 풀에서 규격화된 버퍼를 가져와 직접 Read 수행
-		auto buffer = m_memoryStreamBufferPool->Acquire(static_cast<usize>(length));
-		if (file->Read(buffer->GetPtr(), static_cast<usize>(length)) == length)
+		// 1. [Lock] 버퍼 풀에 접근하기 전에 락을 겁니다.
+		MemoryStreamBufferPtr buffer = nullptr;
 		{
-			// MemoryStream이 해당 버퍼를 소유하며, 소멸 시 자동으로 풀에 반납
-			auto memStream = MakeShared<MemoryStream>(std::move(buffer), static_cast<usize>(length));
-			memStream->SetPosition(0);
-			return memStream;
+			MGF_LOCK_SCOPE(m_streamMutex);
+			buffer = m_memoryStreamBufferPool->Acquire(static_cast<usize>(length));
 		}
+		if (!buffer) return None;
+
+		// 2. 이전 작업의 찌꺼기를 제거합니다.
+		MemoryUtils::Memset(buffer->GetPtr(), 0, buffer->GetCapacity());
+
+		// 3. 데이터 읽기
+		if (file->Read(buffer->GetPtr(), static_cast<usize>(length)) == length)
+        {
+            auto memStream = MakeShared<MemoryStream>(Move(buffer), static_cast<usize>(length));
+            return memStream;
+        }
 
 		MGF_LOG_ERROR("StreamManager: Failed to read all bytes from: {}", path.GetCStr());
 		return None;

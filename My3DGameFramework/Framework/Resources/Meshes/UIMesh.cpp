@@ -7,6 +7,35 @@ namespace MGF3D
 	UIMesh::UIMesh(UIMeshDescriptor& desc) : Super(desc) {}
 	UIMesh::~UIMesh() = default;
 
+	/*==================================//
+	//         Type System              //
+	//==================================*/
+	UniquePtr<MGFType> UIMesh::s_type = nullptr;
+
+	void UIMesh::InitializeType()
+	{
+		s_type = MakeUnique<MGFType>();
+		s_type->name = MGFName("UIMesh");
+		s_type->id = StringHash("UIMesh");
+
+		// 부모인 Mesh의 타입 상속
+		const MGFType* parentType = Mesh::s_type.Get();
+		if (parentType)
+		{
+			s_type->parent = parentType;
+			s_type->depth = parentType->depth + 1;
+
+			for (uint32 i = 0; i <= parentType->depth; ++i)
+				s_type->chain[i] = parentType->chain[i];
+		}
+		s_type->chain[s_type->depth] = s_type->id;
+	}
+
+	const MGFType* UIMesh::GetType() const
+	{
+		return s_type.Get();
+	}
+
 	UIMeshPtr UIMesh::Create(UIMeshDescriptor&& desc)
 	{
 		auto mesh = UIMeshPtr(new UIMesh(desc));

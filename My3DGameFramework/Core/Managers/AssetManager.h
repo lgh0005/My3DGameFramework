@@ -5,8 +5,6 @@
 
 namespace MGF3D
 {
-	MGF_CLASS_PTR(MGFType)
-
 	class AssetManager
 	{
 		MGF_DECLARE_SINGLE(AssetManager)
@@ -30,17 +28,18 @@ namespace MGF3D
 		// 3. 에셋 수동 등록
 		void AddAsset(const AssetPtr& asset);
 
-	private:
-		bool LoadExtensionMap(const MGFPath& configFileName = "FileExtension.json");
-		void ScanDirectoryAsync(const MGFPath& virtualPath);
+		// 4. 비동기 로드 요청
 		AssetPtr LoadAssetAsync(IAssetDescriptorUPtr desc);
 
 	private:
-		SMap<Ptr<MGFType>, IAssetImporterUPtr> m_loaders;
+		bool LoadExtensionMap(const MGFPath& configFileName = "FileExtension.json");
+
+	private:
+		SMap<Ptr<const MGFType>, IAssetImporterUPtr> m_loaders;
 		SMap<StringHash, AssetPtr> m_assets;
 		SMap<StringHash, SString> m_extensionMap;
 
-		Mutex m_mutex;
+		Mutex m_commitMutex;
 		SVector<AssetPtr> m_commitQueue;
 	};
 }

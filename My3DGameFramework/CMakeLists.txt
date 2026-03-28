@@ -6,14 +6,14 @@ add_subdirectory(Core)
 # Level 2: 미들웨어 시스템들
 add_subdirectory(Systems)
 
-# Leve 3: 미들웨어 초기화 및 glfw 컨텍스트 생성
+# Level 3: 미들웨어 초기화 및 glfw 컨텍스트 생성
 add_subdirectory(Middleware)
 
-# Level 4: 컴포넌트와 리소스 모듈
-# add_subdirectory(Framework)
+# Level 4: 엔진 내부의 기본 컴포넌트와 리소스, 머캐닉, 에셋 정의
+add_subdirectory(Framework)
 
-# Level 5: 컴포넌트와 리소스 모듈 활성화
-#add_subdirectory(Bootstrap/Modules)
+# Level 5: 엔진 내부의 기본 컴포넌트와 리소스, 머캐닉, 에셋 타입 빌드 및 기본 설정
+add_subdirectory(Initializer)
 
 # Level 6: 핵심 게임 구성 요소들
 #add_subdirectory(Environment/Rendering)

@@ -42,6 +42,6 @@ namespace MGF3D
 
 		// 버퍼의 실제 용량을 키로 사용하여 해당 버킷 바구니에 다시 넣습니다.
 		usize capacity = buffer->GetCapacity();
-		m_buckets[capacity].PushBack(std::move(buffer));
+		m_buckets[capacity].PushBack(Move(buffer));
 	}
 }
