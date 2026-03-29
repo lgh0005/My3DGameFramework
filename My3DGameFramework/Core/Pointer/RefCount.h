@@ -12,9 +12,9 @@ namespace MGF3D
 		virtual ~RefCount();
 
 	public:
-		void IncRef() const;
-		void DecRef() const;
-		int32 GetRefCount() const;
+		void IncRef();
+		void DecRef();
+		int32 GetRefCount();
 
 	private:
 		mutable Atomic<int32> m_refCount  { 0 };

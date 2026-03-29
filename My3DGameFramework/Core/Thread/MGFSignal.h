@@ -13,7 +13,7 @@ namespace MGF3D
 
     public:
         MGFSignal();
-        virtual ~MGFSignal() override;
+        ~MGFSignal();
 
     public:
         void Set();   // 신호를 보냄 (대기 중인 스레드를 깨움)

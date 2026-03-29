@@ -4,12 +4,11 @@
 namespace MGF3D
 {
 	MGF_CLASS_PTR(MemoryStreamBuffer)
-
 	class MemoryStreamBufferPool : public PoolAlloc
 	{
 	public:
 		MemoryStreamBufferPool();
-		virtual ~MemoryStreamBufferPool() override;
+		~MemoryStreamBufferPool();
 
 	public:
 		MemoryStreamBufferPtr Acquire(usize requiredSize);
@@ -17,6 +16,6 @@ namespace MGF3D
 
 	private:
 		Mutex m_mutex;
-		SMap<usize, SVector<MemoryStreamBufferPtr>> m_buckets;
+		SVector<MemoryStreamBufferPtr> m_buckets[64];
 	};
 }

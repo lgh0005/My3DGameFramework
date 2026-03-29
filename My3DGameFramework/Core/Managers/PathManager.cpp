@@ -26,7 +26,6 @@ namespace MGF3D
 
 	void PathManager::Shutdown()
 	{
-		MGF_LOCK_SCOPE(m_pathMutex);
 		m_virtualPaths.Release();
 		MGF_LOG_INFO("PathManager: Shutdown successfully.");
 	}
@@ -61,7 +60,7 @@ namespace MGF3D
 
 	void PathManager::AddVirtualPath(const MGFName& alias, const MGFPath& actualPath)
 	{
-		MGF_LOCK_SCOPE(m_pathMutex);
+		MGF_SHARED_WRITE_LOCK_SCOPE(m_pathMutex);
 
 		// MGFName에서 StringHash를 꺼내서 키로 사용합니다.
 		StringHash key = alias.GetStringHash();
@@ -93,7 +92,7 @@ namespace MGF3D
 		// 2. 가상 경로 매핑 확인
 		MGFPath resolvedBase;
 		{
-			MGF_LOCK_SCOPE(m_pathMutex);
+			MGF_SHARED_LOCK_SCOPE(m_pathMutex);
 
 			auto ptr = m_virtualPaths.Find(aliasHash);
 			if (!ptr) return virtualPath;

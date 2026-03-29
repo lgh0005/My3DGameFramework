@@ -27,7 +27,6 @@ namespace MGF3D
 
 	void StreamManager::Shutdown()
 	{
-		MGF_LOCK_SCOPE(m_streamMutex);
 		if (m_memoryStreamBufferPool) m_memoryStreamBufferPool.Reset();
 		MGF_LOG_INFO("StreamManager: Shutdown successfully.");
 	}
@@ -57,12 +56,8 @@ namespace MGF3D
 		uint64 length = file->GetLength();
 		if (length == 0) return None;
 
-		// 1. [Lock] 버퍼 풀에 접근하기 전에 락을 겁니다.
-		MemoryStreamBufferPtr buffer = nullptr;
-		{
-			MGF_LOCK_SCOPE(m_streamMutex);
-			buffer = m_memoryStreamBufferPool->Acquire(static_cast<usize>(length));
-		}
+		// 1. 큐와 대기 로직을 제거하고, 내부적으로 락이 구현된 풀에서 즉시 버퍼를 획득합니다.
+		MemoryStreamBufferPtr buffer = m_memoryStreamBufferPool->Acquire(static_cast<usize>(length));
 		if (!buffer) return None;
 
 		// 2. 이전 작업의 찌꺼기를 제거합니다.
@@ -70,10 +65,10 @@ namespace MGF3D
 
 		// 3. 데이터 읽기
 		if (file->Read(buffer->GetPtr(), static_cast<usize>(length)) == length)
-        {
-            auto memStream = MakeShared<MemoryStream>(Move(buffer), static_cast<usize>(length));
-            return memStream;
-        }
+		{
+			auto memStream = MakeShared<MemoryStream>(Move(buffer), static_cast<usize>(length));
+			return memStream;
+		}
 
 		MGF_LOG_ERROR("StreamManager: Failed to read all bytes from: {}", path.GetCStr());
 		return None;

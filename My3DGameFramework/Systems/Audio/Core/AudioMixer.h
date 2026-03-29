@@ -9,7 +9,7 @@ namespace MGF3D
 	{
 	public:
 		AudioMixer(ma_engine& engine);
-		virtual ~AudioMixer() override;
+		~AudioMixer();
 
 	public:
 		bool Init();

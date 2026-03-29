@@ -9,7 +9,7 @@ namespace MGF3D
 	{
 	public:
 		VolumeController(ma_engine& engine);
-		virtual ~VolumeController() override;
+		~VolumeController();
 
 	public:
 		void SetVolume(float volume);

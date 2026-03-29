@@ -26,7 +26,7 @@ set(SOURCES
     "Aliases/Array.h"
     "Aliases/Nullable.h"       "Aliases/Nullable.cpp"        "Aliases/Nullable.inl"
     "Aliases/Delegates.h"
-    "Aliases/Threading.h"
+    "Aliases/Threading.h"      "Aliases/Threading.inl"
 
     # Math
     "Math/Math.h"       "Math/Math.cpp"     "Math/Math.inl"
@@ -69,7 +69,8 @@ set(SOURCES
     "Memory/LinearMemoryPool.h"           "Memory/LinearMemoryPool.cpp"
     "Memory/LinearAllocator.h"           "Memory/LinearAllocator.cpp"      "Memory/LinearAllocator.inl" 
     "Memory/SlabMemoryPool.h"           "Memory/SlabMemoryPool.cpp"
-    "Memory/SlabAllocator.h"           "Memory/SlabAllocator.cpp"      "Memory/SlabAllocator.inl" 
+    "Memory/SlabAllocator.h"           "Memory/SlabAllocator.cpp"      "Memory/SlabAllocator.inl"
+    "Memory/ThreadLocalPool.h"           "Memory/ThreadLocalPool.cpp"
 
     # Module
     "Module/IModuleUnit.h"          "Module/IModuleUnit.cpp"        "Module/IModuleUnit.inl" 
@@ -90,6 +91,10 @@ set(SOURCES
     "Pointer/UniquePtr.h"            "Pointer/UniquePtr.cpp"           "Pointer/UniquePtr.inl"
     "Pointer/SmartPtrCast.h"         "Pointer/SmartPtrCast.cpp"        "Pointer/SmartPtrCast.inl"
     "Pointer/SmartPtrFactory.h"      "Pointer/SmartPtrFactory.cpp"     "Pointer/SmartPtrFactory.inl"
+
+    # Request
+    "Request/MGFRequest.h"            "Request/MGFRequest.cpp"
+    "Request/MpscQueue.h"             "Request/MpscQueue.cpp"       "Request/MpscQueue.inl"
 
     # Resource
     "Resource/IResourceDescriptor.h" "Resource/IResourceDescriptor.cpp"

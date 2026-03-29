@@ -9,7 +9,7 @@ namespace MGF3D
 	{
 	public:
 		AudioEar(ma_engine& engine, uint32 idx = 0);
-		virtual ~AudioEar() override;
+		~AudioEar();
 
 	public:
 

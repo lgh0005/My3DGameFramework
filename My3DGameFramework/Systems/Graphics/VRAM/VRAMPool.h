@@ -8,7 +8,7 @@ namespace MGF3D
 	{
 	public:
 		VRAMPool(uint64 poolSize);
-		virtual ~VRAMPool() override;
+		~VRAMPool();
 
 	public:
 		uint64 Allocate(uint64 size, uint32 alignment);

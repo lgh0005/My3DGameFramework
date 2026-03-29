@@ -25,6 +25,8 @@ namespace MGF3D
 		Ptr<LinearMemoryPool> GetLinearMemoryPool() const noexcept;
 		usize GetTotalSlabUsedMemory() const noexcept;
 
+		void* AllocateLinearChunk(usize size) noexcept;
+
 	private:
 		// Slab 기반 메모리 풀 영역 멤버들
 		int32 GetPoolIndex(usize size) const noexcept; // 크기에 따른 풀의 인덱스를 계산합니다
@@ -35,6 +37,9 @@ namespace MGF3D
 		byte* m_linearMemoryPoolBuffer;
 		Ptr<LinearMemoryPool> m_linearMemoryPool;
 
-		mutable Mutex m_memMutex;
+		// 워커 스레드들이 가질 자신만의 메모리 풀 영역 멤버들 (Linear 기반)
+		byte* m_threadLocalMemoryPoolBuffer;
+		Ptr<LinearMemoryPool> m_threadLocalMemoryPool;
+		Mutex m_threadLocalAllocationMutex;
 	};
 }

@@ -13,7 +13,7 @@ namespace MGF3D
 
 	public:
 		MGFThread();
-		virtual ~MGFThread() override;
+		~MGFThread();
 
 	public:
 		bool Start(const SString& name, Action<> work);

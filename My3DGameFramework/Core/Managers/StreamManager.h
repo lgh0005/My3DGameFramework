@@ -48,7 +48,6 @@ namespace MGF3D
 		);
 
 	private:
-		mutable Mutex m_streamMutex;
 		MemoryStreamBufferPoolUPtr m_memoryStreamBufferPool;
 	};
 }

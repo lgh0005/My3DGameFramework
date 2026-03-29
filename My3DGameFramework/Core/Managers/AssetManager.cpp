@@ -24,22 +24,11 @@ namespace MGF3D
 
 	void AssetManager::Update()
 	{
-		// 1. 메인 스레드 전용 로컬 바구니
-		SVector<AssetPtr> readyToCommit;
-
-		{
-			// 2. 최소화한 임계 영역(Critical Section) : 포인터 교체
-			MGF_LOCK_SCOPE(m_commitMutex);
-			if (m_commitQueue.Empty()) return;
-			readyToCommit.Swap(m_commitQueue);
-		}
-
-		// 3. 이제 락이 없는 상태에서 마음껏 OpenGL API를 호출합니다.
-		for (auto& res : readyToCommit)
+		AssetPtr res;
+		while (m_commitQueue.Pop(res))
 		{
 			if (!res) continue;
 
-			// OnCommit은 반드시 메인 스레드(GL Context)에서 실행됨이 보장됩니다.
 			if (res->OnCommit())
 			{
 				res->SetState(WaitableObjectState::Ready);
@@ -79,7 +68,7 @@ namespace MGF3D
 	{
 		if (!asset) return;
 
-		MGF_LOCK_SCOPE(m_commitMutex);
+		MGF_LOCK_SCOPE(m_cacheMutex);
 		StringHash key = asset->GetName().GetStringHash();
 		if (m_assets.Find(key))
 		{
@@ -132,8 +121,7 @@ namespace MGF3D
 				if (newAsset->OnLoad())
 				{
 					newAsset->SetState(WaitableObjectState::WaitingCommit);
-					MGF_LOCK_SCOPE(m_commitMutex);
-					m_commitQueue.PushBack(newAsset);
+					m_commitQueue.Push(newAsset);
 				}
 				else
 				{

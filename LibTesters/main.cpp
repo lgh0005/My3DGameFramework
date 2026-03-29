@@ -12,6 +12,7 @@
 #include "Managers/TaskManager.h"
 #include "Managers/InputManager.h"
 #include "Managers/VRAMManager.h"
+#include "Memory/ThreadLocalPool.h"
 
 // [에셋 및 리소스 시스템 연동 헤더]
 #include "Layouts/VertexLayout.h"
@@ -47,44 +48,44 @@ int main()
         return -1;
     }
 
-    /*=================================================//
-    // [경합 테스트] SlabMemoryPool 스트레스 테스트         //
-    //=================================================*/
-    {
-        MGF_LOG_INFO("Starting SlabMemoryPool Stress Test...");
+    ///*=================================================//
+    //// [경합 테스트] SlabMemoryPool 스트레스 테스트         //
+    ////=================================================*/
+    //{
+    //    MGF_LOG_INFO("Starting SlabMemoryPool Stress Test...");
 
-        // 1. 특정 사이즈(예: 32바이트)의 전역 슬랩 풀을 가져옵니다.
-        // SlabAllocator가 내부적으로 사용하는 것과 동일한 풀입니다.
-        auto* targetPool = MGF_MEMORY.GetSlabMemoryPool(32);
+    //    // 1. 특정 사이즈(예: 32바이트)의 전역 슬랩 풀을 가져옵니다.
+    //    // SlabAllocator가 내부적으로 사용하는 것과 동일한 풀입니다.
+    //    auto* targetPool = MGF_MEMORY.GetSlabMemoryPool(32);
 
-        const int threadCount = 8;        // 8개의 스레드가 동시에 공격
-        const int iterations = 100000;    // 각 스레드당 10만 번씩 할당/해제 반복
-        SVector<std::thread> testers;
+    //    const int threadCount = 8;        // 8개의 스레드가 동시에 공격
+    //    const int iterations = 100000;    // 각 스레드당 10만 번씩 할당/해제 반복
+    //    SVector<std::thread> testers;
 
-        for (int i = 0; i < threadCount; ++i)
-        {
-            testers.PushBack(std::thread([targetPool, iterations]()
-                {
-                    for (int j = 0; j < iterations; ++j)
-                    {
-                        void* ptr = targetPool->Allocate();
-                        if (ptr)
-                        {
-                            // 할당받자마자 즉시 해제
-                            targetPool->Deallocate(ptr);
-                        }
-                    }
-                }));
-        }
+    //    for (int i = 0; i < threadCount; ++i)
+    //    {
+    //        testers.PushBack(std::thread([targetPool, iterations]()
+    //            {
+    //                for (int j = 0; j < iterations; ++j)
+    //                {
+    //                    void* ptr = targetPool->Allocate();
+    //                    if (ptr)
+    //                    {
+    //                        // 할당받자마자 즉시 해제
+    //                        targetPool->Deallocate(ptr);
+    //                    }
+    //                }
+    //            }));
+    //    }
 
-        // 모든 스레드가 작업을 마칠 때까지 대기
-        for (auto& t : testers)
-        {
-            if (t.joinable()) t.join();
-        }
+    //    // 모든 스레드가 작업을 마칠 때까지 대기
+    //    for (auto& t : testers)
+    //    {
+    //        if (t.joinable()) t.join();
+    //    }
 
-        MGF_LOG_INFO("SlabMemoryPool Stress Test Finished!");
-    }
+    //    MGF_LOG_INFO("SlabMemoryPool Stress Test Finished!");
+    //}
 
     MGF_LOG_INFO("=== MGF3D Integrated System & Window Test ===");
     /*=================================================//
@@ -139,6 +140,8 @@ int main()
         //=================================================*/
         while (!MGF_WINDOW.ShouldClose())
         {
+            MGF3D::ThreadLocalPool::Get()->Reset();
+
             // 0. 시간 업데이트
             MGF_TIME.Update();
 

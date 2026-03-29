@@ -62,6 +62,10 @@ namespace MGF3D
         SDeque<TaskUPtr> m_taskQueue;
 
         // 메인 큐 관련
+        // TODO : 이 부분은 없어도 될 것 같기도 함.
+        // 어차피 AssetManager랑 ResourceManger는 이걸 쓰긴 할텐데
+        // 그건 이미 각 매니저 내부에 구현을 해둘 예정임.
+        // 그런데 다른 데서 쓰고 있을 수 있음.
         Mutex             m_mainMutex;
         SDeque<TaskUPtr> m_mainQueue;
     };

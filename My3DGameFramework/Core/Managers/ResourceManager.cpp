@@ -10,18 +10,10 @@ namespace MGF3D
 
 	void ResourceManager::Update()
 	{
-		// 1. 메인 스레드 전용 로컬 바구니
-		SVector<ResourcePtr> readyToCommit;
+		ResourcePtr res;
 
-		{
-			// 2. 최소화한 임계 영역(Critical Section) : 포인터 교체
-			MGF_LOCK_SCOPE(m_commitMutex);
-			if (m_commitQueue.Empty()) return;
-			readyToCommit.Swap(m_commitQueue);
-		}
-
-		// 3. 이제 락이 없는 상태에서 마음껏 OpenGL API를 호출합니다.
-		for (auto& res : readyToCommit)
+		// 락 없이 원자적 Pop을 통해 큐에 있는 모든 완료된 작업을 소진합니다.
+		while (m_commitQueue.Pop(res))
 		{
 			if (!res) continue;
 
@@ -53,6 +45,7 @@ namespace MGF3D
 	{
 		if (!loader) return;
 
+		MGF_LOCK_SCOPE(m_cacheMutex);
 		if (m_loaders.Find(type))
 		{
 			MGF_LOG_WARN("ResourceManager: Loader for '{}' already registered. Overwriting...", type->name.CStr());
@@ -118,8 +111,7 @@ namespace MGF3D
 				if (newResource->OnLoad())
 				{
 					newResource->SetState(WaitableObjectState::WaitingCommit);
-					MGF_LOCK_SCOPE(m_commitMutex);
-					m_commitQueue.PushBack(newResource);
+					m_commitQueue.Push(newResource);
 				}
 				else
 				{

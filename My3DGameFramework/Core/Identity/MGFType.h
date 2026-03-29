@@ -8,7 +8,7 @@ namespace MGF3D
 	struct MGFType : public PoolAlloc
 	{
 		MGFType();
-		virtual ~MGFType() override;
+		~MGFType();
 
 		MGFName name;
 		StringHash id;

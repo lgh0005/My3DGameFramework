@@ -27,6 +27,8 @@ namespace MGF3D
 			return true;
 		}
 
+		// TODO : 반복 로직은 private 메서드로 뺄 필요가 있음
+
 		/*=============================//
 		//   힙 영역 메모리 풀 (Slab)   //
 		//=============================*/
@@ -69,6 +71,20 @@ namespace MGF3D
 		// 확보한 힙 버퍼를 Stack 전략으로 관리하는 객체 생성
 		m_linearMemoryPool = new LinearMemoryPool(m_linearMemoryPoolBuffer, frameRequirement);
 
+		/*===============================================================//
+		//   워커 스레드들이 가질 자신만의 메모리 풀 영역 멤버들 (Linear)    //
+		//===============================================================*/
+		const usize threadLocalRequirement = 32 * 1024 * 1024;
+		m_threadLocalMemoryPoolBuffer = static_cast<byte*>(::operator new(threadLocalRequirement, MGF3D::alignment(DefaultAlignment), std::nothrow));
+		if (!m_linearMemoryPoolBuffer)
+		{
+			MGF_LOG_FATAL("MemoryManager: Failed to allocate thread local linear buffers! (Out of memory)");
+			Shutdown();
+			return false;
+		}
+
+		m_threadLocalMemoryPool = new LinearMemoryPool(m_threadLocalMemoryPoolBuffer, threadLocalRequirement);
+
 		return true;
 	}
 
@@ -108,8 +124,6 @@ namespace MGF3D
 
 	void* MemoryManager::Allocate(usize size) noexcept
 	{
-		MGF_LOCK_SCOPE(m_memMutex);
-
 		// 1. 관리 범위를 벗어나는 거대 할당은 시스템 힙으로 폴백
 		if (size > SlabMaxSize)
 			return ::operator new(size, MGF3D::alignment(MGF3D::DefaultAlignment));
@@ -121,8 +135,6 @@ namespace MGF3D
 
 	void MemoryManager::Deallocate(void* ptr, usize size) noexcept
 	{
-		MGF_LOCK_SCOPE(m_memMutex);
-
 		if (ptr == nullptr) return;
 
 		// 1. 관리 범위를 벗어나는 거대 할당 해제
@@ -183,5 +195,11 @@ namespace MGF3D
 				total += m_slabMemoryPools[i]->GetUsedMemory();
 		}
 		return total;
+	}
+
+	void* MemoryManager::AllocateLinearChunk(usize size) noexcept
+	{
+		MGF_LOCK_SCOPE(m_threadLocalAllocationMutex);
+		return m_threadLocalMemoryPool->Allocate(size);
 	}
 }

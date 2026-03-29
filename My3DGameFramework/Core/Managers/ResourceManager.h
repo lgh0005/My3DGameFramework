@@ -1,6 +1,7 @@
 ﻿#pragma once
 #include "Resource/Resource.h"
 #include "Resource/IResourceLoader.h"
+#include "Request/MpscQueue.h"
 
 namespace MGF3D
 {
@@ -36,8 +37,9 @@ namespace MGF3D
 		SMap<Ptr<const MGFType>, IResourceLoaderUPtr> m_loaders;
 		SMap<StringHash, ResourcePtr> m_resources;
 
-		Mutex m_commitMutex;
-		SVector<ResourcePtr> m_commitQueue;
+	private:
+		Mutex m_cacheMutex;
+		MpscQueue<ResourcePtr> m_commitQueue;
 	};
 }
 

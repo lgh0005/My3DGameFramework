@@ -24,7 +24,6 @@ namespace MGF3D
 	private:
 		MGFPath m_engineRoot;
 		SMap<StringHash, MGFPath> m_virtualPaths;
-		mutable Mutex m_pathMutex;
-		MGFSignal m_configSignal;
+		mutable SharedMutex m_pathMutex;
 	};
 }

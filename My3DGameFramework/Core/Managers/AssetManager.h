@@ -2,6 +2,7 @@
 #include "Asset/Asset.h"
 #include "Asset/IAssetImporter.h"
 #include "Asset/IAssetDescriptor.h"
+#include "Request/MpscQueue.h"
 
 namespace MGF3D
 {
@@ -39,8 +40,9 @@ namespace MGF3D
 		SMap<StringHash, AssetPtr> m_assets;
 		SMap<StringHash, SString> m_extensionMap;
 
-		Mutex m_commitMutex;
-		SVector<AssetPtr> m_commitQueue;
+	private:
+		Mutex m_cacheMutex;
+		MpscQueue<AssetPtr> m_commitQueue;
 	};
 }
 

@@ -16,7 +16,7 @@ namespace MGF3D
 	public:
 		using InputCallback = Action<>;
 		MGFInputAction(const SString& name);
-		virtual ~MGFInputAction() override;
+		~MGFInputAction();
 
 	public:
 		void AddKeyBinding(int32 keyCode);

@@ -4,8 +4,6 @@
 
 namespace MGF3D
 {
-	PoolAlloc::~PoolAlloc() = default;
-
 	void* PoolAlloc::operator new(usize size) noexcept
 	{
 		return MGF_MEMORY.Allocate(size);

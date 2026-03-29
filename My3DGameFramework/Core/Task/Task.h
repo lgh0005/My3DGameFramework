@@ -11,7 +11,7 @@ namespace MGF3D
     {
     public:
         Task(Action<> work, Action<> onComplete = nullptr);
-        virtual ~Task() override;
+        ~Task();
 
         // 실제 작업을 수행하는 핵심 함수
         void Execute();

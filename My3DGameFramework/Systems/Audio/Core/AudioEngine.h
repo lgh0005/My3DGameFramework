@@ -12,7 +12,7 @@ namespace MGF3D
 	{
 	public:
 		AudioEngine();
-		virtual ~AudioEngine() override;
+		~AudioEngine();
 
 	public:
 		bool Init();

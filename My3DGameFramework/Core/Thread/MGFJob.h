@@ -14,7 +14,7 @@ namespace MGF3D
 
     public:
         MGFJob();
-        virtual ~MGFJob() override;
+        ~MGFJob();
 
     public:
         // 스레드를 실제로 구동합니다.

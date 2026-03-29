@@ -1,7 +1,9 @@
 ﻿#include "CorePch.h"
 #include "JobManager.h"
-#include "TaskManager.h"
 #include "Thread/MGFJob.h"
+#include "Memory/ThreadLocalPool.h"
+#include "Managers/TaskManager.h"
+#include "Managers/MemoryManager.h"
 
 namespace MGF3D
 {
@@ -60,10 +62,14 @@ namespace MGF3D
 
     void JobManager::WorkerLoop(MGFJob* self)
     {
+        MGF3D::ThreadLocalPool::Get();
+
         self->NotifyReady();
 
         while (!m_isShutdown.load())
         {
+            MGF3D::ThreadLocalPool::Get()->Reset();
+
             auto task = MGF_TASK.PopTask();
             
             if (task) task->Execute();
@@ -87,8 +93,6 @@ namespace MGF3D
                 worker->Join();
         }
         m_workers.Release();
-
-        // m_workers.Release(); // INFO : 현재 여기에서 is_block_type_valid 오류를 일으키고 있음
 
         MGF_LOG_INFO("JobManager: All workers have been shut down.");
     }
