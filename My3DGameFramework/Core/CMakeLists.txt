@@ -41,17 +41,24 @@ set(SOURCES
     "Debug/MemoryProfiler.h"      "Debug/MemoryProfiler.cpp"
 
     # Entities
-    #"Entities/ECS/IStorage.h"      "Entities/ECS/IStorage.cpp"  
-    #"Entities/ECS/Storage.h"       "Entities/ECS/Storage.cpp"    "Entities/ECS/Storage.inl"
-    #"Entities/ECS/Chunk.h"         "Entities/ECS/Chunk.cpp"      "Entities/ECS/Chunk.inl"
+    "Entities/ECS/IStorage.h"      "Entities/ECS/IStorage.cpp"  
+    "Entities/ECS/Storage.h"       "Entities/ECS/Storage.cpp"    "Entities/ECS/Storage.inl"
+    "Entities/ECS/Chunk.h"         "Entities/ECS/Chunk.cpp"      "Entities/ECS/Chunk.inl"
 
-    "Entities/Entity/Waitables/IWaitable.h"           "Entities/Entity/Waitables/IWaitable.cpp"
-    "Entities/Entity/Object.h"                             "Entities/Entity/Object.cpp"
+    "Entities/Entity/Object.h"                              "Entities/Entity/Object.cpp" 
+    "Entities/Entity/ObjectPendingQueue.h"                  "Entities/Entity/ObjectPendingQueue.cpp"
+    "Entities/Entity/ObjectStateMachine.h"                  "Entities/Entity/ObjectStateMachine.cpp" 
+    "Entities/Entity/Waitables/IWaitable.h"                 "Entities/Entity/Waitables/IWaitable.cpp"
+
     #"Entities/Entity/Mechanic/Mechanic.h"                  "Entities/Entity/Mechanic/Mechanic.cpp"
     #"Entities/Entity/Mechanic/IMechanicDescriptor.h"       "Entities/Entity/Mechanic/IMechanicDescriptor.cpp"
-    #"Entities/Entity/Component/Component.h"                "Entities/Entity/Component/Component.cpp"
-    #"Entities/Entity/Component/IComponentDescriptor.h"     "Entities/Entity/Component/IComponentDescriptor.cpp"
-    #"Entities/Entity/GameObject/GameObject.h"              "Entities/Entity/GameObject/GameObject.cpp"      "Entities/Entity/GameObject/GameObject.inl" 
+
+    "Entities/Entity/Component/Component.h"                "Entities/Entity/Component/Component.cpp"        "Entities/Entity/Component/Component.inl"
+    "Entities/Entity/Component/IComponentDescriptor.h"     "Entities/Entity/Component/IComponentDescriptor.cpp"
+    "Entities/Entity/Component/ComponentStateMachine.h"    "Entities/Entity/Component/ComponentStateMachine.cpp"
+
+    "Entities/Entity/GameObject/GameObject.h"              "Entities/Entity/GameObject/GameObject.cpp"      "Entities/Entity/GameObject/GameObject.inl" 
+    "Entities/Entity/GameObject/GameObjectStateMachine.h"  "Entities/Entity/GameObject/GameObjectStateMachine.cpp"
 
     # Managers
     "Managers/AssetManager.h"       "Managers/AssetManager.cpp"
@@ -76,7 +83,7 @@ set(SOURCES
     "Module/IModuleUnit.h"          "Module/IModuleUnit.cpp"        "Module/IModuleUnit.inl" 
 
     # Identity
-    "Identity/MGFName.h"            "Identity/MGFName.cpp"
+    "Hashing/InstanceIDHash.h"       "Identity/MGFName.cpp"
     "Identity/MGFPath.h"            "Identity/MGFPath.cpp"
     "Identity/MGFType.h"            "Identity/MGFType.cpp"
 
@@ -85,7 +92,7 @@ set(SOURCES
     "Parsers/YamlParser.h"          "Parsers/YamlParser.cpp"          "Parsers/YamlParser.inl"
 
     # Pointer
-    "Pointer/PoolAlloc.h"             "Pointer/PoolAlloc.cpp"
+    "Pointer/PoolAlloc.h"            "Pointer/PoolAlloc.cpp"
     "Pointer/RefCount.h"             "Pointer/RefCount.cpp"
     "Pointer/SharedPtr.h"            "Pointer/SharedPtr.cpp"           "Pointer/SharedPtr.inl"
     "Pointer/UniquePtr.h"            "Pointer/UniquePtr.cpp"           "Pointer/UniquePtr.inl"
@@ -161,7 +168,8 @@ set(SOURCES
 
     # Hasing
     "Hashing/IHashFunctor.h"        "Hashing/IHashFunctor.cpp"
-    "Hashing/StringHash.h"          "Hashing/StringHash.cpp"
+    "Hashing/InstanceIDHash.h"      "Hashing/InstanceIDHash.cpp"    "Hashing/InstanceIDHash.inl"
+    "Hashing/StringHash.h"          "Hashing/StringHash.cpp"        "Hashing/StringHash.inl"
 
     # Task
     "Task/MGFAsyncResult.h"         "Task/MGFAsyncResult.cpp"          "Task/MGFAsyncResult.inl"

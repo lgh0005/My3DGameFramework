@@ -9,49 +9,45 @@ set(SOURCES
     # 0. Module
     "ComponentModule.h"          "ComponentModule.cpp"  
 
-    # 1. Descriptors
-
-    # 2. Core
+    # 1. Core
     "Core/Transform.h"          "Core/Transform.cpp"
+    "Camera/Camera.h"          "Camera/Camera.cpp"
 
-    # 3. Animator
+    # 2. Animator
     "Animator/Animator.h"          "Animator/Animator.cpp"
 
-    # 4. Audios
+    # 3. Audios
     "Audios/AudioListener.h"          "Audios/AudioListener.cpp"
     "Audios/AudioSource.h"          "Audios/AudioSource.cpp"
 
-    # 5. Camera
-    "Camera/Camera.h"          "Camera/Camera.cpp"
-
-    # 6. Colliders
+    # 4. Colliders
     "Colliders/Collider.h"          "Colliders/Collider.cpp"
     "Colliders/BoxCollider.h"          "Colliders/BoxCollider.cpp"
     "Colliders/SphereCollider.h"          "Colliders/SphereCollider.cpp"
     "Colliders/CapsuleCollider.h"          "Colliders/CapsuleCollider.cpp"
 
-    # 7. Lights
+    # 5. Lights
     "Lights/Light.h"                "Lights/Light.cpp"
     "Lights/DirectionalLight.h"                "Lights/DirectionalLight.cpp"
     "Lights/SpotLight.h"                "Lights/SpotLight.cpp"
     "Lights/PointLight.h"                "Lights/PointLight.cpp"
     "Lights/SkyLight.h"                "Lights/SkyLight.cpp"
 
-    # 8. MeshRenderers
+    # 6. MeshRenderers
     "MeshRenderers/MeshRenderer.h"                "MeshRenderers/MeshRenderer.cpp"
     "MeshRenderers/StaticMeshRenderer.h"          "MeshRenderers/StaticMeshRenderer.cpp"
     "MeshRenderers/SkinnedMeshRenderer.h"         "MeshRenderers/SkinnedMeshRenderer.cpp"
     "MeshRenderers/InstancedMeshRenderer.h"       "MeshRenderers/InstancedMeshRenderer.cpp"
     "MeshRenderers/MeshOutline.h"                "MeshRenderers/MeshOutline.cpp"
 
-    # 9. Rigidbody
+    # 7. Rigidbody
     "Rigidbody/PhysicsComponent.h"                "Rigidbody/PhysicsComponent.cpp"
     "Rigidbody/Rigidbody.h"                       "Rigidbody/Rigidbody.cpp"
     
-    # 10. Script
+    # 8. Script
     "Script/Script.h"             "Script/Script.cpp"             "Script/Script.cpp"
 
-    # 11. UIs
+    # 9. UIs
     "UIs/UICanvas.h"                       "UIs/UICanvas.cpp"
     "UIs/UIImage.h"                       "UIs/UIImage.cpp"
     "UIs/UIRenderer.h"                       "UIs/UIRenderer.cpp"

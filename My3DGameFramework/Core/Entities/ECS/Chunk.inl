@@ -3,14 +3,25 @@
 namespace MGF3D
 {
 	template<typename T>
-	inline Ptr<T> Chunk<T>::Allocate()
+	inline Chunk<T>::Chunk(SlabMemoryPool* pool) : m_allocator(pool)
 	{
-		return m_allocator.allocate(1);
+		m_buffer = m_allocator.allocate(MAX_ITEMS);
 	}
 
 	template<typename T>
-	inline void Chunk<T>::Deallocate(Ptr<T> ptr)
+	inline Chunk<T>::~Chunk()
 	{
-		m_allocator.deallocate(ptr, 1);
+		if (m_buffer)
+		{
+			m_allocator.deallocate(m_buffer, MAX_ITEMS);
+			m_buffer = nullptr;
+		}
+	}
+
+	template<typename T>
+	inline Ptr<T> Chunk<T>::Allocate()
+	{
+		if (IsFull()) return nullptr;
+		return &m_buffer[m_useCount++];
 	}
 }

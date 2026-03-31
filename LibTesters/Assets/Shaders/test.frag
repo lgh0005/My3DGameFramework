@@ -5,5 +5,6 @@ out vec4 FragColor;
 
 void main()
 {
-    FragColor = vec4(TexCoord.x, TexCoord.y, 1.0 - TexCoord.x, 1.0);
+    vec3 color = vec3(TexCoord.x, TexCoord.y, 1.0 - TexCoord.x);
+    FragColor = vec4(color, 1.0);
 }

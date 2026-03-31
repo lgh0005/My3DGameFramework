@@ -1,34 +1,41 @@
 #pragma once
-// #include "Entities/Entity/Component.h"
+#include "Entities/Entity/Component/Component.h"
+#include "Entities/Entity/GameObject/GameObject.h" 
+#include "Entities/ECS/Storage.h"
 
 namespace MGF3D
 {
 	template<typename T>
 	inline Ptr<Storage<T>> EntityManager::GetStorage()
 	{
-		// TODO: 나중에 구상하신 커스텀 RTTI 해시 시스템으로 교체하세요!
-			// 지금은 임시로 컴파일러의 typeid 해시 등을 활용할 수 있습니다.
-		//const size_t typeID = GetTypeID<T>();
+		MGF_STATIC_ASSERT
+		(
+			std::is_base_of_v<Component, T>,
+			"EntityManager::GetStorage<T>: T must inherit from MGF3D::Component!"
+		);
 
-		//if (!m_storages.Contains(typeID))
-		//{
-		//	// Storage 생성 및 UniquePtr로 소유권 확보
-		//	m_storages[typeID] = MakeUnique<Storage<T>>();
-		//}
+		// 1. T 타입의 정적 타입 정보(MGFType) 주소를 키로 사용
+		const MGFType* type = T::s_type.Get();
+		if (!m_storages.Contains(type))
+			m_storages.Insert(type, MakeUnique<Storage<T>>());
 
-		//// 부모 인터페이스(IStorage)를 실제 타입(Storage<T>)으로 캐스팅하여 반환
-		//return static_cast<Storage<T>*>(m_storages[typeID].Get());
-
-		return Ptr<Storage<T>>();
+		return static_cast<Storage<T>*>(m_storages[type].Get());
 	}
 
-	//template<typename T, typename ...Args>
-	//inline Ptr<T> EntityManager::AddComponent(Ptr<GameObject> owner, Args && ...args)
-	//{
-	//	auto* storage = GetStorage<T>();
-	//	Ptr<T> comp = storage->Emplace(std::forward<Args>(args)...);
-	//	comp->SetOwner(owner);
-	//	return comp;
-	//}
+	template<typename T, typename ...Args>
+	inline Ptr<T> EntityManager::AddComponent(Ptr<GameObject> owner, Args && ...args)
+	{
+		// 1. 해당 타입의 스토리지를 가져오거나 생성
+		auto storage = GetStorage<T>();
 
+		// 2. Storage 내부의 Chunk(Slab)에서 메모리를 할당받아 객체 생성
+		Ptr<T> comp = storage->Emplace(std::forward<Args>(args)...);
+
+		// 3. 소유자 설정 및 GameObject 내부 리스트에 추가 (캐스팅 활용)
+		// GameObject에 등록
+		comp->SetOwner(owner);
+		owner->RegisterComponent(comp);
+
+		return comp;
+	}
 }

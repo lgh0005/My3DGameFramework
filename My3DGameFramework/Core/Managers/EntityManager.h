@@ -3,7 +3,7 @@
 
 namespace MGF3D
 {
-	// MGF_CLASS_PTR(GameObject)
+	MGF_CLASS_PTR(GameObject)
 
 	class EntityManager
 	{
@@ -14,18 +14,41 @@ namespace MGF3D
 		~EntityManager();
 
 	public:
-		void OnPartition();
+		bool Init();
+		void Update();
+		void Shutdown();
 
+	/*==========================================//
+	//   Storage & Element Management           //
+	//==========================================*/
 	public:
 		template<typename T> Ptr<Storage<T>> GetStorage();
+		void AddGameObject(UniquePtr<GameObject>&& go);
+		template<typename T, typename... Args>
+		Ptr<T> AddComponent(Ptr<GameObject> owner, Args&&... args);
 
-		//template<typename T, typename... Args>
-		//Ptr<T> AddComponent(Ptr<GameObject> owner, Args&&... args);
+	/*=======================================//
+	//   Object-Processing Methods           //
+	//=======================================*/
+	private:
+		void PartitionObjects();
+		void FixedUpdateObjects();
+		void UpdateObjects();
+		void LateUpdateObjects();
 
-		// TODO : Getcomponent도 추가 고려 필요
+	/*=======================================//
+	//   Pending Queue Processing Methods    //
+	//=======================================*/
+	public:
+		void Clear();
+		void ProcessPendingAddQueue();
+		void ProcessPendingDestroyQueue();
 
 	private:
-		SMap<usize, UniquePtr<IStorage>> m_storages;
+		SMap<Ptr<const MGFType>, UniquePtr<IStorage>> m_storages;
+		SVector<UniquePtr<GameObject>> m_gameObjects;
+		SVector<UniquePtr<GameObject>> m_pendingAddQueue;
+		SVector<Ptr<GameObject>> m_pendingDestroyQueue;
 	};
 }
 

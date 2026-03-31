@@ -1,25 +1,33 @@
-﻿#pragma once
+#pragma once
+#include "Pointer/PoolAlloc.h"
+#include "Hashing/InstanceIDHash.h"
 
 namespace MGF3D
 {
+	MGF_CLASS_PTR(ObjectStateMachine);
+
 	MGF_CLASS_PTR(Object)
-	class Object
+	class Object : public PoolAlloc
 	{
 	public:
 		virtual ~Object();
 
-	/*===============================//
-	//   common life-cycle methods   //
-	//===============================*/
+	/*================================//
+	//      Object State Methods      //
+	//================================*/
 	public:
-		virtual void Awake();
-		virtual void Start();
-		virtual void FixedUpdate();
-		virtual void Update();
-		virtual void LateUpdate();
-		virtual void OnDestroy();
+		Ptr< ObjectStateMachine> GetState() const;
+
+	/*=============================//
+	//      Object ID Methods      //
+	//=============================*/
+	public:
+		InstanceIDHash GetInstanceID() const { return m_instanceID; }
+		void SetInstanceID(InstanceIDHash id) { m_instanceID = id; }
 
 	protected:
 		Object();
+		InstanceIDHash m_instanceID{ 0 };
+		ObjectStateMachineUPtr m_stateMachine { nullptr };
 	};
 }
