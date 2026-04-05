@@ -16,13 +16,16 @@ namespace MGF3D
 		if (m_enabled == enabled) return;
 		m_enabled = enabled;
 		
-		// TODO: 이 시점에 본체가 속한 Storage를 찾아 MarkDirty()를 호출해야 함
-		// 예시:
-		// Ptr<Component> comp = static_cast<Ptr<Component>>(m_owner);
-		// if (auto* storage = Registry::GetStorage(comp->GetType())) 
-		// {
-		//     storage->MarkDirty();
-		// }
+		// 1. 본체(Component)를 가져옵니다.
+		Ptr<Component> comp = static_cast<Ptr<Component>>(m_owner);
+		if (comp == nullptr) return;
+
+		// 2. 자신의 타입 정보(Ptr<const MGFType>)를 획득합니다.
+		auto type = comp->GetType();
+
+		// 3. 해당 타입의 스토리지를 찾아 Dirty 플래그를 세웁니다.
+		auto pStorage = MGF_ENTITY.GetStorageByType(type);
+		if (pStorage != nullptr) pStorage->MarkStorageDirty();
 	}
 
 	bool ComponentStateMachine::IsActive() const

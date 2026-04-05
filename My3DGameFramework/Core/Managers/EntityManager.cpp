@@ -45,6 +45,16 @@ namespace MGF3D
 		MGF_LOG_INFO("EntityManager: All Objects have been cleared.");
 	}
 
+	/*==========================================//
+	//   Storage & Element Management           //
+	//==========================================*/
+	Ptr<IStorage> EntityManager::GetStorageByType(Ptr<const MGFType> type)
+	{
+		auto it = m_storages.Find(type);
+		if (it != nullptr) return it->Get();
+		return nullptr;
+	}
+
 	void EntityManager::AddGameObject(UniquePtr<GameObject>&& go)
 	{
 		if (go) m_pendingAddQueue.PushBack(Move(go));

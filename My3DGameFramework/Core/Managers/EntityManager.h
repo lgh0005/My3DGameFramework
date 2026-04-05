@@ -23,6 +23,7 @@ namespace MGF3D
 	//==========================================*/
 	public:
 		template<typename T> Ptr<Storage<T>> GetStorage();
+		Ptr<IStorage> GetStorageByType(Ptr<const MGFType> type);
 		void AddGameObject(UniquePtr<GameObject>&& go);
 		template<typename T, typename... Args>
 		Ptr<T> AddComponent(Ptr<GameObject> owner, Args&&... args);

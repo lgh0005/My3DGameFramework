@@ -1,5 +1,8 @@
 #include "CorePch.h"
 #include "GameObjectStateMachine.h"
+#include "Entities/Entity/GameObject/GameObject.h"
+#include "Entities/Entity/Component/Component.h"
+#include "Managers/EntityManager.h"
 
 namespace MGF3D
 {
@@ -14,13 +17,16 @@ namespace MGF3D
 		if (m_active == active) return;
 		m_active = active;
 
-		// TODO: 이 시점에 본체가 속한 Storage를 찾아 MarkDirty()를 호출해야 함
-		// 예시:
-		// Ptr<Component> comp = static_cast<Ptr<Component>>(m_owner);
-		// if (auto* storage = Registry::GetStorage(comp->GetType())) 
-		// {
-		//     storage->MarkDirty();
-		// }
+		// 1. 본체(GameObject)를 가져옵니다.
+		Ptr<GameObject> ownerGO = static_cast<Ptr<GameObject>>(m_owner);
+		if (!ownerGO) return;
+
+		// 2. 이 객체가 가진 모든 컴포넌트의 Storage를 찾아 MarkDirty를 호출
+		for (auto& [type, comp] : ownerGO->GetComponents())
+		{
+			auto pStorage = MGF_ENTITY.GetStorageByType(type);
+			if (pStorage) pStorage->MarkStorageDirty();
+		}
 	}
 
 	bool GameObjectStateMachine::IsActive() const

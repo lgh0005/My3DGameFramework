@@ -120,9 +120,8 @@ int main()
             MGF_ENTITY.Update();
 
             // 4. 메인 스레드 일감 작업
-            MGF_TASK.Update();
-
             // 5. 대기 중인 로딩 완료 객체들의 OnCommit을 메인 스레드에서 GPU로 전송
+            MGF_TASK.Update();
             MGF_ASSET.Update();
             MGF_RESOURCE.Update();
 
