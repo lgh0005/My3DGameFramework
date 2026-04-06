@@ -1,0 +1,36 @@
+﻿#include "EnginePch.h"
+#include "InstancedMeshRenderer.h"
+#include "Resources/Meshes/InstancedMesh.h"
+#include "Resources/Material.h"
+#include "Resources/Programs/Program.h"
+#include "Graphics/Layouts/VertexLayout.h"
+
+DECLARE_DEFAULTS_IMPL(InstancedMeshRenderer)
+
+InstancedMeshRendererUPtr InstancedMeshRenderer::Create(InstancedMeshPtr mesh, MaterialPtr material)
+{
+	auto renderer = InstancedMeshRendererUPtr(new InstancedMeshRenderer());
+	if (!renderer->Init(mesh, material)) return nullptr;
+	return std::move(renderer);
+}
+
+bool InstancedMeshRenderer::Init(InstancedMeshPtr mesh, MaterialPtr material)
+{
+	m_mesh = mesh;
+	m_instancedMeshCache = mesh.get();
+	m_material = material;
+	if (!m_mesh || !m_material) return false;
+	return true;
+}
+
+RenderBounds InstancedMeshRenderer::GetWorldBounds() const
+{
+	// TODO : 이후에는 월드 경계를 어떻게 해야 할 지 고민 필요
+	return RenderBounds::Empty();
+}
+
+void InstancedMeshRenderer::Render(Program* program) const
+{
+	if (m_material) m_material->SetToProgram(program);
+	m_instancedMeshCache->Draw();
+}

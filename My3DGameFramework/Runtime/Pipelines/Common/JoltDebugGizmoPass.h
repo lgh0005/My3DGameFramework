@@ -1,0 +1,38 @@
+﻿#pragma once
+#include "Graphics/Rendering/RenderPass.h"
+#include "Graphics/Layouts/Vertex.h"
+#include "Physics/GizmoCommand.h"
+
+#pragma region FORWARD_DECLARATION
+CLASS_PTR(Program)
+CLASS_PTR(DebugMesh)
+#pragma endregion
+
+CLASS_PTR(JoltDebugGizmoPass)
+class JoltDebugGizmoPass : public ContextRenderPass
+{
+public:
+	virtual ~JoltDebugGizmoPass();
+	static JoltDebugGizmoPassUPtr Create(float lineWidth = 1.5f);
+	virtual void Render(RenderContext* context) override;
+
+/*=============================//
+//   gizmo rendering methods   //
+//=============================*/
+private:
+	void RenderDebugLines(const std::vector<GizmoLineCommand>& commands);
+	void RenderDebugTriangles(const std::vector<GizmoTriangleCommand>& commands);
+
+private:
+	JoltDebugGizmoPass();
+	bool Init(float lineWidth);
+
+	ProgramPtr m_debugProgram;
+
+	DebugMeshPtr m_lineMesh;
+	DebugMeshPtr m_triMesh;
+
+	float m_lineWidth	{ 1.5f };
+	std::vector<GizmoVertex> m_lineBatch;
+	std::vector<GizmoVertex> m_triBatch;
+};

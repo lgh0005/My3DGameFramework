@@ -1,0 +1,240 @@
+﻿#include "EnginePch.h"
+#include "IBLUtils.h"
+#include "Resources/Programs/Program.h"
+#include "Resources/Programs/GraphicsProgram.h"
+#include "Resources/Meshes/Mesh.h"
+#include "Resources/Meshes/ScreenMesh.h"
+#include "Resources/Meshes/StaticMesh.h"
+#include "Resources/Textures/CubeTexture.h"
+#include "Resources/Textures/Texture.h"
+#include "Graphics/Framebuffers/CubeFramebuffer.h"
+#include "Graphics/Framebuffers/BRDFLookUpFramebuffer.h"
+#include "Graphics/Geometry/GeometryGenerator.h"
+
+CubeTexturePtr IBLUtils::CreateCubemapFromHDR(Texture* hdrTexture, int32 resolution)
+{
+	// 일회용 유틸성 쉐이더 로드
+	auto sphericalToCubeProgram = RESOURCE.Add<GraphicsProgram>
+	(
+		"ibl_utils_sphericalToCube",
+		"@BuiltInAsset/Shaders/IBLUtils/IBLUtils_Common.vert",
+		"@BuiltInAsset/Shaders/IBLUtils/IBLUtils_Spherical_Map.frag"
+	);
+	if (!sphericalToCubeProgram) return nullptr;
+
+	// 일회용 큐브 메쉬 생성
+	auto cubeMesh = GeometryGenerator::CreateBox();
+	if (!cubeMesh) return nullptr;
+
+	// 결과물을 담을 큐브맵 생성
+	CubeTexturePtr envCubemap = CubeTexture::Create(resolution, resolution, GL_RGB16F, GL_FLOAT);
+	if (!envCubemap) return nullptr;
+
+	// 베이킹 준비 (FBO, 행렬 등)
+	auto captureFBO = CubeFramebuffer::Create(envCubemap);
+	glm::mat4 captureProjection = glm::perspective(glm::radians(90.0f), 1.0f, 0.1f, 10.0f);
+	std::vector<glm::mat4> captureViews =
+	{
+		glm::lookAt(glm::vec3(0.0f), glm::vec3(1.0f,  0.0f,  0.0f), glm::vec3(0.0f, -1.0f,  0.0f)),
+		glm::lookAt(glm::vec3(0.0f), glm::vec3(-1.0f, 0.0f,  0.0f), glm::vec3(0.0f, -1.0f,  0.0f)),
+		glm::lookAt(glm::vec3(0.0f), glm::vec3(0.0f,  1.0f,  0.0f), glm::vec3(0.0f,  0.0f,  1.0f)),
+		glm::lookAt(glm::vec3(0.0f), glm::vec3(0.0f, -1.0f,  0.0f), glm::vec3(0.0f,  0.0f, -1.0f)),
+		glm::lookAt(glm::vec3(0.0f), glm::vec3(0.0f,  0.0f,  1.0f), glm::vec3(0.0f, -1.0f,  0.0f)),
+		glm::lookAt(glm::vec3(0.0f), glm::vec3(0.0f,  0.0f, -1.0f), glm::vec3(0.0f, -1.0f,  0.0f))
+	};
+
+	// 렌더링 (일회용 리소스 사용)
+	sphericalToCubeProgram->Use();
+	sphericalToCubeProgram->SetUniform("tex", 0);
+	glActiveTexture(GL_TEXTURE0);
+	hdrTexture->Bind();
+
+	GLint prevViewport[4];
+	glGetIntegerv(GL_VIEWPORT, prevViewport);
+	glViewport(0, 0, resolution, resolution);
+
+	glDisable(GL_CULL_FACE);
+	for (int i = 0; i < 6; ++i)
+	{
+		sphericalToCubeProgram->SetUniform("transform", captureProjection * captureViews[i]);
+		captureFBO->Bind(i);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		cubeMesh->Draw();
+	}
+	glEnable(GL_CULL_FACE);
+	glEnable(GL_DEPTH_TEST);
+	FramebufferBase::BindToDefault();
+	glViewport(prevViewport[0], prevViewport[1], prevViewport[2], prevViewport[3]);
+
+	// 6. 밉맵 생성
+	envCubemap->GenerateMipmap();
+
+	return envCubemap;
+}
+
+CubeTexturePtr IBLUtils::CreateIrradianceMap(CubeTexture* src)
+{
+	// 일회용 유틸성 쉐이더 로드
+	auto convolutionProgram = RESOURCE.Add<GraphicsProgram>
+	(
+		"ibl_utils_convolution",
+		"@BuiltInAsset/Shaders/IBLUtils/IBLUtils_Common.vert",
+		"@BuiltInAsset/Shaders/IBLUtils/IBLUtils_Diffuse_Irradiance.frag"
+	);
+	if (!convolutionProgram) return nullptr;
+
+	// 일회용 큐브 메쉬 생성
+	auto cubeMesh = GeometryGenerator::CreateBox();
+	if (!cubeMesh) return nullptr;
+
+	// 결과물을 담을 큐브맵 생성
+	int32 resolution = 64;
+	CubeTexturePtr irradianceMap = CubeTexture::Create(resolution, resolution, GL_RGB16F, GL_FLOAT);
+	if (!irradianceMap) return nullptr;
+
+	// 베이킹 준비 (FBO, 행렬)
+	auto captureFBO = CubeFramebuffer::Create(irradianceMap);
+	glm::mat4 captureProjection = glm::perspective(glm::radians(90.0f), 1.0f, 0.1f, 10.0f);
+	std::vector<glm::mat4> captureViews =
+	{
+		glm::lookAt(glm::vec3(0.0f), glm::vec3(1.0f,  0.0f,  0.0f), glm::vec3(0.0f, -1.0f,  0.0f)),
+		glm::lookAt(glm::vec3(0.0f), glm::vec3(-1.0f, 0.0f,  0.0f), glm::vec3(0.0f, -1.0f,  0.0f)),
+		glm::lookAt(glm::vec3(0.0f), glm::vec3(0.0f,  1.0f,  0.0f), glm::vec3(0.0f,  0.0f,  1.0f)),
+		glm::lookAt(glm::vec3(0.0f), glm::vec3(0.0f, -1.0f,  0.0f), glm::vec3(0.0f,  0.0f, -1.0f)),
+		glm::lookAt(glm::vec3(0.0f), glm::vec3(0.0f,  0.0f,  1.0f), glm::vec3(0.0f, -1.0f,  0.0f)),
+		glm::lookAt(glm::vec3(0.0f), glm::vec3(0.0f,  0.0f, -1.0f), glm::vec3(0.0f, -1.0f,  0.0f))
+	};
+
+	// 렌더링 (일회용 리소스 사용)
+	convolutionProgram->Use();
+	convolutionProgram->SetUniform("cubeMap", 0);
+	glActiveTexture(GL_TEXTURE0);
+	src->Bind();
+
+	GLint prevViewport[4];
+	glGetIntegerv(GL_VIEWPORT, prevViewport);
+	glViewport(0, 0, resolution, resolution);
+
+	glDisable(GL_CULL_FACE);
+	for (int i = 0; i < 6; ++i)
+	{
+		convolutionProgram->SetUniform("transform", captureProjection * captureViews[i]);
+		captureFBO->Bind(i);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		cubeMesh->Draw();
+	}
+	glEnable(GL_CULL_FACE);
+	CubeFramebuffer::BindToDefault();
+	glViewport(prevViewport[0], prevViewport[1], prevViewport[2], prevViewport[3]);
+
+	return irradianceMap;
+}
+
+CubeTexturePtr IBLUtils::CreatePrefilteredMap(CubeTexture* src)
+{
+	const uint32 maxMipLevels = 8;
+	const uint32 baseResolution = 512;
+	GLint prevViewport[4];
+	glGetIntegerv(GL_VIEWPORT, prevViewport);
+
+	// 일회용 유틸성 쉐이더 로드
+	auto preFilteredProgram = RESOURCE.Add<GraphicsProgram>
+	(
+		"ibl_utils_prefiltered",
+		"@BuiltInAsset/Shaders/IBLUtils/IBLUtils_Common.vert",
+		"@BuiltInAsset/Shaders/IBLUtils/IBLUtils_Prefiltered_Light.frag"
+	);
+	if (!preFilteredProgram) return nullptr;
+
+	auto cubeMesh = GeometryGenerator::CreateBox();
+	if (!cubeMesh) return nullptr;
+
+
+	CubeTexturePtr preFilteredMap = CubeTexture::Create(baseResolution, baseResolution, 
+														     GL_RGB16F, GL_FLOAT);
+	if (!preFilteredMap) return nullptr;
+	preFilteredMap->GenerateMipmap();
+
+	glm::mat4 captureProjection = glm::perspective(glm::radians(90.0f), 1.0f, 0.1f, 10.0f);
+	std::vector<glm::mat4> captureViews =
+	{
+		glm::lookAt(glm::vec3(0.0f), glm::vec3(1.0f,  0.0f,  0.0f), glm::vec3(0.0f, -1.0f,  0.0f)),
+		glm::lookAt(glm::vec3(0.0f), glm::vec3(-1.0f, 0.0f,  0.0f), glm::vec3(0.0f, -1.0f,  0.0f)),
+		glm::lookAt(glm::vec3(0.0f), glm::vec3(0.0f,  1.0f,  0.0f), glm::vec3(0.0f,  0.0f,  1.0f)),
+		glm::lookAt(glm::vec3(0.0f), glm::vec3(0.0f, -1.0f,  0.0f), glm::vec3(0.0f,  0.0f, -1.0f)),
+		glm::lookAt(glm::vec3(0.0f), glm::vec3(0.0f,  0.0f,  1.0f), glm::vec3(0.0f, -1.0f,  0.0f)),
+		glm::lookAt(glm::vec3(0.0f), glm::vec3(0.0f,  0.0f, -1.0f), glm::vec3(0.0f, -1.0f,  0.0f))
+	};
+
+	preFilteredProgram->Use();
+	preFilteredProgram->SetUniform("cubeMap", 0);
+	glActiveTexture(GL_TEXTURE0);
+	src->Bind();
+
+	glDepthFunc(GL_LEQUAL);
+	glDisable(GL_CULL_FACE);
+	for (uint32 mip = 0; mip < maxMipLevels; mip++)
+	{
+		uint32 mipWidth = baseResolution >> mip;
+		uint32 mipHeight = baseResolution >> mip;
+		auto framebuffer = CubeFramebuffer::Create(preFilteredMap, mip);
+		glViewport(0, 0, mipWidth, mipHeight);
+
+		float roughness = (float)mip / (float)(maxMipLevels - 1);
+		preFilteredProgram->SetUniform("roughness", roughness);
+		for (uint32_t i = 0; i < 6; i++)
+		{
+			preFilteredProgram->SetUniform("transform", captureProjection * captureViews[i]);
+			framebuffer->Bind(i);
+			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+			cubeMesh->Draw();
+		}
+	}
+	glEnable(GL_CULL_FACE);
+	glDepthFunc(GL_LESS);
+	CubeFramebuffer::BindToDefault();
+	glViewport(prevViewport[0], prevViewport[1], prevViewport[2], prevViewport[3]);
+
+	return preFilteredMap;
+}
+
+TexturePtr IBLUtils::CreateBRDFLUT()
+{
+	const uint32 resolution = 512;
+	GLint prevViewport[4];
+	glGetIntegerv(GL_VIEWPORT, prevViewport);
+	glViewport(0, 0, resolution, resolution);
+
+	auto brdfProgram = RESOURCE.Add<GraphicsProgram>
+	(
+		"ibl_utils_brdf_lut",
+		"@BuiltInAsset/Shaders/IBLUtils/IBLUtils_BRDF_Lookup.vert",
+		"@BuiltInAsset/Shaders/IBLUtils/IBLUtils_BRDF_Lookup.frag"
+	);
+	if (!brdfProgram) return nullptr;
+
+	auto lookupFramebuffer = BRDFLookUpFramebuffer::Create(resolution, resolution);
+	if (!lookupFramebuffer) return nullptr;
+
+	lookupFramebuffer->Bind();
+
+	glDisable(GL_DEPTH_TEST);
+	glDisable(GL_CULL_FACE);
+	glDisable(GL_BLEND);
+	glDepthMask(GL_FALSE);
+
+	brdfProgram->Use();
+
+	// 스크린 메쉬
+	auto screen = RESOURCE.Get<ScreenMesh>("Screen");
+	screen->Draw();
+
+	// 복구
+	Framebuffer::BindToDefault();
+	glViewport(prevViewport[0], prevViewport[1], prevViewport[2], prevViewport[3]);
+	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_CULL_FACE);
+	glDepthMask(GL_TRUE);
+
+	return lookupFramebuffer->GetColorAttachment(0);
+}

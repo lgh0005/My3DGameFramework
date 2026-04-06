@@ -1,0 +1,174 @@
+﻿#include "EnginePch.h"
+#include "SSAOPass.h"
+
+#include "Scene/Scene.h"
+#include "Graphics/Rendering/RenderContext.h"
+#include "Components/Camera.h"
+#include "Resources/Textures/Texture.h"
+#include "Resources/Meshes/ScreenMesh.h"
+#include "Resources/Meshes/StaticMesh.h"
+#include "Resources/Programs/Program.h"
+#include "Resources/Programs/GraphicsProgram.h"
+#include "Graphics/Framebuffers/SSAOFramebuffer.h"
+
+DECLARE_DEFAULTS_IMPL(SSAOPass)
+
+SSAOPassUPtr SSAOPass::Create(int32 width, int32 height)
+{
+    auto pass = SSAOPassUPtr(new SSAOPass());
+    if (!pass->Init(width, height)) return nullptr;
+    return std::move(pass);
+}
+
+bool SSAOPass::Init(int32 width, int32 height)
+{
+    m_ssaoProgram = RESOURCE.Add<GraphicsProgram>
+    (
+        "common_ssao",
+        "@BuiltInAsset/Shaders/Common/Common_SSAO.vert",
+        "@BuiltInAsset/Shaders/Common/Common_SSAO_pass.frag"
+    );
+    m_ssaoBlurProgram = RESOURCE.Add<GraphicsProgram>
+    (
+        "common_ssao_blur",
+        "@BuiltInAsset/Shaders/Common/Common_SSAO.vert",
+        "@BuiltInAsset/Shaders/Common/Common_SSAO_blur.frag"
+    );
+    if (!m_ssaoProgram || !m_ssaoBlurProgram) return false;
+
+    // FBO 생성 (우리가 추가한 CreateSSAO 사용)
+    m_ssaoFBO = SSAOFramebuffer::Create(width, height);
+    m_ssaoBlurFBO = SSAOFramebuffer::Create(width, height);
+    if (!m_ssaoFBO || !m_ssaoBlurFBO) return false;
+
+    // 화면 전체를 덮는 Quad 생성
+    m_screenQuad = RESOURCE.Get<ScreenMesh>("Screen");
+    if (!m_screenQuad) return false;
+
+    GenerateKernel();
+    GenerateNoiseTexture();
+
+    // 커널은 초기화할 때 한 번 만 전송
+    m_ssaoProgram->Use();
+    m_ssaoProgram->SetUniform("samples", m_ssaoKernel);
+
+    return true;
+}
+
+void SSAOPass::Resize(int32 width, int32 height)
+{
+    m_ssaoFBO->OnResize(width, height);
+    m_ssaoBlurFBO->OnResize(width, height);
+}
+
+void SSAOPass::Render(RenderContext* context)
+{    
+    // 1. SSAO 계산 (G-Buffer -> Raw SSAO)
+    ComputeSSAO(context);
+
+    // 2. 노이즈 제거 (Raw SSAO -> Blurred SSAO)
+    BlurSSAOResult(context);
+
+    // 3. context에 ssao 결과 캐싱
+    context->SetTexture(RenderSlot::SSAO, m_ssaoBlurFBO->GetColorAttachment(0).get());
+    
+    // 4. 복귀
+    Framebuffer::BindToDefault();
+}
+
+/*==============================//
+//   ssao pass helper methods   //
+//==============================*/
+void SSAOPass::GenerateKernel()
+{
+    std::uniform_real_distribution<float> randomFloats(0.0, 1.0);
+    std::default_random_engine generator;
+
+    for (uint32 i = 0; i < SSAO_KERNEL_SIZE; ++i)
+    {
+        glm::vec3 sample
+        (
+            randomFloats(generator) * 2.0 - 1.0,
+            randomFloats(generator) * 2.0 - 1.0,
+            randomFloats(generator)
+        );
+        sample = glm::normalize(sample);
+        sample *= randomFloats(generator);
+
+        float scale = float(i) / (float)SSAO_KERNEL_SIZE;
+        scale = Utils::Lerp(0.1f, 1.0f, scale * scale);
+        sample *= scale;
+
+        m_ssaoKernel.push_back(sample);
+    }
+}
+
+void SSAOPass::GenerateNoiseTexture()
+{
+    std::uniform_real_distribution<float> randomFloats(0.0, 1.0);
+    std::default_random_engine generator;
+    std::vector<glm::vec3> ssaoNoise;
+
+    const uint32 noiseCount = SSAO_NOISE_DIM * SSAO_NOISE_DIM;
+    for (uint32 i = 0; i < noiseCount; i++)
+    {
+        glm::vec3 noise(
+            randomFloats(generator) * 2.0 - 1.0,
+            randomFloats(generator) * 2.0 - 1.0,
+            0.0f
+        );
+        ssaoNoise.push_back(noise);
+    }
+
+    // Texture::Create를 사용하여 포맷 지정 (GL_RGB16F or GL_RGB32F)
+    // 4x4 크기, 노이즈는 반복되어야 하므로 GL_REPEAT 필수
+    m_noiseTexture = Texture::Create(SSAO_NOISE_DIM, SSAO_NOISE_DIM, GL_RGB16F, GL_RGB, GL_FLOAT);
+    m_noiseTexture->SetFilter(GL_NEAREST, GL_NEAREST);
+    m_noiseTexture->SetWrap(GL_REPEAT, GL_REPEAT);
+
+    // 데이터 업로드 (우리가 추가한 SetData 사용)
+    m_noiseTexture->SetData(ssaoNoise.data());
+}
+
+void SSAOPass::ComputeSSAO(RenderContext* context)
+{
+    Camera* camera = context->GetCamera();
+    Texture* gPos = context->GetTexture(RenderSlot::GPosition);
+    Texture* gNormal = context->GetTexture(RenderSlot::GNormal);
+    if (!camera || !gPos || !gNormal) return;
+
+    m_ssaoFBO->Bind();
+    glViewport(0, 0, m_ssaoFBO->GetWidth(), m_ssaoFBO->GetHeight());
+    glClear(GL_COLOR_BUFFER_BIT);
+
+    m_ssaoProgram->Use();
+
+    // 텍스처 바인딩
+    glActiveTexture(GL_TEXTURE0); gPos->Bind();
+    glActiveTexture(GL_TEXTURE1); gNormal->Bind();
+    glActiveTexture(GL_TEXTURE2); m_noiseTexture->Bind();
+
+    m_ssaoProgram->SetUniform("gPosition", 0);
+    m_ssaoProgram->SetUniform("gNormal", 1);
+    m_ssaoProgram->SetUniform("texNoise", 2);
+
+    // 카메라 행렬 전송 (Context에서 가져온 카메라 사용)
+    m_ssaoProgram->SetUniform("projection", camera->GetProjectionMatrix());
+    m_ssaoProgram->SetUniform("view", camera->GetViewMatrix());
+
+    m_screenQuad->Draw();
+}
+
+void SSAOPass::BlurSSAOResult(RenderContext* context)
+{
+    // SSAO Blur
+    m_ssaoBlurFBO->Bind();
+    glClear(GL_COLOR_BUFFER_BIT);
+
+    m_ssaoBlurProgram->Use();
+    glActiveTexture(GL_TEXTURE0);
+    m_ssaoFBO->GetColorAttachment(0)->Bind();
+    m_ssaoBlurProgram->SetUniform("ssaoInput", 0);
+
+    m_screenQuad->Draw();
+}

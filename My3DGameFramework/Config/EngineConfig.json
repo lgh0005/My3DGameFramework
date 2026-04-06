@@ -1,0 +1,13 @@
+﻿{
+    "virtualPaths": 
+    {
+        "@Config": "Config",
+
+        "@Assets": "Assets",
+        "@BuiltInAsset": "Assets/BuiltIn",
+        "@GameAsset": "Assets/Game",
+
+        "@Virtual": "@Virtual",
+        "@BuiltIn": "@BuiltIn"
+    }
+}

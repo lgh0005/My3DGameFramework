@@ -29,10 +29,6 @@ set(ENGINE_SOURCES
    # Debug
    "Debug/Logger.h"                  "Debug/Logger.cpp"
 
-   # Entity
-   "Entity/Chunk.h"                 "Entity/Chunk.cpp"
-   "Entity/Archetype.h"             "Entity/Archetype.cpp"
-
    # Scene
    "Scene/Scene.h"                   "Scene/Scene.cpp"
    "Scene/GameObjectRegistry.h"      "Scene/GameObjectRegistry.cpp"
@@ -111,7 +107,7 @@ set(ENGINE_SOURCES
    "Graphics/Raycasting/Ray.h"                 "Graphics/Raycasting/Ray.cpp"
    "Graphics/Raycasting/RaycastHit.h"          "Graphics/Raycasting/RaycastHit.cpp"
 
-    "Graphics/Geometry/Frustum.h"             "Graphics/Geometry/Frustum.cpp"
+   "Graphics/Geometry/Frustum.h"             "Graphics/Geometry/Frustum.cpp"
    "Graphics/Geometry/CullingPlane.h"           "Graphics/Geometry/CullingPlane.cpp"
    "Graphics/Geometry/RenderBounds.h"           "Graphics/Geometry/RenderBounds.cpp"
    "Graphics/Geometry/GeometryGenerator.h"   "Graphics/Geometry/GeometryGenerator.cpp"
@@ -218,10 +214,6 @@ set(ENGINE_SOURCES
                    
    "Components/Terrain.h"               "Components/Terrain.cpp"
 
-   # Navigation Mesh
-   "NavMesh/NavigationManager.h"        "NavMesh/NavigationManager.cpp"
-   "NavMesh/NavMeshFunctors.h"          "NavMesh/NavMeshFunctors.cpp"
-
    # UIs
    #"UIs/UIRenderer.h"               "UIs/UIRenderer.cpp"
    #"UIs/UICanvas.h"                 "UIs/UICanvas.cpp"
@@ -237,8 +229,8 @@ set(ENGINE_SOURCES
    "Managers/RenderManager.h"       "Managers/RenderManager.cpp"         "Managers/RenderManager.inl"
    "Managers/AudioManager.h"        "Managers/AudioManager.cpp"
    "Managers/PhysicsManager.h"      "Managers/PhysicsManager.cpp"
-   "Managers/UIManager.h"           "Managers/UIManager.cpp"
-   "Managers/EntityManager.h"           "Managers/EntityManager.cpp"
+   #"Managers/UIManager.h"           "Managers/UIManager.cpp"
+   #"Managers/EntityManager.h"           "Managers/EntityManager.cpp"
    "Managers/InstanceManager.h"      "Managers/InstanceManager.cpp"
    "Managers/LuaManager.h"      "Managers/LuaManager.cpp"
 )
@@ -264,18 +256,12 @@ target_link_libraries(Engine PUBLIC
     spdlog::spdlog
     assimp::assimp
     KTX::ktx
-    Freetype::Freetype
+    # Freetype::Freetype
     Jolt::Jolt
     nlohmann_json::nlohmann_json
     ryml::ryml
     lua
     sol2::sol2
-
-    RecastNavigation::Recast
-    RecastNavigation::Detour
-    RecastNavigation::DetourCrowd
-    RecastNavigation::DetourTileCache
-    RecastNavigation::DebugUtils
 )
 
 # 컴파일 정의
