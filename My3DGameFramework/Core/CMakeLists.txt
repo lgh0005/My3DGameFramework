@@ -53,6 +53,10 @@ set(SOURCES
     #"Entities/Entity/Mechanic/Mechanic.h"                  "Entities/Entity/Mechanic/Mechanic.cpp"
     #"Entities/Entity/Mechanic/IMechanicDescriptor.h"       "Entities/Entity/Mechanic/IMechanicDescriptor.cpp"
 
+    "Entities/Entity/Transform/Transform.h"                "Entities/Entity/Transform/Transform.cpp"
+    "Entities/Entity/Transform/TransformDescriptor.h"      "Entities/Entity/Transform/TransformDescriptor.cpp"
+    "Entities/Entity/Transform/TransformStorage.h"         "Entities/Entity/Transform/TransformStorage.cpp"
+
     "Entities/Entity/Component/Component.h"                "Entities/Entity/Component/Component.cpp"        "Entities/Entity/Component/Component.inl"
     "Entities/Entity/Component/IComponentDescriptor.h"     "Entities/Entity/Component/IComponentDescriptor.cpp"
     "Entities/Entity/Component/ComponentStateMachine.h"    "Entities/Entity/Component/ComponentStateMachine.cpp"
@@ -185,6 +189,7 @@ set(SOURCES
     # Utils
     "Utils/MemoryUtils.h"           "Utils/MemoryUtils.cpp"         "Utils/MemoryUtils.inl"
     "Utils/StringUtils.h"           "Utils/StringUtils.cpp"         "Utils/StringUtils.inl"
+    "Utils/TransformUtils.h"        "Utils/TransformUtils.cpp"
 ) 
 
 # 2. 빌드 타겟 생성 및 별칭 등록

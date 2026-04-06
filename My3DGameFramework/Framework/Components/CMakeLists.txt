@@ -9,49 +9,50 @@ set(SOURCES
     # 0. Module
     "ComponentModule.h"          "ComponentModule.cpp"  
 
+    # 1. Descriptors
+
     # 1. Core
-    "Core/Transform.h"          "Core/Transform.cpp"
-    "Camera/Camera.h"          "Camera/Camera.cpp"
+    #"Core/Collider.h"             "Core/Collider.cpp"
+    #"Core/Camera.h"               "Core/Camera.cpp"
+    #"Core/MeshRenderer.h"         "Core/MeshRenderer.cpp"
+    #"Core/Light.h"                "Core/Light.cpp"
+    #"Core/PhysicsComponent.h"     "Core/PhysicsComponent.cpp"
 
     # 2. Animator
-    "Animator/Animator.h"          "Animator/Animator.cpp"
+    #"Animator/Animator.h"              "Animator/Animator.cpp"
 
     # 3. Audios
-    "Audios/AudioListener.h"          "Audios/AudioListener.cpp"
-    "Audios/AudioSource.h"          "Audios/AudioSource.cpp"
+    #"Audios/AudioListener.h"           "Audios/AudioListener.cpp"
+    #"Audios/AudioSource.h"             "Audios/AudioSource.cpp"
 
     # 4. Colliders
-    "Colliders/Collider.h"          "Colliders/Collider.cpp"
-    "Colliders/BoxCollider.h"          "Colliders/BoxCollider.cpp"
-    "Colliders/SphereCollider.h"          "Colliders/SphereCollider.cpp"
-    "Colliders/CapsuleCollider.h"          "Colliders/CapsuleCollider.cpp"
+    #"Colliders/BoxCollider.h"          "Colliders/BoxCollider.cpp"
+    #"Colliders/SphereCollider.h"       "Colliders/SphereCollider.cpp"
+    #"Colliders/CapsuleCollider.h"      "Colliders/CapsuleCollider.cpp"
 
     # 5. Lights
-    "Lights/Light.h"                "Lights/Light.cpp"
-    "Lights/DirectionalLight.h"                "Lights/DirectionalLight.cpp"
-    "Lights/SpotLight.h"                "Lights/SpotLight.cpp"
-    "Lights/PointLight.h"                "Lights/PointLight.cpp"
-    "Lights/SkyLight.h"                "Lights/SkyLight.cpp"
+    #"Lights/DirectionalLight.h"                "Lights/DirectionalLight.cpp"
+    #"Lights/SpotLight.h"                "Lights/SpotLight.cpp"
+    #"Lights/PointLight.h"                "Lights/PointLight.cpp"
+    #"Lights/SkyLight.h"                "Lights/SkyLight.cpp"
 
     # 6. MeshRenderers
-    "MeshRenderers/MeshRenderer.h"                "MeshRenderers/MeshRenderer.cpp"
-    "MeshRenderers/StaticMeshRenderer.h"          "MeshRenderers/StaticMeshRenderer.cpp"
-    "MeshRenderers/SkinnedMeshRenderer.h"         "MeshRenderers/SkinnedMeshRenderer.cpp"
-    "MeshRenderers/InstancedMeshRenderer.h"       "MeshRenderers/InstancedMeshRenderer.cpp"
-    "MeshRenderers/MeshOutline.h"                "MeshRenderers/MeshOutline.cpp"
+    #"MeshRenderers/StaticMeshRenderer.h"          "MeshRenderers/StaticMeshRenderer.cpp"
+    #"MeshRenderers/SkinnedMeshRenderer.h"         "MeshRenderers/SkinnedMeshRenderer.cpp"
+    #"MeshRenderers/InstancedMeshRenderer.h"       "MeshRenderers/InstancedMeshRenderer.cpp"
+    #"MeshRenderers/MeshOutline.h"                "MeshRenderers/MeshOutline.cpp"
 
     # 7. Rigidbody
-    "Rigidbody/PhysicsComponent.h"                "Rigidbody/PhysicsComponent.cpp"
-    "Rigidbody/Rigidbody.h"                       "Rigidbody/Rigidbody.cpp"
+    #"Rigidbody/Rigidbody.h"                       "Rigidbody/Rigidbody.cpp"
     
     # 8. Script
-    "Script/Script.h"             "Script/Script.cpp"             "Script/Script.cpp"
+    #"Script/Script.h"             "Script/Script.cpp"             "Script/Script.cpp"
 
     # 9. UIs
-    "UIs/UICanvas.h"                       "UIs/UICanvas.cpp"
-    "UIs/UIImage.h"                       "UIs/UIImage.cpp"
-    "UIs/UIRenderer.h"                       "UIs/UIRenderer.cpp"
-    "UIs/UIText.h"                       "UIs/UIText.cpp"
+    #"UIs/UICanvas.h"                       "UIs/UICanvas.cpp"
+    #"UIs/UIImage.h"                       "UIs/UIImage.cpp"
+    #"UIs/UIRenderer.h"                       "UIs/UIRenderer.cpp"
+    #"UIs/UIText.h"                       "UIs/UIText.cpp"
 )
 
 # 2. 빌드 타겟 생성 및 별칭 등록
@@ -68,7 +69,7 @@ target_include_directories(${LIB_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 target_link_libraries(${LIB_NAME} 
 
 PUBLIC
-    # Engine::Core
+    Engine::Core
 )
 
 # 6. PCH (Precompiled Header) 설정

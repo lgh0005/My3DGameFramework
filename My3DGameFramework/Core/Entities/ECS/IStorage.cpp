@@ -8,7 +8,7 @@ namespace MGF3D
 		m_isStorageDirty = true;
 	}
 
-	bool IStorage::IsDirty() const
+	bool IStorage::IsStorageDirty() const
 	{
 		return m_isStorageDirty;
 	}

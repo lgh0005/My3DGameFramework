@@ -31,6 +31,8 @@ namespace MGF3D
 	public:
 		void SetStorageIndex(usize index) { m_storageIndex = index; }
 		usize GetStorageIndex() const { return m_storageIndex; }
+		void SetTransformIndex(usize index) { m_transformIndex = index; }
+		usize GetTransformIndex() const { return m_transformIndex; }
 
 	/*================================//
 	//   GameObject state utilities   //
@@ -42,6 +44,7 @@ namespace MGF3D
 	private:
 		GameObject();
 		Ptr<GameObject> Init(UniquePtr<GameObject>&& self);
+		usize m_transformIndex{ static_cast<usize>(-1) };
 		ComponentCache m_components;
 		usize		   m_storageIndex{ 0 };
 	};

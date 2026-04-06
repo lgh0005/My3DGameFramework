@@ -6,7 +6,7 @@
 namespace MGF3D
 {
 	Component::Component(const IComponentDescriptor& desc)
-		: m_type(desc.type), m_name(desc.name) 
+		: m_owner(desc.owner), m_type(desc.type), m_name(desc.name) 
 	{
 		m_stateMachine = MakeUnique<ComponentStateMachine>(this);
 	}

@@ -20,7 +20,7 @@ namespace MGF3D
 
 	public:
 		void MarkStorageDirty();
-		bool IsDirty()		     const;
+		bool IsStorageDirty()	 const;
 		usize GetActiveCount()   const;
 
 	protected:

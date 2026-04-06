@@ -60,8 +60,8 @@ namespace MGF3D
 
 	protected:
 		Component(const IComponentDescriptor& desc);
-		Ptr<GameObject>	   m_owner{ nullptr };
 		usize			   m_storageIndex{ 0 };
+		Ptr<GameObject>	   m_owner{ nullptr };
 		const Ptr<MGFType> m_type;
 		MGFName			   m_name;
 	};

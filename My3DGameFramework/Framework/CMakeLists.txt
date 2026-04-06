@@ -2,7 +2,7 @@
 # add_subdirectory(Mechanics)
 add_subdirectory(Resources)
 add_subdirectory(Assets)
-# add_subdirectory(Components)
+add_subdirectory(Components)
 
 # 2. 통합 INTERFACE 생성
 add_library(FrameworkLib INTERFACE)

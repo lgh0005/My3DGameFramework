@@ -1,5 +1,6 @@
 ﻿#pragma once
 #include "Entities/ECS/Storage.h"
+#include "Entities/Entity/Transform/TransformStorage.h"
 
 namespace MGF3D
 {
@@ -45,8 +46,22 @@ namespace MGF3D
 		void ProcessPendingAddQueue();
 		void ProcessPendingDestroyQueue();
 
+	/*===================================//
+	//   Transform Management Methods    //
+	//====================================*/
+	public:
+		// Transform 생성 및 제어 인터페이스
+		usize CreateTransform(Ptr<GameObject> owner, const Position& pos, const Rotation& rot, const Scale& scale);
+		void SetTransformParent(usize childIndex, usize parentIndex);
+
+		// 외부에서 Transform 데이터에 접근할 때 사용
+		Transform* GetTransform(usize index);
+		void RemoveTransform(usize index);
+
 	private:
+		TransformStorage m_transformStorage;
 		SMap<Ptr<const MGFType>, UniquePtr<IStorage>> m_storages;
+
 		SVector<UniquePtr<GameObject>> m_gameObjects;
 		SVector<UniquePtr<GameObject>> m_pendingAddQueue;
 		SVector<Ptr<GameObject>> m_pendingDestroyQueue;
