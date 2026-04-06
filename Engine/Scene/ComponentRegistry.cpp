@@ -23,7 +23,6 @@
 #include "Components/BoxCollider.h"
 #include "Components/SphereCollider.h"
 #include "Components/Rigidbody.h"
-#include "UIs/UICanvas.h"
 
 ComponentRegistry::ComponentRegistry() = default;
 ComponentRegistry::~ComponentRegistry()
