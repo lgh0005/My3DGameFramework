@@ -5,12 +5,21 @@ struct GLFWwindow;
 
 namespace MGF3D
 {
+    MGF_STRUCT_PTR(MGFType)
+
     MGF_CLASS_PTR(MGFInputDevice)
     class MGFInputDevice
     {
     public:
         MGFInputDevice(const String& name);
         virtual ~MGFInputDevice();
+
+    /*================================//
+    //    MGFInputDevice Custom Type  //
+    //================================*/
+    public:
+        static int16 s_typeIndex;
+        virtual const MGFType* GetType() const;
 
     public:
         virtual bool Init() = 0;

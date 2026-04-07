@@ -50,8 +50,8 @@
 #include "Defines/DefineDisables.h"
 #include "Defines/DefineSingleton.h"
 #include "Defines/DefineUtilities.h"
-#include "Defines/DefineManagers.h"
 #include "Defines/DefineHash.h"
+#include "Defines/DefineManagers.h"
 
 /*==============================//
 //    Engine common debuggers   //
@@ -63,18 +63,17 @@
 #include "Debug/Stopwatch.h"
 #include "Defines/DefineTimeStamp.h"
 
-/*===============================//
-//    Engine common identities   //
-//===============================*/
-#include "Identities/MGFName.h"
-#include "Identities/MGFPath.h"
-#include "Identities/MGFType.h"
-
 /*===========================//
 //    Engine common hashes   //
 //===========================*/
 #include "Hashes/StringHash.h"
 #include "Hashes/TypeHash.h"
+
+/*===============================//
+//    Engine common identities   //
+//===============================*/
+#include "Identities/MGFPath.h"
+#include "Identities/MGFType.h"
 
 /*==============================//
 //    Engine common utilities   //

@@ -14,6 +14,13 @@ namespace MGF3D
 		MGFMouseDevice(const String& name);
 		virtual ~MGFMouseDevice() override;
 
+	/*================================//
+	//    MGFMouseDevice Custom Type  //
+	//================================*/
+	public:
+		static int16 s_typeIndex;
+		virtual const MGFType* GetType() const override;
+
 	public:
 		virtual bool Init() override;
 		virtual void Update(GLFWwindow* window) override;

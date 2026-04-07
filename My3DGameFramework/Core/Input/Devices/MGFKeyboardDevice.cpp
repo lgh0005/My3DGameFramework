@@ -1,6 +1,8 @@
 #include "CorePch.h"
 #include "MGFKeyboardDevice.h"
 #include "Input/Actions/MGFKeyAction.h"
+#include "Managers/TypeManager.h"
+#include "Identities/MGFTypeTree.h"
 #include <GLFW/glfw3.h>
 
 namespace MGF3D
@@ -15,6 +17,17 @@ namespace MGF3D
 	{
 		// 초기화 시 특별히 할당이 필요한 자원이 있다면 여기서 처리
 		return true;
+	}
+
+	/*====================================//
+	//    MGFKeyboardDevice Custom Type   //
+	//====================================*/
+	int16 MGFKeyboardDevice::s_typeIndex = -1;
+	const MGFType* MGFKeyboardDevice::GetType() const
+	{
+		MGFTypeTree* tree = MGF_TYPE.GetTree("Device");
+		if (tree != nullptr) return tree->GetType(s_typeIndex);
+		return nullptr;
 	}
 
 	void MGFKeyboardDevice::Update(GLFWwindow* window)

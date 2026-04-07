@@ -3,7 +3,7 @@
 /*======================================//
 //     Default Core Module Managers     //
 //======================================*/
-#define MGF_GLFW    GLFWManager::Instance()
-#define MGF_INPUT   InputManager::Instance()
-#define MGF_TIME    TimeManager::Instance()
-#define MGF_WINDOW  WindowManager::Instance()
+#define MGF_INPUT    ::MGF3D::InputManager::Instance()
+#define MGF_TIME     ::MGF3D::TimeManager::Instance()
+#define MGF_WINDOW   ::MGF3D::WindowManager::Instance()
+#define MGF_TYPE     ::MGF3D::TypeManager::Instance()

@@ -5,6 +5,7 @@ set(TARGET_NAME Engine::${MODULE_NAME})
 
 # 1. 소스 파일 목록 정의
 set(SOURCES
+
     # pch
     "CorePch.cpp"
 
@@ -52,17 +53,17 @@ set(SOURCES
     "Window/MGFWindow.h"           "Window/MGFWindow.cpp"
 
     # Managers
-    "Managers/GLFWManager.h"      "Managers/GLFWManager.cpp"
     "Managers/InputManager.h"      "Managers/InputManager.cpp"        "Managers/InputManager.inl"
     #"Managers/PathManager.h"      "Managers/PathManager.cpp"
     #"Managers/ThreadManager.h"      "Managers/ThreadManager.cpp"
+    "Managers/TypeManager.h"      "Managers/TypeManager.cpp"
     "Managers/TimeManager.h"      "Managers/TimeManager.cpp"
     "Managers/WindowManager.h"      "Managers/WindowManager.cpp"
 
     # Identities
-     #"Identities/MGFName.h"      "Identities/MGFName.cpp"
-    #"Identities/MGFPath.h"      "Identities/MGFPath.cpp"
-    #"Identities/MGFType.h"      "Identities/MGFType.cpp"
+    "Identities/MGFPath.h"      "Identities/MGFPath.cpp"
+    "Identities/MGFType.h"      "Identities/MGFType.cpp"
+    "Identities/MGFTypeTree.h"      "Identities/MGFTypeTree.cpp"
 
     # Hashes
     "Hashes/IHashFunctor.h"      "Hashes/IHashFunctor.cpp"
@@ -75,6 +76,10 @@ set(SOURCES
     "CoreUtils/GraphicsUtils.h"    "CoreUtils/GraphicsUtils.cpp"     
     # "CoreUtils/LuaBindingUtils.h"      "CoreUtils/LuaBindingUtils.cpp"  
     "CoreUtils/MathUtils.h"        "CoreUtils/MathUtils.cpp" 
+
+    # Module
+    "Module/IModuleInterface.h"     "Module/IModuleInterface.cpp"
+    "CoreModule.h"       "CoreModule.cpp"
 ) 
 
 # 2. 빌드 타겟 생성 및 별칭 등록

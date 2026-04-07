@@ -1,6 +1,8 @@
 #include "CorePch.h"
 #include "MGFMouseDevice.h"
 #include "Input/Actions/MGFMouseAction.h"
+#include "Managers/TypeManager.h"
+#include "Identities/MGFTypeTree.h"
 #include <GLFW/glfw3.h>
 
 namespace MGF3D
@@ -9,6 +11,17 @@ namespace MGF3D
 	MGFMouseDevice::~MGFMouseDevice()
 	{
 		Shutdown();
+	}
+
+	/*================================//
+	//    MGFMouseDevice Custom Type  //
+	//================================*/
+	int16 MGFMouseDevice::s_typeIndex = -1;
+	const MGFType* MGFMouseDevice::GetType() const
+	{
+		MGFTypeTree* tree = MGF_TYPE.GetTree("Device");
+		if (tree != nullptr) return tree->GetType(s_typeIndex);
+		return nullptr;
 	}
 
 	bool MGFMouseDevice::Init()
