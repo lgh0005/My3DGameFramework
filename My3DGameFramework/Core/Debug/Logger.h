@@ -5,25 +5,36 @@ namespace MGF3D
 {
 	class Logger
 	{
-		DECLARE_SINGLE(Logger)
-		DECLARE_NONINSTANTIABLE(Logger)
-		using SPDLoggerPtr = std::shared_ptr<spdlog::logger>;
+		MGF_DECLARE_UTILITIES(Logger)
+		using SPDLoggerPtr = SharedPtr<spdlog::logger>;
 
 	public:
-		void Init();
-		void Clear();
-		SPDLoggerPtr GetLogger() { return m_logger; }
+		static void _Internal_Init();
+		static void _Internal_Clear();
+		static void _Internal_Flush();
+
+	/*=============================//
+	//   default logging methods   //
+	//=============================*/
+	public:
+		template<typename... Args>
+		static void _Internal_LogTrace(fmt::format_string<Args...> fmt, Args&&... args);
+
+		template<typename... Args>
+		static void _Internal_LogInfo(fmt::format_string<Args...> fmt, Args&&... args);
+
+		template<typename... Args>
+		static void _Internal_LogWarn(fmt::format_string<Args...> fmt, Args&&... args);
+
+		template<typename... Args>
+		static void _Internal_LogError(fmt::format_string<Args...> fmt, Args&&... args);
+
+		template<typename... Args>
+		static void _Internal_LogFatal(fmt::format_string<Args...> fmt, Args&&... args);
 
 	private:
-		SPDLoggerPtr m_logger;
+		static SPDLoggerPtr m_logger;
 	};
 }
 
-/*===================//
-//   Logger macros   //
-//===================*/
-#define MGF_LOG_TRACE(...)    ::MGF3D::Logger::Instance().GetLogger()->trace(__VA_ARGS__)
-#define MGF_LOG_INFO(...)     ::MGF3D::Logger::Instance().GetLogger()->info(__VA_ARGS__)
-#define MGF_LOG_WARN(...)     ::MGF3D::Logger::Instance().GetLogger()->warn(__VA_ARGS__)
-#define MGF_LOG_ERROR(...)    ::MGF3D::Logger::Instance().GetLogger()->error(__VA_ARGS__)
-#define MGF_LOG_FATAL(...)    ::MGF3D::Logger::Instance().GetLogger()->critical(__VA_ARGS__)
+#include "Debug/Logger.inl"

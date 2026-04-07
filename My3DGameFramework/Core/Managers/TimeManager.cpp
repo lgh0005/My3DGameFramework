@@ -1,0 +1,63 @@
+﻿#include "CorePch.h"
+#include "TimeManager.h"
+#include <GLFW/glfw3.h>
+
+namespace MGF3D
+{
+    TimeManager::TimeManager() = default;
+    TimeManager::~TimeManager() = default;
+
+    void TimeManager::Init()
+    {
+        m_lastTime = glfwGetTime();
+        m_currentTime = m_lastTime;
+        m_deltaTime = 0.0f;
+    }
+
+    void TimeManager::Update()
+    {
+        m_currentTime = glfwGetTime();
+        m_deltaTime = static_cast<float>(m_currentTime - m_lastTime);
+
+        // [Spiral of Death 방지]
+        // TODO : 이거 Math::Lerp같은 걸로 0.25로 짤라둘 필요 있음
+        if (m_deltaTime > m_maxFrameTime)
+            m_deltaTime = m_maxFrameTime;
+
+        m_lastTime = m_currentTime;
+        m_accumulator += m_deltaTime;
+        CalculateFPS();
+    }
+
+    void TimeManager::FixedUpdate()
+    {
+        while (m_accumulator >= static_cast<double>(m_fixedDeltaTime))
+        {
+            // TODO : 이후의 컴포넌트이 FixedUpdate를 처리하는 곳
+            m_accumulator -= static_cast<double>(m_fixedDeltaTime);
+        }
+    }
+
+    void TimeManager::CalculateFPS()
+    {
+        m_frameCount++;
+        if (m_currentTime - m_fpsLastTime >= 1.0)
+        {
+            m_fps = static_cast<float>(m_frameCount) / static_cast<float>(m_currentTime - m_fpsLastTime);
+            m_frameCount = 0;
+            m_fpsLastTime = m_currentTime;
+        }
+    }
+
+    bool TimeManager::CheckFixedUpdate()
+    {
+        // 누적된 시간이 고정 시간(1/60초)보다 크다면
+        if (m_accumulator >= m_fixedDeltaTime)
+        {
+            // 고정 시간만큼 덜어내고 true 반환
+            m_accumulator -= m_fixedDeltaTime;
+            return true;
+        }
+        return false;
+    }
+}

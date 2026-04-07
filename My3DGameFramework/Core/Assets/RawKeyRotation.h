@@ -2,7 +2,7 @@
 
 namespace MGF3D
 {
-	struct RawKeyScale
+	struct RawKeyRotation
 	{
 		quat rotation;
 		float time;

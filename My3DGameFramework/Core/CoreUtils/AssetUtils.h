@@ -1,39 +1,45 @@
 ﻿#pragma once
-#include "AssetFormat.h"
+#include "Assets/RawMaterial.h"
+#include "Assets/RawMesh.h"
+#include "Assets/RawNode.h"
+#include "Assets/RawKeyPosition.h"
+#include "Assets/RawKeyRotation.h"
+#include "Assets/RawAnimation.h"
 
 namespace MGF3D
 {
 	class AssetUtils
 	{
-		DECLARE_STATIC_CLASS(AssetUtils)
+		MGF_DECLARE_UTILITIES(AssetUtils)
 
 	/*=============================//
 	//  File writing util methods  //
 	//=============================*/
 	public:
-		template<typename T> static void WriteData(std::ofstream& file, const T& data);
-		template<typename T> static void WriteVector(std::ofstream& file, const std::vector<T>& vec);
-		static void WriteString(std::ofstream& file, const std::string& str);
+		template<typename T> static void WriteData(OutputFileStream& file, const T& data);
+		template<typename T> static void WriteVector(OutputFileStream& file, const Vector<T>& vec);
+		static void WriteString(OutputFileStream& file, const String& str);
 
 	/*=============================//
 	//  File reading util methods  //
 	//=============================*/
 	public:
-		template<typename T> static void ReadData(std::ifstream& file, T& data);
-		template<typename T> static T ReadData(std::ifstream& file);
-		template<typename T> static void ReadVector(std::ifstream& file, std::vector<T>& vec);
-		static std::string ReadString(std::ifstream& file);
+		template<typename T> static void ReadData(InputFileStream& file, T& data);
+		template<typename T> static T ReadData(InputFileStream& file);
+		template<typename T> static void ReadVector(InputFileStream& file, Vector<T>& vec);
+		static String ReadString(InputFileStream& file);
 
 	/*==================================//
 	//  asset format read util methods  //
 	//==================================*/
 	public:
-		static AssetFmt::RawMaterial ReadRawMaterial(std::ifstream& file);
-		static AssetFmt::RawMesh ReadRawMesh(std::ifstream& file);
-		static std::vector<AssetFmt::RawNode> ReadRawNodes(std::ifstream& file);
-		static AssetFmt::RawKeyPosition ReadKeyVector3(std::ifstream& file);
-		static AssetFmt::RawKeyRotation ReadKeyQuaternion(std::ifstream& file);
-		static AssetFmt::RawAnimation ReadRawAnimation(std::ifstream& file);
+		static RawMaterial ReadRawMaterial(InputFileStream& file);
+		static RawMesh ReadRawMesh(InputFileStream& file);
+		static Vector<RawNode> ReadRawNodes(InputFileStream& file);
+		static RawKeyPosition ReadKeyPosition(InputFileStream& file);
+		static RawKeyRotation ReadKeyRotation(InputFileStream& file);
+		static RawKeyScale ReadKeyScale(InputFileStream& file);
+		static RawAnimation ReadRawAnimation(InputFileStream& file);
 	};
 }
 

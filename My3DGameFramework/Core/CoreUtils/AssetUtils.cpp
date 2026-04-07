@@ -1,12 +1,12 @@
-﻿#include "EnginePch.h"
+﻿#include "CorePch.h"
 #include "AssetUtils.h"
 
 namespace MGF3D
 {
     /*========================================//
-//   ModelConverter의 파일 쓰기 유틸 함수   //
-//========================================*/
-    void AssetUtils::WriteString(std::ofstream& file, const std::string& str)
+    //   ModelConverter의 파일 쓰기 유틸 함수   //
+    //========================================*/
+    void AssetUtils::WriteString(OutputFileStream& file, const String& str)
     {
         uint32 len = (uint32)str.length();
         WriteData(file, len);
@@ -16,13 +16,13 @@ namespace MGF3D
     /*========================================//
     //   ModelConverter의 파일 읽기 유틸 함수   //
     //========================================*/
-    std::string AssetUtils::ReadString(std::ifstream& file)
+    String AssetUtils::ReadString(InputFileStream& file)
     {
         uint32 len = 0;
         file.read(reinterpret_cast<char*>(&len), sizeof(uint32));
         if (len == 0) return "";
 
-        std::string str(len, '\0');
+        String str(len, '\0');
         file.read(&str[0], len);
         return str;
     }
@@ -30,35 +30,35 @@ namespace MGF3D
     /*==================================//
     //  asset format read util methods  //
     //==================================*/
-    AssetFmt::RawMaterial AssetUtils::ReadRawMaterial(std::ifstream& file)
+    RawMaterial AssetUtils::ReadRawMaterial(InputFileStream& file)
     {
-        AssetFmt::RawMaterial mat;
+        RawMaterial mat;
 
         // 1. 이름
         mat.name = AssetUtils::ReadString(file);
 
         // 2. Factors
-        mat.albedoFactor = AssetUtils::ReadData<glm::vec4>(file);
-        mat.emissiveFactor = AssetUtils::ReadData<glm::vec3>(file);
+        mat.albedoFactor = AssetUtils::ReadData<vec4>(file);
+        mat.emissiveFactor = AssetUtils::ReadData<vec3>(file);
         mat.emissiveStrength = AssetUtils::ReadData<float>(file);
         mat.metallicFactor = AssetUtils::ReadData<float>(file);
         mat.roughnessFactor = AssetUtils::ReadData<float>(file);
 
         // 3. Textures (Vector of structs)
-        uint32_t texCount = AssetUtils::ReadData<uint32_t>(file);
+        uint32_t texCount = AssetUtils::ReadData<uint32>(file);
         mat.textures.resize(texCount);
         for (uint32_t i = 0; i < texCount; ++i)
         {
             mat.textures[i].fileName = AssetUtils::ReadString(file);
-            mat.textures[i].type = AssetUtils::ReadData<AssetFmt::RawTextureType>(file);
+            mat.textures[i].type = AssetUtils::ReadData<RawTextureType>(file);
         }
 
         return mat;
     }
 
-    AssetFmt::RawMesh AssetUtils::ReadRawMesh(std::ifstream& file)
+    RawMesh AssetUtils::ReadRawMesh(InputFileStream& file)
     {
-        AssetFmt::RawMesh mesh;
+        RawMesh mesh;
 
         // 1. 기본 정보
         mesh.name = AssetUtils::ReadString(file);
@@ -66,8 +66,8 @@ namespace MGF3D
         mesh.isSkinned = AssetUtils::ReadData<bool>(file);
 
         // 2. AABB
-        mesh.aabbMin = AssetUtils::ReadData<glm::vec3>(file);
-        mesh.aabbMax = AssetUtils::ReadData<glm::vec3>(file);
+        mesh.aabbMin = AssetUtils::ReadData<vec3>(file);
+        mesh.aabbMax = AssetUtils::ReadData<vec3>(file);
 
         // 3. Vectors (AssetUtils::WriteVector에 대응)
         AssetUtils::ReadVector(file, mesh.staticVertices);
@@ -77,9 +77,9 @@ namespace MGF3D
         return mesh;
     }
 
-    std::vector<AssetFmt::RawNode> AssetUtils::ReadRawNodes(std::ifstream& file)
+    Vector<RawNode> AssetUtils::ReadRawNodes(InputFileStream& file)
     {
-        std::vector<AssetFmt::RawNode> nodes;
+        Vector<RawNode> nodes;
 
         // 1. 노드 개수 읽기
         uint32 count = ReadData<uint32>(file);
@@ -91,7 +91,7 @@ namespace MGF3D
             auto& node = nodes[i];
             node.name = ReadString(file);
             node.parentIndex = ReadData<int32>(file);
-            node.localTransform = ReadData<glm::mat4>(file);
+            node.localTransform = ReadData<mat4>(file);
             AssetUtils::ReadVector(file, node.meshIndices);
             AssetUtils::ReadVector(file, node.children);
         }
@@ -99,25 +99,33 @@ namespace MGF3D
         return nodes;
     }
 
-    AssetFmt::RawKeyPosition AssetUtils::ReadKeyVector3(std::ifstream& file)
+    RawKeyPosition AssetUtils::ReadKeyPosition(InputFileStream& file)
     {
-        AssetFmt::RawKeyPosition key;
+        RawKeyPosition key;
         key.time = ReadData<float>(file);
-        key.vec3 = ReadData<glm::vec3>(file);
+        key.position = ReadData<vec3>(file);
         return key;
     }
 
-    AssetFmt::RawKeyRotation AssetUtils::ReadKeyQuaternion(std::ifstream& file)
+    RawKeyRotation AssetUtils::ReadKeyRotation(InputFileStream& file)
     {
-        AssetFmt::RawKeyRotation key;
+        RawKeyRotation key;
         key.time = ReadData<float>(file);
-        key.quat = ReadData<glm::quat>(file);
+        key.rotation = ReadData<quat>(file);
         return key;
     }
 
-    AssetFmt::RawAnimation AssetUtils::ReadRawAnimation(std::ifstream& file)
+    RawKeyScale AssetUtils::ReadKeyScale(InputFileStream& file)
     {
-        AssetFmt::RawAnimation anim;
+        RawKeyScale key;
+        key.time = ReadData<float>(file);
+        key.scale = ReadData<vec3>(file);
+        return key;
+    }
+
+    RawAnimation AssetUtils::ReadRawAnimation(InputFileStream& file)
+    {
+        RawAnimation anim;
 
         // 1. Header
         anim.magic = ReadData<uint32>(file);
@@ -130,7 +138,7 @@ namespace MGF3D
         ReadData<float>(file, anim.frameRate);
         ReadData<uint32>(file, anim.frameCount);
         ReadData<uint32>(file, anim.boneCount);
-        ReadVector<glm::mat4>(file, anim.bakedMatrices);
+        ReadVector<mat4>(file, anim.bakedMatrices);
 
         // 2. Channels
         uint32 channelCount = ReadData<uint32>(file);
@@ -147,19 +155,19 @@ namespace MGF3D
             uint32 pCount = ReadData<uint32>(file);
             ch.positions.reserve(pCount);
             for (uint32 k = 0; k < pCount; ++k)
-                ch.positions.push_back(ReadKeyVector3(file));
+                ch.positions.push_back(ReadKeyPosition(file));
 
             // Rotations
             uint32 rCount = ReadData<uint32>(file);
             ch.rotations.reserve(rCount);
             for (uint32 k = 0; k < rCount; ++k)
-                ch.rotations.push_back(ReadKeyQuaternion(file));
+                ch.rotations.push_back(ReadKeyRotation(file));
 
             // Scales
             uint32 sCount = ReadData<uint32>(file);
             ch.scales.reserve(sCount);
             for (uint32 k = 0; k < sCount; ++k)
-                ch.scales.push_back(ReadKeyVector3(file));
+                ch.scales.push_back(ReadKeyScale(file));
         }
 
         return anim;

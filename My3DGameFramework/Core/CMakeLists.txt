@@ -5,7 +5,76 @@ set(TARGET_NAME Engine::${MODULE_NAME})
 
 # 1. 소스 파일 목록 정의
 set(SOURCES
-    ## TODO
+    # pch
+    "CorePch.cpp"
+
+    # Types
+    "Types/Containers.h" "Types/Delegates.h"
+    "Types/FileStream.h" "Types/Math.h"
+    "Types/SmartPtrs.h" "Types/Strings.h"
+    "Types/Types.h"
+
+    # Constants
+    "Constants/ConstantMath.h" 
+    "Constants/ConstantGraphics.h" "Constants/ConstantStringHash.h"
+
+    # Defines
+    "Defines/DefineAsserter.h"  "Defines/DefineBreakpoint.h"
+    "Defines/DefineClassPointers.h"  "Defines/DefineDisables.h"
+    "Defines/DefineFunctionBindings.h"  "Defines/DefineHash.h"
+    "Defines/DefineLoggings.h"  "Defines/DefineManagers.h"
+    "Defines/DefineSingleton.h"  "Defines/DefineStructPointers.h"
+    "Defines/DefineTimeStamp.h"  "Defines/DefineUtilities.h"
+
+    # Debug
+    "Debug/Asserter.h"      "Debug/Asserter.cpp"
+    "Debug/Logger.h"        "Debug/Logger.cpp"    "Debug/Logger.inl"
+    "Debug/Stopwatch.h"     "Debug/Stopwatch.cpp"
+
+    # Parsers
+    #"Parsers/JsonParser.h"      "Parsers/JsonParser.cpp"           "Parsers/JsonParser.inl"
+    #"Parsers/LuaParser.h"      "Parsers/LuaParser.cpp"           "Parsers/LuaParser.inl"
+    #"Parsers/YamlParser.h"      "Parsers/YamlParser.cpp"           "Parsers/YamlParser.inl"
+
+    # Input
+    "Input/MGFInputInterface.h"	  "Input/MGFInputInterface.cpp"
+
+    "Input/MGFInputDevice.h"	  "Input/MGFInputDevice.cpp"
+    "Input/Devices/MGFKeyboardDevice.h"	  "Input/Devices/MGFKeyboardDevice.cpp"
+    "Input/Devices/MGFMouseDevice.h"	  "Input/Devices/MGFMouseDevice.cpp"
+
+    "Input/MGFInputAction.h"              "Input/MGFInputAction.cpp"
+    "Input/Actions/MGFKeyAction.h"        "Input/Actions/MGFKeyAction.cpp"
+    "Input/Actions/MGFMouseAction.h"      "Input/Actions/MGFMouseAction.cpp"
+
+    # Window
+    "Window/MGFWindowInterface.h"  "Window/MGFWindowInterface.cpp"
+    "Window/MGFWindow.h"           "Window/MGFWindow.cpp"
+
+    # Managers
+    "Managers/GLFWManager.h"      "Managers/GLFWManager.cpp"
+    "Managers/InputManager.h"      "Managers/InputManager.cpp"        "Managers/InputManager.inl"
+    #"Managers/PathManager.h"      "Managers/PathManager.cpp"
+    #"Managers/ThreadManager.h"      "Managers/ThreadManager.cpp"
+    "Managers/TimeManager.h"      "Managers/TimeManager.cpp"
+    "Managers/WindowManager.h"      "Managers/WindowManager.cpp"
+
+    # Identities
+     #"Identities/MGFName.h"      "Identities/MGFName.cpp"
+    #"Identities/MGFPath.h"      "Identities/MGFPath.cpp"
+    #"Identities/MGFType.h"      "Identities/MGFType.cpp"
+
+    # Hashes
+    "Hashes/IHashFunctor.h"      "Hashes/IHashFunctor.cpp"
+    "Hashes/StringHash.h"        "Hashes/StringHash.cpp"
+    "Hashes/TypeHash.h"          "Hashes/TypeHash.cpp"
+
+    # Utils
+    "CoreUtils/AssetUtils.h"       "CoreUtils/AssetUtils.cpp"           "CoreUtils/AssetUtils.inl"
+    "CoreUtils/CommonUtils.h"      "CoreUtils/CommonUtils.cpp"           "CoreUtils/CommonUtils.inl"
+    "CoreUtils/GraphicsUtils.h"    "CoreUtils/GraphicsUtils.cpp"     
+    # "CoreUtils/LuaBindingUtils.h"      "CoreUtils/LuaBindingUtils.cpp"  
+    "CoreUtils/MathUtils.h"        "CoreUtils/MathUtils.cpp" 
 ) 
 
 # 2. 빌드 타겟 생성 및 별칭 등록
@@ -22,6 +91,8 @@ target_include_directories(${LIB_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 target_link_libraries(${LIB_NAME} 
 
 PUBLIC
+        glad::glad
+        glfw
         glm::glm
         spdlog::spdlog
         nlohmann_json::nlohmann_json
@@ -29,13 +100,7 @@ PUBLIC
 )
 
 # 6. PCH (Precompiled Header) 설정
-# 옵션 A: 이 라이브러리만의 개별 PCH를 사용할 경우
 target_precompile_headers(${LIB_NAME} PRIVATE "CorePch.h")
-
-# INFO : 이후에는 다른 lib에서는 이 옵션 B를 이용해서 중복되는
-# 헤더 선언을 피할 수 있도록 만들어야 한다.
-# 옵션 B: CoreLib에 정의된 PCH를 재사용할 경우 (빌드 속도 최적화)
-# target_precompile_headers(${LIB_NAME} REUSE_FROM CoreLib)
 
 # 7. 컴파일 설정
 target_compile_definitions(${LIB_NAME} 
@@ -47,13 +112,12 @@ PUBLIC
 )
 
 # 7. 리소스 배포 (Resource Deployment)
-## TODO : 얘네들은 차라리 빌드가 되기 전에 수행해야 하는게 아닐까?
 add_custom_command(TARGET CoreLib POST_BUILD
     COMMENT "Deploying Engine Centralized Content to Bin..."
 
     # 1. Config (Engine)
     COMMAND ${CMAKE_COMMAND} -E make_directory "${OUTPUT_DIR}/Config"
-    COMMAND ${CMAKE_COMMAND} -E rm -rf "${OUTPUT_DIR}/Config/Engine" ## TODO : 이거 경로도 확인 필요
+    COMMAND ${CMAKE_COMMAND} -E rm -rf "${OUTPUT_DIR}/Config/Engine"
     COMMAND ${CMAKE_COMMAND} -E copy_directory
             "${CMAKE_CURRENT_SOURCE_DIR}/Config"
             "${OUTPUT_DIR}/Config"

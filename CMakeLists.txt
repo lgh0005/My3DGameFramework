@@ -46,7 +46,10 @@ find_package(sol2 CONFIG REQUIRED)
 message(STATUS "All Packages Found Successfully!")
 
 # 하위 프로젝트 추가
+#add_subdirectory(AssetConverter)
+#add_subdirectory(Engine)
+#add_subdirectory(Game)
+
 add_subdirectory(AssetConverter)
-add_subdirectory(Engine)
-#add_subdirectory(My3DGameFramework)
-add_subdirectory(Game)
+add_subdirectory(My3DGameFramework)
+add_subdirectory(LibTesters)

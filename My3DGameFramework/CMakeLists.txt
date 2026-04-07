@@ -1,5 +1,3 @@
-# 하위 모듈 추가
-
 # Level 1: 가장 기초
 add_subdirectory(Core)
 

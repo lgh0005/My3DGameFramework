@@ -34,16 +34,19 @@
 #include "Types/SmartPtrs.h"
 #include "Types/Delegates.h"
 #include "Types/FileStream.h"
+#include "Types/Threading.h"
 
 /*==============================//
 //    Engine common constants   //
 //==============================*/
-#include "Constants/ConstMath.h"
-#include "Constants/ConstGraphics.h"
+#include "Constants/ConstantMath.h"
+#include "Constants/ConstantGraphics.h"
 
 /*============================//
 //    Engine common defines   //
 //============================*/
+#include "Defines/DefineClassPointers.h"
+#include "Defines/DefineStructPointers.h"
 #include "Defines/DefineDisables.h"
 #include "Defines/DefineSingleton.h"
 #include "Defines/DefineUtilities.h"
@@ -54,8 +57,11 @@
 //    Engine common debuggers   //
 //==============================*/
 #include "Debug/Logger.h"
+#include "Defines/DefineLoggings.h"
 #include "Debug/Asserter.h"
+#include "Defines/DefineAsserter.h"
 #include "Debug/Stopwatch.h"
+#include "Defines/DefineTimeStamp.h"
 
 /*===============================//
 //    Engine common identities   //
@@ -69,3 +75,9 @@
 //===========================*/
 #include "Hashes/StringHash.h"
 #include "Hashes/TypeHash.h"
+
+/*==============================//
+//    Engine common utilities   //
+//==============================*/
+#include "CoreUtils/CommonUtils.h"
+#include "CoreUtils/MathUtils.h"
