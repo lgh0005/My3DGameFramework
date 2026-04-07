@@ -64,6 +64,7 @@ set(SOURCES
     "Identities/MGFPath.h"      "Identities/MGFPath.cpp"
     "Identities/MGFType.h"      "Identities/MGFType.cpp"
     "Identities/MGFTypeTree.h"      "Identities/MGFTypeTree.cpp"
+    "Identities/MGFTypeCaster.h"   "Identities/MGFTypeCaster.cpp"      "Identities/MGFTypeCaster.inl"
 
     # Hashes
     "Hashes/IHashFunctor.h"      "Hashes/IHashFunctor.cpp"

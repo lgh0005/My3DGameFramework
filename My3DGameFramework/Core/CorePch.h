@@ -74,6 +74,7 @@
 //===============================*/
 #include "Identities/MGFPath.h"
 #include "Identities/MGFType.h"
+#include "Identities/MGFTypeCaster.h"
 
 /*==============================//
 //    Engine common utilities   //

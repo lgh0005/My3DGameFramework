@@ -4,6 +4,8 @@
 
 namespace MGF3D
 {
+	MGF_CLASS_PTR(MGFTypeTree)
+
 	struct MGFType
 	{
 		// 1. 정체성 (Identity)
@@ -17,8 +19,9 @@ namespace MGF3D
 		int16 nextSiblingIndex { -1 };  // 바로 다음 형제의 인덱스
 
 		// 3. 족보 체인 (O(1) Inheritance Check)
+		const MGFTypeTree* ownerTree  { nullptr };
 		Array<TypeHash, MAX_TYPE_DEPTH> chain { };
-		uint32   depth{ 0 };
+		uint32   depth	{ 0 };
 
 		bool IsA(const MGFType& other) const;
 		bool IsValid() const;

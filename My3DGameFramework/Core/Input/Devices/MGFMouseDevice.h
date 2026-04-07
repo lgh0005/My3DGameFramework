@@ -11,7 +11,7 @@ namespace MGF3D
 		using Super = MGFInputDevice;
 
 	public:
-		MGFMouseDevice(const String& name);
+		MGFMouseDevice();
 		virtual ~MGFMouseDevice() override;
 
 	/*================================//

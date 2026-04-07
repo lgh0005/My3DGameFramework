@@ -34,7 +34,7 @@ namespace MGF3D
 	//==============================*/
 	void MGFInputInterface::KeyCallback(GLFWwindow*, int32 key, int32 scancode, int32 action, int32 mods)
 	{
-		auto* keyboardDevice = MGF_INPUT.GetDevice<MGFKeyboardDevice>("Keyboard");
+		auto* keyboardDevice = MGF_INPUT.GetDevice<MGFKeyboardDevice>();
 		if (keyboardDevice) keyboardDevice->OnKey(key, action);
 	}
 
@@ -49,13 +49,13 @@ namespace MGF3D
 	//==============================*/
 	void MGFInputInterface::MouseButtonCallback(GLFWwindow*, int32 button, int32 action, int32 mods)
 	{
-		auto* mouseDevice = MGF_INPUT.GetDevice<MGFMouseDevice>("Mouse");
+		auto* mouseDevice = MGF_INPUT.GetDevice<MGFMouseDevice>();
 		if (mouseDevice) mouseDevice->OnMouseButton(button, action);
 	}
 
 	void MGFInputInterface::CursorPosCallback(GLFWwindow*, double xpos, double ypos)
 	{
-		auto* mouseDevice = MGF_INPUT.GetDevice<MGFMouseDevice>("Mouse");
+		auto* mouseDevice = MGF_INPUT.GetDevice<MGFMouseDevice>();
 		if (mouseDevice) mouseDevice->OnCursorPos(xpos, ypos);
 	}
 

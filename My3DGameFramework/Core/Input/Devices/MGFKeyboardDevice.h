@@ -11,7 +11,7 @@ namespace MGF3D
 		using Super = MGFInputDevice;
 
 	public:
-		MGFKeyboardDevice(const String& name);
+		MGFKeyboardDevice();
 		virtual ~MGFKeyboardDevice() override;
 
 	/*====================================//

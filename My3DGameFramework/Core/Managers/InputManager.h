@@ -20,11 +20,11 @@ namespace MGF3D
 		void Shutdown();
 
 	public:
-		template<typename T> T* RegisterDevice(StringView name);
-		template<typename T> T* GetDevice(StringView name);
+		template<typename T> T* RegisterDevice();
+		template<typename T> T* GetDevice();
 
 	private:
-		HashMap<StringHash, MGFInputDeviceUPtr> m_devices;
+		Vector<MGFInputDeviceUPtr> m_devices;
 	};
 }
 

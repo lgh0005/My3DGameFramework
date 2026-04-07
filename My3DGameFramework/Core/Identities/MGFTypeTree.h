@@ -12,14 +12,17 @@ namespace MGF3D
 
 	public:
 		int16 Register(StringView name, StringView parentName = "");
+		bool IsA(int16 objectIndex, int16 targetIndex) const;
 		int16 FindIndex(TypeHash id) const;
+		void Bake();
+
+	public:
 		const String& GetTreeName() const;
 		const MGFType* GetType(int16 index) const;
-		void Bake();
+		usize GetTypeCount() const { return m_types.size(); }
 
 	private:
 		String m_treeName;
-		Array<MGFType, MAX_TYPE_COUNT> m_types;
-		uint32 m_currentCount{ 0 };
+		Vector<MGFType> m_types;
 	};
 }

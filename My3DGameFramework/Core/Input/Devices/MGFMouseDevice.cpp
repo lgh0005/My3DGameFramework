@@ -7,7 +7,7 @@
 
 namespace MGF3D
 {
-	MGFMouseDevice::MGFMouseDevice(const String& name) : Super{ name } { }
+	MGFMouseDevice::MGFMouseDevice() = default;
 	MGFMouseDevice::~MGFMouseDevice()
 	{
 		Shutdown();

@@ -8,30 +8,40 @@ namespace MGF3D
 
 	int16 MGFTypeTree::Register(StringView name, StringView parentName)
 	{
-		// 1. 최대 개수 초과 검사
-		if (m_currentCount >= MAX_TYPE_COUNT)
-		{
-			MGF_LOG_ERROR("MGFTypeTree: Registration failed. Max type count exceeded.");
-			return -1;
-		}
+		// 1. Vector의 현재 크기가 새로 부여될 인덱스입니다.
+		int16 newIndex = static_cast<int16>(m_types.size());
 
-		// 2. 새 타입 생성 및 기초 정보 기입
-		int16 newIndex = static_cast<int16>(m_currentCount++);
-		MGFType& type = m_types[newIndex];
+		// 2. 새 타입 객체를 생성하고 데이터를 채웁니다.
+		MGFType newType;
+		newType.id = TypeHash(name);
+		newType.typeName = name.data();
+		newType.selfIndex = newIndex;
 
-		type.id = TypeHash(name);
-		type.typeName = name.data();
-		type.selfIndex = newIndex;
+		if (!parentName.empty()) newType.parentIndex = FindIndex(TypeHash(parentName));
+		else newType.parentIndex = -1;
 
-		if (!parentName.empty()) type.parentIndex = FindIndex(TypeHash(parentName));
-		else type.parentIndex = -1;
-
+		// 3. Vector에 추가합니다.
+		m_types.push_back(newType);
 		return newIndex;
+	}
+
+	bool MGFTypeTree::IsA(int16 objectIndex, int16 targetIndex) const
+	{
+		// 1. 인덱스로 두 타입의 포인터를 안전하게 가져옴 (범위 초과 시 nullptr 반환됨)
+		const MGFType* objType = GetType(objectIndex);
+		const MGFType* targetType = GetType(targetIndex);
+
+		// 2. 둘 중 하나라도 유효하지 않으면 실패
+		if (!objType || !targetType)
+			return false;
+
+		// 3. 실제 O(1) 족보 검사는 MGFType 객체에게 위임
+		return objType->IsA(*targetType);
 	}
 
 	int16 MGFTypeTree::FindIndex(TypeHash id) const
 	{
-		for (uint32 i = 0; i < m_currentCount; ++i)
+		for (size_t i = 0; i < m_types.size(); ++i)
 		{
 			if (m_types[i].id == id)
 				return static_cast<int16>(i);
@@ -46,17 +56,19 @@ namespace MGF3D
 
 	const MGFType* MGFTypeTree::GetType(int16 index) const
 	{
-		if (!CommonUtils::IsBetween<int16>(index, 0, static_cast<int16>(m_currentCount)))
+		if (!CommonUtils::IsBetween<int16>(index, 0, static_cast<int16>(m_types.size())))
 			return nullptr;
-
 		return &m_types[index];
 	}
 
 	void MGFTypeTree::Bake()
 	{
-		for (uint32 i = 0; i < m_currentCount; ++i)
+		m_types.shrink_to_fit();
+
+		for (usize i = 0; i < m_types.size(); ++i)
 		{
 			MGFType& type = m_types[i];
+			type.ownerTree = this;
 
 			// 1. 트리 구조 (FirstChild / NextSibling) 연결
 			if (type.parentIndex != -1)
@@ -79,8 +91,11 @@ namespace MGF3D
 				type.depth = parent.depth + 1;
 
 				// 부모의 족보를 그대로 복사 (MAX_TYPE_DEPTH까지만)
-				for (uint32 d = 0; d < parent.depth + 1; ++d)
-					type.chain[d] = parent.chain[d];
+				if (parent.depth + 1 <= MAX_TYPE_DEPTH)
+				{
+					for (int32 d = 0; d < parent.depth + 1; ++d)
+						type.chain[d] = parent.chain[d];
+				}
 			}
 			else
 			{
@@ -92,6 +107,6 @@ namespace MGF3D
 				type.chain[type.depth] = type.id;
 		}
 
-		MGF_LOG_INFO("MGFTypeTree: Baked {0} types successfully.", m_currentCount);
+		MGF_LOG_INFO("MGFTypeTree: Baked {0} types successfully.", m_types.size());
 	}
 }

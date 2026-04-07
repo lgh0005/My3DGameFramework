@@ -1,5 +1,6 @@
 #include "CorePch.h"
 #include "MGFType.h"
+#include "Identities/MGFTypeTree.h"
 
 namespace MGF3D
 {

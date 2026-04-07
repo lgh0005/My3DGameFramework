@@ -7,7 +7,7 @@
 
 namespace MGF3D
 {
-	MGFKeyboardDevice::MGFKeyboardDevice(const String& name) : Super{ name } { }
+	MGFKeyboardDevice::MGFKeyboardDevice() = default;
 	MGFKeyboardDevice::~MGFKeyboardDevice()
 	{
 		Shutdown();

@@ -11,7 +11,7 @@ namespace MGF3D
     class MGFInputDevice
     {
     public:
-        MGFInputDevice(const String& name);
+        MGFInputDevice();
         virtual ~MGFInputDevice();
 
     /*================================//
@@ -30,8 +30,5 @@ namespace MGF3D
         virtual bool GetButton(StringView actionName) const = 0;
         virtual bool GetButtonDown(StringView actionName) const = 0;
         virtual bool GetButtonUp(StringView actionName) const = 0;
-
-    protected:
-        StringHash m_deviceName;
     };
 }
