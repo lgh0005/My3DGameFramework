@@ -22,7 +22,7 @@ namespace MGF3D
             return false;
         }
 
-        // 2. MGFWindow 인스턴스 생성
+        // 2. 메인 윈도우 인스턴스 생성
         m_mainWindow = MGFWindow::Create(width, height, title, vsync);
         if (m_mainWindow == nullptr)
         {

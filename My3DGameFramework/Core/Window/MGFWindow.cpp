@@ -12,10 +12,15 @@ namespace MGF3D
 		Destroy();
 	}
 
-	UniquePtr<MGFWindow> MGFWindow::Create(int32 width, int32 height, const String& title, int32 vsync)
+	UniquePtr<MGFWindow> MGFWindow::Create
+	(
+		int32 width, int32 height, 
+		const String& title, int32 vsync,
+		bool isVisible, GLFWwindow* share
+	)
 	{
 		auto window = MGFWindowUPtr(new MGFWindow());
-		if (!window->Init(width, height, title, vsync))
+		if (!window->Init(width, height, title, vsync, isVisible, share))
 		{
 			MGF_LOG_ERROR("MGFWindow: Failed to initialize window instance.");
 			return nullptr;
@@ -29,15 +34,23 @@ namespace MGF3D
 		return static_cast<MGFWindow*>(glfwGetWindowUserPointer(window));
 	}
 
-	bool MGFWindow::Init(int32 width, int32 height, const String& title, int32 vsync)
+	bool MGFWindow::Init
+	(
+		int32 width, int32 height, 
+		const String& title, int32 vsync,
+		bool isVisible, GLFWwindow* share
+	)
 	{
 		// 1. OpenGL 힌트 설정
 		glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
 		glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
 		glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+		glfwWindowHint(GLFW_VISIBLE, CommonUtils::Select(isVisible, GLFW_TRUE, GLFW_FALSE));
 
 		// 2. 윈도우 생성
-		m_window = glfwCreateWindow(width, height, title.c_str(), nullptr, nullptr);
+		m_window = glfwCreateWindow(width, height, title.c_str(), nullptr, share);
+		glfwWindowHint(GLFW_VISIBLE, GLFW_TRUE);
+
 		if (!m_window)
 		{
 			MGF_LOG_FATAL("MGFWindow: Failed to create GLFW window.");
@@ -46,24 +59,28 @@ namespace MGF3D
 		}
 		m_width = width;
 		m_height = height;
+		glfwSetWindowUserPointer(m_window, this);
 
 		// 3. 컨텍스트 설정 및 인스턴스 연결
-		glfwMakeContextCurrent(m_window);
-		glfwSetWindowUserPointer(m_window, this);
-		glfwSwapInterval(vsync);
-		if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
+		// 메인 윈도우와 공유 컨텍스트를 위한 윈도우 생성 처리에 대한 분기
+		if (isVisible)
 		{
-			MGF_LOG_FATAL("MGFWindow: Failed to initialize GLAD.");
-			glfwTerminate();
-			return false;
+			glfwMakeContextCurrent(m_window);
+			glfwSwapInterval(vsync);
+			if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
+			{
+				MGF_LOG_FATAL("MGFWindow: Failed to initialize GLAD.");
+				glfwTerminate();
+				return false;
+			}
+
+			// 4. 콜백 등록
+			MGFWindowInterface::Install(m_window);
+
+			// 5. SPIR-V 지원 체크
+			if (glfwExtensionSupported("GL_ARB_gl_spirv")) MGF_LOG_INFO("SPIR-V supported!");
+			else MGF_LOG_WARN("SPIR-V not supported on this system!");
 		}
-
-		// 4. 콜백 등록
-		MGFWindowInterface::Install(m_window);
-
-		// 5. SPIR-V 지원 체크
-		if (glfwExtensionSupported("GL_ARB_gl_spirv")) MGF_LOG_INFO("SPIR-V supported!");
-		else MGF_LOG_WARN("SPIR-V not supported on this system!");
 
 		MGF_LOG_INFO("MGFWindow: Window created successfully ({0}x{1})", width, height);
 		return true;

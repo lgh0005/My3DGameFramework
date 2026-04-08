@@ -14,7 +14,12 @@ namespace MGF3D
 		~MGFWindow();
 
 	public:
-		static UniquePtr<MGFWindow> Create(int32 width, int32 height, const String& title, int32 vsync = 0);
+		static UniquePtr<MGFWindow> Create
+		(
+			int32 width, int32 height,
+			const String& title, int32 vsync = 0,
+			bool isVisible = true, GLFWwindow* share = nullptr
+		);
 		static MGFWindow* GetWindowInstance(GLFWwindow* window);
 
 	public:
@@ -43,7 +48,12 @@ namespace MGF3D
 
 	private:
 		MGFWindow();
-		bool Init(int32 width, int32 height, const String& title, int32 vsync);
+		bool Init
+		(
+			int32 width, int32 height, 
+			const String& title, int32 vsync,
+			bool isVisible, GLFWwindow* share
+		);
 
 		GLFWwindow* m_window	{ nullptr };
 		int32 m_width{ 0 },  m_height { 0 };

@@ -1,9 +1,15 @@
 #pragma once
 #include <thread>
 #include <mutex>
+#include <atomic>
 
 namespace MGF3D
 {
+	/*=============//
+	//    Atomic   //
+	//=============*/
+	template<typename T> using Atomic = std::atomic<T>;
+
 	/*===========================//
 	//    Thread & Sync Aliases  //
 	//===========================*/
