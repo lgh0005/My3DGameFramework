@@ -1,6 +1,6 @@
 #pragma once
 #include <fstream>
-
+#include <sstream>
 namespace MGF3D
 {
 	/*===================================//
@@ -15,4 +15,7 @@ namespace MGF3D
 
 	// 입출력 파일 스트림 (읽기/쓰기 모두 가능)
 	using FileStream = std::fstream;
+
+	// 스트링 스트림
+	using StringStream = std::stringstream;
 }

@@ -90,10 +90,6 @@ namespace MGF3D
 		glTextureParameteri(m_handle, GL_TEXTURE_MIN_FILTER, minFilter);
 		glTextureParameteri(m_handle, GL_TEXTURE_MAG_FILTER, magFilter);
 
-		// TODO : 윈도우에 대해서 공통적으로 켜야 할 전역 상태들을
-		// 한데 모아서 켜야함
-		// glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
-
 		return true;
 	}
 }

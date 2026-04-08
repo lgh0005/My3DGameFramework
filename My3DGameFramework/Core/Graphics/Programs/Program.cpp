@@ -1,122 +1,131 @@
-﻿#include "EnginePch.h"
+﻿#include "CorePch.h"
 #include "Program.h"
-#include "Graphics/Shader.h"
+#include "Graphics/Shader/Shader.h"
 
-Program::Program() = default;
-Program::~Program()
+namespace MGF3D
 {
-    if (m_program) glDeleteProgram(m_program);
-}
-
-void Program::Use() const
-{
-    glUseProgram(m_program);
-}
-
-bool Program::Link(const std::vector<ShaderPtr>& shaders)
-{
-    m_program = glCreateProgram();
-
-    // 1. Attach shaders to program
-    for (auto& shader : shaders)
-        glAttachShader(m_program, shader->Get());
-    glLinkProgram(m_program);
-
-    // 2. check program
-    int32 success = 0;
-    glGetProgramiv(m_program, GL_LINK_STATUS, &success);
-    if (!success)
+    Program::Program() = default;
+    Program::~Program()
     {
-        char infoLog[1024];
-        glGetProgramInfoLog(m_program, 1024, nullptr, infoLog);
-        LOG_ERROR("failed to link program: {}", infoLog);
-        return false;
+        if (m_handle != 0)
+        {
+            glDeleteProgram(m_handle);
+            m_handle = 0;
+        }
     }
 
-    // 3. Detach shaders
-    for (auto& shader : shaders)
-        glDetachShader(m_program, shader->Get());
+    ProgramPtr Program::Create(const Vector<ShaderPtr>& shaders)
+    {
+        auto program = ProgramPtr(new Program());
+        if (!program->Link(shaders)) return nullptr;
+        return program;
+    }
 
-    return true;
-}
+    void Program::Use() const
+    {
+        glUseProgram(m_handle);
+    }
 
-bool Program::AddShaderStage
-(
-    const std::string& path, GLenum type, 
-    std::vector<ShaderPtr>& outShaders
-)
-{
-    // 1. 경로가 없으면 그냥 통과
-    if (path.empty()) return true;
+    bool Program::Link(const Vector<ShaderPtr>& shaders)
+    {
+        // 0. 프로그램 생성
+        m_handle = glCreateProgram();
 
-    // 2. 셰이더 파일로부터 객체 생성
-    auto shader = Shader::CreateFromFile(path, type);
-    if (!shader) return false;
+        // 1. 프로그램에 셰이더 부착
+        for (auto& shader : shaders) glAttachShader(m_handle, shader->GetHandle());
+        glLinkProgram(m_handle);
 
-    // 3. 성공 시 목록에 추가
-    outShaders.push_back(std::move(shader));
-    return true;
-}
+        // 2. 프로그램 체크
+        int32 success = 0;
+        glGetProgramiv(m_handle, GL_LINK_STATUS, &success);
+        if (!success)
+        {
+            char infoLog[1024];
+            glGetProgramInfoLog(m_handle, 1024, nullptr, infoLog);
+            MGF_LOG_ERROR("failed to link program: {}", infoLog);
+            return false;
+        }
 
-/*==============================================//
-//   default arithmetic value uniform setters   //
-//==============================================*/
-void Program::SetUniform(const std::string& name, bool value) const
-{
-    auto loc = glGetUniformLocation(m_program, name.c_str());
-    glUniform1i(loc, static_cast<int>(value));
-}
+        // 3. 프로그램에 셰이더 탈착
+        for (auto& shader : shaders)
+            glDetachShader(m_handle, shader->GetHandle());
 
-void Program::SetUniform(const std::string& name, int32 value) const 
-{
-    auto loc = glGetUniformLocation(m_program, name.c_str());
-    glUniform1i(loc, value);
-}
+        return true;
+    }
 
-void Program::SetUniform(const std::string& name, float value) const
-{
-    auto loc = glGetUniformLocation(m_program, name.c_str());
-    glUniform1f(loc, value);
-}
+    int32 Program::GetUniformLocation(const String& name)
+    {
+        auto hash = StringHash(name);
+        auto it = m_location.find(hash);
+        if (it != m_location.end()) return it->second;
 
-void Program::SetUniform(const std::string& name, const glm::vec2& value) const
-{
-    auto loc = glGetUniformLocation(m_program, name.c_str());
-    glUniform2fv(loc, 1, glm::value_ptr(value));
-}
+        int32 loc = glGetUniformLocation(m_handle, name.c_str());
+        m_location[hash] = loc;
+        if (loc == -1)
+            MGF_LOG_WARN("Uniform '{}' not found in program {}", name.c_str(), m_handle);
 
-void Program::SetUniform(const std::string& name, const glm::vec3& value) const
-{
-    auto loc = glGetUniformLocation(m_program, name.c_str());
-    glUniform3fv(loc, 1, glm::value_ptr(value));
-}
+        return loc;
+    }
 
-void Program::SetUniform(const std::string& name, const glm::vec4& value) const
-{
-    auto loc = glGetUniformLocation(m_program, name.c_str());
-    glUniform4fv(loc, 1, glm::value_ptr(value));
-}
+    /*==============================================//
+    //    DSA 기반 유니폼 세터 (glProgramUniform)    //
+    //==============================================*/
+    void Program::SetUniform(const String& name, bool value)
+    {
+        glProgramUniform1i(m_handle, GetUniformLocation(name), static_cast<int32>(value));
+    }
 
-void Program::SetUniform(const std::string& name, const glm::mat4& value) const 
-{
-    auto loc = glGetUniformLocation(m_program, name.c_str());
-    glUniformMatrix4fv(loc, 1, GL_FALSE, glm::value_ptr(value));
-}
+    void Program::SetUniform(const String& name, int32 value)
+    {
+        glProgramUniform1i(m_handle, GetUniformLocation(name), value);
+    }
 
-void Program::SetUniform(const std::string& name, const std::vector<int32>& value) const
-{
-    auto loc = glGetUniformLocation(m_program, name.c_str());
-    glUniform1iv(loc, (GLsizei)value.size(), value.data());
-}
+    void Program::SetUniform(const String& name, float value)
+    {
+        glProgramUniform1f(m_handle, GetUniformLocation(name), value);
+    }
 
-void Program::SetUniform(const std::string& name, const std::vector<glm::mat4>& value) const
-{
-    auto loc = glGetUniformLocation(m_program, name.c_str());
-    glUniformMatrix4fv(loc, (GLsizei)value.size(), GL_FALSE, glm::value_ptr(value[0]));
-}
+    void Program::SetUniform(const String& name, const vec2& value)
+    {
+        glProgramUniform2fv(m_handle, GetUniformLocation(name), 1, value_ptr(value));
+    }
 
-void Program::SetUniform(const std::string& name, const std::vector<glm::vec3>& values) const
-{
-    auto loc = glGetUniformLocation(m_program, name.c_str());
-    glUniform3fv(loc, (GLsizei)values.size(), glm::value_ptr(values[0]));
+    void Program::SetUniform(const String& name, const vec3& value)
+    {
+        glProgramUniform3fv(m_handle, GetUniformLocation(name), 1, value_ptr(value));
+    }
+
+    void Program::SetUniform(const String& name, const vec4& value)
+    {
+        glProgramUniform4fv(m_handle, GetUniformLocation(name), 1, value_ptr(value));
+    }
+
+    void Program::SetUniform(const String& name, const mat4& value)
+    {
+        glProgramUniformMatrix4fv(m_handle, GetUniformLocation(name), 1, GL_FALSE, value_ptr(value));
+    }
+
+    /*===================================//
+    //    default array uniform setters  //
+    //===================================*/
+    void Program::SetUniform(const String& name, const Vector<int32>& value)
+    {
+        if (value.empty()) return;
+        int32 loc = GetUniformLocation(name);
+        if (loc != -1)
+        {
+            glProgramUniform1iv(m_handle, loc, static_cast<GLsizei>(value.size()), value.data());
+        }
+    }
+
+    void Program::SetUniform(const String& name, const Vector<mat4>& value)
+    {
+        if (value.empty()) return;
+        int32 loc = GetUniformLocation(name);
+        if (loc != -1)
+        {
+            glProgramUniformMatrix4fv(m_handle, loc,
+                static_cast<GLsizei>(value.size()), GL_FALSE, value_ptr(value[0]));
+        }
+    }
 }

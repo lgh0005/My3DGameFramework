@@ -1,29 +1,20 @@
 ﻿#pragma once
-#include "Resources/ResourceDesc.h"
-#include "Resources/Meshes/Mesh.h"
+#include "Graphics/Meshes/Mesh.h"
 
-#pragma region FORWARD_DECLARATION
-CLASS_PTR(Buffer)
-CLASS_PTR(VertexLayout)
-CLASS_PTR(Material)
-CLASS_PTR(Program)
-#pragma endregion
-
-CLASS_PTR(ScreenMesh)
-class ScreenMesh : public Mesh
+namespace MGF3D
 {
-	DEFINE_RESOURCE_TYPE(ResourceType::ScreenMesh, ScreenMeshDesc)
+	MGF_CLASS_PTR(ScreenMesh)
+	class ScreenMesh : public Mesh
+	{
+		using Super = Mesh;
 
-public:
-	virtual ~ScreenMesh() override;
-	static ScreenMeshPtr Create();
-	static ScreenMeshPtr Load(const ScreenMeshDesc& desc);
-	virtual ScreenMeshDesc& GetDesc() override { return m_desc; }
-	virtual const ResourceDesc& GetDesc() const override { return m_desc; }
-	virtual void Draw() const override;
+	public:
+		virtual ~ScreenMesh() override;
+		static ScreenMeshPtr Create();
+		virtual void Draw(uint32 count = 1) const override;
 
-private:
-	ScreenMesh();
-	void Init();
-	ScreenMeshDesc m_desc;
-};
+	private:
+		ScreenMesh();
+		void Init();
+	};
+}

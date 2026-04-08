@@ -78,6 +78,28 @@ namespace MGF3D
 			// 5. SPIR-V 지원 체크
 			if (glfwExtensionSupported("GL_ARB_gl_spirv")) MGF_LOG_INFO("SPIR-V supported!");
 			else MGF_LOG_WARN("SPIR-V not supported on this system!");
+
+			// 6. 전역 상태 설정
+			glEnable(GL_DEPTH_TEST);
+			glDepthFunc(GL_LEQUAL);
+
+			glEnable(GL_CULL_FACE);
+			glCullFace(GL_BACK);
+			glFrontFace(GL_CCW);
+
+			glEnable(GL_BLEND);
+			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+			glEnable(GL_MULTISAMPLE);
+			glEnable(GL_FRAMEBUFFER_SRGB);
+
+			glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
+			// TODO : 디버그 에 하나 추가 필요
+//#ifdef _DEBUG
+//			glEnable(GL_DEBUG_OUTPUT);
+//			glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS); // 에러 발생 시 즉시 브레이크포인트가 걸리도록 함
+//			// glDebugMessageCallback(YourCallbackFunction, nullptr); // 콜백 함수가 있다면 등록
+//#endif
 		}
 
 		MGF_LOG_INFO("MGFWindow: Window created successfully ({0}x{1})", width, height);

@@ -9,7 +9,7 @@ namespace MGF3D
 	GLUniformBufferUPtr GLUniformBuffer::Create(const void* data, usize byteSize)
 	{
 		auto buffer = GLUniformBufferUPtr(new GLUniformBuffer());
-		if (!buffer->Init(byteSize, data)) return nullptr;
+		if (!buffer->Init(data, byteSize)) return nullptr;
 		return buffer;
 	}
 

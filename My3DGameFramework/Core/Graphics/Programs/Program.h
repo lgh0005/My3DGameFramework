@@ -1,47 +1,46 @@
 ﻿#pragma once
-#include "Resources/Resource.h"
-#include "Resources/ResourceDesc.h"
 
-#pragma region FORWARD_DECLARATION
-CLASS_PTR(Shader)
-#pragma endregion
-
-CLASS_PTR(Program)
-class Program : public Resource
+namespace MGF3D
 {
-public:
-    usize Get() const { return m_program; }
-    void Use() const;
-    ~Program();
+    MGF_CLASS_PTR(Shader)
 
-/*==============================================//
-//   default arithmetic value uniform setters   //
-//==============================================*/
-public:
-    void SetUniform(const std::string& name, bool value) const;
-    void SetUniform(const std::string& name, int value) const;
-    void SetUniform(const std::string& name, float value) const;
-    void SetUniform(const std::string& name, const glm::vec2& value) const;
-    void SetUniform(const std::string& name, const glm::vec3& value) const;
-    void SetUniform(const std::string& name, const glm::vec4& value) const;
-    void SetUniform(const std::string& name, const glm::mat4& value) const;
+    MGF_CLASS_PTR(Program)
+    class Program
+    {
+    public:
+        ~Program();
+        static ProgramPtr Create(const Vector<ShaderPtr>& shaders);
 
-/*===================================//
-//   default array uniform setters   //
-//===================================*/
-public:
-    void SetUniform(const std::string& name, const std::vector<int32>& value) const;
-    void SetUniform(const std::string& name, const std::vector<glm::mat4>& value) const;
-    void SetUniform(const std::string& name, const std::vector<glm::vec3>& value) const;
+    public:
+        usize GetHandle() const { return m_handle; }
+        void Use() const;
 
-protected:
-    Program();
-    bool Link(const std::vector<ShaderPtr>& shaders);
-    bool AddShaderStage
-    (
-        const std::string& path, GLenum type, 
-        std::vector<ShaderPtr>& outShaders
-    );
+    /*==============================================//
+    //   default arithmetic value uniform setters   //
+    //==============================================*/
+    public:
+        void SetUniform(const String& name, bool value);
+        void SetUniform(const String& name, int32 value);
+        void SetUniform(const String& name, float value);
+        void SetUniform(const String& name, const vec2& value);
+        void SetUniform(const String& name, const vec3& value);
+        void SetUniform(const String& name, const vec4& value);
+        void SetUniform(const String& name, const mat4& value);
 
-    usize m_program  { 0 };
-};
+    /*===================================//
+    //   default array uniform setters   //
+    //===================================*/
+    public:
+        void SetUniform(const String& name, const Vector<int32>& value);
+        void SetUniform(const String& name, const Vector<mat4>& value);
+        void SetUniform(const String& name, const Vector<vec3>& value);
+
+    protected:
+        Program();
+        bool Link(const Vector<ShaderPtr>& shaders);
+        int32 GetUniformLocation(const String& name);
+
+        usize m_handle  { 0 };
+        HashMap<StringHash, int32> m_location;
+    };
+}

@@ -1,5 +1,7 @@
 #include "CorePch.h"
 #include "GLVertexLayout.h"
+#include "Graphics/Buffers/GLVertexBuffer.h"
+#include "Graphics/Buffers/GLIndexBuffer.h"
 
 namespace MGF3D
 {
@@ -13,7 +15,7 @@ namespace MGF3D
 		}
 	}
 
-	GLVertexLayoutUPtr VertexLayout::Create()
+	GLVertexLayoutUPtr GLVertexLayout::Create()
 	{
 		auto layout = GLVertexLayoutUPtr(new GLVertexLayout());
 		layout->Init();
@@ -23,6 +25,11 @@ namespace MGF3D
 	void GLVertexLayout::Init()
 	{
 		glCreateVertexArrays(1, &m_handle);
+	}
+
+	uint32 GLVertexLayout::GetHandle() const
+	{
+		return m_handle;
 	}
 
 	void GLVertexLayout::Bind() const
@@ -62,5 +69,21 @@ namespace MGF3D
 	void GLVertexLayout::DisableAttrib(uint32 attribIndex) const
 	{
 		glDisableVertexArrayAttrib(m_handle, attribIndex);
+	}
+
+	void GLVertexLayout::BindVertexBuffer(uint32 bindingIndex, const GLVertexBufferPtr& buffer, uint32 offset, uint32 stride) const
+	{
+		glVertexArrayVertexBuffer(m_handle, bindingIndex, buffer->GetHandle(), offset, stride);
+	}
+
+	void GLVertexLayout::BindIndexBuffer(const GLIndexBufferPtr& buffer) const
+	{
+		glVertexArrayElementBuffer(m_handle, buffer->GetHandle());
+	}
+
+
+	void GLVertexLayout::SetAttribBinding(uint32 attribIndex, uint32 bindingIndex) const
+	{
+		glVertexArrayAttribBinding(m_handle, attribIndex, bindingIndex);
 	}
 }

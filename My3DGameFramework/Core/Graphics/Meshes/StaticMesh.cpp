@@ -1,115 +1,124 @@
-﻿#include "EnginePch.h"
+﻿#include "CorePch.h"
 #include "StaticMesh.h"
-#include "Resources/Material.h"
-#include "Graphics/Buffers/Buffer.h"
-#include "Graphics/Buffers/VertexBuffer.h"
-#include "Graphics/Buffers/IndexBuffer.h"
-#include "Graphics/Layouts/VertexLayout.h"
-#include "Resources/Programs/Program.h"
+#include "CoreUtils/MathUtils.h"
+#include "Graphics/Layout/GLVertexLayout.h"
+#include "Graphics/Buffers/GLVertexBuffer.h"
+#include "Graphics/Buffers/GLIndexBuffer.h"
 
-DECLARE_DEFAULTS_IMPL(StaticMesh)
-
-StaticMeshPtr StaticMesh::Create(const std::vector<StaticVertex>& vertices,
-	                              const std::vector<uint32>& indices,
-	                              uint32 primitiveType)
+namespace MGF3D
 {
-	auto mesh = StaticMeshPtr(new StaticMesh());
-    mesh->m_desc.name = "StaticMesh_Material";
-    mesh->m_desc.path = "@Virtual/StaticMesh";
-	mesh->Init(vertices, indices, primitiveType);
-	return std::move(mesh);
-}
+    StaticMesh::StaticMesh() = default;
+    StaticMesh::~StaticMesh() = default;
 
-StaticMeshPtr StaticMesh::Load(const StaticMeshDesc& desc)
-{
-    auto mesh = StaticMeshPtr(new StaticMesh());
-    mesh->m_desc = desc;
-    return mesh;
-}
-
-void StaticMesh::Init(const std::vector<StaticVertex>& vertices,
-                      const std::vector<uint32>& indices,
-                      uint32 primitiveType)
-{
-    m_primitiveType = primitiveType;
-    m_indexCount = indices.size();
-    if (m_primitiveType == GL_TRIANGLES)
-        ComputeTangents(const_cast<std::vector<StaticVertex>&>(vertices), indices);
-    m_vertexLayout = VertexLayout::Create();
-    m_vertexBuffer = VertexBuffer::Create(vertices.data(), sizeof(StaticVertex), vertices.size());
-    m_indexBuffer = IndexBuffer::Create(indices);
-
-    m_vertexLayout->SetAttrib(0, 3, GL_FLOAT, false, sizeof(StaticVertex), 0);
-    m_vertexLayout->SetAttrib(1, 3, GL_FLOAT, false, sizeof(StaticVertex), offsetof(StaticVertex, normal));
-    m_vertexLayout->SetAttrib(2, 2, GL_FLOAT, false, sizeof(StaticVertex), offsetof(StaticVertex, texCoord));
-    m_vertexLayout->SetAttrib(3, 3, GL_FLOAT, false, sizeof(StaticVertex), offsetof(StaticVertex, tangent));
-}
-
-void StaticMesh::ComputeTangents(std::vector<StaticVertex>& vertices, const std::vector<uint32>& indices)
-{
-    std::vector<glm::vec3> tangents;
-    tangents.resize(vertices.size(), glm::vec3(0.0f));
-
-    for (usize i = 0; i < indices.size(); i += 3)
+    StaticMeshPtr StaticMesh::Create
+    (
+        const Vector<StaticVertex>& vertices,
+        const Vector<uint32>& indices,
+        uint32 primitiveType
+    )
     {
-        int32 i0 = indices[i];
-        uint32 i1 = indices[i + 1];
-        uint32 i2 = indices[i + 2];
+        auto mesh = StaticMeshPtr(new StaticMesh());
+        mesh->Init(vertices, indices, primitiveType);
+        return mesh;
+    }
 
-        const auto& v0 = vertices[i0];
-        const auto& v1 = vertices[i1];
-        const auto& v2 = vertices[i2];
+    void StaticMesh::Init
+    (
+        const Vector<StaticVertex>& vertices,
+        const Vector<uint32>& indices,
+        uint32 primitiveType
+    )
+    {
+        // 0. 기본 메쉬 설정
+        m_primitiveType = primitiveType;
+        m_indexCount = indices.size();
 
-        // Edge(변) 벡터
-        glm::vec3 edge1 = v1.position - v0.position;
-        glm::vec3 edge2 = v2.position - v0.position;
+        // 1. 탄젠트 연산
+        if (m_primitiveType == GL_TRIANGLES) 
+            ComputeTangents(const_cast<Vector<StaticVertex>&>(vertices), indices);
 
-        // Delta UV 벡터
-        glm::vec2 deltaUV1 = v1.texCoord - v0.texCoord;
-        glm::vec2 deltaUV2 = v2.texCoord - v0.texCoord;
+        // 2. 리소스 생성 (Create 인자 순서: data -> size)
+        m_vertexLayout = GLVertexLayout::Create();
+        m_vertexBuffer = GLVertexBuffer::Create(vertices.data(), vertices.size() * sizeof(StaticVertex));
+        m_indexBuffer = GLIndexBuffer::Create(indices.data(), indices.size() * sizeof(uint32));
 
-        // 행렬식(Determinant) 계산
-        float det = (deltaUV1.x * deltaUV2.y - deltaUV1.y * deltaUV2.x);
+        // 3. DSA 레이아웃 설정
+        const uint32 bindingIndex = 0;
+        m_vertexLayout->BindVertexBuffer(bindingIndex, m_vertexBuffer, 0, sizeof(StaticVertex));
+        m_vertexLayout->BindIndexBuffer(m_indexBuffer);
+        m_vertexLayout->SetAttribFormat(0, 3, GL_FLOAT, false, offsetof(StaticVertex, position), bindingIndex);
+        m_vertexLayout->SetAttribFormat(1, 3, GL_FLOAT, false, offsetof(StaticVertex, normal), bindingIndex);
+        m_vertexLayout->SetAttribFormat(2, 2, GL_FLOAT, false, offsetof(StaticVertex, texCoord), bindingIndex);
+        m_vertexLayout->SetAttribFormat(3, 3, GL_FLOAT, false, offsetof(StaticVertex, tangent), bindingIndex);
+        
+        // 4. 모든 속성 활성화
+        for (uint32 i = 0; i <= 3; ++i) m_vertexLayout->EnableAttrib(i);
+    }
 
-        if (det != 0.0f)
+    void StaticMesh::ComputeTangents
+    (
+        Vector<StaticVertex>& vertices, 
+        const Vector<uint32>& indices
+    )
+    {
+        Vector<vec3> tangents;
+        tangents.resize(vertices.size(), vec3(0.0f));
+
+        for (usize i = 0; i < indices.size(); i += 3)
         {
-            float invDet = 1.0f / det;
+            int32 i0 = indices[i];
+            uint32 i1 = indices[i + 1];
+            uint32 i2 = indices[i + 2];
 
-            // [핵심] 삼각형의 Tangent는 하나입니다!
-            glm::vec3 tangent;
-            tangent.x = invDet * (deltaUV2.y * edge1.x - deltaUV1.y * edge2.x);
-            tangent.y = invDet * (deltaUV2.y * edge1.y - deltaUV1.y * edge2.y);
-            tangent.z = invDet * (deltaUV2.y * edge1.z - deltaUV1.y * edge2.z);
+            const auto& v0 = vertices[i0];
+            const auto& v1 = vertices[i1];
+            const auto& v2 = vertices[i2];
 
-            // [누적] 구해진 하나의 Tangent를 세 정점에 모두 더해줍니다.
-            tangents[i0] += tangent;
-            tangents[i1] += tangent;
-            tangents[i2] += tangent;
+            // Edge(변) 벡터
+            vec3 edge1 = v1.position - v0.position;
+            vec3 edge2 = v2.position - v0.position;
+
+            // Delta UV 벡터
+            vec2 deltaUV1 = v1.texCoord - v0.texCoord;
+            vec2 deltaUV2 = v2.texCoord - v0.texCoord;
+
+            // 행렬식(Determinant) 계산
+            float det = (deltaUV1.x * deltaUV2.y - deltaUV1.y * deltaUV2.x);
+            if (det != 0.0f)
+            {
+                float invDet = 1.0f / det;
+
+                // 삼각형의 Tangent는 하나입니다!
+                vec3 tangent;
+                tangent.x = invDet * (deltaUV2.y * edge1.x - deltaUV1.y * edge2.x);
+                tangent.y = invDet * (deltaUV2.y * edge1.y - deltaUV1.y * edge2.y);
+                tangent.z = invDet * (deltaUV2.y * edge1.z - deltaUV1.y * edge2.z);
+
+                // 구해진 하나의 Tangent를 세 정점에 모두 더해줍니다.
+                tangents[i0] += tangent;
+                tangents[i1] += tangent;
+                tangents[i2] += tangent;
+            }
+            else
+            {
+                tangents[i0] += edge1;
+                tangents[i1] += edge1;
+                tangents[i2] += edge1;
+            }
         }
-        else
+
+        // 3. 정규화 (Normalize) - 평균낸 방향을 단위 벡터로 만듦
+        for (usize i = 0; i < vertices.size(); i++)
         {
-            tangents[i0] += edge1;
-            tangents[i1] += edge1;
-            tangents[i2] += edge1;
+            if (Math::HasLength(tangents[i])) vertices[i].tangent = normalize(tangents[i]);
+            else vertices[i].tangent = vec3(1.0f, 0.0f, 0.0f);
         }
     }
 
-    // 3. 정규화 (Normalize) - 평균낸 방향을 단위 벡터로 만듦
-    for (usize i = 0; i < vertices.size(); i++)
+    void StaticMesh::Draw(uint32 count) const
     {
-        if (glm::length(tangents[i]) > glm::epsilon<float>())
-        {
-            vertices[i].tangent = glm::normalize(tangents[i]);
-        }
-        else
-        {
-            vertices[i].tangent = glm::vec3(1.0f, 0.0f, 0.0f);
-        }
+        Bind();
+        Super::Draw(count);
+        Unbind();
     }
-}
-
-void StaticMesh::Draw() const
-{
-    m_vertexLayout->Bind();
-    glDrawElements(m_primitiveType, m_indexBuffer->GetCount(), GL_UNSIGNED_INT, 0);
 }

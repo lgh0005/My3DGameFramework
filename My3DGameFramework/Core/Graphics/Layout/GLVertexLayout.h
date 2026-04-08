@@ -2,6 +2,9 @@
 
 namespace MGF3D
 {
+	MGF_CLASS_PTR(GLVertexBuffer)
+	MGF_CLASS_PTR(GLIndexBuffer)
+
 	MGF_CLASS_PTR(GLVertexLayout)
 	class GLVertexLayout
 	{
@@ -23,9 +26,15 @@ namespace MGF3D
 		void EnableAttrib(uint32 attribIndex) const;
 		void DisableAttrib(uint32 attribIndex) const;
 
+	public:
+		void BindVertexBuffer(uint32 bindingIndex, const GLVertexBufferPtr& buffer, uint32 offset, uint32 stride) const;
+		void BindIndexBuffer(const GLIndexBufferPtr& buffer) const;
+		void SetAttribBinding(uint32 attribIndex, uint32 bindingIndex) const;
+
 	private:
 		GLVertexLayout();
 		void Init();
-		uint32 m_handle{ 0 };
+
+		uint32 m_handle { 0 };
 	};
 }

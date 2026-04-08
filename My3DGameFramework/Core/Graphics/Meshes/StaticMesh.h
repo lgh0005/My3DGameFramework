@@ -1,45 +1,38 @@
 ﻿#pragma once
-#include "Resources/ResourceDesc.h"
-#include "Resources/Meshes/Mesh.h"
-#include "Graphics/Layouts/Vertex.h"
+#include "Graphics/Meshes/Mesh.h"
+#include "Graphics/Vertices/Vertex.h"
 
-#pragma region FORWARD_DECLARATION
-CLASS_PTR(Buffer)
-CLASS_PTR(VertexLayout)
-CLASS_PTR(Material)
-CLASS_PTR(Program)
-#pragma endregion
-
-CLASS_PTR(StaticMesh)
-class StaticMesh : public Mesh
+namespace MGF3D
 {
-    DEFINE_RESOURCE_TYPE(ResourceType::StaticMesh, StaticMeshDesc)
+    MGF_CLASS_PTR(StaticMesh)
+    class StaticMesh : public Mesh
+    {
+        using Super = Mesh;
 
-public:
-    static StaticMeshPtr Create
-    (
-        const std::vector<StaticVertex>& vertices,
-        const std::vector<uint32>& indices,
-        uint32 primitiveType = GL_TRIANGLES
-    );
-    static StaticMeshPtr Load(const StaticMeshDesc& desc);
-    virtual StaticMeshDesc& GetDesc() override { return m_desc; }
-    virtual const ResourceDesc& GetDesc() const override { return m_desc; }
-    virtual ~StaticMesh() override;
-    void ComputeTangents
-    (
-        std::vector<StaticVertex>& vertices,
-        const std::vector<uint32>& indices
-    );
-    virtual void Draw() const override;
+    public:
+        virtual ~StaticMesh() override;
+        static StaticMeshPtr Create
+        (
+            const Vector<StaticVertex>& vertices,
+            const Vector<uint32>& indices,
+            uint32 primitiveType = GL_TRIANGLES
+        );
+        virtual void Draw(uint32 count) const override;
 
-private:
-    StaticMesh();
-    void Init
-    (
-        const std::vector<StaticVertex>& vertices,
-        const std::vector<uint32>& indices,
-        uint32 primitiveType
-    );
-    StaticMeshDesc m_desc;
-};
+    public:
+        void ComputeTangents
+        (
+            Vector<StaticVertex>& vertices,
+            const Vector<uint32>& indices
+        );
+
+    private:
+        StaticMesh();
+        void Init
+        (
+            const Vector<StaticVertex>& vertices,
+            const Vector<uint32>& indices,
+            uint32 primitiveType
+        );
+    };
+}

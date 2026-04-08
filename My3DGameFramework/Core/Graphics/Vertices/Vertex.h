@@ -1,38 +1,41 @@
 ﻿#pragma once
 
-struct ScreenVertex
+namespace MGF3D
 {
-    glm::vec3 position;
-    glm::vec2 texCoord;
-};
+    struct ScreenVertex
+    {
+        vec3 position;
+        vec2 texCoord;
+    };
 
-struct UIVertex
-{
-    glm::vec3 position;
-    glm::vec4 color;   
-    glm::vec2 texCoord;
-};
+    struct UIVertex
+    {
+        vec3 position;
+        vec4 color;
+        vec2 texCoord;
+    };
 
-struct StaticVertex
-{
-    glm::vec3 position;
-    glm::vec3 normal;
-    glm::vec2 texCoord;
-    glm::vec3 tangent;
-};
+    struct StaticVertex
+    {
+        vec3 position;
+        vec3 normal;
+        vec2 texCoord;
+        vec3 tangent;
+    };
 
-struct SkinnedVertex
-{
-    glm::vec3 position;
-    glm::vec3 normal;
-    glm::vec2 texCoord;
-    glm::vec3 tangent;
-    int32     boneIDs[MAX_BONE_INFLUENCE];
-    float     weights[MAX_BONE_INFLUENCE];
-};
+    struct SkinnedVertex
+    {
+        vec3 position;
+        vec3 normal;
+        vec2 texCoord;
+        vec3 tangent;
+        int32     boneIDs[MAX_BONE_INFLUENCE];
+        float     weights[MAX_BONE_INFLUENCE];
+    };
 
-struct GizmoVertex
-{
-    glm::vec3 position;
-    glm::vec4 color;
-};
+    struct GizmoVertex
+    {
+        vec3 position;
+        vec4 color;
+    };
+}

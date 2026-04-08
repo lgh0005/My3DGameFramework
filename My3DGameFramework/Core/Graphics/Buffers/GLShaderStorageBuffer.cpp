@@ -9,7 +9,7 @@ namespace MGF3D
 	GLShaderStorageBufferUPtr GLShaderStorageBuffer::Create(const void* data, usize byteSize)
 	{
 		auto buffer = GLShaderStorageBufferUPtr(new GLShaderStorageBuffer());
-		if (!buffer->Init(byteSize, data)) return nullptr;
+		if (!buffer->Init(data, byteSize)) return nullptr;
 		return buffer;
 	}
 

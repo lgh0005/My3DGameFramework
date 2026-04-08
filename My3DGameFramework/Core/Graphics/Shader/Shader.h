@@ -1,16 +1,31 @@
 ﻿#pragma once
 
-CLASS_PTR(Shader)
-class Shader
+namespace MGF3D
 {
-public:
-	static ShaderPtr CreateFromFile(const std::string& filename, GLenum shaderType);
+	enum class EShaderFileType
+	{
+		GLSL,
+		SPIRV
+	};
 
-	usize Get() const { return m_shader; }
-	bool LoadFile(const std::string& filename, GLenum shaderType);
-	~Shader();
+	MGF_CLASS_PTR(Shader)
+	class Shader
+	{
+	public:
+		~Shader();
+		static ShaderPtr Create
+		(
+			const String& filename, GLenum shaderType,
+			EShaderFileType shaderFileType, const String& entryPoint = "main"
+		);
+		uint32 GetHandle() const { return m_handle; }
 
-private:
-	Shader();
-	usize m_shader{ 0 };
-};
+	private:
+		Shader();
+
+		bool LoadGLSL(const String& filename, GLenum shaderType);
+		bool LoadSpirV(const String& filename, GLenum shaderType, const String& entryPoint);
+
+		uint32 m_handle { 0 };
+	};
+}
