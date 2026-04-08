@@ -3,7 +3,6 @@
 #include "Managers/InputManager.h"
 #include "Devices/MGFKeyboardDevice.h"
 #include "Devices/MGFMouseDevice.h"
-#include <GLFW/glfw3.h>
 
 namespace MGF3D
 {

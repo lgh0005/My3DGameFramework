@@ -2,7 +2,6 @@
 #include "MGFInputDevice.h"
 #include "Managers/TypeManager.h"
 #include "Identities/MGFTypeTree.h"
-#include <GLFW/glfw3.h>
 
 namespace MGF3D
 {

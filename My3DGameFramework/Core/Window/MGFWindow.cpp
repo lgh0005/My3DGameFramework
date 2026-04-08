@@ -1,8 +1,6 @@
 #include "CorePch.h"
 #include "MGFWindow.h"
 #include "MGFWindowInterface.h"
-#include <glad/glad.h>
-#include <GLFW/glfw3.h>
 
 namespace MGF3D
 {

@@ -1,0 +1,44 @@
+#include "CorePch.h"
+#include "GLTextureHandle.h"
+
+namespace MGF3D
+{
+	GLTextureHandle::GLTextureHandle() = default;
+	GLTextureHandle::~GLTextureHandle()
+	{
+		if (m_handle != 0)
+		{
+			glDeleteTextures(1, &m_handle);
+			m_handle = 0;
+			m_target = 0;
+		}
+	}
+
+	void GLTextureHandle::Bind(uint32 slot) const
+	{
+		if (m_handle == 0) return;
+		glBindTextureUnit(slot, m_handle);
+	}
+
+	void GLTextureHandle::Unbind(uint32 slot) const
+	{
+		glBindTextureUnit(slot, 0);
+	}
+
+	uint32 GLTextureHandle::GetTarget() const
+	{
+		return m_target;
+	}
+
+	uint32 GLTextureHandle::GetHandle() const
+	{
+		return m_handle;
+	}
+
+	void GLTextureHandle::GenerateMipmap()
+	{
+		if (m_handle == 0) return;
+		glGenerateTextureMipmap(m_handle);
+		glTextureParameteri(m_handle, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+	}
+}

@@ -11,6 +11,9 @@
 //    External third-parties   //
 //=============================*/
 #define GLM_ENABLE_EXPERIMENTAL
+#include <glad/glad.h>
+#include <GL/glext.h>
+#include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
 #include <glm/common.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -45,6 +48,7 @@
 /*============================//
 //    Engine common defines   //
 //============================*/
+#include "Defines/DefineGLExtensions.h"
 #include "Defines/DefineClassPointers.h"
 #include "Defines/DefineStructPointers.h"
 #include "Defines/DefineDisables.h"

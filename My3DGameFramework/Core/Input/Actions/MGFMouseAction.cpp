@@ -1,6 +1,5 @@
 #include "CorePch.h"
 #include "MGFMouseAction.h"
-#include <GLFW/glfw3.h>
 
 namespace MGF3D
 {

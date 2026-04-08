@@ -16,8 +16,8 @@ set(SOURCES
     "Types/Types.h"
 
     # Constants
-    "Constants/ConstantMath.h" 
-    "Constants/ConstantGraphics.h" "Constants/ConstantStringHash.h"
+    "Constants/ConstantMath.h"        "Constants/ConstantGraphics.h" 
+    "Constants/ConstantStringHash.h"  "Constants/ConstantType.h" 
 
     # Defines
     "Defines/DefineAsserter.h"  "Defines/DefineBreakpoint.h"
@@ -26,6 +26,19 @@ set(SOURCES
     "Defines/DefineLoggings.h"  "Defines/DefineManagers.h"
     "Defines/DefineSingleton.h"  "Defines/DefineStructPointers.h"
     "Defines/DefineTimeStamp.h"  "Defines/DefineUtilities.h"
+
+    # Graphics
+    "Graphics/Buffers/GLBufferHandle.h"             "Graphics/Buffers/GLBufferHandle.cpp"
+    "Graphics/Buffers/GLIndexBuffer.h"              "Graphics/Buffers/GLIndexBuffer.cpp"
+    "Graphics/Buffers/GLUniformBuffer.h"            "Graphics/Buffers/GLUniformBuffer.cpp"
+    "Graphics/Buffers/GLShaderStorageBuffer.h"      "Graphics/Buffers/GLShaderStorageBuffer.cpp"
+    "Graphics/Buffers/GLPixelBuffer.h"              "Graphics/Buffers/GLPixelBuffer.cpp"
+    "Graphics/Buffers/GLTextureBuffer.h"            "Graphics/Buffers/GLTextureBuffer.cpp"
+    "Graphics/Layout/GLVertexLayout.h"              "Graphics/Layout/GLVertexLayout.cpp"
+    "Graphics/Textures/GLTextureHandle.h"           "Graphics/Textures/GLTextureHandle.cpp"
+    "Graphics/Textures/GLTexture2D.h"               "Graphics/Textures/GLTexture2D.cpp"
+    "Graphics/Textures/GLTexture3D.h"               "Graphics/Textures/GLTexture3D.cpp"
+    "Graphics/Textures/GLTextureCube.h"             "Graphics/Textures/GLTextureCube.cpp"
 
     # Debug
     "Debug/Asserter.h"      "Debug/Asserter.cpp"
@@ -74,7 +87,8 @@ set(SOURCES
     # Utils
     "CoreUtils/AssetUtils.h"       "CoreUtils/AssetUtils.cpp"           "CoreUtils/AssetUtils.inl"
     "CoreUtils/CommonUtils.h"      "CoreUtils/CommonUtils.cpp"           "CoreUtils/CommonUtils.inl"
-    "CoreUtils/GraphicsUtils.h"    "CoreUtils/GraphicsUtils.cpp"     
+    "CoreUtils/GraphicsUtils.h"    "CoreUtils/GraphicsUtils.cpp"
+    "CoreUtils/TextureUtils.h"    "CoreUtils/TextureUtils.cpp" 
     # "CoreUtils/LuaBindingUtils.h"      "CoreUtils/LuaBindingUtils.cpp"  
     "CoreUtils/MathUtils.h"        "CoreUtils/MathUtils.cpp" 
 
