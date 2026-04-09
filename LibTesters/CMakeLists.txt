@@ -26,6 +26,7 @@ target_link_libraries(${APP_NAME}
 
 PRIVATE 
     Engine::Core
+    Engine::Systems
 )
 
 # 7. 리소스 배포 (Resource Deployment)

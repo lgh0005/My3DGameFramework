@@ -1,6 +1,6 @@
 ﻿#include "CorePch.h"
 #include "ScreenMesh.h"
-#include "Graphics/Vertices/Vertex.h"
+#include "Graphics/Vertices/ScreenVertex.h"
 #include "Graphics/Layout/GLVertexLayout.h"
 #include "Graphics/Buffers/GLVertexBuffer.h"
 #include "Graphics/Buffers/GLIndexBuffer.h"

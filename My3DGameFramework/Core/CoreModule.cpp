@@ -22,9 +22,6 @@ namespace MGF3D
 		MGFKeyboardDevice::s_typeIndex = deviceTree.Register("MGFKeyboardDevice", "MGFInputDevice");
 		MGFMouseDevice::s_typeIndex = deviceTree.Register("MGFMouseDevice", "MGFInputDevice");
 		MGF_TYPE.BakeAll();
-
-		int a = 10;
-		int b = 20;
 	}
 
 	bool CoreModule::OnInit()
@@ -47,6 +44,8 @@ namespace MGF3D
 
 		// 3. 타임 매니저
 		MGF_TIME.Init();
+
+		return true;
 	}
 
 	bool CoreModule::OnShutdown()

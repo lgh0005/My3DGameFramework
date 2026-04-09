@@ -45,7 +45,7 @@ namespace MGF3D
 	void GLVertexLayout::SetAttribFormat(uint32 attribIndex, int32 count, uint32 type, bool normalized, uint32 relativeOffset, uint32 bindingIndex) const
 	{
 		glEnableVertexArrayAttrib(m_handle, attribIndex);
-		glVertexArrayAttribFormat(m_handle, attribIndex, count, type, CommonUtils::Select(normalized, GL_TRUE, GL_FALSE), relativeOffset);
+		glVertexArrayAttribFormat(m_handle, attribIndex, count, type, CommonUtils::Select<GLboolean>(normalized, GL_TRUE, GL_FALSE), relativeOffset);
 		glVertexArrayAttribBinding(m_handle, attribIndex, bindingIndex);
 	}
 

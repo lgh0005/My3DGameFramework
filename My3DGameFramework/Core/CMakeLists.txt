@@ -27,37 +27,6 @@ set(SOURCES
     "Defines/DefineSingleton.h"  "Defines/DefineStructPointers.h"
     "Defines/DefineTimeStamp.h"  "Defines/DefineUtilities.h"
 
-    # Graphics
-    "Graphics/Buffers/GLBufferHandle.h"             "Graphics/Buffers/GLBufferHandle.cpp"
-    "Graphics/Buffers/GLIndexBuffer.h"              "Graphics/Buffers/GLIndexBuffer.cpp"
-    "Graphics/Buffers/GLUniformBuffer.h"            "Graphics/Buffers/GLUniformBuffer.cpp"
-    "Graphics/Buffers/GLShaderStorageBuffer.h"      "Graphics/Buffers/GLShaderStorageBuffer.cpp"
-    "Graphics/Buffers/GLPixelBuffer.h"              "Graphics/Buffers/GLPixelBuffer.cpp"
-    "Graphics/Buffers/GLTextureBuffer.h"            "Graphics/Buffers/GLTextureBuffer.cpp"
-
-    "Graphics/Layout/GLVertexLayout.h"              "Graphics/Layout/GLVertexLayout.cpp"
-
-    "Graphics/Textures/GLTextureHandle.h"           "Graphics/Textures/GLTextureHandle.cpp"
-    "Graphics/Textures/GLTexture2D.h"               "Graphics/Textures/GLTexture2D.cpp"
-    "Graphics/Textures/GLTexture3D.h"               "Graphics/Textures/GLTexture3D.cpp"
-    "Graphics/Textures/GLTextureCube.h"             "Graphics/Textures/GLTextureCube.cpp"
-
-    "Graphics/Meshes/Mesh.h"                        "Graphics/Meshes/Mesh.cpp"
-    "Graphics/Meshes/ScreenMesh.h"                  "Graphics/Meshes/ScreenMesh.cpp"
-    "Graphics/Meshes/StaticMesh.h"                  "Graphics/Meshes/StaticMesh.cpp"
-    "Graphics/Meshes/SkinnedMesh.h"                 "Graphics/Meshes/SkinnedMesh.cpp"
-    #"Graphics/Meshes/DebugMesh.h"                   "Graphics/Meshes/DebugMesh.cpp"
-    #"Graphics/Meshes/InstancedMesh.h"               "Graphics/Meshes/InstancedMesh.cpp"
-    #"Graphics/Meshes/UIMesh.h"                      "Graphics/Meshes/UIMesh.cpp"
-
-    "Graphics/Programs/Program.h"                    "Graphics/Programs/Program.cpp"
-
-    "Graphics/Uniforms/Uniform.h"                    "Graphics/Uniforms/Uniform.cpp"
-
-    "Graphics/Vertices/Vertex.h"                    "Graphics/Vertices/Vertex.cpp"
-
-    "Graphics/Shader/Shader.h"                      "Graphics/Shader/Shader.cpp"
-
     # Debug
     "Debug/Asserter.h"      "Debug/Asserter.cpp"
     "Debug/Logger.h"        "Debug/Logger.cpp"    "Debug/Logger.inl"
@@ -105,9 +74,6 @@ set(SOURCES
     # Utils
     "CoreUtils/AssetUtils.h"       "CoreUtils/AssetUtils.cpp"           "CoreUtils/AssetUtils.inl"
     "CoreUtils/CommonUtils.h"      "CoreUtils/CommonUtils.cpp"           "CoreUtils/CommonUtils.inl"
-    "CoreUtils/GraphicsUtils.h"    "CoreUtils/GraphicsUtils.cpp"
-    "CoreUtils/TextureUtils.h"    "CoreUtils/TextureUtils.cpp" 
-    # "CoreUtils/LuaBindingUtils.h"      "CoreUtils/LuaBindingUtils.cpp"  
     "CoreUtils/MathUtils.h"        "CoreUtils/MathUtils.cpp"            "CoreUtils/MathUtils.inl"
 
     # Module
