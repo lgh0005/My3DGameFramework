@@ -1,6 +1,6 @@
-﻿#include "CorePch.h"
+﻿#include "GraphicsPch.h"
 #include "Program.h"
-#include "Graphics/Shader/Shader.h"
+#include "Shader/Shader.h"
 
 namespace MGF3D
 {
@@ -12,13 +12,6 @@ namespace MGF3D
             glDeleteProgram(m_handle);
             m_handle = 0;
         }
-    }
-
-    ProgramPtr Program::Create(const Vector<ShaderPtr>& shaders)
-    {
-        auto program = ProgramPtr(new Program());
-        if (!program->Link(shaders)) return nullptr;
-        return program;
     }
 
     void Program::Use() const

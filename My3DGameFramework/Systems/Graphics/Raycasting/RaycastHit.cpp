@@ -1,32 +1,32 @@
-﻿#include "EnginePch.h"
+﻿#include "CorePch.h"
 #include "RaycastHit.h"
-#include "Object/GameObject.h"
+#include "Entities/GameObject.h"
 
-RaycastHit::RaycastHit()
+namespace MGF3D
 {
-	Reset();
-}
-RaycastHit::~RaycastHit() = default;
+	RaycastHit::RaycastHit() { Reset(); }
+	RaycastHit::~RaycastHit() = default;
 
-void RaycastHit::Reset()
-{
-	m_gameObject = nullptr;
-	m_point = glm::vec3(0.f);
-	m_normal = glm::vec3(0.f);
-	m_distance = 0.f;
-	m_isHit = false;
-}
+	void RaycastHit::Reset()
+	{
+		m_gameObject = nullptr;
+		m_point = vec3(0.f);
+		m_normal = vec3(0.f);
+		m_distance = 0.f;
+		m_isHit = false;
+	}
 
-void RaycastHit::SetHitResult
-(
-	GameObject* obj, 
-	const glm::vec3& point, const glm::vec3& normal, 
-	float dist
-)
-{
-	m_gameObject = obj;
-	m_point = point;
-	m_normal = normal;
-	m_distance = dist;
-	m_isHit = true;
+	void RaycastHit::SetHitResult
+	(
+		GameObject* obj,
+		const vec3& point, const vec3& normal,
+		float dist
+	)
+	{
+		m_gameObject = obj;
+		m_point = point;
+		m_normal = normal;
+		m_distance = dist;
+		m_isHit = true;
+	}
 }

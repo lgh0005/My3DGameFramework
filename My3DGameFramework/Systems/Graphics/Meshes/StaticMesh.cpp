@@ -1,9 +1,9 @@
-﻿#include "CorePch.h"
+﻿#include "GraphicsPch.h"
 #include "StaticMesh.h"
 #include "CoreUtils/MathUtils.h"
-#include "Graphics/Layout/GLVertexLayout.h"
-#include "Graphics/Buffers/GLVertexBuffer.h"
-#include "Graphics/Buffers/GLIndexBuffer.h"
+#include "Layout/GLVertexLayout.h"
+#include "Buffers/GLVertexBuffer.h"
+#include "Buffers/GLIndexBuffer.h"
 
 namespace MGF3D
 {
@@ -36,6 +36,9 @@ namespace MGF3D
         // 1. 탄젠트 연산
         if (m_primitiveType == GL_TRIANGLES) 
             ComputeTangents(const_cast<Vector<StaticVertex>&>(vertices), indices);
+
+        // 2. 바운딩 박스(AABB) 자동 계산 및 세팅
+        SetLocalBounds(RenderBounds(vertices));
 
         // 2. 리소스 생성 (Create 인자 순서: data -> size)
         m_vertexLayout = GLVertexLayout::Create();

@@ -1,5 +1,5 @@
 #pragma once
-#include "Graphics/Buffers/GLBufferHandle.h"
+#include "Buffers/GLBufferHandle.h"
 
 namespace MGF3D
 {

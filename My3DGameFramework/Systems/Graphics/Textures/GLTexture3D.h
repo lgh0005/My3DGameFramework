@@ -1,5 +1,5 @@
 #pragma once
-#include "Graphics/Textures/GLTextureHandle.h"
+#include "Textures/GLTextureHandle.h"
 
 namespace MGF3D
 {

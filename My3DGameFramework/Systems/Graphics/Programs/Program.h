@@ -8,10 +8,7 @@ namespace MGF3D
     class Program
     {
     public:
-        ~Program();
-        static ProgramPtr Create(const Vector<ShaderPtr>& shaders);
-
-    public:
+        virtual ~Program();
         usize GetHandle() const { return m_handle; }
         void Use() const;
 

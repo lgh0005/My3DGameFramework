@@ -1,9 +1,9 @@
-﻿#include "CorePch.h"
+﻿#include "GraphicsPch.h"
 #include "ScreenMesh.h"
-#include "Graphics/Vertices/ScreenVertex.h"
-#include "Graphics/Layout/GLVertexLayout.h"
-#include "Graphics/Buffers/GLVertexBuffer.h"
-#include "Graphics/Buffers/GLIndexBuffer.h"
+#include "Vertices/ScreenVertex.h"
+#include "Layout/GLVertexLayout.h"
+#include "Buffers/GLVertexBuffer.h"
+#include "Buffers/GLIndexBuffer.h"
 
 namespace MGF3D
 {

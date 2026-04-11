@@ -1,5 +1,5 @@
 ﻿#pragma once
-#include "Graphics/Geometry/RenderBounds.h"
+#include "Geometry/RenderBounds.h"
 
 namespace MGF3D
 {
@@ -38,7 +38,7 @@ namespace MGF3D
         GLVertexBufferPtr m_vertexBuffer;
         GLIndexBufferPtr m_indexBuffer;
 
-        RenderBounds m_localBounds { RenderBounds::Empty() };
+        RenderBounds m_localBounds { RenderBounds() };
     };
 
 }

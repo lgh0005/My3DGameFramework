@@ -1,6 +1,6 @@
 ﻿#pragma once
-#include "Graphics/Meshes/Mesh.h"
-#include "Graphics/Vertices/SkinnedVertex.h"
+#include "Meshes/Mesh.h"
+#include "Vertices/SkinnedVertex.h"
 
 namespace MGF3D
 {

@@ -1,4 +1,4 @@
-#include "CorePch.h"
+#include "GraphicsPch.h"
 #include "GLPixelBuffer.h"
 
 namespace MGF3D

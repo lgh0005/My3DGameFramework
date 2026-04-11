@@ -11,12 +11,56 @@ namespace MGF3D
 		return glm::sqrt(v);
 	}
 
+	float Math::InverseSqrt(float v) noexcept
+	{
+		return glm::inversesqrt(v);
+	}
+
 	/*==========================//
 	//   Safe math operations   //
 	//==========================*/
 	bool Math::HasLength(const vec3& v)
 	{
 		return glm::length2(v) > EPSILON2;
+	}
+
+	/*====================//
+//    Trigonometry     //
+//====================*/
+
+	inline float Math::Sin(float radians) noexcept
+	{
+		return glm::sin(radians);
+	}
+
+	inline float Math::Cos(float radians) noexcept
+	{
+		return glm::cos(radians);
+	}
+
+	inline float Math::Tan(float radians) noexcept
+	{
+		return glm::tan(radians);
+	}
+
+	inline float Math::ASin(float v) noexcept
+	{
+		return glm::asin(v);
+	}
+
+	inline float Math::ACos(float v) noexcept
+	{
+		return glm::acos(v);
+	}
+
+	inline float Math::ATan(float v) noexcept
+	{
+		return glm::atan(v);
+	}
+
+	inline float Math::ATan2(float y, float x) noexcept
+	{
+		return glm::atan(y, x);
 	}
 
 	/*==========================//

@@ -1,55 +1,48 @@
-﻿#include "EnginePch.h"
-#include "RenderBounds.h"
+﻿#include "RenderBounds.h"
+#include "GraphicsPch.h"
 
-DECLARE_DEFAULTS_IMPL(RenderBounds)
-
-RenderBounds RenderBounds::Empty()
+namespace MGF3D
 {
-    return Create(glm::vec3(0.0f), glm::vec3(0.0f));
-}
+    RenderBounds::RenderBounds() : m_center(0.0f), m_extents(0.0f) { }
+    RenderBounds::RenderBounds(const vec3& center, const vec3& extents) : m_center(center), m_extents(extents) { }
+    RenderBounds::~RenderBounds() = default;
 
-RenderBounds RenderBounds::Create(const glm::vec3& center,
-    const glm::vec3& extents)
-{
-    RenderBounds bound;
-    bound.m_center = center;
-    bound.m_extents = extents;
-    return bound;
-}
+    RenderBounds RenderBounds::Transform(const mat4& mat) const
+    {
+        vec3 newCenter = vec3(mat * vec4(m_center, 1.0f));
+        vec3 right = vec3(mat[0]);
+        vec3 up = vec3(mat[1]);
+        vec3 fwd = vec3(mat[2]);
 
-RenderBounds RenderBounds::CreateFromMinMax(const glm::vec3& min, const glm::vec3& max)
-{
-    return RenderBounds::Create((max + min) * 0.5f, (max - min) * 0.5f);
-}
+        vec3 newExtents;
+        newExtents.x = Math::Abs(right.x) * m_extents.x + Math::Abs(up.x) * m_extents.y + Math::Abs(fwd.x) * m_extents.z;
+        newExtents.y = Math::Abs(right.y) * m_extents.x + Math::Abs(up.y) * m_extents.y + Math::Abs(fwd.y) * m_extents.z;
+        newExtents.z = Math::Abs(right.z) * m_extents.x + Math::Abs(up.z) * m_extents.y + Math::Abs(fwd.z) * m_extents.z;
 
-RenderBounds RenderBounds::Transform(const glm::mat4& mat) const
-{
-    glm::vec3 newCenter = glm::vec3(mat * glm::vec4(m_center, 1.0f));
-    glm::vec3 right = glm::vec3(mat[0]);
-    glm::vec3 up = glm::vec3(mat[1]);
-    glm::vec3 fwd = glm::vec3(mat[2]);
+        return RenderBounds(newCenter, newExtents);
+    }
 
-    glm::vec3 newExtents;
-    newExtents.x = glm::abs(right.x) * m_extents.x + glm::abs(up.x) * m_extents.y + glm::abs(fwd.x) * m_extents.z;
-    newExtents.y = glm::abs(right.y) * m_extents.x + glm::abs(up.y) * m_extents.y + glm::abs(fwd.y) * m_extents.z;
-    newExtents.z = glm::abs(right.z) * m_extents.x + glm::abs(up.z) * m_extents.y + glm::abs(fwd.z) * m_extents.z;
+    RenderBounds RenderBounds::Union(const RenderBounds& other) const
+    {
+        // 1. 각각의 Min / Max 추출
+        vec3 minA = GetMin();
+        vec3 maxA = GetMax();
+        vec3 minB = other.GetMin();
+        vec3 maxB = other.GetMax();
 
-    return RenderBounds::Create(newCenter, newExtents);
-}
+        // 2. 전체를 아우르는 새로운 Min / Max 계산
+        vec3 newMin = Math::Min(minA, minB);
+        vec3 newMax = Math::Max(maxA, maxB);
 
-RenderBounds RenderBounds::Union(const RenderBounds& other) const
-{
-    // 1. 현재 bounds를 Min/Max 좌표로 변환
-    glm::vec3 minA = m_center - m_extents;
-    glm::vec3 maxA = m_center + m_extents;
+        // 3. 생성자 호출 후 결과 반환
+        RenderBounds result;
+        result.SetFromMinMax(newMin, newMax);
+        return result;
+    }
 
-    // 2. other bounds를 Min/Max 좌표로 변환
-    glm::vec3 minB = other.m_center - other.m_extents;
-    glm::vec3 maxB = other.m_center + other.m_extents;
-
-    // 3. 두 Min/Max를 합쳐서 새로운 최종 Min/Max 계산 (Union)
-    glm::vec3 newMin = Utils::GlmVec3Min(minA, minB);
-    glm::vec3 newMax = Utils::GlmVec3Max(maxA, maxB);
-
-    return RenderBounds::CreateFromMinMax(newMin, newMax);
+    void RenderBounds::SetFromMinMax(const vec3& min, const vec3& max)
+    {
+        m_center = (max + min) * 0.5f;
+        m_extents = (max - min) * 0.5f;
+    }
 }

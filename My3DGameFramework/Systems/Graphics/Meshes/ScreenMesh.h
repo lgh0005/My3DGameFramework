@@ -1,5 +1,5 @@
 ﻿#pragma once
-#include "Graphics/Meshes/Mesh.h"
+#include "Meshes/Mesh.h"
 
 namespace MGF3D
 {

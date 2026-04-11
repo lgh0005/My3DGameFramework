@@ -1,20 +1,31 @@
 ﻿#pragma once
 
-class RenderBounds
+namespace MGF3D
 {
-public:
-	~RenderBounds();
-	static RenderBounds Empty();
-	static RenderBounds Create(const glm::vec3& center, const glm::vec3& extents);
-	static RenderBounds CreateFromMinMax(const glm::vec3& min, const glm::vec3& max);
+	class RenderBounds
+	{
+	public:
+		RenderBounds();
+		RenderBounds(const vec3& center, const vec3& extents);
+		template<typename T> RenderBounds(const Vector<T>& vertices);
+		~RenderBounds();
 
-	RenderBounds Transform(const glm::mat4& mat) const;
-	RenderBounds Union(const RenderBounds& other) const;
-	const glm::vec3& GetCenter() const { return m_center; }
-	const glm::vec3& GetExtents() const { return m_extents; }
+	public:
+		RenderBounds Transform(const mat4& mat) const;
+		RenderBounds Union(const RenderBounds& other) const;
+		void SetFromMinMax(const vec3& min, const vec3& max);
+		template <typename T> void SetFromVertices(const Vector<T>& vertices);
 
-private:
-	RenderBounds();
-	glm::vec3 m_center{ 0.0f };
-	glm::vec3 m_extents{ 0.0f };
-};
+	public:
+		const vec3& GetCenter() const { return m_center; }
+		const vec3& GetExtents() const { return m_extents; }
+		vec3 GetMin() const { return m_center - m_extents; }
+		vec3 GetMax() const { return m_center + m_extents; }
+
+	private:
+		vec3 m_center{ 0.0f };
+		vec3 m_extents{ 0.0f };
+	};
+}
+
+#include "Geometry/RenderBounds.inl"

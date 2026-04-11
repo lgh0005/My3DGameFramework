@@ -1,21 +1,18 @@
 ﻿#pragma once
-#include "Resources/ResourceDesc.h"
-#include "Resources/Programs/Program.h"
+#include "Programs/Program.h"
 
-CLASS_PTR(GraphicsProgram)
-class GraphicsProgram : public Program
+namespace MGF3D
 {
-	DEFINE_RESOURCE_TYPE(ResourceType::GraphicsProgram, GraphicsProgramDesc)
+	MGF_CLASS_PTR(Shader)
 
-public:
-	virtual ~GraphicsProgram();
-	static GraphicsProgramPtr Load(const GraphicsProgramDesc& desc);
+	MGF_CLASS_PTR(GraphicsProgram)
+	class GraphicsProgram : public Program
+	{
+	public:
+		virtual ~GraphicsProgram() override;
+		static GraphicsProgramPtr Create(const Vector<ShaderPtr>& shaders);
 
-public:
-	virtual GraphicsProgramDesc& GetDesc() override { return m_desc; }
-	virtual const ResourceDesc& GetDesc() const override { return m_desc; }
-
-private:
-	GraphicsProgram();
-	GraphicsProgramDesc m_desc;
-};
+	private:
+		GraphicsProgram();
+	};
+}

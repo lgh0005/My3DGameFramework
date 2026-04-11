@@ -1,7 +1,7 @@
-#include "CorePch.h"
+#include "GraphicsPch.h"
 #include "GLVertexLayout.h"
-#include "Graphics/Buffers/GLVertexBuffer.h"
-#include "Graphics/Buffers/GLIndexBuffer.h"
+#include "Buffers/GLVertexBuffer.h"
+#include "Buffers/GLIndexBuffer.h"
 
 namespace MGF3D
 {

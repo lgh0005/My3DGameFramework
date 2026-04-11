@@ -1,23 +1,23 @@
 ﻿#pragma once
 
-class CullingPlane
+namespace MGF3D
 {
-public:
-	CullingPlane();
-	~CullingPlane();
-	static CullingPlane Create(const glm::vec4& eq);
+	class CullingPlane
+	{
+	public:
+		CullingPlane();
+		CullingPlane(const vec4& eq);
+		CullingPlane(const vec3& normal, float distance);
+		~CullingPlane();
 
-	void Normalize();
-	float GetDistanceToPoint(const glm::vec3& point) const;
+	public:
+		void Normalize();
+		float GetDistanceToPoint(const vec3& point) const;
+		const vec3& GetNormal() const { return m_normal; }
+		float GetDistance() const { return m_distance; }
 
-	const glm::vec3& Normal() const { return m_normal; }
-	float NormalX() const { return m_normal.x; }
-	float NormalY() const { return m_normal.y; }
-	float NormalZ() const { return m_normal.z; }
-	float Distance() const { return m_distance; }
-
-private:
-	CullingPlane(const glm::vec3& normal, float dist);
-	glm::vec3 m_normal;
-	float     m_distance;
-};
+	private:
+		vec3	  m_normal;
+		float     m_distance;
+	};
+}

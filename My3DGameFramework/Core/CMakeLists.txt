@@ -16,16 +16,22 @@ set(SOURCES
     "Types/Types.h"
 
     # Constants
-    "Constants/ConstantMath.h"        "Constants/ConstantGraphics.h" 
+    "Constants/ConstantMath.h"        "Constants/ConstantAsset.h" 
     "Constants/ConstantStringHash.h"  "Constants/ConstantType.h" 
 
     # Defines
-    "Defines/DefineAsserter.h"  "Defines/DefineBreakpoint.h"
-    "Defines/DefineClassPointers.h"  "Defines/DefineDisables.h"
+    "Defines/DefineAsserter.h"          "Defines/DefineBreakpoint.h"
+    "Defines/DefineClassPointers.h"     "Defines/DefineDisables.h"
     "Defines/DefineFunctionBindings.h"  "Defines/DefineHash.h"
-    "Defines/DefineLoggings.h"  "Defines/DefineManagers.h"
-    "Defines/DefineSingleton.h"  "Defines/DefineStructPointers.h"
-    "Defines/DefineTimeStamp.h"  "Defines/DefineUtilities.h"
+    "Defines/DefineLoggings.h"          "Defines/DefineManagers.h"
+    "Defines/DefineSingleton.h"         "Defines/DefineStructPointers.h"
+    "Defines/DefineTimeStamp.h"         "Defines/DefineUtilities.h"
+
+    # Entities
+    #"Entities/Component.h"       "Entities/Component.cpp"
+    #"Entities/GameObject.h"      "Entities/GameObject.cpp"   "Entities/GameObject.inl"
+    #"Entities/Mechanic.h"       "Entities/Mechanic.cpp"
+    #"Entities/Object.h"       "Entities/Object.cpp"
 
     # Debug
     "Debug/Asserter.h"      "Debug/Asserter.cpp"

@@ -1,11 +1,10 @@
 #pragma once
+#include "Constants/ConstantAsset.h"
 
 namespace MGF3D
 {
     struct RawSkinnedVertex
     {
-        RawSkinnedVertex();
-
         vec3 position;
         vec3 normal;
         vec2 texCoord;

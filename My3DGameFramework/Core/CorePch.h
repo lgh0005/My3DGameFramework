@@ -43,7 +43,6 @@
 //    Engine common constants   //
 //==============================*/
 #include "Constants/ConstantMath.h"
-#include "Constants/ConstantGraphics.h"
 
 /*============================//
 //    Engine common defines   //

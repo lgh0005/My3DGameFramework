@@ -1,6 +1,6 @@
-#include "CorePch.h"
+#include "GraphicsPch.h"
 #include "GLTextureCube.h"
-#include "SystemUtils/TextureUtils.h"
+#include "GraphicsUtils/TextureUtils.h"
 
 namespace MGF3D
 {
