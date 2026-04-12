@@ -8,6 +8,10 @@ namespace MGF3D
 	{
 		using Super = Scene;
 
+	public:
+		TestScene();
+		virtual ~TestScene();
+
 	/*==========================//
 	//   TestScene Custom Type  //
 	//==========================*/
@@ -15,10 +19,9 @@ namespace MGF3D
 		static int16 s_typeIndex;
 		virtual const MGFType* GetType() const override;
 
-	public:
-		TestScene();
-		virtual ~TestScene();
-
+	/*=========================//
+	//   TestScene Main Logic  //
+	//=========================*/
 	private:
 		virtual bool OnLoadSceneResources() override;
 		virtual bool OnPlaceActors() override;

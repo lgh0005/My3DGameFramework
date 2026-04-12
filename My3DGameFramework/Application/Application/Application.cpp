@@ -3,6 +3,7 @@
 
 #pragma region MODULES
 #include "CoreModule.h"
+#include "RuntimeModule.h"
 #pragma endregion
 
 #pragma region MANAGERS
@@ -23,12 +24,13 @@ namespace MGF3D
 	void Application::RegisterTypes()
 	{
 		CoreModule::OnRegisterTypes();
+		RuntimeModule::OnRegisterTypes();
 	}
 
 	bool Application::Init()
 	{
+		// 0. CoreModule 초기화
 		if (!CoreModule::OnInit()) return false;
-
 		// 0-1. [DEBUG] 디바이스 가져오기 및 키 매핑
 		{
 			auto* kbd = MGF_INPUT.GetDevice<MGFKeyboardDevice>(); if (!kbd) return -1;
@@ -37,6 +39,9 @@ namespace MGF3D
 			auto* mouse = MGF_INPUT.GetDevice<MGFMouseDevice>(); if (!mouse) return -1;
 			mouse->MapButton("Fire", GLFW_MOUSE_BUTTON_LEFT);
 		}
+
+		// 1. RuntimeModule 초기화
+		if (!RuntimeModule::OnInit()) return false;
 
 		return true;
 	}
@@ -66,7 +71,10 @@ namespace MGF3D
 	{
 		// TODO : 파괴는 생성의 역순
 
-		// 0. 코어 모듈 종료
+		// 0. RuntimeModule 종료
+		if (!RuntimeModule::OnShutdown()) return false;
+
+		// 1. CoreModule 종료
 		if (!CoreModule::OnShutdown()) return false;
 
 		return true;

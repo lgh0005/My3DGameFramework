@@ -1,6 +1,7 @@
 ﻿#include "RuntimePch.h"
 #include "SceneManager.h"
 #include "Scene/Scene.h"
+#include "Managers/TypeManager.h"
 
 namespace MGF3D
 {
