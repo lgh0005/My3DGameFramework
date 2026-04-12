@@ -71,6 +71,7 @@
 //===========================*/
 #include "Hashes/StringHash.h"
 #include "Hashes/TypeHash.h"
+#include "Hashes/ObjectIDHash.h"
 
 /*===============================//
 //    Engine common identities   //

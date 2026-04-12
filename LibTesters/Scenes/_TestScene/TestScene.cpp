@@ -20,11 +20,13 @@ namespace MGF3D
 
 	bool TestScene::OnLoadSceneResources()
 	{
+		MGF_LOG_FATAL("TestScene : OnLoadSceneResources called.");
 		return true;
 	}
 
 	bool TestScene::OnPlaceActors()
 	{
+		MGF_LOG_FATAL("TestScene : OnPlaceActors called.");
 		return true;
 	}
 }

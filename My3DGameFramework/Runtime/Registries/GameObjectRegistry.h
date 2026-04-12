@@ -1,64 +1,48 @@
 ﻿#pragma once
+#include "Registries/IRegistry.h"
+#include "Hashes/ObjectIDHash.h"
+#include "Types/MGFPackedArray.h"
+#include "Identities/MGFObjectInfo.h"
 
-#pragma region FORWARD_DECLARATION
-CLASS_PTR(GameObject)
-#pragma endregion
-
-CLASS_PTR(GameObjectRegistry)
-class GameObjectRegistry
+namespace MGF3D
 {
-public:
-	~GameObjectRegistry();
-	struct GameObjectSlot
+	class GameObjectRegistry : public IRegistry
 	{
-		GameObject* object{ nullptr };
-		uint32      generation{ 1 };
-		uint32      nextFree{ 0xFFFFFFFF };
+	public:
+		GameObjectRegistry();
+		virtual ~GameObjectRegistry();
+
+	public:
+		virtual void Init() override;
+		virtual void Update() override;
+		virtual void Shutdown() override;
+		virtual void Clear() override;
+
+	public:
+		ObjectIDHash AddGameObject(const GameObjectInfo& info);
+		void DestroyGameObject(ObjectIDHash id);
+
+	private:
+		// 프레임 끝에서 생성/삭제 대기열을 처리합니다.
+		void FlushPendingAdds();
+		void FlushPendingKills();
+
+		// 이전에 구현한 ID 발급 로직
+		ObjectIDHash GenerateNewId();
+		void ReleaseId(ObjectIDHash id);
+
+	private:
+		// 1. 실제 데이터 저장소 (PackedArray)
+		// GameObject 클래스는 아직 정의 전이라 가정합니다.
+		// MGFPackedArray<GameObject> m_gameObjects;
+
+		// 2. 대기열 (Pending Queues)
+		Vector<MGFObjectInfo> m_pendingAdds;
+		Vector<ObjectIDHash>   m_pendingKills;
+
+		// 3. ID 관리 데이터
+		uint32          m_nextIndex	{ 1 };
+		Vector<uint32>  m_freeIndices;
+		Vector<uint16>  m_generations;
 	};
-	static constexpr usize INVALID_ID = static_cast<usize>(-1);
-
-private:
-	GameObjectRegistry();
-	void Init();
-
-/*======================================//
-//   default GameObject queue methods   //
-//======================================*/
-public:
-	static GameObjectRegistryUPtr Create();
-	void AddGameObject(GameObjectUPtr go);
-	void DestroyGameObject(GameObject* go);
-	std::string MakeUniqueObjectName(const std::string& baseName);
-
-	void FlushCreateQueue();
-	void FlushDestroyQueue();
-	void PushToDestroyQueue(GameObject* go);
-
-	const std::vector<GameObjectUPtr>& GetGameObjects() const;
-	const std::vector<GameObjectUPtr>& GetPendingCreateQueue() const;
-	const std::vector<GameObject*>& GetPendingDestroyQueue() const;
-
-private:
-
-	std::vector<GameObjectUPtr> m_gameObjects;
-	std::vector<GameObjectUPtr> m_pendingCreateQueue;
-	std::vector<GameObject*>	m_pendingDestroyQueue;
-
-/*================================//
-//   GameObject finding methods   //
-//================================*/
-public:
-	GameObject* GetGameObjectByID(InstanceID id);     // O(1)
-	GameObject* FindGameObjectByName(const std::string& name); // O(N)
-
-private:
-	InstanceID RegisterGameObjectID(GameObject* obj);
-	void UnregisterGameObjectID(InstanceID id);
-
-	uint32 GetIndexFromID(InstanceID id);
-	uint32 GetGenerationFromID(InstanceID id);
-	InstanceID MakeID(uint32 index, uint32 gen);
-
-	std::vector<GameObjectSlot> m_gameObjectSlots;
-	uint32 m_freeSlotHead{ 0xFFFFFFFF };
-};
+}

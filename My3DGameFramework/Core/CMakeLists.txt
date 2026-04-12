@@ -14,6 +14,7 @@ set(SOURCES
     "Types/FileStream.h" "Types/Math.h"
     "Types/SmartPtrs.h" "Types/Strings.h"
     "Types/Types.h"
+    "Types/MGFPackedArray.h"    "Types/MGFPackedArray.cpp"    "Types/MGFPackedArray.inl"
 
     # Constants
     "Constants/ConstantMath.h"        "Constants/ConstantAsset.h" 
@@ -34,7 +35,7 @@ set(SOURCES
     #"Entities/Object.h"       "Entities/Object.cpp"
 
     # States
-    "States/IStateMachine.h"        "States/IStateMachine.cpp"
+    "States/MGFStateMachine.h"        "States/MGFStateMachine.cpp"      "States/MGFStateMachine.inl"
 
     # Debug
     "Debug/Asserter.h"      "Debug/Asserter.cpp"
@@ -69,6 +70,7 @@ set(SOURCES
     "Managers/WindowManager.h"      "Managers/WindowManager.cpp"
 
     # Identities
+    "Identities/MGFObjectInfo.h"      
     "Identities/MGFPath.h"      "Identities/MGFPath.cpp"
     "Identities/MGFType.h"      "Identities/MGFType.cpp"
     "Identities/MGFTypeTree.h"      "Identities/MGFTypeTree.cpp"
@@ -76,8 +78,9 @@ set(SOURCES
 
     # Hashes
     "Hashes/IHashFunctor.h"      "Hashes/IHashFunctor.cpp"
-    "Hashes/StringHash.h"        "Hashes/StringHash.cpp"
-    "Hashes/TypeHash.h"          "Hashes/TypeHash.cpp"
+    "Hashes/StringHash.h"        "Hashes/StringHash.cpp"            "Hashes/StringHash.inl"
+    "Hashes/TypeHash.h"          "Hashes/TypeHash.cpp"              "Hashes/TypeHash.inl"
+    "Hashes/ObjectIDHash.h"      "Hashes/ObjectIDHash.cpp"          "Hashes/ObjectIDHash.inl"
 
     # Utils
     "CoreUtils/AssetUtils.h"       "CoreUtils/AssetUtils.cpp"           "CoreUtils/AssetUtils.inl"
