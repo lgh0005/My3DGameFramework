@@ -2,7 +2,6 @@
 #add_subdirectory(Audio)
 add_subdirectory(Graphics)
 #add_subdirectory(Physics)
-#add_subdirectory(Scripting)
 
 # 2. 통합 INTERFACE 생성
 add_library(Systems INTERFACE)

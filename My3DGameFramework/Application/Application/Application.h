@@ -8,11 +8,8 @@ namespace MGF3D
         MGF_DECLARE_UTILITIES(Application)
 
     public:
-        static bool Init
-        (
-            int32 width, int32 height, 
-            const String& title, int32 vsync = 0
-        );
+        static void RegisterTypes();
+        static bool Init();
         static void Run();
         static bool Shutdown();
     };

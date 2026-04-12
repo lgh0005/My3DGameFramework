@@ -1,36 +1,32 @@
 ﻿#pragma once
 #include "Scene/Scene.h"
 
-class SceneManager
+namespace MGF3D
 {
-	DECLARE_SINGLE(SceneManager)
-	DECLARE_NONINSTANTIABLE(SceneManager)
-	using SceneFactory = std::function<SceneUPtr()>;
+	MGF_CLASS_PTR(Scene)
 
-/*===================================//
-//   default scene manager methods   //
-//===================================*/
-public:
-	Scene* GetActiveScene() const;
-	template<typename T> void RegisterScene(const std::string& name);
-	void LoadScene(const std::string& scene, const std::string& pipeline);
-	void OnScreenResize(int32 width, int32 height);
-	void Clear();
+	class SceneManager
+	{
+		MGF_DECLARE_SINGLE(SceneManager)
+		using SceneFactory = Func<SceneUPtr>;
 
-/*=========================================//
-//   active scene state checking methods   //
-//=========================================*/
-public:
-	void SetSceneState(SceneState state);
-	bool HasActiveScene() const;
-	bool IsUninitialized() const;
-	bool IsSceneAwake() const;
-	bool IsSceneRunning() const;
-	bool IsSceneLoading() const;
+	private:
+		SceneManager();
+		~SceneManager();
 
-private:
-	std::unordered_map<std::string, SceneFactory> m_scenes;
-	SceneUPtr m_activeScene;
-};
+	public:
+		void Update();
+		void Shutdown();
+
+	public:
+		Scene* GetActiveScene() const { return m_activeScene.get(); }
+		template<typename T> void RegisterScene(StringView name);
+		template<typename T> void LoadScene();
+
+	public:
+		HashMap<int16, SceneFactory> m_scenes;
+		SceneUPtr m_activeScene;
+	};
+}
 
 #include "Managers/SceneManager.inl"

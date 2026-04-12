@@ -16,12 +16,61 @@ namespace MGF3D
 		newType.id = TypeHash(name);
 		newType.typeName = name.data();
 		newType.selfIndex = newIndex;
+		newType.ownerTree = this;
 
-		if (!parentName.empty()) newType.parentIndex = FindIndex(TypeHash(parentName));
-		else newType.parentIndex = -1;
+		// 3. 부모가 있다면 족보(Chain)와 깊이(Depth)를 즉시 물려받습니다.
+		if (!parentName.empty())
+		{
+			newType.parentIndex = FindIndex(TypeHash(parentName));
+			if (newType.parentIndex != -1)
+			{
+				const MGFType& parent = m_types[newType.parentIndex];
+				newType.depth = parent.depth + 1;
+				if (newType.depth <= MAX_TYPE_DEPTH)
+				{
+					for (int32 d = 0; d <= parent.depth; ++d)
+						newType.chain[d] = parent.chain[d];
+				}
+			}
+			else
+			{
+				newType.depth = 0;
+			}
+		}
+		else
+		{
+			newType.parentIndex = -1;
+			newType.depth = 0;
+		}
 
-		// 3. Vector에 추가합니다.
+		// 4. 자기 자신을 족보 체인의 끝자락에 등록합니다.
+		if (newType.depth < MAX_TYPE_DEPTH)
+			newType.chain[newType.depth] = newType.id;
+
+		// 5. Vector에 추가합니다.
 		m_types.push_back(newType);
+
+		// 6. 부모의 트리 구조(FirstChild / NextSibling)를 연결
+		// push_back 이후이므로 안전하게 인덱스로 원본 배열에 접근합니다.
+		if (m_types[newIndex].parentIndex != -1)
+		{
+			int16 parentIdx = m_types[newIndex].parentIndex;
+			if (m_types[parentIdx].firstChildIndex == -1)
+			{
+				// 부모의 첫 자식인 경우
+				m_types[parentIdx].firstChildIndex = newIndex;
+			}
+			else
+			{
+				// 이미 자식이 있다면, 형제들의 맨 끝을 찾아 연결합니다.
+				int16 siblingIdx = m_types[parentIdx].firstChildIndex;
+				while (m_types[siblingIdx].nextSiblingIndex != -1)
+					siblingIdx = m_types[siblingIdx].nextSiblingIndex;
+				m_types[siblingIdx].nextSiblingIndex = newIndex;
+			}
+		}
+
+		MGF_LOG_INFO("MGFTypeTree: Registered Type '{0}' (Index: {1}, Depth: {2})", name, newIndex, m_types[newIndex].depth);
 		return newIndex;
 	}
 
@@ -59,54 +108,5 @@ namespace MGF3D
 		if (!CommonUtils::IsBetween<int16>(index, 0, static_cast<int16>(m_types.size())))
 			return nullptr;
 		return &m_types[index];
-	}
-
-	void MGFTypeTree::Bake()
-	{
-		m_types.shrink_to_fit();
-
-		for (usize i = 0; i < m_types.size(); ++i)
-		{
-			MGFType& type = m_types[i];
-			type.ownerTree = this;
-
-			// 1. 트리 구조 (FirstChild / NextSibling) 연결
-			if (type.parentIndex != -1)
-			{
-				MGFType& parent = m_types[type.parentIndex];
-				if (parent.firstChildIndex == -1)
-				{
-					parent.firstChildIndex = type.selfIndex;
-				}
-				else
-				{
-					// 형제들 끝에 붙이기
-					int16 siblingIdx = parent.firstChildIndex;
-					while (m_types[siblingIdx].nextSiblingIndex != -1)
-						siblingIdx = m_types[siblingIdx].nextSiblingIndex;
-					m_types[siblingIdx].nextSiblingIndex = type.selfIndex;
-				}
-
-				// 2. 깊이 설정 및 족보(chain) 전파
-				type.depth = parent.depth + 1;
-
-				// 부모의 족보를 그대로 복사 (MAX_TYPE_DEPTH까지만)
-				if (parent.depth + 1 <= MAX_TYPE_DEPTH)
-				{
-					for (int32 d = 0; d < parent.depth + 1; ++d)
-						type.chain[d] = parent.chain[d];
-				}
-			}
-			else
-			{
-				type.depth = 0;
-			}
-
-			// 3. 자기 자신을 족보의 해당 깊이에 등록
-			if (type.depth < MAX_TYPE_DEPTH)
-				type.chain[type.depth] = type.id;
-		}
-
-		MGF_LOG_INFO("MGFTypeTree: Baked {0} types successfully.", m_types.size());
 	}
 }

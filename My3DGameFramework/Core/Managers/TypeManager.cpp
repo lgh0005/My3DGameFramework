@@ -29,10 +29,4 @@ namespace MGF3D
 		if (it == m_typeTrees.end()) return nullptr;
 		return it->second.get();
 	}
-
-	void TypeManager::BakeAll()
-	{
-		MGF_LOG_INFO("TypeManager: Start baking all type trees...");
-		for (auto& [hash, tree] : m_typeTrees) tree->Bake();
-	}
 }

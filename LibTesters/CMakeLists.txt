@@ -3,7 +3,14 @@ set(APP_NAME LibTester)
 
 # 1. 소스 파일 목록 정의
 set(LIB_TEST_SOURCE
+
+    # Entry Point
     "main.cpp"
+
+    # Scenes
+    "Scenes/_TestScene/TestScene.h"     "Scenes/_TestScene/TestScene.cpp"
+
+    # Scripts
 )
 
 # 2. Visual Studio 필터 자동 생성
@@ -17,7 +24,7 @@ add_executable(${APP_NAME} ${LIB_TEST_SOURCE})
 set_target_properties(${APP_NAME} PROPERTIES WIN32_EXECUTABLE FALSE)
 
 # 5. Include 및 PCH 설정
-target_precompile_headers(${APP_NAME} PRIVATE "pch.h")
+target_precompile_headers(${APP_NAME} PRIVATE "GamePch.h")
 target_include_directories(${APP_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 
 # 6. 라이브러리 링크
@@ -28,6 +35,7 @@ PRIVATE
     Engine::Core
     Engine::Systems
     Engine::Runtime
+    Engine::Application
 )
 
 # 7. 리소스 배포 (Resource Deployment)

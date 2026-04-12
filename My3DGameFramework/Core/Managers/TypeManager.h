@@ -15,7 +15,6 @@ namespace MGF3D
 	public:
 		MGFTypeTree& CreateTree(StringView treeName);
 		MGFTypeTree* GetTree(StringView treeName);
-		void BakeAll();
 
 	private:
 		HashMap<StringHash, MGFTypeTreeUPtr> m_typeTrees;

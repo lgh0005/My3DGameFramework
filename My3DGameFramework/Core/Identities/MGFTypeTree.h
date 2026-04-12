@@ -14,7 +14,6 @@ namespace MGF3D
 		int16 Register(StringView name, StringView parentName = "");
 		bool IsA(int16 objectIndex, int16 targetIndex) const;
 		int16 FindIndex(TypeHash id) const;
-		void Bake();
 
 	public:
 		const String& GetTreeName() const;

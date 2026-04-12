@@ -3,7 +3,7 @@
 /*==================================//
 //    default static assert macro   //
 //==================================*/
-#define MGF_STATIC_ASSERT(condition, message) static_assert(condition, message)
+#define MGF_STATIC_ASSERT(...) static_assert(__VA_ARGS__)
 
 /*==============================//
 //    default assertion macro   //

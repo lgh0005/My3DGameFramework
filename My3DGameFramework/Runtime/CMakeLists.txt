@@ -9,19 +9,18 @@ set(SOURCES
     # pch
     "RuntimePch.cpp"
 
-    # Application
-    "Application/Application.h"     "Application/Application.cpp"
+    # Module
+    "RuntimeModule.h"              "RuntimeModule.cpp"
+
+    # Defines
+    "Defines/DefineManagers.h"
 
     # Managers
-    "Managers/LevelManager.h"       "Managers/LevelManager.cpp"       "Managers/LevelManager.inl"
-    #"Managers/SceneManager.h"      "Managers/SceneManager.cpp"       "Managers/SceneManager.inl"
+    "Managers/SceneManager.h"      "Managers/SceneManager.cpp"       "Managers/SceneManager.inl"
     "Managers/GUIManager.h"        "Managers/GUIManager.cpp"
 
     # Editor
     "Editor/GUIWindow.h"            "Editor/GUIWindow.cpp"
-
-    # Level
-    #"Level/Level.h"     "Level/Level.cpp"
 
     # Managers
     #"Managers/ImguiManager.h"     "Managers/ImguiManager.cpp"
@@ -64,7 +63,7 @@ set(SOURCES
     # RuntimUtils
     
     # Scene
-    #"Scene/Scene.h"                 "Scene/Scene.cpp"                       "Scene/Scene.inl"
+    "Scene/Scene.h"                 "Scene/Scene.cpp"
     #"Scene/ComponentRegistry.h"     "Scene/ComponentRegistry.cpp"           "Scene/ComponentRegistry.inl"
     #"Scene/SceneRegistry.h"         "Scene/SceneRegistry.cpp"
     #"Scene/GameObjectRegistry.h"     "Scene/GameObjectRegistry.cpp"

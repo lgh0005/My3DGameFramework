@@ -3,9 +3,9 @@
 
 namespace MGF3D
 {
-	class RuntimeModule : public IModuleInterface<RuntimeModule>
+	class ApplicationModule : public IModuleInterface<ApplicationModule>
 	{
-		MGF_DECLARE_UTILITIES(RuntimeModule)
+		MGF_DECLARE_UTILITIES(ApplicationModule)
 
 	public:
 		static void OnRegisterTypes();

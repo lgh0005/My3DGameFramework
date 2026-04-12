@@ -21,7 +21,6 @@ namespace MGF3D
 		MGFInputDevice::s_typeIndex = deviceTree.Register("MGFInputDevice", "");
 		MGFKeyboardDevice::s_typeIndex = deviceTree.Register("MGFKeyboardDevice", "MGFInputDevice");
 		MGFMouseDevice::s_typeIndex = deviceTree.Register("MGFMouseDevice", "MGFInputDevice");
-		MGF_TYPE.BakeAll();
 	}
 
 	bool CoreModule::OnInit()
