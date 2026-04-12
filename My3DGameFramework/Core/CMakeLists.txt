@@ -22,7 +22,7 @@ set(SOURCES
     # Defines
     "Defines/DefineAsserter.h"          "Defines/DefineBreakpoint.h"
     "Defines/DefineClassPointers.h"     "Defines/DefineDisables.h"
-    "Defines/DefineFunctionBindings.h"  "Defines/DefineHash.h"
+      "Defines/DefineHash.h"
     "Defines/DefineLoggings.h"          "Defines/DefineManagers.h"
     "Defines/DefineSingleton.h"         "Defines/DefineStructPointers.h"
     "Defines/DefineTimeStamp.h"         "Defines/DefineUtilities.h"
@@ -33,6 +33,9 @@ set(SOURCES
     #"Entities/Mechanic.h"       "Entities/Mechanic.cpp"
     #"Entities/Object.h"       "Entities/Object.cpp"
 
+    # States
+    "States/IStateMachine.h"        "States/IStateMachine.cpp"
+
     # Debug
     "Debug/Asserter.h"      "Debug/Asserter.cpp"
     "Debug/Logger.h"        "Debug/Logger.cpp"    "Debug/Logger.inl"
@@ -40,8 +43,6 @@ set(SOURCES
 
     # Parsers
     #"Parsers/JsonParser.h"      "Parsers/JsonParser.cpp"           "Parsers/JsonParser.inl"
-    #"Parsers/LuaParser.h"      "Parsers/LuaParser.cpp"           "Parsers/LuaParser.inl"
-    #"Parsers/YamlParser.h"      "Parsers/YamlParser.cpp"           "Parsers/YamlParser.inl"
 
     # Input
     "Input/MGFInputInterface.h"	  "Input/MGFInputInterface.cpp"
@@ -57,6 +58,7 @@ set(SOURCES
     # Window
     "Window/MGFWindowInterface.h"  "Window/MGFWindowInterface.cpp"
     "Window/MGFWindow.h"           "Window/MGFWindow.cpp"
+    "Window/MGFScreen.h"           "Window/MGFScreen.cpp"
 
     # Managers
     "Managers/InputManager.h"      "Managers/InputManager.cpp"        "Managers/InputManager.inl"
@@ -106,7 +108,6 @@ PUBLIC
         glm::glm
         spdlog::spdlog
         nlohmann_json::nlohmann_json
-        ryml::ryml
 )
 
 # 6. PCH (Precompiled Header) 설정

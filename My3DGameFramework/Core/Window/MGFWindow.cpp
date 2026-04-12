@@ -1,6 +1,7 @@
 #include "CorePch.h"
 #include "MGFWindow.h"
 #include "MGFWindowInterface.h"
+#include "MGFScreen.h"
 
 namespace MGF3D
 {
@@ -72,14 +73,18 @@ namespace MGF3D
 				return false;
 			}
 
-			// 4. 콜백 등록
+			// 4. 물리적 모니터 인스턴스 생성
+			m_screen = std::make_unique<MGFScreen>();
+			if (!m_screen) return false;
+
+			// 5. 콜백 등록
 			MGFWindowInterface::Install(m_window);
 
-			// 5. SPIR-V 지원 체크
+			// 6. SPIR-V 지원 체크
 			if (glfwExtensionSupported("GL_ARB_gl_spirv")) MGF_LOG_INFO("SPIR-V supported!");
 			else MGF_LOG_WARN("SPIR-V not supported on this system!");
 
-			// 6. 전역 상태 설정
+			// 7. 전역 상태 설정
 			glEnable(GL_DEPTH_TEST);
 			glDepthFunc(GL_LEQUAL);
 
@@ -94,6 +99,7 @@ namespace MGF3D
 			glEnable(GL_FRAMEBUFFER_SRGB);
 
 			glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
+
 			// TODO : 디버그 에 하나 추가 필요
 //#ifdef _DEBUG
 //			glEnable(GL_DEBUG_OUTPUT);

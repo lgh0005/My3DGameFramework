@@ -1,153 +1,68 @@
-﻿#include "EnginePch.h"
+﻿#include "CorePch.h"
 #include "Application.h"
-#include "Scene/Scene.h"
 
-Application::Application() = default;
-Application::~Application() { Shutdown(); }
+#pragma region MODULES
+#include "CoreModule.h"
+#pragma endregion
 
-bool Application::Init(int32 width, int32 height, const std::string& title)
+#pragma region MANAGERS
+#include "Managers/InputManager.h"
+#include "Managers/WindowManager.h"
+#include "Managers/TimeManager.h"
+#pragma endregion
+
+#pragma region TEMP
+#include "Input/Devices/MGFKeyboardDevice.h"
+#include "Input/Devices/MGFMouseDevice.h"
+#pragma endregion
+
+namespace MGF3D
 {
-	// 0. Logger 초기화 및 Config 설정
-	// TODO : 이후에는 디버그 빌드 시에만 추가되는 용도로 전환이 되어야 한다.
-	LOGGER.Init();
-	LOG_INFO("Application Started [Start]");
-	LOG_INFO("Engine Initialization Started...");
-
-	// 1. 윈도우 생성 (가장 먼저 되어야 함)
-	if (!WINDOW.Init(width, height, title))
+	bool Application::Init(int32 width, int32 height, const String& title, int32 vsync)
 	{
-		LOG_ERROR("Window Init Failed!");
-		return false;
-	}
+		// 0. 코어 모듈 초기화
+		CoreModule::OnRegisterTypes();
+		if (!CoreModule::OnInit()) return false;
 
-	// 2. 핵심 코어 시스템 초기화
-	if (!RENDER.Init()) return false;    // OpenGL 컨텍스트 등 로드
-	INPUT_MGR.Init();					 // 입력 시스템
-	TIME.Init();						 // 타이머
-	PHYSICS.Init();						 // 물리
-	AUDIO.Init();						 // 오디오 시스템
-	RESOURCE.Init();					 // 전역 리소스 로드
-	LUA_MGR.Init();						 // Lua 스크립트 컨텍스트 로드
-	IMGUI.Init(true);					 // 디버그 UI (Window가 있어야 가능)
-
-	// 3. 레벨들을 등록
-	OnInit();
-
-	return true;
-}
-
-void Application::Run(const std::string& startLevelName)
-{
-	// [Start] 프로그램 시작 확인 문구
-	LOG_INFO("Start Program!");
-
-	// 0. 첫 시작할 레벨이 등록되었는 지 확인
-	if (m_levelMap.find(startLevelName) == m_levelMap.end())
-	{
-		LOG_ERROR("Failed to find level: {}", startLevelName);
-		return;
-	}
-
-	LevelInfo& info = m_levelMap[startLevelName];
-	SCENE.LoadScene(info.sceneKey, info.pipelineKey);
-
-	// 2. 메인 루프
-	auto windowHandle = WINDOW.GetWindow();
-	while (!glfwWindowShouldClose(windowHandle))
-	{
-		// 이벤트 폴링
-		glfwPollEvents();
-
-		// 윈도우가 최소화된 상태라면 건너뛰기
-		if (WINDOW.IsInconified()) continue;
-
-		// 타이머 업데이트
-		TIME.Update();
-
-		auto scene = SCENE.GetActiveScene();
-
-		// 예약된 오브젝트 추가
-		if (scene) scene->ProcessPendingAdds();
-
-		// 물리 시뮬레이션 (고정 시간 업데이트)
-		while (TIME.CheckFixedUpdate())
+		// 0-1. 디바이스 가져오기 및 키 매핑
 		{
-			PHYSICS.Update();
-			scene->FixedUpdate();
+			auto* kbd = MGF_INPUT.GetDevice<MGFKeyboardDevice>(); if (!kbd) return -1;
+			kbd->MapKey("Jump", GLFW_KEY_SPACE);
+
+			auto* mouse = MGF_INPUT.GetDevice<MGFMouseDevice>(); if (!mouse) return -1;
+			mouse->MapButton("Fire", GLFW_MOUSE_BUTTON_LEFT);
 		}
 
-		// 컨텍스트 업데이트
-		if (scene)
+		return true;
+	}
+
+	void Application::Run()
+	{
+		// 메인 엔진 루프
+		while (!MGF_WINDOW.ShouldClose())
 		{
-			// 게임 로직 업데이트
-			scene->Update();
-			scene->LateUpdate();
+			MGF_TIME.Update();
+			MGF_WINDOW.Update();
 
-			// 렌더링 수행 (RenderManager에게 위임)
-			RENDER.Render(scene);
+			// 2. 액션 기반 로직 처리
+			{
+				MGF_INPUT.Update(MGF_WINDOW.GetNativeHandle());
+				if (MGF_INPUT.GetDevice<MGFKeyboardDevice>()->GetButtonDown("Jump")) MGF_LOG_INFO("Action: Jump!");
+				if (MGF_INPUT.GetDevice<MGFMouseDevice>()->GetButtonDown("Fire"))  MGF_LOG_INFO("Action: Fire!");
+			}
 
-			// 파괴 예약 오브젝트를 파괴
-			scene->ProcessPendingKills();
+			MGF_TIME.FixedUpdate();
+			MGF_WINDOW.SwapWindowBuffers();
 		}
-		else
-		{
-			// 씬이 없거나 로딩 중일 때 기본 화면 클리어
-			glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
-			glClear(GL_COLOR_BUFFER_BIT);
-		}
-
-		// 인풋 업데이트
-		INPUT_MGR.Update();
-
-		// 버퍼 스왑
-		glfwSwapBuffers(windowHandle);
 	}
-}
 
-void Application::Update()
-{
-	// 현재 활성화된 씬이 있다면 업데이트
-	if (auto scene = SCENE.GetActiveScene())
+	bool Application::Shutdown()
 	{
-		scene->Update();
+		// TODO : 파괴는 생성의 역순
+
+		// 0. 코어 모듈 종료
+		if (!CoreModule::OnShutdown()) return false;
+
+		return true;
 	}
-}
-
-void Application::Render()
-{
-	// 씬이 존재하면 렌더 매니저에게 위임
-	if (auto scene = SCENE.GetActiveScene())
-	{
-		RENDER.Render(scene);
-	}
-	else
-	{
-		// 씬 로딩 중이거나 없을 때 기본 화면 (검은색/회색 등)
-		glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	}
-}
-
-void Application::Shutdown()
-{
-	// 중복 종료 방지
-	static bool isShutdown = false;
-	if (isShutdown) return;
-	isShutdown = true;
-
-	LOG_INFO("Engine Shutdown Started...");
-
-	SCENE.Clear();      // 씬/게임 오브젝트 정리
-	LUA_MGR.Clear();    // Lua 스크립트 정리 : TODO : 순서 고려 필요
-	PHYSICS.Clear();    // 물리 엔진 정리
-	RENDER.Clear();     // 렌더 리소스/셰이더 정리
-
-	IMGUI.Clear();
-	AUDIO.Clear();
-	RESOURCE.Clear();   // 로드된 텍스처/모델 등 정리
-
-	WINDOW.DestroyWindow(); // 윈도우 파괴
-
-	LOG_INFO("Program terminated successfully.");
-	LOGGER.Clear();
 }

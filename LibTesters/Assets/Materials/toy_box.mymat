@@ -1,0 +1,25 @@
+# MyEngine Asset Definition
+type: "Material"
+
+# texture slots
+diffuse: "toybox_diffuse"
+normal: "toybox_normal"
+specular: ""
+emission: ""
+orm: ""
+height: "toybox_disp"
+ao: ""
+metallic: ""
+roughness: ""
+
+# numerical value
+shininess: 14.0
+emissionStrength: 0.0
+heightScale: 0.065
+metallicFactor: 1.0
+roughnessFactor: 1.0
+useGlossiness: false
+
+# vector data
+albedoFactor: [1.0, 1.0, 1.0, 1.0]
+emissiveFactor: [0.0, 0.0, 0.0]

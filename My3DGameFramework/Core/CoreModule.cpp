@@ -16,7 +16,7 @@ namespace MGF3D
 {
 	void CoreModule::OnRegisterTypes()
 	{
-		// 1. InputModule이 "Device" 도메인 트리의 생성을 주도
+		// 1. InputModule 계층 트리
 		MGFTypeTree& deviceTree = MGF_TYPE.CreateTree("Device");
 		MGFInputDevice::s_typeIndex = deviceTree.Register("MGFInputDevice", "");
 		MGFKeyboardDevice::s_typeIndex = deviceTree.Register("MGFKeyboardDevice", "MGFInputDevice");

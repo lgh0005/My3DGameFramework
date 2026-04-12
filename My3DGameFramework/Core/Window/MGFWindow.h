@@ -4,6 +4,8 @@ struct GLFWwindow;
 
 namespace MGF3D
 {
+	MGF_CLASS_PTR(MGFScreen)
+
 	MGF_CLASS_PTR(MGFWindow)
 	class MGFWindow
 	{
@@ -23,6 +25,7 @@ namespace MGF3D
 		static MGFWindow* GetWindowInstance(GLFWwindow* window);
 
 	public:
+		MGFScreen* GetMonitor() const { return m_screen.get(); }
 		GLFWwindow* GetHandle() const { return m_window; }
 		int32 GetWidth() const { return m_width; }
 		int32 GetHeight() const { return m_height; }
@@ -54,7 +57,7 @@ namespace MGF3D
 			const String& title, int32 vsync,
 			bool isVisible, GLFWwindow* share
 		);
-
+		MGFScreenUPtr m_screen	{ nullptr };
 		GLFWwindow* m_window	{ nullptr };
 		int32 m_width{ 0 },  m_height { 0 };
 		int32 m_winX { 0 },  m_winY   { 0 };
