@@ -2,7 +2,7 @@
 #include "Registries/IRegistry.h"
 #include "Hashes/ObjectIDHash.h"
 #include "Types/MGFPackedArray.h"
-#include "Identities/MGFObjectInfo.h"
+#include "Entities/GameObject.h"
 
 namespace MGF3D
 {
@@ -19,7 +19,11 @@ namespace MGF3D
 		virtual void Clear() override;
 
 	public:
-		ObjectIDHash AddGameObject(const GameObjectInfo& info);
+		ObjectIDHash AddGameObject(const String& name);
+		GameObject* GetGameObject(const String& name);
+		void DestroyGameObject(const String& name);
+
+		GameObject* GetGameObject(ObjectIDHash id);
 		void DestroyGameObject(ObjectIDHash id);
 
 	private:
@@ -28,21 +32,24 @@ namespace MGF3D
 		void FlushPendingKills();
 
 		// 이전에 구현한 ID 발급 로직
-		ObjectIDHash GenerateNewId();
-		void ReleaseId(ObjectIDHash id);
+		ObjectIDHash GenerateNewID();
+		void ReleaseID(ObjectIDHash id);
 
 	private:
+		void DefragmentGameObject();
+
 		// 1. 실제 데이터 저장소 (PackedArray)
-		// GameObject 클래스는 아직 정의 전이라 가정합니다.
-		// MGFPackedArray<GameObject> m_gameObjects;
+		MGFPackedArray<GameObject> m_gameObjects;
 
 		// 2. 대기열 (Pending Queues)
-		Vector<MGFObjectInfo> m_pendingAdds;
+		Vector<GameObject>     m_pendingAdds;
 		Vector<ObjectIDHash>   m_pendingKills;
+		Vector<ObjectIDHash>   m_dirtyStateQueue;
 
 		// 3. ID 관리 데이터
 		uint32          m_nextIndex	{ 1 };
 		Vector<uint32>  m_freeIndices;
 		Vector<uint16>  m_generations;
+		HashMap<StringHash, ObjectIDHash> m_nameLookupTable;
 	};
 }

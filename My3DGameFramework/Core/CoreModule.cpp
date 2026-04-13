@@ -5,6 +5,7 @@
 #include "Managers/TimeManager.h"
 #include "Managers/InputManager.h"
 #include "Managers/TypeManager.h"
+#include "Managers/EntityManager.h"
 
 #include "Identities/MGFTypeTree.h"
 
@@ -44,11 +45,15 @@ namespace MGF3D
 		// 3. 타임 매니저
 		MGF_TIME.Init();
 
+		// 4. 엔티티 매니저
+		MGF_ENTITY.Init();
+
 		return true;
 	}
 
 	bool CoreModule::OnShutdown()
 	{
+		MGF_ENTITY.Shutdown();
 		MGF_INPUT.Shutdown();
 		MGF_WINDOW.Shutdown();
 

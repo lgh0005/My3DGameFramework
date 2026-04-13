@@ -2,9 +2,10 @@
 
 namespace MGF3D
 {
-	class IReistry
+	class IRegistry
 	{
 	public:
+		IRegistry();
 		virtual ~IRegistry();
 
 	public:

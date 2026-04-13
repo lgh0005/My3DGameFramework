@@ -230,7 +230,6 @@ set(ENGINE_SOURCES
    "Managers/AudioManager.h"        "Managers/AudioManager.cpp"
    "Managers/PhysicsManager.h"      "Managers/PhysicsManager.cpp"
    #"Managers/UIManager.h"           "Managers/UIManager.cpp"
-   #"Managers/EntityManager.h"           "Managers/EntityManager.cpp"
    "Managers/InstanceManager.h"      "Managers/InstanceManager.cpp"
    "Managers/LuaManager.h"      "Managers/LuaManager.cpp"
 )

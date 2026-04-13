@@ -17,21 +17,10 @@ namespace MGF3D
 		static int16 s_typeIndex;
 		virtual const MGFType* GetType() const;
 
-	/*======================================//
-	//   default scene GameObject methods   //
-	//======================================*/
 	public:
 		bool Init();
-		// void AddGameObject(GameObjectUPtr gameObject);
-		// void Destroy(GameObject* obj);
-
-	/*======================================//
-	//   default scene life-cycle methods   //
-	//======================================*/
-	public:
-		void FixedUpdate();
 		void Update();
-		void LateUpdate();
+		void Clear();
 
 	/*=======================================//
 	//   abstract methods for user context   //
@@ -40,8 +29,5 @@ namespace MGF3D
 		Scene();
 		virtual bool OnLoadSceneResources() = 0;
 		virtual bool OnPlaceActors()		= 0;
-
-	protected:
-		// TODO : 게임 오브젝트와 컴포넌트 레지스트리
 	};
 }

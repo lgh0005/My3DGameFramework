@@ -62,14 +62,6 @@ set(SOURCES
     
     # Scene
     "Scene/Scene.h"                 "Scene/Scene.cpp"
-    #"Scene/ComponentRegistry.h"     "Scene/ComponentRegistry.cpp"           "Scene/ComponentRegistry.inl"
-    #"Scene/SceneRegistry.h"         "Scene/SceneRegistry.cpp"
-    #"Scene/GameObjectRegistry.h"     "Scene/GameObjectRegistry.cpp"
-
-    # Queues
-    "Queues/IDefragmentQueue.h"            "Queues/IDefragmentQueue.cpp"
-    "Queues/ComponentQueue.h"            "Queues/ComponentQueue.cpp"
-    "Queues/GameObjectQueue.h"            "Queues/GameObjectQueue.cpp"
 )
 
 # 2. 빌드 타겟 생성 및 별칭 등록

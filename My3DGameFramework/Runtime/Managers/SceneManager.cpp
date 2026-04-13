@@ -11,9 +11,7 @@ namespace MGF3D
 	void SceneManager::Update()
 	{
 		if (!m_activeScene) return;
-		m_activeScene->FixedUpdate();
 		m_activeScene->Update();
-		m_activeScene->LateUpdate();
 	}
 
 	void SceneManager::Shutdown()

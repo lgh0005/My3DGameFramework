@@ -1,21 +1,24 @@
 ﻿#pragma once
 
-CLASS_PTR(Object)
-class Object
+namespace MGF3D
 {
-public:
-	virtual ~Object();
-/*===============================//
-//   common life-cycle methods   //
-//===============================*/
-public:
-	virtual void Awake();
-	virtual void Start();
-	virtual void FixedUpdate();
-	virtual void Update();
-	virtual void LateUpdate();
-	virtual void OnDestroy();
+	MGF_CLASS_PTR(Object)
+	class Object
+	{
+		MGF_DISABLE_COPY(Object)
 
-protected:
-	Object();
-};
+	public:
+		Object(ObjectIDHash id);
+		virtual ~Object();
+		Object(Object&&) noexcept;
+		Object& operator=(Object&&) noexcept;
+
+	public:
+		ObjectIDHash GetID() const;
+		EObjectLifecycle GetState() const;
+		void SetState(EObjectLifecycle newState);
+
+	protected:
+		MGFObjectInfo m_info;
+	};
+}

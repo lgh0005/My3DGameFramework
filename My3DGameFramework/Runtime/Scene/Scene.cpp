@@ -1,19 +1,19 @@
 ﻿#include "RuntimePch.h"
 #include "Scene.h"
 #include "Managers/TypeManager.h"
-
-// #include "Entities/GameObject.h"
-//#include "Registries/ComponentRegistry.h"
-//#include "Registries/GameObjectRegistry.h"
+#include "Managers/EntityManager.h"
 
 namespace MGF3D
 {
 	Scene::Scene() = default;
-	Scene::~Scene() = default;
+	Scene::~Scene()
+	{
+		Clear();
+	}
 
-	/*================================//
-	//    MGFInputDevice Custom Type  //
-	//================================*/
+	/*=========================//
+	//    Scene Custom Type    //
+	//=========================*/
 	int16 Scene::s_typeIndex = -1;
 	const MGFType* Scene::GetType() const
 	{
@@ -36,31 +36,13 @@ namespace MGF3D
 		return true;
 	}
 
-	//void Scene::AddGameObject(GameObjectUPtr gameObject)
-	//{
-
-	//}
-
-	//void Scene::Destroy(GameObject* obj)
-	//{
-
-	//}
-
-	/*======================================//
-	//   default scene life-cycle methods   //
-	//======================================*/
-	void Scene::FixedUpdate()
-	{
-
-	}
-
 	void Scene::Update()
 	{
-
+		MGF_ENTITY.Update();
 	}
 
-	void Scene::LateUpdate()
+	void Scene::Clear()
 	{
-
+		MGF_ENTITY.Clear();
 	}
 }

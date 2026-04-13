@@ -19,23 +19,29 @@ set(SOURCES
     # Constants
     "Constants/ConstantMath.h"        "Constants/ConstantAsset.h" 
     "Constants/ConstantStringHash.h"  "Constants/ConstantType.h" 
+    "Constants/ConstantString.h"
 
     # Defines
     "Defines/DefineAsserter.h"          "Defines/DefineBreakpoint.h"
     "Defines/DefineClassPointers.h"     "Defines/DefineDisables.h"
-      "Defines/DefineHash.h"
+    "Defines/DefineHash.h"              
     "Defines/DefineLoggings.h"          "Defines/DefineManagers.h"
     "Defines/DefineSingleton.h"         "Defines/DefineStructPointers.h"
     "Defines/DefineTimeStamp.h"         "Defines/DefineUtilities.h"
 
     # Entities
-    #"Entities/Component.h"       "Entities/Component.cpp"
-    #"Entities/GameObject.h"      "Entities/GameObject.cpp"   "Entities/GameObject.inl"
+    "Entities/Component.h"       "Entities/Component.cpp"
+    "Entities/GameObject.h"      "Entities/GameObject.cpp"   "Entities/GameObject.inl"
     #"Entities/Mechanic.h"       "Entities/Mechanic.cpp"
-    #"Entities/Object.h"       "Entities/Object.cpp"
+    "Entities/Object.h"       "Entities/Object.cpp"
 
     # States
     "States/MGFStateMachine.h"        "States/MGFStateMachine.cpp"      "States/MGFStateMachine.inl"
+
+    # Registries
+    "Registries/IRegistry.h"        "Registries/IRegistry.cpp"
+    #"Scene/ComponentRegistry.h"     "Scene/ComponentRegistry.cpp"           "Scene/ComponentRegistry.inl"
+    "Registries/GameObjectRegistry.h"     "Registries/GameObjectRegistry.cpp"
 
     # Debug
     "Debug/Asserter.h"      "Debug/Asserter.cpp"
@@ -63,8 +69,10 @@ set(SOURCES
 
     # Managers
     "Managers/InputManager.h"      "Managers/InputManager.cpp"        "Managers/InputManager.inl"
+    "Managers/EntityManager.h"      "Managers/EntityManager.cpp"       "Managers/EntityManager.inl"
     #"Managers/PathManager.h"      "Managers/PathManager.cpp"
     #"Managers/ThreadManager.h"      "Managers/ThreadManager.cpp"
+    "Managers/NameManager.h"      "Managers/NameManager.cpp"
     "Managers/TypeManager.h"      "Managers/TypeManager.cpp"
     "Managers/TimeManager.h"      "Managers/TimeManager.cpp"
     "Managers/WindowManager.h"      "Managers/WindowManager.cpp"

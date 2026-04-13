@@ -43,6 +43,7 @@
 //    Engine common constants   //
 //==============================*/
 #include "Constants/ConstantMath.h"
+#include "Constants/ConstantString.h"
 
 /*============================//
 //    Engine common defines   //
@@ -79,6 +80,7 @@
 #include "Identities/MGFPath.h"
 #include "Identities/MGFType.h"
 #include "Identities/MGFTypeCaster.h"
+#include "Identities/MGFObjectInfo.h"
 
 /*==============================//
 //    Engine common utilities   //
