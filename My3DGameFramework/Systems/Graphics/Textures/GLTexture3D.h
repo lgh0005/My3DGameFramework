@@ -1,25 +1,24 @@
 #pragma once
 #include "Textures/GLTextureHandle.h"
 
+struct ktxTexture2;
+
 namespace MGF3D
 {
 	MGF_CLASS_PTR(GLTexture3D)
 	class GLTexture3D : public GLTextureHandle
 	{
 	public:
+		GLTexture3D();
 		virtual ~GLTexture3D() override;
-		static GLTexture3DPtr Create
-		(
-			int32  width, int32 height, int32 depth,
-			uint32 vkFormat, const void* pixels,
-			uint32 levels = 1,
-			uint32 wrapS = GL_REPEAT, 
-			uint32 wrapT = GL_REPEAT, 
-			uint32 wrapR = GL_REPEAT,
-			uint32 minFilter = GL_LINEAR, 
-			uint32 magFilter = GL_LINEAR,
-			uint32 handle = 0
-		);
+
+	/*======================//
+	//    GLTexture3D Type  //
+	//======================*/
+	public:
+		static int16 s_typeIndex;
+		virtual const MGFType* GetType() const override;
+		virtual bool OnSyncCreate() override;
 
 	public:
 		void UpdateSubData
@@ -35,15 +34,12 @@ namespace MGF3D
 		uint32 GetDepth()  const { return m_depth; }
 
 	private:
-		GLTexture3D();
 		bool Init
 		(
 			int32  width, int32 height, int32 depth,
-			uint32 vkFormat, const void* pixels,
-			uint32 levels,
+			uint32 vkFormat, uint32 levels,
 			uint32 wrapS, uint32 wrapT, uint32 wrapR,
-			uint32 minFilter, uint32 magFilter,
-			uint32 handle
+			uint32 minFilter, uint32 magFilter
 		);
 
 		uint32 m_width{ 0 };

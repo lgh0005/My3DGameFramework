@@ -2,6 +2,9 @@
 #include "TestScene.h"
 #include "Managers/TypeManager.h"
 
+#include "Components/Transform.h"
+#include "Components/Camera.h"
+
 namespace MGF3D
 {
 	TestScene::TestScene() = default;
@@ -28,23 +31,53 @@ namespace MGF3D
 	{
 		MGF_LOG_FATAL("TestScene : OnPlaceActors called.");
 
-		// 1. Entities API를 사용하여 게임 오브젝트 생성
-		ObjectIDHash player1ID = Entities::Create("Player");
-		ObjectIDHash player2ID = Entities::Create("Player");
+		MGF_LOG_WARN("--- [Verification Phase] Starting Entity & Component Setup ---");
 
-		// 2. ID가 정상적으로 발급되었는지 확인
-		if (player1ID.IsValid())
+		// 1. 객체 생성
+		ObjectIDHash playerID = Entities::Create("MainPlayer");
+
+		if (playerID.IsValid())
 		{
-			MGF_LOG_ERROR("Player 1 created! Index: {0}, Generation: {1}",
-				player1ID.GetIndex(), player1ID.GetGeneration());
+			// 2. 컴포넌트 추가
+			auto* trn = Entities::AddComponent<Transform>(playerID);
+			auto* cam = Entities::AddComponent<Camera>(playerID);
+
+			MGF_LOG_WARN("Components added to MainPlayer. Now verifying via EntityManager...");
+
+			// 3. GetComponent를 통한 역추적 및 확인
+			// 이 과정에서 우리가 구현한 O(1) m_registryLookup이 작동합니다.
+			Transform* verifiedTransform = Entities::GetComponent<Transform>(playerID);
+			Camera* verifiedCamera = Entities::GetComponent<Camera>(playerID);
+
+			// Transform 검증
+			if (verifiedTransform != nullptr)
+			{
+				MGF_LOG_WARN("[Verify Success] Transform retrieved from EntityManager.");
+				MGF_LOG_WARN(" -> Memory Address: {0}", (void*)verifiedTransform);
+
+				// 데이터 수량화 테스트 (초기값 확인)
+				vec3 pos = verifiedTransform->GetLocalPosition();
+				MGF_LOG_WARN(" -> Initial Position: ({0}, {1}, {2})", pos.x, pos.y, pos.z);
+			}
+			else
+			{
+				MGF_LOG_WARN("[Verify Failed] Transform could not be found in EntityManager!");
+			}
+
+			// Camera 검증
+			if (verifiedCamera != nullptr)
+			{
+				MGF_LOG_WARN("[Verify Success] Camera retrieved from EntityManager.");
+				MGF_LOG_WARN(" -> Memory Address: {0}", (void*)verifiedCamera);
+				MGF_LOG_WARN(" -> Current FOV: {0}", verifiedCamera->GetFOV());
+			}
+			else
+			{
+				MGF_LOG_WARN("[Verify Failed] Camera could not be found in EntityManager!");
+			}
 		}
 
-		if (player2ID.IsValid())
-		{
-			// NameManager가 중복 이름을 "Player_1" 등으로 처리하는지 확인하기 좋은 테스트입니다.
-			MGF_LOG_ERROR("Player 2 created! Index: {0}, Generation: {1}",
-				player2ID.GetIndex(), player2ID.GetGeneration());
-		}
+		MGF_LOG_INFO("--- [Verification Phase] Completed ---");
 
 		return true;
 	}

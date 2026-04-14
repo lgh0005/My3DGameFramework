@@ -1,6 +1,7 @@
 ﻿#include "GraphicsPch.h"
 #include "Program.h"
-#include "Shader/Shader.h"
+#include "Shader/GLShader.h"
+#include "Managers/TypeManager.h"
 
 namespace MGF3D
 {
@@ -14,36 +15,61 @@ namespace MGF3D
         }
     }
 
-    void Program::Use() const
+    /*========================//
+    //      Program Type      //
+    //========================*/
+    int16 Program::s_typeIndex = -1;
+    const MGFType* Program::GetType() const
     {
-        glUseProgram(m_handle);
+        MGFTypeTree* tree = MGF_TYPE.GetTree("Resource");
+        if (tree != nullptr) return tree->GetType(s_typeIndex);
+        return nullptr;
     }
 
-    bool Program::Link(const Vector<ShaderPtr>& shaders)
+    bool Program::OnSyncCreate()
     {
-        // 0. 프로그램 생성
-        m_handle = glCreateProgram();
+        if (m_pendingShaders.empty()) return false;
 
-        // 1. 프로그램에 셰이더 부착
-        for (auto& shader : shaders) glAttachShader(m_handle, shader->GetHandle());
+        // 1. 의존성 체크: 부착할 모든 셰이더가 컴파일 완료(Ready) 상태인지 확인
+        for (const auto& shader : m_pendingShaders)
+        {
+            if (!shader || shader->GetState() != EResourceState::Ready)
+                return false;
+        }
+
+        // 2. 프로그램 생성 및 셰이더 부착
+        m_handle = glCreateProgram();
+        for (auto& shader : m_pendingShaders)
+            glAttachShader(m_handle, shader->GetHandle());
+
         glLinkProgram(m_handle);
 
-        // 2. 프로그램 체크
+        // 3. 링크 상태 검증
         int32 success = 0;
         glGetProgramiv(m_handle, GL_LINK_STATUS, &success);
         if (!success)
         {
             char infoLog[1024];
             glGetProgramInfoLog(m_handle, 1024, nullptr, infoLog);
-            MGF_LOG_ERROR("failed to link program: {}", infoLog);
+            MGF_LOG_ERROR("Failed to link program: {}", infoLog);
+            m_state = EResourceState::Failed;
             return false;
         }
 
-        // 3. 프로그램에 셰이더 탈착
-        for (auto& shader : shaders)
+        // 4. 탈착 및 메모리 정리
+        for (auto& shader : m_pendingShaders)
             glDetachShader(m_handle, shader->GetHandle());
 
+        m_pendingShaders.clear();
+        m_pendingShaders.shrink_to_fit();
+
+        m_state = EResourceState::Ready;
         return true;
+    }
+
+    void Program::Use() const
+    {
+        glUseProgram(m_handle);
     }
 
     int32 Program::GetUniformLocation(const String& name)

@@ -3,6 +3,7 @@
 
 #pragma region MODULES
 #include "CoreModule.h"
+#include "GraphicsModule.h"
 #include "RuntimeModule.h"
 #pragma endregion
 
@@ -24,6 +25,7 @@ namespace MGF3D
 	void Application::RegisterTypes()
 	{
 		CoreModule::OnRegisterTypes();
+		GraphicsModule::OnRegisterTypes();
 		RuntimeModule::OnRegisterTypes();
 	}
 
@@ -40,7 +42,10 @@ namespace MGF3D
 			mouse->MapButton("Fire", GLFW_MOUSE_BUTTON_LEFT);
 		}
 
-		// 1. RuntimeModule 초기화
+		// 1. SystemModule 초기화
+		if (!GraphicsModule::OnInit()) return false;
+
+		// 2. RuntimeModule 초기화
 		if (!RuntimeModule::OnInit()) return false;
 
 		return true;
@@ -74,7 +79,10 @@ namespace MGF3D
 		// 0. RuntimeModule 종료
 		if (!RuntimeModule::OnShutdown()) return false;
 
-		// 1. CoreModule 종료
+		// 1. GraphicsModule 종료
+		if (!GraphicsModule::OnShutdown()) return false;
+
+		// 2. CoreModule 종료
 		if (!CoreModule::OnShutdown()) return false;
 
 		return true;

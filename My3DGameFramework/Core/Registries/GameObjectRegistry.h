@@ -1,7 +1,5 @@
 ﻿#pragma once
 #include "Registries/IRegistry.h"
-#include "Hashes/ObjectIDHash.h"
-#include "Types/MGFPackedArray.h"
 #include "Entities/GameObject.h"
 
 namespace MGF3D
@@ -10,7 +8,7 @@ namespace MGF3D
 	{
 	public:
 		GameObjectRegistry();
-		virtual ~GameObjectRegistry();
+		virtual ~GameObjectRegistry() override;
 
 	public:
 		virtual void Init() override;

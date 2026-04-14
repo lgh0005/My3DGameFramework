@@ -1,41 +1,81 @@
 #include "GraphicsPch.h"
 #include "GLTexture2D.h"
 #include "GraphicsUtils/TextureUtils.h"
+#include "Managers/TypeManager.h"
 
 namespace MGF3D
 {
 	GLTexture2D::GLTexture2D() = default;
 	GLTexture2D::~GLTexture2D() = default;
 
-	GLTexture2DPtr GLTexture2D::Create
-	(
-		uint32 width, uint32 height, 
-		uint32 vkFormat, const void* pixels, 
-		uint32 levels,
-		uint32 wrapS, uint32 wrapT, 
-		uint32 minFilter, uint32 magFilter, 
-		uint32 handle
-	)
+	/*======================//
+	//   GLTexture2D Type   //
+	//======================*/
+	int16 GLTexture2D::s_typeIndex = -1;
+	const MGFType* GLTexture2D::GetType() const
 	{
-		auto texture = GLTexture2DPtr(new GLTexture2D());
-		if (!texture->Init(
-			width, height,
-			vkFormat, pixels,
-			levels,
-			wrapS, wrapT,
-			minFilter, magFilter,
-			handle)) return nullptr;
-		return texture;
+		MGFTypeTree* tree = MGF_TYPE.GetTree("Resource");
+		if (tree != nullptr) return tree->GetType(s_typeIndex);
+		return nullptr;
+	}
+
+	bool GLTexture2D::OnSyncCreate()
+	{
+		if (m_ktxTexture == nullptr) return false;
+
+		// 1. KTX 메타데이터 추출
+		uint32 width = m_ktxTexture->baseWidth;
+		uint32 height = m_ktxTexture->baseHeight;
+		uint32 vkFormat = m_ktxTexture->vkFormat;
+		uint32 levels = m_ktxTexture->numLevels;
+		bool isCompressed = m_ktxTexture->isCompressed;
+
+		// 2. 스토리지 할당 (Init 호출)
+		if (!Init(width, height, vkFormat, levels,
+			GL_REPEAT, GL_REPEAT,
+			GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR)) return false;
+
+		// 3. DSA 기반 데이터 업로드 및 수동 밈맵 생성
+		uint32 internalFormat = TextureUtils::MapVkFormatToGLInternal(vkFormat);
+		uint32 format = TextureUtils::GetPixelFormatFromInternal(internalFormat);
+		uint32 type = TextureUtils::GetGLDataTypeFromVk(vkFormat);
+		for (uint32 level = 0; level < levels; ++level)
+		{
+			ktx_size_t offset;
+			KTX_error_code res = ktxTexture_GetImageOffset(ktxTexture(m_ktxTexture), level, 0, 0, &offset);
+			if (res != KTX_SUCCESS) break;
+
+			uint32 levelWidth = Math::Max(1u, width >> level);
+			uint32 levelHeight = Math::Max(1u, height >> level);
+			void* data = ktxTexture_GetData(ktxTexture(m_ktxTexture)) + offset;
+			ktx_size_t imageSize = ktxTexture_GetImageSize(ktxTexture(m_ktxTexture), level);
+
+			if (isCompressed)
+			{
+				glCompressedTextureSubImage2D(m_handle, level, 0, 0,
+					levelWidth, levelHeight, internalFormat, static_cast<GLsizei>(imageSize), data);
+			}
+			else
+			{
+				glTextureSubImage2D(m_handle, level, 0, 0,
+					levelWidth, levelHeight, format, type, data);
+			}
+		}
+
+		// 4. KTX 객체 파괴 및 상태 업데이트
+		ktxTexture_Destroy(ktxTexture(m_ktxTexture));
+		m_ktxTexture = nullptr;
+
+		m_state = EResourceState::Ready;
+		return true;
 	}
 
 	bool GLTexture2D::Init
 	(
 		uint32 width, uint32 height, 
-		uint32 vkFormat, const void* pixels,
-		uint32 levels,
+		uint32 vkFormat, uint32 levels,
 		uint32 wrapS, uint32 wrapT, 
-		uint32 minFilter, uint32 magFilter, 
-		uint32 handle
+		uint32 minFilter, uint32 magFilter
 	)
 	{
 		// 0. 텍스쳐 유효성 체크
@@ -48,8 +88,6 @@ namespace MGF3D
 
 		// 2. vkFormat을 OpenGL 내부 포맷 정보로 변환
 		uint32 internalFormat = TextureUtils::MapVkFormatToGLInternal(vkFormat);
-		uint32 format = TextureUtils::GetPixelFormatFromInternal(internalFormat);
-		uint32 type = TextureUtils::GetGLDataTypeFromVk(vkFormat);
 		uint32 mipmapLevel = CommonUtils::Select
 		(
 			levels == 0,
@@ -57,31 +95,14 @@ namespace MGF3D
 			levels
 		);
 
-		// 3. 통합된 분기 처리
-		if (!handle)
-		{
-			// 3-1. 새 텍스처 생성 및 메모리 할당
-			glCreateTextures(m_target, 1, &m_handle);
-			if (m_handle == 0) return false;
-			glTextureStorage2D(m_handle, mipmapLevel, internalFormat, m_width, m_height);
-			if (pixels)
-			{
-				glTextureSubImage2D(m_handle, 0, 0, 0, m_width, m_height, format, type, pixels);
-				if (mipmapLevel > 1) GenerateMipmap();
-			}
-		}
-		else
-		{
-			// 3-2. 기존 핸들 재사용 및 데이터 덮어쓰기
-			m_handle = handle;
-			if (pixels)
-			{
-				glTextureSubImage2D(m_handle, 0, 0, 0, m_width, m_height, format, type, pixels);
-				if (mipmapLevel > 1) GenerateMipmap();
-			}
-		}
+		// 새 텍스처 생성 (DSA)
+		glCreateTextures(m_target, 1, &m_handle);
+		if (m_handle == 0) return false;
 
-		// 4. 파라미터 설정
+		// Immutable Storage 할당
+		glTextureStorage2D(m_handle, mipmapLevel, internalFormat, m_width, m_height);
+
+		// 파라미터 설정
 		glTextureParameteri(m_handle, GL_TEXTURE_WRAP_S, wrapS);
 		glTextureParameteri(m_handle, GL_TEXTURE_WRAP_T, wrapT);
 		glTextureParameteri(m_handle, GL_TEXTURE_MIN_FILTER, minFilter);

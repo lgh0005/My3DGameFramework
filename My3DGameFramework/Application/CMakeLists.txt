@@ -44,6 +44,7 @@ PUBLIC
     Engine::Core
     Engine::Frameworks
     Engine::Runtime
+    Engine::Systems
 )
 
 # 6. PCH (Precompiled Header) 설정

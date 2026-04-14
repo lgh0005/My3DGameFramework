@@ -1,16 +1,20 @@
 ﻿#include "GraphicsPch.h"
 #include "GraphicsProgram.h"
-#include "Shader/Shader.h"
+#include "Managers/TypeManager.h"
 
 namespace MGF3D
 {
 	GraphicsProgram::GraphicsProgram() = default;
 	GraphicsProgram::~GraphicsProgram() = default;
 
-	GraphicsProgramPtr GraphicsProgram::Create(const Vector<ShaderPtr>& shaders)
+	/*========================//
+	// GraphicsProgram Type   //
+	//========================*/
+	int16 GraphicsProgram::s_typeIndex = -1;
+	const MGFType* GraphicsProgram::GetType() const
 	{
-		auto program = GraphicsProgramPtr(new GraphicsProgram());
-		if (!program->Link(shaders)) return nullptr;
-		return program;
+		MGFTypeTree* tree = MGF_TYPE.GetTree("Resource");
+		if (tree != nullptr) return tree->GetType(s_typeIndex);
+		return nullptr;
 	}
 }

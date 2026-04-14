@@ -3,25 +3,25 @@
 
 namespace MGF3D
 {
-	MGF_CLASS_PTR(Shader)
-
 	MGF_CLASS_PTR(ComputeProgram)
 	class ComputeProgram : public Program
 	{
+	/*========================//
+	//  ComputeProgram Type   //
+	//========================*/
 	public:
-		virtual ~ComputeProgram() override;
-		static ComputeProgramPtr Create(const ShaderPtr& computeShader);
+		static int16 s_typeIndex;
+		virtual const MGFType* GetType() const override;
 
 	public:
-		// 실행 (Dispatch)
-		// 컴퓨트 셰이더의 핵심입니다. x, y, z 그룹 개수를 지정합니다.
+		ComputeProgram();
+		virtual ~ComputeProgram() override;
+
+	public:
+		// 컴퓨트 셰이더 실행
 		void Dispatch(uint32 numGroupsX, uint32 numGroupsY, uint32 numGroupsZ) const;
 
-		// 메모리 장벽 (Memory Barrier)
-		// SSBO나 ImageStore 작업 후, 다음 단계에서 안전하게 읽기 위해 대기할 때 씁니다.
+		// 메모리 장벽 설정
 		void Wait(uint32 barrierBit = GL_ALL_BARRIER_BITS) const;
-
-	private:
-		ComputeProgram();
 	};
 }

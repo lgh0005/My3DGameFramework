@@ -9,19 +9,55 @@
 
 #include "Identities/MGFTypeTree.h"
 
+#pragma region DEVICES
 #include "Input/MGFInputDevice.h"
 #include "Input/Devices/MGFKeyboardDevice.h"
 #include "Input/Devices/MGFMouseDevice.h"
+#pragma endregion
+
+#pragma region COMPONENT
+#include "Entities/Component.h"
+#include "Registries/ComponentRegistry.h"
+#include "Components/Transform.h"
+#include "Components/Camera.h"
+#pragma endregion
+
+#pragma region RESOURCE
+#include "Sources/Resource.h"
+#include "Sources/Asset.h"
+#pragma endregion
 
 namespace MGF3D
 {
 	void CoreModule::OnRegisterTypes()
 	{
+		// 0. 컴포넌트 레지스트리 등록
+
 		// 1. InputModule 계층 트리
 		MGFTypeTree& deviceTree = MGF_TYPE.CreateTree("Device");
 		MGFInputDevice::s_typeIndex = deviceTree.Register("MGFInputDevice", "");
 		MGFKeyboardDevice::s_typeIndex = deviceTree.Register("MGFKeyboardDevice", "MGFInputDevice");
 		MGFMouseDevice::s_typeIndex = deviceTree.Register("MGFMouseDevice", "MGFInputDevice");
+
+		// 2. Component 계층 트리
+		MGFTypeTree& componentTree = MGF_TYPE.CreateTree("Component");
+		Component::s_typeIndex = componentTree.Register("Component", "");
+		Transform::s_typeIndex = componentTree.Register("Transform", "Component");
+		Camera::s_typeIndex = componentTree.Register("Camera", "Component");
+
+		// 3. Component 레지스트리 주입
+		auto transformReg = MakeUnique<ComponentRegistry<Transform>>();
+		auto cameraReg = MakeUnique<ComponentRegistry<Camera>>();
+		MGF_ENTITY.AddComponentRegistry(Transform::s_typeIndex, std::move(transformReg));
+		MGF_ENTITY.AddComponentRegistry(Camera::s_typeIndex, std::move(cameraReg));
+
+		// 4. Resource 트리 생성
+		MGFTypeTree& resourceTree = MGF_TYPE.CreateTree("Resource");
+		Resource::s_typeIndex = resourceTree.Register("Resource", "");
+
+		// 5. Asset 트리 생성
+		MGFTypeTree& assetTree = MGF_TYPE.CreateTree("Asset");
+		Asset::s_typeIndex = assetTree.Register("Asset", "");
 	}
 
 	bool CoreModule::OnInit()

@@ -81,6 +81,7 @@
 #include "Identities/MGFType.h"
 #include "Identities/MGFTypeCaster.h"
 #include "Identities/MGFObjectInfo.h"
+#include "Types/MGFPackedArray.h"
 
 /*==============================//
 //    Engine common utilities   //

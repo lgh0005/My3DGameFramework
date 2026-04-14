@@ -9,6 +9,9 @@ set(SOURCES
     # pch
     "FrameworkPch.cpp"
 
+    # Module
+    "FrameworkModule.h"     "FrameworkModule.cpp"
+
     # Managers
     # "Managers/ResourceManager.h"    "Managers/ResourceManager.cpp"  "Managers/ResourceManager.inl"
 
@@ -20,8 +23,6 @@ set(SOURCES
     # "Components/Colliders/BoxCollider.h"        "Components/Colliders/BoxCollider.cpp"
     # "Components/Colliders/SphereCollider.h"     "Components/Colliders/SphereCollider.cpp"
     # "Components/Colliders/CapsuleCollider.h"        "Components/Colliders/CapsuleCollider.cpp"
-    # "Components/Core/Camera.h"        "Components/Core/Camera.cpp"
-    # "Components/Core/Transform.h"        "Components/Core/Transform.cpp"
     # "Components/Lights/Light.h"        "Components/Lights/Light.cpp"
     # "Components/Lights/SkyLight.h"        "Components/Lights/SkyLight.cpp"
     # "Components/Lights/PointLight.h"        "Components/Lights/PointLight.cpp"
@@ -47,7 +48,6 @@ set(SOURCES
     # Assets
     # "Assets/Animation.h"             "Assets/Animation.cpp"
     # "Assets/AudioClip.h"             "Assets/AudioClip.cpp"
-    # "Assets/Image.h"             "Assets/Image.cpp"
     # "Assets/Model.h"             "Assets/Model.cpp"
 
     # Resources
@@ -76,7 +76,7 @@ target_include_directories(${LIB_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 target_link_libraries(${LIB_NAME} 
 
 PUBLIC
-    # Engine::Core
+    Engine::Systems
 )
 
 # 6. PCH (Precompiled Header) 설정

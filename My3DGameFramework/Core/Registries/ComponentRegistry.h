@@ -1,43 +1,36 @@
 ﻿#pragma once
+#include "Registries/IComponentRegistry.h"
 
-#pragma region FORWARD_DECLARATION
-CLASS_PTR(GameObject)
-CLASS_PTR(Component)
-CLASS_PTR(GeneralRenderPass)
-#pragma endregion
-
-CLASS_PTR(ComponentRegistry)
-class ComponentRegistry
+namespace MGF3D
 {
-public:
-	~ComponentRegistry();
-	static ComponentRegistryUPtr Create();
+	template<typename T>
+	class ComponentRegistry : public IComponentRegistry
+	{
+	public:
+		ComponentRegistry();
+		virtual ~ComponentRegistry() override;
 
-	using ComponentCache = std::array<std::vector<Component*>, (usize)ComponentType::MAX>;
-	using CustomPassMap = std::unordered_map<std::string, GeneralRenderPassUPtr>;
+	public:
+		virtual void Init() override;
+		virtual void Update() override;
+		virtual void Shutdown() override;
+		virtual void Clear() override;
 
-	void RegisterComponent(Component* component);
-	void UnregisterComponent(Component* component);
-	template<typename T> const std::vector<Component*>& GetComponents();
+	public:
+		T* AddComponent(ObjectIDHash ownerID);
+		T* GetComponent(ObjectIDHash ownerID);
+		void RemoveComponent(ObjectIDHash ownerID);
 
-private:
-	void Init();
-	ComponentRegistry();
-	void RemoveComponentFromBaseList(ComponentType baseType, Component* component);
+	private:
+		void FlushPendingAdds();
+		void FlushPendingKills();
 
-/*=======================================//
-//   getters and setters of components   //
-//=======================================*/
-public:
-	Camera* GetCamera(uint32 idx) const;
-	SkyLight* GetSkyLight(uint32 idx) const;
-	void AddCustomRenderPass(const std::string& name, GeneralRenderPassUPtr pass);
-	GeneralRenderPass* GetCustomRenderPass(const std::string& name);
-	CustomPassMap& GetCustomRenderPasses();
+	private:
+		MGFPackedArray<T> m_components;
 
-private:
-	ComponentCache m_componentCache;
-	CustomPassMap m_customPasses;
-};
+		Vector<ObjectIDHash> m_pendingAdds;
+		Vector<ObjectIDHash> m_pendingKills;
+	};
+}
 
-#include "Scene/ComponentRegistry.inl"
+#include "Registries/ComponentRegistry.inl"

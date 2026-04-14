@@ -1,5 +1,6 @@
 ﻿#pragma once
 #include "Managers/TypeManager.h"
+#include "Managers/EntityManager.h"
 #include "Identities/MGFTypeTree.h"
 
 namespace MGF3D
@@ -32,7 +33,7 @@ namespace MGF3D
 			);
 		}
 
-		m_scenes[typeIndex] = SceneFactory([]() -> SceneUPtr { return std::make_unique<T>(); });
+		m_scenes[typeIndex] = SceneFactory([]() -> SceneUPtr { return MakeUnique<T>(); });
 
 		MGF_LOG_INFO
 		(
@@ -52,6 +53,7 @@ namespace MGF3D
 
 		int16 typeIndex = T::s_typeIndex;
 
+		// 1. 로드할 씬 탐색
 		auto it = m_scenes.find(typeIndex);
 		if (it == m_scenes.end())
 		{
@@ -61,7 +63,11 @@ namespace MGF3D
 
 		MGF_LOG_INFO("SceneManager: Loading Scene with TypeIndex {0} ...", typeIndex);
 
+		// 2. 이전 씬 파괴
 		m_activeScene.reset();
+		MGF_ENTITY.Clear();
+
+		// 3. 다음 씬 로드
 		m_activeScene = it->second();
 		if (!m_activeScene) return;
 

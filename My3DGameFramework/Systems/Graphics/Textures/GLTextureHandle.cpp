@@ -1,5 +1,6 @@
 #include "GraphicsPch.h"
 #include "GLTextureHandle.h"
+#include "Managers/TypeManager.h"
 
 namespace MGF3D
 {
@@ -12,6 +13,17 @@ namespace MGF3D
 			m_handle = 0;
 			m_target = 0;
 		}
+	}
+
+	/*==========================//
+	//   GLTextureHandle Type   //
+	//==========================*/
+	int16 GLTextureHandle::s_typeIndex = -1;
+	const MGFType* GLTextureHandle::GetType() const
+	{
+		MGFTypeTree* tree = MGF_TYPE.GetTree("Resource");
+		if (tree != nullptr) return tree->GetType(s_typeIndex);
+		return nullptr;
 	}
 
 	void GLTextureHandle::Bind(uint32 slot) const

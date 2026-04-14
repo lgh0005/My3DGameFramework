@@ -9,11 +9,18 @@ set(SOURCES
     # pch
     "GraphicsPch.h"
 
+    # Module
+    "GraphicsModule.h"                     "GraphicsModule.cpp"
+
     # Constants
     "Constants/ConstantGraphics.h"
 
     # Managers
     
+    # Assets
+    "Assets/Shader.h"                      "Assets/Shader.cpp"
+    "Assets/Image.h"                       "Assets/Image.cpp"
+
     # Buffer
     "Buffers/GLBufferHandle.h"             "Buffers/GLBufferHandle.cpp"
     "Buffers/GLIndexBuffer.h"              "Buffers/GLIndexBuffer.cpp"
@@ -54,7 +61,7 @@ set(SOURCES
     "Programs/ComputeProgram.h"             "Programs/ComputeProgram.cpp"
 
     # Shader
-    "Shader/Shader.h"                      "Shader/Shader.cpp"
+    "Shader/GLShader.h"                      "Shader/GLShader.cpp"
 
     # Vertices
     "Vertices/ScreenVertex.h" 
@@ -85,6 +92,7 @@ target_include_directories(${LIB_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 target_link_libraries(${LIB_NAME} 
 
 PUBLIC
+    KTX::ktx
     Engine::Core
 )
 

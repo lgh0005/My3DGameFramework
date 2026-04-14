@@ -6,9 +6,9 @@ namespace MGF3D
 	{
 		MGF_DECLARE_UTILITIES(CommonUtils)
 
-			/*=======================//
-			//   constexpr methods   //
-			//=======================*/
+	/*=======================//
+	//   constexpr methods   //
+	//=======================*/
 	public:
 		template<typename T> static constexpr bool IsBetween(T value, T min, T max);
 		template<typename T> static constexpr bool IsInRange(T value, T min, T max);

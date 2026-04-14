@@ -1,4 +1,3 @@
-#include "MGFPackedArray.h"
 #pragma once
 
 namespace MGF3D

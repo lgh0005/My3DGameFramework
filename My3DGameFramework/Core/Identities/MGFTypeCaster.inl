@@ -32,6 +32,24 @@ namespace MGF3D
 	}
 
 	template<typename To, typename From>
+	inline std::shared_ptr<To> MGFTypeCaster::Cast(const std::shared_ptr<From>& obj)
+	{
+		// 1. 원본 nullptr 방어
+		if (!obj) return nullptr;
+
+		// 2. 런타임 타입 트리 검증 (RTTI 없이 인덱스로 확인)
+		const MGFType* runtimeType = obj->GetType();
+		if (!runtimeType || !runtimeType->ownerTree) return nullptr;
+
+		// 3. O(1) 계층 구조 확인
+		// TargetType::s_typeIndex를 사용하여 부모-자식 관계인지 묻습니다.
+		if (runtimeType->ownerTree->IsA(runtimeType->selfIndex, To::s_typeIndex))
+			return std::static_pointer_cast<To>(obj);
+
+		return nullptr;
+	}
+
+	template<typename To, typename From>
 	inline To MGFTypeCaster::ExactCast(From* obj)
 	{
 		// 1. To 타입이 포인터인지 컴파일 타임 검증

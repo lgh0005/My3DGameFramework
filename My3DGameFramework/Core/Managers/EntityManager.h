@@ -1,6 +1,6 @@
 #pragma once
 #include "Registries/GameObjectRegistry.h"
-// #include "Registries/ComponentRegistry.h"
+#include "Registries/ComponentRegistry.h"
 
 namespace MGF3D
 {
@@ -17,10 +17,14 @@ namespace MGF3D
 		void Update();
 		void Shutdown();
 
+	/*==========================//
+	//     Registry methods     //
+	//==========================*/
 	public:
 		void Clear();
 		GameObjectRegistry* GetGameObjectRegistry();
-		// ComponentRegistry* GetComponentRegistry() const;
+		void AddComponentRegistry(int16 typeIndex, IComponentRegistryUPtr registry);
+		template<typename T> ComponentRegistry<T>* GetComponentRegistry() const;
 
 	/*============================//
 	//     GameObject methods     //
@@ -42,7 +46,8 @@ namespace MGF3D
 
 	private:
 		GameObjectRegistry m_gameObjectRegistry;
-		// ComponentRegistry m_componentRegistry;
+		Vector<IComponentRegistry*> m_registryLookup;
+		Vector<IComponentRegistryUPtr> m_componentRegistries;
 	};
 }
 

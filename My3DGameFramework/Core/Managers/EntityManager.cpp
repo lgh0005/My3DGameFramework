@@ -9,25 +9,41 @@ namespace MGF3D
 	void EntityManager::Init()
 	{
 		m_gameObjectRegistry.Init();
-		// m_componentRegistry.Init();
+		for (auto& registry : m_componentRegistries)
+		{
+			if (registry != nullptr)
+				registry->Init();
+		}
 	}
 
 	void EntityManager::Update()
 	{
 		m_gameObjectRegistry.Update();
-		// m_componentRegistry.Update();
+		for (auto& registry : m_componentRegistries)
+		{
+			if (registry != nullptr)
+				registry->Update();
+		}
 	}
 
 	void EntityManager::Shutdown()
 	{
 		m_gameObjectRegistry.Shutdown();
-		// m_componentRegistry.Shutdown();
+		for (auto& registry : m_componentRegistries)
+		{
+			if (registry != nullptr)
+				registry->Shutdown();
+		}
 	}
 
 	void EntityManager::Clear()
 	{
 		m_gameObjectRegistry.Clear();
-		// m_componentRegistry.Clear();
+		for (auto& registry : m_componentRegistries)
+		{
+			if (registry != nullptr)
+				registry->Clear();
+		}
 	}
 
 	GameObjectRegistry* EntityManager::GetGameObjectRegistry()
@@ -35,11 +51,14 @@ namespace MGF3D
 		return &m_gameObjectRegistry;
 	}
 
-	//ComponentRegistry* EntityManager::GetComponentRegistry() const
-	//{
-	//	// return &m_componentRegistry;
-	//	return nullptr;
-	//}
+	void EntityManager::AddComponentRegistry(int16 typeIndex, IComponentRegistryUPtr registry)
+	{
+		if (typeIndex < 0 || registry == nullptr) return;
+		if (typeIndex >= m_registryLookup.size())
+			m_registryLookup.resize(typeIndex + 1, nullptr);
+		m_registryLookup[typeIndex] = registry.get();
+		m_componentRegistries.push_back(std::move(registry));
+	}
 
 	/*============================//
 	//     GameObject methods     //

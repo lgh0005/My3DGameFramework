@@ -32,15 +32,23 @@ set(SOURCES
     # Entities
     "Entities/Component.h"       "Entities/Component.cpp"
     "Entities/GameObject.h"      "Entities/GameObject.cpp"   "Entities/GameObject.inl"
-    #"Entities/Mechanic.h"       "Entities/Mechanic.cpp"
+    "Entities/Mechanic.h"       "Entities/Mechanic.cpp"
     "Entities/Object.h"       "Entities/Object.cpp"
+
+    # Components
+    "Components/Transform.h"        "Components/Transform.cpp"
+    "Components/Camera.h"           "Components/Camera.cpp"
+
+    # Mechanics
+    #"Mechanics/Velocitybuffer.h"       "Mechanics/Velocitybuffer.cpp"
 
     # States
     "States/MGFStateMachine.h"        "States/MGFStateMachine.cpp"      "States/MGFStateMachine.inl"
 
     # Registries
     "Registries/IRegistry.h"        "Registries/IRegistry.cpp"
-    #"Scene/ComponentRegistry.h"     "Scene/ComponentRegistry.cpp"           "Scene/ComponentRegistry.inl"
+    "Registries/IComponentRegistry.h"        "Registries/IComponentRegistry.cpp"
+    "Registries/ComponentRegistry.h"     "Registries/ComponentRegistry.cpp"           "Registries/ComponentRegistry.inl"
     "Registries/GameObjectRegistry.h"     "Registries/GameObjectRegistry.cpp"
 
     # Debug
@@ -89,6 +97,10 @@ set(SOURCES
     "Hashes/StringHash.h"        "Hashes/StringHash.cpp"            "Hashes/StringHash.inl"
     "Hashes/TypeHash.h"          "Hashes/TypeHash.cpp"              "Hashes/TypeHash.inl"
     "Hashes/ObjectIDHash.h"      "Hashes/ObjectIDHash.cpp"          "Hashes/ObjectIDHash.inl"
+
+    # Sources
+    "Sources/Asset.h"        "Sources/Asset.cpp"
+    "Sources/Resource.h"     "Sources/Resource.cpp"
 
     # Utils
     "CoreUtils/AssetUtils.h"       "CoreUtils/AssetUtils.cpp"           "CoreUtils/AssetUtils.inl"
