@@ -15,12 +15,7 @@ namespace MGF3D
 		void Clear();
 		void BeginFrame();
 		void EndFrame();
-		bool Begin
-		(
-			const char* name,
-			bool* p_open = nullptr,
-			ImGuiWindowFlags flags = 0
-		);
+		bool Begin(cstr name, bool* p_open = nullptr, ImGuiWindowFlags flags = 0);
 		void End();
 
 	private:

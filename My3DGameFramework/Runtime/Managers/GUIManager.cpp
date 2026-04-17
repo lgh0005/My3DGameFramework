@@ -18,6 +18,8 @@ namespace MGF3D
 		ImGui::CreateContext();
 		ImGui::StyleColorsDark();
 
+		ImGuizmo::SetImGuiContext(ImGui::GetCurrentContext());
+
 		ImGui_ImplGlfw_InitForOpenGL(MGF_WINDOW.GetNativeHandle(), true);
 		ImGui_ImplOpenGL3_Init("#version 460 core");
 
@@ -48,7 +50,7 @@ namespace MGF3D
 		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 	}
 
-	bool GUIManager::Begin(const char* name, bool* p_open, ImGuiWindowFlags flags)
+	bool GUIManager::Begin(cstr name, bool* p_open, ImGuiWindowFlags flags)
 	{
 		if (!m_isEnable) return false;
 		return ImGui::Begin(name, p_open, flags);
