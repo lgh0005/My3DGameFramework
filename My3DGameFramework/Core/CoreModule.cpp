@@ -1,13 +1,18 @@
 #include "CorePch.h"
 #include "CoreModule.h"
 
+#pragma region MANAGERS
 #include "Managers/WindowManager.h"
+#include "Managers/ThreadManager.h"
 #include "Managers/TimeManager.h"
 #include "Managers/InputManager.h"
-#include "Managers/TypeManager.h"
 #include "Managers/EntityManager.h"
+#pragma endregion
 
+#pragma region TYPES
+#include "Managers/TypeManager.h"
 #include "Identities/MGFTypeTree.h"
+#pragma endregion
 
 #pragma region DEVICES
 #include "Input/MGFInputDevice.h"
@@ -25,6 +30,10 @@
 #pragma region RESOURCE
 #include "Sources/Resource.h"
 #include "Sources/Asset.h"
+#pragma endregion
+
+#pragma region MISC
+#include "Window/MGFWindow.h"
 #pragma endregion
 
 namespace MGF3D
@@ -78,6 +87,9 @@ namespace MGF3D
 			return false;
 		}
 
+		// 3. 스레드 매니저
+		MGF_THREAD.Init(6, 2);
+
 		// 3. 타임 매니저
 		MGF_TIME.Init();
 
@@ -90,6 +102,7 @@ namespace MGF3D
 	bool CoreModule::OnShutdown()
 	{
 		MGF_ENTITY.Shutdown();
+		MGF_THREAD.Shutdown();
 		MGF_INPUT.Shutdown();
 		MGF_WINDOW.Shutdown();
 

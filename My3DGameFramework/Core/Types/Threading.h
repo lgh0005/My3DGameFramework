@@ -15,5 +15,11 @@ namespace MGF3D
 	//===========================*/
 	using Thread = std::thread;
 	using Mutex = std::mutex;
-	using LockScope = std::lock_guard<std::mutex>;
+	using LockScope = std::scoped_lock<Mutex>;
+
+	/*=========================//
+	//    Producer & Consumer  //
+	//=========================*/
+	using UniqueLock = std::unique_lock<Mutex>;
+	using ConditionVariable = std::condition_variable;
 }

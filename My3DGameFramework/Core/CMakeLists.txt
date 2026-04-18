@@ -78,8 +78,7 @@ set(SOURCES
     # Managers
     "Managers/InputManager.h"      "Managers/InputManager.cpp"        "Managers/InputManager.inl"
     "Managers/EntityManager.h"      "Managers/EntityManager.cpp"       "Managers/EntityManager.inl"
-    #"Managers/PathManager.h"      "Managers/PathManager.cpp"
-    #"Managers/ThreadManager.h"      "Managers/ThreadManager.cpp"
+    "Managers/ThreadManager.h"      "Managers/ThreadManager.cpp"
     "Managers/NameManager.h"      "Managers/NameManager.cpp"
     "Managers/TypeManager.h"      "Managers/TypeManager.cpp"
     "Managers/TimeManager.h"      "Managers/TimeManager.cpp"
@@ -87,7 +86,6 @@ set(SOURCES
 
     # Identities
     "Identities/MGFObjectInfo.h"      
-    "Identities/MGFPath.h"      "Identities/MGFPath.cpp"
     "Identities/MGFType.h"      "Identities/MGFType.cpp"
     "Identities/MGFTypeTree.h"      "Identities/MGFTypeTree.cpp"
     "Identities/MGFTypeCaster.h"   "Identities/MGFTypeCaster.cpp"      "Identities/MGFTypeCaster.inl"
@@ -101,6 +99,12 @@ set(SOURCES
     # Sources
     "Sources/Asset.h"        "Sources/Asset.cpp"
     "Sources/Resource.h"     "Sources/Resource.cpp"
+
+    # Thread
+    "Thread/TaskQueue.h"           "Thread/TaskQueue.cpp"
+    "Thread/Worker.h"           "Thread/Worker.cpp"
+    "Thread/CPUWorker.h"        "Thread/CPUWorker.cpp"
+    "Thread/GPUWorker.h"        "Thread/GPUWorker.cpp"
 
     # Utils
     "CoreUtils/AssetUtils.h"       "CoreUtils/AssetUtils.cpp"           "CoreUtils/AssetUtils.inl"

@@ -63,6 +63,19 @@ namespace MGF3D
         return nullptr;
     }
 
+    MGFWindowUPtr WindowManager::CreateSharedContextWindow() const
+    {
+        // 1. 메인 윈도우 컨텍스트가 있는지 검사
+        if (m_mainWindow == nullptr)
+        {
+            MGF_LOG_ERROR("WindowManager: Cannot create shared context. Main window is null.");
+            return nullptr;
+        }
+
+        // 2. 컨텍스트 공유 전용 윈도우 생성 및 윈도우 반환
+        return MGFWindow::Create(1, 1, "", 0, false, m_mainWindow->GetHandle());
+    }
+
     int32 WindowManager::GetWindowWidth() const
     {
         if (m_mainWindow != nullptr) return m_mainWindow->GetWidth();

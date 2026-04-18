@@ -13,7 +13,10 @@ set(SOURCES
     "FrameworkModule.h"     "FrameworkModule.cpp"
 
     # Managers
-    # "Managers/ResourceManager.h"    "Managers/ResourceManager.cpp"  "Managers/ResourceManager.inl"
+    "Managers/AssetManager.h"       "Managers/AssetManager.cpp"      "Managers/AssetManager.inl"
+    "Managers/ResourceManager.h"    "Managers/ResourceManager.cpp"   "Managers/ResourceManager.inl"
+    "Managers/PathManager.h"        "Managers/PathManager.cpp"       "Managers/PathManager.inl"
+    #"Managers/RenderManager.h"      "Managers/RenderManager.cpp"     "Managers/RenderManager.inl"
 
     # Components
     # "Components/Animation/Animator.h"       "Components/Animation/Animator.cpp"

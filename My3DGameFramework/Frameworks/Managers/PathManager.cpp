@@ -1,5 +1,5 @@
 #include "FrameworkPch.h"
-#include "ScriptManager.h"
+#include "PathManager.h"
 
 namespace MGF3D
 {

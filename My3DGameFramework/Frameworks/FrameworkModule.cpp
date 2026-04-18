@@ -8,7 +8,6 @@
 #include "Entities/Component.h"
 #include "Registries/ComponentRegistry.h"
 #include "Components/MeshRenderers/MeshRenderer.h"
-#include "Components/MeshRenderers/StaticMeshRenderer.h"
 #pragma endregion
 
 #pragma region RESOURCE
@@ -26,7 +25,6 @@ namespace MGF3D
 		// 2. Components 타입 베이킹
 		MGFTypeTree* componentTree = MGF_TYPE.GetTree("Component");
 		MeshRenderer::s_typeIndex = componentTree->Register("MeshRenderer", "Component");
-		StaticMeshRenderer::s_typeIndex = componentTree->Register("StaticMeshRenderer", "MeshRenderer");
 
 		// 3. Component 레지스트리 주입
 	}
