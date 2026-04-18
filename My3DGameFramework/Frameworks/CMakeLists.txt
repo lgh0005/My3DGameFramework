@@ -15,7 +15,6 @@ set(SOURCES
     # Managers
     "Managers/AssetManager.h"       "Managers/AssetManager.cpp"      "Managers/AssetManager.inl"
     "Managers/ResourceManager.h"    "Managers/ResourceManager.cpp"   "Managers/ResourceManager.inl"
-    "Managers/PathManager.h"        "Managers/PathManager.cpp"       "Managers/PathManager.inl"
     #"Managers/RenderManager.h"      "Managers/RenderManager.cpp"     "Managers/RenderManager.inl"
 
     # Components

@@ -47,6 +47,9 @@ namespace MGF3D
 		// 1. SystemModule 초기화
 		if (!GraphicsModule::OnInit()) return false;
 
+		// 2. FrameworkModule 초기화
+		if (!FrameworkModule::OnInit()) return false;
+
 		// 2. RuntimeModule 초기화
 		if (!RuntimeModule::OnInit()) return false;
 

@@ -7,6 +7,7 @@
 #include "Managers/TimeManager.h"
 #include "Managers/InputManager.h"
 #include "Managers/EntityManager.h"
+#include "Managers/PathManager.h"
 #pragma endregion
 
 #pragma region TYPES
@@ -89,6 +90,9 @@ namespace MGF3D
 
 		// 3. 스레드 매니저
 		MGF_THREAD.Init(6, 2);
+
+		// 3. 경로 매니저
+		if (!MGF_PATH.Init("Config/ResourceConfig.json")) return false;
 
 		// 3. 타임 매니저
 		MGF_TIME.Init();

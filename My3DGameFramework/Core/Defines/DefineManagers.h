@@ -10,3 +10,4 @@
 #define MGF_NAME   ::MGF3D::NameManager::Instance()
 #define MGF_ENTITY ::MGF3D::EntityManager::Instance()
 #define MGF_THREAD ::MGF3D::ThreadManager::Instance()
+#define MGF_PATH     ::MGF3D::PathManager::Instance()

@@ -57,7 +57,7 @@ set(SOURCES
     "Debug/Stopwatch.h"     "Debug/Stopwatch.cpp"
 
     # Parsers
-    #"Parsers/JsonParser.h"      "Parsers/JsonParser.cpp"           "Parsers/JsonParser.inl"
+    "Parsers/JsonParser.h"      "Parsers/JsonParser.cpp"           "Parsers/JsonParser.inl"
 
     # Input
     "Input/MGFInputInterface.h"	  "Input/MGFInputInterface.cpp"
@@ -78,6 +78,7 @@ set(SOURCES
     # Managers
     "Managers/InputManager.h"      "Managers/InputManager.cpp"        "Managers/InputManager.inl"
     "Managers/EntityManager.h"      "Managers/EntityManager.cpp"       "Managers/EntityManager.inl"
+    "Managers/PathManager.h"      "Managers/PathManager.cpp"        "Managers/PathManager.inl"
     "Managers/ThreadManager.h"      "Managers/ThreadManager.cpp"
     "Managers/NameManager.h"      "Managers/NameManager.cpp"
     "Managers/TypeManager.h"      "Managers/TypeManager.cpp"
@@ -92,6 +93,7 @@ set(SOURCES
 
     # Hashes
     "Hashes/IHashFunctor.h"      "Hashes/IHashFunctor.cpp"
+    "Hashes/PathHash.h"        "Hashes/PathHash.cpp"            "Hashes/PathHash.inl"
     "Hashes/StringHash.h"        "Hashes/StringHash.cpp"            "Hashes/StringHash.inl"
     "Hashes/TypeHash.h"          "Hashes/TypeHash.cpp"              "Hashes/TypeHash.inl"
     "Hashes/ObjectIDHash.h"      "Hashes/ObjectIDHash.cpp"          "Hashes/ObjectIDHash.inl"

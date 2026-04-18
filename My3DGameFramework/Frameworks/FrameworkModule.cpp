@@ -1,8 +1,17 @@
 #include "FrameworkPch.h"
 #include "FrameworkModule.h"
+
+#pragma region MANAGERS
+#include "Managers/PathManager.h"
+#include "Managers/AssetManager.h"
+#include "Managers/ResourceManager.h"
+// #include "Managers/RenderManager.h"
+#pragma endregion
+
+#pragma region TYPES
 #include "Managers/TypeManager.h"
-#include "Managers/EntityManager.h"
 #include "Identities/MGFTypeTree.h"
+#pragma endregion
 
 #pragma region COMPONENT
 #include "Entities/Component.h"
@@ -30,12 +39,23 @@ namespace MGF3D
 	}
 
 	bool FrameworkModule::OnInit()
-	{
+	{		
+
 		return true;
 	}
 
 	bool FrameworkModule::OnShutdown()
 	{
+		// 0. 리소스 매니저 종료
+
+		// 1. 에셋 매니저 종료
+		MGF_ASSET.Shutdown();
+
+		// 2. 경로 매니저 종료
+		
+		// 3. 렌더 매니저 종료
+
+
 		return true;
 	}
 }
