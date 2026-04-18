@@ -21,20 +21,4 @@ namespace MGF3D
 		if (tree != nullptr) return tree->GetType(s_typeIndex);
 		return nullptr;
 	}
-
-
 }
-
-
-//DECLARE_DEFAULTS_IMPL(MeshRenderer)
-//
-//bool MeshRenderer::MatchesType(ComponentType type) const
-//{
-//    return type == ComponentType::MeshRenderer || Super::MatchesType(type);
-//}
-//
-//RenderBounds MeshRenderer::GetWorldBounds() const
-//{
-//    if (!m_mesh) return RenderBounds::Empty();
-//    return m_mesh->GetLocalBounds().Transform(GetTransform().GetWorldMatrix());
-//}

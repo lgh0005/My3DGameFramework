@@ -4,48 +4,66 @@
 #include "Layout/GLVertexLayout.h"
 #include "Buffers/GLVertexBuffer.h"
 #include "Buffers/GLIndexBuffer.h"
+#include "Managers/TypeManager.h"
 
 namespace MGF3D
 {
     StaticMesh::StaticMesh() = default;
     StaticMesh::~StaticMesh() = default;
 
+    /*==========================//
+    //   GLTextureHandle Type   //
+    //==========================*/
+    int16 StaticMesh::s_typeIndex = -1;
+    const MGFType* StaticMesh::GetType() const
+    {
+        MGFTypeTree* tree = MGF_TYPE.GetTree("Resource");
+        if (tree != nullptr) return tree->GetType(s_typeIndex);
+        return nullptr;
+    }
+
     StaticMeshPtr StaticMesh::Create
     (
-        const Vector<StaticVertex>& vertices,
-        const Vector<uint32>& indices,
+        Vector<StaticVertex>&& vertices,
+        Vector<uint32>&& indices,
         uint32 primitiveType
     )
     {
         auto mesh = StaticMeshPtr(new StaticMesh());
-        mesh->Init(vertices, indices, primitiveType);
+        mesh->Init(std::move(vertices), std::move(indices), primitiveType);
+        mesh->SetState(EResourceState::Loaded);
         return mesh;
     }
 
     void StaticMesh::Init
     (
-        const Vector<StaticVertex>& vertices,
-        const Vector<uint32>& indices,
+        Vector<StaticVertex>&& vertices,
+        Vector<uint32>&& indices,
         uint32 primitiveType
     )
     {
-        // 0. 기본 메쉬 설정
         m_primitiveType = primitiveType;
         m_indexCount = indices.size();
+        m_vertices = std::move(vertices);
+        m_indices = std::move(indices);
 
-        // 1. 탄젠트 연산
-        if (m_primitiveType == GL_TRIANGLES) 
-            ComputeTangents(const_cast<Vector<StaticVertex>&>(vertices), indices);
+        // CPU 헤비 연산: 탄젠트 및 AABB 계산
+        if (m_primitiveType == GL_TRIANGLES)
+            ComputeTangents(m_vertices, m_indices);
 
-        // 2. 바운딩 박스(AABB) 자동 계산 및 세팅
-        SetLocalBounds(RenderBounds(vertices));
+        SetLocalBounds(RenderBounds(m_vertices));
+    }
 
-        // 2. 리소스 생성 (Create 인자 순서: data -> size)
+    bool StaticMesh::OnSyncCreate()
+    {
+        if (m_vertices.empty() || m_indices.empty()) return false;
+
+        // 1. 리소스 생성
         m_vertexLayout = GLVertexLayout::Create();
-        m_vertexBuffer = GLVertexBuffer::Create(vertices.data(), vertices.size() * sizeof(StaticVertex));
-        m_indexBuffer = GLIndexBuffer::Create(indices.data(), indices.size() * sizeof(uint32));
+        m_vertexBuffer = GLVertexBuffer::Create(m_vertices.data(), m_vertices.size() * sizeof(StaticVertex));
+        m_indexBuffer = GLIndexBuffer::Create(m_indices.data(), m_indices.size() * sizeof(uint32));
 
-        // 3. DSA 레이아웃 설정
+        // 2. DSA 레이아웃 설정
         const uint32 bindingIndex = 0;
         m_vertexLayout->BindVertexBuffer(bindingIndex, m_vertexBuffer, 0, sizeof(StaticVertex));
         m_vertexLayout->BindIndexBuffer(m_indexBuffer);
@@ -53,9 +71,18 @@ namespace MGF3D
         m_vertexLayout->SetAttribFormat(1, 3, GL_FLOAT, false, offsetof(StaticVertex, normal), bindingIndex);
         m_vertexLayout->SetAttribFormat(2, 2, GL_FLOAT, false, offsetof(StaticVertex, texCoord), bindingIndex);
         m_vertexLayout->SetAttribFormat(3, 3, GL_FLOAT, false, offsetof(StaticVertex, tangent), bindingIndex);
-        
-        // 4. 모든 속성 활성화
+
+        // 3. 모든 속성 활성화
         for (uint32 i = 0; i <= 3; ++i) m_vertexLayout->EnableAttrib(i);
+
+        // 4. GPU 업로드 완료 후 CPU 측 원본 메모리 즉각 해제
+        m_vertices.clear();
+        m_vertices.shrink_to_fit();
+        m_indices.clear();
+        m_indices.shrink_to_fit();
+
+        m_state = EResourceState::Ready;
+        return true;
     }
 
     void StaticMesh::ComputeTangents

@@ -1,4 +1,5 @@
 ﻿#pragma once
+#include "Sources/Resource.h"
 #include "Geometry/RenderBounds.h"
 
 namespace MGF3D
@@ -8,13 +9,20 @@ namespace MGF3D
     MGF_CLASS_PTR(GLIndexBuffer)
 
     MGF_CLASS_PTR(Mesh)
-    class Mesh
+    class Mesh : public Resource
     {
     public:
         virtual ~Mesh();
         virtual void Draw(uint32 count) const;
         virtual void Bind() const;
         virtual void Unbind() const;
+
+    /*===============//
+    //   Mesh Type   //
+    //===============*/
+    public:
+        static int16 s_typeIndex;
+        virtual const MGFType* GetType() const override;
 
     public:
         GLIndexBufferPtr GetIndexBuffer() const { return m_indexBuffer; }
@@ -40,5 +48,4 @@ namespace MGF3D
 
         RenderBounds m_localBounds { RenderBounds() };
     };
-
 }

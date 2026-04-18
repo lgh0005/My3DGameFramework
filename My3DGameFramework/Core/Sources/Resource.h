@@ -26,7 +26,7 @@ namespace MGF3D
 		virtual const MGFType* GetType() const;
 
 	public:
-		// 메인 스레드에서 호출되어 실제 GPU 핸들(VAO, TextureID 등)을 생성함
+		// GPU 컨텍스트 스레드에서 호출되어 실제 GPU 핸들(VAO, TextureID 등)을 생성함
 		virtual bool OnSyncCreate() = 0;
 
 	/*==================================//

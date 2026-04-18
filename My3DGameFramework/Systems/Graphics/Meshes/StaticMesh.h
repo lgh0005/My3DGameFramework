@@ -13,11 +13,20 @@ namespace MGF3D
         virtual ~StaticMesh() override;
         static StaticMeshPtr Create
         (
-            const Vector<StaticVertex>& vertices,
-            const Vector<uint32>& indices,
+            Vector<StaticVertex>&& vertices,
+            Vector<uint32>&&       indices,
             uint32 primitiveType = GL_TRIANGLES
         );
+
+        virtual bool OnSyncCreate() override;
         virtual void Draw(uint32 count) const override;
+
+    /*=====================//
+    //   StaticMesh Type   //
+    //=====================*/
+    public:
+        static int16 s_typeIndex;
+        virtual const MGFType* GetType() const override;
 
     public:
         void ComputeTangents
@@ -30,9 +39,12 @@ namespace MGF3D
         StaticMesh();
         void Init
         (
-            const Vector<StaticVertex>& vertices,
-            const Vector<uint32>& indices,
+            Vector<StaticVertex>&& vertices,
+            Vector<uint32>&& indices,
             uint32 primitiveType
         );
+
+        Vector<StaticVertex> m_vertices;
+        Vector<uint32> m_indices;
     };
 }

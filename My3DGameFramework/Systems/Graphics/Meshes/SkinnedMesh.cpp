@@ -4,28 +4,41 @@
 #include "Layout/GLVertexLayout.h"
 #include "Buffers/GLVertexBuffer.h"
 #include "Buffers/GLIndexBuffer.h"
+#include "Managers/TypeManager.h"
 
 namespace MGF3D
 {
     SkinnedMesh::SkinnedMesh() = default;
     SkinnedMesh::~SkinnedMesh() = default;
 
+    /*==========================//
+    //   GLTextureHandle Type   //
+    //==========================*/
+    int16 SkinnedMesh::s_typeIndex = -1;
+    const MGFType* SkinnedMesh::GetType() const
+    {
+        MGFTypeTree* tree = MGF_TYPE.GetTree("Resource");
+        if (tree != nullptr) return tree->GetType(s_typeIndex);
+        return nullptr;
+    }
+
     SkinnedMeshPtr SkinnedMesh::Create
     (
-        const Vector<SkinnedVertex>& vertices,
-        const Vector<uint32>& indices,
+        Vector<SkinnedVertex>&& vertices,
+        Vector<uint32>&& indices,
         uint32 primitiveType
     )
     {
         auto mesh = SkinnedMeshPtr(new SkinnedMesh());
-        mesh->Init(vertices, indices, primitiveType);
+        mesh->Init(std::move(vertices), std::move(indices), primitiveType);
+        mesh->SetState(EResourceState::Loaded);
         return mesh;
     }
 
     void SkinnedMesh::Init
     (
-        const Vector<SkinnedVertex>& vertices,
-        const Vector<uint32>& indices,
+        Vector<SkinnedVertex>&& vertices,
+        Vector<uint32>&& indices,
         uint32 primitiveType
     )
     {
@@ -35,12 +48,17 @@ namespace MGF3D
 
         // 1. 탄젠트 연산
         if (m_primitiveType == GL_TRIANGLES)
-            ComputeTangents(const_cast<Vector<SkinnedVertex>&>(vertices), indices);
+            ComputeTangents(m_vertices, m_indices);
+    }
 
-       // 2. 리소스 생성
+    bool SkinnedMesh::OnSyncCreate()
+    {
+        if (m_vertices.empty() || m_indices.empty()) return false;
+
+        // 2. 리소스 생성
         m_vertexLayout = GLVertexLayout::Create();
-        m_vertexBuffer = GLVertexBuffer::Create(vertices.data(), vertices.size() * sizeof(SkinnedVertex));
-        m_indexBuffer = GLIndexBuffer::Create(indices.data(), indices.size() * sizeof(uint32));
+        m_vertexBuffer = GLVertexBuffer::Create(m_vertices.data(), m_vertices.size() * sizeof(SkinnedVertex));
+        m_indexBuffer = GLIndexBuffer::Create(m_indices.data(), m_indices.size() * sizeof(uint32));
 
         // 3. DSA 레이아웃 설정
         const uint32 bindingIndex = 0;
@@ -52,7 +70,18 @@ namespace MGF3D
         m_vertexLayout->SetAttribFormat(3, 3, GL_FLOAT, false, offsetof(SkinnedVertex, tangent), bindingIndex);
         m_vertexLayout->SetAttribIFormat(4, 4, GL_INT, offsetof(SkinnedVertex, boneIDs), bindingIndex);
         m_vertexLayout->SetAttribFormat(5, 4, GL_FLOAT, false, offsetof(SkinnedVertex, weights), bindingIndex);
+
+        // 4. 모든 속성 활성화
         for (uint32 i = 0; i <= 5; ++i) m_vertexLayout->EnableAttrib(i);
+
+        // 4. GPU 업로드 완료 후 CPU 측 원본 메모리 즉각 해제
+        m_vertices.clear();
+        m_vertices.shrink_to_fit();
+        m_indices.clear();
+        m_indices.shrink_to_fit();
+
+        m_state = EResourceState::Ready;
+        return true;
     }
 
     void SkinnedMesh::ComputeTangents
