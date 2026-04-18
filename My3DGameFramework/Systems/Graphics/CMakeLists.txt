@@ -23,6 +23,7 @@ set(SOURCES
 
     # Buffer
     "Buffers/GLBufferHandle.h"             "Buffers/GLBufferHandle.cpp"
+    "Buffers/GLVertexBuffer.h"             "Buffers/GLVertexBuffer.cpp"
     "Buffers/GLIndexBuffer.h"              "Buffers/GLIndexBuffer.cpp"
     "Buffers/GLUniformBuffer.h"            "Buffers/GLUniformBuffer.cpp"
     "Buffers/GLShaderStorageBuffer.h"      "Buffers/GLShaderStorageBuffer.cpp"

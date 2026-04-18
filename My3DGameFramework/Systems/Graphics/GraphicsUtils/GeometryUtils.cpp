@@ -58,7 +58,7 @@ namespace MGF3D
             maxBound = Math::Max(maxBound, v.position);
         }
 
-        auto mesh = StaticMesh::Create(vertices, indices, GL_TRIANGLES);
+        auto mesh = StaticMesh::Create(std::move(vertices), std::move(indices), GL_TRIANGLES);
         if (!mesh) return nullptr;
 
         RenderBounds bounds;
@@ -88,7 +88,7 @@ namespace MGF3D
             maxBound = Math::Max(maxBound, v.position);
         }
 
-        auto mesh = StaticMesh::Create(vertices, indices, GL_TRIANGLES);
+        auto mesh = StaticMesh::Create(std::move(vertices), std::move(indices), GL_TRIANGLES);
         if (!mesh) return nullptr;
 
         RenderBounds bounds;
@@ -151,7 +151,7 @@ namespace MGF3D
             maxBound = Math::Max(maxBound, v.position);
         }
 
-        auto mesh = StaticMesh::Create(vertices, indices, GL_TRIANGLES);
+        auto mesh = StaticMesh::Create(std::move(vertices), std::move(indices), GL_TRIANGLES);
         if (!mesh) return nullptr;
 
         RenderBounds bounds;

@@ -14,7 +14,11 @@ namespace MGF3D
 		using Super = Component;
 
 	public:
-		MeshRenderer(ObjectIDHash id, ObjectIDHash ownerID);
+		MeshRenderer
+		(
+			ObjectIDHash id, ObjectIDHash ownerID, 
+			MeshPtr mesh, StringHash materialHash
+		);
 		virtual ~MeshRenderer() override;
 		MeshRenderer(MeshRenderer&& other) noexcept;
 		MeshRenderer& operator=(MeshRenderer&& other) noexcept;
@@ -31,13 +35,14 @@ namespace MGF3D
 	//======================================*/
 	public:
 		void SetMesh(MeshPtr mesh) { m_mesh = mesh; }
-		MeshPtr GetMesh() const { return m_mesh; }
-		void SetMaterial(MaterialPtr material) { m_material = material; }
-		MaterialPtr GetMaterial() const { return m_material; }
+		void SetMaterialHash(StringHash materialHash) { m_materialHash = materialHash; }
+		StringHash GetMaterialHash() const { return m_materialHash; }
+
+	public:
+		void Draw(uint32 count) const;
 
 	private:
-		MeshPtr m_mesh			{ nullptr };
-		MaterialPtr m_material	{ nullptr };
-
+		MeshPtr m_mesh			  { nullptr };
+		StringHash m_materialHash { 0 };
 	};
 }

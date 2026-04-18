@@ -6,7 +6,12 @@
 
 namespace MGF3D
 {
-	MeshRenderer::MeshRenderer(ObjectIDHash id, ObjectIDHash ownerID) : Super(id, ownerID) { }
+	MeshRenderer::MeshRenderer
+	(
+		ObjectIDHash id, ObjectIDHash ownerID,
+		MeshPtr mesh, StringHash materialHash
+	)
+		: Super(id, ownerID), m_mesh(mesh), m_materialHash(materialHash) { }
 	MeshRenderer::~MeshRenderer() = default;
 	MeshRenderer::MeshRenderer(MeshRenderer&& other) noexcept = default;
 	MeshRenderer& MeshRenderer::operator=(MeshRenderer&& other) noexcept = default;
@@ -20,5 +25,14 @@ namespace MGF3D
 		MGFTypeTree* tree = MGF_TYPE.GetTree("MeshRenderer");
 		if (tree != nullptr) return tree->GetType(s_typeIndex);
 		return nullptr;
+	}
+
+	/*======================================//
+	//     default MeshRenderer methods     //
+	//======================================*/
+	void MeshRenderer::Draw(uint32 count) const
+	{
+		if (m_mesh && m_mesh->GetState() == EResourceState::Ready)
+			m_mesh->Draw(count);
 	}
 }

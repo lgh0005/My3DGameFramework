@@ -28,8 +28,7 @@ set(SOURCES
     # "Components/Lights/PointLight.h"        "Components/Lights/PointLight.cpp"
     # "Components/Lights/SpotLight.h"        "Components/Lights/SpotLight.cpp"
     # "Components/Lights/DirectionalLight.h"        "Components/Lights/DirectionalLight.cpp"
-    # "Components/MeshRenderers/MeshRenderer.h"           "Components/MeshRenderers/MeshRenderer.cpp" 
-    # "Components/MeshRenderers/StaticMeshRenderer.h"    "Components/MeshRenderers/StaticMeshRenderer.cpp" 
+    "Components/MeshRenderers/MeshRenderer.h"           "Components/MeshRenderers/MeshRenderer.cpp" 
     # "Components/MeshRenderers/SkinnedMeshRenderer.h"   "Components/MeshRenderers/SkinnedMeshRenderer.cpp" 
     # "Components/MeshRenderers/MeshOutline.h"           "Components/MeshRenderers/MeshOutline.cpp" 
     # "Components/Physics/PhysicsComponent.h"            "Components/Physics/PhysicsComponent.cpp" 
@@ -51,7 +50,7 @@ set(SOURCES
     # "Assets/Model.h"             "Assets/Model.cpp"
 
     # Resources
-    # "Resources/Material.h"             "Resources/Material.cpp"
+    "Resources/Material.h"             "Resources/Material.cpp"
     # "Resources/EnvironmentMap.h"             "Resources/EnvironmentMap.cpp"
 
     # Rendering

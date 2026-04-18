@@ -4,6 +4,7 @@
 #pragma region MODULES
 #include "CoreModule.h"
 #include "GraphicsModule.h"
+#include "FrameworkModule.h"
 #include "RuntimeModule.h"
 #pragma endregion
 
@@ -26,6 +27,7 @@ namespace MGF3D
 	{
 		CoreModule::OnRegisterTypes();
 		GraphicsModule::OnRegisterTypes();
+		FrameworkModule::OnRegisterTypes();
 		RuntimeModule::OnRegisterTypes();
 	}
 
@@ -78,6 +80,9 @@ namespace MGF3D
 
 		// 0. RuntimeModule 종료
 		if (!RuntimeModule::OnShutdown()) return false;
+
+		// 0. FrameworkModule 종료
+		if (!FrameworkModule::OnShutdown()) return false;
 
 		// 1. GraphicsModule 종료
 		if (!GraphicsModule::OnShutdown()) return false;

@@ -1,71 +1,61 @@
 ﻿#pragma once
-#include "Resources/Resource.h"
-#include "Resources/ResourceDesc.h"
+#include "Sources/Resource.h"
 
-#pragma region FORWARD_DECLARATION
-CLASS_PTR(Texture)
-CLASS_PTR(Program)
-#pragma endregion
-
-/*==================//
-//  material enums  //
-//==================*/
-enum class TextureSlot : uint8
+namespace MGF3D
 {
-    SLOT_ALBEDO = 0,
-    SLOT_SPECULAR = 1,
-    SLOT_EMISSION = 2,
-    SLOT_NORMAL = 3,
-    SLOT_HEIGHT = 4,
-    SLOT_AO = 5,
-    SLOT_METALLIC = 6,
-    SLOT_ROUGHNESS = 7,
-    SLOT_ORM = 8,
-    SLOT_GLOSSINESS = 9
-};
+	MGF_CLASS_PTR(GraphicsProgram)
+	MGF_CLASS_PTR(GLTextureHandle)
 
-CLASS_PTR(Material);
-class Material : public Resource
-{
-    DEFINE_RESOURCE_TYPE(ResourceType::Material, MaterialDesc)
+	enum class ETextureSlot : uint8
+	{
+		Albedo	 = 0,
+		Specular,
+		Emission,
+		Normal,
+		Height,
+		ORM,
+		Max
+	};
 
-public:
-    virtual ~Material();
-    static MaterialPtr Load(const MaterialDesc& desc);
-    static MaterialPtr Create();
-    virtual MaterialDesc& GetDesc() override { return m_desc; }
-    virtual const ResourceDesc& GetDesc() const override { return m_desc; }
+	MGF_CLASS_PTR(Material)
+	class Material : public Resource
+	{
+	public:
+		Material();
+		virtual ~Material() override;
+		static MaterialPtr Create(StringView matName, const GraphicsProgramPtr& program);
+		virtual bool OnSyncCreate() override;
 
-    /*=====================//
-    //  material textures  //
-    //=====================*/
-    TexturePtr  diffuse;   // [Common]
-    TexturePtr  specular;  // [SRP]
-    TexturePtr  emission;  // [Common]
-    TexturePtr  normal;    // [Common]
-    TexturePtr  height;    // [Common]
-    TexturePtr  ao;        // [Common]
-    TexturePtr  metallic;  // [URP]
-    TexturePtr  roughness; // [URP]
-    TexturePtr  orm;       // [URP]
+	/*========================//
+	//     Material Type      //
+	//========================*/
+	public:
+		static int16 s_typeIndex;
+		virtual const MGFType* GetType() const override;
 
-    /*====================//
-    //  material factors  //
-    //====================*/
-    float       shininess           { 32.0f }; // [SRP]
-    float       emissionStrength    { 1.0f };  // [Common]
-    float       heightScale         { 1.0f };  // [Common]
+	public:
+		void Bind() const;
+		void SetProgram(const GraphicsProgramPtr& program);
+		GraphicsProgramPtr GetProgram() const { return m_program; }
+		void SetTexture(ETextureSlot slot, const GLTextureHandlePtr& texture);
+		GLTextureHandlePtr GetTexture(ETextureSlot slot) const;
+		void SetHash(StringView matName) { m_materialHash = StringHash(matName); }
+		StringHash GetHash() const { return m_materialHash; }
 
-    glm::vec4   albedoFactor        { 1.0f, 1.0f, 1.0f, 1.0f };  // [URP]
-    glm::vec3   emissiveFactor      { 0.0f, 0.0f, 0.0f };
-    float       metallicFactor      { 1.0f };  // [URP]
-    float       roughnessFactor     { 1.0f };  // [URP]
+	private:
+		float shininess			{ 32.0f };
+		float emissionStrength	{ 1.0f };
+		float heightScale		{ 1.0f };
 
-    bool useGlossinessAsRoughness   { false }; // [URP]
+		vec4  albedoFactor		{ 1.0f, 1.0f, 1.0f, 1.0f };
+		vec3  emissiveFactor	{ 0.0f, 0.0f, 0.0f };
 
-    void SetToProgram(const Program* program) const;
+		float metallicFactor{ 1.0f };
+		float roughnessFactor{ 1.0f };
 
-private:
-    Material();
-    MaterialDesc m_desc;
-};
+	private:
+		StringHash m_materialHash;
+		GraphicsProgramPtr m_program;
+		HashMap<ETextureSlot, GLTextureHandlePtr> m_textures;
+	};
+}
