@@ -2,6 +2,10 @@
 
 namespace MGF3D
 {
+    MGF_CLASS_PTR(StaticMesh)
+    MGF_CLASS_PTR(GraphicsProgram)
+    MGF_CLASS_PTR(Shader)
+
     MGF_CLASS_PTR(Application)
     class Application
     {

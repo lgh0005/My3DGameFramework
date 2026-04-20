@@ -132,7 +132,10 @@ namespace MGF3D
 	//==================================*/
 	void MGFWindow::UpdateWindowSize(int32 w, int32 h)
 	{
-		m_width = w; m_height = h; 
+		m_width = w; 
+		m_height = h;
+		glViewport(0, 0, m_width, m_height);
+		if (m_onWindowResize) m_onWindowResize(w, h);
 	}
 
 	void MGFWindow::UpdateWindowIconified(bool icon)

@@ -8,7 +8,7 @@ namespace MGF3D
 	Resource::~Resource() = default;
 
 	/*==============================//
-	//       Asset Type             //
+	//       Resource Type          //
 	//==============================*/
 	int16 Resource::s_typeIndex = -1;
 	const MGFType* Resource::GetType() const

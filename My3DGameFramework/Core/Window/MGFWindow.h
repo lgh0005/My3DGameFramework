@@ -13,6 +13,7 @@ namespace MGF3D
 		friend class MGFWindowInterface;
 		using ResizeCallback = Action<int32, int32>;
 		using IconifyCallback = Action<bool>;
+		using WindowResizeCallback = Func<void, int32, int32>;
 		~MGFWindow();
 
 	public:
@@ -57,8 +58,11 @@ namespace MGF3D
 			const String& title, int32 vsync,
 			bool isVisible, GLFWwindow* share
 		);
-		MGFScreenUPtr m_screen	{ nullptr };
-		GLFWwindow* m_window	{ nullptr };
+
+		MGFScreenUPtr		 m_screen		  { nullptr };
+		GLFWwindow*			 m_window		  { nullptr };
+		WindowResizeCallback m_onWindowResize { nullptr };
+
 		int32 m_width{ 0 },  m_height { 0 };
 		int32 m_winX { 0 },  m_winY   { 0 };
 

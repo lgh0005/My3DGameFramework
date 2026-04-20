@@ -4,8 +4,15 @@
 
 namespace MGF3D
 {
-	GraphicsProgram::GraphicsProgram() = default;
+	GraphicsProgram::GraphicsProgram(StringView name) : Super(name) { }
 	GraphicsProgram::~GraphicsProgram() = default;
+
+	GraphicsProgramPtr GraphicsProgram::Create(StringView name)
+	{
+		auto program = SharedPtr<GraphicsProgram>(new GraphicsProgram(name));
+		program->SetState(EResourceState::Loaded);
+		return program;
+	}
 
 	/*========================//
 	// GraphicsProgram Type   //

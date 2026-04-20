@@ -72,6 +72,7 @@ set(SOURCES
     # Uniforms
     "Uniforms/LightUniform.h"
     "Uniforms/CameraUniform.h"
+    "Uniforms/MaterialUniform.h"
 
     # Utils
     "GraphicsUtils/GeometryUtils.h"       "GraphicsUtils/GeometryUtils.cpp"

@@ -6,7 +6,7 @@
 
 namespace MGF3D
 {
-	Material::Material() = default;
+	Material::Material(StringView name) : Super(name) { }
 	Material::~Material() = default;
 
 	/*========================//
@@ -22,8 +22,7 @@ namespace MGF3D
 
 	MaterialPtr Material::Create(StringView matName, const GraphicsProgramPtr& program)
 	{
-		auto material = MakeShared<Material>();
-		material->SetHash(matName);
+		auto material = MaterialPtr(new Material(matName));
 		if (program) material->SetProgram(program);
 		material->SetState(EResourceState::Loaded);
 		return material;

@@ -16,20 +16,22 @@ namespace MGF3D
 		virtual const MGFType* GetType() const override;
 
 	public:
-		GLShader();
 		virtual ~GLShader() override;
+		static GLShaderPtr Create(GLenum type, const String& source);
+		static GLShaderPtr Create(GLenum type, Vector<char>&& binary, const String& entryPoint = "main");
+
 		virtual bool OnSyncCreate() override;
 		uint32 GetHandle() const { return m_handle; }
 
-	public:
-		void SetSourceGLSL(GLenum type, const String& source);
-		void SetSourceSpirv(GLenum type, Vector<char>&& binary, const String& entryPoint);
-
 	private:
+		GLShader();
+		bool CompileGLSL();
+		bool SpecializeSpirv();
+
 		uint32 m_handle{ 0 };
 		GLenum m_type{ 0 };
 
-		bool m_isSpirv{ false };
+		bool m_isSpirv { false };
 		String m_sourceGLSL;
 		Vector<char> m_sourceSpirv;
 		String m_entryPoint;

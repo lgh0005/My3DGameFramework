@@ -1,13 +1,24 @@
 ﻿#pragma once
 
-CLASS_PTR(RenderPipeline)
-class RenderPipeline
+namespace MGF3D
 {
-public:
-    virtual ~RenderPipeline();
-    virtual void Render(Scene* scene) = 0;
-    virtual void OnResize(int32 width, int32 height) = 0;
+    class RenderPipeline
+    {
+    public:
+        virtual ~RenderPipeline();
 
-protected:
-    RenderPipeline();
-};
+    /*=====================================//
+    //   MGF3D RenderPipeline Custom Type  //
+    //=====================================*/
+    public:
+        static int16 s_typeIndex;
+        virtual const MGFType* GetType() const;
+
+    public:
+        virtual void Render() = 0;
+        virtual void Resize() = 0;
+
+    protected:
+        RenderPipeline();
+    };
+}

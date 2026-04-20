@@ -1,59 +1,41 @@
-﻿#include "EnginePch.h"
+﻿#include "FrameworkPch.h"
 #include "RenderManager.h"
+#include "Managers/WindowManager.h"
+#include "Rendering/RenderPipeline.h"
 
-bool RenderManager::Init()
+namespace MGF3D
 {
-	m_renderer = Renderer::Create();
-	if (!m_renderer) return false;
-	return true;
-}
+	RenderManager::RenderManager() = default;
+	RenderManager::~RenderManager() = default;
 
-void RenderManager::SetPipeline(const std::string& name)
-{
-	if (!m_renderer) return;
-
-	auto it = m_pipelines.find(name);
-	if (it == m_pipelines.end())
+	void RenderManager::Render()
 	{
-		LOG_ERROR("Failed to find pipeline factory: {}", name);
-		return;
+		if (m_activePipeline) m_activePipeline->Render();
 	}
 
-	RenderPipelineUPtr newPipeline = it->second();
-	m_renderer->SetPipeline(std::move(newPipeline));
+	void RenderManager::Resize()
+	{
+		m_activePipeline->Resize();
+	}
 
-	// 리사이즈 동기화
-	int32 width, height;
-	glfwGetFramebufferSize(WINDOW.GetWindow(), &width, &height);
-	m_renderer->OnResize(width, height);
+	void RenderManager::Shutdown()
+	{
+		m_activePipeline.reset();
+		m_pipelines.clear();
+	}
 
-	LOG_INFO("Switched RenderPipeline to: {}", name);
-}
+	RenderPipeline* RenderManager::GetActiveRenderPipeline() const
+	{
+		return m_activePipeline.get();
+	}
 
-void RenderManager::UpdateViewport(int32* outWidth, int32* outHeight)
-{
-	int32 width, height;
-	glfwGetFramebufferSize(WINDOW.GetWindow(), &width, &height);
-	OnResize(width, height);
-
-	if (outWidth) *outWidth = width;
-	if (outHeight) *outHeight = height;
-
-	LOG_INFO("Viewport synced to window size: {}x{}", width, height);
-}
-
-void RenderManager::Clear()
-{
-	m_renderer.reset();
-	LOG_INFO("RenderManager Cleared.");
-}
-
-void RenderManager::Render(Scene* scene)
-{
-	if (m_renderer) m_renderer->Render(scene);
-}
-
-void RenderManager::OnResize(int32 width, int32 height)
-{
-	if (m_renderer) m_renderer->OnResize(width, height);
+	void RenderManager::SetRenderPipeline(StringView name)
+	{
+		auto it = m_pipelines.find(StringHash(name));
+		if (it != m_pipelines.end())
+		{
+			m_activePipeline = it->second();
+			Resize();
+		}
+	}
 }

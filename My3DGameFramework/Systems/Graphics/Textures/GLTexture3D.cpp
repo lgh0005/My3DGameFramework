@@ -8,6 +8,27 @@ namespace MGF3D
 	GLTexture3D::GLTexture3D() = default;
 	GLTexture3D::~GLTexture3D() = default;
 
+	GLTexture3DPtr GLTexture3D::Create(ktxTexture2* ktx)
+	{
+		if (ktx == nullptr) return nullptr;
+		auto texture = SharedPtr<GLTexture3D>(new GLTexture3D());
+		texture->SetKtxTexture(ktx);
+		texture->SetState(EResourceState::Loaded);
+		return texture;
+	}
+
+	GLTexture3DPtr GLTexture3D::Create(uint32 width, uint32 height, uint32 depth, uint32 vkFormat, uint32 levels)
+	{
+		auto texture = SharedPtr<GLTexture3D>(new GLTexture3D());
+		texture->m_width = width;
+		texture->m_height = height;
+		texture->m_depth = depth;
+		texture->m_vkFormat = vkFormat;
+		texture->m_levels = levels;
+		texture->SetState(EResourceState::Loaded);
+		return texture;
+	}
+
 	/*======================//
 	//    GLTexture3D Type  //
 	//======================*/
@@ -21,9 +42,19 @@ namespace MGF3D
 
 	bool GLTexture3D::OnSyncCreate()
 	{
-		if (m_ktxTexture == nullptr) return false;
+		bool success = CommonUtils::Select
+		(
+			m_ktxTexture != nullptr,
+			CreateFromKtx(),
+			AllocateStorage(m_width, m_height, m_depth, m_vkFormat, m_levels)
+		);
 
-		// 1. KTX 메타데이터 추출
+		if (success) m_state = EResourceState::Ready;
+		return success;
+	}
+
+	bool GLTexture3D::CreateFromKtx()
+	{
 		uint32 width = m_ktxTexture->baseWidth;
 		uint32 height = m_ktxTexture->baseHeight;
 		uint32 depth = m_ktxTexture->baseDepth;
@@ -31,27 +62,21 @@ namespace MGF3D
 		uint32 levels = m_ktxTexture->numLevels;
 		bool isCompressed = m_ktxTexture->isCompressed;
 
-		// 2. 스토리지 할당 (Init 호출)
-		if (!Init(width, height, depth, vkFormat, levels,
-			GL_REPEAT, GL_REPEAT, GL_REPEAT,
-			GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR)) return false;
+		if (!AllocateStorage(width, height, depth, vkFormat, levels))
+			return false;
 
-		// 3. 데이터 업로드 (3D는 각 레벨이 하나의 볼륨 덩어리입니다)
 		uint32 internalFormat = TextureUtils::MapVkFormatToGLInternal(vkFormat);
 		uint32 format = TextureUtils::GetPixelFormatFromInternal(internalFormat);
 		uint32 type = TextureUtils::GetGLDataTypeFromVk(vkFormat);
+
 		for (uint32 level = 0; level < levels; ++level)
 		{
 			ktx_size_t offset;
-
-			// 3D 텍스처는 face와 layer가 보통 0입니다.
-			KTX_error_code res = ktxTexture_GetImageOffset(ktxTexture(m_ktxTexture), level, 0, 0, &offset);
-			if (res != KTX_SUCCESS) break;
+			if (ktxTexture_GetImageOffset(ktxTexture(m_ktxTexture), level, 0, 0, &offset) != KTX_SUCCESS) break;
 
 			uint32 levelWidth = std::max(1u, width >> level);
 			uint32 levelHeight = std::max(1u, height >> level);
 			uint32 levelDepth = std::max(1u, depth >> level);
-
 			void* data = ktxTexture_GetData(ktxTexture(m_ktxTexture)) + offset;
 			ktx_size_t imageSize = ktxTexture_GetImageSize(ktxTexture(m_ktxTexture), level);
 
@@ -67,50 +92,39 @@ namespace MGF3D
 			}
 		}
 
-		// 4. 자원 정리 및 상태 변경
 		ktxTexture_Destroy(ktxTexture(m_ktxTexture));
 		m_ktxTexture = nullptr;
-
-		m_state = EResourceState::Ready;
 		return true;
 	}
 
-	bool GLTexture3D::Init
-	(
-		int32  width, int32 height, int32 depth,
-		uint32 vkFormat, uint32 levels,
-		uint32 wrapS, uint32 wrapT, uint32 wrapR,
-		uint32 minFilter, uint32 magFilter
-	)
+	bool GLTexture3D::AllocateStorage(uint32 width, uint32 height, uint32 depth, uint32 vkFormat, uint32 levels)
 	{
 		if (width <= 0 || height <= 0 || depth <= 0) return false;
 
 		m_target = GL_TEXTURE_3D;
-		m_width = static_cast<uint32>(width);
-		m_height = static_cast<uint32>(height);
-		m_depth = static_cast<uint32>(depth);
+		m_width = width;
+		m_height = height;
+		m_depth = depth;
 
 		uint32 internalFormat = TextureUtils::MapVkFormatToGLInternal(vkFormat);
 		uint32 mipmapLevel = CommonUtils::Select
 		(
-			levels == 0,
-			TextureUtils::CalculateMaxMipLevels(m_width, m_height, m_depth),
+			levels == 0, 
+			TextureUtils::CalculateMaxMipLevels(m_width, m_height, m_depth), 
 			levels
 		);
 
-		// 새 텍스처 생성 (DSA)
 		glCreateTextures(m_target, 1, &m_handle);
 		if (m_handle == 0) return false;
 
-		// Immutable Storage 할당 (3D)
 		glTextureStorage3D(m_handle, mipmapLevel, internalFormat, m_width, m_height, m_depth);
 
-		// 파라미터 설정
-		glTextureParameteri(m_handle, GL_TEXTURE_WRAP_S, wrapS);
-		glTextureParameteri(m_handle, GL_TEXTURE_WRAP_T, wrapT);
-		glTextureParameteri(m_handle, GL_TEXTURE_WRAP_R, wrapR);
-		glTextureParameteri(m_handle, GL_TEXTURE_MIN_FILTER, minFilter);
-		glTextureParameteri(m_handle, GL_TEXTURE_MAG_FILTER, magFilter);
+		// 3D 특화 파라미터 (Wrap R 추가)
+		glTextureParameteri(m_handle, GL_TEXTURE_WRAP_S, GL_REPEAT);
+		glTextureParameteri(m_handle, GL_TEXTURE_WRAP_T, GL_REPEAT);
+		glTextureParameteri(m_handle, GL_TEXTURE_WRAP_R, GL_REPEAT);
+		glTextureParameteri(m_handle, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+		glTextureParameteri(m_handle, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
 		return true;
 	}

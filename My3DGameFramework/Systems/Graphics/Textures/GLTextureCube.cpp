@@ -19,99 +19,92 @@ namespace MGF3D
 		return nullptr;
 	}
 
-	bool GLTextureCube::OnSyncCreate()
-	{
-		if (m_ktxTexture == nullptr) return false;
+    bool GLTextureCube::OnSyncCreate()
+    {
+        bool success = CommonUtils::Select
+        (
+            m_ktxTexture != nullptr,
+            CreateFromKtx(),
+            AllocateStorage(m_size, m_vkFormat, m_levels)
+        );
 
-		// 1. KTX 메타데이터 추출 (큐브맵은 baseWidth가 size가 됩니다)
-		uint32 size = m_ktxTexture->baseWidth;
-		uint32 vkFormat = m_ktxTexture->vkFormat;
-		uint32 levels = m_ktxTexture->numLevels;
-		bool isCompressed = m_ktxTexture->isCompressed;
+        if (success) m_state = EResourceState::Ready;
+        return success;
+    }
 
-		// 2. 스토리지 할당 (Init 호출)
-		// 큐브맵은 기본적으로 CLAMP_TO_EDGE를 사용하여 심(Seam) 현상을 방지합니다.
-		if (!Init(size, vkFormat, levels,
-			GL_CLAMP_TO_EDGE, GL_CLAMP_TO_EDGE, GL_CLAMP_TO_EDGE,
-			GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR)) return false;
+    bool GLTextureCube::CreateFromKtx()
+    {
+        uint32 size = m_ktxTexture->baseWidth;
+        uint32 vkFormat = m_ktxTexture->vkFormat;
+        uint32 levels = m_ktxTexture->numLevels;
+        bool isCompressed = m_ktxTexture->isCompressed;
 
-		// 3. 데이터 업로드 (Level -> Face 순으로 루프)
-		uint32 internalFormat = TextureUtils::MapVkFormatToGLInternal(vkFormat);
-		uint32 format = TextureUtils::GetPixelFormatFromInternal(internalFormat);
-		uint32 type = TextureUtils::GetGLDataTypeFromVk(vkFormat);
-		for (uint32 level = 0; level < levels; ++level)
-		{
-			uint32 levelSize = std::max(1u, size >> level);
+        if (!AllocateStorage(size, vkFormat, levels))
+            return false;
 
-			for (uint32 face = 0; face < 6; ++face)
-			{
-				ktx_size_t offset;
-				// KTX에서 특정 레벨, 특정 면의 데이터 오프셋을 가져옵니다.
-				KTX_error_code res = ktxTexture_GetImageOffset(ktxTexture(m_ktxTexture), level, 0, face, &offset);
-				if (res != KTX_SUCCESS) break;
+        uint32 internalFormat = TextureUtils::MapVkFormatToGLInternal(vkFormat);
+        uint32 format = TextureUtils::GetPixelFormatFromInternal(internalFormat);
+        uint32 type = TextureUtils::GetGLDataTypeFromVk(vkFormat);
 
-				void* data = ktxTexture_GetData(ktxTexture(m_ktxTexture)) + offset;
-				ktx_size_t imageSize = ktxTexture_GetImageSize(ktxTexture(m_ktxTexture), level);
+        for (uint32 level = 0; level < levels; ++level)
+        {
+            uint32 levelSize = Math::Max(1u, size >> level);
 
-				// DSA에서는 큐브맵 업로드 시 glTextureSubImage3D를 사용하며, 
-				// zoffset 위치(5번째 인자)가 Face 인덱스(0~5)가 됩니다.
-				if (isCompressed)
-				{
-					glCompressedTextureSubImage3D(m_handle, level, 0, 0, face,
-						levelSize, levelSize, 1, internalFormat, static_cast<GLsizei>(imageSize), data);
-				}
-				else
-				{
-					glTextureSubImage3D(m_handle, level, 0, 0, face,
-						levelSize, levelSize, 1, format, type, data);
-				}
-			}
-		}
+            for (uint32 face = 0; face < 6; ++face)
+            {
+                ktx_size_t offset;
+                if (ktxTexture_GetImageOffset(ktxTexture(m_ktxTexture), level, 0, face, &offset) != KTX_SUCCESS) break;
 
-		// 4. 자원 정리
-		ktxTexture_Destroy(ktxTexture(m_ktxTexture));
-		m_ktxTexture = nullptr;
+                void* data = ktxTexture_GetData(ktxTexture(m_ktxTexture)) + offset;
+                ktx_size_t imageSize = ktxTexture_GetImageSize(ktxTexture(m_ktxTexture), level);
 
-		m_state = EResourceState::Ready;
-		return true;
-	}
+                // DSA에서 큐브맵은 SubImage3D를 사용하며 face가 z-offset이 됨
+                if (isCompressed)
+                {
+                    glCompressedTextureSubImage3D(m_handle, level, 0, 0, face,
+                        levelSize, levelSize, 1, internalFormat, static_cast<GLsizei>(imageSize), data);
+                }
+                else
+                {
+                    glTextureSubImage3D(m_handle, level, 0, 0, face,
+                        levelSize, levelSize, 1, format, type, data);
+                }
+            }
+        }
 
-	bool GLTextureCube::Init
-	(
-		int32 size, 
-		uint32 vkFormat, uint32 levels,
-		uint32 wrapS, uint32 wrapT, uint32 wrapR,
-		uint32 minFilter, uint32 magFilter
-	)
-	{
-		if (size <= 0) return false;
+        ktxTexture_Destroy(ktxTexture(m_ktxTexture));
+        m_ktxTexture = nullptr;
+        return true;
+    }
 
-		m_target = GL_TEXTURE_CUBE_MAP;
-		m_size = static_cast<uint32>(size);
+    bool GLTextureCube::AllocateStorage(uint32 size, uint32 vkFormat, uint32 levels)
+    {
+        if (size <= 0) return false;
 
-		uint32 internalFormat = TextureUtils::MapVkFormatToGLInternal(vkFormat);
-		uint32 mipmapLevel = CommonUtils::Select
-		(
-			levels == 0,
-			TextureUtils::CalculateMaxMipLevels(m_size, m_size),
-			levels
-		);
+        m_target = GL_TEXTURE_CUBE_MAP;
+        m_size = size;
 
-		// 새 텍스처 생성 및 스토리지 할당
-		glCreateTextures(m_target, 1, &m_handle);
-		if (m_handle == 0) return false;
+        uint32 internalFormat = TextureUtils::MapVkFormatToGLInternal(vkFormat);
+        uint32 mipmapLevel = CommonUtils::Select
+        (
+            levels == 0,
+            TextureUtils::CalculateMaxMipLevels(m_size, m_size),
+            levels
+        );
 
-		// 큐브맵 역시 glTextureStorage2D를 사용합니다. 
-		// 타겟이 CUBE_MAP이면 내부적으로 6개 면에 대한 메모리를 모두 할당합니다.
-		glTextureStorage2D(m_handle, mipmapLevel, internalFormat, m_size, m_size);
+        glCreateTextures(m_target, 1, &m_handle);
+        if (m_handle == 0) return false;
 
-		// 파라미터 설정 (S, T, R 세 축 모두 설정)
-		glTextureParameteri(m_handle, GL_TEXTURE_WRAP_S, wrapS);
-		glTextureParameteri(m_handle, GL_TEXTURE_WRAP_T, wrapT);
-		glTextureParameteri(m_handle, GL_TEXTURE_WRAP_R, wrapR);
-		glTextureParameteri(m_handle, GL_TEXTURE_MIN_FILTER, minFilter);
-		glTextureParameteri(m_handle, GL_TEXTURE_MAG_FILTER, magFilter);
+        // 큐브맵은 내부적으로 6개 면을 가지므로 glTextureStorage2D로 일괄 할당 가능
+        glTextureStorage2D(m_handle, mipmapLevel, internalFormat, m_size, m_size);
 
-		return true;
-	}
+        // 큐브맵 필수 파라미터 (Clamp to Edge)
+        glTextureParameteri(m_handle, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        glTextureParameteri(m_handle, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+        glTextureParameteri(m_handle, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+        glTextureParameteri(m_handle, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+        glTextureParameteri(m_handle, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+        return true;
+    }
 }

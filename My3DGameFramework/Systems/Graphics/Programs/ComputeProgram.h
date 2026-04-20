@@ -6,6 +6,8 @@ namespace MGF3D
 	MGF_CLASS_PTR(ComputeProgram)
 	class ComputeProgram : public Program
 	{
+		using Super = Program;
+
 	/*========================//
 	//  ComputeProgram Type   //
 	//========================*/
@@ -14,8 +16,8 @@ namespace MGF3D
 		virtual const MGFType* GetType() const override;
 
 	public:
-		ComputeProgram();
 		virtual ~ComputeProgram() override;
+		static ComputeProgramPtr Create(StringView name);
 
 	public:
 		// 컴퓨트 셰이더 실행
@@ -23,5 +25,8 @@ namespace MGF3D
 
 		// 메모리 장벽 설정
 		void Wait(uint32 barrierBit = GL_ALL_BARRIER_BITS) const;
+
+	private:
+		ComputeProgram(StringView name);
 	};
 }

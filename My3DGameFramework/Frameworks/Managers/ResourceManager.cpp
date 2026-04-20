@@ -3,5 +3,8 @@
 
 namespace MGF3D
 {
+	ResourceManager::ResourceManager() = default;
+	ResourceManager::~ResourceManager() = default;
+
 
 }

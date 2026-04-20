@@ -5,7 +5,7 @@
 
 namespace MGF3D
 {
-    Program::Program() = default;
+    Program::Program(StringView name) : Super(name) { }
     Program::~Program()
     {
         if (m_handle != 0)
@@ -24,6 +24,11 @@ namespace MGF3D
         MGFTypeTree* tree = MGF_TYPE.GetTree("Resource");
         if (tree != nullptr) return tree->GetType(s_typeIndex);
         return nullptr;
+    }
+
+    void Program::AddShader(const GLShaderPtr& shader)
+    {
+        if (shader) m_pendingShaders.push_back(shader);
     }
 
     bool Program::OnSyncCreate()
@@ -131,20 +136,13 @@ namespace MGF3D
     {
         if (value.empty()) return;
         int32 loc = GetUniformLocation(name);
-        if (loc != -1)
-        {
-            glProgramUniform1iv(m_handle, loc, static_cast<GLsizei>(value.size()), value.data());
-        }
+        if (loc != -1) glProgramUniform1iv(m_handle, loc, static_cast<GLsizei>(value.size()), value.data());
     }
 
     void Program::SetUniform(const String& name, const Vector<mat4>& value)
     {
         if (value.empty()) return;
         int32 loc = GetUniformLocation(name);
-        if (loc != -1)
-        {
-            glProgramUniformMatrix4fv(m_handle, loc,
-                static_cast<GLsizei>(value.size()), GL_FALSE, value_ptr(value[0]));
-        }
+        if (loc != -1) glProgramUniformMatrix4fv(m_handle, loc, static_cast<GLsizei>(value.size()), GL_FALSE, value_ptr(value[0]));
     }
 }

@@ -4,8 +4,16 @@
 
 namespace MGF3D
 {
-	ComputeProgram::ComputeProgram() = default;
+	ComputeProgram::ComputeProgram(StringView name) : Super(name) { }
 	ComputeProgram::~ComputeProgram() = default;
+
+	ComputeProgramPtr ComputeProgram::Create(StringView name)
+	{
+		auto program = SharedPtr<ComputeProgram>(new ComputeProgram(name));
+		program->SetState(EResourceState::Loaded);
+		MGF_LOG_INFO("ComputeProgram '{}' created. Waiting for compute shader sync.", name.data());
+		return program;
+	}
 
 	/*========================//
 	//  ComputeProgram Type   //
@@ -20,6 +28,7 @@ namespace MGF3D
 
 	void ComputeProgram::Dispatch(uint32 numGroupsX, uint32 numGroupsY, uint32 numGroupsZ) const
 	{
+		if (m_state != EResourceState::Ready) return;
 		Use();
 		glDispatchCompute(numGroupsX, numGroupsY, numGroupsZ);
 	}

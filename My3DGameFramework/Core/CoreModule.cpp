@@ -30,6 +30,7 @@
 
 #pragma region RESOURCE
 #include "Sources/Resource.h"
+#include "Sources/NamedResource.h"
 #include "Sources/Asset.h"
 #pragma endregion
 
@@ -64,6 +65,7 @@ namespace MGF3D
 		// 4. Resource 트리 생성
 		MGFTypeTree& resourceTree = MGF_TYPE.CreateTree("Resource");
 		Resource::s_typeIndex = resourceTree.Register("Resource", "");
+		NamedResource::s_typeIndex = resourceTree.Register("NamedResource", "Resource");
 
 		// 5. Asset 트리 생성
 		MGFTypeTree& assetTree = MGF_TYPE.CreateTree("Asset");

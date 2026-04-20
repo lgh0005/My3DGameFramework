@@ -1,29 +1,32 @@
 ﻿#pragma once
-#include "Graphics/Rendering/Renderer.h"
-#include "Graphics/Rendering/RenderPipeline.h"
 
-class RenderManager
+namespace MGF3D
 {
-	DECLARE_SINGLE(RenderManager)
-	DECLARE_NONINSTANTIABLE(RenderManager)
-	using PipelineFactory = std::function<RenderPipelineUPtr()>;
+	MGF_CLASS_PTR(RenderPipeline)
 
-public:
-	bool Init();
-	void Render(Scene* scene);
-	void OnResize(int32 width, int32 height);
-	void Clear();
+	class RenderManager
+	{
+		MGF_DECLARE_SINGLE(RenderManager)
+		using RenderPipelineFactory = Func<RenderPipelineUPtr>;
 
-	template<typename T>
-	void RegisterPipeline(const std::string & name);
+	private:
+		RenderManager();
+		~RenderManager();
 
-	void SetPipeline(const std::string& name);
-	Renderer* GetRenderer() const { return m_renderer.get(); }
-	void UpdateViewport(int32* outWidth, int32* outHeight);
+	public:
+		void Render();
+		void Resize();
+		void Shutdown();
 
-private:
-	std::unordered_map<std::string, PipelineFactory> m_pipelines;
-	RendererUPtr m_renderer;
-};
+	public:
+		RenderPipeline* GetActiveRenderPipeline() const;
+		template<typename T> void RegisterRenderPipeline(StringView name);
+		void SetRenderPipeline(StringView name);
+
+	public:
+		HashMap<int16, RenderPipelineFactory> m_pipelines;
+		RenderPipelineUPtr m_activePipeline;
+	};
+}
 
 #include "Managers/RenderManager.inl"

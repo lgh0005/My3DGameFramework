@@ -11,6 +11,10 @@ namespace MGF3D
 	public:
 		static StaticMeshPtr CreateBox();
 		static StaticMeshPtr CreatePlane();
-		static StaticMeshPtr CreateSphere(uint32 latiSegmentCount = 16, uint32 longiSegmentCount = 32);
+		static StaticMeshPtr CreateSphere
+		(
+			uint32 latiSegmentCount = 16, 
+			uint32 longiSegmentCount = 32
+		);
 	};
 }

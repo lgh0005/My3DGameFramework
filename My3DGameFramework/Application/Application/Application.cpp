@@ -14,6 +14,7 @@
 #include "Managers/TimeManager.h"
 #include "Managers/SceneManager.h"
 #include "Managers/TypeManager.h"
+#include "Managers/AssetManager.h"
 #pragma endregion
 
 #pragma region TEMP
@@ -70,8 +71,13 @@ namespace MGF3D
 				if (MGF_INPUT.GetDevice<MGFMouseDevice>()->GetButtonDown("Fire"))  MGF_LOG_INFO("Action: Fire!");
 			}
 
-			MGF_SCENE.Update();
+			// 3. [DEBUG] 비동기 에셋 로드 검사 및 렌더링 테스트
+			{
+				glClearColor(0.2f, 0.5f, 0.3f, 1.0f);
+				glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+			}
 
+			MGF_SCENE.Update();
 			MGF_TIME.FixedUpdate();
 			MGF_WINDOW.SwapWindowBuffers();
 		}

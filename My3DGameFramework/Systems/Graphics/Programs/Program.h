@@ -1,13 +1,15 @@
 ﻿#pragma once
-#include "Sources/Resource.h"
+#include "Sources/NamedResource.h"
 
 namespace MGF3D
 {
     MGF_CLASS_PTR(GLShader)
 
     MGF_CLASS_PTR(Program)
-    class Program : public Resource
+    class Program : public NamedResource
     {
+        using Super = NamedResource;
+
     public:
         virtual ~Program();
         void AddShader(const GLShaderPtr& shader);
@@ -43,7 +45,7 @@ namespace MGF3D
         void SetUniform(const String& name, const Vector<vec3>& value);
 
     protected:
-        Program();
+        Program(StringView name);
         int32 GetUniformLocation(const String& name);
 
         usize m_handle  { 0 };

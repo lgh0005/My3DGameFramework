@@ -15,7 +15,7 @@ set(SOURCES
     # Managers
     "Managers/AssetManager.h"       "Managers/AssetManager.cpp"      "Managers/AssetManager.inl"
     "Managers/ResourceManager.h"    "Managers/ResourceManager.cpp"   "Managers/ResourceManager.inl"
-    #"Managers/RenderManager.h"      "Managers/RenderManager.cpp"     "Managers/RenderManager.inl"
+    "Managers/RenderManager.h"      "Managers/RenderManager.cpp"     "Managers/RenderManager.inl"
 
     # Components
     # "Components/Animation/Animator.h"       "Components/Animation/Animator.cpp"
@@ -60,7 +60,7 @@ set(SOURCES
     # "Rendering/GlobalUniforms.h"          "Rendering/GlobalUniforms.cpp"
     # "Rendering/RenderContext.h"          "Rendering/RenderContext.cpp"
     # "Rendering/RenderPass.h"          "Rendering/RenderPass.cpp"
-    # "Rendering/RenderPipeline.h"          "Rendering/RenderPipeline.cpp"
+    "Rendering/RenderPipeline.h"          "Rendering/RenderPipeline.cpp"
 )
 
 # 2. 빌드 타겟 생성 및 별칭 등록

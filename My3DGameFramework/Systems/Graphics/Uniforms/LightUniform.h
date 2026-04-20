@@ -15,7 +15,7 @@ namespace MGF3D
         int32 shadowMapIndex;   vec2 pad6;
 	};
 
-    struct LightData
+    struct alignas(16) LightData
     {
         LightInfo lights[MAX_LIGHTS];
         vec3 viewPos;

@@ -9,8 +9,13 @@ namespace MGF3D
 	class GLTexture2D : public GLTextureHandle
 	{
 	public:
-		GLTexture2D();
 		virtual ~GLTexture2D() override;
+		static GLTexture2DPtr Create(ktxTexture2* ktx);
+		static GLTexture2DPtr Create
+		(
+			uint32 width, uint32 height, 
+			uint32 vkFormat, uint32 levels = 1
+		);
 
 	/*======================//
 	//   GLTexture2D Type   //
@@ -33,15 +38,17 @@ namespace MGF3D
 		uint32 GetHeight() const { return m_height; }
 
 	private:
-		bool Init
+		GLTexture2D();
+		bool CreateFromKtx();
+		bool AllocateStorage
 		(
-			uint32 width, uint32 height,
-			uint32 vkFormat, uint32 levels,
-			uint32 wrapS, uint32 wrapT,
-			uint32 minFilter, uint32 magFilter
+			uint32 width, uint32 height, 
+			uint32 vkFormat, uint32 levels
 		);
 
 		uint32 m_width{ 0 };
 		uint32 m_height{ 0 };
+		uint32 m_vkFormat{ 0 };
+		uint32 m_levels{ 1 };
 	};
 }

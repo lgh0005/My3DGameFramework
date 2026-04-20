@@ -99,8 +99,9 @@ set(SOURCES
     "Hashes/ObjectIDHash.h"      "Hashes/ObjectIDHash.cpp"          "Hashes/ObjectIDHash.inl"
 
     # Sources
-    "Sources/Asset.h"        "Sources/Asset.cpp"
-    "Sources/Resource.h"     "Sources/Resource.cpp"
+    "Sources/Asset.h"         "Sources/Asset.cpp"
+    "Sources/Resource.h"      "Sources/Resource.cpp"
+    "Sources/NamedResource.h" "Sources/NamedResource.cpp"
 
     # Thread
     "Thread/TaskQueue.h"           "Thread/TaskQueue.cpp"

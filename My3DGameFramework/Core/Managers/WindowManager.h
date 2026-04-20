@@ -21,13 +21,14 @@ namespace MGF3D
 
 	public:
 		bool ShouldClose() const;
-		MGFWindow* GetMainWindow() const { return m_mainWindow.get(); }
-		GLFWwindow* GetNativeHandle() const;
-		MGFWindowUPtr CreateSharedContextWindow() const;
+		void SwapWindowBuffers();
 
+	public:
+		MGFWindow* GetMainWindow() const;
+		MGFWindowUPtr CreateSharedContextWindow() const;
+		GLFWwindow* GetNativeHandle() const;
 		int32 GetWindowWidth() const;
 		int32 GetWindowHeight() const;
-		void SwapWindowBuffers();
 
 	private:
 		static void ErrorCallback(int32 error, cstr description);

@@ -5,7 +5,13 @@
 
 namespace MGF3D
 {
-	Shader::Shader(const String& path, GLenum shaderType, EShaderFileType fileType, const String& entryPoint)
+	Shader::Shader
+	(
+		const String& path, 
+		GLenum shaderType, 
+		EShaderFileType fileType, 
+		const String& entryPoint
+	)
 		: Super(path), m_shaderType(shaderType), m_fileType(fileType), m_entryPoint(entryPoint) { }
 	Shader::~Shader() = default;
 

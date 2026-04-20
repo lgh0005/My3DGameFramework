@@ -62,8 +62,8 @@ namespace MGF3D
 
 	ResourcePtr Image::CreateTextureResource(ktxTexture2* kTexture)
 	{
-		if (kTexture->isCubemap)      return MakeShared<GLTextureCube>();
-		if (kTexture->baseDepth > 1)  return MakeShared<GLTexture3D>();
-		return MakeShared<GLTexture2D>();
+		if (kTexture->isCubemap)      return GLTextureCube::Create(kTexture);
+		if (kTexture->baseDepth > 1)  return GLTexture3D::Create(kTexture);
+		return GLTexture2D::Create(kTexture);
 	}
 }

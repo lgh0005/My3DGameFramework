@@ -1,5 +1,6 @@
 ﻿#pragma once
-#include "Sources/Resource.h"
+#include "Sources/NamedResource.h"
+#include "Uniforms/MaterialUniform.h"
 
 namespace MGF3D
 {
@@ -18,10 +19,11 @@ namespace MGF3D
 	};
 
 	MGF_CLASS_PTR(Material)
-	class Material : public Resource
+	class Material : public NamedResource
 	{
+		using Super = NamedResource;
+
 	public:
-		Material();
 		virtual ~Material() override;
 		static MaterialPtr Create(StringView matName, const GraphicsProgramPtr& program);
 		virtual bool OnSyncCreate() override;
@@ -39,22 +41,41 @@ namespace MGF3D
 		GraphicsProgramPtr GetProgram() const { return m_program; }
 		void SetTexture(ETextureSlot slot, const GLTextureHandlePtr& texture);
 		GLTextureHandlePtr GetTexture(ETextureSlot slot) const;
-		void SetHash(StringView matName) { m_materialHash = StringHash(matName); }
-		StringHash GetHash() const { return m_materialHash; }
+
+	/*==================================//
+	//       Material Parameters        //
+	//==================================*/
+	public:
+		// Setters
+		void SetAlbedoFactor(const vec4& factor) { albedoFactor = factor; }
+		void SetEmissionStrength(float strength) { emissionStrength = strength; }
+		void SetEmissiveFactor(const vec3& factor) { emissiveFactor = factor; }
+		void SetShininess(float value) { shininess = value; }
+		void SetHeightScale(float scale) { heightScale = scale; }
+		void SetMetallicFactor(float factor) { metallicFactor = factor; }
+		void SetRoughnessFactor(float factor) { roughnessFactor = factor; }
+
+		// Getters
+		const vec4& GetAlbedoFactor() const { return albedoFactor; }
+		float       GetEmissionStrength() const { return emissionStrength; }
+		const vec3& GetEmissiveFactor() const { return emissiveFactor; }
+		float       GetShininess() const { return shininess; }
+		float       GetHeightScale() const { return heightScale; }
+		float       GetMetallicFactor() const { return metallicFactor; }
+		float       GetRoughnessFactor() const { return roughnessFactor; }
 
 	private:
+		vec4  albedoFactor{ 1.0f, 1.0f, 1.0f, 1.0f };
+		float emissionStrength{ 1.0f };
+		vec3  emissiveFactor{ 0.0f, 0.0f, 0.0f };
 		float shininess			{ 32.0f };
-		float emissionStrength	{ 1.0f };
 		float heightScale		{ 1.0f };
-
-		vec4  albedoFactor		{ 1.0f, 1.0f, 1.0f, 1.0f };
-		vec3  emissiveFactor	{ 0.0f, 0.0f, 0.0f };
-
 		float metallicFactor{ 1.0f };
 		float roughnessFactor{ 1.0f };
 
 	private:
-		StringHash m_materialHash;
+		Material(StringView name);
+\
 		GraphicsProgramPtr m_program;
 		HashMap<ETextureSlot, GLTextureHandlePtr> m_textures;
 	};

@@ -63,6 +63,11 @@ namespace MGF3D
         return nullptr;
     }
 
+    MGFWindow* WindowManager::GetMainWindow() const
+    {
+        return m_mainWindow.get();
+    }
+
     MGFWindowUPtr WindowManager::CreateSharedContextWindow() const
     {
         // 1. 메인 윈도우 컨텍스트가 있는지 검사
