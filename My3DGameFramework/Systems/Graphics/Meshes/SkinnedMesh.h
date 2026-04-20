@@ -36,12 +36,6 @@ namespace MGF3D
 
     private:
         SkinnedMesh();
-        void Init
-        (
-            Vector<SkinnedVertex>&& vertices,
-            Vector<uint32>&& indices,
-            uint32 primitiveType
-        );
 
         Vector<SkinnedVertex> m_vertices;
         Vector<uint32> m_indices;

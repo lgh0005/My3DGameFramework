@@ -37,13 +37,7 @@ namespace MGF3D
 
     private:
         StaticMesh();
-        void Init
-        (
-            Vector<StaticVertex>&& vertices,
-            Vector<uint32>&& indices,
-            uint32 primitiveType
-        );
-
+  
         Vector<StaticVertex> m_vertices;
         Vector<uint32> m_indices;
     };

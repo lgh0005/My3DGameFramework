@@ -5,6 +5,7 @@
 #include "Buffers/GLVertexBuffer.h"
 #include "Buffers/GLIndexBuffer.h"
 #include "Managers/TypeManager.h"
+#include "Managers/ThreadManager.h"
 
 namespace MGF3D
 {
@@ -29,26 +30,44 @@ namespace MGF3D
         uint32 primitiveType
     )
     {
+        // 1. 메인 스레드에서 즉시 빈 껍데기 객체 생성 및 반환
         auto mesh = SkinnedMeshPtr(new SkinnedMesh());
-        mesh->Init(std::move(vertices), std::move(indices), primitiveType);
-        mesh->SetState(EResourceState::Loaded);
+        mesh->m_primitiveType = primitiveType;
+        mesh->m_indexCount = indices.size();
+
+        // 메모리 소유권 이전 (이후 CPU 워커에서 사용)
+        mesh->m_vertices = std::move(vertices);
+        mesh->m_indices = std::move(indices);
+
+        // 상태를 Loading으로 설정 (아직 그릴 수 없음)
+        mesh->SetState(EResourceState::Loading);
+
+        // 2. CPU 헤비 연산을 백그라운드 워커에 할당
+        MGF_THREAD.PushCPUTask
+        (
+            [mesh]()
+            {
+                if (mesh->m_primitiveType == GL_TRIANGLES)
+                    mesh->ComputeTangents(mesh->m_vertices, mesh->m_indices);
+
+                mesh->SetLocalBounds(RenderBounds(mesh->m_vertices));
+                mesh->SetState(EResourceState::Loaded);
+
+                // 2. [GPU 워커 스레드] 연쇄 할당
+                MGF_THREAD.PushGPUTask
+                (
+                    [mesh]()
+                    {
+                        mesh->SetState(EResourceState::Syncing);
+
+                        if (mesh->OnSyncCreate()) mesh->SetState(EResourceState::Ready);
+                        else mesh->SetState(EResourceState::Failed);
+                    }
+                );
+            }
+        );
+
         return mesh;
-    }
-
-    void SkinnedMesh::Init
-    (
-        Vector<SkinnedVertex>&& vertices,
-        Vector<uint32>&& indices,
-        uint32 primitiveType
-    )
-    {
-        // 0. 기본 메쉬 설정
-        m_primitiveType = primitiveType;
-        m_indexCount = indices.size();
-
-        // 1. 탄젠트 연산
-        if (m_primitiveType == GL_TRIANGLES)
-            ComputeTangents(m_vertices, m_indices);
     }
 
     bool SkinnedMesh::OnSyncCreate()

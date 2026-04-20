@@ -5,7 +5,9 @@ namespace MGF3D
 	enum class EResourceState : uint8
 	{
 		Empty,      // 데이터 없음
+		Loading,    // CPU 스레드에서 파일 파싱 및 연산 중
 		Loaded,     // CPU 데이터 준비 완료 (파싱 완료)
+		Syncing,    // GPU 스레드에서 VRAM 업로드 및 리소스 생성 중
 		Ready,      // GPU 리소스 생성 완료 (사용 가능)
 		Failed      // 생성 실패
 	};

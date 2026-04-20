@@ -5,6 +5,7 @@
 #include "Buffers/GLVertexBuffer.h"
 #include "Buffers/GLIndexBuffer.h"
 #include "Managers/TypeManager.h"
+#include "Managers/ThreadManager.h"
 
 namespace MGF3D
 {
@@ -25,28 +26,32 @@ namespace MGF3D
 	ScreenMeshPtr ScreenMesh::Create()
 	{
 		auto mesh = ScreenMeshPtr(new ScreenMesh());
-		mesh->Init();
-		mesh->SetState(EResourceState::Loaded);
-		return mesh;
-	}
+		mesh->m_primitiveType = GL_TRIANGLES;
 
-	void ScreenMesh::Init()
-	{
-		m_primitiveType = GL_TRIANGLES;
-
-		// 1. 고정된 정점 및 인덱스 데이터 생성
-		m_vertices =
+		// 1. 연산이 매우 가벼우므로 즉시 데이터 할당
+		mesh->m_vertices =
 		{
-			// Pos(x,y,z)         // UV(u,v)
 			ScreenVertex { {-1.0f,  1.0f, 0.0f}, {0.0f, 1.0f} }, // 0: Top-Left
 			ScreenVertex { {-1.0f, -1.0f, 0.0f}, {0.0f, 0.0f} }, // 1: Bottom-Left
 			ScreenVertex { { 1.0f,  1.0f, 0.0f}, {1.0f, 1.0f} }, // 2: Top-Right
 			ScreenVertex { { 1.0f, -1.0f, 0.0f}, {1.0f, 0.0f} }  // 3: Bottom-Right
 		};
+		mesh->m_indices = { 0, 1, 2, 2, 1, 3 };
+		mesh->m_indexCount = mesh->m_indices.size();
+		mesh->SetState(EResourceState::Loaded);
 
-		// 2. 인덱스 데이터
-		m_indices = { 0, 1, 2, 2, 1, 3 };
-		m_indexCount = m_indices.size();
+		// 2. [GPU 워커 스레드] OpenGL 자원 생성만 비동기로 할당
+		MGF_THREAD.PushGPUTask
+		(
+			[mesh]()
+			{
+				mesh->SetState(EResourceState::Syncing);
+				if (mesh->OnSyncCreate()) mesh->SetState(EResourceState::Ready);
+				else mesh->SetState(EResourceState::Failed);
+			}
+		);
+
+		return mesh;
 	}
 
 	bool ScreenMesh::OnSyncCreate()
@@ -67,7 +72,12 @@ namespace MGF3D
 		m_vertexLayout->EnableAttrib(0);
 		m_vertexLayout->EnableAttrib(2);
 
-		m_state = EResourceState::Ready;
+		// 6. GPU 업로드 완료 후 CPU 측 원본 메모리 해제 (최적화)
+		m_vertices.clear();
+		m_vertices.shrink_to_fit();
+		m_indices.clear();
+		m_indices.shrink_to_fit();
+
 		return true;
 	}
 

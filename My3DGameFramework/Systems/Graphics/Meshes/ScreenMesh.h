@@ -23,7 +23,6 @@ namespace MGF3D
 
 	private:
 		ScreenMesh();
-		void Init();
 
 		Vector<ScreenVertex> m_vertices;
 		Vector<uint32> m_indices;
