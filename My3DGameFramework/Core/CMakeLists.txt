@@ -105,6 +105,7 @@ set(SOURCES
 
     # Thread
     "Thread/TaskQueue.h"           "Thread/TaskQueue.cpp"
+    "Thread/LockFreeQueue.h"      "Thread/LockFreeQueue.cpp" "Thread/LockFreeQueue.inl"
     "Thread/Worker.h"           "Thread/Worker.cpp"
     "Thread/CPUWorker.h"        "Thread/CPUWorker.cpp"
     "Thread/GPUWorker.h"        "Thread/GPUWorker.cpp"

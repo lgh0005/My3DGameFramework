@@ -138,17 +138,6 @@ namespace MGF3D
 
 					g_debugCube->Draw(1);
 				}
-
-				MGF_LOG_FATAL("VS Addr: {0}, VS State: {1}", (void*)g_debugVS.get(), (int)g_debugVS->GetState());
-				MGF_LOG_FATAL("FS Addr: {0}, FS State: {1}", (void*)g_debugFS.get(), (int)g_debugFS->GetState());
-				MGF_LOG_FATAL
-				(
-					"States - Program: {0}, Cube: {1}, VS: {2}, FS: {3}",
-					(int)g_debugProgram->GetState(),
-					(int)g_debugCube->GetState(),
-					(int)g_debugVS->GetState(),
-					(int)g_debugFS->GetState()
-				);
 			}
 
 			MGF_SCENE.Update();

@@ -1,4 +1,5 @@
 ﻿#pragma once
+#include "Thread/LockFreeQueue.h"
 
 namespace MGF3D
 {
@@ -33,10 +34,7 @@ namespace MGF3D
 	private:
 		mutable Mutex m_mutex;
 		HashMap<StringHash, ResourcePtr> m_namedCache;
-
-		mutable Mutex m_syncMutex;
-		Vector<ResourcePtr> m_inputQueue;
-		Vector<ResourcePtr> m_workQueue;
+		MGFLockFreeQueue<ResourcePtr> m_pendingQueue;
 	};
 }
 

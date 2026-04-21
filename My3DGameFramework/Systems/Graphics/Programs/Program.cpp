@@ -34,51 +34,6 @@ namespace MGF3D
 
     bool Program::OnSyncCreate()
     {
-        {
-            // 1. 등록된 셰이더 개수 확인
-            MGF_LOG_FATAL("Program Sync Check - Shader Count: {0}", m_pendingShaders.size());
-
-            for (int i = 0; i < m_pendingShaders.size(); ++i)
-            {
-                auto& shader = m_pendingShaders[i];
-                if (!shader) continue;
-
-                // 2. 주소와 상태를 동시에 출력
-                MGF_LOG_FATAL("Shader[{0}] Addr: {1}, State: {2}",
-                    i, (void*)shader.get(), (int)shader->GetState());
-
-                if (shader->GetState() != EAssetState::Ready)
-                {
-                    MGF_LOG_ERROR("Waiting for Shader[{0}] (Addr: {1}) to be Ready.", i, (void*)shader.get());
-                    return false;
-                }
-            }
-
-            if (m_pendingShaders.empty()) {
-                MGF_LOG_FATAL("Program Pending: No Shaders Attached.");
-                return false;
-            }
-
-            for (int i = 0; i < m_pendingShaders.size(); ++i)
-            {
-                auto& shader = m_pendingShaders[i];
-                if (!shader) {
-                    MGF_LOG_FATAL("Program Pending: Shader[{0}] is NULL.", i);
-                    return false;
-                }
-                if (shader->GetState() != EAssetState::Ready) {
-                    MGF_LOG_FATAL("Program Pending: Shader[{0}] is not Ready yet.", i);
-                    return false;
-                }
-
-                // 리소스가 실제로 들어있는지도 체크
-                if (shader->GetResources().empty()) {
-                    MGF_LOG_FATAL("Program Pending: Shader[{0}] has NO resources.", i);
-                    return false;
-                }
-            }
-        }
-
         if (m_pendingShaders.empty()) return false;
 
         // 1. 의존성 체크: 부착할 모든 셰이더가 컴파일 완료(Ready) 상태인지 확인
