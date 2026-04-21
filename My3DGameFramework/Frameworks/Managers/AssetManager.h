@@ -13,6 +13,7 @@ namespace MGF3D
 		~AssetManager();
 
 	public:
+		void Update();
 		void Shutdown();
 
 	public:
@@ -22,11 +23,15 @@ namespace MGF3D
 
 	private:
 		void ProcessCPULoadTask(AssetPtr asset);
-		void ProcessGPUSyncTask(AssetPtr asset);
+		void RegisterSync(AssetPtr asset);
 
 	private:
 		mutable Mutex m_cacheMutex;
 		HashMap<PathHash, AssetPtr> m_assetCache;
+
+		mutable Mutex m_syncMutex;
+		Vector<AssetPtr> m_inputQueue;
+		Vector<AssetPtr> m_workQueue;
 	};
 }
 

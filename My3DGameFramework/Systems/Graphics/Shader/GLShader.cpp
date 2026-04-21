@@ -16,7 +16,7 @@ namespace MGF3D
 
     GLShaderPtr GLShader::Create(GLenum type, const String& source)
     {
-        auto shader = MakeShared<GLShader>();
+        auto shader = GLShaderPtr(new GLShader());
         shader->m_type = type;
         shader->m_sourceGLSL = source;
         shader->m_isSpirv = false;
@@ -31,7 +31,7 @@ namespace MGF3D
         const String& entryPoint
     )
     {
-        auto shader = MakeShared<GLShader>();
+        auto shader = GLShaderPtr(new GLShader());
         shader->m_type = type;
         shader->m_sourceSpirv = std::move(binary);
         shader->m_entryPoint = entryPoint;
@@ -53,16 +53,36 @@ namespace MGF3D
 
     bool GLShader::OnSyncCreate()
     {
-        // 1. 셰이더 생성
-        m_handle = glCreateShader(m_type);
+        // 1. 소스가 비어있다면 아직 준비가 안 된 것이므로 다음 프레임을 기약함
+        if (!m_isSpirv && m_sourceGLSL.empty())
+        {
+			MGF_LOG_FATAL("GLShader OnSyncCreate: GLSL source is empty.");
+            return false;
+        }
+        if (m_isSpirv && m_sourceSpirv.empty())
+        {
+			MGF_LOG_FATAL("GLShader OnSyncCreate: SPIR-V binary is empty.");
+            return false;
+        }
 
-        // 2. 셰이더 컴파일
-        if (!m_isSpirv) CompileGLSL();
-        else SpecializeSpirv();
+        // 1. 셰이더 생성
+        if (m_handle == 0) m_handle = glCreateShader(m_type);
+
+        // 3. 컴파일 및 결과 반환
+        bool bSuccess = false;
+        if (!m_isSpirv) bSuccess = CompileGLSL();
+        else bSuccess = SpecializeSpirv();
+
+        // 4. 성공했을 때만 Ready 상태로 변경
+        if (bSuccess)
+        {
+            m_state = EResourceState::Ready;
+            return true;
+        }
 
         // 3. 로드 완료
-        m_state = EResourceState::Ready;
-        return true;
+        m_state = EResourceState::Failed;
+        return false;
     }
 
     bool GLShader::CompileGLSL()

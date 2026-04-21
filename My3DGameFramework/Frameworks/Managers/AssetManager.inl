@@ -8,6 +8,13 @@ namespace MGF3D
 	template<typename T, typename... Args>
 	std::shared_ptr<T> AssetManager::LoadAssetAsync(const String& virtualPath, Args&&... args)
 	{
+		// 0. T는 Asset을 상속받아야 함.
+		MGF_STATIC_ASSERT
+		(
+			std::is_base_of_v<Asset, T>,
+			"T must be derived from Asset."
+		);
+
 		// 1. 가상 경로를 물리 경로로 변환
 		String resolvedPath = MGF_PATH.ResolvePath(virtualPath);
 
@@ -23,7 +30,8 @@ namespace MGF3D
 		}
 
 		// 4. 캐시에 없는 경우 새로 생성
-		auto newAsset = MakeShared<T>(resolvedPath, std::forward<Args>(args)...);
+		auto newAsset = T::Create(resolvedPath, std::forward<Args>(args)...);
+		if (!newAsset) return nullptr;
 		newAsset->SetState(EAssetState::Loading);
 		{
 			LockScope lock(m_cacheMutex);

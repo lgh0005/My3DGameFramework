@@ -52,6 +52,7 @@ namespace MGF3D
 			// Transform 검증
 			if (verifiedTransform != nullptr)
 			{
+				verifiedTransform->SetLocalPosition(vec3(0.0f, 0.0f, -5.0f));
 				MGF_LOG_WARN("[Verify Success] Transform retrieved from EntityManager.");
 				MGF_LOG_WARN(" -> Memory Address: {0}", (void*)verifiedTransform);
 

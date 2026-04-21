@@ -13,6 +13,11 @@ namespace MGF3D
 	Image::Image(const String& path) : Super(path) { }
 	Image::~Image() = default;
 
+	ImagePtr Image::Create(const String& path)
+	{
+		return SharedPtr<Image>(new Image(path));
+	}
+
 	/*========================//
 	//       Image Type       //
 	//========================*/

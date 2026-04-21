@@ -1,6 +1,7 @@
 #include "FrameworkPch.h"
 #include "AssetManager.h"
 #include "Managers/ThreadManager.h"
+#include "Managers/ResourceManager.h"
 #include "Sources/Asset.h"
 #include "Sources/Resource.h"
 
@@ -31,37 +32,73 @@ namespace MGF3D
 		// 1. 파일 I/O 및 파싱
 		if (asset->Load())
 		{
+			for (auto& resource : asset->GetResources())
+				MGF_RESOURCE.RegisterSync(resource);
 			asset->SetState(EAssetState::Loaded);
-
-			// 2. CPU 작업 성공 시, GPU 큐로 바통 터치
-			MGF_THREAD.PushGPUTask([this, gpuAsset = asset]() { ProcessGPUSyncTask(gpuAsset); });
+			RegisterSync(asset);
 		}
-		else
-		{
-			// 실패 시 상태만 변경하고 파이프라인 종료
-			asset->SetState(EAssetState::Failed);
-		}
+		else asset->SetState(EAssetState::Failed);
 	}
 
-	void AssetManager::ProcessGPUSyncTask(AssetPtr asset)
+	void AssetManager::RegisterSync(AssetPtr asset)
 	{
-		bool bAllReady = true;
+		if (!asset) return;
+		LockScope lock(m_syncMutex);
+		m_inputQueue.push_back(asset);
+	}
 
-		// 1. 소속된 모든 Resource의 GPU 메모리 할당 요청
-		for (const auto& resource : asset->GetResources())
+	void AssetManager::Update()
+	{
+		// 1. 입력 큐의 내용을 작업 큐로 이동
 		{
-			if (resource && resource->GetState() == EResourceState::Loaded)
+			LockScope lock(m_syncMutex);
+			if (m_inputQueue.empty() && m_workQueue.empty()) return;
+
+			if (!m_inputQueue.empty())
 			{
-				if (resource->OnSyncCreate()) resource->SetState(EResourceState::Ready);
+				m_workQueue.insert(m_workQueue.end(), m_inputQueue.begin(), m_inputQueue.end());
+				m_inputQueue.clear();
+			}
+		}
+
+		// 2. 작업 수행 (메인 스레드)
+		Vector<AssetPtr> pendingList;
+
+		for (auto& asset : m_workQueue)
+		{
+			EAssetState state = asset->GetState();
+
+			// 에셋은 Loaded(2) 혹은 Syncing(3) 상태일 때 리소스들을 감시합니다.
+			if (state == EAssetState::Loaded || state == EAssetState::Syncing)
+			{
+				bool bAllReady = true;
+				for (const auto& res : asset->GetResources())
+				{
+					if (res->GetState() != EResourceState::Ready) // 리소스가 4가 아니면
+					{
+						bAllReady = false;
+						break;
+					}
+				}
+
+				if (bAllReady)
+				{
+					asset->SetState(EAssetState::Ready); // 드디어 4!
+
+				}
 				else
 				{
-					resource->SetState(EResourceState::Failed);
-					bAllReady = false;
+					// 아직 리소스가 준비 안 됐다면 다시 대기열에 추가
+					pendingList.push_back(asset);
+
+					// [꿀팁] 만약 상태가 Loaded(2)였다면 Syncing(3)으로 바꿔서 
+					// "나 지금 자식들 기다리는 중이야"라고 표시해 주는 것도 좋습니다.
+					if (state == EAssetState::Loaded) asset->SetState(EAssetState::Syncing);
 				}
 			}
 		}
 
-		// 2. 최종 상태 결정
-		asset->SetState(CommonUtils::Select(bAllReady, EAssetState::Ready, EAssetState::Failed));
+		// 3. 남은 일감 스왑
+		m_workQueue.swap(pendingList);
 	}
 }

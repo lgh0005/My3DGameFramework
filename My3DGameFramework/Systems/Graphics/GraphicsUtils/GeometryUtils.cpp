@@ -50,6 +50,10 @@ namespace MGF3D
           20, 22, 21, 22, 20, 23,
         };
 
+        // 1. 탄젠트 계산 (템플릿 함수 호출)
+        ComputeTangents<StaticVertex>(vertices, indices);
+
+        // 2. 바운딩 박스(AABB) 계산
         vec3 minBound(MAX_FLOAT);
         vec3 maxBound(MIN_FLOAT);
         for (const auto& v : vertices)
@@ -58,13 +62,17 @@ namespace MGF3D
             maxBound = Math::Max(maxBound, v.position);
         }
 
+        // 3. 메쉬 순수 껍데기 생성
         auto mesh = StaticMesh::Create(std::move(vertices), std::move(indices), GL_TRIANGLES);
         if (!mesh) return nullptr;
 
+        // 4. 렌더링 바운드 계산
         RenderBounds bounds;
         bounds.SetFromMinMax(minBound, maxBound);
         mesh->SetLocalBounds(bounds);
 
+        // 5. 런타임 절차적 생성이므로 즉시 동기적 GPU 업로드 수행
+        if (mesh->OnSyncCreate()) mesh->SetState(EResourceState::Ready);
         return mesh;
     }
 
@@ -80,6 +88,10 @@ namespace MGF3D
 
         Vector<uint32> indices = { 0, 1, 2, 2, 3, 0 };
 
+        // 1. 탄젠트 계산
+        ComputeTangents<StaticVertex>(vertices, indices);
+
+        // 2. 바운딩 박스(AABB) 계산
         vec3 minBound(MAX_FLOAT);
         vec3 maxBound(MIN_FLOAT);
         for (const auto& v : vertices)
@@ -88,13 +100,17 @@ namespace MGF3D
             maxBound = Math::Max(maxBound, v.position);
         }
 
+        // 3. 메쉬 순수 껍데기 생성
         auto mesh = StaticMesh::Create(std::move(vertices), std::move(indices), GL_TRIANGLES);
         if (!mesh) return nullptr;
 
+        // 4. 렌더링 바운드 계산
         RenderBounds bounds;
         bounds.SetFromMinMax(minBound, maxBound);
         mesh->SetLocalBounds(bounds);
 
+        // 5. 런타임 절차적 생성이므로 즉시 동기적 GPU 업로드 수행
+        if (mesh->OnSyncCreate()) mesh->SetState(EResourceState::Ready);
         return mesh;
     }
    
@@ -142,7 +158,10 @@ namespace MGF3D
             }
         }
 
-        // 3. 바운딩 박스(AABB) 계산
+        // 1. 탄젠트 계산 추가
+        ComputeTangents<StaticVertex>(vertices, indices);
+
+        // 2. 바운딩 박스(AABB) 계산
         vec3 minBound(MAX_FLOAT);
         vec3 maxBound(MIN_FLOAT);
         for (const auto& v : vertices)
@@ -151,12 +170,17 @@ namespace MGF3D
             maxBound = Math::Max(maxBound, v.position);
         }
 
+        // 3. 메쉬 순수 껍데기 생성
         auto mesh = StaticMesh::Create(std::move(vertices), std::move(indices), GL_TRIANGLES);
         if (!mesh) return nullptr;
 
+        // 4. 렌더링 바운드 계산
         RenderBounds bounds;
         bounds.SetFromMinMax(minBound, maxBound);
         mesh->SetLocalBounds(bounds);
+
+        // 5. 런타임 절차적 생성이므로 즉시 동기적 GPU 업로드 수행
+        if (mesh->OnSyncCreate()) mesh->SetState(EResourceState::Ready);
         return mesh;
     }
 }

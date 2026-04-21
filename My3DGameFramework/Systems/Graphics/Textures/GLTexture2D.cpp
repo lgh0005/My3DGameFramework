@@ -26,6 +26,8 @@ namespace MGF3D
 		auto texture = SharedPtr<GLTexture2D>(new GLTexture2D());
 		texture->m_width = width;
 		texture->m_height = height;
+		texture->m_vkFormat = vkFormat;
+		texture->m_levels = levels;
 		texture->SetState(EResourceState::Loaded);
 		return texture;
 	}

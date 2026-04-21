@@ -14,8 +14,8 @@ namespace MGF3D
 		using Super = Asset;
 
 	public:
-		Image(const String& path);
 		virtual ~Image() override;
+		static ImagePtr Create(const String& path);
 
 	/*========================//
 	//       Image Type       //
@@ -28,6 +28,7 @@ namespace MGF3D
 		virtual bool Load() override;
 
 	private:
+		Image(const String& path);
 		ResourcePtr CreateTextureResource(ktxTexture2* kTexture);
 	};
 }

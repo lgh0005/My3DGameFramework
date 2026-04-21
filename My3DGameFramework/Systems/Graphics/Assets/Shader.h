@@ -18,11 +18,12 @@ namespace MGF3D
 		using Super = Asset;
 
 	public:
-		Shader
-		(
-			const String& path, GLenum shaderType, 
-			EShaderFileType fileType, const String& entryPoint = "main");
 		virtual ~Shader() override;
+		static ShaderPtr Create
+		(
+			const String& path, GLenum shaderType,
+			EShaderFileType fileType, const String& entryPoint = "main"
+		);
 
 	/*========================//
 	//       Shader Type      //
@@ -37,10 +38,16 @@ namespace MGF3D
 		EShaderFileType GetFileType() const { return m_fileType; }
 
 	private:
-		bool LoadGLSL(const GLShaderPtr& module);
-		bool LoadSpirV(const GLShaderPtr& module);
+		GLShaderPtr LoadGLSL();
+		GLShaderPtr LoadSpirV();
 
 	private:
+		Shader
+		(
+			const String& path, GLenum shaderType,
+			EShaderFileType fileType, const String& entryPoint = "main"
+		);
+
 		GLenum m_shaderType;
 		EShaderFileType m_fileType;
 		String m_entryPoint;

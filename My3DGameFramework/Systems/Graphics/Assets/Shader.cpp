@@ -15,6 +15,11 @@ namespace MGF3D
 		: Super(path), m_shaderType(shaderType), m_fileType(fileType), m_entryPoint(entryPoint) { }
 	Shader::~Shader() = default;
 
+	ShaderPtr Shader::Create(const String& path, GLenum shaderType, EShaderFileType fileType, const String& entryPoint)
+	{
+		return SharedPtr<Shader>(new Shader(path, shaderType, fileType, entryPoint));
+	}
+
 	/*========================//
 	//       Shader Type      //
 	//========================*/
@@ -30,32 +35,30 @@ namespace MGF3D
 	{
 		m_state = EAssetState::Loading;
 
-		auto shader = MakeShared<GLShader>();
-		if (!shader) return false;
-
-		bool loadSuccess = false;
+		GLShaderPtr resource = nullptr;
 		switch (m_fileType)
 		{
-			case EShaderFileType::GLSL: loadSuccess = LoadGLSL(shader); break;
-			case EShaderFileType::SPIRV: loadSuccess = LoadSpirV(shader); break;
+			case EShaderFileType::GLSL: resource = LoadGLSL(); break;
+			case EShaderFileType::SPIRV: resource = LoadSpirV(); break;
 		}
-		if (!loadSuccess) return false;
+		if (!resource)
+		{
+			m_state = EAssetState::Failed;
+			return false;
+		}
 
-		shader->SetState(EResourceState::Loaded);
-		AddResource(shader);
+		AddResource(resource);
 		m_state = EAssetState::Loaded;
-
 		return true;
 	}
 
-	bool Shader::LoadGLSL(const GLShaderPtr& shader)
+	GLShaderPtr Shader::LoadGLSL()
 	{
 		InputFileStream fin(m_path.c_str());
 		if (!fin.is_open())
 		{
 			MGF_LOG_ERROR("Failed to open GLSL file: {}", m_path.c_str());
-			m_state = EAssetState::Failed;
-			return false;
+			return nullptr;
 		}
 
 		StringStream text;
@@ -64,29 +67,26 @@ namespace MGF3D
 		if (code.empty())
 		{
 			MGF_LOG_ERROR("GLSL file is empty: {}", m_path.c_str());
-			m_state = EAssetState::Failed;
-			return false;
+			return nullptr;
 		}
 
-		shader->SetSourceGLSL(m_shaderType, code);
-		return true;
+		return GLShader::Create(m_shaderType, code);
 	}
 
-	bool Shader::LoadSpirV(const GLShaderPtr& shader)
+	GLShaderPtr Shader::LoadSpirV()
 	{
 		InputFileStream file(m_path.c_str(), std::ios::ate | std::ios::binary);
 		if (!file.is_open())
 		{
 			MGF_LOG_ERROR("Failed to open SPIR-V file: {}", m_path.c_str());
-			m_state = EAssetState::Failed;
-			return false;
+			return nullptr;
 		}
 
 		usize fileSize = static_cast<usize>(file.tellg());
 		if (fileSize == 0)
 		{
-			m_state = EAssetState::Failed;
-			return false;
+			MGF_LOG_ERROR("SPIR-V file is empty: {}", m_path.c_str());
+			return nullptr;
 		}
 
 		Vector<char> buffer(fileSize);
@@ -94,7 +94,6 @@ namespace MGF3D
 		file.read(buffer.data(), fileSize);
 		file.close();
 
-		shader->SetSourceSpirv(m_shaderType, std::move(buffer), m_entryPoint);
-		return true;
+		return GLShader::Create(m_shaderType, std::move(buffer), m_entryPoint);
 	}
 }

@@ -39,33 +39,8 @@ namespace MGF3D
         mesh->m_vertices = std::move(vertices);
         mesh->m_indices = std::move(indices);
 
-        // 상태를 Loading으로 설정 (아직 그릴 수 없음)
-        mesh->SetState(EResourceState::Loading);
-
-        // 2. CPU 헤비 연산을 백그라운드 워커에 할당
-        MGF_THREAD.PushCPUTask
-        (
-            [mesh]()
-            {
-                if (mesh->m_primitiveType == GL_TRIANGLES)
-                    mesh->ComputeTangents(mesh->m_vertices, mesh->m_indices);
-
-                mesh->SetLocalBounds(RenderBounds(mesh->m_vertices));
-                mesh->SetState(EResourceState::Loaded);
-
-                // 2. [GPU 워커 스레드] 연쇄 할당
-                MGF_THREAD.PushGPUTask
-                (
-                    [mesh]()
-                    {
-                        mesh->SetState(EResourceState::Syncing);
-
-                        if (mesh->OnSyncCreate()) mesh->SetState(EResourceState::Ready);
-                        else mesh->SetState(EResourceState::Failed);
-                    }
-                );
-            }
-        );
+        // 상태를 Loaded으로 설정
+        mesh->SetState(EResourceState::Loaded);
 
         return mesh;
     }
@@ -101,66 +76,6 @@ namespace MGF3D
 
         m_state = EResourceState::Ready;
         return true;
-    }
-
-    void SkinnedMesh::ComputeTangents
-    (
-        Vector<SkinnedVertex>& vertices,
-        const Vector<uint32>& indices
-    )
-    {
-        Vector<vec3> tangents;
-        tangents.resize(vertices.size(), vec3(0.0f));
-
-        for (usize i = 0; i < indices.size(); i += 3)
-        {
-            int32 i0 = indices[i];
-            uint32 i1 = indices[i + 1];
-            uint32 i2 = indices[i + 2];
-
-            const auto& v0 = vertices[i0];
-            const auto& v1 = vertices[i1];
-            const auto& v2 = vertices[i2];
-
-            // Edge(변) 벡터
-            vec3 edge1 = v1.position - v0.position;
-            vec3 edge2 = v2.position - v0.position;
-
-            // Delta UV 벡터
-            vec2 deltaUV1 = v1.texCoord - v0.texCoord;
-            vec2 deltaUV2 = v2.texCoord - v0.texCoord;
-
-            // 행렬식(Determinant) 계산
-            float det = (deltaUV1.x * deltaUV2.y - deltaUV1.y * deltaUV2.x);
-            if (det != 0.0f)
-            {
-                float invDet = 1.0f / det;
-
-                // 삼각형의 Tangent는 하나입니다!
-                vec3 tangent;
-                tangent.x = invDet * (deltaUV2.y * edge1.x - deltaUV1.y * edge2.x);
-                tangent.y = invDet * (deltaUV2.y * edge1.y - deltaUV1.y * edge2.y);
-                tangent.z = invDet * (deltaUV2.y * edge1.z - deltaUV1.y * edge2.z);
-
-                // 구해진 하나의 Tangent를 세 정점에 모두 더해줍니다.
-                tangents[i0] += tangent;
-                tangents[i1] += tangent;
-                tangents[i2] += tangent;
-            }
-            else
-            {
-                tangents[i0] += edge1;
-                tangents[i1] += edge1;
-                tangents[i2] += edge1;
-            }
-        }
-
-        // 3. 정규화 (Normalize) - 평균낸 방향을 단위 벡터로 만듦
-        for (usize i = 0; i < vertices.size(); i++)
-        {
-            if (Math::HasLength(tangents[i])) vertices[i].tangent = normalize(tangents[i]);
-            else vertices[i].tangent = vec3(1.0f, 0.0f, 0.0f);
-        }
     }
 
     void SkinnedMesh::Draw(uint32 count) const

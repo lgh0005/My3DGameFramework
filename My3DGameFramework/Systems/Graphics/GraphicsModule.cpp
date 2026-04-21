@@ -13,6 +13,8 @@
 #include "Meshes/SkinnedMesh.h"
 #include "Meshes/ScreenMesh.h"
 
+#include "Shader/GLShader.h"
+
 #include "Assets/Image.h"
 #include "Assets/Shader.h"
 
@@ -32,6 +34,9 @@ namespace MGF3D
 		StaticMesh::s_typeIndex = resourceTree->Register("StaticMesh", "Mesh");
 		SkinnedMesh::s_typeIndex = resourceTree->Register("SkinnedMesh", "Mesh");
 		ScreenMesh::s_typeIndex = resourceTree->Register("ScreenMesh", "Mesh");
+
+		// 3. 리소스 타입 베이킹
+		GLShader::s_typeIndex = resourceTree->Register("GLShader", "Resource");
 
 		// 3. Asset 타입 베이킹
 		MGFTypeTree* assetTree = MGF_TYPE.GetTree("Asset");

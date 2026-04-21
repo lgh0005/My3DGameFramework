@@ -28,37 +28,37 @@ namespace MGF3D
 //    Trigonometry     //
 //====================*/
 
-	inline float Math::Sin(float radians) noexcept
+	float Math::Sin(float radians) noexcept
 	{
 		return glm::sin(radians);
 	}
 
-	inline float Math::Cos(float radians) noexcept
+	float Math::Cos(float radians) noexcept
 	{
 		return glm::cos(radians);
 	}
 
-	inline float Math::Tan(float radians) noexcept
+	float Math::Tan(float radians) noexcept
 	{
 		return glm::tan(radians);
 	}
 
-	inline float Math::ASin(float v) noexcept
+	float Math::ASin(float v) noexcept
 	{
 		return glm::asin(v);
 	}
 
-	inline float Math::ACos(float v) noexcept
+	float Math::ACos(float v) noexcept
 	{
 		return glm::acos(v);
 	}
 
-	inline float Math::ATan(float v) noexcept
+	float Math::ATan(float v) noexcept
 	{
 		return glm::atan(v);
 	}
 
-	inline float Math::ATan2(float y, float x) noexcept
+	float Math::ATan2(float y, float x) noexcept
 	{
 		return glm::atan(y, x);
 	}

@@ -27,13 +27,6 @@ namespace MGF3D
         static int16 s_typeIndex;
         virtual const MGFType* GetType() const override;
 
-    public:
-        void ComputeTangents
-        (
-            Vector<SkinnedVertex>& vertices,
-            const Vector<uint32>& indices
-        );
-
     private:
         SkinnedMesh();
 

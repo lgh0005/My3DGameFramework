@@ -38,19 +38,8 @@ namespace MGF3D
 		};
 		mesh->m_indices = { 0, 1, 2, 2, 1, 3 };
 		mesh->m_indexCount = mesh->m_indices.size();
+
 		mesh->SetState(EResourceState::Loaded);
-
-		// 2. [GPU 워커 스레드] OpenGL 자원 생성만 비동기로 할당
-		MGF_THREAD.PushGPUTask
-		(
-			[mesh]()
-			{
-				mesh->SetState(EResourceState::Syncing);
-				if (mesh->OnSyncCreate()) mesh->SetState(EResourceState::Ready);
-				else mesh->SetState(EResourceState::Failed);
-			}
-		);
-
 		return mesh;
 	}
 
@@ -78,6 +67,7 @@ namespace MGF3D
 		m_indices.clear();
 		m_indices.shrink_to_fit();
 
+		m_state = EResourceState::Ready;
 		return true;
 	}
 

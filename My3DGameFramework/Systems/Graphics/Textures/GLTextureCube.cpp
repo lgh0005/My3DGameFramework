@@ -8,6 +8,25 @@ namespace MGF3D
 	GLTextureCube::GLTextureCube() = default;
 	GLTextureCube::~GLTextureCube() = default;
 
+    GLTextureCubePtr GLTextureCube::Create(ktxTexture2* ktx)
+    {
+        if (ktx == nullptr) return nullptr;
+        auto texture = GLTextureCubePtr(new GLTextureCube());
+        texture->SetKtxTexture(ktx);
+        texture->SetState(EResourceState::Loaded);
+        return texture;
+    }
+
+    GLTextureCubePtr GLTextureCube::Create(uint32 size, uint32 vkFormat, uint32 levels)
+    {
+        auto texture = GLTextureCubePtr(new GLTextureCube());
+        texture->m_size = size;
+        texture->m_vkFormat = vkFormat;
+        texture->m_levels = levels;
+        texture->SetState(EResourceState::Loaded);
+        return texture;
+    }
+
 	/*======================//
 	//   GLTextureCube Type //
 	//======================*/

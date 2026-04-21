@@ -9,6 +9,7 @@ namespace MGF3D
 		Empty,      // 아무 작업도 시작되지 않음
 		Loading,    // CPU에서 파일 읽기/파싱 중
 		Loaded,     // 데이터 파싱 완료, 리소스들이 생성됨 (GPU 대기)
+		Syncing,    // 3: 자식 리소스들이 GPU 업로드 중
 		Ready,      // 모든 내부 리소스가 사용 가능한 상태
 		Failed      // 로드 실패
 	};
@@ -40,7 +41,7 @@ namespace MGF3D
 	//         State Management         //
 	//==================================*/
 	public:
-		EAssetState GetState() const { return m_state; }
+		EAssetState GetState() const;
 		void SetState(EAssetState state) { m_state = state; }
 
 	protected:

@@ -1,5 +1,6 @@
 ﻿#include "GraphicsPch.h"
 #include "Program.h"
+#include "Assets/Shader.h"
 #include "Shader/GLShader.h"
 #include "Managers/TypeManager.h"
 
@@ -26,26 +27,76 @@ namespace MGF3D
         return nullptr;
     }
 
-    void Program::AddShader(const GLShaderPtr& shader)
+    void Program::AddShader(const ShaderPtr& shader)
     {
         if (shader) m_pendingShaders.push_back(shader);
     }
 
     bool Program::OnSyncCreate()
     {
+        {
+            // 1. 등록된 셰이더 개수 확인
+            MGF_LOG_FATAL("Program Sync Check - Shader Count: {0}", m_pendingShaders.size());
+
+            for (int i = 0; i < m_pendingShaders.size(); ++i)
+            {
+                auto& shader = m_pendingShaders[i];
+                if (!shader) continue;
+
+                // 2. 주소와 상태를 동시에 출력
+                MGF_LOG_FATAL("Shader[{0}] Addr: {1}, State: {2}",
+                    i, (void*)shader.get(), (int)shader->GetState());
+
+                if (shader->GetState() != EAssetState::Ready)
+                {
+                    MGF_LOG_ERROR("Waiting for Shader[{0}] (Addr: {1}) to be Ready.", i, (void*)shader.get());
+                    return false;
+                }
+            }
+
+            if (m_pendingShaders.empty()) {
+                MGF_LOG_FATAL("Program Pending: No Shaders Attached.");
+                return false;
+            }
+
+            for (int i = 0; i < m_pendingShaders.size(); ++i)
+            {
+                auto& shader = m_pendingShaders[i];
+                if (!shader) {
+                    MGF_LOG_FATAL("Program Pending: Shader[{0}] is NULL.", i);
+                    return false;
+                }
+                if (shader->GetState() != EAssetState::Ready) {
+                    MGF_LOG_FATAL("Program Pending: Shader[{0}] is not Ready yet.", i);
+                    return false;
+                }
+
+                // 리소스가 실제로 들어있는지도 체크
+                if (shader->GetResources().empty()) {
+                    MGF_LOG_FATAL("Program Pending: Shader[{0}] has NO resources.", i);
+                    return false;
+                }
+            }
+        }
+
         if (m_pendingShaders.empty()) return false;
 
         // 1. 의존성 체크: 부착할 모든 셰이더가 컴파일 완료(Ready) 상태인지 확인
         for (const auto& shader : m_pendingShaders)
         {
-            if (!shader || shader->GetState() != EResourceState::Ready)
+            if (!shader || shader->GetState() != EAssetState::Ready)
                 return false;
         }
 
-        // 2. 프로그램 생성 및 셰이더 부착
-        m_handle = glCreateProgram();
+        // 2. [중요] 핸들이 없을 때만 딱 한 번 생성
+        if (m_handle == 0) m_handle = glCreateProgram();
+
         for (auto& shader : m_pendingShaders)
-            glAttachShader(m_handle, shader->GetHandle());
+        {
+            auto glShader = MGFTypeCaster::Cast<GLShader>(shader->GetResources()[0]);
+            if (!glShader || glShader->GetState() != EResourceState::Ready) return false;
+            glAttachShader(m_handle, glShader->GetHandle());
+        }
 
         glLinkProgram(m_handle);
 
@@ -58,12 +109,17 @@ namespace MGF3D
             glGetProgramInfoLog(m_handle, 1024, nullptr, infoLog);
             MGF_LOG_ERROR("Failed to link program: {}", infoLog);
             m_state = EResourceState::Failed;
+            glDeleteProgram(m_handle);
+            m_handle = 0;
             return false;
         }
 
         // 4. 탈착 및 메모리 정리
         for (auto& shader : m_pendingShaders)
-            glDetachShader(m_handle, shader->GetHandle());
+        {
+            auto glShader = MGFTypeCaster::Cast<GLShader>(shader->GetResources()[0]);
+            glDetachShader(m_handle, glShader->GetHandle());
+        }
 
         m_pendingShaders.clear();
         m_pendingShaders.shrink_to_fit();

@@ -4,6 +4,7 @@
 namespace MGF3D
 {
     MGF_CLASS_PTR(GLShader)
+    MGF_CLASS_PTR(Shader)
 
     MGF_CLASS_PTR(Program)
     class Program : public NamedResource
@@ -12,7 +13,8 @@ namespace MGF3D
 
     public:
         virtual ~Program();
-        void AddShader(const GLShaderPtr& shader);
+        virtual bool OnSyncCreate() override;
+        void AddShader(const ShaderPtr& shader);
         usize GetHandle() const { return m_handle; }
         void Use() const;
 
@@ -22,7 +24,6 @@ namespace MGF3D
     public:
         static int16 s_typeIndex;
         virtual const MGFType* GetType() const override;
-        virtual bool OnSyncCreate() override;
 
     /*==============================================//
     //   default arithmetic value uniform setters   //
@@ -50,6 +51,6 @@ namespace MGF3D
 
         usize m_handle  { 0 };
         HashMap<StringHash, int32> m_location;
-        Vector<GLShaderPtr> m_pendingShaders;
+        Vector<ShaderPtr> m_pendingShaders;
     };
 }
