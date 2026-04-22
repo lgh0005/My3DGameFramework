@@ -24,7 +24,7 @@ namespace MGF3D
 		void SetRenderPipeline(StringView name);
 
 	public:
-		HashMap<int16, RenderPipelineFactory> m_pipelines;
+		HashMap<int64, RenderPipelineFactory> m_pipelines;
 		RenderPipelineUPtr m_activePipeline;
 	};
 }

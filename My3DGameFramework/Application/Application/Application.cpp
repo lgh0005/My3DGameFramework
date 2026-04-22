@@ -116,7 +116,7 @@ namespace MGF3D
 
 			// 3. [DEBUG] 렌더링 테스트
 			{
-				glClearColor(0.2f, 0.5f, 0.3f, 1.0f);
+				glClearColor(0.2f, 0.2f, 0.3f, 1.0f);
 				glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 				// 위에서 호출한 Update들 덕분에 상태가 Ready로 변경되면 여기서 바로 그려집니다.

@@ -1,5 +1,5 @@
 # 1. 하위 개별 모듈들 추가
-#add_subdirectory(Audio)
+add_subdirectory(Audio)
 add_subdirectory(Graphics)
 #add_subdirectory(Physics)
 
@@ -12,8 +12,7 @@ target_include_directories(Systems INTERFACE ${CMAKE_CURRENT_SOURCE_DIR})
 
 # 4. 모든 하위 시스템 링크
 target_link_libraries(Systems INTERFACE 
-    #Engine::Audio
+    Engine::Audio
     Engine::Graphics
     #Engine::Physics
-    #Engine::Scripting
 )

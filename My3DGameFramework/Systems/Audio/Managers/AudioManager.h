@@ -1,22 +1,29 @@
 ﻿#pragma once
-#include "miniaudio.h"
 
-class AudioManager
+namespace MGF3D
 {
-	DECLARE_SINGLE(AudioManager)
-	DECLARE_NONINSTANTIABLE(AudioManager)
+	MGF_CLASS_PTR(AudioEngine)
+	MGF_CLASS_PTR(AudioMixer)
 
-public:
-	bool Init();
-	void Clear();
-	ma_engine* GetEngine() { return &m_audioEngine; }
+	class AudioManager
+	{
+		MGF_DECLARE_SINGLE(AudioManager)
 
-	// TODO : 그룹 : sfx, bgm 별로 음향 통제
-	ma_sound_group* GetGroup(AudioType type);
-	void SetGroupVolume(AudioType type, float volume);
-	void SetMasterVolume(float volume);
+	private:
+		AudioManager();
+		~AudioManager();
 
-private:
-	ma_engine m_audioEngine;
-	ma_sound_group m_groups[(int32)AudioType::MAX];
-};
+	public:
+		bool Init();
+		void Shutdown();
+
+	public:
+		bool CreateChannel(const String& name);
+		AudioMixer* GetMixer(const String& name);
+		void SetChannelVolume(const String& name, float volume);
+
+	private:
+		AudioEngineUPtr m_engine;
+		HashMap<StringHash, AudioMixerUPtr> m_channels;
+	};
+}
