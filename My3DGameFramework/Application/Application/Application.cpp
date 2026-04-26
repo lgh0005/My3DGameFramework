@@ -84,6 +84,7 @@ namespace MGF3D
 				if (MGF_INPUT.GetDevice<MGFMouseDevice>()->GetButtonDown("Fire"))  MGF_LOG_INFO("Action: Fire!");
 			}
 
+			MGF_ENTITY.Update();
 			MGF_SCENE.Update();
 			MGF_TIME.FixedUpdate();
 			MGF_RENDER.Render();

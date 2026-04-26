@@ -65,12 +65,10 @@ namespace MGF3D
     template<typename T>
     void RenderQueue<T>::Clear()
     {
-        // 맵의 노드 구조(메모리)는 유지하되 인스턴스 벡터만 비움
-        // 이를 통해 매 프레임 발생하는 할당 오버헤드를 줄임
         for (auto& [mesh, materialMap] : m_batches)
         {
             for (auto& [material, batch] : materialMap)
-                batch.instances.clear();
+                batch.GetInstances().clear();
         }
     }
 }

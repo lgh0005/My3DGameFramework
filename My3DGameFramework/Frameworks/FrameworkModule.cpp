@@ -10,7 +10,6 @@
 #pragma endregion
 
 #pragma region TYPES
-#include "Managers/TypeManager.h"
 #include "Identities/MGFTypeTree.h"
 #pragma endregion
 

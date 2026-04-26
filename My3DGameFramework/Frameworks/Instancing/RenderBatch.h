@@ -9,9 +9,11 @@ namespace MGF3D
 	class RenderBatch
 	{
 	public:
-		void Clear();
 		void SetMesh(Mesh* mesh);
 		void SetMaterial(Material* material);
+		void AddInstance(const T& data);
+		Vector<T>& GetInstances() { return m_instances; }
+		void Clear();
 
 	private:
 		Mesh*	  m_mesh     { nullptr };

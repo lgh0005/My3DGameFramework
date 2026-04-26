@@ -1,11 +1,11 @@
 #pragma once
 #include "Instancing/RenderBatch.h"
+#include "Graphics/Buffers/GLShaderStorageBuffer.h"
 
 namespace MGF3D
 {
 	MGF_CLASS_PTR(Mesh)
 	MGF_CLASS_PTR(Material)
-	MGF_CLASS_PTR(GLShaderStorageBuffer)
 
 	template<typename T>
 	class RenderQueue

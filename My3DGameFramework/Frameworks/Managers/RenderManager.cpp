@@ -2,6 +2,7 @@
 #include "RenderManager.h"
 #include "Managers/WindowManager.h"
 #include "Rendering/RenderPipeline.h"
+#include "Rendering/RenderContext.h"
 
 namespace MGF3D
 {
@@ -10,7 +11,7 @@ namespace MGF3D
 
 	void RenderManager::Render()
 	{
-		if (m_activePipeline) m_activePipeline->Render();
+		if (m_activePipeline) m_activePipeline->Render(m_renderContext.get());
 	}
 
 	void RenderManager::Resize()

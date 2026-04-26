@@ -1,5 +1,6 @@
 ﻿#include "FrameworkPch.h"
 #include "RenderPipeline.h"
+#include "Rendering/RenderContext.h"
 #include "Managers/TypeManager.h"
 
 namespace MGF3D

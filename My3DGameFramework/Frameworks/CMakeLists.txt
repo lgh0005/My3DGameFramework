@@ -62,9 +62,9 @@ set(SOURCES
     "Rendering/RenderPipeline.h"          "Rendering/RenderPipeline.cpp"
 
     # Instancing
-    "Instancing/RenderBatch.h"          "Instancing/RenderBatch.cpp"
-    "Instancing/RenderQueue.h"          "Instancing/RenderQueue.cpp"
-    "Instancing/Properties/StaticInstanceData.h" 
+    "Instancing/RenderBatch.h"          "Instancing/RenderBatch.cpp"        "Instancing/RenderBatch.inl"
+    "Instancing/RenderQueue.h"          "Instancing/RenderQueue.cpp"        "Instancing/RenderQueue.inl"
+    "Instancing/Properties/StaticInstanceData.h"        
     "Instancing/Properties/SkinnedInstanceData.h"
 )
 

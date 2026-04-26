@@ -2,6 +2,8 @@
 
 namespace MGF3D
 {
+    MGF_CLASS_PTR(RenderContext)
+
     class RenderPipeline
     {
     public:
@@ -15,7 +17,7 @@ namespace MGF3D
         virtual const MGFType* GetType() const;
 
     public:
-        virtual void Render() = 0;
+        virtual void Render(RenderContext* context) = 0;
         virtual void Resize() = 0;
 
     protected:

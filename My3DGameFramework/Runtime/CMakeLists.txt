@@ -22,6 +22,10 @@ set(SOURCES
     # Editor
     "Editor/GUIWindow.h"            "Editor/GUIWindow.cpp"
 
+    # Test
+    "Pipelines/_Test/TestPipeline.h"          "Pipelines/_Test/TestPipeline.cpp"
+    "Pipelines/_Test/RenderPasses/TestRenderPass.h"          "Pipelines/_Test/RenderPasses/TestRenderPass.cpp"
+
     # Managers
     #"Managers/ImguiManager.h"     "Managers/ImguiManager.cpp"
     #"Managers/LevelManager.h"     "Managers/LevelManager.cpp"    "Application/LevelManager.inl"
