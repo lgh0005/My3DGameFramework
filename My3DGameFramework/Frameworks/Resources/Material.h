@@ -6,6 +6,7 @@ namespace MGF3D
 {
 	MGF_CLASS_PTR(GraphicsProgram)
 	MGF_CLASS_PTR(GLTextureHandle)
+	MGF_CLASS_PTR(GLUniformBuffer)
 
 	enum class ETextureSlot : uint8
 	{
@@ -75,8 +76,9 @@ namespace MGF3D
 
 	private:
 		Material(StringView name);
-\
-		GraphicsProgramPtr m_program;
-		HashMap<ETextureSlot, GLTextureHandlePtr> m_textures;
+
+		GraphicsProgramPtr  m_program;
+		GLUniformBufferUPtr m_materialBuffer;
+		Array<GLTextureHandlePtr, static_cast<usize>(ETextureSlot::Max)> m_textures;
 	};
 }

@@ -75,11 +75,4 @@ namespace MGF3D
         m_state = EResourceState::Ready;
         return true;
     }
-
-    void StaticMesh::Draw(uint32 count) const
-    {
-        Bind();
-        Super::Draw(count);
-        Unbind();
-    }
 }

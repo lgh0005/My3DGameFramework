@@ -13,7 +13,6 @@ namespace MGF3D
     {
     public:
         virtual ~Mesh();
-        virtual void Draw(uint32 count) const;
         virtual void Bind() const;
         virtual void Unbind() const;
 

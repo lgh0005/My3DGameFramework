@@ -17,7 +17,7 @@ namespace MGF3D
 		MeshRenderer
 		(
 			ObjectIDHash id, ObjectIDHash ownerID, 
-			MeshPtr mesh, StringHash materialHash
+			const MeshPtr& mesh, const MaterialPtr& material
 		);
 		virtual ~MeshRenderer() override;
 		MeshRenderer(MeshRenderer&& other) noexcept;
@@ -30,19 +30,8 @@ namespace MGF3D
 		static int16 s_typeIndex;
 		virtual const MGFType* GetType() const override;
 
-	/*======================================//
-	//     default MeshRenderer methods     //
-	//======================================*/
-	public:
-		void SetMesh(MeshPtr mesh) { m_mesh = mesh; }
-		void SetMaterialHash(StringHash materialHash) { m_materialHash = materialHash; }
-		StringHash GetMaterialHash() const { return m_materialHash; }
-
-	public:
-		void Draw(uint32 count) const;
-
 	private:
-		MeshPtr m_mesh			  { nullptr };
-		StringHash m_materialHash { 0 };
+		MeshPtr     m_mesh		  { nullptr };
+		MaterialPtr m_material    { nullptr };
 	};
 }

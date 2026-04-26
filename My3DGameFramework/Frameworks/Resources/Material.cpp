@@ -3,10 +3,14 @@
 #include "Managers/TypeManager.h"
 #include "Programs/GraphicsProgram.h"
 #include "Textures/GLTextureHandle.h"
+#include "Buffers/GLUniformBuffer.h"
 
 namespace MGF3D
 {
-	Material::Material(StringView name) : Super(name) { }
+	Material::Material(StringView name) : Super(name) 
+	{
+		m_textures.fill(nullptr);
+	}
 	Material::~Material() = default;
 
 	/*========================//
@@ -35,10 +39,17 @@ namespace MGF3D
 			return false;
 
 		// 2. 머티리얼이 가질 모든 텍스쳐 로드 완료 검사
-		for (const auto& [slot, texture] : m_textures)
+		for (const auto& texture : m_textures)
 		{
 			if (texture && texture->GetState() != EResourceState::Ready)
 				return false;
+		}
+
+		// 3. 머티리얼 UBO 생성
+		if (!m_materialBuffer)
+		{
+			MaterialData data; // 초기값으로 생성
+			m_materialBuffer = GLUniformBuffer::Create(&data, sizeof(MaterialData));
 		}
 
 		// 3. 머티리얼 로드 완료
@@ -53,22 +64,43 @@ namespace MGF3D
 
 	void Material::SetTexture(ETextureSlot slot, const GLTextureHandlePtr& texture)
 	{
-		m_textures[slot] = texture;
+		m_textures[static_cast<usize>(slot)] = texture;
 	}
 
 	GLTextureHandlePtr Material::GetTexture(ETextureSlot slot) const
 	{
-		auto it = m_textures.find(slot);
-		if (it != m_textures.end()) return it->second;
-		return nullptr;
+		return m_textures[static_cast<usize>(slot)];
 	}
 
 	void Material::Bind() const
 	{
-		// TODO
-		// 1. 머티리얼 인자값들 (수치값) UBO 바인딩
- 
-		// 2. 텍스쳐 바인딩
+		if (m_state != EResourceState::Ready || !m_program || !m_materialBuffer) return;
 
+		// 1. 셰이더 사용
+		m_program->Use();
+
+		// 2. 래퍼 클래스를 이용한 데이터 업데이트 및 바인딩
+		MaterialData data;
+		data.albedoFactor = albedoFactor;
+		data.emissiveFactor = emissiveFactor;
+		data.emissionStrength = emissionStrength;
+		data.shininess = shininess;
+		data.heightScale = heightScale;
+		data.metallicFactor = metallicFactor;
+		data.roughnessFactor = roughnessFactor;
+
+		// 내부에서 glNamedBufferSubData 호출
+		m_materialBuffer->UpdateData(&data, 0, sizeof(MaterialData));
+
+		// 내부에서 glBindBufferBase 호출 (Binding Index: 2)
+		m_materialBuffer->Bind(2);
+
+		// 3. 텍스처 바인딩
+		for (uint32 i = 0; i < static_cast<uint32>(ETextureSlot::Max); ++i)
+		{
+			const auto& texture = m_textures[i];
+			if (texture && texture->GetState() == EResourceState::Ready) texture->Bind(i);
+			else texture->Unbind(i);
+		}
 	}
 }

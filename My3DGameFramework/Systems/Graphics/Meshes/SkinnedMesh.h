@@ -18,7 +18,6 @@ namespace MGF3D
             uint32 primitiveType = GL_TRIANGLES
         );
         virtual bool OnSyncCreate() override;
-        virtual void Draw(uint32 count) const override;
 
     /*======================//
     //   SkinnedMesh Type   //

@@ -1,31 +1,21 @@
-﻿#include "EnginePch.h"
+﻿#include "FrameworkPch.h"
 #include "RenderPass.h"
-#include "Scene/Scene.h"
-#include "Graphics/Rendering/RenderContext.h"
-#include "Components/Camera.h"
+#include "Rendering/RenderContext.h"
+#include "Managers/TypeManager.h"
 
-/*====================================================//
-//  Base class for all render passes (Common Data)    //
-//====================================================*/
-std::vector<glm::mat4> RenderPass::s_identityBones;
-RenderPass::RenderPass()
+namespace MGF3D
 {
-    if (s_identityBones.empty()) s_identityBones.assign(MAX_BONES, glm::mat4(1.0f));
-}
-RenderPass::~RenderPass() = default;
-const std::vector<glm::mat4>& RenderPass::GetIdentityBones() const
-{
-	return s_identityBones;
-}
+	RenderPass::RenderPass() = default;
+	RenderPass::~RenderPass() = default;
 
-/*===========================================//
-//   custom extension render pass interface  //
-//===========================================*/
-GeneralRenderPass::GeneralRenderPass() = default;
-GeneralRenderPass::~GeneralRenderPass() = default;
-
-/*====================================================//
-//   RenderContext based core render pass interface   //
-//====================================================*/
-ContextRenderPass::ContextRenderPass() = default;
-ContextRenderPass::~ContextRenderPass() = default;
+	/*==============================//
+	//    RenderPass Custom Type    //
+	//==============================*/
+	int16 RenderPass::s_typeIndex = -1;
+	const MGFType* RenderPass::GetType() const
+	{
+		MGFTypeTree* tree = MGF_TYPE.GetTree("RenderPass");
+		if (tree != nullptr) return tree->GetType(s_typeIndex);
+		return nullptr;
+	}
+}

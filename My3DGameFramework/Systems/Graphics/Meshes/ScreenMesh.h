@@ -12,7 +12,6 @@ namespace MGF3D
 		virtual ~ScreenMesh() override;
 		static ScreenMeshPtr Create();
 		virtual bool OnSyncCreate() override;
-		virtual void Draw(uint32 count = 1) const override;
 
 	/*=====================//
 	//   ScreenMesh Type   //

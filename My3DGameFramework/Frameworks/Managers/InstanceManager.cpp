@@ -3,5 +3,9 @@
 
 namespace MGF3D
 {
+	InstanceManager::InstanceManager() = default;
+	InstanceManager::~InstanceManager() = default;
+
+
 
 }

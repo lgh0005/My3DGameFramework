@@ -1,7 +1,5 @@
 #include "FrameworkPch.h"
 #include "RenderQueue.h"
-
-namespace MGF3D
-{
-
-}
+#include "Meshes/Mesh.h"
+#include "Resources/Material.h"
+#include "Buffers/GLShaderStorageBuffer.h"

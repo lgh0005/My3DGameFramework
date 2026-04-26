@@ -1,7 +1,4 @@
 #include "FrameworkPch.h"
 #include "RenderBatch.h"
-
-namespace MGF3D
-{
-	
-}
+#include "Meshes/Mesh.h"
+#include "Resources/Material.h"

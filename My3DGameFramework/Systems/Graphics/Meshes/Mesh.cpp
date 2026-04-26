@@ -10,21 +10,6 @@ namespace MGF3D
 	Mesh::Mesh() = default;
 	Mesh::~Mesh() = default;
 
-	void Mesh::Draw(uint32 count) const
-	{
-		if (m_indexCount == 0) return;
-
-		// 인스턴싱 드로우 콜
-		glDrawElementsInstanced
-		(
-			m_primitiveType,
-			static_cast<GLsizei>(m_indexCount),
-			GL_UNSIGNED_INT,
-			nullptr,
-			static_cast<GLsizei>(count)
-		);
-	}
-
 	void Mesh::Bind() const
 	{
 		if (m_vertexLayout) m_vertexLayout->Bind();

@@ -16,6 +16,7 @@ set(SOURCES
     "Managers/AssetManager.h"       "Managers/AssetManager.cpp"      "Managers/AssetManager.inl"
     "Managers/ResourceManager.h"    "Managers/ResourceManager.cpp"   "Managers/ResourceManager.inl"
     "Managers/RenderManager.h"      "Managers/RenderManager.cpp"     "Managers/RenderManager.inl"
+    "Managers/InstanceManager.h"    "Managers/InstanceManager.cpp"
 
     # Components
     # "Components/Animation/Animator.h"       "Components/Animation/Animator.cpp"
@@ -56,11 +57,15 @@ set(SOURCES
     # "Resources/EnvironmentMap.h"             "Resources/EnvironmentMap.cpp"
 
     # Rendering
-    # "Rendering/Renderer.h"          "Rendering/Renderer.cpp"
-    # "Rendering/GlobalUniforms.h"          "Rendering/GlobalUniforms.cpp"
-    # "Rendering/RenderContext.h"          "Rendering/RenderContext.cpp"
-    # "Rendering/RenderPass.h"          "Rendering/RenderPass.cpp"
+    "Rendering/RenderContext.h"          "Rendering/RenderContext.cpp"
+    "Rendering/RenderPass.h"          "Rendering/RenderPass.cpp"
     "Rendering/RenderPipeline.h"          "Rendering/RenderPipeline.cpp"
+
+    # Instancing
+    "Instancing/RenderBatch.h"          "Instancing/RenderBatch.cpp"
+    "Instancing/RenderQueue.h"          "Instancing/RenderQueue.cpp"
+    "Instancing/Properties/StaticInstanceData.h" 
+    "Instancing/Properties/SkinnedInstanceData.h"
 )
 
 # 2. 빌드 타겟 생성 및 별칭 등록

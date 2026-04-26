@@ -70,11 +70,4 @@ namespace MGF3D
 		m_state = EResourceState::Ready;
 		return true;
 	}
-
-	void ScreenMesh::Draw(uint32 count) const
-	{
-		Bind();
-		Mesh::Draw(count);
-		Unbind();
-	}
 }

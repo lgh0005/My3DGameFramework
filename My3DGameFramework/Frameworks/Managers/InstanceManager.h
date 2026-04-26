@@ -4,7 +4,7 @@ namespace MGF3D
 {
 	class InstanceManager
 	{
-		MGF_CLASS_PTR(InstanceManager)
+		MGF_DECLARE_SINGLE(InstanceManager)
 
 	private:
 		InstanceManager();

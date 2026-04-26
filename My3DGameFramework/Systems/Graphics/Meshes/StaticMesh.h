@@ -19,7 +19,6 @@ namespace MGF3D
         );
 
         virtual bool OnSyncCreate() override;
-        virtual void Draw(uint32 count) const override;
 
     /*=====================//
     //   StaticMesh Type   //

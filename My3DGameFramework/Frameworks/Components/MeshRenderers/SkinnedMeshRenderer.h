@@ -13,7 +13,7 @@ namespace MGF3D
 		SkinnedMeshRenderer
 		(
 			ObjectIDHash id, ObjectIDHash ownerID,
-			SkinnedMeshPtr mesh, StringHash materialHash,
+			const SkinnedMeshPtr& mesh, const MaterialPtr& materialHash,
 			Animator* animator = nullptr
 		);
 
