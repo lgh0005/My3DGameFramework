@@ -41,7 +41,8 @@ namespace MGF3D
 	//     Component methods     //
 	//===========================*/
 	public:
-		template<typename T> T* AddComponent(ObjectIDHash ownerID);
+		template<typename T, typename... Args>
+		T* AddComponent(ObjectIDHash ownerID, Args&&... args);
 		template<typename T> T* GetComponent(ObjectIDHash ownerID);
 
 	private:

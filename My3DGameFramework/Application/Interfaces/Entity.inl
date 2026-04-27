@@ -2,10 +2,10 @@
 
 namespace MGF3D
 {
-	template<typename T>
-	inline T* Entities::AddComponent(ObjectIDHash ownerID)
+	template<typename T, typename... Args>
+	inline T* Entities::AddComponent(ObjectIDHash ownerID, Args&&... args)
 	{
-		return MGF_ENTITY.AddComponent<T>(ownerID);
+		return MGF_ENTITY.AddComponent<T>(ownerID, std::forward<Args>(args)...);
 	}
 
 	template<typename T>

@@ -35,12 +35,12 @@ namespace MGF3D
 		const quat& GetLocalRotation() const { return m_localRotation; }
 		const vec3& GetLocalScale() const { return m_localScale; }
 
-		const mat4& GetWorldMatrix() const { return m_worldMatrix; }
+		const mat4& GetWorldMatrix() const;
 		void SetWorldMatrix(const mat4& matrix) { m_worldMatrix = matrix; }
 
 		bool IsTransformDirty() const { return m_isTransformDirty; }
-		void SetTransformDirty() { m_isTransformDirty = true; }
-		void ClearTransformDirty() { m_isTransformDirty = false; }
+		void SetTransformDirty() const { m_isTransformDirty = true; }
+		void ClearTransformDirty() const { m_isTransformDirty = false; }
 
 	private:
 
@@ -50,9 +50,9 @@ namespace MGF3D
 		vec3 m_localScale	 { 1.0f, 1.0f, 1.0f };
 
 		// 계산된 월드 행렬
-		mat4 m_worldMatrix{ 1.0f };
+		mutable mat4 m_worldMatrix{ 1.0f };
 
 		// 월드 행렬 갱신 필요 여부
-		bool m_isTransformDirty { true };
+		mutable bool m_isTransformDirty { true };
 	};
 }

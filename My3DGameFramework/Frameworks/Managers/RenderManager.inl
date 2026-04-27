@@ -13,17 +13,13 @@ namespace MGF3D
 			"RenderManager::RegisterRenderPipeline - 'T' must be derived from 'RenderPipeline'."
 		);
 
-		// TODO : 타입 트리 추가 필요
+		// 2. 이름 해싱 (int64 키 생성)
+		int64 hash = StringHash(name);
 
-		m_pipelines[name] = RenderPipelineFactory([]() -> RenderPipelineUPtr { return MakeUnique<T>(); });
+		// 2. 팩토리 함수 등록
+		m_pipelines[hash] = []() -> RenderPipelineUPtr
+		{
+			return T::Create();
+		};
 	}
 }
-
-//template<typename T>
-//inline void RenderManager::RegisterPipeline(const std::string& name)
-//{
-//	m_pipelines[name] = []() -> RenderPipelineUPtr
-//	{
-//		return T::Create();
-//	};
-//}

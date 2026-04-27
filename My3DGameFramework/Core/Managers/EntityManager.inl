@@ -5,15 +5,15 @@ namespace MGF3D
 	/*===========================//
 	//     Component methods     //
 	//===========================*/
-	template<typename T>
-	inline T* EntityManager::AddComponent(ObjectIDHash ownerID)
+	template<typename T, typename... Args>
+	inline T* EntityManager::AddComponent(ObjectIDHash ownerID, Args&&... args)
 	{
 		usize typeIdx = T::s_typeIndex;
 		if (typeIdx >= m_registryLookup.size() || m_registryLookup[typeIdx] == nullptr)
 			return nullptr;
 
 		auto* registry = static_cast<ComponentRegistry<T>*>(m_registryLookup[typeIdx]);
-		return registry->AddComponent(ownerID);
+		return registry->AddComponent(ownerID, std::forward<Args>(args)...);
 	}
 
 	template<typename T>

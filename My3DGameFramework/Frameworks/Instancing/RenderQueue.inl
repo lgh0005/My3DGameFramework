@@ -1,4 +1,6 @@
 #pragma once
+#include "Meshes/Mesh.h"
+#include "Resources/Material.h"
 
 namespace MGF3D
 {
@@ -16,12 +18,12 @@ namespace MGF3D
         if (!mesh || !material) return;
 
         auto& batch = m_batches[mesh][material];
-        if (batch.instances.empty())
+        if (batch.GetInstances().empty())
         {
-            batch.mesh = mesh;
-            batch.material = material;
+            batch.SetMesh(mesh);
+            batch.SetMaterial(material);
         }
-        batch.instances.push_back(data);
+        batch.GetInstances().push_back(data);
     }
 
     template<typename T>
@@ -29,35 +31,20 @@ namespace MGF3D
     {
         for (auto& [meshPtr, materialMap] : m_batches)
         {
-            // 1. 메쉬 바인딩 (VAO)
-            meshPtr->Bind();
-
             for (auto& [materialPtr, batch] : materialMap)
             {
-                if (batch.instances.empty()) continue;
+                if (batch.GetInstances().empty()) continue;
 
-                // 2. 머티리얼 바인딩 (Shader, UBO, Textures)
-                materialPtr->Bind();
-
-                // 3. 인스턴스 데이터 전송 (SSBO)
-                usize requiredSize = batch.instances.size() * sizeof(T);
-
-                // 버퍼 크기가 부족하면 확장 (Growth Strategy)
+                // 1. 버퍼 크기 체크 및 확장
+                usize requiredSize = batch.GetInstances().size() * sizeof(T);
                 if (m_instanceBuffer->GetByteSize() < requiredSize)
                 {
-                    // 1.5배수로 넉넉하게 재할당하여 빈번한 Stall 방지
                     usize newSize = static_cast<usize>(requiredSize * 1.5f);
                     m_instanceBuffer = GLShaderStorageBuffer::Create(nullptr, newSize);
                 }
 
-                // DSA를 통한 고속 데이터 업로드
-                m_instanceBuffer->UpdateData(batch.instances.data(), 0, requiredSize);
-
-                // 지정된 슬롯(예: 1번)에 SSBO 바인딩
-                m_instanceBuffer->Bind(m_bindingSlot);
-
-                // 4. 인스턴싱 드로우 콜 실행
-                meshPtr->RenderInstanced(static_cast<uint32>(batch.instances.size()));
+                // 2. 배치에게 "네 짐(Data) 들고 가서 그려라" 명령
+                batch.Draw(m_bindingSlot, m_instanceBuffer.get());
             }
         }
     }

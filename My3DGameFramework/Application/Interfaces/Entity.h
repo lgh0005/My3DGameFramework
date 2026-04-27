@@ -21,8 +21,8 @@ namespace MGF3D
 	//     Component API          //
 	//============================*/
 	public:
-		template<typename T>
-		static T* AddComponent(ObjectIDHash ownerID);
+		template<typename T, typename... Args>
+		static T* AddComponent(ObjectIDHash ownerID, Args&&... args);
 
 		template<typename T>
 		static T* GetComponent(ObjectIDHash ownerID);

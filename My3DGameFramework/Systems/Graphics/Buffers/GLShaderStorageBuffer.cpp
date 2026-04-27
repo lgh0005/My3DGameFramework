@@ -15,7 +15,7 @@ namespace MGF3D
 
 	bool GLShaderStorageBuffer::Init(const void* data, usize byteSize)
 	{
-		if (byteSize == 0 || data == nullptr)
+		if (byteSize == 0)
 		{
 			MGF_LOG_ERROR("GLShaderStorageBuffer: Invalid byte size.");
 			return false;

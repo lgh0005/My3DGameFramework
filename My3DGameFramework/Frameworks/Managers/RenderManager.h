@@ -15,6 +15,7 @@ namespace MGF3D
 		~RenderManager();
 
 	public:
+		bool Init();
 		void Render();
 		void Resize();
 		void Shutdown();

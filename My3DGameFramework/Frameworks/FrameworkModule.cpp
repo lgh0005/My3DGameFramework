@@ -48,7 +48,7 @@ namespace MGF3D
 
 		// 2. Components 타입 베이킹
 		MGFTypeTree* componentTree = MGF_TYPE.GetTree("Component");
-		MeshRenderer::s_typeIndex = componentTree->Register("MeshRenderer", "Component");
+		MeshRenderer::s_typeIndex = componentTree->Register("MeshRenderer", "");
 
 		// 3. Component 레지스트리 주입
 		auto meshRendererReg = MakeUnique<ComponentRegistry<MeshRenderer>>();
@@ -57,6 +57,9 @@ namespace MGF3D
 
 	bool FrameworkModule::OnInit()
 	{
+		// 1. 렌더 매니저 초기화
+		if (!MGF_RENDER.Init()) return false;
+
 		return true;
 	}
 

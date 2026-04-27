@@ -17,9 +17,11 @@ namespace MGF3D
 		virtual void Clear() override;
 
 	public:
-		T* AddComponent(ObjectIDHash ownerID);
+		template<typename... Args>
+		T* AddComponent(ObjectIDHash ownerID, Args&&... args);
 		T* GetComponent(ObjectIDHash ownerID);
 		void RemoveComponent(ObjectIDHash ownerID);
+		const MGFPackedArray<T>& GetComponents() const { return m_components; }
 
 	private:
 		void FlushPendingAdds();

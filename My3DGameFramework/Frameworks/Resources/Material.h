@@ -26,7 +26,7 @@ namespace MGF3D
 
 	public:
 		virtual ~Material() override;
-		static MaterialPtr Create(StringView matName, const GraphicsProgramPtr& program);
+		static MaterialPtr Create(StringView matName);
 		virtual bool OnSyncCreate() override;
 
 	/*========================//
@@ -38,8 +38,6 @@ namespace MGF3D
 
 	public:
 		void Bind() const;
-		void SetProgram(const GraphicsProgramPtr& program);
-		GraphicsProgramPtr GetProgram() const { return m_program; }
 		void SetTexture(ETextureSlot slot, const GLTextureHandlePtr& texture);
 		GLTextureHandlePtr GetTexture(ETextureSlot slot) const;
 
@@ -77,7 +75,6 @@ namespace MGF3D
 	private:
 		Material(StringView name);
 
-		GraphicsProgramPtr  m_program;
 		GLUniformBufferUPtr m_materialBuffer;
 		Array<GLTextureHandlePtr, static_cast<usize>(ETextureSlot::Max)> m_textures;
 	};

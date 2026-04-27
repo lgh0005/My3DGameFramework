@@ -24,20 +24,15 @@ namespace MGF3D
 		return nullptr;
 	}
 
-	MaterialPtr Material::Create(StringView matName, const GraphicsProgramPtr& program)
+	MaterialPtr Material::Create(StringView matName)
 	{
 		auto material = MaterialPtr(new Material(matName));
-		if (program) material->SetProgram(program);
 		material->SetState(EResourceState::Loaded);
 		return material;
 	}
 
 	bool Material::OnSyncCreate()
 	{
-		// 1. 프로그램 로드 완료 검사
-		if (m_program && m_program->GetState() != EResourceState::Ready)
-			return false;
-
 		// 2. 머티리얼이 가질 모든 텍스쳐 로드 완료 검사
 		for (const auto& texture : m_textures)
 		{
@@ -57,11 +52,6 @@ namespace MGF3D
 		return true;
 	}
 
-	void Material::SetProgram(const GraphicsProgramPtr& program)
-	{
-		m_program = program;
-	}
-
 	void Material::SetTexture(ETextureSlot slot, const GLTextureHandlePtr& texture)
 	{
 		m_textures[static_cast<usize>(slot)] = texture;
@@ -74,10 +64,7 @@ namespace MGF3D
 
 	void Material::Bind() const
 	{
-		if (m_state != EResourceState::Ready || !m_program || !m_materialBuffer) return;
-
-		// 1. 셰이더 사용
-		m_program->Use();
+		if (m_state != EResourceState::Ready || !m_materialBuffer) return;
 
 		// 2. 래퍼 클래스를 이용한 데이터 업데이트 및 바인딩
 		MaterialData data;

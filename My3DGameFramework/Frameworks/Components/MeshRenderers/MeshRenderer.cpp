@@ -22,7 +22,7 @@ namespace MGF3D
 	int16 MeshRenderer::s_typeIndex = -1;
 	const MGFType* MeshRenderer::GetType() const
 	{
-		MGFTypeTree* tree = MGF_TYPE.GetTree("MeshRenderer");
+		MGFTypeTree* tree = MGF_TYPE.GetTree("Component");
 		if (tree != nullptr) return tree->GetType(s_typeIndex);
 		return nullptr;
 	}

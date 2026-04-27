@@ -38,7 +38,8 @@ namespace MGF3D
 	//    Component API                 //
 	//==================================*/
 	template<typename T>
-	inline T* ComponentRegistry<T>::AddComponent(ObjectIDHash ownerID)
+	template<typename... Args>
+	inline T* ComponentRegistry<T>::AddComponent(ObjectIDHash ownerID, Args&&... args)
 	{
 		MGF_STATIC_ASSERT
 		(
@@ -52,7 +53,7 @@ namespace MGF3D
 		if (m_components.Has(index))
 			return m_components.Get(index);
 
-		T* newComponent = &m_components.Emplace(index, ownerID, ownerID);
+		T* newComponent = &m_components.Emplace(index, ownerID, ownerID, std::forward<Args>(args)...);
 		m_pendingAdds.push_back(ownerID);
 		return newComponent;
 	}

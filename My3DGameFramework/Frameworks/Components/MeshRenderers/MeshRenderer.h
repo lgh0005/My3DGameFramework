@@ -30,6 +30,10 @@ namespace MGF3D
 		static int16 s_typeIndex;
 		virtual const MGFType* GetType() const override;
 
+	public:
+		Mesh* GetMesh() const { return m_mesh.get(); }
+		Material* GetMaterial() const { return m_material.get(); }
+
 	private:
 		MeshPtr     m_mesh		  { nullptr };
 		MaterialPtr m_material    { nullptr };

@@ -9,31 +9,31 @@ namespace MGF3D
 		MGF_DISABLE_COPY(SkinnedMeshRenderer)
 		using Super = MeshRenderer;
 
-	public:
-		SkinnedMeshRenderer
-		(
-			ObjectIDHash id, ObjectIDHash ownerID,
-			const SkinnedMeshPtr& mesh, const MaterialPtr& materialHash,
-			Animator* animator = nullptr
-		);
+	//public:
+	//	SkinnedMeshRenderer
+	//	(
+	//		ObjectIDHash id, ObjectIDHash ownerID,
+	//		const SkinnedMeshPtr& mesh, const MaterialPtr& materialHash,
+	//		Animator* animator = nullptr
+	//	);
 
-	/*=========================================//
-	//       SkinnedMeshRenderer Type          //
-	//=========================================*/
-	public:
-		static int16 s_typeIndex;
-		virtual const MGFType* GetType() const override;
+	///*=========================================//
+	////       SkinnedMeshRenderer Type          //
+	////=========================================*/
+	//public:
+	//	static int16 s_typeIndex;
+	//	virtual const MGFType* GetType() const override;
 
-	/*======================================//
-	//   SkinnedMeshRenderer methods        //
-	//======================================*/
-	public:
-		void SetAnimator(Animator* animator) { m_animator = animator; }
-		Animator* GetAnimator() const { return m_animator; }
-		const Vector<mat4>* GetBoneMatrices() const;
+	///*======================================//
+	////   SkinnedMeshRenderer methods        //
+	////======================================*/
+	//public:
+	//	void SetAnimator(Animator* animator) { m_animator = animator; }
+	//	Animator* GetAnimator() const { return m_animator; }
+	//	const Vector<mat4>* GetBoneMatrices() const;
 
-	private:
-		Animator* m_animator{ nullptr };
+	//private:
+	//	Animator* m_animator{ nullptr };
 	};
 }
 

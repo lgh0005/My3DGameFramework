@@ -5,6 +5,7 @@
 
 #pragma region MANAGERS
 #include "Managers/TypeManager.h"
+#include "Managers/RenderManager.h"
 #pragma endregion
 
 #pragma region TYPES
@@ -31,6 +32,12 @@ namespace MGF3D
 
 	bool RuntimeModule::OnInit()
 	{
+		// 1. 렌더 매니저에 테스트용 파이프라인 등록
+		MGF_RENDER.RegisterRenderPipeline<TestPipeline>("TestPipeline");
+
+		// 2. 현재 활성 파이프라인으로 설정
+		MGF_RENDER.SetRenderPipeline("TestPipeline");
+
 		return true;
 	}
 

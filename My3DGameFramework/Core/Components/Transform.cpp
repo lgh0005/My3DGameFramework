@@ -43,4 +43,18 @@ namespace MGF3D
 		m_localScale = scale;
 		SetTransformDirty();
 	}
+
+	const mat4& Transform::GetWorldMatrix() const
+	{
+		if (m_isTransformDirty)
+		{
+			mat4 translation = glm::translate(mat4(1.0f), m_localPosition);
+			mat4 rotation = glm::mat4_cast(m_localRotation);
+			mat4 scale = glm::scale(mat4(1.0f), m_localScale);
+			m_worldMatrix = translation * rotation * scale;
+			ClearTransformDirty();
+		}
+
+		return m_worldMatrix;
+	}
 }
