@@ -11,7 +11,7 @@ namespace MGF3D
 	public:
 		virtual bool OnSyncCreate() override = 0;
 		void Bind(uint32 slot) const;
-		void Unbind(uint32 slot) const;
+		static void Unbind(uint32 slot);
 
 	/*==========================//
 	//   GLTextureHandle Type   //

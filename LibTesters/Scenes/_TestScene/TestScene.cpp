@@ -1,6 +1,7 @@
 #include "GamePch.h"
 #include "TestScene.h"
 #include "Managers/TypeManager.h"
+#include "Managers/AssetManager.h"
 #include "Managers/ResourceManager.h"
 
 #include "Components/Transform.h"
@@ -10,7 +11,8 @@
 #include "Meshes/StaticMesh.h"
 #include "Resources/Material.h"
 #include "GraphicsUtils/GeometryUtils.h"
-#include "Programs/GraphicsProgram.h"
+
+#include "Assets/Image.h"
 
 namespace MGF3D
 {
@@ -28,8 +30,15 @@ namespace MGF3D
 		return nullptr;
 	}
 
-	bool TestScene::OnLoadSceneResources()
+	bool TestScene::OnLoadSceneSources()
 	{
+		auto sharedMaterial = MGF_RESOURCE.GetOrCreate<Material>("SharedCubeMaterial");
+		sharedMaterial->SetTexture
+		(
+			ETextureSlot::Albedo,
+			MGF_ASSET.LoadAssetAsync<Image>("@GameAsset/Images/baked/brickwall.ktx")
+		);
+
 		return true;
 	}
 
@@ -44,7 +53,7 @@ namespace MGF3D
 
 		// [핵심] 자원은 메모리에 딱 한 번만 생성하여 공유합니다.
 		StaticMeshPtr sharedMesh = GeometryUtils::CreateBox();
-		MaterialPtr sharedMaterial = Material::Create("SharedCubeMaterial");
+		MaterialPtr sharedMaterial = MGF_RESOURCE.Get<Material>("SharedCubeMaterial");
 
 		// 2. 객체 생성 [첫 번째 큐브]
 		ObjectIDHash cubeID1 = Entities::Create("Cube1");

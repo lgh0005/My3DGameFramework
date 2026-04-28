@@ -14,7 +14,7 @@ namespace MGF3D
 		void Bind(uint32 bindingIndex) const;
 		void BindToRange(uint32 bindingIndex, usize offset, usize size) const;
 		void UpdateData(const void* data, usize offset, usize size);
-		void Unbind(uint32 bindingIndex) const;
+		static void Unbind(uint32 bindingIndex);
 
 	private:
 		GLUniformBuffer();

@@ -56,7 +56,7 @@ namespace MGF3D
 		auto handle = MGFTypeCaster::Cast<GLTextureHandle>(res);
 		if (!handle) return false;
 
-		handle->SetKtxTexture(kTexture);
+		// handle->SetKtxTexture(kTexture);
 		handle->SetState(EResourceState::Loaded);
 
 		// 5. 만든 리소스들 저장

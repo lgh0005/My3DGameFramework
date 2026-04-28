@@ -23,7 +23,7 @@ namespace MGF3D
 	//   TestScene Main Logic  //
 	//=========================*/
 	private:
-		virtual bool OnLoadSceneResources() override;
+		virtual bool OnLoadSceneSources() override;
 		virtual bool OnPlaceActors() override;
 	};
 }

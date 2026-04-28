@@ -51,7 +51,7 @@ namespace MGF3D
 		glBindTextureUnit(unit, m_texture);
 	}
 
-	void GLTextureBuffer::Unbind(uint32 unit) const
+	void GLTextureBuffer::Unbind(uint32 unit)
 	{
 		glBindTextureUnit(unit, 0);
 	}

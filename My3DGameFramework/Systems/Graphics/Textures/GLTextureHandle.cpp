@@ -32,7 +32,7 @@ namespace MGF3D
 		glBindTextureUnit(slot, m_handle);
 	}
 
-	void GLTextureHandle::Unbind(uint32 slot) const
+	void GLTextureHandle::Unbind(uint32 slot)
 	{
 		glBindTextureUnit(slot, 0);
 	}

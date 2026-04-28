@@ -27,7 +27,7 @@ namespace MGF3D
 	//=======================================*/
 	protected:
 		Scene();
-		virtual bool OnLoadSceneResources() = 0;
+		virtual bool OnLoadSceneSources()   = 0;
 		virtual bool OnPlaceActors()		= 0;
 	};
 }

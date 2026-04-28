@@ -45,13 +45,9 @@ namespace MGF3D
 
 	bool GLTexture2D::OnSyncCreate()
 	{
-		bool success = CommonUtils::Select
-		(
-			m_ktxTexture != nullptr,
-			CreateFromKtx(),
-			AllocateStorage(m_width, m_height, m_vkFormat, m_levels)
-		);
-
+		bool success = false;
+		if (m_ktxTexture != nullptr) success = CreateFromKtx();
+		else success = AllocateStorage(m_width, m_height, m_vkFormat, m_levels);
 		if (success) m_state = EResourceState::Ready;
 		return success;
 	}

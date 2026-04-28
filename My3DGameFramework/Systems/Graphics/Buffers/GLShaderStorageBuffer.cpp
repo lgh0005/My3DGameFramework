@@ -67,7 +67,7 @@ namespace MGF3D
 		glNamedBufferSubData(m_handle, offset, size, data);
 	}
 
-	void GLShaderStorageBuffer::Unbind(uint32 bindingIndex) const
+	void GLShaderStorageBuffer::Unbind(uint32 bindingIndex)
 	{
 		glBindBufferBase(GL_SHADER_STORAGE_BUFFER, bindingIndex, 0);
 	}

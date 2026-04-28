@@ -12,7 +12,7 @@ namespace MGF3D
 	
 	public:
 		void Bind(uint32 unit) const;
-		void Unbind(uint32 unit) const;
+		static void Unbind(uint32 unit);
 		void UpdateData(const void* data, usize offset, usize size);
 		uint32 GetTexture() const;
 

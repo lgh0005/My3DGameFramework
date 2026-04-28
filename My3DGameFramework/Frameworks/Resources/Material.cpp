@@ -1,7 +1,7 @@
 ﻿#include "FrameworkPch.h"
 #include "Material.h"
 #include "Managers/TypeManager.h"
-#include "Programs/GraphicsProgram.h"
+#include "Assets/Image.h"
 #include "Textures/GLTextureHandle.h"
 #include "Buffers/GLUniformBuffer.h"
 
@@ -9,7 +9,7 @@ namespace MGF3D
 {
 	Material::Material(StringView name) : Super(name) 
 	{
-		m_textures.fill(nullptr);
+		m_images.fill(nullptr);
 	}
 	Material::~Material() = default;
 
@@ -33,33 +33,26 @@ namespace MGF3D
 
 	bool Material::OnSyncCreate()
 	{
-		// 2. 머티리얼이 가질 모든 텍스쳐 로드 완료 검사
-		for (const auto& texture : m_textures)
-		{
-			if (texture && texture->GetState() != EResourceState::Ready)
-				return false;
-		}
-
-		// 3. 머티리얼 UBO 생성
+		// 1. 머티리얼 UBO 생성
 		if (!m_materialBuffer)
 		{
 			MaterialData data; // 초기값으로 생성
 			m_materialBuffer = GLUniformBuffer::Create(&data, sizeof(MaterialData));
 		}
 
-		// 3. 머티리얼 로드 완료
+		// 2. 머티리얼 로드 완료
 		m_state = EResourceState::Ready;
 		return true;
 	}
 
-	void Material::SetTexture(ETextureSlot slot, const GLTextureHandlePtr& texture)
+	void Material::SetTexture(ETextureSlot slot, const ImagePtr& image)
 	{
-		m_textures[static_cast<usize>(slot)] = texture;
+		m_images[static_cast<usize>(slot)] = image;
 	}
 
-	GLTextureHandlePtr Material::GetTexture(ETextureSlot slot) const
+	ImagePtr Material::GetTexture(ETextureSlot slot) const
 	{
-		return m_textures[static_cast<usize>(slot)];
+		return m_images[static_cast<usize>(slot)];
 	}
 
 	void Material::Bind() const
@@ -76,18 +69,32 @@ namespace MGF3D
 		data.metallicFactor = metallicFactor;
 		data.roughnessFactor = roughnessFactor;
 
-		// 내부에서 glNamedBufferSubData 호출
+		// 내부에서 glNamedBufferSubData 호출 및 바인딩
 		m_materialBuffer->UpdateData(&data, 0, sizeof(MaterialData));
-
-		// 내부에서 glBindBufferBase 호출 (Binding Index: 2)
 		m_materialBuffer->Bind(2);
 
 		// 3. 텍스처 바인딩
 		for (uint32 i = 0; i < static_cast<uint32>(ETextureSlot::Max); ++i)
 		{
-			const auto& texture = m_textures[i];
-			if (texture && texture->GetState() == EResourceState::Ready) texture->Bind(i);
-			else texture->Unbind(i);
+			bool success = false;
+			const auto& image = m_images[i];
+
+			// 에셋이 있고, 로드가 완료된 상태인지 확인
+			if (image && image->GetState() >= EAssetState::Loaded)
+			{
+				const auto& resources = image->GetResources();
+				if (!resources.empty())
+				{
+					auto texture = MGFTypeCaster::Cast<GLTextureHandle>(resources[0]);
+					if (texture && texture->GetState() == EResourceState::Ready)
+					{
+						texture->Bind(i);
+						success = true;
+					}
+				}
+			}
+
+			if (!success) GLTextureHandle::Unbind(i);
 		}
 	}
 }

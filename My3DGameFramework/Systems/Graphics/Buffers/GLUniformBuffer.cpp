@@ -67,7 +67,7 @@ namespace MGF3D
 		glNamedBufferSubData(m_handle, offset, size, data);
 	}
 
-	void GLUniformBuffer::Unbind(uint32 bindingIndex) const
+	void GLUniformBuffer::Unbind(uint32 bindingIndex)
 	{
 		glBindBufferBase(GL_UNIFORM_BUFFER, bindingIndex, 0);
 	}

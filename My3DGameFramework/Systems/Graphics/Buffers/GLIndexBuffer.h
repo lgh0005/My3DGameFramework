@@ -12,7 +12,7 @@ namespace MGF3D
 
 	public:
 		void Bind(uint32 vao);
-		void Unbind(uint32 vao);
+		static void Unbind(uint32 vao);
 
 	private:
 		GLIndexBuffer();

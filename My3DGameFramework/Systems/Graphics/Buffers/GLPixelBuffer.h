@@ -29,7 +29,7 @@ namespace MGF3D
 
 	public:
 		void Bind(Type type) const;
-		void Unbind(Type type) const;
+		static void Unbind(Type type);
 		void* Map(Access access);
 		void Unmap();
 

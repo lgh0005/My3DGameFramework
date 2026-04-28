@@ -12,7 +12,7 @@ namespace MGF3D
 	
 	public:
 		void Bind(uint32 vao, uint32 bindingIndex, uint32 stride, uint32 offset = 0);
-		void Unbind(uint32 vao, uint32 bindingIndex);
+		static void Unbind(uint32 vao, uint32 bindingIndex);
 
 	private:
 		GLVertexBuffer();

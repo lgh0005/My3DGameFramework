@@ -44,7 +44,7 @@ namespace MGF3D
 		glBindBuffer(target, m_handle);
 	}
 
-	void GLPixelBuffer::Unbind(Type type) const
+	void GLPixelBuffer::Unbind(Type type)
 	{
 		uint32 target = CommonUtils::Select(type == Type::Pack, GL_PIXEL_PACK_BUFFER, GL_PIXEL_UNPACK_BUFFER);
 		glBindBuffer(target, 0);

@@ -28,7 +28,7 @@ namespace MGF3D
 	bool Scene::Init()
 	{
 		// 1. 엔진 레벨 리소스 로드
-		if (!OnLoadSceneResources()) return false;
+		if (!OnLoadSceneSources()) return false;
 
 		// 2. Actor들을 배치
 		if (!OnPlaceActors()) return false;

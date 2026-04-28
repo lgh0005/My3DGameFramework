@@ -4,8 +4,7 @@
 
 namespace MGF3D
 {
-	MGF_CLASS_PTR(GraphicsProgram)
-	MGF_CLASS_PTR(GLTextureHandle)
+	MGF_CLASS_PTR(Image)
 	MGF_CLASS_PTR(GLUniformBuffer)
 
 	enum class ETextureSlot : uint8
@@ -38,8 +37,8 @@ namespace MGF3D
 
 	public:
 		void Bind() const;
-		void SetTexture(ETextureSlot slot, const GLTextureHandlePtr& texture);
-		GLTextureHandlePtr GetTexture(ETextureSlot slot) const;
+		void SetTexture(ETextureSlot slot, const ImagePtr& image);
+		ImagePtr GetTexture(ETextureSlot slot) const;
 
 	/*==================================//
 	//       Material Parameters        //
@@ -76,6 +75,6 @@ namespace MGF3D
 		Material(StringView name);
 
 		GLUniformBufferUPtr m_materialBuffer;
-		Array<GLTextureHandlePtr, static_cast<usize>(ETextureSlot::Max)> m_textures;
+		Array<ImagePtr, static_cast<usize>(ETextureSlot::Max)> m_images;
 	};
 }
