@@ -62,15 +62,6 @@ namespace MGF3D
 
 		// 3. 프로그램 사용 (glUseProgram)
 		m_program->Use();
-	
-		// 1. 카메라의 위치와 주시점 설정
-		vec3 eye = vec3(2.0f, 0.0f, 5.0f);  // 카메라를 +5 지점으로 옮깁니다. (안전하게)
-		vec3 center = vec3(0.0f, 0.0f, 0.0f);  // 원점(큐브)을 바라봅니다.
-		vec3 up     = vec3(0.0f, 1.0f, 0.0f);  // 위쪽 방향
-		mat4 view = glm::lookAt(eye, center, up);
-		mat4 proj = glm::perspective(glm::radians(45.0f), (float)WINDOW_WIDTH / (float)WINDOW_HEIGHT, 0.1f, 100.0f);
-		mat4 viewProj = proj * view;
-		m_program->SetUniform("uViewProj", viewProj);
 
 		// 4. 큐 실행
 		// 정적 메쉬 렌더링 (Slot 1 사용)

@@ -40,6 +40,7 @@ namespace MGF3D
 		auto* transform = Entities::AddComponent<Transform>(playerID);
 		auto* camera = Entities::AddComponent<Camera>(playerID);
 		transform->SetLocalPosition(vec3(0.0f, 0.0f, 5.0f));
+		camera->SetProjection(45.0f, (float)WINDOW_WIDTH / (float)WINDOW_HEIGHT, 0.1f, 100.0f);
 
 		// [핵심] 자원은 메모리에 딱 한 번만 생성하여 공유합니다.
 		StaticMeshPtr sharedMesh = GeometryUtils::CreateBox();

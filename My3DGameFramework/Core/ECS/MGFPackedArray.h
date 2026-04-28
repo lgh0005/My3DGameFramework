@@ -1,4 +1,6 @@
 #pragma once
+#include "ECS/MGFChunk.h"
+#include "Constants/ConstantChunk.h"
 
 namespace MGF3D
 {
@@ -6,10 +8,22 @@ namespace MGF3D
 	class MGFPackedArray
 	{
 	private:
-		Vector<T> m_data;
+		// 실제 데이터가 담긴 고정된 메모리 블록들
+		using ChunkType = MGFChunk<T, CHUNK_SIZE>;
+		Vector<UniquePtr<ChunkType>> m_storage;
+
+		// 2. 순회 및 그룹화를 위한 포인터 배열(Packed Array)
+		Vector<T*> m_data;
+
+		// 3. 매핑 정보
 		HashMap<int32, int32> m_entityToIndex;
 		HashMap<int32, int32> m_indexToEntity;
-		int32 m_boundaryIndex { 0 };
+		HashMap<int32, usize> m_entityToStorageIndex;
+
+		// 4. 삭제된 칸 재사용을 위한 Free List
+		Vector<usize> m_freeSlots;
+		int32 m_boundaryIndex{ 0 };
+		usize m_totalStorageCapacity{ 0 };
 
 	public:
 		MGFPackedArray();
@@ -35,9 +49,9 @@ namespace MGF3D
 		auto begin() const { return m_data.begin(); }
 		auto end() const { return m_data.end(); }
 
-		T* GetData() { return m_data.data(); }
+		T** GetData() { return m_data.data(); }
 		usize GetSize() const { return m_data.size(); }
 	};
 }
 
-#include "Types/MGFPackedArray.inl"
+#include "ECS/MGFPackedArray.inl"

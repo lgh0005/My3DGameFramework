@@ -14,12 +14,15 @@ set(SOURCES
     "Types/FileStream.h" "Types/Math.h"
     "Types/SmartPtrs.h" "Types/Strings.h"
     "Types/Types.h"
-    "Types/MGFPackedArray.h"    "Types/MGFPackedArray.cpp"    "Types/MGFPackedArray.inl"
 
     # Constants
     "Constants/ConstantMath.h"        "Constants/ConstantAsset.h" 
     "Constants/ConstantStringHash.h"  "Constants/ConstantType.h" 
-    "Constants/ConstantString.h"
+    "Constants/ConstantString.h"      "Constants/ConstantChunk.h"
+
+    # ECS
+    "ECS/MGFChunk.h"    "ECS/MGFChunk.cpp"    "ECS/MGFChunk.inl"
+    "ECS/MGFPackedArray.h"    "ECS/MGFPackedArray.cpp"    "ECS/MGFPackedArray.inl"
 
     # Defines
     "Defines/DefineAsserter.h"          "Defines/DefineBreakpoint.h"
@@ -40,6 +43,7 @@ set(SOURCES
     "Components/Camera.h"           "Components/Camera.cpp"
 
     # Mechanics
+    "Mechanics/TransformHierarchy.h"       "Mechanics/TransformHierarchy.cpp"
     #"Mechanics/Velocitybuffer.h"       "Mechanics/Velocitybuffer.cpp"
 
     # States

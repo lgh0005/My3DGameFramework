@@ -4,7 +4,7 @@
 
 namespace MGF3D
 {
-	Transform::Transform(ObjectIDHash id, ObjectIDHash ownerID) : Super(id, ownerID) { }
+	Transform::Transform(ObjectIDHash id, ObjectIDHash ownerID) : Super(id, ownerID), m_hierarchy(this) { }
 	Transform::~Transform() = default;
 	Transform::Transform(Transform&& other) noexcept = default;
 	Transform& Transform::operator=(Transform&& other) noexcept = default;
@@ -44,17 +44,41 @@ namespace MGF3D
 		SetTransformDirty();
 	}
 
-	const mat4& Transform::GetWorldMatrix() const
+	/*===================================//
+	//      Hierarchy & World Methods    //
+	//===================================*/
+	void Transform::SetParent(Transform* parent)
 	{
-		if (m_isTransformDirty)
-		{
-			mat4 translation = glm::translate(mat4(1.0f), m_localPosition);
-			mat4 rotation = glm::mat4_cast(m_localRotation);
-			mat4 scale = glm::scale(mat4(1.0f), m_localScale);
-			m_worldMatrix = translation * rotation * scale;
-			ClearTransformDirty();
-		}
+		m_hierarchy.SetParent(parent);
+	}
 
-		return m_worldMatrix;
+	Transform* Transform::GetParent() const
+	{
+		return m_hierarchy.GetParent();
+	}
+
+	void Transform::AddChild(Transform* child)
+	{
+		m_hierarchy.AddChild(child);
+	}
+
+	void Transform::RemoveChild(Transform* child)
+	{
+		m_hierarchy.RemoveChild(child);
+	}
+
+	vec3 Transform::GetWorldPosition() const
+	{
+		return m_hierarchy.ExtractWorldPosition();
+	}
+
+	quat Transform::GetWorldRotation() const
+	{
+		return m_hierarchy.ExtractWorldRotation();
+	}
+
+	vec3 Transform::GetWorldScale() const
+	{
+		return m_hierarchy.ExtractWorldScale();
 	}
 }

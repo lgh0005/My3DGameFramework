@@ -28,6 +28,12 @@
 #include "Components/Camera.h"
 #pragma endregion
 
+#pragma region MECHANICS
+#include "Entities/Mechanic.h"
+#include "Mechanics/TransformHierarchy.h"
+// #include "Mechanics/Velocitybuffer.h"
+#pragma endregion
+
 #pragma region RESOURCE
 #include "Sources/Resource.h"
 #include "Sources/NamedResource.h"
@@ -61,6 +67,11 @@ namespace MGF3D
 		auto cameraReg = MakeUnique<ComponentRegistry<Camera>>();
 		MGF_ENTITY.AddComponentRegistry(Transform::s_typeIndex, std::move(transformReg));
 		MGF_ENTITY.AddComponentRegistry(Camera::s_typeIndex, std::move(cameraReg));
+
+		// 4. Mechanic 계층 트리
+		MGFTypeTree& mechanicTree = MGF_TYPE.CreateTree("Mechanics");
+		Mechanic::s_typeIndex = mechanicTree.Register("Mechanic", "");
+		TransformHierarchy::s_typeIndex = mechanicTree.Register("TransformHierarchy", "Mechanic");
 
 		// 4. Resource 트리 생성
 		MGFTypeTree& resourceTree = MGF_TYPE.CreateTree("Resource");

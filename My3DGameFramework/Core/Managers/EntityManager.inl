@@ -33,6 +33,7 @@ namespace MGF3D
 		usize typeIdx = T::s_typeIndex;
 		if (typeIdx >= m_registryLookup.size() || m_registryLookup[typeIdx] == nullptr)
 			return nullptr;
+
 		return static_cast<ComponentRegistry<T>*>(m_registryLookup[typeIdx]);
 	}
 }

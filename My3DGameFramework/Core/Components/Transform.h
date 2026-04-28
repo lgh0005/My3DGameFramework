@@ -1,5 +1,6 @@
 ﻿#pragma once
 #include "Entities/Component.h"
+#include "Mechanics/TransformHierarchy.h"
 
 namespace MGF3D
 {
@@ -35,24 +36,31 @@ namespace MGF3D
 		const quat& GetLocalRotation() const { return m_localRotation; }
 		const vec3& GetLocalScale() const { return m_localScale; }
 
-		const mat4& GetWorldMatrix() const;
-		void SetWorldMatrix(const mat4& matrix) { m_worldMatrix = matrix; }
+		const mat4& GetWorldMatrix() const { return m_hierarchy.GetWorldMatrix(); }
+		bool IsTransformDirty() const { return m_hierarchy.IsTransformDirty(); }
+		void SetTransformDirty() const { m_hierarchy.SetTransformDirty(); }
 
-		bool IsTransformDirty() const { return m_isTransformDirty; }
-		void SetTransformDirty() const { m_isTransformDirty = true; }
-		void ClearTransformDirty() const { m_isTransformDirty = false; }
+	/*===================================//
+	//      Hierarchy & World Methods    //
+	//===================================*/
+	public:
+		void SetParent(Transform* parent);
+		Transform* GetParent() const;
+		void AddChild(Transform* child);
+		void RemoveChild(Transform* child);
+
+		vec3 GetWorldPosition() const;
+		quat GetWorldRotation() const;
+		vec3 GetWorldScale() const;
 
 	private:
+
+		// 계층 및 연산 부품 (Mechanic)
+		TransformHierarchy m_hierarchy;
 
 		// 로컬 공간 데이터
 		vec3 m_localPosition { 0.0f, 0.0f, 0.0f };
 		quat m_localRotation { 1.0f, 0.0f, 0.0f, 0.0f };
 		vec3 m_localScale	 { 1.0f, 1.0f, 1.0f };
-
-		// 계산된 월드 행렬
-		mutable mat4 m_worldMatrix{ 1.0f };
-
-		// 월드 행렬 갱신 필요 여부
-		mutable bool m_isTransformDirty { true };
 	};
 }

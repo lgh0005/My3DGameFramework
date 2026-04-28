@@ -9,26 +9,52 @@ namespace MGF3D
 	template<typename ...Args>
 	inline T& MGFPackedArray<T>::Emplace(int32 id, Args && ...args)
 	{
-		if (Has(id))
+		if (Has(id)) return *Get(id);
+
+		// 1. Storage에서 사용 가능한 절대 인덱스 결정
+		usize targetStorageIdx;
+		if (!m_freeSlots.empty())
 		{
-			MGF_LOG_WARN("MGFPackedArray: Entity {0} already has this component/object.", id);
-			return m_data[m_entityToIndex[id]];
+			targetStorageIdx = m_freeSlots.back();
+			m_freeSlots.pop_back();
 		}
 
-		int32 newIndex = static_cast<int32>(m_data.size());
-		m_entityToIndex[id] = newIndex;
-		m_indexToEntity[newIndex] = id;
+		// 새로운 칸이 필요할 때
+		else targetStorageIdx = m_totalStorageCapacity++;
 
-		// 메모리 풀의 맨 끝에 객체를 직접 생성하여 반환
-		return m_data.emplace_back(std::forward<Args>(args)...);
+		// 2. 필요하다면 새로운 Chunk 할당
+		usize chunkIdx = targetStorageIdx / CHUNK_SIZE;
+		usize localIdx = targetStorageIdx % CHUNK_SIZE;
+		while(m_storage.size() <= chunkIdx)
+			m_storage.push_back(MakeUnique<ChunkType>());
+
+		// 3. Chunk에 객체 생성
+		T* newObjPtr = m_storage[chunkIdx]->Allocate(localIdx, std::forward<Args>(args)...);
+
+		// 4. 포인터 명부(Packed Array) 업데이트
+		int32 newPackedIdx = static_cast<int32>(m_data.size());
+		m_data.push_back(newObjPtr);
+
+		m_entityToIndex[id] = newPackedIdx;
+		m_indexToEntity[newPackedIdx] = id;
+		m_entityToStorageIndex[id] = targetStorageIdx;
+
+		return *newObjPtr;
 	}
 
 	template<typename T>
 	inline void MGFPackedArray<T>::Clear()
 	{
+		m_storage.clear();
 		m_data.clear();
+
 		m_entityToIndex.clear();
 		m_indexToEntity.clear();
+		m_entityToStorageIndex.clear();
+
+		m_freeSlots.clear();
+		m_boundaryIndex = 0;
+		m_totalStorageCapacity = 0;
 	}
 
 	template<typename T>
@@ -100,6 +126,13 @@ namespace MGF3D
 		// 이렇게 하면 m_boundaryIndex가 안전하게 감소하고, 삭제할 대상은 Back 그룹 구역으로 이동합니다.
 		if (it->second < m_boundaryIndex) MoveToBackGroup(id);
 
+		// 1. Storage에서 객체 해제 및 인덱스 반납
+		usize storageIdx = m_entityToStorageIndex[id];
+		usize chunkIdx = storageIdx / CHUNK_SIZE;
+		usize localIdx = storageIdx % CHUNK_SIZE;
+		m_storage[chunkIdx]->Free(localIdx);
+		m_freeSlots.push_back(storageIdx);
+
 		// 2. 이제 기존의 Swap-and-Pop 로직 수행 (배열의 맨 끝과 스왑 후 제거)
 		int32 indexOfRemoved = m_entityToIndex[id];
 		int32 indexOfLast = static_cast<int32>(m_data.size()) - 1;
@@ -114,6 +147,7 @@ namespace MGF3D
 
 		m_entityToIndex.erase(id);
 		m_indexToEntity.erase(indexOfLast);
+		m_entityToStorageIndex.erase(id);
 		m_data.pop_back();
 	}
 
@@ -121,7 +155,7 @@ namespace MGF3D
 	inline T* MGFPackedArray<T>::Get(int32 id)
 	{
 		auto it = m_entityToIndex.find(id);
-		if (it != m_entityToIndex.end()) return &m_data[it->second];
+		if (it != m_entityToIndex.end()) return m_data[it->second];
 		return nullptr;
 	}
 

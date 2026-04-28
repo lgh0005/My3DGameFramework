@@ -6,7 +6,6 @@
 #include "Components/MeshRenderers/MeshRenderer.h"
 //#include "Components/MeshRenderers/SkinnedMeshRenderer.h"
 
-
 namespace MGF3D
 {
 	InstanceManager::InstanceManager() = default;
@@ -25,16 +24,16 @@ namespace MGF3D
         if (!registry) return;
 
         const auto& renderers = registry->GetComponents();
-        for (const auto& renderer : renderers)
+        for (const auto* renderer : renderers)
         {
-            if (renderer.GetType()->selfIndex != MeshRenderer::s_typeIndex)
+            if (renderer->GetType()->selfIndex != MeshRenderer::s_typeIndex)
                 continue;
 
-            auto* transform = MGF_ENTITY.GetComponent<Transform>(renderer.GetOwnerID());
+            auto* transform = MGF_ENTITY.GetComponent<Transform>(renderer->GetOwnerID());
             if (!transform) continue;
 
-            Mesh* mesh = renderer.GetMesh();
-            Material* material = renderer.GetMaterial();
+            Mesh* mesh = renderer->GetMesh();
+            Material* material = renderer->GetMaterial();
             if (!mesh || !material) continue;
 
             StaticInstanceData data;
@@ -46,14 +45,14 @@ namespace MGF3D
 
     void InstanceManager::ExtractSkinnedMeshes(RenderContext* context)
     {
-  //      auto* registry = MGF_ENTITY.GetComponentRegistry<SkinnedMeshRenderer>();
-  //      if (!registry) return;
+        //  auto* registry = MGF_ENTITY.GetComponentRegistry<SkinnedMeshRenderer>();
+        //  if (!registry) return;
 
-  //      const auto& components = registry->GetComponents();
-		//for (const auto& renderer : components)
-		//{
-		//	if (renderer.GetType()->selfIndex != SkinnedMeshRenderer::s_typeIndex)
-		//		continue;
+        //  const auto& components = registry->GetComponents();
+		//  for (const auto& renderer : components)
+		//  {
+		//	  if (renderer.GetType()->selfIndex != SkinnedMeshRenderer::s_typeIndex)
+		//		  continue;
 
 		//	auto* transform = MGF_ENTITY.GetComponent<Transform>(renderer.GetOwnerID());
 		//	if (!transform) continue;

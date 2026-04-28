@@ -34,7 +34,7 @@ namespace MGF3D
 		Mesh* GetMesh() const { return m_mesh.get(); }
 		Material* GetMaterial() const { return m_material.get(); }
 
-	private:
+	protected:
 		MeshPtr     m_mesh		  { nullptr };
 		MaterialPtr m_material    { nullptr };
 	};
