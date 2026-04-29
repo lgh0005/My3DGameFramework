@@ -1,6 +1,7 @@
 ﻿#pragma once
 #include "Entities/Component.h"
 #include "Mechanics/TransformHierarchy.h"
+#include "Mechanics/TransformCoordinate.h"
 
 namespace MGF3D
 {
@@ -67,8 +68,9 @@ namespace MGF3D
 
 	private:
 
-		// 계층 및 연산 부품 (Mechanic)
+		// 계층 및 좌표계 부품 (Mechanic)
 		TransformHierarchy m_hierarchy;
+		TransformCoordinate m_coordinate;
 
 		// 로컬 공간 데이터
 		vec3 m_localPosition { 0.0f, 0.0f, 0.0f };

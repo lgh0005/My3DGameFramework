@@ -44,7 +44,8 @@ set(SOURCES
 
     # Mechanics
     "Mechanics/TransformHierarchy.h"       "Mechanics/TransformHierarchy.cpp"
-    #"Mechanics/Velocitybuffer.h"       "Mechanics/Velocitybuffer.cpp"
+    "Mechanics/TransformCoordinate.h"      "Mechanics/TransformCoordinate.cpp"
+    "Mechanics/CameraShutter.h"            "Mechanics/CameraShutter.cpp"
 
     # States
     "States/MGFStateMachine.h"        "States/MGFStateMachine.cpp"      "States/MGFStateMachine.inl"

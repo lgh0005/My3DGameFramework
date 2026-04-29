@@ -4,7 +4,7 @@
 
 namespace MGF3D
 {
-	Transform::Transform(ObjectIDHash id, ObjectIDHash ownerID) : Super(id, ownerID), m_hierarchy(this) { }
+	Transform::Transform(ObjectIDHash id, ObjectIDHash ownerID) : Super(id, ownerID), m_hierarchy(this), m_coordinate(this) { }
 	Transform::~Transform() = default;
 	Transform::Transform(Transform&& other) noexcept = default;
 	Transform& Transform::operator=(Transform&& other) noexcept = default;
@@ -28,7 +28,7 @@ namespace MGF3D
 
 	void Transform::SetLocalRotation(const vec3& eulerRotation)
 	{
-		m_localRotation = quat(eulerRotation);
+		m_localRotation = Math::ToQuat(eulerRotation);
 		SetTransformDirty();
 	}
 
@@ -46,17 +46,17 @@ namespace MGF3D
 
 	vec3 Transform::GetForward() const
 	{
-		return GetWorldRotation() * vec3(0.0f, 0.0f, -1.0f);
+		return m_coordinate.CalculateForward(GetWorldRotation());
 	}
 
 	vec3 Transform::GetRight() const
 	{
-		return GetWorldRotation() * vec3(1.0f, 0.0f, 0.0f);
+		return m_coordinate.CalculateRight(GetWorldRotation());
 	}
 
 	vec3 Transform::GetUp() const
 	{
-		return GetWorldRotation() * vec3(0.0f, 1.0f, 0.0f);
+		return m_coordinate.CalculateUp(GetWorldRotation());
 	}
 
 	/*=====================================//
@@ -71,7 +71,7 @@ namespace MGF3D
 
 	void Transform::Rotate(const vec3& eulerDelta)
 	{
-		m_localRotation = m_localRotation * quat(eulerDelta);
+		m_localRotation = m_localRotation * Math::ToQuat(eulerDelta);
 		SetTransformDirty();
 	}
 
@@ -87,6 +87,7 @@ namespace MGF3D
 	void Transform::SetParent(Transform* parent)
 	{
 		m_hierarchy.SetParent(parent);
+
 	}
 
 	Transform* Transform::GetParent() const
