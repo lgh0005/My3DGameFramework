@@ -13,6 +13,7 @@
 #include "Managers/WindowManager.h"
 #include "Managers/TimeManager.h"
 #include "Managers/SceneManager.h"
+#include "Managers/ScriptManager.h"
 #include "Managers/TypeManager.h"
 #include "Managers/AssetManager.h"
 #include "Managers/ResourceManager.h"
@@ -47,15 +48,6 @@ namespace MGF3D
 		// 0. CoreModule 초기화
 		if (!CoreModule::OnInit()) return false;
 
-		// 0-1. [DEBUG] 디바이스 가져오기 및 키 매핑
-		{
-			auto* kbd = MGF_INPUT.GetDevice<MGFKeyboardDevice>(); if (!kbd) return -1;
-			kbd->MapKey("Jump", GLFW_KEY_SPACE);
-
-			auto* mouse = MGF_INPUT.GetDevice<MGFMouseDevice>(); if (!mouse) return -1;
-			mouse->MapButton("Fire", GLFW_MOUSE_BUTTON_LEFT);
-		}
-
 		// 1. SystemModule 초기화
 		if (!GraphicsModule::OnInit()) return false;
 
@@ -72,21 +64,26 @@ namespace MGF3D
 	{
 		while (!MGF_WINDOW.ShouldClose())
 		{
+			// 1. 프레임 시작 및 시스템 갱신
 			MGF_TIME.Update();
 			MGF_WINDOW.Update();
+			MGF_INPUT.Update(MGF_WINDOW.GetNativeHandle());
 			MGF_RESOURCE.Update();
 			MGF_ASSET.Update();
 
-			// 2. [DEBUG] 액션 기반 로직 처리
-			{
-				MGF_INPUT.Update(MGF_WINDOW.GetNativeHandle());
-				if (MGF_INPUT.GetDevice<MGFKeyboardDevice>()->GetButtonDown("Jump")) MGF_LOG_INFO("Action: Jump!");
-				if (MGF_INPUT.GetDevice<MGFMouseDevice>()->GetButtonDown("Fire"))  MGF_LOG_INFO("Action: Fire!");
-			}
-
+			// 2. 메인 게임 로직 (가변 프레임)
+			MGF_SCRIPT.Update();
 			MGF_ENTITY.Update();
 			MGF_SCENE.Update();
+
+			// 3. 물리 및 고정 프레임 로직
+			MGF_SCRIPT.FixedUpdate();
 			MGF_TIME.FixedUpdate();
+
+			// 4. 후처리 로직 (렌더링 직전)
+			MGF_SCRIPT.LateUpdate();
+
+			// 5. 렌더링
 			MGF_RENDER.Render();
 			MGF_WINDOW.SwapWindowBuffers();
 		}

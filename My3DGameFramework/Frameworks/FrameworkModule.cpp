@@ -5,6 +5,7 @@
 #include "Managers/AssetManager.h"
 #include "Managers/ResourceManager.h"
 #include "Managers/RenderManager.h"
+#include "Managers/ScriptManager.h"
 #include "Managers/EntityManager.h"
 #include "Managers/TypeManager.h"
 #pragma endregion
@@ -24,6 +25,7 @@
 #pragma region COMPONENT
 #include "Registries/ComponentRegistry.h"
 #include "Components/MeshRenderers/MeshRenderer.h"
+#include "Components/Script/Script.h"
 #pragma endregion
 
 #pragma region RESOURCE
@@ -49,6 +51,7 @@ namespace MGF3D
 		// 2. Components 타입 베이킹
 		MGFTypeTree* componentTree = MGF_TYPE.GetTree("Component");
 		MeshRenderer::s_typeIndex = componentTree->Register("MeshRenderer", "");
+		Script::s_typeIndex = componentTree->Register("Script", "");
 
 		// 3. Component 레지스트리 주입
 		auto meshRendererReg = MakeUnique<ComponentRegistry<MeshRenderer>>();
@@ -60,6 +63,9 @@ namespace MGF3D
 		// 1. 렌더 매니저 초기화
 		if (!MGF_RENDER.Init()) return false;
 
+		// 2. 스크립트 매니저 초기화
+		if (!MGF_SCRIPT.Init()) return false;
+
 		return true;
 	}
 
@@ -70,6 +76,9 @@ namespace MGF3D
 
 		// 1. 에셋 매니저 종료
 		MGF_ASSET.Shutdown();
+
+		// 2. 스크립트 매니저 종료
+		MGF_SCRIPT.Shutdown();
 
 		// 3. 렌더 매니저 종료
 		MGF_RENDER.Shutdown();

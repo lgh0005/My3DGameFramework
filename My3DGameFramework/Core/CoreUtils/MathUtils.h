@@ -14,6 +14,8 @@ namespace MGF3D
 		template<typename T> static constexpr T Max(const T& a, const T& b) noexcept;
 		template<typename T> static constexpr T Abs(const T& v) noexcept;
 		template<typename T> static constexpr T Square(const T& v) noexcept;
+		template<typename T> static constexpr T Clamp(const T& v, const T& lo, const T& hi) noexcept;
+		template<typename T> static constexpr T Saturate(const T& v) noexcept;
 		static float Sqrt(float v) noexcept;
 		static float InverseSqrt(float v) noexcept;
 
@@ -56,8 +58,8 @@ namespace MGF3D
 	//   rad or degree angle  //
 	//========================*/
 	public:
-		static constexpr float ToRadians(float degrees) noexcept;
-		static constexpr float ToDegrees(float radians) noexcept;
+		static float ToRadians(float degrees) noexcept;
+		static float ToDegrees(float radians) noexcept;
 		static vec3 ToRadians(const vec3& degrees) noexcept;
 		static vec3 ToDegrees(const vec3& radians) noexcept;
 
@@ -79,6 +81,7 @@ namespace MGF3D
 	public:
 		static quat ToQuat(const vec3& eulerDegrees);
 		static vec3 ToEuler(const quat& q);
+		static quat AngleAxis(float radians, const vec3& axis) noexcept;
 
 	/*====================//
 	//   interpolations   //

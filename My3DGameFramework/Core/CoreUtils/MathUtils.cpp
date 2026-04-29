@@ -172,6 +172,11 @@ namespace MGF3D
 		return ToDegrees(glm::eulerAngles(q));
 	}
 
+	quat Math::AngleAxis(float radians, const vec3& axis) noexcept
+	{
+		return glm::angleAxis(radians, Normalize(axis));
+	}
+
 	/*====================//
 	//   interpolations   //
 	//====================*/

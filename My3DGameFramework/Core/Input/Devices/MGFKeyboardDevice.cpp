@@ -54,8 +54,9 @@ namespace MGF3D
 	bool MGFKeyboardDevice::GetButton(StringView actionName) const
 	{
 		StringHash hash{ actionName };
-		auto it { m_currentStates.find(hash) };
-		return CommonUtils::Select(it != m_currentStates.end(), it->second, false);
+		auto it = m_currentStates.find(hash);
+		if (it == m_currentStates.end()) return false;
+		return it->second;
 	}
 
 	bool MGFKeyboardDevice::GetButtonDown(StringView actionName) const

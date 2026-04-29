@@ -53,6 +53,18 @@ namespace MGF3D
 	}
 
 	template<typename T>
+	inline constexpr T Math::Clamp(const T& v, const T& lo, const T& hi) noexcept
+	{
+		return (v < lo) ? lo : (hi < v) ? hi : v;
+	}
+
+	template<typename T>
+	inline constexpr T Math::Saturate(const T& v) noexcept
+	{
+		return Clamp(v, static_cast<T>(0), static_cast<T>(1));
+	}
+
+	template<typename T>
 	inline constexpr T Math::Abs(const T& v) noexcept
 	{
 		return glm::abs(v);
@@ -80,12 +92,12 @@ namespace MGF3D
 	/*========================//
 	//   rad or degree angle  //
 	//========================*/
-	inline constexpr float Math::ToRadians(float degrees) noexcept
+	inline float Math::ToRadians(float degrees) noexcept
 	{
 		return degrees * DEG_TO_RAD;
 	}
 
-	inline constexpr float Math::ToDegrees(float radians) noexcept
+	inline float Math::ToDegrees(float radians) noexcept
 	{
 		return radians * DEG_TO_RAD;
 	}

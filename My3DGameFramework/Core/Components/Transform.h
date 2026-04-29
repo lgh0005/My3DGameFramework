@@ -32,6 +32,10 @@ namespace MGF3D
 		void SetLocalRotation(const quat& quatRotation);
 		void SetLocalScale(const vec3& scale);
 
+		vec3 GetForward() const;
+		vec3 GetRight()   const;
+		vec3 GetUp()      const;
+
 		const vec3& GetLocalPosition() const { return m_localPosition; }
 		const quat& GetLocalRotation() const { return m_localRotation; }
 		const vec3& GetLocalScale() const { return m_localScale; }
@@ -39,6 +43,14 @@ namespace MGF3D
 		const mat4& GetWorldMatrix() const { return m_hierarchy.GetWorldMatrix(); }
 		bool IsTransformDirty() const { return m_hierarchy.IsTransformDirty(); }
 		void SetTransformDirty() const { m_hierarchy.SetTransformDirty(); }
+
+	/*=====================================//
+	//      default translation methods    //
+	//=====================================*/
+	public:
+		void Translate(const vec3& delta);
+		void Rotate(const vec3& eulerDelta);
+		void Scale(const vec3& delta);
 
 	/*===================================//
 	//      Hierarchy & World Methods    //

@@ -19,7 +19,6 @@ namespace MGF3D
         RegisterDevice<MGFMouseDevice>();
 
         // 2. 등록된 장치들 초기화
-        uint32 activeDeviceCount = 0;
         for (auto& device : m_devices)
         {
             // Vector는 중간에 빈 슬롯이 있을 수 있으므로 nullptr 체크가 필수입니다.
@@ -30,7 +29,6 @@ namespace MGF3D
                     MGF_LOG_ERROR("Failed to initialize input device.");
                     return false;
                 }
-                activeDeviceCount++;
             }
         }
 
@@ -38,7 +36,7 @@ namespace MGF3D
         MGFInputInterface::Install(window);
 
 		// 4. 초기화 완료 로그
-        MGF_LOG_INFO("InputManager initialized with {} devices.", activeDeviceCount);
+        MGF_LOG_INFO("InputManager initialized with default PC devices.");
         return true;
     }
 

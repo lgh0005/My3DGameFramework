@@ -14,3 +14,4 @@
 #include "Interfaces/Levels.h"
 #include "Interfaces/Pipelines.h"
 #include "Interfaces/Scenes.h"
+#include "Interfaces/Scripts.h"

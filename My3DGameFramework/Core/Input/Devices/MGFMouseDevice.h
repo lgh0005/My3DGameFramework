@@ -36,13 +36,16 @@ namespace MGF3D
 		void OnMouseButton(int32 button, int32 action);
 		void OnCursorPos(double x, double y);
 		const vec2& GetMousePos() const { return m_mousePos; }
+		const vec2& GetDelta() const { return m_mouseDelta; }
 
 	private:
+		Array<Vector<MGFMouseAction*>, 16> m_buttonBindings;
 		HashMap<StringHash, MGFMouseActionUPtr> m_actions;
 		HashMap<StringHash, bool> m_currentStates;
 		HashMap<StringHash, bool> m_prevStates;
 
-		Array<Vector<MGFMouseAction*>, 16> m_buttonBindings;
 		vec2 m_mousePos{ 0.0f, 0.0f };
+		vec2 m_prevMousePos{ 0.0f, 0.0f };
+		vec2 m_mouseDelta{ 0.0f, 0.0f }; 
 	};
 }

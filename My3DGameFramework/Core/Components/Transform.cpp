@@ -44,6 +44,43 @@ namespace MGF3D
 		SetTransformDirty();
 	}
 
+	vec3 Transform::GetForward() const
+	{
+		return GetWorldRotation() * vec3(0.0f, 0.0f, -1.0f);
+	}
+
+	vec3 Transform::GetRight() const
+	{
+		return GetWorldRotation() * vec3(1.0f, 0.0f, 0.0f);
+	}
+
+	vec3 Transform::GetUp() const
+	{
+		return GetWorldRotation() * vec3(0.0f, 1.0f, 0.0f);
+	}
+
+	/*=====================================//
+	//      Default Translation Methods    //
+	//=====================================*/
+
+	void Transform::Translate(const vec3& delta)
+	{
+		m_localPosition += delta;
+		SetTransformDirty();
+	}
+
+	void Transform::Rotate(const vec3& eulerDelta)
+	{
+		m_localRotation = m_localRotation * quat(eulerDelta);
+		SetTransformDirty();
+	}
+
+	void Transform::Scale(const vec3& delta)
+	{
+		m_localScale *= delta;
+		SetTransformDirty();
+	}
+
 	/*===================================//
 	//      Hierarchy & World Methods    //
 	//===================================*/

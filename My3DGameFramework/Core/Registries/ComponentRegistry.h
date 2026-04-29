@@ -23,11 +23,11 @@ namespace MGF3D
 		void RemoveComponent(ObjectIDHash ownerID);
 		const MGFPackedArray<T>& GetComponents() const { return m_components; }
 
-	private:
+	protected:
 		void FlushPendingAdds();
 		void FlushPendingKills();
 
-	private:
+	protected:
 		MGFPackedArray<T> m_components;
 
 		Vector<ObjectIDHash> m_pendingAdds;

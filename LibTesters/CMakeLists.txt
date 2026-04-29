@@ -11,6 +11,7 @@ set(LIB_TEST_SOURCE
     "Scenes/_TestScene/TestScene.h"     "Scenes/_TestScene/TestScene.cpp"
 
     # Scripts
+    "Scripts/CameraController.h"     "Scripts/CameraController.cpp"
 )
 
 # 2. Visual Studio 필터 자동 생성

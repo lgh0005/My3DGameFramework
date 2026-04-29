@@ -12,6 +12,8 @@
 #include "Resources/Material.h"
 #include "GraphicsUtils/GeometryUtils.h"
 
+#include "Scripts/CameraController.h"
+
 #include "Assets/Image.h"
 
 namespace MGF3D
@@ -48,6 +50,7 @@ namespace MGF3D
 		ObjectIDHash playerID = Entities::Create("MainPlayer");
 		auto* transform = Entities::AddComponent<Transform>(playerID);
 		auto* camera = Entities::AddComponent<Camera>(playerID);
+		auto* controller = Scripts::AddScript<CameraController>(playerID);
 		transform->SetLocalPosition(vec3(0.0f, 0.0f, 5.0f));
 		camera->SetProjection(45.0f, (float)WINDOW_WIDTH / (float)WINDOW_HEIGHT, 0.1f, 100.0f);
 

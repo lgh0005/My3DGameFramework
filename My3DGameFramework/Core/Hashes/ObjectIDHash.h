@@ -29,3 +29,5 @@ namespace MGF3D
 }
 
 #include "Hashes/ObjectIDHash.inl"
+
+MGF_REGISTER_HASH(ObjectIDHash, uint32)

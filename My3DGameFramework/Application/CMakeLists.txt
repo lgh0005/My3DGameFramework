@@ -22,6 +22,7 @@ set(SOURCES
     "Interfaces/Pipelines.h"    "Interfaces/Pipelines.cpp"
     "Interfaces/Inputs.h"       "Interfaces/Inputs.cpp"
     "Interfaces/Entity.h"       "Interfaces/Entity.cpp"      "Interfaces/Entity.inl"
+    "Interfaces/Scripts.h"      "Interfaces/Scripts.cpp"     "Interfaces/Scripts.inl"
 
     # Level
     "Level/Level.h"     "Level/Level.cpp"

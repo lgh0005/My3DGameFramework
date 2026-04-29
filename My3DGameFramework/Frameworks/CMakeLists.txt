@@ -17,6 +17,10 @@ set(SOURCES
     "Managers/ResourceManager.h"    "Managers/ResourceManager.cpp"   "Managers/ResourceManager.inl"
     "Managers/RenderManager.h"      "Managers/RenderManager.cpp"     "Managers/RenderManager.inl"
     "Managers/InstanceManager.h"    "Managers/InstanceManager.cpp"
+    "Managers/ScriptManager.h"      "Managers/ScriptManager.cpp"
+
+    # Registries
+    "Registries/ScriptRegistry.h"     "Registries/ScriptRegistry.cpp"
 
     # Components
     # "Components/Animation/Animator.h"       "Components/Animation/Animator.cpp"
@@ -36,7 +40,7 @@ set(SOURCES
     # "Components/MeshRenderers/MeshOutline.h"           "Components/MeshRenderers/MeshOutline.cpp" 
     # "Components/Physics/PhysicsComponent.h"            "Components/Physics/PhysicsComponent.cpp" 
     # "Components/Physics/Rigidbody.h"                  "Components/Physics/Rigidbody.cpp" 
-    # "Components/Script/Script.h"                  "Components/Script/Script.cpp" 
+    "Components/Script/Script.h"                  "Components/Script/Script.cpp" 
 
     # Mechanics
     # "Mechanics/Animation/AnimChannel.h"             "Mechanics/Animation/AnimChannel.cpp"

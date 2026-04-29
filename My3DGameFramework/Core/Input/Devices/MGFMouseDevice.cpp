@@ -33,10 +33,14 @@ namespace MGF3D
 	{
 		if (window == nullptr) return;
 
-		// 1. 이전 프레임 상태 백업
+		// 1. 이번 프레임의 변화량(Delta) 계산
+		m_mouseDelta = m_mousePos - m_prevMousePos;
+		m_prevMousePos = m_mousePos;
+
+		// 2. 이전 프레임 상태 백업
 		m_prevStates = m_currentStates;
 
-		// 2. 등록된 모든 액션의 상태를 폴링(Polling)하여 업데이트
+		// 3. 등록된 모든 액션의 상태를 폴링(Polling)하여 업데이트
 		for (auto& [hash, action] : m_actions)
 			m_currentStates[hash] = action->CheckRawState(window);
 	}
@@ -54,8 +58,9 @@ namespace MGF3D
 	bool MGFMouseDevice::GetButton(StringView actionName) const
 	{
 		StringHash hash{ actionName };
-		auto it{ m_currentStates.find(hash) };
-		return CommonUtils::Select(it != m_currentStates.end(), it->second, false);
+		auto it = m_currentStates.find(hash);
+		if (it == m_currentStates.end()) return false;
+		return it->second;
 	}
 
 	bool MGFMouseDevice::GetButtonDown(StringView actionName) const
