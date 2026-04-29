@@ -183,4 +183,73 @@ namespace MGF3D
         if (mesh->OnSyncCreate()) mesh->SetState(EResourceState::Ready);
         return mesh;
     }
+
+    StaticMeshPtr GeometryUtils::CreateCone(float radius, float height, uint32 segments)
+    {
+        Vector<StaticVertex> vertices;
+        Vector<uint32> indices;
+
+        // 1. 정점 데이터 구성
+        // [0] : 꼭짓점 (Apex)
+        vertices.push_back(StaticVertex{ vec3(0.0f, 0.0f, 0.0f), vec3(0.0f, 0.0f, 1.0f), vec2(0.5f, 0.5f), vec3(0.0f) });
+
+        // [1] : 밑면 중심 (Base Center)
+        vertices.push_back(StaticVertex{ vec3(0.0f, 0.0f, -height), vec3(0.0f, 0.0f, -1.0f), vec2(0.5f, 0.5f), vec3(0.0f) });
+
+        // 밑면 테두리 정점들
+        float angleStep = TWO_PI / (float)segments;
+        for (uint32 i = 0; i <= segments; i++)
+        {
+            float angle = (float)i * angleStep;
+            float x = radius * Math::Cos(angle);
+            float y = radius * Math::Sin(angle);
+            vec3 pos = vec3(x, y, -height);
+            vec3 normal = Math::Normalize(pos);
+            vec2 uv = vec2(x / radius * 0.5f + 0.5f, y / radius * 0.5f + 0.5f);
+            vertices.push_back(StaticVertex{ pos, normal, uv, vec3(0.0f) });
+        }
+
+        // 2. 인덱스 데이터 구성
+        uint32 baseOffset = 2;
+        for (uint32 i = 0; i < segments; i++)
+        {
+            uint32 current = baseOffset + i;
+            uint32 next = baseOffset + i + 1;
+
+            // 옆면 (Apex -> 테두리)
+            indices.push_back(0);
+            indices.push_back(current);
+            indices.push_back(next);
+
+            // 밑면 (Center -> 테두리)
+            indices.push_back(1);
+            indices.push_back(next);
+            indices.push_back(current);
+        }
+
+        // 3. 탄젠트 계산
+        ComputeTangents<StaticVertex>(vertices, indices);
+
+        // 4. 바운딩 박스(AABB) 계산
+        vec3 minBound(MAX_FLOAT);
+        vec3 maxBound(MIN_FLOAT);
+        for (const auto& v : vertices)
+        {
+            minBound = Math::Min(minBound, v.position);
+            maxBound = Math::Max(maxBound, v.position);
+        }
+
+        // 5. 메쉬 생성 (GL_TRIANGLES)
+        auto mesh = StaticMesh::Create(std::move(vertices), std::move(indices), GL_TRIANGLES);
+        if (!mesh) return nullptr;
+
+        // 6. 렌더링 바운드 설정
+        RenderBounds bounds;
+        bounds.SetFromMinMax(minBound, maxBound);
+        mesh->SetLocalBounds(bounds);
+
+        // 7. GPU 업로드 및 상태 설정
+        if (mesh->OnSyncCreate()) mesh->SetState(EResourceState::Ready);
+        return mesh;
+    }
 }

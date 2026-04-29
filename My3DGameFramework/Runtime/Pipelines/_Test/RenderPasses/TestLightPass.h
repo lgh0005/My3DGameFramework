@@ -5,12 +5,12 @@ namespace MGF3D
 {
 	MGF_CLASS_PTR(GraphicsProgram)
 
-	MGF_CLASS_PTR(TestRenderPass)
-	class TestRenderPass : public RenderPass
+	MGF_CLASS_PTR(TestLightPass)
+	class TestLightPass : public RenderPass
 	{
 	public:
-		virtual ~TestRenderPass();
-		static TestRenderPassUPtr Create();
+		virtual ~TestLightPass();
+		static TestLightPassUPtr Create();
 
 	/*=================================//
 	//   MGF3D RenderPass Custom Type  //
@@ -23,7 +23,7 @@ namespace MGF3D
 		virtual void Execute(RenderContext* context) override;
 
 	private:
-		TestRenderPass();
+		TestLightPass();
 		bool Init();
 
 		GraphicsProgramPtr m_program;

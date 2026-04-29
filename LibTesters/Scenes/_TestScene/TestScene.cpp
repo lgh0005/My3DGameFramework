@@ -55,7 +55,7 @@ namespace MGF3D
 		camera->SetProjection(45.0f, (float)WINDOW_WIDTH / (float)WINDOW_HEIGHT, 0.1f, 100.0f);
 
 		// [핵심] 자원은 메모리에 딱 한 번만 생성하여 공유합니다.
-		StaticMeshPtr sharedMesh = GeometryUtils::CreateBox();
+		StaticMeshPtr sharedMesh = GeometryUtils::CreateCone();
 		MaterialPtr sharedMaterial = MGF_RESOURCE.Get<Material>("SharedCubeMaterial");
 
 		// 2. 객체 생성 [첫 번째 큐브]

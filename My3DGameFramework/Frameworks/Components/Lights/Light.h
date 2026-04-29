@@ -1,46 +1,41 @@
 ﻿#pragma once
-#include "Object/Component.h"
+#include "Entities/Component.h"
 
-enum class LightType
+namespace MGF3D
 {
-    Directional,
-    Point,
-    Spot
-};
+	MGF_CLASS_PTR(Light)
+	class Light : public Component
+	{
+		MGF_DISABLE_COPY(Light)
+		using Super = Component;
 
-CLASS_PTR(Light)
-class Light : public Component
-{
-    using Super = Component;
-    DEFINE_COMPONENT_TYPE(ComponentType::Light)
+	public:
+		virtual ~Light() override;
+		Light(Light&& other) noexcept;
+		Light& operator=(Light&& other) noexcept;
 
-public:
-    virtual ~Light();
-    virtual bool MatchesType(ComponentType type) const override;
+	/*================================//
+	//   MGF3D Component Custom Type  //
+	//================================*/
+	public:
+		static int16 s_typeIndex;
+		virtual const MGFType* GetType() const;
 
-    const glm::vec3& GetAmbient() const { return m_ambient; }
-    const glm::vec3& GetDiffuse() const { return m_diffuse; }
-    const glm::vec3& GetSpecular() const { return m_specular; }
-    const float      GetIntensity() const { return m_intensity; }
-    bool  IsCastShadow() const { return m_castShadow; }
-    int32 GetShadowMapIndex() const { return m_shadowMapIndex; }
-    const glm::mat4& GetLightSpaceMatrix() const { return m_lightSpaceMatrix; }
+	public:
+		void SetColor(const vec3& color) { m_color = color; }
+		const vec3& GetColor() const { return m_color; }
 
-    void SetAmbient(const glm::vec3& ambient) { m_ambient = ambient; }
-    void SetDiffuse(const glm::vec3& diffuse) { m_diffuse = diffuse; }
-    void SetSpecular(const glm::vec3& specular) { m_specular = specular; }
-    void SetIntensity(float intensity) { m_intensity = intensity; }
-    void SetCastShadow(bool cast) { m_castShadow = cast; }
-    void SetShadowMapIndex(int32 index) { m_shadowMapIndex = index; }
-    void SetLightSpaceMatrix(const glm::mat4& matrix) { m_lightSpaceMatrix = matrix; }
+		void SetIntensity(float intensity) { m_intensity = intensity; }
+		float GetIntensity() const { return m_intensity; }
 
-protected:
-    Light();
-    glm::vec3 m_ambient         { glm::vec3(0.1f, 0.1f, 0.1f) };
-    glm::vec3 m_diffuse         { glm::vec3(0.5f, 0.5f, 0.5f) };
-    glm::vec3 m_specular        { glm::vec3(1.0f, 1.0f, 1.0f) };
-    float     m_intensity       { 1.0f };
-    bool      m_castShadow      { false };
-    int32     m_shadowMapIndex  { -1 };
-    glm::mat4 m_lightSpaceMatrix{ glm::mat4(1.0f) };
-};
+		void SetCastShadow(bool cast) { m_castShadow = cast; }
+		bool IsCastShadow() const { return m_castShadow; }
+
+	protected:
+		Light(ObjectIDHash id, ObjectIDHash ownerID);
+
+		vec3  m_color{ 1.0f, 1.0f, 1.0f };
+		float m_intensity{ 1.0f };
+		bool  m_castShadow{ false };
+	};
+}

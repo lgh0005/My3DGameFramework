@@ -16,6 +16,12 @@ namespace MGF3D
 			uint32 latiSegmentCount = 16, 
 			uint32 longiSegmentCount = 32
 		);
+		static StaticMeshPtr CreateCone
+		(
+			float radius = 1.0f,
+			float height = 1.0f,
+			uint32 segments = 32
+		);
 
 	public:
 		template<typename T>

@@ -1,12 +1,20 @@
-﻿#include "EnginePch.h"
+﻿#include "FrameworkPch.h"
 #include "DirectionalLight.h"
-#include "Components/Transform.h"
+#include "Managers/TypeManager.h"
 
-DECLARE_DEFAULTS_IMPL(DirectionalLight)
-
-DirectionalLightUPtr DirectionalLight::Create()
+namespace MGF3D
 {
-	auto pointLight = DirectionalLightUPtr(new DirectionalLight());
-	if (!pointLight) return nullptr;
-	return pointLight;
+	DirectionalLight::DirectionalLight(ObjectIDHash id, ObjectIDHash ownerID) : Super(id, ownerID) {}
+	DirectionalLight::~DirectionalLight() = default;
+
+	/*=========================//
+	//    Scene Custom Type    //
+	//=========================*/
+	int16 DirectionalLight::s_typeIndex = -1;
+	const MGFType* DirectionalLight::GetType() const
+	{
+		MGFTypeTree* tree = MGF_TYPE.GetTree("Component");
+		if (tree != nullptr) return tree->GetType(s_typeIndex);
+		return nullptr;
+	}
 }

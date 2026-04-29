@@ -1,28 +1,29 @@
 ﻿#pragma once
-#include "Light.h"
+#include "Components/Lights/Light.h"
 
-// TODO : 더 이후에는 Compute shading을 통해서 최적화를 할 수 있겠지만, 그건 이후에
-// 차근차근 더 공부하고 보강해보는 것으로 한다.
-
-#pragma region FORWARD_DECLARATION
-CLASS_PTR(Transform)
-#pragma endregion
-
-CLASS_PTR(PointLight)
-class PointLight : public Light
+namespace MGF3D
 {
-	DEFINE_COMPONENT_TYPE(ComponentType::PointLight)
+	MGF_CLASS_PTR(PointLight)
+	class PointLight : public Light
+	{
+		using Super = Light;
 
-public:
-	virtual ~PointLight();
-	static PointLightUPtr Create();
+	public:
+		PointLight(ObjectIDHash id, ObjectIDHash ownerID);
+		virtual ~PointLight() override;
 
-	const float GetDistance() const { return m_distance; }
-	const glm::vec3 GetAttenuation() const      { return Utils::GetAttenuationCoeff(m_distance); }
+	/*================================//
+	//   MGF3D Component Custom Type  //
+	//================================*/
+	public:
+		static int16 s_typeIndex;
+		virtual const MGFType* GetType() const override;
 
-	void SetDistance(float distance)			{ m_distance = distance; }
+	public:
+		void SetRange(float range) { m_range = range; }
+		float GetRange() const { return m_range; }
 
-private:
-	PointLight();
-	float     m_distance	{ 32.0f };
-};
+	private:
+		float m_range{ 10.0f };
+	};
+}

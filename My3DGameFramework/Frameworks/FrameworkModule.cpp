@@ -26,6 +26,10 @@
 #include "Registries/ComponentRegistry.h"
 #include "Components/MeshRenderers/MeshRenderer.h"
 #include "Components/Script/Script.h"
+#include "Components/Lights/Light.h"
+#include "Components/Lights/DirectionalLight.h"
+#include "Components/Lights/SpotLight.h"
+#include "Components/Lights/PointLight.h"
 #pragma endregion
 
 #pragma region RESOURCE
@@ -50,8 +54,15 @@ namespace MGF3D
 
 		// 2. Components 타입 베이킹
 		MGFTypeTree* componentTree = MGF_TYPE.GetTree("Component");
+
 		MeshRenderer::s_typeIndex = componentTree->Register("MeshRenderer", "");
+
 		Script::s_typeIndex = componentTree->Register("Script", "");
+
+		Light::s_typeIndex = componentTree->Register("Light", "");
+		DirectionalLight::s_typeIndex = componentTree->Register("DirectionalLight", "Light");
+		SpotLight::s_typeIndex = componentTree->Register("SpotLight", "Light");
+		PointLight::s_typeIndex = componentTree->Register("PointLight", "Light");
 
 		// 3. Component 레지스트리 주입
 		auto meshRendererReg = MakeUnique<ComponentRegistry<MeshRenderer>>();

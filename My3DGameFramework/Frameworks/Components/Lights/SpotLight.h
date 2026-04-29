@@ -1,35 +1,35 @@
 ﻿#pragma once
-#include "Light.h"
+#include "Components/Lights/Light.h"
 
-// TODO : 더 이후에는 Compute shading을 통해서 최적화를 할 수 있겠지만, 그건 이후에
-// 차근차근 더 공부하고 보강해보는 것으로 한다.
-
-#pragma region FORWARD_DECLARATION
-CLASS_PTR(Transform)
-#pragma endregion
-
-CLASS_PTR(SpotLight)
-class SpotLight : public Light
+namespace MGF3D
 {
-	DEFINE_COMPONENT_TYPE(ComponentType::SpotLight)
+	MGF_CLASS_PTR(SpotLight)
+	class SpotLight : public Light
+	{
+		using Super = Light;
 
-public:
-	virtual ~SpotLight();
-	static SpotLightUPtr Create();
+	public:
+		virtual ~SpotLight() override;
+		SpotLight(ObjectIDHash id, ObjectIDHash ownerID);
 
-	const glm::vec2 GetCutoff()				const { return m_cutoff; }
-	const float GetDistance()				const { return m_distance; }
-	const glm::vec3& GetDirection()			const { return m_direction; }
-	const glm::vec3 GetAttenuation()        const { return Utils::GetAttenuationCoeff(m_distance); }
+	/*================================//
+	//   MGF3D Component Custom Type  //
+	//================================*/
+	public:
+		static int16 s_typeIndex;
+		virtual const MGFType* GetType() const override;
 
-	void SetCutoff(const glm::vec2& cutoff)		  { m_cutoff = cutoff; }
-	void SetDistance(float distance)			  { m_distance = distance; }
-	void SetDirection(const glm::vec3& direction) { m_direction = direction; }
+	public:
+		void SetRange(float range) { m_range = range; }
+		float GetRange() const { return m_range; }
 
-private:
-	SpotLight();
+		void SetSpotAngles(float innerDegree, float outerDegree);
+		float GetInnerCutoff() const { return m_innerCutoff; }
+		float GetOuterCutoff() const { return m_outerCutoff; }
 
-	glm::vec2 m_cutoff		{ 20.0f, 5.0f };
-	float m_distance		{ 32.0f };
-	glm::vec3 m_direction	{ glm::vec3(-0.2f, -1.0f, 0.3f) };
-};
+	private:
+		float m_range{ 10.0f };
+		float m_innerCutoff{ 0.0f };
+		float m_outerCutoff{ 0.0f };
+	};
+}

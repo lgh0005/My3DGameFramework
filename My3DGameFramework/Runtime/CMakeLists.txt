@@ -24,6 +24,7 @@ set(SOURCES
 
     # Test
     "Pipelines/_Test/TestPipeline.h"          "Pipelines/_Test/TestPipeline.cpp"
+    # "Pipelines/_Test/RenderPasses/TestLightPass.h"          "Pipelines/_Test/RenderPasses/TestLightPass.cpp"
     "Pipelines/_Test/RenderPasses/TestRenderPass.h"          "Pipelines/_Test/RenderPasses/TestRenderPass.cpp"
 
     # Managers
