@@ -7,7 +7,7 @@ layout(location = 3) in vec3 aTangent;
 
 layout(location = 0) out vec2 vTexCoord;
 layout(location = 1) out vec3 vWorldPos;
-layout(location = 2) out vec3 vNormal;
+layout(location = 2) out mat3 vTBN;
 
 // [SSBO] 인스턴싱 데이터
 struct InstanceData
@@ -40,8 +40,17 @@ void main()
     
     vWorldPos = worldPos.xyz;
     vTexCoord = aTexCoord;
-    vNormal = mat3(worldMat) * aNormal;
     
+    // 비균등 스케일을 고려한 노멀 행렬 계산
+    mat3 normalMatrix = transpose(inverse(mat3(worldMat)));
+
+    // TBN 벡터 월드 공간 변환
+    vec3 T = normalize(normalMatrix * aTangent);
+    vec3 N = normalize(normalMatrix * aNormal);
+    T = normalize(T - dot(T, N) * N);
+    vec3 B = cross(N, T);
+    vTBN = mat3(T, B, N);
+
     // 글로벌 데이터의 프로젝션, 뷰 행렬 사용
     gl_Position = uScene.projection * uScene.view * worldPos;
 }

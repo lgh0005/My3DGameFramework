@@ -41,6 +41,11 @@ namespace MGF3D
 			ETextureSlot::Albedo,
 			MGF_ASSET.LoadAssetAsync<Image>("@GameAsset/Images/baked/brickwall.ktx")
 		);
+		sharedMaterial->SetTexture
+		(
+			ETextureSlot::Normal,
+			MGF_ASSET.LoadAssetAsync<Image>("@GameAsset/Images/baked/brickwall_normal.ktx")
+		);
 
 		return true;
 	}
