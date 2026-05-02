@@ -3,6 +3,7 @@
 #include "Rendering/RenderContext.h"
 #include "Managers/EntityManager.h"
 #include "Managers/InstanceManager.h"
+#include "Managers/TimeManager.h"
 #include "Components/Transform.h"
 #include "Components/Camera.h"
 #include "Components/Lights/DirectionalLight.h"
@@ -25,19 +26,28 @@ namespace MGF3D
 		m_spotShadows.clear();
 	}
 
-	void RenderCollector::CollectCameras(RenderContext* context, const Camera* camera)
+	void RenderCollector::CollectGlobals(RenderContext* context, const Camera* camera)
 	{
 		if (!camera || !context) return;
 
-		CameraData camData;
-		camData.view = camera->GetViewMatrix();
-		camData.projection = camera->GetProjectionMatrix();
+		GlobalData globalData;
 
+		// 1. 카메라 데이터 수집
+		globalData.view = camera->GetViewMatrix();
+		globalData.projection = camera->GetProjectionMatrix();
 		Transform* camTransform = MGF_ENTITY.GetComponent<Transform>(camera->GetOwnerID());
-		camData.viewPos = camTransform->GetWorldPosition();
-		camData.pad0 = 0.0f;
+		globalData.viewPos = camTransform->GetWorldPosition();
 
-		context->UpdateCameras(camData);
+		// 2. 시간 데이터 수집
+		globalData.time = static_cast<float>(MGF_TIME.GetTime());
+
+		// 3. 조명 개수 수집
+		globalData.dirLightCount = static_cast<int32>(m_dirLights.size());
+		globalData.pointLightCount = static_cast<int32>(m_pointLights.size());
+		globalData.spotLightCount = static_cast<int32>(m_spotLights.size());
+		globalData.pad0 = 0;
+
+		context->UpdateGlobals(globalData);
 	}
 
 	void RenderCollector::CollectMeshData(RenderContext* context)

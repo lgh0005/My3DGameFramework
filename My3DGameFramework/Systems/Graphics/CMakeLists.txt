@@ -79,7 +79,7 @@ set(SOURCES
     "Vertices/StaticVertex.h" 
 
     # Uniforms
-    "Uniforms/CameraUniform.h"
+    "Uniforms/GlobalUniform.h"
     "Uniforms/MaterialUniform.h"
 
     # Utils

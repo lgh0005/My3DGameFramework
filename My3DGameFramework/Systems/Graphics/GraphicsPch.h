@@ -25,5 +25,5 @@
 /*====================//
 //  default uniforms  //
 //====================*/
-#include "Uniforms/CameraUniform.h"
+#include "Uniforms/GlobalUniform.h"
 #include "Uniforms/MaterialUniform.h"

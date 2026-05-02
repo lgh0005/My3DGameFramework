@@ -8,7 +8,7 @@
 #include "Instancing/Shadows/DirectionalShadowData.h"
 #include "Instancing/Shadows/PointShadowData.h"
 #include "Instancing/Shadows/SpotShadowData.h"
-#include "Uniforms/CameraUniform.h"
+#include "Uniforms/GlobalUniform.h"
 
 namespace MGF3D
 {
@@ -28,7 +28,7 @@ namespace MGF3D
 		void ClearQueues();
 
 	public:
-		void UpdateCameras(const CameraData& camera);
+		void UpdateGlobals(const GlobalData& globalData);
 		
 		void UpdateDirectionalLights(const Vector<DirectionalLightData>& lights);
 		void UpdatePointLights(const Vector<PointLightData>& lights);
@@ -48,7 +48,7 @@ namespace MGF3D
 		);
 
 	private:
-		GLUniformBufferUPtr m_cameraUBO;
+		GLUniformBufferUPtr m_globalUBO;
 		RenderQueue<StaticInstanceData>  m_staticQueue;
 		RenderQueue<SkinnedInstanceData> m_skinnedQueue;
 	

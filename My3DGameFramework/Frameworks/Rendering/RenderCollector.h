@@ -19,7 +19,7 @@ namespace MGF3D
 		~RenderCollector();
 
 	public:
-		void CollectCameras(RenderContext* context, const Camera* camera);
+		void CollectGlobals(RenderContext* context, const Camera* camera);
 		void CollectMeshData(RenderContext* context);
 	
 		void CollectDirectionalLights(RenderContext* context);

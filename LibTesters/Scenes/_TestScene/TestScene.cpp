@@ -7,6 +7,7 @@
 #include "Components/Transform.h"
 #include "Components/Camera.h"
 #include "Components/MeshRenderers/MeshRenderer.h"
+#include "Components/Lights/PointLight.h"
 
 #include "Meshes/StaticMesh.h"
 #include "Resources/Material.h"
@@ -55,7 +56,7 @@ namespace MGF3D
 		camera->SetProjection(45.0f, (float)WINDOW_WIDTH / (float)WINDOW_HEIGHT, 0.1f, 100.0f);
 
 		// [핵심] 자원은 메모리에 딱 한 번만 생성하여 공유합니다.
-		StaticMeshPtr sharedMesh = GeometryUtils::CreateCone();
+		StaticMeshPtr sharedMesh = GeometryUtils::CreateSphere();
 		MaterialPtr sharedMaterial = MGF_RESOURCE.Get<Material>("SharedCubeMaterial");
 
 		// 2. 객체 생성 [첫 번째 큐브]
@@ -69,6 +70,15 @@ namespace MGF3D
 		auto* cubeTransform2 = Entities::AddComponent<Transform>(cubeID2);
 		Entities::AddComponent<MeshRenderer>(cubeID2, sharedMesh, sharedMaterial);
 		cubeTransform2->SetLocalPosition(vec3(1.5f, 0.0f, 0.0f));
+
+		// 4. 객체 생성 [포인트 라이트]
+		ObjectIDHash lightID = Entities::Create("PointLight1");
+		auto* lightTransform = Entities::AddComponent<Transform>(lightID);
+		auto* pointLight = Entities::AddComponent<PointLight>(lightID);
+		lightTransform->SetLocalPosition(vec3(0.0f, 1.0f, 2.0f));
+		pointLight->SetColor(vec3(1.0f, 0.0f, 0.0f));
+		pointLight->SetIntensity(2.0f);
+		pointLight->SetRange(10.0f);
 
 		return true;
 	}

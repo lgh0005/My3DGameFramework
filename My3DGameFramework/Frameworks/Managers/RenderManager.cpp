@@ -8,7 +8,7 @@
 #include "Rendering/RenderCollector.h"
 #include "Components/Camera.h"
 #include "Components/Transform.h"
-#include "Uniforms/CameraUniform.h"
+#include "Uniforms/GlobalUniform.h"
 
 namespace MGF3D
 {
@@ -44,7 +44,7 @@ namespace MGF3D
 		for (const auto* camera : cameras)
 		{
 			// 3-1. 현재 카메라의 렌더링 데이터 수집
-			m_renderCollector->CollectCameras(m_renderContext.get(), camera);
+			m_renderCollector->CollectGlobals(m_renderContext.get(), camera);
 
 			// 3-2. 씬의 엔티티들로부터 메쉬 및 인스턴스 데이터 추출
 			m_renderCollector->CollectMeshData(m_renderContext.get());
