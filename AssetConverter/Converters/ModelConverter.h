@@ -1,70 +1,89 @@
 ﻿#pragma once
-#include "AssetTypes/AssetFormat.h"
 
-class ModelConverter
+namespace MGF3D
 {
-	DECLARE_SINGLE(ModelConverter)
+	class ModelConverter
+	{
+		MGF_DECLARE_SINGLE(ModelConverter)
 
-public:
-	bool Convert
-	(
-		const std::string& inputPath, 
-		const std::string& outputPath, 
-		bool extractORM, bool flipY = true
-	);
+	private:
+		ModelConverter();
+		~ModelConverter();
 
-private:
-	bool m_extractORM	{ false };
-	bool m_flipY		{ true };
+	public:
+		bool Convert
+		(
+			const String& inputPath,
+			const String& outputPath,
+			bool extractORM, bool flipY = true
+		);
 
-/*============================//
-//   main coversion methods   //
-//============================*/
-private:
-	bool RunConversion();
-	bool WriteCustomModelFile();
-	void CreateORMTextureFromAssimp(aiMaterial* material, AssetFmt::RawMaterial& rawMat, int32 index);
+	private:
+		bool m_extractORM{ false };
+		bool m_flipY{ true };
 
-	// 모델 데이터 구조체
-	AssetFmt::RawModel m_rawModel;
+		/*============================//
+		//   main coversion methods   //
+		//============================*/
+	private:
+		bool RunConversion();
+		bool WriteCustomModelFile();
+		void CreateORMTextureFromAssimp(aiMaterial* material, RawMaterial& rawMat, int32 index);
 
-	// 경로 문자열 멤버
-	std::string m_inputPath;
-	std::string m_outputPath;
-	std::string m_modelDirectory;
-	std::string m_modelName;
+		// 모델 데이터 구조체
+		RawModel m_rawModel;
 
-/*====================================//
-//   default assimp process methods   //
-//====================================*/
-private:
-	void ParseNodeHierarchy(const aiScene* scene);
-	void ProcessMesh(aiMesh* mesh, const aiScene* scene);
-	void ProcessSkinnedMesh(aiMesh* mesh, AssetFmt::RawMesh& rawMesh);
-	void ProcessStaticMesh(aiMesh* mesh, AssetFmt::RawMesh& rawMesh);
-	AssetFmt::RawMaterial ProcessMaterial(aiMaterial* material, int32 index);
+		// 경로 문자열 멤버
+		String m_inputPath;
+		String m_outputPath;
+		String m_modelDirectory;
+		String m_modelName;
 
-/*=========================================================//
-//   texture helper methods for material and ORM texture   //
-//=========================================================*/
-private:
-	std::string ResolveTexturePath(const std::string& relativePath);
-	void AddTextureToMaterial(AssetFmt::RawMaterial& rawMat, aiMaterial* aiMat, aiTextureType aiType, AssetFmt::RawTextureType rawType);
-	std::string GetTexturePath(aiMaterial* material, aiTextureType type);
-	void LogFinalMappedTextures(aiMaterial* material, const AssetFmt::RawMaterial& rawMat);
-	void ProcessTextureToKTX(AssetFmt::RawMaterial& rawMat, const std::string& srcFileName, AssetFmt::RawTextureType type);
+		/*====================================//
+		//   default assimp process methods   //
+		//====================================*/
+	private:
+		void ParseNodeHierarchy(const aiScene* scene);
+		void ProcessMesh(aiMesh* mesh, const aiScene* scene);
+		void ProcessSkinnedMesh(aiMesh* mesh, RawMesh& rawMesh);
+		void ProcessStaticMesh(aiMesh* mesh, RawMesh& rawMesh);
+		RawMaterial ProcessMaterial(aiMaterial* material, int32 index);
 
-	std::unordered_set<std::string> m_convertedTextures;
+		/*=========================================================//
+		//   texture helper methods for material and ORM texture   //
+		//=========================================================*/
+	private:
+		String ResolveTexturePath(const String& relativePath);
+		void AddTextureToMaterial(RawMaterial& rawMat, aiMaterial* aiMat, aiTextureType aiType, RawTextureType rawType);
+		String GetTexturePath(aiMaterial* material, aiTextureType type);
+		void LogFinalMappedTextures(aiMaterial* material, const RawMaterial& rawMat);
+		void ProcessTextureToKTX(RawMaterial& rawMat, const String& srcFileName, RawTextureType type);
 
-/*==========================================//
-//   skeleton and rigging process methods   //
-//==========================================*/
-private:
-	void ExtractBoneWeights(std::vector<AssetFmt::RawSkinnedVertex>& vertices, aiMesh* mesh);
-	void CollectBoneOffsets(const aiScene* scene);
-	void FinalizeBoneIDs();
+		HashSet<String> m_convertedTextures;
 
-	int32 m_boneCounter{ 0 };
-	std::unordered_map<std::string, glm::mat4> m_boneOffsets;
-	std::unordered_map<std::string, int32> m_boneNameToIdMap;
-};
+		/*==========================================//
+		//   skeleton and rigging process methods   //
+		//==========================================*/
+	private:
+		void ExtractBoneWeights(Vector<RawSkinnedVertex>& vertices, aiMesh* mesh);
+		void CollectBoneOffsets(const aiScene* scene);
+		void FinalizeBoneIDs();
+
+		int32 m_boneCounter{ 0 };
+		HashMap<String, glm::mat4> m_boneOffsets;
+		HashMap<String, int32> m_boneNameToIdMap;
+
+		/*=============================//
+		//   multi-threading members   //
+		//=============================*/
+	private:
+		Atomic<int32> m_activeTasks{ 0 };
+		Mutex m_taskMutex;
+		ConditionVariable m_taskCv;
+		Mutex m_textureSetMutex;
+
+		void AddTaskCount();
+		void CompleteTaskCount();
+		void WaitAllTasks();
+	};
+}

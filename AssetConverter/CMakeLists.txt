@@ -1,9 +1,37 @@
 ﻿# 소스 파일 목록
 set(ASSET_CONVERTER_SOURCES
 
-    # Core
     "main.cpp"
-    "pch.h"                 "pch.cpp" 
+    "ConverterPch.h"                    "ConverterPch.cpp"
+
+    # Assets
+    "Assets/CubeFaceElement.h"
+    "Assets/RawAnimation.h"
+    "Assets/RawAnimChannel.h"
+    "Assets/RawBone.h"
+    "Assets/RawBoneInfo.h"
+    "Assets/RawKeyPosition.h"      "Assets/RawKeyRotation.h"       "Assets/RawKeyScale.h"
+    "Assets/RawMaterial.h"
+    "Assets/RawMesh.h"
+    "Assets/RawModel.h"
+    "Assets/RawNode.h"
+    "Assets/RawStaticVertex.h"
+    "Assets/RawTexture.h"
+    "Assets/RawSkinnedVertex.h"    "Assets/RawSkinnedVertex.h"
+    "Assets/RawImage.h"            "Assets/RawImage.cpp"
+
+    # Core
+    "Core/AssetUtils.h"                "Core/AssetUtils.cpp"
+    "Core/MathUtils.h"                "Core/MathUtils.cpp"
+    "Core/ArgumentParser.h"            "Core/ArgumentParser.cpp"
+    "Core/ParseResult.h"            "Core/ParseResult.cpp"
+
+    # Animation
+    "Animation/Pose.h"                 "Animation/Pose.cpp"
+    "Animation/AnimChannel.h"          "Animation/AnimChannel.cpp"
+
+    # Debug
+    "Debug/Logger.h"                    "Debug/Logger.cpp"          "Debug/Logger.inl"
 
     # Converters
     "Converters/ModelConverter.h"       "Converters/ModelConverter.cpp"
@@ -12,18 +40,33 @@ set(ASSET_CONVERTER_SOURCES
     "Converters/KTXTextureConverter.h"  "Converters/KTXTextureConverter.cpp"
     "Converters/KTXCubeMapConverter.h"  "Converters/KTXCubeMapConverter.cpp"
 
-    # AssetTypes
-    "AssetTypes/AssetUtils.h"           "AssetTypes/AssetUtils.cpp"
-    "AssetTypes/AssetFormat.h"          "AssetTypes/AssetFormat.cpp"
+    # Defines
+    "Defines/DefineConverters.h"        "Defines/DefineManagers.h"
+    "Defines/DefineDisables.h"        "Defines/DefineClassPointers.h"
+    "Defines/DefineSingleton.h"         "Defines/DefineUtilities.h"
+    "Defines/DefineLoggings.h"
+
+    # Managers
+    "Managers/ThreadManager.h"          "Managers/ThreadManager.cpp"
+
+    # Types
+    "Types/Containers.h"
+    "Types/Strings.h"
+    "Types/Types.h"
+    "Types/Delegates.h"
+    "Types/FileStream.h"
+    "Types/Threading.h"
+    "Types/Math.h"
+    "Types/SmartPtrs.h"
+
+    # Thread
+    "Thread/Worker.h"                   "Thread/Worker.cpp"
+    "Thread/TaskQueue.h"                "Thread/TaskQueue.cpp"
 
     # Utils
-    "Utils/Utils.h"                     "Utils/Utils.cpp"
-    "Utils/Logger.h"                    "Utils/Logger.cpp"
-    "Utils/ArgumentParser.h"            "Utils/ArgumentParser.cpp"
-    "Utils/Types.h"
-    "Utils/Defines.h"
-    "Utils/AnimChannel.h"               "Utils/AnimChannel.cpp"
-    "Utils/Pose.h"                      "Utils/Pose.cpp"
+    "Types/Types.h"
+    "Types/Containers.h"
+    "Types/Strings.h"
 )
 
 # Visual Studio 필터 자동 생성
@@ -33,7 +76,7 @@ source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${ASSET_CONVERTER_SOURCES})
 add_executable(AssetConverter ${ASSET_CONVERTER_SOURCES})
 
 # Include 및 PCH 설정
-target_precompile_headers(AssetConverter PRIVATE pch.h)
+target_precompile_headers(AssetConverter PRIVATE ConverterPch.h)
 target_include_directories(AssetConverter PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 
 # 라이브러리 링크

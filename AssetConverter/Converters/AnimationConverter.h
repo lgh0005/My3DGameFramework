@@ -1,27 +1,45 @@
 ﻿#pragma once
-#include "Utils/AnimChannel.h"
 
-class AnimationConverter
+namespace MGF3D
 {
-	DECLARE_SINGLE(AnimationConverter)
+	class AnimationConverter
+	{
+		MGF_DECLARE_SINGLE(AnimationConverter)
 
-public:
-	bool Convert
-	(
-		const std::string& animPath,
-		const std::string& refModelPath,
-		const std::string& outputPath
-	);
+	private:
+		AnimationConverter();
+		~AnimationConverter();
 
-private:
-	bool LoadReferenceSkeleton(const std::string& path);
-	AnimChannel ConvertAssimpChannelToEngine(aiNodeAnim* srcChannel);
-	void BakeAnimation(const aiAnimation* srcAnim, AssetFmt::RawAnimation& outAnim);
-	std::string MakeSafeName(const std::string& rawName);
-    bool WriteAnimationFile(const std::string& finalPath, const AssetFmt::RawAnimation& anim);
+	public:
+		bool Convert
+		(
+			const String& animPath,
+			const String& refModelPath,
+			const String& outputPath
+		);
 
-private:
-    // m_rawAnim 멤버 변수 제거 (지역 변수 사용)
-	std::vector<AssetFmt::RawBone> m_bones;
-	std::unordered_map<std::string, int32> m_boneNameMap;
-};
+	private:
+		bool LoadReferenceSkeleton(const String& path);
+		AnimChannel ConvertAssimpChannelToEngine(aiNodeAnim* srcChannel);
+		void BakeAnimation(const aiAnimation* srcAnim, RawAnimation& outAnim);
+		String MakeSafeName(const String& rawName);
+		bool WriteAnimationFile(const String& finalPath, const RawAnimation& anim);
+
+	private:
+		Vector<RawBone> m_bones;
+		HashMap<String, int32> m_boneNameMap;
+
+		/*=============================//
+		//   multi-threading members   //
+		//=============================*/
+	private:
+		Atomic<int32> m_activeTasks{ 0 };
+		Mutex m_taskMutex;
+		ConditionVariable m_taskCv;
+		Atomic<int32> m_successCount{ 0 };
+
+		void AddTaskCount();
+		void CompleteTaskCount();
+		void WaitAllTasks();
+	};
+}

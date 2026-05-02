@@ -9,7 +9,16 @@ namespace MGF3D
 		MGF_DISABLE_COPY(SkinnedMeshRenderer)
 		using Super = MeshRenderer;
 
-	//public:
+	public:
+
+
+	private:
+
+
+	};
+}
+
+//public:
 	//	SkinnedMeshRenderer
 	//	(
 	//		ObjectIDHash id, ObjectIDHash ownerID,
@@ -34,8 +43,7 @@ namespace MGF3D
 
 	//private:
 	//	Animator* m_animator{ nullptr };
-	};
-}
+
 
 //#pragma region FORWARD_DECLARATION
 //CLASS_PTR(SkinnedMesh)

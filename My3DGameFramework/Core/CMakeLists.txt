@@ -115,6 +115,21 @@ set(SOURCES
     "Thread/CPUWorker.h"        "Thread/CPUWorker.cpp"
     "Thread/GPUWorker.h"        "Thread/GPUWorker.cpp"
 
+    # Assets
+    "Assets/RawAnimation.h"
+    "Assets/RawAnimChannel.h"
+    "Assets/RawBone.h"
+    "Assets/RawBoneInfo.h"
+    "Assets/RawKeyPosition.h"      "Assets/RawKeyRotation.h"       "Assets/RawKeyScale.h"
+    "Assets/RawMaterial.h"
+    "Assets/RawMesh.h"
+    "Assets/RawModel.h"
+    "Assets/RawNode.h"
+    "Assets/RawStaticVertex.h"
+    "Assets/RawTexture.h"
+    "Assets/RawSkinnedVertex.h"    "Assets/RawSkinnedVertex.h"
+    "Assets/RawImage.h"            "Assets/RawImage.cpp"
+
     # Utils
     "CoreUtils/AssetUtils.h"       "CoreUtils/AssetUtils.cpp"           "CoreUtils/AssetUtils.inl"
     "CoreUtils/CommonUtils.h"      "CoreUtils/CommonUtils.cpp"           "CoreUtils/CommonUtils.inl"

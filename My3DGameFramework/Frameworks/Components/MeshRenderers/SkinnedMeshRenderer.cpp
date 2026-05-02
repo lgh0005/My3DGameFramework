@@ -1,6 +1,11 @@
 ﻿#include "FrameworkPch.h"
 #include "SkinnedMeshRenderer.h"
 
+namespace MGF3D
+{
+
+}
+
 //DECLARE_DEFAULTS_IMPL(SkinnedMeshRenderer)
 //
 //SkinnedMeshRendererUPtr SkinnedMeshRenderer::Create(SkinnedMeshPtr mesh, MaterialPtr material, Animator* animator)
