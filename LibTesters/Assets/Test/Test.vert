@@ -1,8 +1,8 @@
 #version 460 core
 
 layout(location = 0) in vec3 aPos;
-layout(location = 1) in vec3 aNormal;   // 1번을 Normal로!
-layout(location = 2) in vec2 aTexCoord; // 2번을 UV로!
+layout(location = 1) in vec3 aNormal;
+layout(location = 2) in vec2 aTexCoord;
 layout(location = 3) in vec3 aTangent;
 
 layout(location = 0) out vec2 vTexCoord;

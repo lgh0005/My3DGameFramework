@@ -15,12 +15,6 @@ namespace MGF3D
 
 	bool GLPixelBuffer::Init(const void* data, usize byteSize)
 	{
-		if (byteSize == 0 || data == nullptr)
-		{
-			MGF_LOG_ERROR("GLPixelBuffer: Invalid data or byte size.");
-			return false;
-		}
-
 		m_byteSize = byteSize;
 
 		// 1. DSA 버퍼 생성

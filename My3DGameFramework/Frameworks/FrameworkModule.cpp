@@ -65,8 +65,10 @@ namespace MGF3D
 		PointLight::s_typeIndex = componentTree->Register("PointLight", "Light");
 
 		// 3. Component 레지스트리 주입
-		auto meshRendererReg = MakeUnique<ComponentRegistry<MeshRenderer>>();
-		MGF_ENTITY.AddComponentRegistry(MeshRenderer::s_typeIndex, std::move(meshRendererReg));
+		MGF_ENTITY.AddComponentRegistry(MeshRenderer::s_typeIndex, MakeUnique<ComponentRegistry<MeshRenderer>>());
+		MGF_ENTITY.AddComponentRegistry(DirectionalLight::s_typeIndex, MakeUnique<ComponentRegistry<DirectionalLight>>());
+		MGF_ENTITY.AddComponentRegistry(PointLight::s_typeIndex, MakeUnique<ComponentRegistry<PointLight>>());
+		MGF_ENTITY.AddComponentRegistry(SpotLight::s_typeIndex, MakeUnique<ComponentRegistry<SpotLight>>());
 	}
 
 	bool FrameworkModule::OnInit()

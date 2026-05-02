@@ -2,6 +2,7 @@
 #include "InstanceManager.h"
 #include "Managers/EntityManager.h"
 #include "Rendering/RenderContext.h"
+#include "Instancing/Meshes/StaticInstanceData.h"
 #include "Components/Transform.h"
 #include "Components/MeshRenderers/MeshRenderer.h"
 //#include "Components/MeshRenderers/SkinnedMeshRenderer.h"
@@ -71,4 +72,9 @@ namespace MGF3D
 		//	context->GetSkinnedQueue().Submit(mesh, material, data);
 		//}
     }
+
+	void InstanceManager::ExtractOutlineMeshes(RenderContext* context)
+	{
+		// Outline 메쉬 추출 로직 구현
+	}
 }

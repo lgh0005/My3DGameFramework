@@ -20,6 +20,45 @@ layout(std140, binding = 2) uniform MaterialBlock
 
 // [Sampler] 머티리얼 텍스쳐
 layout(binding = 0) uniform sampler2D uAlbedoMap;
+// TODO : 이후에 더 많은 텍스쳐들을 적어둬야 한다.
+
+// 2. 조명 데이터 구조체 & SSBO
+struct DirectionalLight 
+{
+    vec4 direction;
+    vec4 color;         // rgb = color, a = intensity
+    int  shadowIndex;
+    vec3 pad0;          // 16바이트 정렬(std430)을 위한 패딩
+};
+
+struct PointLight 
+{
+    vec4 position;      // xyz = pos, w = range
+    vec4 color;         // rgb = color, a = intensity
+    int  shadowIndex;
+    vec3 pad0;
+};
+
+struct SpotLight 
+{
+    vec4 position;      // xyz = pos, w = range
+    vec4 direction;
+    vec4 color;         // rgb = color, a = intensity
+    vec4 params;        // x = innerCutoff, y = outerCutoff
+    int  shadowIndex;
+    vec3 pad0;
+};
+
+layout(std430, binding = 3) readonly buffer DirLightBuffer  { DirectionalLight dirLights[]; };
+layout(std430, binding = 4) readonly buffer PointLightBuffer { PointLight pointLights[]; };
+layout(std430, binding = 5) readonly buffer SpotLightBuffer  { SpotLight spotLights[]; };
+layout(std140, binding = 6) uniform LightCounts 
+{
+    int dirLightCount;
+    int pointLightCount;
+    int spotLightCount;
+    int pad1;
+} uCounts;
 
 void main() 
 {

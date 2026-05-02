@@ -4,6 +4,7 @@ namespace MGF3D
 {
 	MGF_CLASS_PTR(RenderPipeline)
 	MGF_CLASS_PTR(RenderContext)
+	MGF_CLASS_PTR(RenderCollector)
 
 	class RenderManager
 	{
@@ -28,6 +29,7 @@ namespace MGF3D
 	public:
 		HashMap<int64, RenderPipelineFactory> m_pipelines;
 		RenderPipelineUPtr m_activePipeline;
+		RenderCollectorUPtr m_renderCollector;
 		RenderContextUPtr m_renderContext;
 	};
 }

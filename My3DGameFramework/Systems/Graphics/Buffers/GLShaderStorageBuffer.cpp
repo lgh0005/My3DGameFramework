@@ -15,15 +15,9 @@ namespace MGF3D
 
 	bool GLShaderStorageBuffer::Init(const void* data, usize byteSize)
 	{
-		if (byteSize == 0)
-		{
-			MGF_LOG_ERROR("GLShaderStorageBuffer: Invalid byte size.");
-			return false;
-		}
-
 		m_byteSize = byteSize;
 
-		// 1. DSA: 타겟 지정 없이 버퍼 객체 생성
+		// 1. 타겟 지정 없이 버퍼 객체 생성
 		glCreateBuffers(1, &m_handle);
 		if (m_handle == 0)
 		{
@@ -31,8 +25,7 @@ namespace MGF3D
 			return false;
 		}
 
-		// 2. DSA: 메모리 할당 및 초기 데이터 업로드
-		// UBO는 자주 갱신되므로 힌트로 GL_DYNAMIC_DRAW를 주는 것이 성능상 유리
+		// 2. 메모리 할당 및 초기 데이터 업로드
 		glNamedBufferData(m_handle, byteSize, data, GL_DYNAMIC_DRAW);
 
 		return true;

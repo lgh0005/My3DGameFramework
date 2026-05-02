@@ -1,13 +1,19 @@
 ﻿#pragma once
 #include "Instancing/RenderQueue.h"
-#include "Instancing/Properties/StaticInstanceData.h"
-#include "Instancing/Properties/SkinnedInstanceData.h"
+#include "Instancing/Meshes/StaticInstanceData.h"
+#include "Instancing/Meshes/SkinnedInstanceData.h"
+#include "Instancing/Lights/DirectionalLightData.h"
+#include "Instancing/Lights/PointLightData.h"
+#include "Instancing/Lights/SpotLightData.h"
+#include "Instancing/Shadows/DirectionalShadowData.h"
+#include "Instancing/Shadows/PointShadowData.h"
+#include "Instancing/Shadows/SpotShadowData.h"
 #include "Uniforms/CameraUniform.h"
-#include "Uniforms/LightUniform.h"
 
 namespace MGF3D
 {
 	MGF_CLASS_PTR(GLUniformBuffer)
+	MGF_CLASS_PTR(GLShaderStorageBuffer)
 
 	MGF_CLASS_PTR(RenderContext)
 	class RenderContext
@@ -23,13 +29,39 @@ namespace MGF3D
 
 	public:
 		void UpdateCameras(const CameraData& camera);
-		void UpdateLights(const LightData& lights);
+		
+		void UpdateDirectionalLights(const Vector<DirectionalLightData>& lights);
+		void UpdatePointLights(const Vector<PointLightData>& lights);
+		void UpdateSpotLights(const Vector<SpotLightData>& lights);
+
+		void UpdateDirectionalShadows(const Vector<DirectionalShadowData>& shadows);
+		void UpdatePointShadows(const Vector<PointShadowData>& shadows);
+		void UpdateSpotShadows(const Vector<SpotShadowData>& shadows);
 
 	private:
+		template <typename T>
+		void UpdateSSBO
+		(
+			GLShaderStorageBufferUPtr& buffer, 
+			const Vector<T>& data, 
+			uint32 bindingIndex
+		);
+
+	private:
+		GLUniformBufferUPtr m_cameraUBO;
 		RenderQueue<StaticInstanceData>  m_staticQueue;
 		RenderQueue<SkinnedInstanceData> m_skinnedQueue;
+	
+		// 조명 전용 SSBO
+		GLShaderStorageBufferUPtr m_dirLightSSBO;
+		GLShaderStorageBufferUPtr m_pointLightSSBO;
+		GLShaderStorageBufferUPtr m_spotLightSSBO;
 
-		GLUniformBufferUPtr m_cameraUBO;
-		GLUniformBufferUPtr m_lightUBO;
+		// 그림자 전용 SSBO
+		GLShaderStorageBufferUPtr m_dirShadowSSBO;
+		GLShaderStorageBufferUPtr m_pointShadowSSBO;
+		GLShaderStorageBufferUPtr m_spotShadowSSBO;
 	};
 }
+
+#include "Rendering/RenderContext.inl"

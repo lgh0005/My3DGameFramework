@@ -36,6 +36,9 @@ set(SOURCES
     "Framebuffers/GLFramebuffer3D.h"    "Framebuffers/GLFramebuffer3D.cpp"
     "Framebuffers/GLFramebufferCube.h"    "Framebuffers/GLFramebufferCube.cpp"
 
+    # ShadowFramebuffers
+    "ShadowFramebuffers/GLShadowFramebuffer.h"    "ShadowFramebuffers/GLShadowFramebuffer.cpp"
+
     # Layout
     "Layout/GLVertexLayout.h"              "Layout/GLVertexLayout.cpp"
 
@@ -44,6 +47,12 @@ set(SOURCES
     "Textures/GLTexture2D.h"               "Textures/GLTexture2D.cpp"
     "Textures/GLTexture3D.h"               "Textures/GLTexture3D.cpp"
     "Textures/GLTextureCube.h"             "Textures/GLTextureCube.cpp"
+
+    # Texture Arrays
+    "TextureArrays/GLTextureArrayHandle.h"           "TextureArrays/GLTextureArrayHandle.cpp"
+    "TextureArrays/GLTexture2DArray.h"               "TextureArrays/GLTexture2DArray.cpp"
+    "TextureArrays/GLTextureCubeArray.h"               "TextureArrays/GLTextureCubeArray.cpp"
+
 
     # Geometry
     "Geometry/CullingPlane.h"              "Geometry/CullingPlane.cpp"
@@ -70,7 +79,6 @@ set(SOURCES
     "Vertices/StaticVertex.h" 
 
     # Uniforms
-    "Uniforms/LightUniform.h"
     "Uniforms/CameraUniform.h"
     "Uniforms/MaterialUniform.h"
 

@@ -22,8 +22,6 @@ namespace MGF3D
 
 	bool GLTextureBuffer::Init(uint32 format, const void* data, usize byteSize)
 	{
-		if (byteSize == 0) return false;
-
 		m_byteSize = byteSize;
 		m_format = format;
 

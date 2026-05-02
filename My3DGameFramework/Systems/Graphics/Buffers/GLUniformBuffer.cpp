@@ -15,12 +15,6 @@ namespace MGF3D
 
 	bool GLUniformBuffer::Init(const void* data, usize byteSize)
 	{
-		if (byteSize == 0)
-		{
-			MGF_LOG_ERROR("GLUniformBuffer: Invalid byte size.");
-			return false;
-		}
-
 		m_byteSize = byteSize;
 
 		// 1. DSA: 타겟 지정 없이 버퍼 객체 생성

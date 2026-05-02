@@ -18,5 +18,6 @@ namespace MGF3D
 	private:
 		void ExtractStaticMeshes(RenderContext* context);
 		void ExtractSkinnedMeshes(RenderContext* context);
+		void ExtractOutlineMeshes(RenderContext* context);
 	};
 }

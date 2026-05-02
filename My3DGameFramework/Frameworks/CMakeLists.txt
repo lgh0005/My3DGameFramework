@@ -61,15 +61,25 @@ set(SOURCES
     # "Resources/EnvironmentMap.h"             "Resources/EnvironmentMap.cpp"
 
     # Rendering
-    "Rendering/RenderContext.h"          "Rendering/RenderContext.cpp"
+    "Rendering/RenderContext.h"          "Rendering/RenderContext.cpp"      "Rendering/RenderContext.inl"
     "Rendering/RenderPass.h"          "Rendering/RenderPass.cpp"
     "Rendering/RenderPipeline.h"          "Rendering/RenderPipeline.cpp"
+    "Rendering/RenderCollector.h"          "Rendering/RenderCollector.cpp"
 
     # Instancing
     "Instancing/RenderBatch.h"          "Instancing/RenderBatch.cpp"        "Instancing/RenderBatch.inl"
     "Instancing/RenderQueue.h"          "Instancing/RenderQueue.cpp"        "Instancing/RenderQueue.inl"
-    "Instancing/Properties/StaticInstanceData.h"        
-    "Instancing/Properties/SkinnedInstanceData.h"
+
+    "Instancing/Meshes/StaticInstanceData.h"        
+    "Instancing/Meshes/SkinnedInstanceData.h"
+
+    "Instancing/Lights/DirectionalLightData.h"    
+    "Instancing/Lights/PointLightData.h"    
+    "Instancing/Lights/SpotLightData.h"
+
+    "Instancing/Shadows/DirectionalShadowData.h"
+    "Instancing/Shadows/PointShadowData.h"
+    "Instancing/Shadows/SpotShadowData.h"
 )
 
 # 2. 빌드 타겟 생성 및 별칭 등록
