@@ -1,11 +1,9 @@
 ﻿#include "GraphicsPch.h"
 #include "SkinnedMesh.h"
-#include "CoreUtils/MathUtils.h"
 #include "Layout/GLVertexLayout.h"
 #include "Buffers/GLVertexBuffer.h"
 #include "Buffers/GLIndexBuffer.h"
 #include "Managers/TypeManager.h"
-#include "Managers/ThreadManager.h"
 
 namespace MGF3D
 {

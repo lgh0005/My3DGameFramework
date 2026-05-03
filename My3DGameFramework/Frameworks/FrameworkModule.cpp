@@ -36,10 +36,18 @@
 #include "Resources/Material.h"
 #pragma endregion
 
+#pragma region ASSET
+#include "Assets/Model.h"
+#pragma endregion
+
 namespace MGF3D
 {
 	void FrameworkModule::OnRegisterTypes()
 	{
+		// 0. Asset 타입
+		MGFTypeTree* assetTree = MGF_TYPE.GetTree("Asset");
+		Model::s_typeIndex = assetTree->Register("Model", "Asset");
+
 		// 1. Resources 타입 베이킹
 		MGFTypeTree* resourceTree = MGF_TYPE.GetTree("Resource");
 		Material::s_typeIndex = resourceTree->Register("Material", "Resource");

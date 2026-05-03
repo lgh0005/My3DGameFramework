@@ -743,7 +743,7 @@ namespace MGF3D
     void ModelConverter::CompleteTaskCount()
     {
         --m_activeTasks;
-        if (m_activeTasks == 0)  m_taskCv.notify_all();
+        if (m_activeTasks == 0) m_taskCv.notify_all();
     }
 
     void ModelConverter::WaitAllTasks()

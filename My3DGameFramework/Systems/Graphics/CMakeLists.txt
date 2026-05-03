@@ -53,7 +53,6 @@ set(SOURCES
     "TextureArrays/GLTexture2DArray.h"               "TextureArrays/GLTexture2DArray.cpp"
     "TextureArrays/GLTextureCubeArray.h"               "TextureArrays/GLTextureCubeArray.cpp"
 
-
     # Geometry
     "Geometry/CullingPlane.h"              "Geometry/CullingPlane.cpp"
     "Geometry/Frustum.h"                   "Geometry/Frustum.cpp"   

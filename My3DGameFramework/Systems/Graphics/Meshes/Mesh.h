@@ -36,10 +36,14 @@ namespace MGF3D
         void SetLocalBounds(const RenderBounds& bounds) { m_localBounds = bounds; }
         const RenderBounds& GetLocalBounds() const { return m_localBounds; }
 
+        void SetMaterialIndex(uint32 index) { m_materialIndex = index; }
+        uint32 GetMaterialIndex() const { return m_materialIndex; }
+
     protected:
         Mesh();
         usize  m_indexCount        { 0 };
         uint32 m_primitiveType     { GL_TRIANGLES };
+        uint32 m_materialIndex     { 0 };
 
         GLVertexLayoutUPtr m_vertexLayout;
         GLVertexBufferPtr m_vertexBuffer;

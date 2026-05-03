@@ -1,82 +1,43 @@
 ﻿#pragma once
-#include "Resources/Resource.h"
-#include "Resources/ResourceDesc.h"
-#include "Graphics/Layouts/Vertex.h"
-#include "Resources/Animations/AnimChannel.h"
-#include "Misc/AssetFormat.h"
+#include "Sources/Asset.h"
+#include "Assets/RawNode.h"
 
-#pragma region FORWARD_DECLARATION
-CLASS_PTR(Scene)
-CLASS_PTR(Animator)
-CLASS_PTR(GameObject)
-CLASS_PTR(Mesh)
-CLASS_PTR(SkinnedMesh)
-CLASS_PTR(StaticMesh)
-CLASS_PTR(Material)
-CLASS_PTR(Program)
-CLASS_PTR(Texture)
-CLASS_PTR(Skeleton)
-#pragma endregion
-
-CLASS_PTR(Model)
-class Model : public Resource
+namespace MGF3D
 {
-	DEFINE_RESOURCE_TYPE(ResourceType::Model, ModelDesc)
+	MGF_CLASS_PTR(Mesh)
+	MGF_CLASS_PTR(Material)
+	MGF_CLASS_PTR(Skeleton)
 
-public:
-	virtual ~Model();
-	static ModelPtr Load(const ModelDesc& desc);
-	virtual ResourceDesc& GetDesc() override { return m_desc; }
-	virtual const ResourceDesc& GetDesc() const override { return m_desc; }
+	MGF_CLASS_PTR(Model)
+	class Model : public Asset
+	{
+		MGF_DISABLE_COPY(Model)
+		using Super = Asset;
 
-	uint32 GetMeshCount() const { return (uint32)m_meshes.size(); }
-	SkinnedMeshPtr GetSkinnedMesh(int index) const;
-	StaticMeshPtr GetStaticMesh(int index) const;
-	SkeletonPtr GetSkeleton() const { return m_skeleton; }
-	auto& GetNodes() { return m_nodes; }
+	public:
+		virtual ~Model() override;
+		static ModelPtr Create(const String& path);
 
-/*======================================//
-//   3d model load instancing methods   //
-//======================================*/
-public:
-	// 모델을 인스턴스화하여 Scene에 등록하고, Root 오브젝트를 반환
-	GameObjectUPtr Instantiate(Scene* scene, Animator* animator = nullptr);
+	/*========================//
+	//       Model Type       //
+	//========================*/
+	public:
+		static int16 s_typeIndex;
+		virtual const MGFType* GetType() const;
 
-private:
-	GameObjectUPtr CreateGameObjectForSingleNode
-	(
-		Scene* scene,
-		GameObject* parent,
-		const AssetFmt::RawNode& node,
-		Animator* animator
-	);
+	public:
+		virtual bool Load() override;
+		ObjectIDHash Instantiate(const String& name);
 
-/*========================================================//
-//   .mymodel file load process methods : .mymodel file   //
-//========================================================*/
-private:
-	bool LoadByBinary();
-	bool ReadBinaryModelHeader(std::ifstream& inFile, uint32& outMatCount, uint32& outMeshCount, bool& outHasSkeleton);
-	void ReadBinaryNodes(std::ifstream& inFile);
-	void ReadBinarySkeleton(std::ifstream& inFile);
-	void ReadBinaryMaterials(std::ifstream& inFile, uint32 matCount, const std::filesystem::path& modelDir);
-	void ReadBinaryMeshes(std::ifstream& inFile, uint32 meshCount);
-	void CreateBinarySkinnedMesh(const AssetFmt::RawMesh& rawMesh);
-	void CreateBinaryStaticMesh(const AssetFmt::RawMesh& rawMesh);
+	private:
+		Model(const String& path);
 
-/*============================//
-//   skeleton helper method   //
-//============================*/
-private:
-	void LinkSkeletonHierarchy();
-	SkeletonPtr m_skeleton;
+		SkeletonPtr m_skeleton{ nullptr };
+		Vector<MeshPtr> m_meshes;
+		Vector<MaterialPtr> m_materials;
+		Vector<RawNode> m_nodes;
 
-private:
-	Model();
-
-	ModelDesc m_desc;
-	std::vector<MeshPtr> m_meshes;
-	std::vector<MaterialPtr> m_materials;
-	std::vector<uint32> m_meshMaterialIndices;
-	std::vector<AssetFmt::RawNode> m_nodes;
-};
+		vec3 m_aabbMin{ 0.0f };
+		vec3 m_aabbMax{ 0.0f };
+	};
+}

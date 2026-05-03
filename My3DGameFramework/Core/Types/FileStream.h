@@ -1,4 +1,5 @@
 #pragma once
+#include <filesystem>
 #include <fstream>
 #include <sstream>
 namespace MGF3D
@@ -6,6 +7,7 @@ namespace MGF3D
 	/*===================================//
 	//       File Stream Aliases         //
 	//===================================*/
+	namespace FileSystem = std::filesystem;
 
 	// 입력 파일 스트림 (파일 읽기 전용)
 	using InputFileStream = std::ifstream;

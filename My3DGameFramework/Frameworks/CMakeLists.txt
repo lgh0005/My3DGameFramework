@@ -13,6 +13,7 @@ set(SOURCES
     "FrameworkModule.h"     "FrameworkModule.cpp"
 
     # Managers
+    "Managers/AnimationManager.h"    "Managers/AnimationManager.cpp"
     "Managers/AssetManager.h"       "Managers/AssetManager.cpp"      "Managers/AssetManager.inl"
     "Managers/ResourceManager.h"    "Managers/ResourceManager.cpp"   "Managers/ResourceManager.inl"
     "Managers/RenderManager.h"      "Managers/RenderManager.cpp"     "Managers/RenderManager.inl"
@@ -36,25 +37,24 @@ set(SOURCES
     "Components/Lights/SpotLight.h"        "Components/Lights/SpotLight.cpp"
     "Components/Lights/DirectionalLight.h"        "Components/Lights/DirectionalLight.cpp"
     "Components/MeshRenderers/MeshRenderer.h"           "Components/MeshRenderers/MeshRenderer.cpp" 
-    # "Components/MeshRenderers/SkinnedMeshRenderer.h"   "Components/MeshRenderers/SkinnedMeshRenderer.cpp" 
+    "Components/MeshRenderers/SkinnedMeshRenderer.h"   "Components/MeshRenderers/SkinnedMeshRenderer.cpp" 
     # "Components/MeshRenderers/MeshOutline.h"           "Components/MeshRenderers/MeshOutline.cpp" 
     # "Components/Physics/PhysicsComponent.h"            "Components/Physics/PhysicsComponent.cpp" 
     # "Components/Physics/Rigidbody.h"                  "Components/Physics/Rigidbody.cpp" 
     "Components/Script/Script.h"                  "Components/Script/Script.cpp" 
 
     # Mechanics
-    # "Mechanics/Animation/AnimChannel.h"             "Mechanics/Animation/AnimChannel.cpp"
+    "Mechanics/Animation/AnimChannel.h"             "Mechanics/Animation/AnimChannel.cpp"
     # "Mechanics/Animation/AnimClip.h"             "Mechanics/Animation/AnimClip.cpp"
     # "Mechanics/Animation/AnimController.h"             "Mechanics/Animation/AnimController.cpp"
     # "Mechanics/Animation/AnimState.h"             "Mechanics/Animation/AnimState.cpp"
-    # "Mechanics/Animation/Pose.h"             "Mechanics/Animation/Pose.cpp"
-    # "Mechanics/Animation/Skeleton.h"             "Mechanics/Animation/Skeleton.cpp"
-    # "Mechanics/Camera/Velocitybuffer.h"             "Mechanics/Camera/Velocitybuffer.cpp"
+    "Mechanics/Animation/Pose.h"             "Mechanics/Animation/Pose.cpp"
+    "Mechanics/Animation/Skeleton.h"             "Mechanics/Animation/Skeleton.cpp"
 
     # Assets
     # "Assets/Animation.h"             "Assets/Animation.cpp"
     # "Assets/AudioClip.h"             "Assets/AudioClip.cpp"
-    # "Assets/Model.h"             "Assets/Model.cpp"
+    "Assets/Model.h"                   "Assets/Model.cpp"
 
     # Resources
     "Resources/Material.h"             "Resources/Material.cpp"
@@ -80,6 +80,9 @@ set(SOURCES
     "Instancing/Shadows/DirectionalShadowData.h"
     "Instancing/Shadows/PointShadowData.h"
     "Instancing/Shadows/SpotShadowData.h"
+
+    "Instancing/Animations/AnimationBuffer.h"       "Instancing/Animations/AnimationBuffer.cpp"
+    "Instancing/Animations/AnimationTexture.h"      "Instancing/Animations/AnimationTexture.cpp"
 )
 
 # 2. 빌드 타겟 생성 및 별칭 등록

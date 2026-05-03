@@ -5,7 +5,7 @@
 #include "Instancing/Meshes/StaticInstanceData.h"
 #include "Components/Transform.h"
 #include "Components/MeshRenderers/MeshRenderer.h"
-//#include "Components/MeshRenderers/SkinnedMeshRenderer.h"
+#include "Components/MeshRenderers/SkinnedMeshRenderer.h"
 
 namespace MGF3D
 {
@@ -46,31 +46,28 @@ namespace MGF3D
 
     void InstanceManager::ExtractSkinnedMeshes(RenderContext* context)
     {
-        //  auto* registry = MGF_ENTITY.GetComponentRegistry<SkinnedMeshRenderer>();
-        //  if (!registry) return;
+        auto* registry = MGF_ENTITY.GetComponentRegistry<SkinnedMeshRenderer>();
+        if (!registry) return;
 
-        //  const auto& components = registry->GetComponents();
-		//  for (const auto& renderer : components)
-		//  {
-		//	  if (renderer.GetType()->selfIndex != SkinnedMeshRenderer::s_typeIndex)
-		//		  continue;
+        const auto& components = registry->GetComponents();
+		for (const auto& renderer : components)
+		{
+	        if (renderer->GetType()->selfIndex != SkinnedMeshRenderer::s_typeIndex)
+			   continue;
 
-		//	auto* transform = MGF_ENTITY.GetComponent<Transform>(renderer.GetOwnerID());
-		//	if (!transform) continue;
+		    auto* transform = MGF_ENTITY.GetComponent<Transform>(renderer->GetOwnerID());
+		    if (!transform) continue;
 
-		//	Mesh* mesh = renderer.GetMesh();
-		//	Material* material = renderer.GetMaterial();
-		//	if (!mesh || !material) continue;
+		    Mesh* mesh = renderer->GetMesh();
+		    Material* material = renderer->GetMaterial();
+		    if (!mesh || !material) continue;
 
-		//	const Vector<mat4>* boneMatrices = renderer.GetBoneMatrices();
-		//	if (!boneMatrices) continue;
+		    SkinnedInstanceData data;
+		    data.worldMatrix = transform->GetWorldMatrix();
+		    data.boneOffset = renderer->GetBoneBufferOffset();
 
-		//	SkinnedInstanceData data;
-		//	data.worldMatrix = transform->GetWorldMatrix();
-		//	data.boneMatrices = *boneMatrices;
-
-		//	context->GetSkinnedQueue().Submit(mesh, material, data);
-		//}
+		    context->GetSkinnedQueue().Submit(mesh, material, data);
+		}
     }
 
 	void InstanceManager::ExtractOutlineMeshes(RenderContext* context)

@@ -15,7 +15,6 @@ namespace MGF3D
 
 	// max bone influence values
 	static constexpr int32 MAX_BONES		  { 100 };
-	static constexpr int32 MAX_BONE_INFLUENCE { 4 };
 
 	// default ssao values
 	static constexpr int32 SSAO_KERNEL_SIZE	  { 64 };

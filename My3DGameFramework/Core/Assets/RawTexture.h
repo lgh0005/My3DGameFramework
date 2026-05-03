@@ -4,18 +4,14 @@ namespace MGF3D
 {
     enum class RawTextureType : uint8
     {
-        None = 0, 
-        Albedo, 
-        Normal, 
+        None = 0,
+        Albedo,
+        Specular,
         Emissive,
-        ORM, 
-        AmbientOcclusion, 
-        Metallic,
-        Roughness, 
-        Specular, 
+        Normal,
         Height,
-        Glossiness, 
-        MAX
+        ORM,
+        Max
     };
 
     struct RawTexture

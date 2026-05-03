@@ -1,54 +1,58 @@
 ﻿#pragma once
-#include "Resources/Resource.h"
-#include "Resources/ResourceDesc.h"
-#include "Resources/Animations/AnimChannel.h"
-#include "Resources/Animations/AnimClip.h"
-#include "Misc/AssetFormat.h"
-#include "Misc/Utils.h"
+#include "Sources/Asset.h"
+#include "Mechanics/Animation/AnimChannel.h"
+#include "Mechanics/Animation/AnimClip.h"
 
-#pragma region FORWARD_DECLARATION
-CLASS_PTR(Model)
-CLASS_PTR(Bone)
-CLASS_PTR(Skeleton)
-#pragma endregion
-
-CLASS_PTR(Animation)
-class Animation : public Resource
+namespace MGF3D
 {
-    DEFINE_RESOURCE_TYPE(ResourceType::Animation, AnimationDesc)
+	MGF_CLASS_PTR(Animation)
+	class Animation : public Asset
+	{
+		MGF_DISABLE_COPY(Animation)
+		using Super = Asset;
 
-public:
-    virtual ~Animation();
-    static AnimationPtr Load(const AnimationDesc& desc);
-    virtual AnimationDesc& GetDesc() override { return m_desc; }
-    virtual const ResourceDesc& GetDesc() const override { return m_desc; }
-    
-    const AnimClip& GetAnimClip() const { return m_animClip; }
-    void SetGlobalOffset(uint32 offset) { m_globalOffset = offset; }
-    uint32 GetGlobalOffset() const { return m_globalOffset; }
-    float GetTicksPerSecond() const { return m_ticksPerSecond; }
-    float GetDuration() const { return m_duration; }
-    const std::string& GetName() const { return m_name; }
+	/*========================//
+	//     Animation Type     //
+	//========================*/
+	public:
+		static int16 s_typeIndex;
+		virtual const MGFType* GetType() const override;
+		static AnimationPtr Create(const String& path);
 
-    // [LEGACY: CPU Skinning] 채널 데이터 접근
-    AnimChannel* FindChannel(const std::string& name);
-    AnimChannel* FindChannel(uint32 nameHash);
+	/*========================//
+	//      Asset Loading     //
+	//========================*/
+	public:
+		virtual bool Load() override;
 
-/*===================================//
-//   keyframe load process methods   //
-//===================================*/
-private:
-    bool LoadByBinary();
-    Animation();
-    AnimationDesc m_desc;
+	/*========================//
+	//      Data Getters      //
+	//========================*/
+	public:
+		const AnimClip& GetAnimClip() const { return m_animClip; }
+		const String& GetName() const { return m_name; }
 
-    AnimClip m_animClip;
-    uint32 m_globalOffset{ 0 };
+		float GetDuration() const { return m_duration; }
+		float GetTicksPerSecond() const { return m_ticksPerSecond; }
 
-    std::string m_name;
-    float m_duration            { 0.0f };
-    float m_ticksPerSecond      { 0.0f };
+		uint32 GetGlobalOffset() const { return m_globalOffset; }
+		void SetGlobalOffset(uint32 offset) { m_globalOffset = offset; }
 
-    std::vector<AnimChannelUPtr> m_channels;
-    std::unordered_map<uint32, AnimChannel*> m_channelMap;
-};
+		// [CPU Skinning / Blend] StringHash 기반 채널 검색
+		const AnimChannel* FindChannel(StringHash nameHash) const;
+
+	private:
+		Animation(const String& path);
+		String m_name;
+		float m_duration{ 0.0f };
+		float m_ticksPerSecond{ 0.0f };
+
+		// 베이킹된 글로벌 오프셋과 행렬 데이터 모음
+		AnimClip m_animClip;
+		uint32 m_globalOffset{ 0 };
+
+		// 원본 키프레임 데이터 (CPU 스킨닝 및 보간 용도)
+		Vector<AnimChannelUPtr> m_channels;
+		HashMap<StringHash, AnimChannel*> m_channelMap;
+	};
+}

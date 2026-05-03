@@ -34,6 +34,9 @@ namespace MGF3D
 		Mesh* GetMesh() const { return m_mesh.get(); }
 		Material* GetMaterial() const { return m_material.get(); }
 
+		void SetMesh(const MeshPtr& mesh) { m_mesh = mesh; }
+		void SetMaterial(const MaterialPtr& material) { m_material = material; }
+
 	protected:
 		MeshPtr     m_mesh		  { nullptr };
 		MaterialPtr m_material    { nullptr };

@@ -1,39 +1,40 @@
 ﻿#pragma once
-#include "Misc/AssetFormat.h"
-#include "Graphics/Layouts/Vertex.h"
-
-CLASS_PTR(Skeleton)
-class Skeleton
+namespace MGF3D
 {
-public:
-	~Skeleton();
-	static SkeletonUPtr Create();
-	static void InitializeVertexBoneData(SkinnedVertex& vertex);
-	static void AddBoneWeightToVertex(SkinnedVertex& vertex, int32 boneID, float weight);
-	using BoneMap = std::unordered_map<uint32, AssetFmt::RawBoneInfo>;
+	MGF_CLASS_PTR(Skeleton)
+		class Skeleton
+	{
+		MGF_DISABLE_COPY(Skeleton)
 
-	void SetData(const BoneMap& map, int32 count);
-	const BoneMap& GetBoneInfoMap() const;
-	int32 GetBoneCount() const; 
-	int32 GetBoneID(uint32 nameHash) const;
-	int32 GetBoneID(const std::string& name) const;
-	int32 AddBone(const std::string& name, const glm::mat4& offset);
-	const glm::mat4& GetBoneOffset(int32 boneID) const;
+	public:
+		~Skeleton();
+		static SkeletonPtr Create
+		(
+			uint32 boneCount,
+			Vector<mat4>&& offsets,
+			Vector<int32>&& parentIndices,
+			HashMap<StringHash, int32>&& nameToIdMap
+		);
 
-/*========================================//
-//   For GPU-Driven skeleton instancing   //
-//========================================*/
-public:
-	void SetParentIndices(const std::vector<int32>& parents) { m_parentIndices = parents; }
-	const std::vector<int32>& GetParentIndices() const { return m_parentIndices; }
-	uint32 GetBoneHash(int32 id) const;
+	public:
+		uint32 GetBoneCount() const { return m_boneCount; }
+		const Vector<mat4>& GetBoneOffsets() const { return m_boneOffsets; }
+		const Vector<int32>& GetParentIndices() const { return m_parentIndices; }
+		int32 GetBoneID(StringHash nameHash) const;
 
-private:
-	Skeleton();
-	BoneMap m_boneInfoMap;
-	int32 m_boneCounter	{ 0 };
-	std::vector<glm::mat4> m_boneOffsets;
+	private:
+		Skeleton();
+		void Init
+		(
+			uint32 boneCount,
+			Vector<mat4>&& offsets,
+			Vector<int32>&& parentIndices,
+			HashMap<StringHash, int32>&& nameToIdMap
+		);
 
-	std::vector<int32> m_parentIndices; // GPU 연산용 부모 인덱스 (Index = BoneID, Value = ParentBoneID)
-	std::vector<uint32> m_boneHashByID; // ID로 이름을 찾기 위한 캐시 (Index = BoneID)
-};
+		uint32 m_boneCount{ 0 };
+		Vector<mat4> m_boneOffsets;
+		Vector<int32> m_parentIndices;
+		HashMap<StringHash, int32> m_boneMap;
+	};
+}

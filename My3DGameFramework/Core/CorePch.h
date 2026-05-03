@@ -44,6 +44,7 @@
 //==============================*/
 #include "Constants/ConstantMath.h"
 #include "Constants/ConstantString.h"
+#include "Constants/ConstantAsset.h"
 
 /*============================//
 //    Engine common defines   //

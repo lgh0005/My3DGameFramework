@@ -3,6 +3,8 @@
 
 namespace MGF3D
 {
+	MGF_CLASS_PTR(Model)
+
 	MGF_CLASS_PTR(TestScene)
 	class TestScene : public Scene
 	{
@@ -25,5 +27,8 @@ namespace MGF3D
 	private:
 		virtual bool OnLoadSceneSources() override;
 		virtual bool OnPlaceActors() override;
+
+	private:
+		ModelPtr m_backpackModel;
 	};
 }
