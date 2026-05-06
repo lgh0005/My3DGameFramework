@@ -7,6 +7,23 @@ namespace MGF3D
     RenderBounds::RenderBounds(const vec3& center, const vec3& extents) : m_center(center), m_extents(extents) { }
     RenderBounds::~RenderBounds() = default;
 
+    RenderBounds RenderBounds::Empty()
+    {
+        return RenderBounds(vec3(0.0f), vec3(0.0f));
+    }
+
+    RenderBounds RenderBounds::CreateFromMinMax(const vec3& min, const vec3& max)
+    {
+        vec3 center = (max + min) * 0.5f;
+        vec3 extents = (max - min) * 0.5f;
+        return RenderBounds(center, extents);
+    }
+
+    bool RenderBounds::IsValid() const
+    {
+        return m_extents.x >= 0.0f && m_extents.y >= 0.0f && m_extents.z >= 0.0f;
+    }
+
     RenderBounds RenderBounds::Transform(const mat4& mat) const
     {
         vec3 newCenter = vec3(mat * vec4(m_center, 1.0f));

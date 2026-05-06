@@ -27,8 +27,5 @@ namespace MGF3D
 	private:
 		virtual bool OnLoadSceneSources() override;
 		virtual bool OnPlaceActors() override;
-
-	private:
-		ModelPtr m_backpackModel;
 	};
 }

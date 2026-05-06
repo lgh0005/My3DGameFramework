@@ -1,7 +1,6 @@
 ﻿#include "FrameworkPch.h"
 #include "MeshRenderer.h"
-#include "Meshes/Mesh.h"
-#include "Resources/Material.h"
+#include "Meshes/StaticMesh.h"
 #include "Managers/TypeManager.h"
 
 namespace MGF3D
@@ -25,5 +24,15 @@ namespace MGF3D
 		MGFTypeTree* tree = MGF_TYPE.GetTree("Component");
 		if (tree != nullptr) return tree->GetType(s_typeIndex);
 		return nullptr;
+	}
+
+	StaticMesh* MeshRenderer::GetMesh() const
+	{
+		return MGFTypeCaster::Cast<StaticMesh*>(m_mesh.get());
+	}
+
+	RenderBounds MeshRenderer::GetLocalBounds() const
+	{
+		return m_mesh ? m_mesh->GetLocalBounds() : RenderBounds::Empty();
 	}
 }

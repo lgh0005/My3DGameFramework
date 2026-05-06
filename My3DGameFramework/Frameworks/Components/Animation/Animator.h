@@ -1,67 +1,58 @@
 ﻿#pragma once
-#include "Object/Component.h"
-#include "Resources/Animations/Animation.h"
-#include "Resources/Animations/Pose.h"
-#include "Graphics/Geometry/RenderBounds.h"
+#include "Entities/Component.h"
+#include "Geometry/RenderBounds.h"
 
-#pragma region FORWARD_DECLARATION
-CLASS_PTR(Model)
-CLASS_PTR(AnimController)
-CLASS_PTR(Transform)
-#pragma endregion
-
-CLASS_PTR(Animator)
-class Animator : public Component
+namespace MGF3D
 {
-	DEFINE_COMPONENT_TYPE(ComponentType::Animator)
+	MGF_CLASS_PTR(Model)
+	MGF_CLASS_PTR(AnimController)
 
-private:
-	struct AnimBinding
+	MGF_CLASS_PTR(Animator)
+	class Animator : public Component
 	{
-		uint32 nodeNameHash;       // 해싱된 노드 이름 (Controller 전달용)
-		Transform* transform;      // 씬의 실제 Transform 컴포넌트
-		Pose defaultPose;          // 미리 Decompose 해둔 초기 포즈 (T-Pose)
+		MGF_DISABLE_COPY(Animator)
+		using Super = Component;
+
+	public:
+		Animator
+		(
+			ObjectIDHash id, ObjectIDHash ownerID,
+			const ModelPtr& model, AnimControllerUPtr controller
+		);
+		virtual ~Animator() override;
+		Animator(Animator&& other) noexcept;
+		Animator& operator=(Animator&& other) noexcept;
+
+	/*================================//
+	//   MGF3D Component Custom Type  //
+	//================================*/
+	public:
+		static int16 s_typeIndex;
+		virtual const MGFType* GetType() const override;
+
+	/*================================//
+	//        Animator Interface      //
+	//================================*/
+	public:
+		void Update(float deltaTime);
+		AnimController* GetController() const { return m_controller.get(); }
+		const Vector<mat4>& GetFinalBoneMatrices() const { return m_finalBoneMatrices; }
+		const RenderBounds& GetCurrentLocalBounds() const { return m_currentLocalAABB; }
+		void SetBoneBufferOffset(uint32 offset) { m_boneBufferOffset = offset; }
+		uint32 GetBoneBufferOffset() const { return m_boneBufferOffset; }
+
+	private:
+		void CalculateBoneMatrices();
+		void UpdateLocalBounds();
+
+		ModelPtr m_currentModel;
+		AnimControllerUPtr m_controller;
+
+		uint32 m_boneBufferOffset{ 0 };
+		Vector<mat4> m_globalBoneMatrices;
+		Vector<mat4> m_finalBoneMatrices;
+
+		RenderBounds m_currentLocalAABB{ RenderBounds::Empty() };
 	};
+}
 
-public:
-	virtual ~Animator();
-	static AnimatorUPtr Create(ModelPtr model, AnimControllerUPtr controller);
-	virtual void OnStart() override;
-	virtual void OnUpdate() override;
-
-	AnimController* GetController() const { return m_controller.get(); }
-	const std::vector<glm::mat4>& GetFinalBoneMatrices() const { return m_finalBoneMatrices; }
-	const RenderBounds& GetCurrentLocalBounds() const { return m_currentLocalAABB; }
-
-	void SetModel(ModelPtr model);
-	void SetController(AnimControllerUPtr controller);
-
-/*==================================//
-//   animation initialize methods   //
-//==================================*/
-private:
-	void BindBoneTransforms();
-	void BindBoneTransformsFlat(Transform* rootTransform);
-
-/*==============================//
-//   animation update methods   //
-//==============================*/
-private:
-	void UpdateAnimationToTransforms();
-	void CalculateFinalBoneMatrices();
-	void UpdateCurrentPoseLocalBounds();
-
-private:
-	Animator();
-	bool Init(ModelPtr model, AnimControllerUPtr controller);
-
-	ModelPtr m_currentModel;
-	AnimControllerUPtr m_controller;
-
-	std::vector<glm::mat4> m_finalBoneMatrices;
-	std::unordered_map<uint32, Transform*> m_boneTransformMap;
-	std::vector<Transform*> m_skinningTransforms;
-	std::vector<AnimBinding> m_animationBindings;
-
-	RenderBounds m_currentLocalAABB		{ RenderBounds::Empty() };
-};

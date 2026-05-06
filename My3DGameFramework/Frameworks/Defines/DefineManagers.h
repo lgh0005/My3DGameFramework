@@ -8,3 +8,4 @@
 #define MGF_RENDER     ::MGF3D::RenderManager::Instance()
 #define MGF_INSTANCE   ::MGF3D::InstanceManager::Instance()
 #define MGF_SCRIPT	   ::MGF3D::ScriptManager::Instance()
+#define MGF_ANIM       ::MGF3D::AnimationManager::Instance()

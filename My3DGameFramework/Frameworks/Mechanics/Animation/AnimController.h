@@ -1,44 +1,65 @@
 ﻿#pragma once
+#include "Entities/Mechanic.h"
+#include "Mechanics/Animation/Pose.h"
 
-#pragma region FORWARD_DECLARATION
-CLASS_PTR(Animation)
-CLASS_PTR(AnimState)
-CLASS_PTR(Pose)
-CLASS_PTR(Skeleton)
-#pragma endregion
-
-CLASS_PTR(AnimController)
-class AnimController
+namespace MGF3D
 {
-public:
-	virtual ~AnimController();
-	static AnimControllerUPtr Create();
-	using AnimStateMap = std::unordered_map<std::string, AnimStatePtr>;
-	void AddState(const std::string& name, AnimationPtr clip, bool isLoop = true, float speed = 1.0f);
-	void CrossFade(const std::string& stateName, float duration = -1.0f);
-	void Update(float deltaTime);
-	void Play(const std::string& stateName);
+	MGF_CLASS_PTR(Animation)
+	MGF_CLASS_PTR(AnimState)
 
-	void SetTransitionDuration(const std::string& from, const std::string& to, float duration);
-	void SetStartState(const std::string& name);
-	Pose GetPose(uint32 nodeNameHash, const Pose& defaultPose) const;
+	MGF_CLASS_PTR(AnimController)
+	class AnimController : public Mechanic
+	{
+		MGF_DISABLE_COPY(AnimController)
+		using Super = Mechanic;
 
-private:
-	AnimController();
-	void TransitTo(std::shared_ptr<AnimState> nextState, float duration);
-	AnimStateMap m_states;
+	public:
+		AnimController(Component* owner);
+		virtual ~AnimController() override;
+		AnimController(AnimController&& other) noexcept;
+		AnimController& operator=(AnimController&& other) noexcept;
 
-	// 현재/다음 상태 (포인터로 가리킴)
-	AnimStatePtr m_currentState;
-	AnimStatePtr m_nextState;
+	/*================================//
+	//   MGF3D Mechanic Custom Type   //
+	//================================*/
+	public:
+		static int16 s_typeIndex;
+		virtual const MGFType* GetType() const override;
 
-	// 시간 관리
-	float m_currentTime = 0.0f;
-    float m_nextTime = 0.0f;
+	/*================================//
+	//       Animation Controls       //
+	//================================*/
+	public:
+		void AddState(const String& name, const AnimationPtr& clip, bool isLoop = true, float speed = 1.0f);
+		void SetTransitionDuration(StringHash fromHash, StringHash toHash, float duration);
 
-	// 블렌딩 제어
-    bool  m_isBlending = false;
-    float m_blendTimer = 0.0f;
-    float m_blendDuration = 0.0f;
-	float m_finalBlendFactor = 0.0f;
-};
+		void SetStartState(StringHash stateHash);
+		void Play(StringHash stateHash);
+		void CrossFade(StringHash nextStateHash, float duration = -1.0f);
+
+		void Update(float deltaTime);
+
+		AnimState* GetCurrentState() const { return m_currentState.get(); }
+		Pose GetPose(StringHash nodeHash, const Pose& defaultPose) const;
+		mat4 GetLocalMatrix(StringHash nodeHash, const mat4& defaultMatrix) const;
+
+	private:
+		void TransitTo(const AnimStatePtr& nextState, float duration);
+
+		HashMap<StringHash, AnimStatePtr> m_states;
+
+		// 현재/다음 상태
+		AnimStatePtr m_currentState;
+		AnimStatePtr m_nextState;
+
+		// 시간 관리
+		float m_currentTime{ 0.0f };
+		float m_nextTime{ 0.0f };
+
+		// 블렌딩 제어
+		bool  m_isBlending{ false };
+		float m_blendTimer{ 0.0f };
+		float m_blendDuration{ 0.0f };
+		float m_finalBlendFactor{ 0.0f };
+	};
+}

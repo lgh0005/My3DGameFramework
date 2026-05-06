@@ -1,33 +1,27 @@
-﻿#include "EnginePch.h"
+﻿#include "FrameworkPch.h"
 #include "AnimState.h"
-#include "Resources/Animations/Animation.h"
-#include "Misc/Utils.h"
+#include "Assets/Animation.h"
 
-DECLARE_DEFAULTS_IMPL(AnimState)
-
-AnimStateUPtr AnimState::Create(const std::string& name, AnimationPtr clip)
+namespace MGF3D
 {
-	auto state = AnimStateUPtr(new AnimState());
-	state->Init(name, clip);
-	return std::move(state);
-}
+	AnimState::AnimState(const String& name, const AnimationPtr& anim)
+		: m_name(name), m_animation(anim)
+	{
+		m_nameHash = StringHash(name);
+	}
+	AnimState::~AnimState() = default;
+	AnimState::AnimState(AnimState&& other) noexcept = default;
+	AnimState& AnimState::operator=(AnimState&& other) noexcept = default;
 
-void AnimState::Init(const std::string& name, AnimationPtr clip)
-{
-	m_name = name;
-	m_clip = clip;
-}
+	void AnimState::AddTransition(StringHash targetStateHash, float duration)
+	{
+		m_transitions[targetStateHash] = duration;
+	}
 
-void AnimState::AddTransition(const std::string& targetStateName, float duration)
-{
-	uint32 hash = Utils::StrHash(targetStateName);
-	m_transitions[hash] = duration;
-}
-
-float AnimState::GetTransitionDuration(const std::string& targetStateName) const
-{
-	uint32 hash = Utils::StrHash(targetStateName);
-	auto it = m_transitions.find(hash);
-	if (it != m_transitions.end()) return it->second;
-	return -1.0f;
+	float AnimState::GetTransitionDuration(StringHash targetStateHash) const
+	{
+		auto it = m_transitions.find(targetStateHash);
+		if (it != m_transitions.end()) return it->second;
+		return -1.0f;
+	}
 }

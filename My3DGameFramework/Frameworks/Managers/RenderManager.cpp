@@ -9,6 +9,7 @@
 #include "Components/Camera.h"
 #include "Components/Transform.h"
 #include "Uniforms/GlobalUniform.h"
+#include "Instancing/Animations/AnimationBuffer.h"
 
 namespace MGF3D
 {

@@ -70,7 +70,7 @@ namespace MGF3D
 		void FinalizeBoneIDs();
 
 		int32 m_boneCounter{ 0 };
-		HashMap<String, glm::mat4> m_boneOffsets;
+		HashMap<String, mat4> m_boneOffsets;
 		HashMap<String, int32> m_boneNameToIdMap;
 
 		/*=============================//

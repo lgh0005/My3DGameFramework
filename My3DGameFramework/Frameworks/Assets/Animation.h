@@ -5,6 +5,8 @@
 
 namespace MGF3D
 {
+	MGF_CLASS_PTR(AnimClip)
+
 	MGF_CLASS_PTR(Animation)
 	class Animation : public Asset
 	{
@@ -23,13 +25,14 @@ namespace MGF3D
 	//      Asset Loading     //
 	//========================*/
 	public:
+		virtual ~Animation() override;
 		virtual bool Load() override;
 
 	/*========================//
 	//      Data Getters      //
 	//========================*/
 	public:
-		const AnimClip& GetAnimClip() const { return m_animClip; }
+		const AnimClipPtr& GetAnimClip() const { return m_animClip; }
 		const String& GetName() const { return m_name; }
 
 		float GetDuration() const { return m_duration; }
@@ -41,6 +44,14 @@ namespace MGF3D
 		// [CPU Skinning / Blend] StringHash 기반 채널 검색
 		const AnimChannel* FindChannel(StringHash nameHash) const;
 
+	// [DEBUG]
+	public:
+		// 현재 로드된 모든 애니메이션 채널의 원본 이름을 리스트로 반환 (디버깅용)
+		Vector<String> GetChannelNames() const;
+
+		// 로그에 모든 채널 이름을 즉시 출력
+		void DebugPrintChannels() const;
+
 	private:
 		Animation(const String& path);
 		String m_name;
@@ -48,7 +59,7 @@ namespace MGF3D
 		float m_ticksPerSecond{ 0.0f };
 
 		// 베이킹된 글로벌 오프셋과 행렬 데이터 모음
-		AnimClip m_animClip;
+		AnimClipPtr m_animClip;
 		uint32 m_globalOffset{ 0 };
 
 		// 원본 키프레임 데이터 (CPU 스킨닝 및 보간 용도)

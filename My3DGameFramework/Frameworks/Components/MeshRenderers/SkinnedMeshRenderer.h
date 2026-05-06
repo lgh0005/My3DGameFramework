@@ -32,10 +32,13 @@ namespace MGF3D
 
 	public:
 		SkinnedMesh* GetSkinnedMesh() const;
-		void SetBoneBufferOffset(uint32 offset) { m_boneBufferOffset = offset; }
-		uint32 GetBoneBufferOffset() const { return m_boneBufferOffset; }
+		void SetDynamicLocalBounds(const RenderBounds& bounds);
+		RenderBounds GetDynamicLocalBounds() const;
+		void SetRootEntityID(ObjectIDHash id) { m_rootEntityID = id; }
+		ObjectIDHash GetRootEntityID() const { return m_rootEntityID; }
 
 	private:
-		uint32 m_boneBufferOffset { 0 };
+		RenderBounds m_dynamicLocalBounds;
+		ObjectIDHash m_rootEntityID{ 0 };
 	};
 }

@@ -11,6 +11,11 @@ namespace MGF3D
 		~RenderBounds();
 
 	public:
+		static RenderBounds Empty();
+		static RenderBounds CreateFromMinMax(const vec3& min, const vec3& max);
+
+	public:
+		bool IsValid() const;
 		RenderBounds Transform(const mat4& mat) const;
 		RenderBounds Union(const RenderBounds& other) const;
 		void SetFromMinMax(const vec3& min, const vec3& max);

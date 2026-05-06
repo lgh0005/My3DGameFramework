@@ -2,6 +2,7 @@
 #include "Animation.h"
 #include "Managers/TypeManager.h"
 #include "CoreUtils/AssetUtils.h"
+#include "Mechanics/Animation/AnimClip.h"
 
 namespace MGF3D
 {
@@ -53,15 +54,18 @@ namespace MGF3D
 		m_name = std::move(rawAnim.name);
 		m_duration = rawAnim.duration;
 		m_ticksPerSecond = rawAnim.ticksPerSecond;
+		m_animClip = AnimClipPtr
+		(
+			new AnimClip
+			(
+				rawAnim.frameCount,
+				rawAnim.boneCount,
+				rawAnim.frameRate,
+				std::move(rawAnim.bakedMatrices)
+			)
+		);
 
-		m_animClip.frameRate = rawAnim.frameRate;
-		m_animClip.frameCount = rawAnim.frameCount;
-		m_animClip.boneCount = rawAnim.boneCount;
-
-		// 행렬 데이터의 소유권 이전 (std::move로 복사 비용 0)
-		m_animClip.localMatrices = std::move(rawAnim.bakedMatrices);
-
-		// 4. 채널 데이터 파싱 및 Map 구축 (StringHash 적용)
+		// 4. 채널 데이터 파싱 및 Map 구축
 		m_channels.reserve(rawAnim.channels.size());
 		for (auto& rawCh : rawAnim.channels)
 		{
@@ -82,14 +86,14 @@ namespace MGF3D
 		}
 
 		// 5. 유효성 검증
-		if (!m_animClip.IsValid())
+		if (!m_animClip->IsValid())
 		{
 			MGF_LOG_ERROR("Animation::Load - Loaded [{}] but AnimClip is empty/invalid.", m_name);
 			SetState(EAssetState::Failed);
 			return false;
 		}
 
-		MGF_LOG_INFO("Loaded Baked Animation: {} ({} frames, {} bones)", m_name, m_animClip.frameCount, m_animClip.boneCount);
+		MGF_LOG_INFO("Loaded Baked Animation: {} ({} frames, {} bones)", m_name, m_animClip->GetFrameCount(), m_animClip->GetBoneCount());
 
 		// 6. 성공 시 에셋 상태를 Loaded로 전환 (Animation은 내부 리소스가 없으므로 Update 단계에서 바로 Ready가 됩니다)
 		SetState(EAssetState::Loaded);
@@ -104,5 +108,28 @@ namespace MGF3D
 		auto it = m_channelMap.find(nameHash);
 		if (it != m_channelMap.end()) return it->second;
 		return nullptr;
+	}
+
+	Vector<String> Animation::GetChannelNames() const
+	{
+		Vector<String> names;
+		names.reserve(m_channels.size());
+
+		for (const auto& ch : m_channels)
+		{
+			// AnimChannel::GetName()이 구현되어 있다고 가정합니다.
+			names.push_back(ch->GetBoneName());
+		}
+		return names;
+	}
+
+	void Animation::DebugPrintChannels() const
+	{
+		MGF_LOG_FATAL("------- [Animation Debug] Channel Names in '{}' -------", m_name);
+		for (const auto& ch : m_channels)
+		{
+			MGF_LOG_FATAL(" - Channel: '{}' (Hash: {})", ch->GetBoneName(), StringHash(ch->GetBoneName()).value);
+		}
+		MGF_LOG_FATAL("-------------------------------------------------------");
 	}
 }

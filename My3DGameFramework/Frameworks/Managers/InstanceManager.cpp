@@ -4,8 +4,11 @@
 #include "Rendering/RenderContext.h"
 #include "Instancing/Meshes/StaticInstanceData.h"
 #include "Components/Transform.h"
+#include "Graphics/Meshes/StaticMesh.h"
+#include "Graphics/Meshes/SkinnedMesh.h"
 #include "Components/MeshRenderers/MeshRenderer.h"
 #include "Components/MeshRenderers/SkinnedMeshRenderer.h"
+#include "Components/Animation/Animator.h"
 
 namespace MGF3D
 {
@@ -33,7 +36,7 @@ namespace MGF3D
             auto* transform = MGF_ENTITY.GetComponent<Transform>(renderer->GetOwnerID());
             if (!transform) continue;
 
-            Mesh* mesh = renderer->GetMesh();
+            StaticMesh* mesh = renderer->GetMesh();
             Material* material = renderer->GetMaterial();
             if (!mesh || !material) continue;
 
@@ -58,13 +61,16 @@ namespace MGF3D
 		    auto* transform = MGF_ENTITY.GetComponent<Transform>(renderer->GetOwnerID());
 		    if (!transform) continue;
 
-		    Mesh* mesh = renderer->GetMesh();
+		    SkinnedMesh* mesh = renderer->GetSkinnedMesh();
 		    Material* material = renderer->GetMaterial();
 		    if (!mesh || !material) continue;
 
 		    SkinnedInstanceData data;
 		    data.worldMatrix = transform->GetWorldMatrix();
-		    data.boneOffset = renderer->GetBoneBufferOffset();
+            ObjectIDHash rootID = renderer->GetRootEntityID();
+            auto* animator = MGF_ENTITY.GetComponent<Animator>(rootID);
+            if (animator) data.boneOffset = animator->GetBoneBufferOffset();
+            else data.boneOffset = 0;
 
 		    context->GetSkinnedQueue().Submit(mesh, material, data);
 		}

@@ -4,7 +4,6 @@
 #include "Managers/AssetManager.h"
 #include "Managers/EntityManager.h"
 #include "CoreUtils/AssetUtils.h"
-#include "Entities/GameObject.h"
 #include "Components/Transform.h"
 #include "Components/MeshRenderers/MeshRenderer.h"
 #include "Components/MeshRenderers/SkinnedMeshRenderer.h"
@@ -98,12 +97,22 @@ namespace MGF3D
 				if (myIt != boneMap.end())
 				{
 					int32 myBoneID = myIt->second;
-					if (node.parentIndex >= 0)
+					int32 searchParentIdx = node.parentIndex;
+
+					// 부모가 진짜 뼈일 때까지 계속 위로 거슬러 올라감
+					for (const auto& node : m_nodes)
 					{
-						const auto& parentNode = m_nodes[node.parentIndex];
-						auto parentIt = boneMap.find(StringHash(parentNode.name));
-						if (parentIt != boneMap.end())
-							parentIndices[myBoneID] = parentIt->second;
+						auto myIt = boneMap.find(StringHash(node.name));
+						if (myIt != boneMap.end())
+						{
+							int32 myBoneID = myIt->second;
+							if (node.parentIndex >= 0)
+							{
+								const auto& parentNode = m_nodes[node.parentIndex];
+								auto parentIt = boneMap.find(StringHash(parentNode.name));
+								if (parentIt != boneMap.end()) parentIndices[myBoneID] = parentIt->second;
+							}
+						}
 					}
 				}
 			}
@@ -249,20 +258,38 @@ namespace MGF3D
 			}
 
 			// 5. 메쉬 및 렌더러 컴포넌트 조립
-			for (uint32 meshIdx : node.meshIndices)
+			for (uint32 m = 0; m < (uint32)node.meshIndices.size(); ++m)
 			{
+				uint32 meshIdx = node.meshIndices[m];
 				if (meshIdx >= m_meshes.size()) continue;
 
 				auto mesh = m_meshes[meshIdx];
 				uint32 matIdx = mesh->GetMaterialIndex();
 
-				// 1. 주입할 머티리얼 포인터 준비
 				MaterialPtr targetMaterial = nullptr;
 				if (matIdx < m_materials.size()) targetMaterial = m_materials[matIdx];
 
+				String meshObjName = targetName + "_SubMesh_" + std::to_string(m);
+				ObjectIDHash meshObjID = MGF_ENTITY.CreateGameObject(meshObjName);
+
+				MGF_ENTITY.AddComponent<Transform>(meshObjID);
+				Transform* meshTransform = MGF_ENTITY.GetComponent<Transform>(meshObjID);
+				if (meshTransform)
+				{
+					Transform* rootTransform = MGF_ENTITY.GetComponent<Transform>(spawnedIDs[0]);
+					if (rootTransform) meshTransform->SetParent(rootTransform);
+				}
+
 				auto skinnedMesh = MGFTypeCaster::Cast<SkinnedMesh>(mesh);
-				if (skinnedMesh != nullptr) MGF_ENTITY.AddComponent<SkinnedMeshRenderer>(currentID, skinnedMesh, targetMaterial);
-				else MGF_ENTITY.AddComponent<MeshRenderer>(currentID, mesh, targetMaterial);
+				if (skinnedMesh != nullptr)
+				{
+					auto* renderer = MGF_ENTITY.AddComponent<SkinnedMeshRenderer>(meshObjID, skinnedMesh, targetMaterial);
+					if (renderer) renderer->SetRootEntityID(spawnedIDs[0]);
+				}
+				else
+				{
+					MGF_ENTITY.AddComponent<MeshRenderer>(meshObjID, mesh, targetMaterial);
+				}
 			}
 		}
 

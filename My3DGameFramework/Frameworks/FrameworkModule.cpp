@@ -6,6 +6,7 @@
 #include "Managers/ResourceManager.h"
 #include "Managers/RenderManager.h"
 #include "Managers/ScriptManager.h"
+#include "Managers/AnimationManager.h"
 #include "Managers/EntityManager.h"
 #include "Managers/TypeManager.h"
 #pragma endregion
@@ -25,11 +26,13 @@
 #pragma region COMPONENT
 #include "Registries/ComponentRegistry.h"
 #include "Components/MeshRenderers/MeshRenderer.h"
+#include "Components/MeshRenderers/SkinnedMeshRenderer.h"
 #include "Components/Script/Script.h"
 #include "Components/Lights/Light.h"
 #include "Components/Lights/DirectionalLight.h"
 #include "Components/Lights/SpotLight.h"
 #include "Components/Lights/PointLight.h"
+#include "Components/Animation/Animator.h"
 #pragma endregion
 
 #pragma region RESOURCE
@@ -38,6 +41,7 @@
 
 #pragma region ASSET
 #include "Assets/Model.h"
+#include "Assets/Animation.h"
 #pragma endregion
 
 namespace MGF3D
@@ -47,6 +51,7 @@ namespace MGF3D
 		// 0. Asset 타입
 		MGFTypeTree* assetTree = MGF_TYPE.GetTree("Asset");
 		Model::s_typeIndex = assetTree->Register("Model", "Asset");
+		Animation::s_typeIndex = assetTree->Register("Animation", "Asset");
 
 		// 1. Resources 타입 베이킹
 		MGFTypeTree* resourceTree = MGF_TYPE.GetTree("Resource");
@@ -64,6 +69,7 @@ namespace MGF3D
 		MGFTypeTree* componentTree = MGF_TYPE.GetTree("Component");
 
 		MeshRenderer::s_typeIndex = componentTree->Register("MeshRenderer", "");
+		SkinnedMeshRenderer::s_typeIndex = componentTree->Register("SkinnedMeshRenderer", "MeshRenderer");
 
 		Script::s_typeIndex = componentTree->Register("Script", "");
 
@@ -72,11 +78,15 @@ namespace MGF3D
 		SpotLight::s_typeIndex = componentTree->Register("SpotLight", "Light");
 		PointLight::s_typeIndex = componentTree->Register("PointLight", "Light");
 
+		Animator::s_typeIndex = componentTree->Register("Animator", "");
+
 		// 3. Component 레지스트리 주입
 		MGF_ENTITY.AddComponentRegistry(MeshRenderer::s_typeIndex, MakeUnique<ComponentRegistry<MeshRenderer>>());
+		MGF_ENTITY.AddComponentRegistry(SkinnedMeshRenderer::s_typeIndex, MakeUnique<ComponentRegistry<SkinnedMeshRenderer>>());
 		MGF_ENTITY.AddComponentRegistry(DirectionalLight::s_typeIndex, MakeUnique<ComponentRegistry<DirectionalLight>>());
 		MGF_ENTITY.AddComponentRegistry(PointLight::s_typeIndex, MakeUnique<ComponentRegistry<PointLight>>());
 		MGF_ENTITY.AddComponentRegistry(SpotLight::s_typeIndex, MakeUnique<ComponentRegistry<SpotLight>>());
+		MGF_ENTITY.AddComponentRegistry(Animator::s_typeIndex, MakeUnique<ComponentRegistry<Animator>>());
 	}
 
 	bool FrameworkModule::OnInit()
@@ -86,6 +96,9 @@ namespace MGF3D
 
 		// 2. 스크립트 매니저 초기화
 		if (!MGF_SCRIPT.Init()) return false;
+
+		// 3. 애니메이션 매니저 초기화
+		if (!MGF_ANIM.Init()) return false;
 
 		return true;
 	}
@@ -97,6 +110,9 @@ namespace MGF3D
 
 		// 1. 에셋 매니저 종료
 		MGF_ASSET.Shutdown();
+
+		// 2. 애니메이션 매니저 종료
+		MGF_ANIM.Shutdown();
 
 		// 2. 스크립트 매니저 종료
 		MGF_SCRIPT.Shutdown();

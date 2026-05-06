@@ -17,7 +17,6 @@ namespace MGF3D
             Vector<uint32>&&       indices,
             uint32 primitiveType = GL_TRIANGLES
         );
-
         virtual bool OnSyncCreate() override;
 
     /*=====================//
@@ -29,7 +28,6 @@ namespace MGF3D
 
     private:
         StaticMesh();
-  
         Vector<StaticVertex> m_vertices;
         Vector<uint32> m_indices;
     };

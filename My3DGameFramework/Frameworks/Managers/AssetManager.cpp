@@ -16,16 +16,6 @@ namespace MGF3D
 		MGF_LOG_INFO("AssetManager Shutdown. Cache cleared.");
 	}
 
-	AssetPtr AssetManager::GetAsset(const String& path)
-	{
-		PathHash pathHash = PathHash(path);
-
-		LockScope lock(m_cacheMutex);
-		auto it = m_assetCache.find(pathHash);
-		if (it != m_assetCache.end()) return it->second;
-		return nullptr;
-	}
-
 	void AssetManager::ProcessCPULoadTask(AssetPtr asset)
 	{
 		// 1. 파일 I/O 및 파싱

@@ -24,7 +24,7 @@ set(SOURCES
     "Registries/ScriptRegistry.h"     "Registries/ScriptRegistry.cpp"
 
     # Components
-    # "Components/Animation/Animator.h"       "Components/Animation/Animator.cpp"
+    "Components/Animation/Animator.h"       "Components/Animation/Animator.cpp"
     # "Components/Audios/AudioListener.h"     "Components/Audios/AudioListener.cpp"
     # "Components/Audios/AudioSource.h"       "Components/Audios/AudioSource.cpp"
     # "Components/Colliders/Collider.h"     "Components/Colliders/Collider.cpp"
@@ -45,14 +45,14 @@ set(SOURCES
 
     # Mechanics
     "Mechanics/Animation/AnimChannel.h"             "Mechanics/Animation/AnimChannel.cpp"
-    # "Mechanics/Animation/AnimClip.h"             "Mechanics/Animation/AnimClip.cpp"
-    # "Mechanics/Animation/AnimController.h"             "Mechanics/Animation/AnimController.cpp"
-    # "Mechanics/Animation/AnimState.h"             "Mechanics/Animation/AnimState.cpp"
+    "Mechanics/Animation/AnimClip.h"             "Mechanics/Animation/AnimClip.cpp"
+    "Mechanics/Animation/AnimController.h"             "Mechanics/Animation/AnimController.cpp"
+    "Mechanics/Animation/AnimState.h"             "Mechanics/Animation/AnimState.cpp"
     "Mechanics/Animation/Pose.h"             "Mechanics/Animation/Pose.cpp"
     "Mechanics/Animation/Skeleton.h"             "Mechanics/Animation/Skeleton.cpp"
 
     # Assets
-    # "Assets/Animation.h"             "Assets/Animation.cpp"
+    "Assets/Animation.h"             "Assets/Animation.cpp"
     # "Assets/AudioClip.h"             "Assets/AudioClip.cpp"
     "Assets/Model.h"                   "Assets/Model.cpp"
 

@@ -3,6 +3,8 @@
 #include "Managers/TypeManager.h"
 #include "Managers/ResourceManager.h"
 #include "Managers/AssetManager.h"
+#include "Managers/AnimationManager.h"
+#include "Instancing/Animations/AnimationBuffer.h"
 #include "Assets/Shader.h"
 #include "Graphics/Programs/GraphicsProgram.h"
 #include "Rendering/RenderContext.h"
@@ -27,6 +29,14 @@ namespace MGF3D
 		m_program->AddShader(vs);
 		m_program->AddShader(fs);
 		m_program->SetState(EResourceState::Loaded);
+
+		m_programAnim = MGF_RESOURCE.GetOrCreate<GraphicsProgram>("TestDebugProgram2");
+		auto vs2 = MGF_ASSET.LoadAssetAsync<Shader>("@GameAsset/Test/Test_skin.vert", GL_VERTEX_SHADER, EShaderFileType::GLSL);
+		auto fs2 = MGF_ASSET.LoadAssetAsync<Shader>("@GameAsset/Test/Test.frag", GL_FRAGMENT_SHADER, EShaderFileType::GLSL);
+		m_programAnim->AddShader(vs2);
+		m_programAnim->AddShader(fs2);
+		m_programAnim->SetState(EResourceState::Loaded);
+
 		return true;
 	}	
 
@@ -60,14 +70,13 @@ namespace MGF3D
 			MGF_LOG_INFO("TestRenderPass: Program is linked and ready.");
 		}
 
-		// 3. 프로그램 사용 (glUseProgram)
+		// 3. 정적 메쉬 렌더링
 		m_program->Use();
-
-		// 4. 큐 실행
-		// 정적 메쉬 렌더링 (Slot 1 사용)
 		context->GetStaticQueue().Execute();
 
-		// 스킨드 메쉬 렌더링 (동일하게 Slot 1 사용하지만 배치가 다르므로 문제 없음)
+		// 4. 스킨드 메쉬 렌더링
+		m_programAnim->Use();
+		MGF_ANIM.GetAnimationBuffer()->Bind(9);
 		context->GetSkinnedQueue().Execute();
 	}
 }

@@ -27,5 +27,6 @@ namespace MGF3D
 		bool Init();
 
 		GraphicsProgramPtr m_program;
+		GraphicsProgramPtr m_programAnim;
 	};
 }

@@ -28,6 +28,8 @@ namespace MGF3D
 	public:
 		virtual bool Load() override;
 		ObjectIDHash Instantiate(const String& name);
+		SkeletonPtr GetSkeleton() const { return m_skeleton; }
+		const Vector<RawNode>& GetNodes() const { return m_nodes; }
 
 	private:
 		Model(const String& path);

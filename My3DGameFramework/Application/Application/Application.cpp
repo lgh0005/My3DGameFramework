@@ -14,23 +14,10 @@
 #include "Managers/TimeManager.h"
 #include "Managers/SceneManager.h"
 #include "Managers/ScriptManager.h"
-#include "Managers/TypeManager.h"
 #include "Managers/AssetManager.h"
 #include "Managers/ResourceManager.h"
 #include "Managers/RenderManager.h"
-#pragma endregion
-
-#pragma region TEMP
-#include "Input/Devices/MGFKeyboardDevice.h"
-#include "Input/Devices/MGFMouseDevice.h"
-#pragma endregion
-
-#pragma region ASSET_RESOURCE_DEBUG
-#include "Assets/Shader.h"
-#include "Programs/GraphicsProgram.h"
-#include "Meshes/StaticMesh.h"
-#include "Shader/GLShader.h"
-#include "GraphicsUtils/GeometryUtils.h"
+#include "Managers/AnimationManager.h"
 #pragma endregion
 
 namespace MGF3D
@@ -84,6 +71,7 @@ namespace MGF3D
 			MGF_SCRIPT.LateUpdate();
 
 			// 5. 렌더링
+			MGF_ANIM.Update(MGF_TIME.GetDeltaTime());
 			MGF_RENDER.Render();
 			MGF_WINDOW.SwapWindowBuffers();
 		}

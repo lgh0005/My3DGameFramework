@@ -20,7 +20,9 @@ namespace MGF3D
 	public:
 		template<typename T, typename... Args>
 		std::shared_ptr<T> LoadAssetAsync(const String& virtualPath, Args&&... args);
-		AssetPtr GetAsset(const String& virtualPath);
+		
+		template<typename T>
+		std::shared_ptr<T> GetAsset(const String& virtualPath);
 
 	private:
 		void ProcessCPULoadTask(AssetPtr asset);

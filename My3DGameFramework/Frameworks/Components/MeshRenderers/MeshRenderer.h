@@ -5,6 +5,7 @@
 namespace MGF3D
 {
 	MGF_CLASS_PTR(Mesh)
+	MGF_CLASS_PTR(StaticMesh)
 	MGF_CLASS_PTR(Material)
 
 	MGF_CLASS_PTR(MeshRenderer)
@@ -23,15 +24,16 @@ namespace MGF3D
 		MeshRenderer(MeshRenderer&& other) noexcept;
 		MeshRenderer& operator=(MeshRenderer&& other) noexcept;
 
-	/*===============================//
-	//      Transform Type           //
-	//===============================*/
+	/*==================================//
+	//      MeshRenderer Type           //
+	//==================================*/
 	public:
 		static int16 s_typeIndex;
 		virtual const MGFType* GetType() const override;
 
 	public:
-		Mesh* GetMesh() const { return m_mesh.get(); }
+		StaticMesh* GetMesh() const;
+		RenderBounds GetLocalBounds() const;
 		Material* GetMaterial() const { return m_material.get(); }
 
 		void SetMesh(const MeshPtr& mesh) { m_mesh = mesh; }

@@ -395,6 +395,13 @@ namespace MGF3D
             // Tangent
             if (mesh->mTangents) v.tangent = { mesh->mTangents[i].x, mesh->mTangents[i].y, mesh->mTangents[i].z };
             else v.tangent = { 0.0f, 0.0f, 0.0f };
+            
+            // 뼈와 가중치
+            for (int k = 0; k < MAX_BONE_INFLUENCE; ++k)
+            {
+                v.boneIDs[k] = -1;
+                v.weights[k] = 0.0f;
+            }
 
             // AABB 갱신 (Global & Local)
             rawMesh.aabbMin = Math::Min(rawMesh.aabbMin, v.position);
