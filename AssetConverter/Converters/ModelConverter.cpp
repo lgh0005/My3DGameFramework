@@ -3,6 +3,7 @@
 #include "KTXTextureConverter.h"
 #include "ORMTexturePacker.h"
 #include "Managers/ThreadManager.h"
+#include "Assets/RawTexture.h"
 
 namespace MGF3D
 {
@@ -107,7 +108,7 @@ namespace MGF3D
         if (m_rawModel.hasSkeleton) MGF_LOG_INFO(" - Skeleton Detected (Total Bones: {})", m_boneCounter);
         else MGF_LOG_INFO(" - Static Mesh Detected (No Skeleton)");
 
-        // [추가] 모든 비동기 텍스처 작업 대기
+        // 모든 비동기 텍스처 작업 대기
         MGF_LOG_INFO("Waiting for texture conversion tasks...");
         WaitAllTasks();
 
@@ -128,7 +129,7 @@ namespace MGF3D
         OutputFileStream outFile(m_outputPath, std::ios::binary);
         if (!outFile) return false;
 
-        // [DEBUG] 시작 위치
+        // 시작 위치
         long pos = (long)outFile.tellp();
         MGF_LOG_WARN(">>> [WRITER] Start Offset: {}", pos);
 
