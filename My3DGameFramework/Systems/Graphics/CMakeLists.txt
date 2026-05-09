@@ -13,7 +13,7 @@ set(SOURCES
     "GraphicsModule.h"                     "GraphicsModule.cpp"
 
     # Constants
-    "Constants/ConstantGraphics.h"
+    "Constants/ConstantGraphics.h"          "Constants/ConstantVulkan.h"
 
     # Managers
     

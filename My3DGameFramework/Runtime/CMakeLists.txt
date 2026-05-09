@@ -26,6 +26,11 @@ set(SOURCES
     "Pipelines/_Test/TestPipeline.h"          "Pipelines/_Test/TestPipeline.cpp"
     "Pipelines/_Test/RenderPasses/TestRenderPass.h"          "Pipelines/_Test/RenderPasses/TestRenderPass.cpp"
 
+    # RenderPipeline
+    "Pipelines/RenderPipeline/MGFRenderPipeline.h"                     "Pipelines/RenderPipeline/MGFRenderPipeline.cpp"
+    "Pipelines/RenderPipeline/RenderPasses/MGFGeometryPass.h"          "Pipelines/RenderPipeline/RenderPasses/MGFGeometryPass.cpp"
+    "Pipelines/RenderPipeline/RenderPasses/MGFDeferredLightingPass.h"  "Pipelines/RenderPipeline/RenderPasses/MGFDeferredLightingPass.cpp"
+
     # Managers
     #"Managers/ImguiManager.h"     "Managers/ImguiManager.cpp"
     #"Managers/LevelManager.h"     "Managers/LevelManager.cpp"    "Application/LevelManager.inl"

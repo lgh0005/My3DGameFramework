@@ -70,4 +70,19 @@ namespace MGF3D
 		m_state = EResourceState::Ready;
 		return true;
 	}
+
+	void ScreenMesh::Draw() const
+	{
+		// 리소스가 Ready 상태가 아니거나 레이아웃이 없으면 무시
+		if (m_state != EResourceState::Ready || !m_vertexLayout) return;
+
+		// 1. VAO 바인딩
+		Bind();
+
+		// 2. 인스턴싱 없이 단일 드로우
+		glDrawElements(m_primitiveType, static_cast<GLsizei>(m_indexCount), GL_UNSIGNED_INT, nullptr);
+
+		// 3. 상태 오염 방지를 위해 바인딩 해제
+		Unbind();
+	}
 }

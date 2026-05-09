@@ -14,6 +14,7 @@
 //  default Graphics constants  //
 //==============================*/
 #include "Constants/ConstantGraphics.h"
+#include "Constants/ConstantVulkan.h"
 
 /*====================//
 //  default vertices  //

@@ -13,6 +13,9 @@ namespace MGF3D
 		static ScreenMeshPtr Create();
 		virtual bool OnSyncCreate() override;
 
+	public:
+		void Draw() const;
+
 	/*=====================//
 	//   ScreenMesh Type   //
 	//=====================*/

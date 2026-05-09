@@ -14,6 +14,19 @@ namespace MGF3D
 {
 	MGF_CLASS_PTR(GLUniformBuffer)
 	MGF_CLASS_PTR(GLShaderStorageBuffer)
+	MGF_CLASS_PTR(GLTexture2D)
+	MGF_CLASS_PTR(ScreenMesh)
+	MGF_CLASS_PTR(GLFramebuffer2D)
+
+	enum class EGBufferSlot : uint8
+	{
+		PositionAO = 0,      // location = 0
+		NormalRoughness,     // location = 1
+		AlbedoMetallic,      // location = 2
+		Emission,            // location = 3
+		Velocity,            // location = 4
+		Max
+	};
 
 	MGF_CLASS_PTR(RenderContext)
 	class RenderContext
@@ -38,6 +51,12 @@ namespace MGF3D
 		void UpdatePointShadows(const Vector<PointShadowData>& shadows);
 		void UpdateSpotShadows(const Vector<SpotShadowData>& shadows);
 
+	public:
+		ScreenMesh* GetScreenMesh() const { return m_screenMesh.get(); }
+		void InitGeometryBuffer(uint32 width, uint32 height);
+		GLFramebuffer2D* GetGeometryBuffer() const { return m_geometryBuffer.get(); }
+		GLTexture2D* GetGeometryBufferTexture(EGBufferSlot slot) const;
+
 	private:
 		template <typename T>
 		void UpdateSSBO
@@ -48,9 +67,17 @@ namespace MGF3D
 		);
 
 	private:
+		// 전역 설정 대상들
 		GLUniformBufferUPtr m_globalUBO;
 		RenderQueue<StaticInstanceData>  m_staticQueue;
 		RenderQueue<SkinnedInstanceData> m_skinnedQueue;
+
+		// Screen 메쉬
+		ScreenMeshPtr m_screenMesh;
+
+		// G-Buffer
+		GLFramebuffer2DPtr m_geometryBuffer;
+		Vector<GLTexture2DPtr> m_gBufferTextures;
 	
 		// 조명 전용 SSBO
 		GLShaderStorageBufferUPtr m_dirLightSSBO;

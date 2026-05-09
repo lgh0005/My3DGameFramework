@@ -21,7 +21,9 @@ namespace MGF3D
 		case 146: return GL_COMPRESSED_SRGB_ALPHA_BPTC_UNORM;
 		case 37:  return GL_RGBA8;
 		case 43:  return GL_SRGB8_ALPHA8;
+		case 83:  return GL_RG16F;
 		case 97:  return GL_RGBA16F;
+		case 129: return GL_DEPTH24_STENCIL8;
 		default:
 			MGF_LOG_WARN
 			(
@@ -46,6 +48,12 @@ namespace MGF3D
 		case GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT5_EXT:
 			return GL_RGBA;
 
+		case GL_RG16F:
+			return GL_RG;
+
+		case GL_DEPTH24_STENCIL8:
+			return GL_DEPTH_STENCIL;
+
 		case GL_R16F:
 		case GL_R32F:
 		case GL_RED:
@@ -65,7 +73,16 @@ namespace MGF3D
 
 	uint32 TextureUtils::GetGLDataTypeFromVk(uint32 vkFormat)
 	{
-		return CommonUtils::Select(vkFormat == 97, GL_HALF_FLOAT, GL_UNSIGNED_BYTE);
+		switch (vkFormat)
+		{
+		case 83:  // VK_FORMAT_R16G16_SFLOAT
+		case 97:  // VK_FORMAT_R16G16B16A16_SFLOAT
+			return GL_HALF_FLOAT;
+		case 129: // VK_FORMAT_D24_UNORM_S8_UINT
+			return GL_UNSIGNED_INT_24_8;
+		default:
+			return GL_UNSIGNED_BYTE;
+		}
 	}
 
 	uint32 TextureUtils::CalculateMaxMipLevels(uint32 width, uint32 height)

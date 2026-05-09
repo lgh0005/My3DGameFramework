@@ -105,11 +105,12 @@ namespace MGF3D
 
 		// Immutable Storage 할당
 		glTextureStorage2D(m_handle, mipmapLevel, internalFormat, m_width, m_height);
+		GLint minFilter = (mipmapLevel == 1) ? GL_LINEAR : GL_LINEAR_MIPMAP_LINEAR;
 
 		// 기본 파라미터 설정 (필요 시 인자로 빼서 확장 가능)
 		glTextureParameteri(m_handle, GL_TEXTURE_WRAP_S, GL_REPEAT);
 		glTextureParameteri(m_handle, GL_TEXTURE_WRAP_T, GL_REPEAT);
-		glTextureParameteri(m_handle, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+		glTextureParameteri(m_handle, GL_TEXTURE_MIN_FILTER, minFilter);
 		glTextureParameteri(m_handle, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
 		return true;

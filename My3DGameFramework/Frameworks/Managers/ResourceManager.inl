@@ -19,6 +19,30 @@ namespace MGF3D
 	}
 
 	template<typename T, typename... Args>
+	std::shared_ptr<T> ResourceManager::CreateImmediate(Args&&... args)
+	{
+		MGF_STATIC_ASSERT
+		(
+			std::is_base_of_v<Resource, T>,
+			"T must inherit from Resource"
+		);
+
+		auto newResource = T::Create(std::forward<Args>(args)...);
+		if (newResource)
+		{
+			// RegisterSync를 호출하지 않고 그 자리에서 즉시 할당을 시도합니다.
+			if (newResource->OnSyncCreate()) newResource->SetState(EResourceState::Ready);
+			else
+			{
+				newResource->SetState(EResourceState::Failed);
+				return nullptr;
+			}
+		}
+
+		return newResource;
+	}
+
+	template<typename T, typename... Args>
 	std::shared_ptr<T> ResourceManager::GetOrCreate(const String& name, Args&&... args)
 	{
 		MGF_STATIC_ASSERT

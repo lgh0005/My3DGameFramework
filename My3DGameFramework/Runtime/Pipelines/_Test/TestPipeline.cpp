@@ -40,7 +40,7 @@ namespace MGF3D
 	int16 TestPipeline::s_typeIndex = -1;
 	const MGFType* TestPipeline::GetType() const
 	{
-		MGFTypeTree* tree = MGF_TYPE.GetTree("TestPipeline");
+		MGFTypeTree* tree = MGF_TYPE.GetTree("RenderPipeline");
 		if (tree != nullptr) return tree->GetType(s_typeIndex);
 		return nullptr;
 	}
