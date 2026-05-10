@@ -39,11 +39,20 @@ namespace MGF3D
         // 1. 의존성 체크: 부착할 모든 셰이더가 컴파일 완료(Ready) 상태인지 확인
         for (const auto& shader : m_pendingShaders)
         {
-            if (!shader || shader->GetState() != EAssetState::Ready)
+            if (!shader) return false;
+
+            auto resources = shader->GetResources();
+            if (resources.empty()) return false;
+
+            // 셰이더 에셋이 품고 있는 실제 OpenGL 리소스(GLShader)를 꺼내옴
+            auto glShader = MGFTypeCaster::Cast<GLShader>(resources[0]);
+
+            // 핵심: 에셋의 Ready가 아니라 리소스의 Ready를 확인!
+            if (!glShader || glShader->GetState() != EResourceState::Ready)
                 return false;
         }
 
-        // 2. [중요] 핸들이 없을 때만 딱 한 번 생성
+        // 2. 핸들이 없을 때만 딱 한 번 생성
         if (m_handle == 0) m_handle = glCreateProgram();
 
         for (auto& shader : m_pendingShaders)

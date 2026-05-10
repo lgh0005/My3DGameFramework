@@ -19,6 +19,9 @@ namespace MGF3D
         );
         virtual bool OnSyncCreate() override;
 
+    public:
+        virtual void Bind() override;
+
     /*======================//
     //   SkinnedMesh Type   //
     //======================*/

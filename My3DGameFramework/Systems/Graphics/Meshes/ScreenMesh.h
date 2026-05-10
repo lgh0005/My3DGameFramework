@@ -14,7 +14,8 @@ namespace MGF3D
 		virtual bool OnSyncCreate() override;
 
 	public:
-		void Draw() const;
+		virtual void Bind() override;
+		void Draw();
 
 	/*=====================//
 	//   ScreenMesh Type   //

@@ -13,8 +13,8 @@ namespace MGF3D
     {
     public:
         virtual ~Mesh();
-        virtual void Bind() const;
-        virtual void Unbind() const;
+        virtual void Bind() = 0;
+        void Unbind();
 
     /*===============//
     //   Mesh Type   //

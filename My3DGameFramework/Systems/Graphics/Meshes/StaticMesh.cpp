@@ -1,11 +1,9 @@
 ﻿#include "GraphicsPch.h"
 #include "StaticMesh.h"
-#include "CoreUtils/MathUtils.h"
 #include "Layout/GLVertexLayout.h"
 #include "Buffers/GLVertexBuffer.h"
 #include "Buffers/GLIndexBuffer.h"
 #include "Managers/TypeManager.h"
-#include "Managers/ThreadManager.h"
 
 namespace MGF3D
 {
@@ -50,23 +48,10 @@ namespace MGF3D
         if (m_vertices.empty() || m_indices.empty()) return false;
 
         // 1. 리소스 생성
-        m_vertexLayout = GLVertexLayout::Create();
         m_vertexBuffer = GLVertexBuffer::Create(m_vertices.data(), m_vertices.size() * sizeof(StaticVertex));
         m_indexBuffer = GLIndexBuffer::Create(m_indices.data(), m_indices.size() * sizeof(uint32));
 
-        // 2. DSA 레이아웃 설정
-        const uint32 bindingIndex = 0;
-        m_vertexLayout->BindVertexBuffer(bindingIndex, m_vertexBuffer, 0, sizeof(StaticVertex));
-        m_vertexLayout->BindIndexBuffer(m_indexBuffer);
-        m_vertexLayout->SetAttribFormat(0, 3, GL_FLOAT, false, offsetof(StaticVertex, position), bindingIndex);
-        m_vertexLayout->SetAttribFormat(1, 3, GL_FLOAT, false, offsetof(StaticVertex, normal), bindingIndex);
-        m_vertexLayout->SetAttribFormat(2, 2, GL_FLOAT, false, offsetof(StaticVertex, texCoord), bindingIndex);
-        m_vertexLayout->SetAttribFormat(3, 3, GL_FLOAT, false, offsetof(StaticVertex, tangent), bindingIndex);
-
-        // 3. 모든 속성 활성화
-        for (uint32 i = 0; i <= 3; ++i) m_vertexLayout->EnableAttrib(i);
-
-        // 4. GPU 업로드 완료 후 CPU 측 원본 메모리 즉각 해제
+        // 2. GPU 업로드 완료 후 CPU 측 원본 메모리 즉각 해제
         m_vertices.clear();
         m_vertices.shrink_to_fit();
         m_indices.clear();
@@ -74,5 +59,29 @@ namespace MGF3D
 
         m_state = EResourceState::Ready;
         return true;
+    }
+
+    void StaticMesh::Bind()
+    {
+        // 아직 메인 스레드에서 VAO 껍데기를 만들지 않았다면 지연 생성
+        if (!m_vertexLayout)
+        {
+            m_vertexLayout = GLVertexLayout::Create();
+
+            // 1. DSA 레이아웃 설정
+            const uint32 bindingIndex = 0;
+            m_vertexLayout->BindVertexBuffer(bindingIndex, m_vertexBuffer, 0, sizeof(StaticVertex));
+            m_vertexLayout->BindIndexBuffer(m_indexBuffer);
+            m_vertexLayout->SetAttribFormat(0, 3, GL_FLOAT, false, offsetof(StaticVertex, position), bindingIndex);
+            m_vertexLayout->SetAttribFormat(1, 3, GL_FLOAT, false, offsetof(StaticVertex, normal), bindingIndex);
+            m_vertexLayout->SetAttribFormat(2, 2, GL_FLOAT, false, offsetof(StaticVertex, texCoord), bindingIndex);
+            m_vertexLayout->SetAttribFormat(3, 3, GL_FLOAT, false, offsetof(StaticVertex, tangent), bindingIndex);
+
+            // 2. 모든 속성 활성화
+            for (uint32 i = 0; i <= 3; ++i) m_vertexLayout->EnableAttrib(i);
+        }
+
+        // 완성된 VAO 바인딩
+        m_vertexLayout->Bind();
     }
 }

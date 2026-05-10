@@ -23,8 +23,8 @@ set(SOURCES
     "Editor/GUIWindow.h"            "Editor/GUIWindow.cpp"
 
     # Test
-    "Pipelines/_Test/TestPipeline.h"          "Pipelines/_Test/TestPipeline.cpp"
-    "Pipelines/_Test/RenderPasses/TestRenderPass.h"          "Pipelines/_Test/RenderPasses/TestRenderPass.cpp"
+    #"Pipelines/_Test/TestPipeline.h"          "Pipelines/_Test/TestPipeline.cpp"
+    #"Pipelines/_Test/RenderPasses/TestRenderPass.h"          "Pipelines/_Test/RenderPasses/TestRenderPass.cpp"
 
     # RenderPipeline
     "Pipelines/RenderPipeline/MGFRenderPipeline.h"                     "Pipelines/RenderPipeline/MGFRenderPipeline.cpp"

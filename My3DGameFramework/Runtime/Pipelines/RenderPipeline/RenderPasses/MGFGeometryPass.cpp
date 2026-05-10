@@ -24,17 +24,13 @@ namespace MGF3D
 
 	bool MGFGeometryPass::Init()
 	{
-		m_geometryStaticDrawProgram = MGF_RESOURCE.GetOrCreate<GraphicsProgram>("GeometryStaticDrawProgram");
 		auto vs = MGF_ASSET.LoadAssetAsync<Shader>("@BuiltInAsset/Shaders/Default/MGF3D_Deferred_Geometry_Static.vert", GL_VERTEX_SHADER, EShaderFileType::GLSL);
 		auto fs = MGF_ASSET.LoadAssetAsync<Shader>("@BuiltInAsset/Shaders/Default/MGF3D_Deferred_Geometry.frag", GL_FRAGMENT_SHADER, EShaderFileType::GLSL);
-		m_geometryStaticDrawProgram->AddShader(vs);
-		m_geometryStaticDrawProgram->AddShader(fs);
+		m_geometryStaticDrawProgram = MGF_RESOURCE.Create<GraphicsProgram>("GeometryStaticDrawProgram", Vector<ShaderPtr>{ vs, fs });
 
-		m_geometrySkinnedDrawProgram = MGF_RESOURCE.GetOrCreate<GraphicsProgram>("GeometrySkinnedDrawProgram");
 		auto vs2 = MGF_ASSET.LoadAssetAsync<Shader>("@BuiltInAsset/Shaders/Default/MGF3D_Deferred_Geometry_Skinned.vert", GL_VERTEX_SHADER, EShaderFileType::GLSL);
 		auto fs2 = MGF_ASSET.LoadAssetAsync<Shader>("@BuiltInAsset/Shaders/Default/MGF3D_Deferred_Geometry.frag", GL_FRAGMENT_SHADER, EShaderFileType::GLSL);
-		m_geometrySkinnedDrawProgram->AddShader(vs2);
-		m_geometrySkinnedDrawProgram->AddShader(fs2);
+		m_geometrySkinnedDrawProgram = MGF_RESOURCE.GetOrCreate<GraphicsProgram>("GeometrySkinnedDrawProgram", Vector<ShaderPtr>{ vs2, fs2 });
 
 		return true;
 	}
@@ -53,6 +49,9 @@ namespace MGF3D
 	void MGFGeometryPass::Execute(RenderContext* context)
 	{
 		if (!context || !m_geometryStaticDrawProgram || !m_geometrySkinnedDrawProgram) return;
+
+		if (m_geometryStaticDrawProgram->GetState() != EResourceState::Ready ||
+			m_geometrySkinnedDrawProgram->GetState() != EResourceState::Ready) return;
 
 		// 2. G-Buffer 프레임버퍼 가져오기
 		auto gBuffer = context->GetGeometryBuffer();

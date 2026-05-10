@@ -48,23 +48,8 @@ namespace MGF3D
         if (m_vertices.empty() || m_indices.empty()) return false;
 
         // 2. 리소스 생성
-        m_vertexLayout = GLVertexLayout::Create();
         m_vertexBuffer = GLVertexBuffer::Create(m_vertices.data(), m_vertices.size() * sizeof(SkinnedVertex));
         m_indexBuffer = GLIndexBuffer::Create(m_indices.data(), m_indices.size() * sizeof(uint32));
-
-        // 3. DSA 레이아웃 설정
-        const uint32 bindingIndex = 0;
-        m_vertexLayout->BindVertexBuffer(bindingIndex, m_vertexBuffer, 0, sizeof(SkinnedVertex));
-        m_vertexLayout->BindIndexBuffer(m_indexBuffer);
-        m_vertexLayout->SetAttribFormat(0, 3, GL_FLOAT, false, offsetof(SkinnedVertex, position), bindingIndex);
-        m_vertexLayout->SetAttribFormat(1, 3, GL_FLOAT, false, offsetof(SkinnedVertex, normal), bindingIndex);
-        m_vertexLayout->SetAttribFormat(2, 2, GL_FLOAT, false, offsetof(SkinnedVertex, texCoord), bindingIndex);
-        m_vertexLayout->SetAttribFormat(3, 3, GL_FLOAT, false, offsetof(SkinnedVertex, tangent), bindingIndex);
-        m_vertexLayout->SetAttribIFormat(4, 4, GL_INT, offsetof(SkinnedVertex, boneIDs), bindingIndex);
-        m_vertexLayout->SetAttribFormat(5, 4, GL_FLOAT, false, offsetof(SkinnedVertex, weights), bindingIndex);
-
-        // 4. 모든 속성 활성화
-        for (uint32 i = 0; i <= 5; ++i) m_vertexLayout->EnableAttrib(i);
 
         // 4. GPU 업로드 완료 후 CPU 측 원본 메모리 즉각 해제
         m_vertices.clear();
@@ -74,5 +59,31 @@ namespace MGF3D
 
         m_state = EResourceState::Ready;
         return true;
+    }
+
+    void SkinnedMesh::Bind()
+    {
+        // 아직 메인 스레드에서 VAO 껍데기를 만들지 않았다면 지연 생성
+        if (!m_vertexLayout)
+        {
+            m_vertexLayout = GLVertexLayout::Create();
+
+            // 3. DSA 레이아웃 설정
+            const uint32 bindingIndex = 0;
+            m_vertexLayout->BindVertexBuffer(bindingIndex, m_vertexBuffer, 0, sizeof(SkinnedVertex));
+            m_vertexLayout->BindIndexBuffer(m_indexBuffer);
+            m_vertexLayout->SetAttribFormat(0, 3, GL_FLOAT, false, offsetof(SkinnedVertex, position), bindingIndex);
+            m_vertexLayout->SetAttribFormat(1, 3, GL_FLOAT, false, offsetof(SkinnedVertex, normal), bindingIndex);
+            m_vertexLayout->SetAttribFormat(2, 2, GL_FLOAT, false, offsetof(SkinnedVertex, texCoord), bindingIndex);
+            m_vertexLayout->SetAttribFormat(3, 3, GL_FLOAT, false, offsetof(SkinnedVertex, tangent), bindingIndex);
+            m_vertexLayout->SetAttribIFormat(4, 4, GL_INT, offsetof(SkinnedVertex, boneIDs), bindingIndex);
+            m_vertexLayout->SetAttribFormat(5, 4, GL_FLOAT, false, offsetof(SkinnedVertex, weights), bindingIndex);
+
+            // 4. 모든 속성 활성화
+            for (uint32 i = 0; i <= 5; ++i) m_vertexLayout->EnableAttrib(i);
+        }
+
+        // 완성된 VAO 바인딩
+        m_vertexLayout->Bind();
     }
 }

@@ -23,11 +23,9 @@ namespace MGF3D
 
 	bool MGFDeferredLightingPass::Init()
 	{
-		m_deferredLightingProgram = MGF_RESOURCE.GetOrCreate<GraphicsProgram>("DeferredLightingProgram");
 		auto vs = MGF_ASSET.LoadAssetAsync<Shader>("@BuiltInAsset/Shaders/Default/MGF3D_Deferred_Lighting.vert", GL_VERTEX_SHADER, EShaderFileType::GLSL);
 		auto fs = MGF_ASSET.LoadAssetAsync<Shader>("@BuiltInAsset/Shaders/Default/MGF3D_Deferred_Lighting.frag", GL_FRAGMENT_SHADER, EShaderFileType::GLSL);
-		m_deferredLightingProgram->AddShader(vs);
-		m_deferredLightingProgram->AddShader(fs);
+		m_deferredLightingProgram = MGF_RESOURCE.Create<GraphicsProgram>("DeferredLightingProgram", Vector<ShaderPtr>{ vs, fs });
 		return true;
 	}
 
@@ -46,9 +44,11 @@ namespace MGF3D
 	{
 		if (!context || !m_deferredLightingProgram) return;
 
+		if (m_deferredLightingProgram->GetState() != EResourceState::Ready) return;
+
 		// 2. 화면 초기화 (조명 결과가 그려질 기본 프레임버퍼)
-		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-		glClear(GL_COLOR_BUFFER_BIT);
+		glClearColor(0.55f, 0.45, 0.95f, 1.0f);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		// 3. 디퍼드 라이팅은 화면에 2D 사각형을 그리는 작업이므로 깊이 테스트 비활성화
 		glDisable(GL_DEPTH_TEST);

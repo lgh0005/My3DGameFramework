@@ -12,7 +12,11 @@ namespace MGF3D
 
 	public:
 		virtual ~GraphicsProgram() override;
-		static GraphicsProgramPtr Create(StringView name);
+		static GraphicsProgramPtr Create
+		(
+			StringView name, 
+			const Vector<ShaderPtr>& shaders
+		);
 
 	/*========================//
 	// GraphicsProgram Type   //

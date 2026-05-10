@@ -7,9 +7,14 @@ namespace MGF3D
 	GraphicsProgram::GraphicsProgram(StringView name) : Super(name) { }
 	GraphicsProgram::~GraphicsProgram() = default;
 
-	GraphicsProgramPtr GraphicsProgram::Create(StringView name)
+	GraphicsProgramPtr GraphicsProgram::Create
+	(
+		StringView name,
+		const Vector<ShaderPtr>& shaders
+	)
 	{
 		auto program = SharedPtr<GraphicsProgram>(new GraphicsProgram(name));
+		for (const auto& shader : shaders) program->AddShader(shader);
 		program->SetState(EResourceState::Loaded);
 		return program;
 	}

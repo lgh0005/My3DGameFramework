@@ -14,8 +14,6 @@
 #include "Managers/TimeManager.h"
 #include "Managers/SceneManager.h"
 #include "Managers/ScriptManager.h"
-#include "Managers/AssetManager.h"
-#include "Managers/ResourceManager.h"
 #include "Managers/RenderManager.h"
 #include "Managers/AnimationManager.h"
 #pragma endregion
@@ -55,8 +53,6 @@ namespace MGF3D
 			MGF_TIME.Update();
 			MGF_WINDOW.Update();
 			MGF_INPUT.Update(MGF_WINDOW.GetNativeHandle());
-			MGF_RESOURCE.Update();
-			MGF_ASSET.Update();
 
 			// 2. 메인 게임 로직 (가변 프레임)
 			MGF_SCRIPT.Update();

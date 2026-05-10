@@ -1,5 +1,4 @@
 #pragma once
-#include "Thread/LockFreeQueue.h"
 
 namespace MGF3D
 {
@@ -14,7 +13,6 @@ namespace MGF3D
 		~AssetManager();
 
 	public:
-		void Update();
 		void Shutdown();
 
 	public:
@@ -26,12 +24,10 @@ namespace MGF3D
 
 	private:
 		void ProcessCPULoadTask(AssetPtr asset);
-		void RegisterSync(AssetPtr asset);
 
 	private:
 		mutable Mutex m_cacheMutex;
 		HashMap<PathHash, AssetPtr> m_assetCache;
-		MGFLockFreeQueue<AssetPtr> m_pendingQueue;
 	};
 }
 

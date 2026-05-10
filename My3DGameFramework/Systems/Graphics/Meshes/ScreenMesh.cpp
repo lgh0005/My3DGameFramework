@@ -5,7 +5,6 @@
 #include "Buffers/GLVertexBuffer.h"
 #include "Buffers/GLIndexBuffer.h"
 #include "Managers/TypeManager.h"
-#include "Managers/ThreadManager.h"
 
 namespace MGF3D
 {
@@ -46,20 +45,8 @@ namespace MGF3D
 	bool ScreenMesh::OnSyncCreate()
 	{
 		// 3. 리소스 생성
-		m_vertexLayout = GLVertexLayout::Create();
 		m_vertexBuffer = GLVertexBuffer::Create(m_vertices.data(), m_vertices.size() * sizeof(ScreenVertex));
 		m_indexBuffer = GLIndexBuffer::Create(m_indices.data(), m_indices.size() * sizeof(uint32));
-
-		// 4. DSA 바인딩 및 레이아웃과 포맷 설정
-		const uint32 bindingIndex = 0;
-		m_vertexLayout->BindVertexBuffer(bindingIndex, m_vertexBuffer, 0, sizeof(ScreenVertex));
-		m_vertexLayout->BindIndexBuffer(m_indexBuffer);
-		m_vertexLayout->SetAttribFormat(0, 3, GL_FLOAT, false, offsetof(ScreenVertex, position), bindingIndex);
-		m_vertexLayout->SetAttribFormat(2, 2, GL_FLOAT, false, offsetof(ScreenVertex, texCoord), bindingIndex);
-
-		// 5. 속성 활성화
-		m_vertexLayout->EnableAttrib(0);
-		m_vertexLayout->EnableAttrib(2);
 
 		// 6. GPU 업로드 완료 후 CPU 측 원본 메모리 해제 (최적화)
 		m_vertices.clear();
@@ -71,10 +58,32 @@ namespace MGF3D
 		return true;
 	}
 
-	void ScreenMesh::Draw() const
+	void ScreenMesh::Bind()
+	{
+		if (!m_vertexLayout)
+		{
+			m_vertexLayout = GLVertexLayout::Create();
+
+			// 4. DSA 바인딩 및 레이아웃과 포맷 설정
+			const uint32 bindingIndex = 0;
+			m_vertexLayout->BindVertexBuffer(bindingIndex, m_vertexBuffer, 0, sizeof(ScreenVertex));
+			m_vertexLayout->BindIndexBuffer(m_indexBuffer);
+			m_vertexLayout->SetAttribFormat(0, 3, GL_FLOAT, false, offsetof(ScreenVertex, position), bindingIndex);
+			m_vertexLayout->SetAttribFormat(2, 2, GL_FLOAT, false, offsetof(ScreenVertex, texCoord), bindingIndex);
+
+			// 5. 속성 활성화
+			m_vertexLayout->EnableAttrib(0);
+			m_vertexLayout->EnableAttrib(2);
+		}
+
+		// 완성된 VAO 바인딩
+		m_vertexLayout->Bind();
+	}
+
+	void ScreenMesh::Draw()
 	{
 		// 리소스가 Ready 상태가 아니거나 레이아웃이 없으면 무시
-		if (m_state != EResourceState::Ready || !m_vertexLayout) return;
+		if (m_state != EResourceState::Ready) return;
 
 		// 1. VAO 바인딩
 		Bind();

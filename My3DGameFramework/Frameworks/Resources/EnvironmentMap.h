@@ -1,38 +1,44 @@
 ﻿#pragma once
-#include "Resources/Resource.h"
-#include "Resources/ResourceDesc.h"
+#include "Sources/NamedResource.h"
 
-#pragma region FORWARD_DECLARATION
-CLASS_PTR(CubeTexture)
-#pragma endregion
-
-CLASS_PTR(EnvironmentMap)
-class EnvironmentMap : public Resource
+namespace MGF3D
 {
-	DEFINE_RESOURCE_TYPE(ResourceType::EnvironmentMap, EnvironmentMapDesc)
+	MGF_CLASS_PTR(Image)
+	MGF_CLASS_PTR(GLTexture2D)
+	MGF_CLASS_PTR(GLTextureCube)
 
-public:
-	virtual ~EnvironmentMap();
-	static EnvironmentMapPtr Load(const EnvironmentMapDesc& desc);
-	static EnvironmentMapPtr Create(const CubeTexturePtr& cubeTexture);
-	static EnvironmentMapPtr CreateIBL(const TexturePtr& hdrTexture);
+	MGF_CLASS_PTR(EnvironmentMap)
+	class EnvironmentMap : public NamedResource
+	{
+		using Super = NamedResource;
 
-public:
-	virtual EnvironmentMapDesc& GetDesc() override { return m_desc; }
-	virtual const ResourceDesc& GetDesc() const override { return m_desc; }
+	public:
+		EnvironmentMap();
+		virtual ~EnvironmentMap();
+		static EnvironmentMapPtr Create(StringView mapName);
+		virtual bool OnSyncCreate() override;
 
-public:
-	CubeTexturePtr GetSkybox() const { return m_skybox; }
-	CubeTexturePtr GetIrradiance() const { return m_irradiance; }
-	CubeTexturePtr GetPrefiltered() const { return m_prefiltered; }
-	TexturePtr     GetBrdfLUT() const { return m_brdf; }
+	/*==============================//
+	//       Resource Type          //
+	//==============================*/
+	public:
+		static int16 s_typeIndex;
+		virtual const MGFType* GetType() const;
 
-private:
-	EnvironmentMap();
-	EnvironmentMapDesc m_desc;
+	public:
+		void SetCubeTexture(const ImagePtr& image);
+		GLTextureCubePtr GetSkybox() const { return m_skybox; }
+		GLTextureCubePtr GetIrradiance() const { return m_irradiance; }
+		GLTextureCubePtr GetPrefiltered() const { return m_prefiltered; }
+		GLTexture2DPtr   GetBrdfLUT() const { return m_brdf; }
 
-	CubeTexturePtr m_skybox			{ nullptr };	// 원본(또는 Baked) 스카이박스
-	CubeTexturePtr m_irradiance		{ nullptr };	// Diffuse IBL
-	CubeTexturePtr m_prefiltered	{ nullptr };	// Specular IBL
-	TexturePtr     m_brdf			{ nullptr };	// LUT (Look Up Table)
-};
+	private:
+		EnvironmentMap(StringView mapName);
+
+		ImagePtr m_environmentCubeImage;
+		GLTextureCubePtr m_skybox		{ nullptr };
+		GLTextureCubePtr m_irradiance	{ nullptr };
+		GLTextureCubePtr m_prefiltered	{ nullptr };
+		GLTexture2DPtr   m_brdf			{ nullptr };
+	};
+}

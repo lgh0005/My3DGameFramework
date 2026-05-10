@@ -2,6 +2,7 @@
 #include "Managers/ThreadManager.h"
 #include "Managers/PathManager.h"
 #include "Sources/Asset.h"
+#include "Sources/Resource.h"
 
 namespace MGF3D
 {
@@ -75,19 +76,34 @@ namespace MGF3D
 		// 2. 캐시에 에셋이 등록된 적이 없다면 nullptr
 		if (!asset) return nullptr;
 
-		// 3. 로딩 중이라면 스레드 대기 (스핀락)
+		// 3. 로딩 중이라면 스레드 대기
 		while (asset->GetState() == EAssetState::Loading)
 			std::this_thread::yield();
 
-		// [DEBUG] Ready이면 그것을 캐스팅해서 반환
-		if (asset->GetState() == EAssetState::Ready)
+		// 2. 지연 평가 (Lazy Evaluation): 
+		// GPU 워커에서 작업 중인(Syncing) 상태일 때 누군가 에셋을 요청하면, 
+		// 하위 리소스들이 모두 구워졌는지 확인하고 상태를 업데이트합니다.
+		if (asset->GetState() == EAssetState::Syncing)
+		{
+			bool bAllReady = true;
+			for (const auto& res : asset->GetResources())
+			{
+				if (res->GetState() != EResourceState::Ready)
+				{
+					bAllReady = false;
+					break;
+				}
+			}
+
+			if (bAllReady)
+				asset->SetState(EAssetState::Ready);
+		}
+
+		// 3. 실패 상태만 아니라면 에셋 반환 
+		// (Syncing 상태여도 렌더러가 내부적으로 리소스 Ready 체크를 수행하므로 껍데기를 줍니다)
+		if (asset->GetState() != EAssetState::Failed)
 			return MGFTypeCaster::Cast<T>(asset);
 
-		// 4. 로딩이 끝났으나 실패(Failed) 상태인 경우 처리
-		if (asset->GetState() != EAssetState::Loaded)
-			return nullptr;
-
-		// 5. 무사히 Loaded 상태가 된 완벽한 에셋 반환
-		return asset;
+		return nullptr;
 	}
 }

@@ -10,73 +10,42 @@ namespace MGF3D
 
 	void ResourceManager::Shutdown()
 	{
-		{
-			LockScope lock(m_mutex);
-			m_namedCache.clear();
-		}
-		
-		m_pendingQueue.Clear();
+		LockScope lock(m_mutex);
+		m_namedCache.clear();
 	}
 
 	void ResourceManager::RegisterSync(ResourcePtr resource)
 	{
 		if (!resource) return;
-		m_pendingQueue.Push(resource);
-	}
 
-	void ResourceManager::Update()
-	{
-		// 1. 락 없이 원자적 연산 1번으로 모든 일감을 뜯어옴
-		auto* current = m_pendingQueue.Pop();
-		if (current == nullptr) return;
+		// 1. 이미 Ready이거나 Failed이면 GPU에 넘길 필요 없음
+		auto state = resource->GetState();
+		if (state == EResourceState::Ready || state == EResourceState::Failed) return;
 
-		Vector<ResourcePtr> pendingList;
+		// 2. 상태를 Syncing(GPU 작업 대기)으로 변경
+		resource->SetState(EResourceState::Syncing);
 
-		// 2. 내 소유가 된 연결 리스트 순회
-		while (current != nullptr)
-		{
-			ResourcePtr resource = current->data;
-			EResourceState state = resource->GetState();
-
-			switch (state)
+		// 3. GPU 워커 스레드 큐로 작업 던지기
+		MGF_THREAD.PushGPUTask
+		(
+			[resource]()
 			{
-				case EResourceState::Loaded:
+				// 이 내부 코드는 GPU 워커 스레드에서 실행됩니다.
+				if (resource->OnSyncCreate())
 				{
-					resource->SetState(EResourceState::Syncing);
-					[[fallthrough]];
+					glFlush();
+					resource->SetState(EResourceState::Ready);
 				}
 
-				case EResourceState::Syncing:
+				// 실패 시 다른 스레드에서 무한 대기하는 것을 막기 위해 상태 변경
+				else
 				{
-					if (resource->OnSyncCreate()) resource->SetState(EResourceState::Ready);
-					else
-					{
-						// 실패가 아니라면 의존성 대기 중인 것으로 판단
-						if (resource->GetState() != EResourceState::Failed)
-							pendingList.push_back(resource);
-					}
-					break;
-				}
+					if (resource->GetState() != EResourceState::Failed)
+						MGF_RESOURCE.RegisterSync(resource);
 
-				case EResourceState::Ready:
-				case EResourceState::Failed:
-					break;
-
-				default:
-				{
-					pendingList.push_back(resource);
-					break;
+					else MGF_LOG_ERROR("Resource permanently failed.");
 				}
 			}
-
-			// 3. 다 쓴 빈 노드는 즉시 메모리 해제
-			auto* temp = current;
-			current = current->next;
-			delete temp;
-		}
-
-		// 4. 다음 프레임에 다시 봐야 하는 리소스들을 큐에 다시 삽입
-		for (auto& pendingResource : pendingList)
-			m_pendingQueue.Push(pendingResource);
+		);
 	}
 }

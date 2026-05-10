@@ -83,7 +83,6 @@ set(SOURCES
 
     # Utils
     "GraphicsUtils/GeometryUtils.h"       "GraphicsUtils/GeometryUtils.cpp"
-    # "GraphicsUtils/IBLUtils.h"            "GraphicsUtils/IBLUtils.cpp"
     "GraphicsUtils/TextureUtils.h"        "GraphicsUtils/TextureUtils.cpp"
 )
 

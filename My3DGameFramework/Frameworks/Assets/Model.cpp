@@ -100,19 +100,20 @@ namespace MGF3D
 					int32 searchParentIdx = node.parentIndex;
 
 					// 부모가 진짜 뼈일 때까지 계속 위로 거슬러 올라감
-					for (const auto& node : m_nodes)
+					while (searchParentIdx >= 0)
 					{
-						auto myIt = boneMap.find(StringHash(node.name));
-						if (myIt != boneMap.end())
+						const auto& parentNode = m_nodes[searchParentIdx];
+						auto parentIt = boneMap.find(StringHash(parentNode.name));
+
+						if (parentIt != boneMap.end())
 						{
-							int32 myBoneID = myIt->second;
-							if (node.parentIndex >= 0)
-							{
-								const auto& parentNode = m_nodes[node.parentIndex];
-								auto parentIt = boneMap.find(StringHash(parentNode.name));
-								if (parentIt != boneMap.end()) parentIndices[myBoneID] = parentIt->second;
-							}
+							// 부모 뼈를 찾았다면 기록하고 탐색 종료
+							parentIndices[myBoneID] = parentIt->second;
+							break;
 						}
+
+						// 못 찾았다면 그 윗대의 조상으로 인덱스를 올려서 다시 탐색
+						searchParentIdx = parentNode.parentIndex;
 					}
 				}
 			}
@@ -221,8 +222,13 @@ namespace MGF3D
 
 	ObjectIDHash Model::Instantiate(const String& name)
 	{
-		if (GetState() != EAssetState::Ready && GetState() != EAssetState::Loaded)
+		// [DEBUG] Syncing 상태여도 CPU 데이터(노드 계층, 스켈레톤 등)는 완성되어 있으므로 통과
+		auto state = GetState();
+		if (state != EAssetState::Ready && state != EAssetState::Syncing && state != EAssetState::Loaded)
+		{
+			MGF_LOG_ERROR("Model::Instantiate - Model '{}' is not loaded yet (State: {}).", m_path, (int)state);
 			return ObjectIDHash(0);
+		}
 
 		// 1. 생성된 GameObject들의 ID를 추적하기 위한 컨테이너
 		Vector<ObjectIDHash> spawnedIDs(m_nodes.size());

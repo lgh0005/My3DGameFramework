@@ -6,7 +6,7 @@ struct ktxTexture2;
 namespace MGF3D
 {
 	MGF_CLASS_PTR(GLTextureCube)
-		class GLTextureCube : public GLTextureHandle
+	class GLTextureCube : public GLTextureHandle
 	{
 	public:
 		virtual ~GLTextureCube() override;

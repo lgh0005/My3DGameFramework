@@ -20,6 +20,9 @@ set(SOURCES
     "Managers/InstanceManager.h"    "Managers/InstanceManager.cpp"
     "Managers/ScriptManager.h"      "Managers/ScriptManager.cpp"
 
+    # FrameworkUtils
+    "FrameworkUtils/IBLUtils.h"      "FrameworkUtils/IBLUtils.cpp"
+
     # Registries
     "Registries/ScriptRegistry.h"     "Registries/ScriptRegistry.cpp"
 
@@ -58,7 +61,7 @@ set(SOURCES
 
     # Resources
     "Resources/Material.h"             "Resources/Material.cpp"
-    # "Resources/EnvironmentMap.h"             "Resources/EnvironmentMap.cpp"
+    "Resources/EnvironmentMap.h"             "Resources/EnvironmentMap.cpp"
 
     # Rendering
     "Rendering/RenderContext.h"          "Rendering/RenderContext.cpp"      "Rendering/RenderContext.inl"
