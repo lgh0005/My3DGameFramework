@@ -91,13 +91,6 @@ namespace MGF3D
 		for (auto& go : m_pendingAdds)
 		{
 			int32 id = go.GetID().GetIndex();
-
-			{
-				// NameManager를 통해 해시값으로 원본 문자열을 복원하여 출력합니다.
-				String objName = MGF_NAME.GetString(go.GetNameHash());
-				MGF_LOG_ERROR("FlushPendingAdds - Index: {0}, Name: {1}", id, objName);
-			}
-
 			if (m_gameObjects.Has(id)) continue;
 
 			m_nameLookupTable[go.GetNameHash()] = go.GetID();

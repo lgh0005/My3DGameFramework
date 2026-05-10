@@ -1,49 +1,35 @@
-﻿#include "EnginePch.h"
+﻿#include "FrameworkPch.h"
 #include "SkyLight.h"
-#include "Resources/Textures/Texture.h"
-#include "Resources/Textures/CubeTexture.h"
-#include "Resources/EnvironmentMap.h"
+#include "Managers/TypeManager.h"
+#include "Mechanics/Lights/SkyCube.h"
 
-DECLARE_DEFAULTS_IMPL(SkyLight)
-
-SkyLightUPtr SkyLight::Create(const EnvironmentMapPtr& envMap)
+namespace MGF3D
 {
-	auto skyLight = SkyLightUPtr(new SkyLight());
-	if (!skyLight->Init(envMap)) return nullptr;
-	return std::move(skyLight);
-}
+	SkyLight::SkyLight(ObjectIDHash id, ObjectIDHash ownerID, SkyCubeUPtr skyCube)
+		: Super(id, ownerID) ,m_skyCube(std::move(skyCube)) { }
+	SkyLight::~SkyLight() = default;
+	SkyLight::SkyLight(SkyLight&& other) noexcept = default;
+	SkyLight& SkyLight::operator=(SkyLight&& other) noexcept = default;
 
-bool SkyLight::Init(const EnvironmentMapPtr& envMap)
-{
-	m_environmentMap = envMap;
-	if (!m_environmentMap) return false;
-	return true;
-}
+	/*================================//
+	//   MGF3D Component Custom Type  //
+	//================================*/
+	int16 SkyLight::s_typeIndex = -1;
+	const MGFType* SkyLight::GetType() const
+	{
+		MGFTypeTree* tree = MGF_TYPE.GetTree("Component");
+		if (tree != nullptr) return tree->GetType(s_typeIndex);
+		return nullptr;
+	}
 
-CubeTexture* SkyLight::GetSkybox() const
-{
-	auto skybox = m_environmentMap->GetSkybox();
-	if (skybox) return skybox.get();
-	return nullptr;
-}
+	void SkyLight::SetEnvironmentMap(const EnvironmentMapPtr& envMap)
+	{
+		if (m_skyCube != nullptr) m_skyCube->SetEnvironmentMap(envMap);
+	}
 
-CubeTexture* SkyLight::GetIrradianceMap() const
-{
-	auto irradiance = m_environmentMap->GetIrradiance();
-	if (irradiance) return irradiance.get();
-	return nullptr;
-}
-
-CubeTexture* SkyLight::GetPrefilterMap() const
-{
-	auto prefilter = m_environmentMap->GetPrefiltered();
-	if (prefilter) return prefilter.get();
-	return nullptr;
-}
-
-Texture* SkyLight::GetBRDFLookUp() const
-{
-	auto brdf = m_environmentMap->GetBrdfLUT();
-	if (brdf) return brdf.get();
-	return nullptr;
+	EnvironmentMapPtr SkyLight::GetEnvironmentMap() const
+	{
+		if (m_skyCube != nullptr) return m_skyCube->GetEnvironmentMap();
+		return nullptr;
+	}
 }

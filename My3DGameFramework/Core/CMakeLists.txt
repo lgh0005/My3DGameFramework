@@ -34,7 +34,7 @@ set(SOURCES
 
     # Entities
     "Entities/Component.h"       "Entities/Component.cpp"
-    "Entities/GameObject.h"      "Entities/GameObject.cpp"   "Entities/GameObject.inl"
+    "Entities/GameObject.h"      "Entities/GameObject.cpp"
     "Entities/Mechanic.h"       "Entities/Mechanic.cpp"
     "Entities/Object.h"       "Entities/Object.cpp"
 

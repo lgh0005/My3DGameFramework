@@ -20,9 +20,6 @@ set(SOURCES
     "Managers/InstanceManager.h"    "Managers/InstanceManager.cpp"
     "Managers/ScriptManager.h"      "Managers/ScriptManager.cpp"
 
-    # FrameworkUtils
-    "FrameworkUtils/IBLUtils.h"      "FrameworkUtils/IBLUtils.cpp"
-
     # Registries
     "Registries/ScriptRegistry.h"     "Registries/ScriptRegistry.cpp"
 
@@ -35,7 +32,7 @@ set(SOURCES
     # "Components/Colliders/SphereCollider.h"     "Components/Colliders/SphereCollider.cpp"
     # "Components/Colliders/CapsuleCollider.h"        "Components/Colliders/CapsuleCollider.cpp"
     "Components/Lights/Light.h"        "Components/Lights/Light.cpp"
-    # "Components/Lights/SkyLight.h"        "Components/Lights/SkyLight.cpp"
+    "Components/Lights/SkyLight.h"        "Components/Lights/SkyLight.cpp"
     "Components/Lights/PointLight.h"        "Components/Lights/PointLight.cpp"
     "Components/Lights/SpotLight.h"        "Components/Lights/SpotLight.cpp"
     "Components/Lights/DirectionalLight.h"        "Components/Lights/DirectionalLight.cpp"
@@ -53,6 +50,8 @@ set(SOURCES
     "Mechanics/Animation/AnimState.h"             "Mechanics/Animation/AnimState.cpp"
     "Mechanics/Animation/Pose.h"             "Mechanics/Animation/Pose.cpp"
     "Mechanics/Animation/Skeleton.h"             "Mechanics/Animation/Skeleton.cpp"
+
+    "Mechanics/Lights/SkyCube.h"            "Mechanics/Lights/SkyCube.cpp"
 
     # Assets
     "Assets/Animation.h"             "Assets/Animation.cpp"

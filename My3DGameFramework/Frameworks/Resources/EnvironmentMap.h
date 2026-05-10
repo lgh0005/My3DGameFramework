@@ -6,6 +6,9 @@ namespace MGF3D
 	MGF_CLASS_PTR(Image)
 	MGF_CLASS_PTR(GLTexture2D)
 	MGF_CLASS_PTR(GLTextureCube)
+	MGF_CLASS_PTR(GraphicsProgram)
+	MGF_CLASS_PTR(GLUniformBuffer)
+	MGF_CLASS_PTR(GLFramebuffer2D)
 
 	MGF_CLASS_PTR(EnvironmentMap)
 	class EnvironmentMap : public NamedResource
@@ -33,12 +36,25 @@ namespace MGF3D
 		GLTexture2DPtr   GetBrdfLUT() const { return m_brdf; }
 
 	private:
+		void BakeSkybox(uint32 fbo, uint32 cubeVAO);
+		void BakeIrradiance(uint32 fbo, uint32 cubeVAO);
+		void BakePrefiltered(uint32 fbo, const GLUniformBufferUPtr& ubo, uint32 cubeVAO);
+		void BakeBRDF(uint32 fbo, uint32 screenVAO);
+
+	private:
 		EnvironmentMap(StringView mapName);
+		bool Init(StringView mapName);
 
 		ImagePtr m_environmentCubeImage;
+
 		GLTextureCubePtr m_skybox		{ nullptr };
 		GLTextureCubePtr m_irradiance	{ nullptr };
 		GLTextureCubePtr m_prefiltered	{ nullptr };
 		GLTexture2DPtr   m_brdf			{ nullptr };
+
+		GraphicsProgramPtr m_skyboxProgram;
+		GraphicsProgramPtr m_irradianceProgram;
+		GraphicsProgramPtr m_prefilterProgram;
+		GraphicsProgramPtr m_brdfProgram;
 	};
 }

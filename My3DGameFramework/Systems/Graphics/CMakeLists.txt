@@ -80,6 +80,8 @@ set(SOURCES
     # Uniforms
     "Uniforms/GlobalUniform.h"
     "Uniforms/MaterialUniform.h"
+    "Uniforms/IBLUniform.h"
+    "Uniforms/SkyboxUniform.h"
 
     # Utils
     "GraphicsUtils/GeometryUtils.h"       "GraphicsUtils/GeometryUtils.cpp"

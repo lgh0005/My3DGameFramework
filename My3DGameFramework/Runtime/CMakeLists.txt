@@ -22,52 +22,16 @@ set(SOURCES
     # Editor
     "Editor/GUIWindow.h"            "Editor/GUIWindow.cpp"
 
-    # Test
-    #"Pipelines/_Test/TestPipeline.h"          "Pipelines/_Test/TestPipeline.cpp"
-    #"Pipelines/_Test/RenderPasses/TestRenderPass.h"          "Pipelines/_Test/RenderPasses/TestRenderPass.cpp"
-
-    # RenderPipeline
-    "Pipelines/RenderPipeline/MGFRenderPipeline.h"                     "Pipelines/RenderPipeline/MGFRenderPipeline.cpp"
-    "Pipelines/RenderPipeline/RenderPasses/MGFGeometryPass.h"          "Pipelines/RenderPipeline/RenderPasses/MGFGeometryPass.cpp"
-    "Pipelines/RenderPipeline/RenderPasses/MGFDeferredLightingPass.h"  "Pipelines/RenderPipeline/RenderPasses/MGFDeferredLightingPass.cpp"
+    # RenderPipeline & RenderPass
+    "Pipelines/MGFRenderPipeline.h"                          "Pipelines/MGFRenderPipeline.cpp"
+    "Pipelines/RenderPasses/MGFGeometryPass.h"               "Pipelines/RenderPasses/MGFGeometryPass.cpp"
+    "Pipelines/RenderPasses/MGFDeferredLightingPass.h"       "Pipelines/RenderPasses/MGFDeferredLightingPass.cpp"
+    "Pipelines/RenderPasses/MGFSkyboxPass.h"                 "Pipelines/RenderPasses/MGFSkyboxPass.cpp"
+    "Pipelines/RenderPasses/MGFSSAOPass.h"                 "Pipelines/RenderPasses/MGFSSAOPass.cpp"
 
     # Managers
-    #"Managers/ImguiManager.h"     "Managers/ImguiManager.cpp"
-    #"Managers/LevelManager.h"     "Managers/LevelManager.cpp"    "Application/LevelManager.inl"
-    #"Managers/SceneManager.h"     "Managers/SceneManager.cpp"    "Application/SceneManager.inl"
-
-    # Pipelines
-    #"Common/CullingPass.h"            "Common/CullingPass.cpp"
-    #"Common/PostProcessPass.h"        "Common/PostProcessPass.cpp"
-    #"Common/ShadowPass.h"             "Common/ShadowPass.cpp"
-    #"Common/SkyboxPass.h"             "Common/SkyboxPass.cpp"
-    #"Common/SSAOPass.h"               "Common/SSAOPass.cpp"
-    ##"Common/JoltDebugGizmoPass.h"               "Common/JoltDebugGizmoPass.cpp"
-    ##"Common/UIScreenSpacePass.h"               "Common/UIScreenSpacePass.cpp"
-    ##"Common/UIWorldSpacePass.h"               "Common/UIWorldSpacePass.cpp"
-
-    #"PostProcessing/PostProcessEffect.h"               "PostProcessing/PostProcessEffect.cpp"
-
-    #"PostProcessing/Bloom/GaussianBloomEffect.h"               "PostProcessing/Bloom/GaussianBloomEffect.cpp"
-    #"PostProcessing/Bloom/KawaseBloomEffect.h"                 "PostProcessing/Bloom/KawaseBloomEffect.cpp"
-    #"PostProcessing/Bloom/LensFlareEffect.h"                   "PostProcessing/Bloom/LensFlareEffect.cpp"
-    #"PostProcessing/Bloom/DOFEffect.h"                         "PostProcessing/Bloom/DOFEffect.cpp"
-
-    #"PostProcessing/Display/DisplayMappingEffects.h"           "PostProcessing/Display/DisplayMappingEffects.cpp"
-
-    #"PostProcessing/World/MotionBlurEffect.h"                  "PostProcessing/World/MotionBlurEffect.cpp"
-    #"PostProcessing/World/OutlineEffect.h"                     "PostProcessing/World/OutlineEffect.cpp"
-    #"PostProcessing/World/WorldSpaceEffects.h"                 "PostProcessing/World/WorldSpaceEffects.cpp"
-
-    #"SRP/StandardGlobalUniforms.h"            "SRP/StandardGlobalUniforms.cpp"
-    #"SRP/StandardRenderPipeline.h"            "SRP/StandardRenderPipeline.cpp"
-    #"SRP/RenderPasses/StandardGeometryPass.h"            "SRP/RenderPasses/StandardGeometryPass.cpp"
-    #"SRP/RenderPasses/StandardDeferredLightingPass.h"            "SRP/RenderPasses/StandardDeferredLightingPass.cpp"
-
-    #"URP/UniversalGlobalUniforms.h"                               "URP/UniversalGlobalUniforms.cpp"
-    #"URP/UniversalRenderPipeline.h"                               "URP/UniversalRenderPipeline.cpp"
-    #"URP/RenderPasses/UniversalGeometryPass.h"                    "URP/RenderPasses/UniversalGeometryPass.cpp"
-    #"URP/RenderPasses/UniversalDeferredLightingPass.h"            "URP/RenderPasses/UniversalDeferredLightingPass.cpp"
+    "Managers/GUIManager.h"     "Managers/GUIManager.cpp"
+    "Managers/SceneManager.h"     "Managers/SceneManager.cpp"    "Managers/SceneManager.inl"
     
     # Scene
     "Scene/Scene.h"                 "Scene/Scene.cpp"

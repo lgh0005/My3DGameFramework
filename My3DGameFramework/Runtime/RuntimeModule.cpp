@@ -12,12 +12,10 @@
 #include "Identities/MGFTypeTree.h"
 #pragma endregion
 
-#pragma once TEST_RENDERING
-//#include "Pipelines/_Test/TestPipeline.h"
-//#include "Pipelines/_Test/RenderPasses/TestRenderPass.h"
-#include "Pipelines/RenderPipeline/MGFRenderPipeline.h"
-#include "Pipelines/RenderPipeline/RenderPasses/MGFGeometryPass.h"
-#include "Pipelines/RenderPipeline/RenderPasses/MGFDeferredLightingPass.h"
+#pragma once RENDER_PIPELINE
+#include "Pipelines/MGFRenderPipeline.h"
+#include "Pipelines/RenderPasses/MGFGeometryPass.h"
+#include "Pipelines/RenderPasses/MGFDeferredLightingPass.h"
 #pragma endregion
 
 namespace MGF3D
@@ -30,18 +28,12 @@ namespace MGF3D
 
 		// 2. 테스트 렌더링 파이프라인 타입 트리 생성
 		MGFTypeTree* renderPipelineTree = MGF_TYPE.GetTree("RenderPipeline");
-		//TestPipeline::s_typeIndex = renderPipelineTree->Register("TestPipeline", "RenderPipeline");
 		MGFRenderPipeline::s_typeIndex = renderPipelineTree->Register("MGFRenderPipeline", "RenderPipeline");
-
-		//// 3. 렌더 패스
-		//MGFTypeTree* renderPassTree = MGF_TYPE.GetTree("RenderPass");
-		//MGFGeometryPass::s_typeIndex = renderPassTree->Register("MGFGeometryPass", "RenderPass");
 	}
 
 	bool RuntimeModule::OnInit()
 	{
 		// 1. 렌더 매니저에 테스트용 파이프라인 등록
-		//MGF_RENDER.RegisterRenderPipeline<TestPipeline>("TestPipeline");
 		MGF_RENDER.RegisterRenderPipeline<MGFRenderPipeline>("MGFRenderPipeline");
 
 		// 2. 현재 활성 파이프라인으로 설정
