@@ -6,7 +6,10 @@
 namespace MGF3D
 {
 	SkyLight::SkyLight(ObjectIDHash id, ObjectIDHash ownerID, SkyCubeUPtr skyCube)
-		: Super(id, ownerID) ,m_skyCube(std::move(skyCube)) { }
+		: Super(id, ownerID) ,m_skyCube(std::move(skyCube)) 
+	{
+		m_skyCube->SetOwner(this);
+	}
 	SkyLight::~SkyLight() = default;
 	SkyLight::SkyLight(SkyLight&& other) noexcept = default;
 	SkyLight& SkyLight::operator=(SkyLight&& other) noexcept = default;

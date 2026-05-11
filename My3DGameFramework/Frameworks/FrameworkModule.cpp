@@ -32,7 +32,13 @@
 #include "Components/Lights/DirectionalLight.h"
 #include "Components/Lights/SpotLight.h"
 #include "Components/Lights/PointLight.h"
+#include "Components/Lights/SkyLight.h"
 #include "Components/Animation/Animator.h"
+#pragma endregion
+
+#pragma region MECHANICS
+#include "Mechanics/Animation/AnimController.h"
+#include "Mechanics/Lights/SkyCube.h"
 #pragma endregion
 
 #pragma region RESOURCE
@@ -67,18 +73,20 @@ namespace MGF3D
 
 		// 2. Components 타입 베이킹
 		MGFTypeTree* componentTree = MGF_TYPE.GetTree("Component");
-
 		MeshRenderer::s_typeIndex = componentTree->Register("MeshRenderer", "");
 		SkinnedMeshRenderer::s_typeIndex = componentTree->Register("SkinnedMeshRenderer", "MeshRenderer");
-
 		Script::s_typeIndex = componentTree->Register("Script", "");
-
 		Light::s_typeIndex = componentTree->Register("Light", "");
 		DirectionalLight::s_typeIndex = componentTree->Register("DirectionalLight", "Light");
 		SpotLight::s_typeIndex = componentTree->Register("SpotLight", "Light");
 		PointLight::s_typeIndex = componentTree->Register("PointLight", "Light");
-
+		SkyLight::s_typeIndex = componentTree->Register("SkyLight", "");
 		Animator::s_typeIndex = componentTree->Register("Animator", "");
+
+		// 3. 머캐닉 타입
+		MGFTypeTree* mechanicsTree = MGF_TYPE.GetTree("Mechanics");
+		SkyLight::s_typeIndex = mechanicsTree->Register("SkyLight", "");
+		AnimController::s_typeIndex = mechanicsTree->Register("AnimController", "");
 
 		// 3. Component 레지스트리 주입
 		MGF_ENTITY.AddComponentRegistry(MeshRenderer::s_typeIndex, MakeUnique<ComponentRegistry<MeshRenderer>>());
@@ -87,6 +95,7 @@ namespace MGF3D
 		MGF_ENTITY.AddComponentRegistry(PointLight::s_typeIndex, MakeUnique<ComponentRegistry<PointLight>>());
 		MGF_ENTITY.AddComponentRegistry(SpotLight::s_typeIndex, MakeUnique<ComponentRegistry<SpotLight>>());
 		MGF_ENTITY.AddComponentRegistry(Animator::s_typeIndex, MakeUnique<ComponentRegistry<Animator>>());
+		MGF_ENTITY.AddComponentRegistry(SkyLight::s_typeIndex, MakeUnique<ComponentRegistry<SkyLight>>());
 	}
 
 	bool FrameworkModule::OnInit()

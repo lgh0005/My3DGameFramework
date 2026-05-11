@@ -21,9 +21,9 @@ namespace MGF3D
 		static int16 s_typeIndex;
 		virtual const MGFType* GetType() const override;
 
-	/*=========================//
+	/*===========================//
 	//   SampleScene Main Logic  //
-	//=========================*/
+	//===========================*/
 	private:
 		virtual bool OnLoadSceneSources() override;
 		virtual bool OnPlaceActors() override;

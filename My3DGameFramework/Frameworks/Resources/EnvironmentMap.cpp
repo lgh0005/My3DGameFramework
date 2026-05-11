@@ -31,15 +31,19 @@ namespace MGF3D
 		return nullptr;
 	}
 
-	EnvironmentMapPtr EnvironmentMap::Create(StringView mapName)
+	EnvironmentMapPtr EnvironmentMap::Create(StringView mapName, const ImagePtr& image)
 	{
 		auto envMap = EnvironmentMapPtr(new EnvironmentMap(mapName));
+		if (!envMap->Init(mapName, image)) return nullptr;
 		envMap->SetState(EResourceState::Loaded);
 		return envMap;
 	}
 
-	bool EnvironmentMap::Init(StringView mapNAme)
+	bool EnvironmentMap::Init(StringView mapNAme, const ImagePtr& image)
 	{
+		// 0. 이미지 세팅
+		m_environmentCubeImage = image;
+
 		// 1. 공통 셰이더 (여러 프로그램에서 공유)
 		auto commonVs = MGF_ASSET.LoadAssetAsync<Shader>("@BuiltInAsset/Shaders/IBL/MGF3D_IBL_Common.vert", GL_VERTEX_SHADER, EShaderFileType::GLSL);
 		auto commonGs = MGF_ASSET.LoadAssetAsync<Shader>("@BuiltInAsset/Shaders/IBL/MGF3D_IBL_Layered.geom", GL_GEOMETRY_SHADER, EShaderFileType::GLSL);
@@ -94,6 +98,8 @@ namespace MGF3D
 			glDeleteFramebuffers(1, &tempFBO);
 			return false;
 		}
+		cubeMesh->Bind();
+		screenMesh->Bind();
 
 		// 3. 리소스 바인딩
 		bakeUBO->Bind(1);

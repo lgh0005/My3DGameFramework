@@ -44,7 +44,7 @@ namespace MGF3D
 		//====================================*/
 	private:
 		void ParseNodeHierarchy(const aiScene* scene);
-		void ProcessMesh(aiMesh* mesh, const aiScene* scene);
+		void ProcessMesh(aiMesh* mesh);
 		void ProcessSkinnedMesh(aiMesh* mesh, RawMesh& rawMesh);
 		void ProcessStaticMesh(aiMesh* mesh, RawMesh& rawMesh);
 		RawMaterial ProcessMaterial(aiMaterial* material, int32 index);

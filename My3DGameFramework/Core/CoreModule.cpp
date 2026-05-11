@@ -72,6 +72,7 @@ namespace MGF3D
 		MGFTypeTree& mechanicTree = MGF_TYPE.CreateTree("Mechanics");
 		Mechanic::s_typeIndex = mechanicTree.Register("Mechanic", "");
 		TransformHierarchy::s_typeIndex = mechanicTree.Register("TransformHierarchy", "Mechanic");
+		TransformHierarchy::s_typeIndex = mechanicTree.Register("TransformCoordinate", "Mechanic");
 
 		// 4. Resource 트리 생성
 		MGFTypeTree& resourceTree = MGF_TYPE.CreateTree("Resource");

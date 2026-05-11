@@ -18,7 +18,7 @@ namespace MGF3D
 	public:
 		EnvironmentMap();
 		virtual ~EnvironmentMap();
-		static EnvironmentMapPtr Create(StringView mapName);
+		static EnvironmentMapPtr Create(StringView mapName, const ImagePtr& image);
 		virtual bool OnSyncCreate() override;
 
 	/*==============================//
@@ -43,7 +43,7 @@ namespace MGF3D
 
 	private:
 		EnvironmentMap(StringView mapName);
-		bool Init(StringView mapName);
+		bool Init(StringView mapName, const ImagePtr& image);
 
 		ImagePtr m_environmentCubeImage;
 

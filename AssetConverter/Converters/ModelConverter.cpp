@@ -102,7 +102,7 @@ namespace MGF3D
         MGF_LOG_INFO("Processing meshes... Total: {}", scene->mNumMeshes);
         m_rawModel.meshes.reserve(scene->mNumMeshes);
         for (uint32 i = 0; i < scene->mNumMeshes; ++i)
-            ProcessMesh(scene->mMeshes[i], scene);
+            ProcessMesh(scene->mMeshes[i]);
 
         // 5. 스켈레톤 존재 여부 최종 확정
         if (m_rawModel.hasSkeleton) MGF_LOG_INFO(" - Skeleton Detected (Total Bones: {})", m_boneCounter);
@@ -332,7 +332,7 @@ namespace MGF3D
         }
     }
 
-    void ModelConverter::ProcessMesh(aiMesh* mesh, const aiScene* scene)
+    void ModelConverter::ProcessMesh(aiMesh* mesh)
     {
         RawMesh rawMesh;
         rawMesh.name = mesh->mName.C_Str();

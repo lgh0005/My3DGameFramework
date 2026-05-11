@@ -29,6 +29,9 @@ namespace MGF3D
 		MGF_ASSET.LoadAssetAsync<Model>("@GameAsset/Models/test/aliensoldier.mymodel");
 		MGF_ASSET.LoadAssetAsync<Animation>("@GameAsset/Models/test/Hip Hop Dancing.myanim");
 
+		auto sky = MGF_ASSET.LoadAssetAsync<Image>("@GameAsset/Images/kloppenheim_06_puresky_4k.ktx");
+		MGF_RESOURCE.GetOrCreate<EnvironmentMap>("Sky", sky);
+
 		return true;
 	}
 
@@ -38,7 +41,7 @@ namespace MGF3D
 		ObjectIDHash playerID = Entities::Create("MainPlayer");
 		auto* transform = Entities::AddComponent<Transform>(playerID);
 		auto* camera = Entities::AddComponent<Camera>(playerID);
-		auto* controller = Scripts::AddScript<CameraController>(playerID);
+		Scripts::AddScript<CameraController>(playerID);
 		transform->SetLocalPosition(vec3(0.0f, 0.0f, 5.0f));
 		camera->SetProjection(45.0f, (float)WINDOW_WIDTH / (float)WINDOW_HEIGHT, 0.1f, 100.0f);
 
@@ -87,8 +90,12 @@ namespace MGF3D
 		animController->AddState("Dance", danceAsset, true, 1.0f);
 		animController->SetStartState(StringHash("Dance"));
 		animController->Play(StringHash("Dance"));
+		Entities::AddComponent<Animator>(soldierID, soldier, std::move(animController));
 
-		auto* soldierAnimator = Entities::AddComponent<Animator>(soldierID, soldier, std::move(animController));
+		// 7. Sky
+		ObjectIDHash skyID = Entities::Create("Sky");
+		auto skyCube = MakeUnique<SkyCube>(nullptr);
+		Entities::AddComponent<SkyLight>(skyID, std::move(skyCube));
 
 		return true;
 	}

@@ -1,7 +1,7 @@
 #version 460 core
 out vec2 fragColor;
 
-in vec2 TexCoords;
+in vec2 texCoord;
 
 const float PI = 3.14159265359;
 
@@ -110,6 +110,6 @@ void main()
 {
     // 텍스처 좌표 자체가 입력값(NdotV, Roughness)이 됩니다.
     // X축: NdotV (시야각), Y축: Roughness (거칠기)
-    vec2 integratedBRDF = IntegrateBRDF(TexCoords.x, TexCoords.y);
+    vec2 integratedBRDF = IntegrateBRDF(texCoord.x, texCoord.y);
     fragColor = integratedBRDF;
 }
