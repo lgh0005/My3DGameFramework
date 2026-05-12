@@ -12,9 +12,12 @@
 
 namespace MGF3D
 {
+	MGF_CLASS_PTR(Camera)
 	MGF_CLASS_PTR(GLUniformBuffer)
 	MGF_CLASS_PTR(GLShaderStorageBuffer)
 	MGF_CLASS_PTR(GLTexture2D)
+	MGF_CLASS_PTR(GLTexture2DArray)
+	MGF_CLASS_PTR(GLTextureCubeArray)
 	MGF_CLASS_PTR(ScreenMesh)
 	MGF_CLASS_PTR(GLFramebuffer2D)
 
@@ -49,6 +52,8 @@ namespace MGF3D
 
 	public:
 		void UpdateGlobals(const GlobalData& globalData);
+		void SetCurrentCamera(const Camera* camera) { m_currentCamera = camera; }
+		const Camera* GetCurrentCamera() const { return m_currentCamera; }
 		
 		void UpdateDirectionalLights(const Vector<DirectionalLightData>& lights);
 		void UpdatePointLights(const Vector<PointLightData>& lights);
@@ -59,6 +64,15 @@ namespace MGF3D
 		void UpdateSpotShadows(const Vector<SpotShadowData>& shadows);
 
 	public:
+		const Vector<DirectionalLightData>& GetDirectionalLights() const { return m_dirLights; }
+		const Vector<PointLightData>& GetPointLights() const { return m_pointLights; }
+		const Vector<SpotLightData>& GetSpotLights() const { return m_spotLights; }
+
+		const Vector<DirectionalShadowData>& GetDirectionalShadows() const { return m_dirShadows; }
+		const Vector<PointShadowData>& GetPointShadows() const { return m_pointShadows; }
+		const Vector<SpotShadowData>& GetSpotShadows() const { return m_spotShadows; }
+
+	public:
 		ScreenMesh* GetScreenMesh() const { return m_screenMesh.get(); }
 		void InitGeometryBuffer(uint32 width, uint32 height);
 		GLFramebuffer2D* GetGeometryBuffer() const { return m_geometryBuffer.get(); }
@@ -67,6 +81,12 @@ namespace MGF3D
 	public:
 		void SetCachedTexture(ETextureCache slot, const GLTexture2DPtr& texture);
 		GLTexture2D* GetCachedTexture(ETextureCache slot) const;
+		void SetDirectionalShadowMap(const GLTexture2DArrayPtr& texture) { m_dirShadowMapArray = texture; }
+		GLTexture2DArray* GetDirectionalShadowMap() const { return m_dirShadowMapArray.get(); }
+		void SetPointShadowMap(const GLTextureCubeArrayPtr& texture) { m_pointShadowMapArray = texture; }
+		GLTextureCubeArray* GetPointShadowMap() const { return m_pointShadowMapArray.get(); }
+		void SetSpotShadowMap(const GLTexture2DArrayPtr& texture) { m_spotShadowMapArray = texture; }
+		GLTexture2DArray* GetSpotShadowMap() const { return m_spotShadowMapArray.get(); }
 
 	private:
 		template <typename T>
@@ -79,9 +99,18 @@ namespace MGF3D
 
 	private:
 		// 전역 설정 대상들
+		const Camera* m_currentCamera{ nullptr };
 		GLUniformBufferUPtr m_globalUBO;
 		RenderQueue<StaticInstanceData>  m_staticQueue;
 		RenderQueue<SkinnedInstanceData> m_skinnedQueue;
+
+		// CPU 측 조명/그림자 데이터 캐시
+		Vector<DirectionalLightData> m_dirLights;
+		Vector<PointLightData> m_pointLights;
+		Vector<SpotLightData> m_spotLights;
+		Vector<DirectionalShadowData> m_dirShadows;
+		Vector<PointShadowData> m_pointShadows;
+		Vector<SpotShadowData> m_spotShadows;
 
 		// Screen 메쉬
 		ScreenMeshPtr m_screenMesh;
@@ -100,8 +129,12 @@ namespace MGF3D
 		GLShaderStorageBufferUPtr m_pointShadowSSBO;
 		GLShaderStorageBufferUPtr m_spotShadowSSBO;
 
-		// 다른 텍스쳐 캐시
+		// 기타 텍스쳐 캐시 (SSAO, 그림자 등)
 		Vector<GLTexture2DPtr> m_cachedTextures;
+
+		GLTexture2DArrayPtr m_dirShadowMapArray;
+		GLTextureCubeArrayPtr m_pointShadowMapArray;
+		GLTexture2DArrayPtr m_spotShadowMapArray;
 	};
 }
 

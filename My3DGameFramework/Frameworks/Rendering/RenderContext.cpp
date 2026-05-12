@@ -43,31 +43,37 @@ namespace MGF3D
 
     void RenderContext::UpdateDirectionalLights(const Vector<DirectionalLightData>& lights)
     {
+        m_dirLights = lights;
         UpdateSSBO(m_dirLightSSBO, lights, 3);
     }
 
     void RenderContext::UpdatePointLights(const Vector<PointLightData>& lights)
     {
+        m_pointLights = lights;
         UpdateSSBO(m_pointLightSSBO, lights, 4);
     }
 
     void RenderContext::UpdateSpotLights(const Vector<SpotLightData>& lights)
     {
+        m_spotLights = lights;
         UpdateSSBO(m_spotLightSSBO, lights, 5);
     }
 
     void RenderContext::UpdateDirectionalShadows(const Vector<DirectionalShadowData>& shadows)
     {
+        m_dirShadows = shadows;
         UpdateSSBO(m_dirShadowSSBO, shadows, 6);
     }
 
     void RenderContext::UpdatePointShadows(const Vector<PointShadowData>& shadows)
     {
+        m_pointShadows = shadows;
         UpdateSSBO(m_pointShadowSSBO, shadows, 7);
     }
 
     void RenderContext::UpdateSpotShadows(const Vector<SpotShadowData>& shadows)
     {
+        m_spotShadows = shadows;
         UpdateSSBO(m_spotShadowSSBO, shadows, 8);
     }
 

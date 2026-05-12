@@ -1,5 +1,6 @@
 #include "GraphicsPch.h"
 #include "GLFramebufferCube.h"
+#include "TextureArrays/GLTextureCubeArray.h"
 
 namespace MGF3D
 {
@@ -14,6 +15,13 @@ namespace MGF3D
 	{
 		auto fbo = GLFramebufferCubePtr(new GLFramebufferCube());
 		if (!fbo->Init(colorAttachments, depthAttachment)) return nullptr;
+		return fbo;
+	}
+
+	GLFramebufferCubePtr GLFramebufferCube::CreateArray(const GLTextureCubeArrayPtr& depthAttachmentArray)
+	{
+		auto fbo = GLFramebufferCubePtr(new GLFramebufferCube());
+		if (!fbo->InitArray(depthAttachmentArray)) return nullptr;
 		return fbo;
 	}
 
@@ -67,6 +75,28 @@ namespace MGF3D
 		{
 			glNamedFramebufferTexture(m_handle, GL_DEPTH_STENCIL_ATTACHMENT, depthAttachment->GetHandle(), 0);
 		}
+
+		return CheckStatus();
+	}
+
+	bool GLFramebufferCube::InitArray(const GLTextureCubeArrayPtr& depthAttachmentArray)
+	{
+		if (!depthAttachmentArray)
+		{
+			MGF_LOG_ERROR("GLFramebufferCube InitArray failed: depthAttachmentArray is null.");
+			return false;
+		}
+
+		m_size = depthAttachmentArray->GetWidth();
+
+		glCreateFramebuffers(1, &m_handle);
+
+		// 그림자용 FBO이므로 컬러 버퍼는 사용하지 않음
+		glNamedFramebufferDrawBuffer(m_handle, GL_NONE);
+		glNamedFramebufferReadBuffer(m_handle, GL_NONE);
+
+		// 텍스처 배열 전체를 Layered 타겟으로 한 번에 바인딩
+		glNamedFramebufferTexture(m_handle, GL_DEPTH_ATTACHMENT, depthAttachmentArray->GetHandle(), 0);
 
 		return CheckStatus();
 	}

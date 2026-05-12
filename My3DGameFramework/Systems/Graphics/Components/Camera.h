@@ -29,6 +29,10 @@ namespace MGF3D
 	//       Camera Methods          //
 	//===============================*/
 	public:
+		bool IsMainCamera() const { return m_isMainCamera; }
+		void SetMainCamera(bool isMain) { m_isMainCamera = isMain; }
+
+	public:
 		// 투영(Projection) 설정
 		void SetProjection(float fovDegrees, float aspectRatio, float nearPlane, float farPlane);
 		void SetViewportSize(float width, float height);
@@ -54,6 +58,8 @@ namespace MGF3D
 
 	private:
 		Transform* GetTransform() const;
+
+		bool m_isMainCamera{ false };
 
 		float m_fovDegrees		{ 45.0f };
 		float m_aspectRatio		{ 16.0f / 9.0f };

@@ -6,6 +6,7 @@ namespace MGF3D
 {
 	MGF_CLASS_PTR(Mesh)
 	MGF_CLASS_PTR(Material)
+	MGF_CLASS_PTR(GraphicsProgram)
 
 	template<typename T>
 	class RenderQueue
@@ -16,7 +17,7 @@ namespace MGF3D
 
 	public:
 		void Submit(Mesh* mesh, Material* material, const T& data);
-		void Execute();
+		void Execute(GraphicsProgram* overrideProgram = nullptr);
 		void Clear();
 
 	private:

@@ -4,6 +4,8 @@
 
 namespace MGF3D
 {
+	MGF_CLASS_PTR(GLTexture2DArray)
+
 	MGF_CLASS_PTR(GLFramebuffer2D)
 	class GLFramebuffer2D : public GLFramebufferHandle
 	{
@@ -14,6 +16,7 @@ namespace MGF3D
 			const Vector<GLTexture2DPtr>& colorAttachments,
 			const GLTexture2DPtr& depthAttachment = nullptr
 		);
+		static GLFramebuffer2DPtr CreateArray(const GLTexture2DArrayPtr& depthAttachmentArray);
 
 	public:
 		GLTexture2DPtr GetColorAttachment(uint32 index = 0) const;
@@ -28,6 +31,7 @@ namespace MGF3D
 			const Vector<GLTexture2DPtr>& colorAttachments,
 			const GLTexture2DPtr& depthAttachment
 		);
+		bool InitArray(const GLTexture2DArrayPtr& depthAttachmentArray);
 
 		Vector<GLTexture2DPtr> m_colorAttachments;
 		GLTexture2DPtr m_depthAttachment;

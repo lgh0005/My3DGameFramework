@@ -4,6 +4,8 @@
 
 namespace MGF3D
 {
+	MGF_CLASS_PTR(GLTextureCubeArray)
+
 	MGF_CLASS_PTR(GLFramebufferCube)
 	class GLFramebufferCube : public GLFramebufferHandle
 	{
@@ -14,6 +16,7 @@ namespace MGF3D
 			const Vector<GLTextureCubePtr>& colorAttachments,
 			const GLTextureCubePtr& depthAttachment = nullptr
 		);
+		static GLFramebufferCubePtr CreateArray(const GLTextureCubeArrayPtr& depthAttachmentArray);
 
 	public:
 		void AttachFace(uint32 attachmentTarget, const GLTextureCubePtr& texture, uint32 faceIndex, int32 mipLevel = 0);
@@ -28,6 +31,7 @@ namespace MGF3D
 			const Vector<GLTextureCubePtr>& colorAttachments,
 			const GLTextureCubePtr& depthAttachment
 		);
+		bool InitArray(const GLTextureCubeArrayPtr& depthAttachmentArray);
 
 		Vector<GLTextureCubePtr> m_colorAttachments;
 		GLTextureCubePtr m_depthAttachment;

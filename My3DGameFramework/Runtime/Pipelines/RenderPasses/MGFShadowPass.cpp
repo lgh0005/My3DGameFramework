@@ -6,6 +6,7 @@
 #include "Assets/Shader.h"
 #include "Graphics/Programs/GraphicsProgram.h"
 #include "Rendering/RenderContext.h"
+#include "Components/Camera.h"
 #include "TextureArrays/GLTexture2DArray.h"
 #include "TextureArrays/GLTextureCubeArray.h"
 #include "Framebuffers/GLFramebuffer2D.h"
@@ -28,37 +29,37 @@ namespace MGF3D
 
 	bool MGFShadowPass::Init()
 	{
-		//// 1. 셰이더 로드 (Vertex, Geometry, Fragment)
-		//auto dirVs = MGF_ASSET.LoadAssetAsync<Shader>("@BuiltInAsset/Shaders/Shadow/DirShadow.vert", GL_VERTEX_SHADER, EShaderFileType::GLSL);
-		//auto dirGs = MGF_ASSET.LoadAssetAsync<Shader>("@BuiltInAsset/Shaders/Shadow/DirShadow.geom", GL_GEOMETRY_SHADER, EShaderFileType::GLSL);
-		//auto dirFs = MGF_ASSET.LoadAssetAsync<Shader>("@BuiltInAsset/Shaders/Shadow/DirShadow.frag", GL_FRAGMENT_SHADER, EShaderFileType::GLSL);
-		//m_dirShadowProgram = MGF_RESOURCE.Create<GraphicsProgram>("DirShadowProgram", Vector<ShaderPtr>{ dirVs, dirGs, dirFs });
+		// 1. 셰이더 로드
+		auto dirVs = MGF_ASSET.LoadAssetAsync<Shader>("@BuiltInAsset/Shaders/Default/MGF3D_Shadow_Directional.vert", GL_VERTEX_SHADER, EShaderFileType::GLSL);
+		auto dirGs = MGF_ASSET.LoadAssetAsync<Shader>("@BuiltInAsset/Shaders/Default/MGF3D_Shadow_Directional.geom", GL_GEOMETRY_SHADER, EShaderFileType::GLSL);
+		auto dirFs = MGF_ASSET.LoadAssetAsync<Shader>("@BuiltInAsset/Shaders/Default/MGF3D_Shadow_Directional.frag", GL_FRAGMENT_SHADER, EShaderFileType::GLSL);
+		m_dirShadowProgram = MGF_RESOURCE.Create<GraphicsProgram>("DirShadowProgram", Vector<ShaderPtr>{ dirVs, dirGs, dirFs });
 
-		//auto pointVs = MGF_ASSET.LoadAssetAsync<Shader>("@BuiltInAsset/Shaders/Shadow/PointShadow.vert", GL_VERTEX_SHADER, EShaderFileType::GLSL);
-		//auto pointGs = MGF_ASSET.LoadAssetAsync<Shader>("@BuiltInAsset/Shaders/Shadow/PointShadow.geom", GL_GEOMETRY_SHADER, EShaderFileType::GLSL);
-		//auto pointFs = MGF_ASSET.LoadAssetAsync<Shader>("@BuiltInAsset/Shaders/Shadow/PointShadow.frag", GL_FRAGMENT_SHADER, EShaderFileType::GLSL);
-		//m_pointShadowProgram = MGF_RESOURCE.Create<GraphicsProgram>("PointShadowProgram", Vector<ShaderPtr>{ pointVs, pointGs, pointFs });
+		auto pointVs = MGF_ASSET.LoadAssetAsync<Shader>("@BuiltInAsset/Shaders/Default/MGF3D_Shadow_Point.vert", GL_VERTEX_SHADER, EShaderFileType::GLSL);
+		auto pointGs = MGF_ASSET.LoadAssetAsync<Shader>("@BuiltInAsset/Shaders/Default/MGF3D_Shadow_Point.geom", GL_GEOMETRY_SHADER, EShaderFileType::GLSL);
+		auto pointFs = MGF_ASSET.LoadAssetAsync<Shader>("@BuiltInAsset/Shaders/Default/MGF3D_Shadow_Point.frag", GL_FRAGMENT_SHADER, EShaderFileType::GLSL);
+		m_pointShadowProgram = MGF_RESOURCE.Create<GraphicsProgram>("PointShadowProgram", Vector<ShaderPtr>{ pointVs, pointGs, pointFs });
 
-		//auto spotVs = MGF_ASSET.LoadAssetAsync<Shader>("@BuiltInAsset/Shaders/Shadow/SpotShadow.vert", GL_VERTEX_SHADER, EShaderFileType::GLSL);
-		//auto spotGs = MGF_ASSET.LoadAssetAsync<Shader>("@BuiltInAsset/Shaders/Shadow/SpotShadow.geom", GL_GEOMETRY_SHADER, EShaderFileType::GLSL);
-		//auto spotFs = MGF_ASSET.LoadAssetAsync<Shader>("@BuiltInAsset/Shaders/Shadow/SpotShadow.frag", GL_FRAGMENT_SHADER, EShaderFileType::GLSL);
-		//m_spotShadowProgram = MGF_RESOURCE.Create<GraphicsProgram>("SpotShadowProgram", Vector<ShaderPtr>{ spotVs, spotGs, spotFs });
-		//
-		//// 2. FBO 및 텍스처 배열 생성
-		//// Directional (CSM): 조명당 4개의 레이어 필요
-		//int32 dirLayers = MAX_LIGHTS * MAX_DIR_SHADOW_LAYERS;
-		//m_dirShadowMapArray = MGF_RESOURCE.CreateImmediate<GLTexture2DArray>(SHADOW_RES_HIGH, SHADOW_RES_HIGH, dirLayers);
-		//m_dirShadowFBO = GLFramebuffer2D::CreateArray(m_dirShadowMapArray);
+		auto spotVs = MGF_ASSET.LoadAssetAsync<Shader>("@BuiltInAsset/Shaders/Default/MGF3D_Shadow_Spot.vert", GL_VERTEX_SHADER, EShaderFileType::GLSL);
+		auto spotGs = MGF_ASSET.LoadAssetAsync<Shader>("@BuiltInAsset/Shaders/Default/MGF3D_Shadow_Spot.geom", GL_GEOMETRY_SHADER, EShaderFileType::GLSL);
+		auto spotFs = MGF_ASSET.LoadAssetAsync<Shader>("@BuiltInAsset/Shaders/Default/MGF3D_Shadow_Spot.frag", GL_FRAGMENT_SHADER, EShaderFileType::GLSL);
+		m_spotShadowProgram = MGF_RESOURCE.Create<GraphicsProgram>("SpotShadowProgram", Vector<ShaderPtr>{ spotVs, spotGs, spotFs });
+		
+		// 2. FBO 및 텍스처 배열 생성
+		// Directional (CSM): 조명당 4개의 레이어 필요
+		int32 dirLayers = MAX_LIGHTS * MAX_DIR_SHADOW_LAYERS;
+		m_dirShadowMapArray = MGF_RESOURCE.CreateImmediate<GLTexture2DArray>(SHADOW_RES_HIGH, SHADOW_RES_HIGH, dirLayers);
+		m_dirShadowFBO = GLFramebuffer2D::CreateArray(m_dirShadowMapArray);
 
-		//// Point (Cube): 조명 1개당 6면이므로 CubeArray에서 내부적으로 처리
-		//m_pointShadowMapArray = GLTextureCubeArray::Create(SHADOW_RES_MEDIUM, SHADOW_RES_MEDIUM, MAX_POINT_SHADOW_COUNT);
-		//m_pointShadowFBO = GLFramebufferCube::CreateArray(m_pointShadowMapArray);
+		// Point (Cube): 조명 1개당 6면이므로 CubeArray에서 내부적으로 처리
+		m_pointShadowMapArray = GLTextureCubeArray::Create(SHADOW_RES_MEDIUM, SHADOW_RES_MEDIUM, MAX_POINT_SHADOW_COUNT);
+		m_pointShadowFBO = GLFramebufferCube::CreateArray(m_pointShadowMapArray);
 
-		//// Spot: 조명 1개당 1개의 레이어
-		//m_spotShadowMapArray = MGF_RESOURCE.CreateImmediate<GLTexture2DArray>(SHADOW_RES_MEDIUM, SHADOW_RES_MEDIUM, MAX_SPOT_SHADOW_LAYERS);
-		//m_spotShadowFBO = GLFramebuffer2D::CreateArray(m_spotShadowMapArray);
+		// Spot: 조명 1개당 1개의 레이어
+		m_spotShadowMapArray = MGF_RESOURCE.CreateImmediate<GLTexture2DArray>(SHADOW_RES_MEDIUM, SHADOW_RES_MEDIUM, MAX_SPOT_SHADOW_LAYERS);
+		m_spotShadowFBO = GLFramebuffer2D::CreateArray(m_spotShadowMapArray);
 
-		//if (!m_dirShadowFBO || !m_pointShadowFBO || !m_spotShadowFBO) return false;
+		if (!m_dirShadowFBO || !m_pointShadowFBO || !m_spotShadowFBO) return false;
 
 		return true;
 	}
@@ -76,170 +77,228 @@ namespace MGF3D
 
 	void MGFShadowPass::Execute(RenderContext* context)
 	{
-		//if (!context) return;
-		//if (m_dirShadowProgram->GetState() != EResourceState::Ready ||
-		//	m_pointShadowProgram->GetState() != EResourceState::Ready ||
-		//	m_spotShadowProgram->GetState() != EResourceState::Ready) return;
+		if (!context) return;
+		if (m_dirShadowProgram->GetState() != EResourceState::Ready ||
+			m_pointShadowProgram->GetState() != EResourceState::Ready ||
+			m_spotShadowProgram->GetState() != EResourceState::Ready) return;
 
-		//// 1. 그림자 렌더링 공통 상태 설정
-		//glEnable(GL_DEPTH_TEST);
-		//glCullFace(GL_FRONT);
+		// 1. 그림자 렌더링 공통 상태 설정
+		glEnable(GL_DEPTH_TEST);
+		glCullFace(GL_FRONT);
 
-		//// 2. 그림자 텍스쳐 베이킹
-		//RenderDirectionalShadows(context);
-		//RenderPointShadows(context);
-		//RenderSpotShadows(context);
+		// 2. 그림자 텍스쳐 베이킹
+		RenderDirectionalShadows(context);
+		RenderPointShadows(context);
+		RenderSpotShadows(context);
 
-		//// 3. 원상태로 복구
-		//glCullFace(GL_BACK);
+		// 3. 원상태로 복구
+		glCullFace(GL_BACK);
 	}
 
 	void MGFShadowPass::RenderDirectionalShadows(RenderContext* context)
 	{
-		//auto& dirLights = context->GetDirectionalLights();
-		//if (dirLights.empty()) return;
+		const auto& dirLights = context->GetDirectionalLights();
+		Vector<DirectionalShadowData> shadowDataList = context->GetDirectionalShadows();
+		if (dirLights.empty() || shadowDataList.empty()) return;
 
-		//m_dirShadowFBO->Bind();
-		//glViewport(0, 0, SHADOW_RES_HIGH, SHADOW_RES_HIGH);
-		//glClear(GL_DEPTH_BUFFER_BIT);
+		const Camera* currentCamera = context->GetCurrentCamera();
+		if (!currentCamera || !currentCamera->IsMainCamera()) return;
 
-		//m_dirShadowProgram->Use();
+		m_dirShadowFBO->Bind();
+		glViewport(0, 0, SHADOW_RES_HIGH, SHADOW_RES_HIGH);
+		glClear(GL_DEPTH_BUFFER_BIT);
 
-		//Vector<DirectionalShadowData> shadowDataList;
-		//int32 currentBaseIdx = 0;
+		m_dirShadowProgram->Use();
+		for (usize i = 0; i < dirLights.size(); ++i)
+		{
+			int32 shadowIdx = dirLights[i].shadowIndex;
+			if (shadowIdx < 0) continue;
 
-		//for (size_t i = 0; i < dirLights.size(); ++i)
-		//{
-		//	if (i >= MAX_LIGHTS) break;
+			DirectionalShadowData& sData = shadowDataList[shadowIdx];
+			vec3 lightDir = vec3(dirLights[i].direction);
 
-		//	DirectionalShadowData sData;
-		//	sData.shadowMapBaseIdx = currentBaseIdx;
-		//	sData.shadowBias = 0.005f;
+			// 1. 카메라 시야를 기반으로 CSM 분할 행렬(4단계) 계산
+			Vector<mat4> lightMatrices = CalculateCSMMatrices(currentCamera, lightDir, sData.cascadeSplits);
+			for (int j = 0; j < 4; ++j) sData.lightSpaceMatrices[j] = lightMatrices[j];
 
-		//	// CSM 분할 행렬 계산 (추후 구현)
-		//	// Vector<mat4> lightMatrices = CalculateCSMMatrices(context->GetCameraView(), context->GetCameraProj(), dirLights[i].direction, sData.cascadeSplits);
-		//	// for (int j = 0; j < 4; ++j) sData.lightSpaceMatrices[j] = lightMatrices[j];
+			// 2. 셰이더로 행렬 배열 및 대상 Layer(층) 인덱스 전달
+			m_dirShadowProgram->SetUniform("lightSpaceMatrices", lightMatrices);
+			m_dirShadowProgram->SetUniform("baseLayerIndex", sData.shadowMapBaseIdx);
 
-		//	// m_dirShadowProgram->SetUniformArray("lightSpaceMatrices", lightMatrices.data(), 4);
-		//	m_dirShadowProgram->SetUniform("baseLayerIndex", currentBaseIdx);
+			// 3. RenderQueue에 쌓인 메쉬들을 그림자 셰이더를 덮어씌워 렌더링
+			context->GetStaticQueue().Execute(m_dirShadowProgram.get());
+			context->GetSkinnedQueue().Execute(m_dirShadowProgram.get());
+		}
 
-		//	context->GetStaticQueue().Execute(m_dirShadowProgram.get());
-		//	context->GetSkinnedQueue().Execute(m_dirShadowProgram.get());
-
-		//	shadowDataList.push_back(sData);
-		//	currentBaseIdx += MAX_DIR_SHADOW_LAYERS;
-		//}
-
-		//context->UpdateDirectionalShadows(shadowDataList);
-		//context->SetCachedTexture(ETextureCache::DirShadowArray, m_dirShadowMapArray);
-		//GLFramebufferHandle::Unbind();
+		// 4. 행렬이 채워진 최종 데이터를 컨텍스트에 갱신하고, 텍스처 캐시에 등록
+		context->UpdateDirectionalShadows(shadowDataList);
+		context->SetDirectionalShadowMap(m_dirShadowMapArray);
+		GLFramebufferHandle::Unbind();
 	}
 
 	void MGFShadowPass::RenderPointShadows(RenderContext* context)
 	{
-		//auto& pointLights = context->GetPointLights();
-		//if (pointLights.empty()) return;
+		auto& pointLights = context->GetPointLights();
+		if (pointLights.empty()) return;
 
-		//m_pointShadowFBO->Bind();
-		//glViewport(0, 0, SHADOW_RES_MEDIUM, SHADOW_RES_MEDIUM);
-		//glClear(GL_DEPTH_BUFFER_BIT);
+		m_pointShadowFBO->Bind();
+		glViewport(0, 0, SHADOW_RES_MEDIUM, SHADOW_RES_MEDIUM);
+		glClear(GL_DEPTH_BUFFER_BIT);
 
-		//m_pointShadowProgram->Use();
+		m_pointShadowProgram->Use();
 
-		//Vector<PointShadowData> shadowDataList;
+		Vector<PointShadowData> shadowDataList;
 
-		//for (size_t i = 0; i < pointLights.size(); ++i)
-		//{
-		//	if (i >= MAX_POINT_SHADOW_COUNT) break;
+		for (size_t i = 0; i < pointLights.size(); ++i)
+		{
+			if (i >= MAX_POINT_SHADOW_COUNT) break;
 
-		//	vec3 lightPos = vec3(pointLights[i].position);
-		//	float farPlane = pointLights[i].position.w;
+			vec3 lightPos = vec3(pointLights[i].position);
+			float farPlane = pointLights[i].position.w;
 
-		//	mat4 shadowProj = glm::perspective(Math::ToRadians(90.0f), 1.0f, 0.1f, farPlane);
-		//	Vector<mat4> shadowTransforms;
-		//	shadowTransforms.push_back(shadowProj * glm::lookAt(lightPos, lightPos + vec3(1, 0, 0), vec3(0, -1, 0)));
-		//	shadowTransforms.push_back(shadowProj * glm::lookAt(lightPos, lightPos + vec3(-1, 0, 0), vec3(0, -1, 0)));
-		//	shadowTransforms.push_back(shadowProj * glm::lookAt(lightPos, lightPos + vec3(0, 1, 0), vec3(0, 0, 1)));
-		//	shadowTransforms.push_back(shadowProj * glm::lookAt(lightPos, lightPos + vec3(0, -1, 0), vec3(0, 0, -1)));
-		//	shadowTransforms.push_back(shadowProj * glm::lookAt(lightPos, lightPos + vec3(0, 0, 1), vec3(0, -1, 0)));
-		//	shadowTransforms.push_back(shadowProj * glm::lookAt(lightPos, lightPos + vec3(0, 0, -1), vec3(0, -1, 0)));
+			mat4 shadowProj = glm::perspective(Math::ToRadians(90.0f), 1.0f, 0.1f, farPlane);
+			Vector<mat4> shadowTransforms;
+			shadowTransforms.push_back(shadowProj * glm::lookAt(lightPos, lightPos + vec3(1, 0, 0), vec3(0, -1, 0)));
+			shadowTransforms.push_back(shadowProj * glm::lookAt(lightPos, lightPos + vec3(-1, 0, 0), vec3(0, -1, 0)));
+			shadowTransforms.push_back(shadowProj * glm::lookAt(lightPos, lightPos + vec3(0, 1, 0), vec3(0, 0, 1)));
+			shadowTransforms.push_back(shadowProj * glm::lookAt(lightPos, lightPos + vec3(0, -1, 0), vec3(0, 0, -1)));
+			shadowTransforms.push_back(shadowProj * glm::lookAt(lightPos, lightPos + vec3(0, 0, 1), vec3(0, -1, 0)));
+			shadowTransforms.push_back(shadowProj * glm::lookAt(lightPos, lightPos + vec3(0, 0, -1), vec3(0, -1, 0)));
 
-		//	m_pointShadowProgram->SetUniformArray("shadowMatrices", shadowTransforms.data(), 6);
-		//	m_pointShadowProgram->SetUniform("lightPos", lightPos);
-		//	m_pointShadowProgram->SetUniform("farPlane", farPlane);
-		//	m_pointShadowProgram->SetUniform("lightIndex", static_cast<int>(i));
+			m_pointShadowProgram->SetUniform("shadowMatrices", shadowTransforms);
+			m_pointShadowProgram->SetUniform("lightPos", lightPos);
+			m_pointShadowProgram->SetUniform("farPlane", farPlane);
+			m_pointShadowProgram->SetUniform("lightIndex", static_cast<int32>(i));
 
-		//	context->GetStaticQueue().Execute(m_pointShadowProgram.get());
-		//	context->GetSkinnedQueue().Execute(m_pointShadowProgram.get());
+			context->GetStaticQueue().Execute(m_pointShadowProgram.get());
+			context->GetSkinnedQueue().Execute(m_pointShadowProgram.get());
 
-		//	PointShadowData sData;
-		//	sData.shadowFarPlane = farPlane;
-		//	sData.shadowMapIdx = static_cast<int32>(i);
-		//	sData.shadowBias = 0.05f;
-		//	shadowDataList.push_back(sData);
-		//}
+			PointShadowData sData;
+			sData.shadowFarPlane = farPlane;
+			sData.shadowMapIdx = static_cast<int32>(i);
+			sData.shadowBias = 0.05f;
+			shadowDataList.push_back(sData);
+		}
 
-		//context->UpdatePointShadows(shadowDataList);
-		//context->SetCachedTexture(ETextureCache::PointShadowArray, m_pointShadowMapArray);
-		//GLFramebufferHandle::Unbind();
+		context->UpdatePointShadows(shadowDataList);
+		context->SetPointShadowMap(m_pointShadowMapArray);
+		GLFramebufferHandle::Unbind();
 	}
 
 	void MGFShadowPass::RenderSpotShadows(RenderContext* context)
 	{
-		//auto& spotLights = context->GetSpotLights();
-		//if (spotLights.empty()) return;
+		const auto& spotLights = context->GetSpotLights();
+		if (spotLights.empty()) return;
 
-		//m_spotShadowFBO->Bind();
-		//glViewport(0, 0, SHADOW_RES_MEDIUM, SHADOW_RES_MEDIUM);
-		//glClear(GL_DEPTH_BUFFER_BIT);
+		m_spotShadowFBO->Bind();
+		glViewport(0, 0, SHADOW_RES_MEDIUM, SHADOW_RES_MEDIUM);
+		glClear(GL_DEPTH_BUFFER_BIT);
 
-		//m_spotShadowProgram->Use();
+		m_spotShadowProgram->Use();
 
-		//Vector<SpotShadowData> shadowDataList;
+		Vector<SpotShadowData> shadowDataList = context->GetSpotShadows();
 
-		//for (size_t i = 0; i < spotLights.size(); ++i)
-		//{
-		//	if (i >= MAX_SPOT_SHADOW_LAYERS) break;
+		for (size_t i = 0; i < spotLights.size(); ++i)
+		{
+			int shadowIdx = spotLights[i].shadowIndex;
+			if (shadowIdx < 0) continue;
 
-		//	const auto& light = spotLights[i];
-		//	vec3 lightPos = vec3(light.position);
-		//	vec3 lightDir = vec3(light.direction);
+			// Spot Light는 Collector에서 이미 View-Proj 행렬(lightSpaceMatrix)을 계산해 두었습니다.
+			const SpotShadowData& sData = shadowDataList[shadowIdx];
 
-		//	float fov = Math::ACos(light.cutOff[1]) * 2.0f;
-		//	float farPlane = light.position.w;
+			m_spotShadowProgram->SetUniform("lightSpaceMatrix", sData.lightSpaceMatrix);
+			m_spotShadowProgram->SetUniform("layerIndex", sData.shadowMapIdx);
 
-		//	mat4 lightProj = glm::perspective(fov, 1.0f, 0.1f, farPlane);
-		//	mat4 lightView = glm::lookAt(lightPos, lightPos + lightDir, vec3(0.0f, 1.0f, 0.0f));
-		//	mat4 lightSpaceMatrix = lightProj * lightView;
+			context->GetStaticQueue().Execute(m_spotShadowProgram.get());
+			context->GetSkinnedQueue().Execute(m_spotShadowProgram.get());
+		}
 
-		//	m_spotShadowProgram->SetUniform("lightSpaceMatrix", lightSpaceMatrix);
-		//	m_spotShadowProgram->SetUniform("layerIndex", static_cast<int>(i));
-
-		//	context->GetStaticQueue().Execute(m_spotShadowProgram.get());
-		//	context->GetSkinnedQueue().Execute(m_spotShadowProgram.get());
-
-		//	SpotShadowData sData;
-		//	sData.lightSpaceMatrix = lightSpaceMatrix;
-		//	sData.shadowMapIdx = static_cast<int32>(i);
-		//	sData.shadowBias = 0.005f;
-		//	shadowDataList.push_back(sData);
-		//}
-
-		//context->UpdateSpotShadows(shadowDataList);
-		//context->SetCachedTexture(ETextureCache::SpotShadowArray, m_spotShadowMapArray);
-
-		//GLFramebufferHandle::Unbind();
+		context->SetSpotShadowMap(m_spotShadowMapArray);
+		GLFramebufferHandle::Unbind();
 	}
 
 	Vector<mat4> MGFShadowPass::CalculateCSMMatrices
 	(
-		const mat4& cameraView, 
-		const mat4& cameraProj, 
+		const Camera* camera, 
 		const vec3& lightDir, 
 		vec4& outSplits
 	)
 	{
-		//// TODO: CSM 행렬 분할 수학 로직 구현
-		return Vector<mat4>(4, mat4(1.0f));
+		Vector<mat4> ret;
+		if (!camera) return ret;
+
+		float nearPlane = camera->GetNear();
+		float farPlane = camera->GetFar();
+		float fov = camera->GetFOV();
+		float aspect = camera->GetAspectRatio();
+
+		mat4 camView = camera->GetViewMatrix();
+		mat4 camInvView = Math::Inverse(camView);
+
+		float cascadeLevels[4];
+		cascadeLevels[0] = nearPlane + (farPlane - nearPlane) * 0.05f;
+		cascadeLevels[1] = nearPlane + (farPlane - nearPlane) * 0.15f;
+		cascadeLevels[2] = nearPlane + (farPlane - nearPlane) * 0.50f;
+		cascadeLevels[3] = farPlane;
+
+		outSplits = vec4(cascadeLevels[0], cascadeLevels[1], cascadeLevels[2], cascadeLevels[3]);
+
+		float lastSplitDist = nearPlane;
+
+		for (int i = 0; i < 4; ++i)
+		{
+			float currentSplitDist = cascadeLevels[i];
+
+			mat4 proj = glm::perspective(Math::ToRadians(fov), aspect, lastSplitDist, currentSplitDist);
+			mat4 invCam = camInvView * Math::Inverse(proj);
+
+			vec3 corners[8] = {
+				vec3(-1.0f, -1.0f, -1.0f), vec3(1.0f, -1.0f, -1.0f),
+				vec3(1.0f,  1.0f, -1.0f), vec3(-1.0f,  1.0f, -1.0f),
+				vec3(-1.0f, -1.0f,  1.0f), vec3(1.0f, -1.0f,  1.0f),
+				vec3(1.0f,  1.0f,  1.0f), vec3(-1.0f,  1.0f,  1.0f)
+			};
+
+			vec3 center = vec3(0.0f);
+			for (int j = 0; j < 8; ++j)
+			{
+				vec4 pt = invCam * vec4(corners[j], 1.0f);
+				corners[j] = vec3(pt) / pt.w;
+				center += corners[j];
+			}
+			center /= 8.0f;
+
+			vec3 up = (Math::Abs(lightDir.y) > 0.999f) ? vec3(0.0f, 0.0f, 1.0f) : vec3(0.0f, 1.0f, 0.0f);
+			mat4 lightView = glm::lookAt(center - lightDir, center, up);
+
+			float minX = std::numeric_limits<float>::max();
+			float maxX = std::numeric_limits<float>::lowest();
+			float minY = std::numeric_limits<float>::max();
+			float maxY = std::numeric_limits<float>::lowest();
+			float minZ = std::numeric_limits<float>::max();
+			float maxZ = std::numeric_limits<float>::lowest();
+
+			for (int j = 0; j < 8; ++j)
+			{
+				vec4 trf = lightView * vec4(corners[j], 1.0f);
+				minX = Math::Min(minX, trf.x);
+				maxX = Math::Max(maxX, trf.x);
+				minY = Math::Min(minY, trf.y);
+				maxY = Math::Max(maxY, trf.y);
+				minZ = Math::Min(minZ, trf.z);
+				maxZ = Math::Max(maxZ, trf.z);
+			}
+
+			constexpr float zMultiplier = 10.0f;
+			if (minZ < 0) minZ *= zMultiplier; else minZ /= zMultiplier;
+			if (maxZ < 0) maxZ /= zMultiplier; else maxZ *= zMultiplier;
+
+			mat4 lightProj = glm::ortho(minX, maxX, minY, maxY, minZ, maxZ);
+
+			ret.push_back(lightProj * lightView);
+			lastSplitDist = currentSplitDist;
+		}
+
+		return ret;
 	}
 }

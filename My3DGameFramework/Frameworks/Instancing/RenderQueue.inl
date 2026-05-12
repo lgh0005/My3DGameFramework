@@ -27,7 +27,7 @@ namespace MGF3D
     }
 
     template<typename T>
-    void RenderQueue<T>::Execute()
+    void RenderQueue<T>::Execute(GraphicsProgram* overrideProgram)
     {
         for (auto& [meshPtr, materialMap] : m_batches)
         {
@@ -44,7 +44,7 @@ namespace MGF3D
                 }
 
                 // 2. 배치에게 "네 짐(Data) 들고 가서 그려라" 명령
-                batch.Draw(m_bindingSlot, m_instanceBuffer.get());
+                batch.Draw(m_bindingSlot, m_instanceBuffer.get(), overrideProgram);
             }
         }
     }

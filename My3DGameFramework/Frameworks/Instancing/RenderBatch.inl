@@ -1,5 +1,6 @@
 #pragma once
 #include "Buffers/GLShaderStorageBuffer.h"
+#include "Graphics/Programs/GraphicsProgram.h"
 
 namespace MGF3D
 {
@@ -7,13 +8,15 @@ namespace MGF3D
 	void RenderBatch<T>::Draw
 	(
 		uint32 bindingSlot,
-		GLShaderStorageBuffer* instanceBuffer
+		GLShaderStorageBuffer* instanceBuffer,
+		GraphicsProgram* overrideProgram
 	)
 	{
 		if (m_instances.empty() || !m_mesh || !m_material) return;
 
-		// 1. 머티리얼 바인딩
-		m_material->Bind();
+		// 1. 머티리얼 또는 오버라이드 셰이더 바인딩
+		if (overrideProgram != nullptr) overrideProgram->Use();
+		else m_material->Bind();
 
 		// 2. 인스턴스 데이터 전송 및 바인딩
 		usize requiredSize = m_instances.size() * sizeof(T);

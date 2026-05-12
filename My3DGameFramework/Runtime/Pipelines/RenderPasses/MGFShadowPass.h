@@ -3,6 +3,7 @@
 
 namespace MGF3D
 {
+	MGF_CLASS_PTR(Camera)
 	MGF_CLASS_PTR(GraphicsProgram)
 	MGF_CLASS_PTR(GLFramebuffer2D)
 	MGF_CLASS_PTR(GLTexture2DArray)
@@ -30,13 +31,7 @@ namespace MGF3D
 		void RenderDirectionalShadows(RenderContext* context);
 		void RenderPointShadows(RenderContext* context);
 		void RenderSpotShadows(RenderContext* context);
-		Vector<mat4> CalculateCSMMatrices
-		(
-			const mat4& cameraView, 
-			const mat4& cameraProj, 
-			const vec3& lightDir, 
-			vec4& outSplits
-		);
+		Vector<mat4> CalculateCSMMatrices(const Camera* camera, const vec3& lightDir, vec4& outSplits);
 
 	private:
 		MGFShadowPass();

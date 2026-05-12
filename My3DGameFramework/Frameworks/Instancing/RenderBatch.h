@@ -5,6 +5,7 @@ namespace MGF3D
 	MGF_CLASS_PTR(Mesh)
 	MGF_CLASS_PTR(Material)
 	MGF_CLASS_PTR(GLShaderStorageBuffer)
+	MGF_CLASS_PTR(GraphicsProgram)
 
 	template<typename T>
 	class RenderBatch
@@ -13,7 +14,8 @@ namespace MGF3D
 		void Draw
 		(
 			uint32 bindingSlot,
-			GLShaderStorageBuffer* instanceBuffer
+			GLShaderStorageBuffer* instanceBuffer,
+			GraphicsProgram* overrideProgram = nullptr
 		);
 
 	public:

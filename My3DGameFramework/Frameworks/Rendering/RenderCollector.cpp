@@ -48,6 +48,7 @@ namespace MGF3D
 		globalData.pad0 = 0;
 
 		context->UpdateGlobals(globalData);
+		context->SetCurrentCamera(camera);
 	}
 
 	void RenderCollector::CollectMeshData(RenderContext* context, const Camera* camera)
@@ -76,9 +77,8 @@ namespace MGF3D
 			if (light->IsCastShadow() && m_dirShadows.size() < MAX_SHADOW_CASTER)
 			{
 				DirectionalShadowData sData;
-
-				// TODO: 여기서 카메라 프러스트럼 기반 CSM 행렬 계산 로직 호출
-				// CalculateCSMMatrices(sData, camera);
+				sData.shadowMapBaseIdx = static_cast<int32>(m_dirShadows.size()) * MAX_DIR_SHADOW_LAYERS;
+				sData.shadowBias = 0.005f;
 				data.shadowIndex = static_cast<int32>(m_dirShadows.size());
 				m_dirShadows.push_back(sData);
 			}
@@ -113,7 +113,7 @@ namespace MGF3D
 				PointShadowData sData;
 				sData.shadowFarPlane = light->GetRange();
 				sData.shadowMapIdx = static_cast<int32>(m_pointShadows.size());
-				sData.shadowBias = 0.05f; // 기본 바이어스 값
+				sData.shadowBias = 0.05f;
 
 				data.shadowIndex = static_cast<int32>(m_pointShadows.size());
 				m_pointShadows.push_back(sData);
@@ -152,8 +152,17 @@ namespace MGF3D
 			{
 				SpotShadowData sData;
 
-				// TODO: 스팟 라이트용 View-Projection 행렬 계산 로직 필요
-				// sData.lightSpaceMatrix = CalculateSpotVP(transform, light);
+				// 1. Projection: 빛의 퍼짐 각도(OuterCutoff의 2배)를 FOV로 사용합니다.
+				float fov = Math::ToRadians(light->GetOuterCutoff() * 2.0f);
+				mat4 lightProj = glm::perspective(fov, 1.0f, 0.1f, light->GetRange());
+
+				// 2. View: 조명의 위치에서 조명의 방향을 바라보는 행렬을 만듭니다.
+				vec3 lightPos = transform->GetWorldPosition();
+				vec3 lightDir = transform->GetForward();
+				vec3 up = (Math::Abs(lightDir.y) > 0.999f) ? vec3(0.0f, 0.0f, 1.0f) : vec3(0.0f, 1.0f, 0.0f);
+				mat4 lightView = glm::lookAt(lightPos, lightPos + lightDir, up);
+
+				sData.lightSpaceMatrix = lightProj * lightView;
 				sData.shadowMapIdx = static_cast<int32>(m_spotShadows.size());
 				sData.shadowBias = 0.005f;
 

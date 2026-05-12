@@ -1,5 +1,6 @@
 #include "GraphicsPch.h"
 #include "GLFramebuffer2D.h"
+#include "TextureArrays/GLTexture2DArray.h"
 
 namespace MGF3D
 {
@@ -14,6 +15,13 @@ namespace MGF3D
 	{
 		auto fbo = GLFramebuffer2DPtr(new GLFramebuffer2D());
 		if (!fbo->Init(colorAttachments, depthAttachment)) return nullptr;
+		return fbo;
+	}
+
+	GLFramebuffer2DPtr GLFramebuffer2D::CreateArray(const GLTexture2DArrayPtr& depthAttachmentArray)
+	{
+		auto fbo = GLFramebuffer2DPtr(new GLFramebuffer2D());
+		if (!fbo->InitArray(depthAttachmentArray)) return nullptr;
 		return fbo;
 	}
 
@@ -84,6 +92,29 @@ namespace MGF3D
 			glNamedFramebufferTexture(m_handle, GL_DEPTH_STENCIL_ATTACHMENT, depthAttachment->GetHandle(), 0);
 
 		// 6. 기반 클래스의 상태 체크 호출
+		return CheckStatus();
+	}
+
+	bool GLFramebuffer2D::InitArray(const GLTexture2DArrayPtr& depthAttachmentArray)
+	{
+		if (!depthAttachmentArray)
+		{
+			MGF_LOG_ERROR("GLFramebuffer2D InitArray failed: depthAttachmentArray is null.");
+			return false;
+		}
+
+		m_width = depthAttachmentArray->GetWidth();
+		m_height = depthAttachmentArray->GetHeight();
+
+		glCreateFramebuffers(1, &m_handle);
+
+		// 그림자 전용 프레임버퍼이므로 Color 관련 읽기/쓰기를 명시적으로 차단
+		glNamedFramebufferDrawBuffer(m_handle, GL_NONE);
+		glNamedFramebufferReadBuffer(m_handle, GL_NONE);
+
+		// glNamedFramebufferTexture를 통해 2D 배열 전체(모든 Layer)를 한 번에 바인딩
+		glNamedFramebufferTexture(m_handle, GL_DEPTH_ATTACHMENT, depthAttachmentArray->GetHandle(), 0);
+
 		return CheckStatus();
 	}
 }
