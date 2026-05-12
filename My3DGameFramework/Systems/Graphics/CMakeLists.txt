@@ -15,7 +15,8 @@ set(SOURCES
     # Constants
     "Constants/ConstantGraphics.h"          "Constants/ConstantVulkan.h"
 
-    # Managers
+    # Components
+    "Components/Camera.h"                    "Components/Camera.cpp"
     
     # Assets
     "Assets/Shader.h"                      "Assets/Shader.cpp"
@@ -83,6 +84,9 @@ set(SOURCES
     "Uniforms/IBLUniform.h"
     "Uniforms/SkyboxUniform.h"
     "Uniforms/SSAOKernalUniform.h"
+
+    # Mechanics
+    "Mechanics/Camera/CameraShutter.h"            "Mechanics/Camera/CameraShutter.cpp"
 
     # Utils
     "GraphicsUtils/GeometryUtils.h"       "GraphicsUtils/GeometryUtils.cpp"

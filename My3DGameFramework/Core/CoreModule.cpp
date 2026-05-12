@@ -25,23 +25,18 @@
 #include "Entities/Component.h"
 #include "Registries/ComponentRegistry.h"
 #include "Components/Transform.h"
-#include "Components/Camera.h"
 #pragma endregion
 
 #pragma region MECHANICS
 #include "Entities/Mechanic.h"
-#include "Mechanics/TransformHierarchy.h"
-// #include "Mechanics/Velocitybuffer.h"
+#include "Mechanics/Transform/TransformHierarchy.h"
+#include "Mechanics/Transform/TransformCoordinate.h"
 #pragma endregion
 
 #pragma region RESOURCE
 #include "Sources/Resource.h"
 #include "Sources/NamedResource.h"
 #include "Sources/Asset.h"
-#pragma endregion
-
-#pragma region MISC
-#include "Window/MGFWindow.h"
 #pragma endregion
 
 namespace MGF3D
@@ -60,19 +55,16 @@ namespace MGF3D
 		MGFTypeTree& componentTree = MGF_TYPE.CreateTree("Component");
 		Component::s_typeIndex = componentTree.Register("Component", "");
 		Transform::s_typeIndex = componentTree.Register("Transform", "Component");
-		Camera::s_typeIndex = componentTree.Register("Camera", "Component");
 
 		// 3. Component 레지스트리 주입
 		auto transformReg = MakeUnique<ComponentRegistry<Transform>>();
-		auto cameraReg = MakeUnique<ComponentRegistry<Camera>>();
 		MGF_ENTITY.AddComponentRegistry(Transform::s_typeIndex, std::move(transformReg));
-		MGF_ENTITY.AddComponentRegistry(Camera::s_typeIndex, std::move(cameraReg));
 
 		// 4. Mechanic 계층 트리
 		MGFTypeTree& mechanicTree = MGF_TYPE.CreateTree("Mechanics");
 		Mechanic::s_typeIndex = mechanicTree.Register("Mechanic", "");
 		TransformHierarchy::s_typeIndex = mechanicTree.Register("TransformHierarchy", "Mechanic");
-		TransformHierarchy::s_typeIndex = mechanicTree.Register("TransformCoordinate", "Mechanic");
+		TransformCoordinate::s_typeIndex = mechanicTree.Register("TransformCoordinate", "Mechanic");
 
 		// 4. Resource 트리 생성
 		MGFTypeTree& resourceTree = MGF_TYPE.CreateTree("Resource");

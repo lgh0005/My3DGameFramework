@@ -40,12 +40,6 @@ set(SOURCES
 
     # Components
     "Components/Transform.h"        "Components/Transform.cpp"
-    "Components/Camera.h"           "Components/Camera.cpp"
-
-    # Mechanics
-    "Mechanics/TransformHierarchy.h"       "Mechanics/TransformHierarchy.cpp"
-    "Mechanics/TransformCoordinate.h"      "Mechanics/TransformCoordinate.cpp"
-    "Mechanics/CameraShutter.h"            "Mechanics/CameraShutter.cpp"
 
     # States
     "States/MGFStateMachine.h"        "States/MGFStateMachine.cpp"      "States/MGFStateMachine.inl"
@@ -74,6 +68,10 @@ set(SOURCES
     "Input/MGFInputAction.h"              "Input/MGFInputAction.cpp"
     "Input/Actions/MGFKeyAction.h"        "Input/Actions/MGFKeyAction.cpp"
     "Input/Actions/MGFMouseAction.h"      "Input/Actions/MGFMouseAction.cpp"
+
+    # Mechanics
+    "Mechanics/Transform/TransformHierarchy.h"       "Mechanics/Transform/TransformHierarchy.cpp"
+    "Mechanics/Transform/TransformCoordinate.h"      "Mechanics/Transform/TransformCoordinate.cpp"
 
     # Window
     "Window/MGFWindowInterface.h"  "Window/MGFWindowInterface.cpp"

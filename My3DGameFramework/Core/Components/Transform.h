@@ -1,7 +1,7 @@
 ﻿#pragma once
 #include "Entities/Component.h"
-#include "Mechanics/TransformHierarchy.h"
-#include "Mechanics/TransformCoordinate.h"
+#include "Mechanics/Transform/TransformHierarchy.h"
+#include "Mechanics/Transform/TransformCoordinate.h"
 
 namespace MGF3D
 {

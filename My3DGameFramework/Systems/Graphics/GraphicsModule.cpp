@@ -1,12 +1,17 @@
 #include "GraphicsPch.h"
 #include "GraphicsModule.h"
 #include "Managers/TypeManager.h"
+#include "Managers/EntityManager.h"
 #include "Identities/MGFTypeTree.h"
+
+#include "Registries/ComponentRegistry.h"
 
 #include "Textures/GLTextureHandle.h"
 #include "Textures/GLTexture2D.h"
 #include "Textures/GLTexture3D.h"
 #include "Textures/GLTextureCube.h"
+
+#include "Components/Camera.h"
 
 #include "Meshes/Mesh.h"
 #include "Meshes/StaticMesh.h"
@@ -42,6 +47,14 @@ namespace MGF3D
 		MGFTypeTree* assetTree = MGF_TYPE.GetTree("Asset");
 		Image::s_typeIndex = assetTree->Register("Image", "Asset");
 		Shader::s_typeIndex = assetTree->Register("Shader", "Asset");
+
+		// 4. Component 타입 베이킹
+		MGFTypeTree* componentTree = MGF_TYPE.GetTree("Component");
+		Camera::s_typeIndex = componentTree->Register("Camera", "Component");
+
+		auto cameraReg = MakeUnique<ComponentRegistry<Camera>>();
+		MGF_ENTITY.AddComponentRegistry(Camera::s_typeIndex, std::move(cameraReg));
+
 	}
 
 	bool GraphicsModule::OnInit()

@@ -7,9 +7,6 @@
 #include "Rendering/RenderContext.h"
 #include "Rendering/RenderCollector.h"
 #include "Components/Camera.h"
-#include "Components/Transform.h"
-#include "Uniforms/GlobalUniform.h"
-#include "Instancing/Animations/AnimationBuffer.h"
 
 namespace MGF3D
 {
@@ -48,7 +45,7 @@ namespace MGF3D
 			m_renderCollector->CollectGlobals(m_renderContext.get(), camera);
 
 			// 3-2. 씬의 엔티티들로부터 메쉬 및 인스턴스 데이터 추출
-			m_renderCollector->CollectMeshData(m_renderContext.get());
+			m_renderCollector->CollectMeshData(m_renderContext.get(), camera);
 
 			// 3-3. 파이프라인 실행
 			m_activePipeline->Render(m_renderContext.get());

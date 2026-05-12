@@ -14,7 +14,9 @@ namespace MGF3D
 
 	MGFSkyboxPassUPtr MGFSkyboxPass::Create()
 	{
-		return nullptr;
+		auto renderPass = MGFSkyboxPassUPtr(new MGFSkyboxPass());
+		if (!renderPass->Init()) return nullptr;
+		return renderPass;
 	}
 
 	bool MGFSkyboxPass::Init()
@@ -34,5 +36,10 @@ namespace MGF3D
 		MGFTypeTree* tree = MGF_TYPE.GetTree("RenderPass");
 		if (tree != nullptr) return tree->GetType(s_typeIndex);
 		return nullptr;
+	}
+
+	void MGFSkyboxPass::Execute(RenderContext* context)
+	{
+		// TODO : 절두체 기반 컬링
 	}
 }

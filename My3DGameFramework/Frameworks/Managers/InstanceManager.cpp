@@ -4,6 +4,8 @@
 #include "Rendering/RenderContext.h"
 #include "Instancing/Meshes/StaticInstanceData.h"
 #include "Components/Transform.h"
+#include "Components/Camera.h"
+#include "Geometry/Frustum.h"
 #include "Graphics/Meshes/StaticMesh.h"
 #include "Graphics/Meshes/SkinnedMesh.h"
 #include "Components/MeshRenderers/MeshRenderer.h"
@@ -15,19 +17,21 @@ namespace MGF3D
 	InstanceManager::InstanceManager() = default;
 	InstanceManager::~InstanceManager() = default;
 
-    void InstanceManager::Extract(RenderContext* context)
+    void InstanceManager::Extract(RenderContext* context, const Camera* camera)
     {
         // 1. 메쉬 렌더러 추출
-        ExtractStaticMeshes(context);
-        ExtractSkinnedMeshes(context);
+        ExtractStaticMeshes(context, camera);
+        ExtractSkinnedMeshes(context, camera);
     }
 
-    void InstanceManager::ExtractStaticMeshes(RenderContext* context)
+    void InstanceManager::ExtractStaticMeshes(RenderContext* context, const Camera* camera)
     {
         auto* registry = MGF_ENTITY.GetComponentRegistry<MeshRenderer>();
         if (!registry) return;
 
+        const Frustum& frustum = camera->GetFrustum();
         const auto& renderers = registry->GetComponents();
+
         for (const auto* renderer : renderers)
         {
             if (renderer->GetType()->selfIndex != MeshRenderer::s_typeIndex)
@@ -39,6 +43,10 @@ namespace MGF3D
             StaticMesh* mesh = renderer->GetMesh();
             Material* material = renderer->GetMaterial();
             if (!mesh || !material) continue;
+            
+            RenderBounds worldBounds = mesh->GetLocalBounds().Transform(transform->GetWorldMatrix());
+            if (!frustum.CheckBounds(worldBounds))
+                continue;
 
             StaticInstanceData data;
             data.worldMatrix = transform->GetWorldMatrix();
@@ -47,11 +55,12 @@ namespace MGF3D
         }
     }
 
-    void InstanceManager::ExtractSkinnedMeshes(RenderContext* context)
+    void InstanceManager::ExtractSkinnedMeshes(RenderContext* context, const Camera* camera)
     {
         auto* registry = MGF_ENTITY.GetComponentRegistry<SkinnedMeshRenderer>();
         if (!registry) return;
 
+        const Frustum& frustum = camera->GetFrustum();
         const auto& components = registry->GetComponents();
 		for (const auto& renderer : components)
 		{
@@ -65,6 +74,10 @@ namespace MGF3D
 		    Material* material = renderer->GetMaterial();
 		    if (!mesh || !material) continue;
 
+            RenderBounds worldBounds = mesh->GetLocalBounds().Transform(transform->GetWorldMatrix());
+            if (!frustum.CheckBounds(worldBounds))
+                continue;
+
 		    SkinnedInstanceData data;
 		    data.worldMatrix = transform->GetWorldMatrix();
             ObjectIDHash rootID = renderer->GetRootEntityID();
@@ -76,7 +89,7 @@ namespace MGF3D
 		}
     }
 
-	void InstanceManager::ExtractOutlineMeshes(RenderContext* context)
+	void InstanceManager::ExtractOutlineMeshes(RenderContext* context, const Camera* camera)
 	{
 		// Outline 메쉬 추출 로직 구현
 	}

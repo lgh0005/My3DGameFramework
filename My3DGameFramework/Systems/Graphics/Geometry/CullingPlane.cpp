@@ -26,7 +26,6 @@ namespace MGF3D
         m_distance *= invLength;
     }
 
-
     float CullingPlane::GetDistanceToPoint(const vec3& point) const
     {
         return Math::Dot(m_normal, point) + m_distance;

@@ -7,9 +7,12 @@ namespace MGF3D
 	MGF_CLASS_PTR(RenderContext)
 
 	// main render passes
+	MGF_CLASS_PTR(MGFShadowPass)
+	MGF_CLASS_PTR(MGFSSAOPass)
 	MGF_CLASS_PTR(MGFGeometryPass)
 	MGF_CLASS_PTR(MGFDeferredLightingPass)
-	MGF_CLASS_PTR(MGFSSAOPass)
+	MGF_CLASS_PTR(MGFSkyboxPass)
+	MGF_CLASS_PTR(MGFPostProcessingPass)
 
 	// MGF3D main render pipeline class
 	MGF_CLASS_PTR(MGFRenderPipeline)
@@ -34,8 +37,12 @@ namespace MGF3D
 		MGFRenderPipeline();
 		bool Init();
 
+		// main render pass members
+		MGFShadowPassUPtr m_shadowPass;
+		MGFSSAOPassUPtr m_ssaoPass;
 		MGFGeometryPassUPtr m_geometryPass;
 		MGFDeferredLightingPassUPtr m_deferredLightingPass;
-		MGFSSAOPassUPtr m_ssaoPass;
+		MGFSkyboxPassUPtr m_skyboxPass;
+		MGFPostProcessingPassUPtr m_postProcessPass;
 	};
 }

@@ -24,10 +24,14 @@ set(SOURCES
 
     # RenderPipeline & RenderPass
     "Pipelines/MGFRenderPipeline.h"                          "Pipelines/MGFRenderPipeline.cpp"
+
+    "Pipelines/RenderPasses/MGFShadowPass.h"                 "Pipelines/RenderPasses/MGFShadowPass.cpp"
     "Pipelines/RenderPasses/MGFGeometryPass.h"               "Pipelines/RenderPasses/MGFGeometryPass.cpp"
     "Pipelines/RenderPasses/MGFDeferredLightingPass.h"       "Pipelines/RenderPasses/MGFDeferredLightingPass.cpp"
     "Pipelines/RenderPasses/MGFSkyboxPass.h"                 "Pipelines/RenderPasses/MGFSkyboxPass.cpp"
-    "Pipelines/RenderPasses/MGFSSAOPass.h"                 "Pipelines/RenderPasses/MGFSSAOPass.cpp"
+    "Pipelines/RenderPasses/MGFSSAOPass.h"                   "Pipelines/RenderPasses/MGFSSAOPass.cpp"
+    "Pipelines/RenderPasses/MGFSkyboxPass.h"                 "Pipelines/RenderPasses/MGFSkyboxPass.cpp"
+    "Pipelines/RenderPasses/MGFPostProcessingPass.h"         "Pipelines/RenderPasses/MGFPostProcessingPass.cpp"
 
     # Managers
     "Managers/GUIManager.h"     "Managers/GUIManager.cpp"

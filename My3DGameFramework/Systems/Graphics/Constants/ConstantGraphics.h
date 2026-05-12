@@ -6,12 +6,16 @@ namespace MGF3D
 	static constexpr int32 MAX_LIGHTS		  { 32 };
 	static constexpr int32 MAX_SHADOW_CASTER  { 8 };
 
-	// Shadow Map Resolution
-	static constexpr int32 SHADOW_MAP_RES_DEFAULT{ 1024 };
-	static constexpr int32 SHADOW_MAP_RES_HIGH{ 2048 };
-	static constexpr int32 MAX_DIR_SHADOW_LAYERS  { 4 };
-	static constexpr int32 MAX_SPOT_SHADOW_LAYERS { MAX_SHADOW_CASTER };
-	static constexpr int32 MAX_POINT_SHADOW_COUNT { MAX_SHADOW_CASTER };
+	// Shadow Map Resolutions
+	static constexpr int32 SHADOW_RES_LOW{ 512 };
+	static constexpr int32 SHADOW_RES_MEDIUM{ 1024 };
+	static constexpr int32 SHADOW_RES_HIGH{ 2048 };
+	static constexpr int32 SHADOW_RES_VERY_HIGH{ 4096 };
+
+	// Shadow Layers & Counts
+	static constexpr int32 MAX_DIR_SHADOW_LAYERS{ 4 };
+	static constexpr int32 MAX_SPOT_SHADOW_LAYERS{ MAX_SHADOW_CASTER };
+	static constexpr int32 MAX_POINT_SHADOW_COUNT{ MAX_SHADOW_CASTER };
 
 	// max bone influence values
 	static constexpr int32 MAX_BONES		  { 100 };

@@ -1,5 +1,6 @@
 ﻿#pragma once
 #include "Entities/Component.h"
+#include "Geometry/Frustum.h"
 
 namespace MGF3D
 {
@@ -44,6 +45,7 @@ namespace MGF3D
 		float GetFar() const { return m_farPlane; }
 		float GetFOV() const { return m_fovDegrees; }
 		float GetAspectRatio() const { return m_aspectRatio; }
+		const Frustum& GetFrustum() const;
 
 	public:
 		bool IsProjectionDirty() const { return m_isProjectionDirty; }
@@ -60,5 +62,8 @@ namespace MGF3D
 
 		mat4 m_projectionMatrix { 1.0f };
 		bool m_isProjectionDirty{ true };
+
+		mutable Frustum m_frustum;
+		mutable mat4 m_cachedViewProjMatrix{ 0.0f };
 	};
 }

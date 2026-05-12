@@ -1,4 +1,4 @@
-﻿#include "CorePch.h"
+﻿#include "GraphicsPch.h"
 #include "Camera.h"
 #include "Components/Transform.h"
 #include "Managers/TypeManager.h"
@@ -86,6 +86,19 @@ namespace MGF3D
 	mat4 Camera::GetViewProjectionMatrix() const
 	{
 		return m_projectionMatrix * GetViewMatrix();
+	}
+
+	const Frustum& Camera::GetFrustum() const
+	{
+		mat4 currentVP = GetViewProjectionMatrix();
+
+		if (m_cachedViewProjMatrix != currentVP)
+		{
+			m_cachedViewProjMatrix = currentVP;
+			m_frustum.Update(currentVP);
+		}
+
+		return m_frustum;
 	}
 
 	Transform* Camera::GetTransform() const

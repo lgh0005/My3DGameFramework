@@ -2,6 +2,7 @@
 
 namespace MGF3D
 {
+	MGF_CLASS_PTR(Camera)
 	MGF_CLASS_PTR(RenderContext)
 
 	class InstanceManager
@@ -13,11 +14,11 @@ namespace MGF3D
 		~InstanceManager();
 
 	public:
-		void Extract(RenderContext* context);
+		void Extract(RenderContext* context, const Camera* camera);
 
 	private:
-		void ExtractStaticMeshes(RenderContext* context);
-		void ExtractSkinnedMeshes(RenderContext* context);
-		void ExtractOutlineMeshes(RenderContext* context);
+		void ExtractStaticMeshes(RenderContext* context, const Camera* camera);
+		void ExtractSkinnedMeshes(RenderContext* context, const Camera* camera);
+		void ExtractOutlineMeshes(RenderContext* context, const Camera* camera);
 	};
 }

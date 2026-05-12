@@ -50,9 +50,9 @@ namespace MGF3D
 		context->UpdateGlobals(globalData);
 	}
 
-	void RenderCollector::CollectMeshData(RenderContext* context)
+	void RenderCollector::CollectMeshData(RenderContext* context, const Camera* camera)
 	{
-		MGF_INSTANCE.Extract(context);
+		MGF_INSTANCE.Extract(context, camera);
 	}
 
 	void RenderCollector::CollectDirectionalLights(RenderContext* context)
