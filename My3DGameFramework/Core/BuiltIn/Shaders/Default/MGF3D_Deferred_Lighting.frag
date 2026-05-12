@@ -12,6 +12,7 @@ layout(binding = 1) uniform sampler2D gNormalRoughness; // .a 채널에 shinines
 layout(binding = 2) uniform sampler2D gAlbedoMetallic;  // .a 채널에 specFactor 저장됨
 layout(binding = 3) uniform sampler2D gEmission;
 // layout(binding = 4) uniform sampler2D gVelocity;
+layout(binding = 5) uniform sampler2D gSSAO;
 
 // --------------------------------------------------------
 // Scene & Light Uniforms
@@ -110,7 +111,7 @@ void main()
     vec4 dataEmission   = texture(gEmission, vTexCoord);
 
     vec3 fragPos    = dataPosAO.xyz;
-    float ao        = dataPosAO.a;
+    float ao        = dataPosAO.a * texture(gSSAO, vTexCoord).r;
     vec3 normal     = dataNormRough.xyz;
     
     // G-Buffer의 Alpha 채널에서 기존 방식의 파라미터를 꺼내옵니다.
@@ -126,7 +127,8 @@ void main()
 
     // 2. 공통 계산
     vec3 viewDir = normalize(uScene.viewPos - fragPos);
-    vec3 resultColor = albedo * 0.05 * ao;
+    vec3 ambient = albedo * 0.05 * ao;
+    vec3 resultColor = ambient;
 
     // 3. 조명 누적 계산 (인자 수정 반영)
     for(int i = 0; i < uScene.dirLightCount; ++i)

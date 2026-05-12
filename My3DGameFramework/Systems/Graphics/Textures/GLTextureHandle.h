@@ -23,6 +23,8 @@ namespace MGF3D
 	public:
 		uint32 GetTarget() const;
 		uint32 GetHandle() const;
+		void SetFilter(uint32 minFilter, uint32 magFilter);
+		void SetWrap(uint32 wrapS, uint32 wrapT);
 		void GenerateMipmap();
 
 	public:

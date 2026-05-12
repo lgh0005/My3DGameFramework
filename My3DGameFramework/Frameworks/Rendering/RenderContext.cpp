@@ -17,6 +17,7 @@ namespace MGF3D
         m_spotLightSSBO = GLShaderStorageBuffer::Create(nullptr, 0);
 
         m_gBufferTextures.reserve(static_cast<usize>(EGBufferSlot::Max));
+        m_cachedTextures.resize(static_cast<usize>(ETextureCache::Max), nullptr);
 
         m_dirShadowSSBO = GLShaderStorageBuffer::Create(nullptr, 0);
         m_pointShadowSSBO = GLShaderStorageBuffer::Create(nullptr, 0);
@@ -103,6 +104,19 @@ namespace MGF3D
     {
         uint8 index = static_cast<uint8>(slot);
         if (index < m_gBufferTextures.size()) return m_gBufferTextures[index].get();
+        return nullptr;
+    }
+
+    void RenderContext::SetCachedTexture(ETextureCache slot, const GLTexture2DPtr& texture)
+    {
+        uint8 index = static_cast<uint8>(slot);
+        if (index < m_cachedTextures.size()) m_cachedTextures[index] = texture;
+    }
+
+    GLTexture2D* RenderContext::GetCachedTexture(ETextureCache slot) const
+    {
+        uint8 index = static_cast<uint8>(slot);
+        if (index < m_cachedTextures.size()) return m_cachedTextures[index].get();
         return nullptr;
     }
 }

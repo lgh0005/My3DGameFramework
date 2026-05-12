@@ -49,7 +49,6 @@ namespace MGF3D
 	void MGFGeometryPass::Execute(RenderContext* context)
 	{
 		if (!context || !m_geometryStaticDrawProgram || !m_geometrySkinnedDrawProgram) return;
-
 		if (m_geometryStaticDrawProgram->GetState() != EResourceState::Ready ||
 			m_geometrySkinnedDrawProgram->GetState() != EResourceState::Ready) return;
 

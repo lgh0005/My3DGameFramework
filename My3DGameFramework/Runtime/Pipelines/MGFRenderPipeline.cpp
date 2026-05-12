@@ -4,6 +4,7 @@
 #include "Rendering/RenderContext.h"
 #include "Pipelines/RenderPasses/MGFGeometryPass.h"
 #include "Pipelines/RenderPasses/MGFDeferredLightingPass.h"
+#include "Pipelines/RenderPasses/MGFSSAOPass.h"
 
 namespace MGF3D
 {
@@ -26,14 +27,19 @@ namespace MGF3D
 		m_deferredLightingPass = MGFDeferredLightingPass::Create();
 		if (!m_deferredLightingPass) return false;
 
+		m_ssaoPass = MGFSSAOPass::Create();
+		if (!m_ssaoPass) return false;
+
 		return true;
 	}
 
 	void MGFRenderPipeline::Render(RenderContext* context)
 	{
-		// [DEBUG]
 		// 1. GBuffer 생성 패스
 		m_geometryPass->Execute(context);
+
+		// 2. SSSAO 패스
+		m_ssaoPass->Execute(context);
 
 		// 2. 라이팅 패스
 		m_deferredLightingPass->Execute(context);

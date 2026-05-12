@@ -43,7 +43,6 @@ namespace MGF3D
 	void MGFDeferredLightingPass::Execute(RenderContext* context)
 	{
 		if (!context || !m_deferredLightingProgram) return;
-
 		if (m_deferredLightingProgram->GetState() != EResourceState::Ready) return;
 
 		// 2. 화면 초기화 (조명 결과가 그려질 기본 프레임버퍼)
@@ -64,6 +63,10 @@ namespace MGF3D
 		if (normRoughTex) normRoughTex->Bind(1);
 		if (albMetalTex)  albMetalTex->Bind(2);
 		if (emissionTex)  emissionTex->Bind(3);
+
+		// 5. 중간 텍스쳐들을 가져와 이어서 바인딩 (SSAO)
+		auto ssaoTex = context->GetCachedTexture(ETextureCache::SSAO);
+		if (ssaoTex) ssaoTex->Bind(5);
 
 		// 5. 셰이더 활성화
 		m_deferredLightingProgram->Use();

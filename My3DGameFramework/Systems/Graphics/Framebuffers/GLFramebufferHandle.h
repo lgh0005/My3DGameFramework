@@ -6,7 +6,7 @@ namespace MGF3D
 	{
 	public:
 		void Bind(uint32 target	  = GL_FRAMEBUFFER) const;
-		void Unbind(uint32 target = GL_FRAMEBUFFER) const;
+		static void Unbind(uint32 target = GL_FRAMEBUFFER);
 		static void Blit
 		(
 			const GLFramebufferHandle* src, const GLFramebufferHandle* dst,

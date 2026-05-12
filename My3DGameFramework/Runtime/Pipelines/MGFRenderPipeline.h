@@ -9,6 +9,7 @@ namespace MGF3D
 	// main render passes
 	MGF_CLASS_PTR(MGFGeometryPass)
 	MGF_CLASS_PTR(MGFDeferredLightingPass)
+	MGF_CLASS_PTR(MGFSSAOPass)
 
 	// MGF3D main render pipeline class
 	MGF_CLASS_PTR(MGFRenderPipeline)
@@ -35,5 +36,6 @@ namespace MGF3D
 
 		MGFGeometryPassUPtr m_geometryPass;
 		MGFDeferredLightingPassUPtr m_deferredLightingPass;
+		MGFSSAOPassUPtr m_ssaoPass;
 	};
 }

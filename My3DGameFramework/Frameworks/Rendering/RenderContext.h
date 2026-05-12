@@ -28,6 +28,13 @@ namespace MGF3D
 		Max
 	};
 
+	enum class ETextureCache : uint8
+	{
+		SSAO,
+		Bloom,
+		Max
+	};
+
 	MGF_CLASS_PTR(RenderContext)
 	class RenderContext
 	{
@@ -56,6 +63,10 @@ namespace MGF3D
 		void InitGeometryBuffer(uint32 width, uint32 height);
 		GLFramebuffer2D* GetGeometryBuffer() const { return m_geometryBuffer.get(); }
 		GLTexture2D* GetGeometryBufferTexture(EGBufferSlot slot) const;
+
+	public:
+		void SetCachedTexture(ETextureCache slot, const GLTexture2DPtr& texture);
+		GLTexture2D* GetCachedTexture(ETextureCache slot) const;
 
 	private:
 		template <typename T>
@@ -88,6 +99,9 @@ namespace MGF3D
 		GLShaderStorageBufferUPtr m_dirShadowSSBO;
 		GLShaderStorageBufferUPtr m_pointShadowSSBO;
 		GLShaderStorageBufferUPtr m_spotShadowSSBO;
+
+		// 다른 텍스쳐 캐시
+		Vector<GLTexture2DPtr> m_cachedTextures;
 	};
 }
 

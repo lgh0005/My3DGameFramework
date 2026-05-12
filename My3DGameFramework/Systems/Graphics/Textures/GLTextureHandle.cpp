@@ -47,6 +47,20 @@ namespace MGF3D
 		return m_handle;
 	}
 
+	void GLTextureHandle::SetFilter(uint32 minFilter, uint32 magFilter)
+	{
+		if (m_handle == 0) return;
+		glTextureParameteri(m_handle, GL_TEXTURE_MIN_FILTER, minFilter);
+		glTextureParameteri(m_handle, GL_TEXTURE_MAG_FILTER, magFilter);
+	}
+
+	void GLTextureHandle::SetWrap(uint32 wrapS, uint32 wrapT)
+	{
+		if (m_handle == 0) return;
+		glTextureParameteri(m_handle, GL_TEXTURE_WRAP_S, wrapS);
+		glTextureParameteri(m_handle, GL_TEXTURE_WRAP_T, wrapT);
+	}
+
 	void GLTextureHandle::GenerateMipmap()
 	{
 		if (m_handle == 0) return;

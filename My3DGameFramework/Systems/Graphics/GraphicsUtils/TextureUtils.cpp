@@ -22,6 +22,8 @@ namespace MGF3D
 		case 37:  return GL_RGBA8;
 		case 43:  return GL_SRGB8_ALPHA8;
 		case 83:  return GL_RG16F;
+		case 90:  return GL_RGB16F;
+		case 95:  return GL_RGBA16F;
 		case 97:  return GL_RGBA16F;
 		case 129: return GL_DEPTH24_STENCIL8;
 		default:
@@ -66,6 +68,7 @@ namespace MGF3D
 		case GL_COMPRESSED_SRGB_S3TC_DXT1_EXT:
 		case GL_COMPRESSED_RGB_BPTC_UNSIGNED_FLOAT:
 		case GL_COMPRESSED_RGB_BPTC_SIGNED_FLOAT:
+
 		default:
 			return GL_RGB;
 		}
@@ -76,6 +79,8 @@ namespace MGF3D
 		switch (vkFormat)
 		{
 		case 83:  // VK_FORMAT_R16G16_SFLOAT
+		case 90:  // RGB16F
+		case 95:  // RGBA16F
 		case 97:  // VK_FORMAT_R16G16B16A16_SFLOAT
 			return GL_HALF_FLOAT;
 		case 129: // VK_FORMAT_D24_UNORM_S8_UINT

@@ -165,4 +165,11 @@ namespace MGF3D
         int32 loc = GetUniformLocation(name);
         if (loc != -1) glProgramUniformMatrix4fv(m_handle, loc, static_cast<GLsizei>(value.size()), GL_FALSE, value_ptr(value[0]));
     }
+
+    void Program::SetUniform(const String& name, const Vector<vec3>& value)
+    {
+        if (value.empty()) return;
+        int32 loc = GetUniformLocation(name);
+        if (loc != -1) glProgramUniform3fv(m_handle, loc, static_cast<GLsizei>(value.size()), value_ptr(value[0]));
+    }
 }

@@ -18,7 +18,7 @@ namespace MGF3D
 		glBindFramebuffer(target, m_handle);
 	}
 
-	void GLFramebufferHandle::Unbind(uint32 target) const
+	void GLFramebufferHandle::Unbind(uint32 target)
 	{
 		glBindFramebuffer(target, 0);
 	}
