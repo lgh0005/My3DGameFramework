@@ -17,6 +17,8 @@ namespace MGF3D
 			uint32 layers
 		);
 
+		virtual bool OnSyncCreate() override;
+
 	private:
 		GLTexture2DArray();
 		bool Init

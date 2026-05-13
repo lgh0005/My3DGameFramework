@@ -15,6 +15,8 @@ namespace MGF3D
 			uint32 lightCount
 		);
 
+		virtual bool OnSyncCreate() override;
+
 	private:
 		GLTextureCubeArray();
 		bool Init
@@ -22,5 +24,7 @@ namespace MGF3D
 			uint32 width, uint32 height, 
 			uint32 lightCount
 		);
+
+		uint32 m_lightCount{ 0 };
 	};
 }

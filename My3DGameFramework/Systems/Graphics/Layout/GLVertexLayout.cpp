@@ -81,7 +81,6 @@ namespace MGF3D
 		glVertexArrayElementBuffer(m_handle, buffer->GetHandle());
 	}
 
-
 	void GLVertexLayout::SetAttribBinding(uint32 attribIndex, uint32 bindingIndex) const
 	{
 		glVertexArrayAttribBinding(m_handle, attribIndex, bindingIndex);

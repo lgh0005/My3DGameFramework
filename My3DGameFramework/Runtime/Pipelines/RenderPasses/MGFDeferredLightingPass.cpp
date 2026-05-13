@@ -7,6 +7,8 @@
 #include "Graphics/Programs/GraphicsProgram.h"
 #include "Rendering/RenderContext.h"
 #include "Textures/GLTexture2D.h"
+#include "TextureArrays/GLTexture2DArray.h"
+#include "TextureArrays/GLTextureCubeArray.h"
 #include "Meshes/ScreenMesh.h"
 
 namespace MGF3D
@@ -67,6 +69,14 @@ namespace MGF3D
 		// 5. 중간 텍스쳐들을 가져와 이어서 바인딩 (SSAO)
 		auto ssaoTex = context->GetCachedTexture(ETextureCache::SSAO);
 		if (ssaoTex) ssaoTex->Bind(5);
+
+		auto dirShadowMap = context->GetDirectionalShadowMap();
+		auto pointShadowMap = context->GetPointShadowMap();
+		auto spotShadowMap = context->GetSpotShadowMap();
+
+		if (dirShadowMap)   dirShadowMap->Bind(6);
+		if (pointShadowMap) pointShadowMap->Bind(7);
+		if (spotShadowMap)  spotShadowMap->Bind(8);
 
 		// 5. 셰이더 활성화
 		m_deferredLightingProgram->Use();

@@ -53,5 +53,7 @@
 #include "Components/Camera.h"
 #include "Components/MeshRenderers/MeshRenderer.h"
 #include "Components/Animation/Animator.h"
+#include "Components/Lights/DirectionalLight.h"
 #include "Components/Lights/PointLight.h"
+#include "Components/Lights/SpotLight.h"
 #include "Components/Lights/SkyLight.h"

@@ -68,32 +68,34 @@ namespace MGF3D
 		Entities::AddComponent<MeshRenderer>(cubeID2, sharedMesh, sharedMaterial);
 		cubeTransform2->SetLocalPosition(vec3(1.5f, -0.25f, 0.0f));
 
-		// 4. 객체 생성 [포인트 라이트]
-		ObjectIDHash lightID = Entities::Create("PointLight1");
+		//// 4. 객체 생성 [스폿 라이트]
+		ObjectIDHash lightID = Entities::Create("spotLight");
 		auto* lightTransform = Entities::AddComponent<Transform>(lightID);
-		auto* pointLight = Entities::AddComponent<PointLight>(lightID);
-		lightTransform->SetLocalPosition(vec3(-3.0f, 3.0f, 0.0f));
-		pointLight->SetColor(vec3(0.2f, 0.6f, 1.0f));
-		pointLight->SetIntensity(2.0f);
-		pointLight->SetRange(5);
+		auto* spotLight = Entities::AddComponent<SpotLight>(lightID);
+		lightTransform->SetLocalPosition(vec3(0.0f, 10.0f, 0.0f));
+		lightTransform->SetLocalRotation(vec3(-90.0f, 0.0f, 0.0f));
+		spotLight->SetColor(vec3(0.9f, 0.6f, 1.0f));
+		spotLight->SetIntensity(2.0f);
+		spotLight->SetRange(15);
+		spotLight->SetSpotAngles(12.5f, 17.5f);
+		spotLight->SetCastShadow(true);
+
+		//// 4. 객체 생성 [디렉셔널 라이트]
+		//ObjectIDHash lightID2 = Entities::Create("dirLight");
+		//auto* lightTransform2 = Entities::AddComponent<Transform>(lightID2);
+		//auto* dirLight = Entities::AddComponent<DirectionalLight>(lightID2);
+		//lightTransform2->SetLocalPosition(vec3(1.5f, 3.0f, 5.0f));
+		//dirLight->SetColor(vec3(0.8f, 1.0f, 0.7f));
+		//dirLight->SetIntensity(2.0f);
 
 		// 4. 객체 생성 [포인트 라이트]
-		ObjectIDHash lightID2 = Entities::Create("PointLight2");
-		auto* lightTransform2 = Entities::AddComponent<Transform>(lightID2);
-		auto* pointLight2 = Entities::AddComponent<PointLight>(lightID2);
-		lightTransform2->SetLocalPosition(vec3(3.0f, 3.0f, 0.0f));
-		pointLight2->SetColor(vec3(0.6f, 0.2f, 1.0f));
-		pointLight2->SetIntensity(2.0f);
-		pointLight2->SetRange(5);
-
-		// 4. 객체 생성 [포인트 라이트]
-		ObjectIDHash lightID3 = Entities::Create("PointLight3");
-		auto* lightTransform3 = Entities::AddComponent<Transform>(lightID3);
-		auto* pointLight3 = Entities::AddComponent<PointLight>(lightID3);
-		lightTransform3->SetLocalPosition(vec3(1.5f, 3.0f, 5.0f));
-		pointLight3->SetColor(vec3(0.2f, 1.0f, 0.4f));
-		pointLight3->SetIntensity(2.0f);
-		pointLight3->SetRange(5);
+		//ObjectIDHash lightID3 = Entities::Create("PointLight3");
+		//auto* lightTransform3 = Entities::AddComponent<Transform>(lightID3);
+		//auto* pointLight3 = Entities::AddComponent<PointLight>(lightID3);
+		//lightTransform3->SetLocalPosition(vec3(1.5f, 3.0f, 5.0f));
+		//pointLight3->SetColor(vec3(0.8f, 1.0f, 0.7f));
+		//pointLight3->SetIntensity(2.0f);
+		//pointLight3->SetRange(20);
 
 		// 5. 가방
 		auto bag = MGF_ASSET.GetAsset<Model>("@GameAsset/Models/backpack/backpack.mymodel");

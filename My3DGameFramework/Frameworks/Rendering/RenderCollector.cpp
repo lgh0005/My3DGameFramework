@@ -144,7 +144,9 @@ namespace MGF3D
 			data.color = vec4(light->GetColor(), light->GetIntensity());
 
 			// 조명 파라미터 (x: InnerCutoff, y: OuterCutoff)
-			data.params = vec4(light->GetInnerCutoff(), light->GetOuterCutoff(), 0.0f, 0.0f);
+			float innerCos = Math::Cos(Math::ToRadians(light->GetInnerCutoff()));
+			float outerCos = Math::Cos(Math::ToRadians(light->GetOuterCutoff()));
+			data.params = vec4(innerCos, outerCos, 0.0f, 0.0f);
 			data.shadowIndex = -1;
 
 			// 그림자 데이터 수집

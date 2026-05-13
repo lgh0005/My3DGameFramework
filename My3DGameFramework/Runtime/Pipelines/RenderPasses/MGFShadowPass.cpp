@@ -48,11 +48,11 @@ namespace MGF3D
 		// 2. FBO 및 텍스처 배열 생성
 		// Directional (CSM): 조명당 4개의 레이어 필요
 		int32 dirLayers = MAX_LIGHTS * MAX_DIR_SHADOW_LAYERS;
-		m_dirShadowMapArray = MGF_RESOURCE.CreateImmediate<GLTexture2DArray>(SHADOW_RES_HIGH, SHADOW_RES_HIGH, dirLayers);
+		m_dirShadowMapArray = MGF_RESOURCE.CreateImmediate<GLTexture2DArray>(SHADOW_RES_MEDIUM, SHADOW_RES_MEDIUM, dirLayers);
 		m_dirShadowFBO = GLFramebuffer2D::CreateArray(m_dirShadowMapArray);
 
 		// Point (Cube): 조명 1개당 6면이므로 CubeArray에서 내부적으로 처리
-		m_pointShadowMapArray = GLTextureCubeArray::Create(SHADOW_RES_MEDIUM, SHADOW_RES_MEDIUM, MAX_POINT_SHADOW_COUNT);
+		m_pointShadowMapArray = MGF_RESOURCE.CreateImmediate<GLTextureCubeArray>(SHADOW_RES_MEDIUM, SHADOW_RES_MEDIUM, MAX_POINT_SHADOW_COUNT);
 		m_pointShadowFBO = GLFramebufferCube::CreateArray(m_pointShadowMapArray);
 
 		// Spot: 조명 1개당 1개의 레이어
@@ -84,15 +84,12 @@ namespace MGF3D
 
 		// 1. 그림자 렌더링 공통 상태 설정
 		glEnable(GL_DEPTH_TEST);
-		glCullFace(GL_FRONT);
+		glCullFace(GL_BACK);
 
 		// 2. 그림자 텍스쳐 베이킹
 		RenderDirectionalShadows(context);
 		RenderPointShadows(context);
 		RenderSpotShadows(context);
-
-		// 3. 원상태로 복구
-		glCullFace(GL_BACK);
 	}
 
 	void MGFShadowPass::RenderDirectionalShadows(RenderContext* context)
@@ -105,7 +102,7 @@ namespace MGF3D
 		if (!currentCamera || !currentCamera->IsMainCamera()) return;
 
 		m_dirShadowFBO->Bind();
-		glViewport(0, 0, SHADOW_RES_HIGH, SHADOW_RES_HIGH);
+		glViewport(0, 0, SHADOW_RES_MEDIUM, SHADOW_RES_MEDIUM);
 		glClear(GL_DEPTH_BUFFER_BIT);
 
 		m_dirShadowProgram->Use();
@@ -149,10 +146,11 @@ namespace MGF3D
 
 		Vector<PointShadowData> shadowDataList;
 
-		for (size_t i = 0; i < pointLights.size(); ++i)
+		for (usize i = 0; i < pointLights.size(); ++i)
 		{
 			if (i >= MAX_POINT_SHADOW_COUNT) break;
-
+			
+			pointLights[i].shadowIndex = static_cast<int32>(i);
 			vec3 lightPos = vec3(pointLights[i].position);
 			float farPlane = pointLights[i].position.w;
 
@@ -182,6 +180,7 @@ namespace MGF3D
 
 		context->UpdatePointShadows(shadowDataList);
 		context->SetPointShadowMap(m_pointShadowMapArray);
+		context->UpdatePointLights(pointLights);
 		GLFramebufferHandle::Unbind();
 	}
 

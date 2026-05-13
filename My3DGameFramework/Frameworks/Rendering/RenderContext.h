@@ -64,13 +64,13 @@ namespace MGF3D
 		void UpdateSpotShadows(const Vector<SpotShadowData>& shadows);
 
 	public:
-		const Vector<DirectionalLightData>& GetDirectionalLights() const { return m_dirLights; }
-		const Vector<PointLightData>& GetPointLights() const { return m_pointLights; }
-		const Vector<SpotLightData>& GetSpotLights() const { return m_spotLights; }
+		Vector<DirectionalLightData>& GetDirectionalLights() { return m_dirLights; }
+		Vector<PointLightData>& GetPointLights() { return m_pointLights; }
+		Vector<SpotLightData>& GetSpotLights() { return m_spotLights; }
 
-		const Vector<DirectionalShadowData>& GetDirectionalShadows() const { return m_dirShadows; }
-		const Vector<PointShadowData>& GetPointShadows() const { return m_pointShadows; }
-		const Vector<SpotShadowData>& GetSpotShadows() const { return m_spotShadows; }
+		Vector<DirectionalShadowData>& GetDirectionalShadows() { return m_dirShadows; }
+		Vector<PointShadowData>& GetPointShadows() { return m_pointShadows; }
+		Vector<SpotShadowData>& GetSpotShadows() { return m_spotShadows; }
 
 	public:
 		ScreenMesh* GetScreenMesh() const { return m_screenMesh.get(); }

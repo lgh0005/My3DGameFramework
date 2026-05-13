@@ -1,17 +1,15 @@
 #pragma once
+#include "Sources/Resource.h"
 
 namespace MGF3D
 {
-	MGF_CLASS_PTR(GLTextureArrayHand)
-	class GLTextureArrayHandle
+	MGF_CLASS_PTR(GLTextureArrayHandle)
+	class GLTextureArrayHandle : public Resource
 	{
 		MGF_DISABLE_COPY(GLTextureArrayHandle)
 
 	public:
-		GLTextureArrayHandle();
-		virtual ~GLTextureArrayHandle();
-
-	public:
+		virtual bool OnSyncCreate() override = 0;
 		void Bind(uint32 slot) const;
 		static void Unbind(uint32 slot);
 
@@ -21,6 +19,10 @@ namespace MGF3D
 		uint32 GetWidth() const { return m_width; }
 		uint32 GetHeight() const { return m_height; }
 		uint32 GetLayers() const { return m_layers; }
+
+	protected:
+		GLTextureArrayHandle();
+		virtual ~GLTextureArrayHandle();
 
 	protected:
 		uint32 m_target{ 0 };
