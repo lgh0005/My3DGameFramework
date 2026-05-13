@@ -29,22 +29,30 @@ namespace MGF3D
 
 	bool MGFShadowPass::Init()
 	{
-		// 1. 셰이더 로드
-		auto dirVs = MGF_ASSET.LoadAssetAsync<Shader>("@BuiltInAsset/Shaders/Default/MGF3D_Shadow_Directional.vert", GL_VERTEX_SHADER, EShaderFileType::GLSL);
+		// 0. 공통 셰이더 로드
 		auto dirGs = MGF_ASSET.LoadAssetAsync<Shader>("@BuiltInAsset/Shaders/Default/MGF3D_Shadow_Directional.geom", GL_GEOMETRY_SHADER, EShaderFileType::GLSL);
 		auto dirFs = MGF_ASSET.LoadAssetAsync<Shader>("@BuiltInAsset/Shaders/Default/MGF3D_Shadow_Directional.frag", GL_FRAGMENT_SHADER, EShaderFileType::GLSL);
-		m_dirShadowProgram = MGF_RESOURCE.Create<GraphicsProgram>("DirShadowProgram", Vector<ShaderPtr>{ dirVs, dirGs, dirFs });
-
-		auto pointVs = MGF_ASSET.LoadAssetAsync<Shader>("@BuiltInAsset/Shaders/Default/MGF3D_Shadow_Point.vert", GL_VERTEX_SHADER, EShaderFileType::GLSL);
 		auto pointGs = MGF_ASSET.LoadAssetAsync<Shader>("@BuiltInAsset/Shaders/Default/MGF3D_Shadow_Point.geom", GL_GEOMETRY_SHADER, EShaderFileType::GLSL);
 		auto pointFs = MGF_ASSET.LoadAssetAsync<Shader>("@BuiltInAsset/Shaders/Default/MGF3D_Shadow_Point.frag", GL_FRAGMENT_SHADER, EShaderFileType::GLSL);
-		m_pointShadowProgram = MGF_RESOURCE.Create<GraphicsProgram>("PointShadowProgram", Vector<ShaderPtr>{ pointVs, pointGs, pointFs });
-
-		auto spotVs = MGF_ASSET.LoadAssetAsync<Shader>("@BuiltInAsset/Shaders/Default/MGF3D_Shadow_Spot.vert", GL_VERTEX_SHADER, EShaderFileType::GLSL);
 		auto spotGs = MGF_ASSET.LoadAssetAsync<Shader>("@BuiltInAsset/Shaders/Default/MGF3D_Shadow_Spot.geom", GL_GEOMETRY_SHADER, EShaderFileType::GLSL);
 		auto spotFs = MGF_ASSET.LoadAssetAsync<Shader>("@BuiltInAsset/Shaders/Default/MGF3D_Shadow_Spot.frag", GL_FRAGMENT_SHADER, EShaderFileType::GLSL);
-		m_spotShadowProgram = MGF_RESOURCE.Create<GraphicsProgram>("SpotShadowProgram", Vector<ShaderPtr>{ spotVs, spotGs, spotFs });
-		
+
+		// 1. 셰이더 로드
+		auto dirVsStatic = MGF_ASSET.LoadAssetAsync<Shader>("@BuiltInAsset/Shaders/Default/MGF3D_Shadow_Directional_Static.vert", GL_VERTEX_SHADER, EShaderFileType::GLSL);
+		auto dirVsSkinned = MGF_ASSET.LoadAssetAsync<Shader>("@BuiltInAsset/Shaders/Default/MGF3D_Shadow_Directional_Skinned.vert", GL_VERTEX_SHADER, EShaderFileType::GLSL);
+		m_dirShadowStaticProgram = MGF_RESOURCE.Create<GraphicsProgram>("DirShadowStaticProgram", Vector<ShaderPtr>{ dirVsStatic, dirGs, dirFs });
+		m_dirShadowSkinnedProgram = MGF_RESOURCE.Create<GraphicsProgram>("DirShadowSkinnedProgram", Vector<ShaderPtr>{ dirVsSkinned, dirGs, dirFs });
+
+		auto pointVsStatic = MGF_ASSET.LoadAssetAsync<Shader>("@BuiltInAsset/Shaders/Default/MGF3D_Shadow_Point_Static.vert", GL_VERTEX_SHADER, EShaderFileType::GLSL);
+		auto pointVsSkinned = MGF_ASSET.LoadAssetAsync<Shader>("@BuiltInAsset/Shaders/Default/MGF3D_Shadow_Point_Skinned.vert", GL_VERTEX_SHADER, EShaderFileType::GLSL);
+		m_pointShadowStaticProgram = MGF_RESOURCE.Create<GraphicsProgram>("PointShadowProgram", Vector<ShaderPtr>{ pointVsStatic, pointGs, pointFs });
+		m_pointShadowSkinnedProgram = MGF_RESOURCE.Create<GraphicsProgram>("SpotShadowProgram", Vector<ShaderPtr>{ pointVsSkinned, pointGs, pointFs });
+
+		auto spotVsStatic = MGF_ASSET.LoadAssetAsync<Shader>("@BuiltInAsset/Shaders/Default/MGF3D_Shadow_Spot_Static.vert", GL_VERTEX_SHADER, EShaderFileType::GLSL);
+		auto spotVsSkinned = MGF_ASSET.LoadAssetAsync<Shader>("@BuiltInAsset/Shaders/Default/MGF3D_Shadow_Spot_Skinned.vert", GL_VERTEX_SHADER, EShaderFileType::GLSL);
+		m_spotShadowStaticProgram = MGF_RESOURCE.Create<GraphicsProgram>("SpotShadowProgram", Vector<ShaderPtr>{ spotVsStatic, spotGs, spotFs });
+		m_spotShadowSkinnedProgram = MGF_RESOURCE.Create<GraphicsProgram>("SpotShadowProgram", Vector<ShaderPtr>{ spotVsSkinned, spotGs, spotFs });
+
 		// 2. FBO 및 텍스처 배열 생성
 		// Directional (CSM): 조명당 4개의 레이어 필요
 		int32 dirLayers = MAX_LIGHTS * MAX_DIR_SHADOW_LAYERS;
@@ -78,15 +86,22 @@ namespace MGF3D
 	void MGFShadowPass::Execute(RenderContext* context)
 	{
 		if (!context) return;
-		if (m_dirShadowProgram->GetState() != EResourceState::Ready ||
-			m_pointShadowProgram->GetState() != EResourceState::Ready ||
-			m_spotShadowProgram->GetState() != EResourceState::Ready) return;
+
+		// Static 프로그램 검증
+		if (m_dirShadowStaticProgram->GetState() != EResourceState::Ready   ||
+			m_pointShadowStaticProgram->GetState() != EResourceState::Ready ||
+			m_spotShadowStaticProgram->GetState() != EResourceState::Ready) return;
+
+		// Skinned 프로그램 검증
+		if (m_dirShadowSkinnedProgram->GetState() != EResourceState::Ready   ||
+			m_pointShadowSkinnedProgram->GetState() != EResourceState::Ready ||
+			m_spotShadowSkinnedProgram->GetState() != EResourceState::Ready) return;
 
 		// 1. 그림자 렌더링 공통 상태 설정
 		glEnable(GL_DEPTH_TEST);
 		glCullFace(GL_BACK);
 
-		// 2. 그림자 텍스쳐 베이킹
+		// 2. 매쉬 그림자 텍스쳐 베이킹
 		RenderDirectionalShadows(context);
 		RenderPointShadows(context);
 		RenderSpotShadows(context);
@@ -105,7 +120,7 @@ namespace MGF3D
 		glViewport(0, 0, SHADOW_RES_MEDIUM, SHADOW_RES_MEDIUM);
 		glClear(GL_DEPTH_BUFFER_BIT);
 
-		m_dirShadowProgram->Use();
+		m_dirShadowStaticProgram->Use();
 		for (usize i = 0; i < dirLights.size(); ++i)
 		{
 			int32 shadowIdx = dirLights[i].shadowIndex;
@@ -118,13 +133,17 @@ namespace MGF3D
 			Vector<mat4> lightMatrices = CalculateCSMMatrices(currentCamera, lightDir, sData.cascadeSplits);
 			for (int j = 0; j < 4; ++j) sData.lightSpaceMatrices[j] = lightMatrices[j];
 
-			// 2. 셰이더로 행렬 배열 및 대상 Layer(층) 인덱스 전달
-			m_dirShadowProgram->SetUniform("lightSpaceMatrices", lightMatrices);
-			m_dirShadowProgram->SetUniform("baseLayerIndex", sData.shadowMapBaseIdx);
+			// 2. Static Queue 처리
+			m_dirShadowStaticProgram->Use();
+			m_dirShadowStaticProgram->SetUniform("lightSpaceMatrices", lightMatrices);
+			m_dirShadowStaticProgram->SetUniform("baseLayerIndex", sData.shadowMapBaseIdx);
+			context->GetStaticQueue().Execute(m_dirShadowStaticProgram.get());
 
-			// 3. RenderQueue에 쌓인 메쉬들을 그림자 셰이더를 덮어씌워 렌더링
-			context->GetStaticQueue().Execute(m_dirShadowProgram.get());
-			context->GetSkinnedQueue().Execute(m_dirShadowProgram.get());
+			// 3. Skinned Queue 처리
+			m_dirShadowSkinnedProgram->Use();
+			m_dirShadowSkinnedProgram->SetUniform("lightSpaceMatrices", lightMatrices);
+			m_dirShadowSkinnedProgram->SetUniform("baseLayerIndex", sData.shadowMapBaseIdx);
+			context->GetSkinnedQueue().Execute(m_dirShadowSkinnedProgram.get());
 		}
 
 		// 4. 행렬이 채워진 최종 데이터를 컨텍스트에 갱신하고, 텍스처 캐시에 등록
@@ -143,7 +162,7 @@ namespace MGF3D
 		glViewport(0, 0, SHADOW_RES_MEDIUM, SHADOW_RES_MEDIUM);
 		glClear(GL_DEPTH_BUFFER_BIT);
 
-		m_pointShadowProgram->Use();
+		m_pointShadowStaticProgram->Use();
 
 		for (usize i = 0; i < pointLights.size(); ++i)
 		{
@@ -165,13 +184,21 @@ namespace MGF3D
 			shadowTransforms.push_back(shadowProj * glm::lookAt(lightPos, lightPos + vec3(0, 0, 1), vec3(0, -1, 0)));
 			shadowTransforms.push_back(shadowProj * glm::lookAt(lightPos, lightPos + vec3(0, 0, -1), vec3(0, -1, 0)));
 
-			m_pointShadowProgram->SetUniform("shadowMatrices", shadowTransforms);
-			m_pointShadowProgram->SetUniform("lightPos", lightPos);
-			m_pointShadowProgram->SetUniform("farPlane", farPlane);
-			m_pointShadowProgram->SetUniform("lightIndex", static_cast<int32>(i));
+			// Static Queue 처리
+			m_pointShadowStaticProgram->Use();
+			m_pointShadowStaticProgram->SetUniform("shadowMatrices", shadowTransforms);
+			m_pointShadowStaticProgram->SetUniform("lightPos", lightPos);
+			m_pointShadowStaticProgram->SetUniform("farPlane", farPlane);
+			m_pointShadowStaticProgram->SetUniform("lightIndex", static_cast<int32>(i));
+			context->GetStaticQueue().Execute(m_pointShadowStaticProgram.get());
 
-			context->GetStaticQueue().Execute(m_pointShadowProgram.get());
-			context->GetSkinnedQueue().Execute(m_pointShadowProgram.get());
+			// Skinned Queue 처리
+			m_pointShadowSkinnedProgram->Use();
+			m_pointShadowSkinnedProgram->SetUniform("shadowMatrices", shadowTransforms);
+			m_pointShadowSkinnedProgram->SetUniform("lightPos", lightPos);
+			m_pointShadowSkinnedProgram->SetUniform("farPlane", farPlane);
+			m_pointShadowSkinnedProgram->SetUniform("lightIndex", static_cast<int32>(i));
+			context->GetSkinnedQueue().Execute(m_pointShadowSkinnedProgram.get());
 		}
 
 		context->SetPointShadowMap(m_pointShadowMapArray);
@@ -188,7 +215,7 @@ namespace MGF3D
 		glViewport(0, 0, SHADOW_RES_MEDIUM, SHADOW_RES_MEDIUM);
 		glClear(GL_DEPTH_BUFFER_BIT);
 
-		m_spotShadowProgram->Use();
+		m_spotShadowStaticProgram->Use();
 
 		for (usize i = 0; i < spotLights.size(); ++i)
 		{
@@ -198,11 +225,17 @@ namespace MGF3D
 			// Spot Light는 Collector에서 이미 View-Proj 행렬(lightSpaceMatrix)을 계산해 두었습니다.
 			const SpotShadowData& sData = shadowDataList[shadowIdx];
 
-			m_spotShadowProgram->SetUniform("lightSpaceMatrix", sData.lightSpaceMatrix);
-			m_spotShadowProgram->SetUniform("layerIndex", sData.shadowMapIdx);
+			// Static Queue 처리
+			m_spotShadowStaticProgram->Use();
+			m_spotShadowStaticProgram->SetUniform("lightSpaceMatrix", sData.lightSpaceMatrix);
+			m_spotShadowStaticProgram->SetUniform("layerIndex", sData.shadowMapIdx);
+			context->GetStaticQueue().Execute(m_spotShadowStaticProgram.get());
 
-			context->GetStaticQueue().Execute(m_spotShadowProgram.get());
-			context->GetSkinnedQueue().Execute(m_spotShadowProgram.get());
+			// Skinned Queue 처리
+			m_spotShadowSkinnedProgram->Use();
+			m_spotShadowSkinnedProgram->SetUniform("lightSpaceMatrix", sData.lightSpaceMatrix);
+			m_spotShadowSkinnedProgram->SetUniform("layerIndex", sData.shadowMapIdx);
+			context->GetSkinnedQueue().Execute(m_spotShadowSkinnedProgram.get());
 		}
 
 		context->SetSpotShadowMap(m_spotShadowMapArray);
@@ -211,8 +244,8 @@ namespace MGF3D
 
 	Vector<mat4> MGFShadowPass::CalculateCSMMatrices
 	(
-		const Camera* camera, 
-		const vec3& lightDir, 
+		const Camera* camera,
+		const vec3& lightDir,
 		vec4& outSplits
 	)
 	{
@@ -260,8 +293,11 @@ namespace MGF3D
 			}
 			center /= 8.0f;
 
-			vec3 up = (Math::Abs(lightDir.y) > 0.999f) ? vec3(0.0f, 0.0f, 1.0f) : vec3(0.0f, 1.0f, 0.0f);
-			mat4 lightView = glm::lookAt(center - lightDir, center, up);
+			vec3 lightDirNorm = glm::normalize(lightDir);
+			vec3 tempUp = (glm::abs(lightDirNorm.z) > 0.999f) ? vec3(0.0f, 1.0f, 0.0f) : vec3(0.0f, 0.0f, 1.0f);
+			vec3 right = glm::normalize(glm::cross(tempUp, lightDirNorm));
+			vec3 up = glm::normalize(glm::cross(lightDirNorm, right));
+			mat4 lightView = glm::lookAt(center - lightDirNorm, center, up);
 
 			float minX = std::numeric_limits<float>::max();
 			float maxX = std::numeric_limits<float>::lowest();
@@ -281,11 +317,14 @@ namespace MGF3D
 				maxZ = Math::Max(maxZ, trf.z);
 			}
 
-			constexpr float zMultiplier = 10.0f;
-			if (minZ < 0) minZ *= zMultiplier; else minZ /= zMultiplier;
-			if (maxZ < 0) maxZ /= zMultiplier; else maxZ *= zMultiplier;
+			float zNear = -maxZ;
+			float zFar = -minZ;
 
-			mat4 lightProj = glm::ortho(minX, maxX, minY, maxY, minZ, maxZ);
+			constexpr float shadowCasterBackDistance = 150.0f;
+			zNear -= shadowCasterBackDistance;
+			zFar += shadowCasterBackDistance;
+
+			mat4 lightProj = glm::ortho(minX, maxX, minY, maxY, zNear, zFar);
 
 			ret.push_back(lightProj * lightView);
 			lastSplitDist = currentSplitDist;

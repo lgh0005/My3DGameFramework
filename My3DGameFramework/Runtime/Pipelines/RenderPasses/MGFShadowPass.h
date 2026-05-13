@@ -37,10 +37,13 @@ namespace MGF3D
 		MGFShadowPass();
 		bool Init();
 
-		// 셰이더 프로그램 (정적/스켈레탈 분리 권장)
-		GraphicsProgramPtr m_dirShadowProgram{ nullptr };
-		GraphicsProgramPtr m_pointShadowProgram{ nullptr };
-		GraphicsProgramPtr m_spotShadowProgram{ nullptr };
+		// 셰이더 프로그램
+		GraphicsProgramPtr m_dirShadowStaticProgram{ nullptr };
+		GraphicsProgramPtr m_pointShadowStaticProgram{ nullptr };
+		GraphicsProgramPtr m_spotShadowStaticProgram{ nullptr };
+		GraphicsProgramPtr m_dirShadowSkinnedProgram{ nullptr };
+		GraphicsProgramPtr m_pointShadowSkinnedProgram{ nullptr };
+		GraphicsProgramPtr m_spotShadowSkinnedProgram{ nullptr };
 
 		// Directional Light (CSM) 리소스
 		GLTexture2DArrayPtr m_dirShadowMapArray{ nullptr };
