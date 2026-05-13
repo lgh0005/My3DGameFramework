@@ -75,13 +75,11 @@ float CalcDirShadow(int shadowIndex, vec3 fragPosWorld, vec3 normal, vec3 lightD
     
     // 3. 해당 층의 행렬로 프래그먼트를 빛의 시점으로 투영
     vec4 fragPosLightSpace = sData.lightSpaceMatrices[layer] * vec4(fragPosWorld, 1.0);
+    if (fragPosLightSpace.w <= 0.0) return 0.0;
     vec3 projCoords = fragPosLightSpace.xyz / fragPosLightSpace.w;
     projCoords = projCoords * 0.5 + 0.5; // NDC [-1, 1] -> [0, 1]
     
-    if (projCoords.z > 1.0) return 0.0;
-    
     float currentDepth = projCoords.z;
-    // 경사에 따른 가변 바이어스 (피터팬 현상 방지)
     float bias = max(sData.shadowBias * 5.0 * (1.0 - dot(normal, normalize(-lightDir))), sData.shadowBias);
     
     // 4. PCF (3x3) 샘플링으로 그림자 경계선 블러링
@@ -145,14 +143,15 @@ float CalcSpotShadow(int shadowIndex, vec3 fragPosWorld, vec3 normal, vec3 light
     SpotShadowData sData = spotShadows[shadowIndex];
 
     vec4 fragPosLightSpace = sData.lightSpaceMatrix * vec4(fragPosWorld, 1.0);
+    if (fragPosLightSpace.w <= 0.0) return 0.0;
     vec3 projCoords = fragPosLightSpace.xyz / fragPosLightSpace.w;
     projCoords = projCoords * 0.5 + 0.5;
     
     if(projCoords.z > 1.0 || projCoords.x < 0.0 || projCoords.x > 1.0 || projCoords.y < 0.0 || projCoords.y > 1.0)
-        return 0.0; // 조명 밖은 그림자 없음
+        return 0.0;
 
     float currentDepth = projCoords.z;
-    float bias = max(sData.shadowBias * 5.0 * (1.0 - dot(normal, normalize(-lightDir))), sData.shadowBias);
+    float bias = max(sData.shadowBias * 5.0 * (1.0 - dot(normal, normalize(lightDir))), sData.shadowBias);
     
     float shadow = 0.0;
     vec2 texelSize = 1.0 / textureSize(gShadowMapSpot, 0).xy;
@@ -225,7 +224,7 @@ vec3 CalcSpotLight(SpotLight light, vec3 normal, vec3 fragPos, vec3 viewDir, vec
     attenuation *= attenuation;
 
     float theta = dot(lightDir, normalize(-light.direction.xyz)); 
-    float epsilon = light.params.x - light.params.y;
+    float epsilon = max(light.params.x - light.params.y, 0.0001);
     float intensity = clamp((theta - light.params.y) / epsilon, 0.0, 1.0);
 
     float diff = max(dot(normal, lightDir), 0.0);

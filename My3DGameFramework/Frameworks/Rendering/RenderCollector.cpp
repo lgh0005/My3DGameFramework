@@ -78,7 +78,7 @@ namespace MGF3D
 			{
 				DirectionalShadowData sData;
 				sData.shadowMapBaseIdx = static_cast<int32>(m_dirShadows.size()) * MAX_DIR_SHADOW_LAYERS;
-				sData.shadowBias = 0.005f;
+				sData.shadowBias = 0.00005f;
 				data.shadowIndex = static_cast<int32>(m_dirShadows.size());
 				m_dirShadows.push_back(sData);
 			}
@@ -166,7 +166,7 @@ namespace MGF3D
 
 				sData.lightSpaceMatrix = lightProj * lightView;
 				sData.shadowMapIdx = static_cast<int32>(m_spotShadows.size());
-				sData.shadowBias = 0.005f;
+				sData.shadowBias = 0.00005f;
 
 				data.shadowIndex = static_cast<int32>(m_spotShadows.size());
 				m_spotShadows.push_back(sData);

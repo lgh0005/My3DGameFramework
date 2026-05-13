@@ -95,7 +95,7 @@ namespace MGF3D
 	void MGFShadowPass::RenderDirectionalShadows(RenderContext* context)
 	{
 		const auto& dirLights = context->GetDirectionalLights();
-		Vector<DirectionalShadowData> shadowDataList = context->GetDirectionalShadows();
+		auto& shadowDataList = context->GetDirectionalShadows();
 		if (dirLights.empty() || shadowDataList.empty()) return;
 
 		const Camera* currentCamera = context->GetCurrentCamera();
@@ -135,8 +135,9 @@ namespace MGF3D
 
 	void MGFShadowPass::RenderPointShadows(RenderContext* context)
 	{
-		auto& pointLights = context->GetPointLights();
-		if (pointLights.empty()) return;
+		const auto& pointLights = context->GetPointLights();
+		auto& shadowDataList = context->GetPointShadows();
+		if (pointLights.empty() || shadowDataList.empty()) return;
 
 		m_pointShadowFBO->Bind();
 		glViewport(0, 0, SHADOW_RES_MEDIUM, SHADOW_RES_MEDIUM);
@@ -144,15 +145,16 @@ namespace MGF3D
 
 		m_pointShadowProgram->Use();
 
-		Vector<PointShadowData> shadowDataList;
-
 		for (usize i = 0; i < pointLights.size(); ++i)
 		{
 			if (i >= MAX_POINT_SHADOW_COUNT) break;
 			
-			pointLights[i].shadowIndex = static_cast<int32>(i);
+			int32 shadowIdx = pointLights[i].shadowIndex;
+			if (shadowIdx < 0) continue;
+
+			const PointShadowData& sData = shadowDataList[shadowIdx];
 			vec3 lightPos = vec3(pointLights[i].position);
-			float farPlane = pointLights[i].position.w;
+			float farPlane = sData.shadowFarPlane;
 
 			mat4 shadowProj = glm::perspective(Math::ToRadians(90.0f), 1.0f, 0.1f, farPlane);
 			Vector<mat4> shadowTransforms;
@@ -170,24 +172,17 @@ namespace MGF3D
 
 			context->GetStaticQueue().Execute(m_pointShadowProgram.get());
 			context->GetSkinnedQueue().Execute(m_pointShadowProgram.get());
-
-			PointShadowData sData;
-			sData.shadowFarPlane = farPlane;
-			sData.shadowMapIdx = static_cast<int32>(i);
-			sData.shadowBias = 0.05f;
-			shadowDataList.push_back(sData);
 		}
 
-		context->UpdatePointShadows(shadowDataList);
 		context->SetPointShadowMap(m_pointShadowMapArray);
-		context->UpdatePointLights(pointLights);
 		GLFramebufferHandle::Unbind();
 	}
 
 	void MGFShadowPass::RenderSpotShadows(RenderContext* context)
 	{
 		const auto& spotLights = context->GetSpotLights();
-		if (spotLights.empty()) return;
+		const auto& shadowDataList = context->GetSpotShadows();
+		if (spotLights.empty() || shadowDataList.empty()) return;
 
 		m_spotShadowFBO->Bind();
 		glViewport(0, 0, SHADOW_RES_MEDIUM, SHADOW_RES_MEDIUM);
@@ -195,11 +190,9 @@ namespace MGF3D
 
 		m_spotShadowProgram->Use();
 
-		Vector<SpotShadowData> shadowDataList = context->GetSpotShadows();
-
-		for (size_t i = 0; i < spotLights.size(); ++i)
+		for (usize i = 0; i < spotLights.size(); ++i)
 		{
-			int shadowIdx = spotLights[i].shadowIndex;
+			int32 shadowIdx = spotLights[i].shadowIndex;
 			if (shadowIdx < 0) continue;
 
 			// Spot Light는 Collector에서 이미 View-Proj 행렬(lightSpaceMatrix)을 계산해 두었습니다.

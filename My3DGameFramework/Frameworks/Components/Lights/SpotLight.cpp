@@ -20,7 +20,7 @@ namespace MGF3D
 
 	void SpotLight::SetSpotAngles(float innerDegree, float outerDegree)
 	{
-		m_innerCutoff = Math::Cos(Math::ToRadians(innerDegree));
-		m_outerCutoff = Math::Cos(Math::ToRadians(outerDegree));
+		m_innerCutoff = innerDegree;
+		m_outerCutoff = outerDegree;
 	}
 }
