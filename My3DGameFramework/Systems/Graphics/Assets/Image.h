@@ -1,7 +1,7 @@
 #pragma once
 #include "Sources/Asset.h"
 
-struct ktxTexture2;
+struct ktxTexture;
 
 namespace MGF3D
 {
@@ -29,6 +29,6 @@ namespace MGF3D
 
 	private:
 		Image(const String& path);
-		ResourcePtr CreateTextureResource(ktxTexture2* kTexture);
+		ResourcePtr CreateTextureResource(ktxTexture* kTexture);
 	};
 }

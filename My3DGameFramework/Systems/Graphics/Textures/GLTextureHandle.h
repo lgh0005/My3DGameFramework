@@ -1,7 +1,7 @@
 #pragma once
 #include "Sources/Resource.h"
 
-struct ktxTexture2;
+struct ktxTexture;
 
 namespace MGF3D
 {
@@ -28,8 +28,8 @@ namespace MGF3D
 		void GenerateMipmap();
 
 	public:
-		void SetKtxTexture(ktxTexture2* ktx) { m_ktxTexture = ktx; }
-		ktxTexture2* GetTexture() const { return m_ktxTexture; }
+		void SetKtxTexture(ktxTexture* ktx) { m_ktxTexture = ktx; }
+		ktxTexture* GetTexture() const { return m_ktxTexture; }
 
 	protected:
 		GLTextureHandle();
@@ -38,6 +38,6 @@ namespace MGF3D
 	protected:
 		uint32 m_target{ 0 };
 		uint32 m_handle{ 0 };
-		ktxTexture2* m_ktxTexture { nullptr };
+		ktxTexture* m_ktxTexture { nullptr };
 	};
 }

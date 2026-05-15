@@ -18,7 +18,7 @@ namespace MGF3D
 	public:
 		EnvironmentMap();
 		virtual ~EnvironmentMap();
-		static EnvironmentMapPtr Create(StringView mapName, const ImagePtr& image);
+		static EnvironmentMapPtr Create(StringView mapName);
 		virtual bool OnSyncCreate() override;
 
 	/*==============================//
@@ -36,14 +36,14 @@ namespace MGF3D
 		GLTexture2DPtr   GetBrdfLUT() const { return m_brdf; }
 
 	private:
-		void BakeSkybox(uint32 fbo, uint32 cubeVAO);
-		void BakeIrradiance(uint32 fbo, uint32 cubeVAO);
-		void BakePrefiltered(uint32 fbo, const GLUniformBufferUPtr& ubo, uint32 cubeVAO);
-		void BakeBRDF(uint32 fbo, uint32 screenVAO);
+		void BakeSkybox(uint32 fbo, uint32 cubeVAO, usize indexCount);
+		void BakeIrradiance(uint32 fbo, uint32 cubeVAO, usize indexCount);
+		void BakePrefiltered(uint32 fbo, const GLUniformBufferUPtr& ubo, uint32 cubeVAO, usize indexCount);
+		void BakeBRDF(uint32 fbo, uint32 screenVAO, usize indexCount);
 
 	private:
 		EnvironmentMap(StringView mapName);
-		bool Init(StringView mapName, const ImagePtr& image);
+		bool Init(StringView mapName);
 
 		ImagePtr m_environmentCubeImage;
 

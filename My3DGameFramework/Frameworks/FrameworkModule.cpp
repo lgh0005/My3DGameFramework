@@ -43,6 +43,7 @@
 
 #pragma region RESOURCE
 #include "Resources/Material.h"
+#include "Resources/EnvironmentMap.h"
 #pragma endregion
 
 #pragma region ASSET
@@ -62,6 +63,7 @@ namespace MGF3D
 		// 1. Resources 타입 베이킹
 		MGFTypeTree* resourceTree = MGF_TYPE.GetTree("Resource");
 		Material::s_typeIndex = resourceTree->Register("Material", "Resource");
+		EnvironmentMap::s_typeIndex = resourceTree->Register("Material", "EnvironmentMap");
 
 		// 1. RenderPass 타입 트리 생성
 		MGFTypeTree& renderPassTree = MGF_TYPE.CreateTree("RenderPass");

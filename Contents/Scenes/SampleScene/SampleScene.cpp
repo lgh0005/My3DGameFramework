@@ -29,8 +29,8 @@ namespace MGF3D
 		MGF_ASSET.LoadAssetAsync<Model>("@GameAsset/Models/test/aliensoldier.mymodel");
 		MGF_ASSET.LoadAssetAsync<Animation>("@GameAsset/Models/test/Hip Hop Dancing.myanim");
 
-		auto sky = MGF_ASSET.LoadAssetAsync<Image>("@GameAsset/Images/kloppenheim_06_puresky_4k.ktx");
-		MGF_RESOURCE.GetOrCreate<EnvironmentMap>("Sky", sky);
+		auto sky = MGF_RESOURCE.GetOrCreate<EnvironmentMap>("Sky");
+		sky->SetCubeTexture(MGF_ASSET.LoadAssetAsync<Image>("@GameAsset/Images/mirrored_hall_4k.ktx"));
 
 		auto sharedMaterial2 = MGF_RESOURCE.GetOrCreate<Material>("SharedCubeMaterial2");
 		sharedMaterial2->SetTexture(ETextureSlot::Albedo, MGF_ASSET.LoadAssetAsync<Image>("@GameAsset/Images/wood_albedo.ktx"));
@@ -125,6 +125,8 @@ namespace MGF3D
 		// 7. Sky
 		ObjectIDHash skyID = Entities::Create("Sky");
 		auto skyCube = MakeUnique<SkyCube>(nullptr);
+		auto skyMap = MGF_RESOURCE.Get<EnvironmentMap>("Sky");
+		skyCube->SetEnvironmentMap(skyMap);
 		Entities::AddComponent<SkyLight>(skyID, std::move(skyCube));
 
 		// 8. Ground

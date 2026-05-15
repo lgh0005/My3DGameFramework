@@ -4,6 +4,8 @@
 namespace MGF3D
 {
 	MGF_CLASS_PTR(GraphicsProgram)
+	MGF_CLASS_PTR(GLUniformBuffer)
+	MGF_CLASS_PTR(StaticMesh)
 
 	MGF_CLASS_PTR(MGFSkyboxPass)
 	class MGFSkyboxPass : public RenderPass
@@ -27,5 +29,7 @@ namespace MGF3D
 		bool Init();
 
 		GraphicsProgramPtr m_skyboxProgram;
+		GLUniformBufferUPtr m_skyboxUBO;
+		StaticMeshPtr m_cubeMesh;
 	};
 }

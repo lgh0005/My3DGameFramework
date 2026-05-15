@@ -34,12 +34,12 @@ namespace MGF3D
 		m_ssaoBlurProgram = MGF_RESOURCE.Create<GraphicsProgram>("SSAOBlurProgram", Vector<ShaderPtr>{ vs2, fs2 });
 		
 		// 2. SSAO FBO 텍스처 생성
-		auto ssaoTex = MGF_RESOURCE.CreateImmediate<GLTexture2D>(width, height, 90, 1);
+		auto ssaoTex = MGF_RESOURCE.CreateImmediate<GLTexture2D>(width, height, GL_R16F, 1);
 		ssaoTex->SetFilter(GL_NEAREST, GL_NEAREST);
 		m_ssaoFBO = GLFramebuffer2D::Create(Vector<GLTexture2DPtr>{ ssaoTex });
 
 		// 3. Blur FBO 텍스처 생성
-		auto ssaoBlurTex = MGF_RESOURCE.CreateImmediate<GLTexture2D>(width, height, 90, 1);
+		auto ssaoBlurTex = MGF_RESOURCE.CreateImmediate<GLTexture2D>(width, height, GL_R16F, 1);
 		ssaoBlurTex->SetFilter(GL_NEAREST, GL_NEAREST);
 		m_ssaoBlurFBO = GLFramebuffer2D::Create(Vector<GLTexture2DPtr>{ ssaoBlurTex });
 
@@ -96,7 +96,7 @@ namespace MGF3D
 			);
 		}
 
-		m_noiseTexture = MGF_RESOURCE.CreateImmediate<GLTexture2D>(SSAO_NOISE_DIM, SSAO_NOISE_DIM, 95, 1);
+		m_noiseTexture = MGF_RESOURCE.CreateImmediate<GLTexture2D>(SSAO_NOISE_DIM, SSAO_NOISE_DIM, GL_RGBA16F, 1);
 		m_noiseTexture->SetFilter(GL_NEAREST, GL_NEAREST);
 		m_noiseTexture->SetWrap(GL_REPEAT, GL_REPEAT);
 

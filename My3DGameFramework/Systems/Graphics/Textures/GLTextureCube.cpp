@@ -8,7 +8,7 @@ namespace MGF3D
 	GLTextureCube::GLTextureCube() = default;
 	GLTextureCube::~GLTextureCube() = default;
 
-    GLTextureCubePtr GLTextureCube::Create(ktxTexture2* ktx)
+    GLTextureCubePtr GLTextureCube::Create(ktxTexture* ktx)
     {
         if (ktx == nullptr) return nullptr;
         auto texture = GLTextureCubePtr(new GLTextureCube());
@@ -17,11 +17,11 @@ namespace MGF3D
         return texture;
     }
 
-    GLTextureCubePtr GLTextureCube::Create(uint32 size, uint32 vkFormat, uint32 levels)
+    GLTextureCubePtr GLTextureCube::Create(uint32 size, uint32 internalFormat, uint32 levels)
     {
         auto texture = GLTextureCubePtr(new GLTextureCube());
         texture->m_size = size;
-        texture->m_vkFormat = vkFormat;
+        texture->m_internalFormat = internalFormat;
         texture->m_levels = levels;
         texture->SetState(EResourceState::Loaded);
         return texture;
@@ -40,12 +40,9 @@ namespace MGF3D
 
     bool GLTextureCube::OnSyncCreate()
     {
-        bool success = CommonUtils::Select
-        (
-            m_ktxTexture != nullptr,
-            CreateFromKtx(),
-            AllocateStorage(m_size, m_vkFormat, m_levels)
-        );
+        bool success = false;
+        if (m_ktxTexture != nullptr) success = CreateFromKtx();
+        else success = AllocateStorage(m_size, m_internalFormat, m_levels);
 
         if (success) m_state = EResourceState::Ready;
         return success;
@@ -53,17 +50,36 @@ namespace MGF3D
 
     bool GLTextureCube::CreateFromKtx()
     {
+        if (!m_ktxTexture) 
+        {
+            MGF_LOG_ERROR("CreateFromKtx: KTX Object is null. Is the file still loading?");
+            return false;
+        }
+
         uint32 size = m_ktxTexture->baseWidth;
-        uint32 vkFormat = m_ktxTexture->vkFormat;
         uint32 levels = m_ktxTexture->numLevels;
         bool isCompressed = m_ktxTexture->isCompressed;
+        uint32 internalFormat = 0, format = 0, type = 0;
 
-        if (!AllocateStorage(size, vkFormat, levels))
+        if (m_ktxTexture->classId == ktxTexture1_c)
+        {
+            ktxTexture1* ktx1 = reinterpret_cast<ktxTexture1*>(m_ktxTexture);
+            internalFormat = ktx1->glInternalformat;
+            format = ktx1->glFormat;
+            type = ktx1->glType;
+        }
+        else if (m_ktxTexture->classId == ktxTexture2_c)
+        {
+            ktxTexture2* ktx2 = reinterpret_cast<ktxTexture2*>(m_ktxTexture);
+            uint32 vkFormat = ktx2->vkFormat;
+            internalFormat = TextureUtils::MapVkFormatToGLInternal(vkFormat);
+            format = TextureUtils::GetPixelFormatFromInternal(internalFormat);
+            type = TextureUtils::GetGLDataTypeFromVk(vkFormat);
+        }
+        else return false;
+
+        if (!AllocateStorage(size, internalFormat, levels))
             return false;
-
-        uint32 internalFormat = TextureUtils::MapVkFormatToGLInternal(vkFormat);
-        uint32 format = TextureUtils::GetPixelFormatFromInternal(internalFormat);
-        uint32 type = TextureUtils::GetGLDataTypeFromVk(vkFormat);
 
         for (uint32 level = 0; level < levels; ++level)
         {
@@ -72,10 +88,11 @@ namespace MGF3D
             for (uint32 face = 0; face < 6; ++face)
             {
                 ktx_size_t offset;
-                if (ktxTexture_GetImageOffset(ktxTexture(m_ktxTexture), level, 0, face, &offset) != KTX_SUCCESS) break;
+                // 기반 포인터 전달
+                if (ktxTexture_GetImageOffset(m_ktxTexture, level, 0, face, &offset) != KTX_SUCCESS) break;
 
-                void* data = ktxTexture_GetData(ktxTexture(m_ktxTexture)) + offset;
-                ktx_size_t imageSize = ktxTexture_GetImageSize(ktxTexture(m_ktxTexture), level);
+                void* data = ktxTexture_GetData(m_ktxTexture) + offset;
+                ktx_size_t imageSize = ktxTexture_GetImageSize(m_ktxTexture, level);
 
                 // DSA에서 큐브맵은 SubImage3D를 사용하며 face가 z-offset이 됨
                 if (isCompressed)
@@ -91,19 +108,18 @@ namespace MGF3D
             }
         }
 
-        ktxTexture_Destroy(ktxTexture(m_ktxTexture));
+        ktxTexture_Destroy(m_ktxTexture);
         m_ktxTexture = nullptr;
         return true;
     }
 
-    bool GLTextureCube::AllocateStorage(uint32 size, uint32 vkFormat, uint32 levels)
+    bool GLTextureCube::AllocateStorage(uint32 size, uint32 internalFormat, uint32 levels)
     {
         if (size <= 0) return false;
 
         m_target = GL_TEXTURE_CUBE_MAP;
         m_size = size;
 
-        uint32 internalFormat = TextureUtils::MapVkFormatToGLInternal(vkFormat);
         uint32 mipmapLevel = CommonUtils::Select
         (
             levels == 0,

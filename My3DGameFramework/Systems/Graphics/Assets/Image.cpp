@@ -6,7 +6,6 @@
 #include "textures/GLTexture3D.h"
 #include "textures/GLTextureCube.h"
 #include "Managers/TypeManager.h"
-#include <ktx.h>
 
 namespace MGF3D
 {
@@ -32,40 +31,55 @@ namespace MGF3D
 	bool Image::Load()
 	{
 		// 0. 에셋이 로딩 상태임을 표시
-		m_state = EAssetState::Loading;
+		SetState(EAssetState::Loading);
 
-		// 1. 파일 읽기 (I/O)
-		ktxTexture2* kTexture = nullptr;
-		KTX_error_code result = ktxTexture2_CreateFromNamedFile
+		// 1. 파일 읽기
+		ktxTexture* kTexture = nullptr;
+		KTX_error_code result = ktxTexture_CreateFromNamedFile
 		(
 			m_path.c_str(),
 			KTX_TEXTURE_CREATE_LOAD_IMAGE_DATA_BIT,
 			&kTexture
 		);
-		if (result != KTX_SUCCESS) return false;
+		if (result != KTX_SUCCESS)
+		{
+			MGF_LOG_ERROR("Image::Load - KTX load failed [code: {}]: {}", (int32)result, m_path);
+			return false;
+		}
 
 		// 2. BasisU 트랜스코딩
-		if (ktxTexture2_NeedsTranscoding(kTexture))
-			ktxTexture2_TranscodeBasis(kTexture, KTX_TTF_BC7_RGBA, 0);
+		if (kTexture->classId == ktxTexture2_c)
+		{
+			ktxTexture2* k2 = reinterpret_cast<ktxTexture2*>(kTexture);
+			if (ktxTexture2_NeedsTranscoding(k2))
+				ktxTexture2_TranscodeBasis(k2, KTX_TTF_BC7_RGBA, 0);
+		}
 
 		// 3. 리소스 생성
 		ResourcePtr res = CreateTextureResource(kTexture);
-		if (!res) return false;
+		if (!res)
+		{
+			ktxTexture_Destroy(kTexture);
+			SetState(EAssetState::Failed);
+			return false;
+		}
 
-		// 4. 빈 텍스쳐 생성 및 데이터 전달
+		// 4. 핸들 획득
 		auto handle = MGFTypeCaster::Cast<GLTextureHandle>(res);
-		if (!handle) return false;
+		if (!handle)
+		{
+			ktxTexture_Destroy(kTexture);
+			SetState(EAssetState::Failed);
+			return false;
+		}
 
-		// handle->SetKtxTexture(kTexture);
 		handle->SetState(EResourceState::Loaded);
-
-		// 5. 만든 리소스들 저장
 		AddResource(handle);
 		SetState(EAssetState::Loaded);
 		return true;
 	}
 
-	ResourcePtr Image::CreateTextureResource(ktxTexture2* kTexture)
+	ResourcePtr Image::CreateTextureResource(ktxTexture* kTexture)
 	{
 		if (kTexture->isCubemap)      return GLTextureCube::Create(kTexture);
 		if (kTexture->baseDepth > 1)  return GLTexture3D::Create(kTexture);

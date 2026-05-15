@@ -8,6 +8,8 @@
 #include "Rendering/RenderCollector.h"
 #include "Components/Camera.h"
 #include "Components/Lights/SkyLight.h"
+#include "Graphics/Framebuffers/GLFramebufferHandle.h"
+#include "Graphics/Framebuffers/GLFramebuffer2D.h"
 
 namespace MGF3D
 {
@@ -56,6 +58,16 @@ namespace MGF3D
 
 			// 3-3. 파이프라인 실행
 			m_activePipeline->Render(m_renderContext.get());
+
+			// [DEBUG] Scene 버퍼 상에서의 고속복사
+			auto sceneBuffer = m_renderContext->GetSceneBuffer();
+			GLFramebufferHandle::Blit
+			(
+				sceneBuffer, nullptr,
+				0, 0, WINDOW_WIDTH, WINDOW_HEIGHT,
+				0, 0, WINDOW_WIDTH, WINDOW_HEIGHT,
+				GL_COLOR_BUFFER_BIT, GL_NEAREST
+			);
 
 			// 3-4. 다음 카메라(혹은 프레임)를 위한 큐 정리
 			m_renderContext->ClearQueues();

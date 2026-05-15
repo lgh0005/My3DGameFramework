@@ -5,6 +5,7 @@
 #include "Managers/AssetManager.h"
 #include "Assets/Shader.h"
 #include "Graphics/Programs/GraphicsProgram.h"
+#include "Graphics/Framebuffers/GLFramebuffer2D.h"
 #include "Rendering/RenderContext.h"
 #include "Textures/GLTexture2D.h"
 #include "TextureArrays/GLTexture2DArray.h"
@@ -48,8 +49,12 @@ namespace MGF3D
 		if (m_deferredLightingProgram->GetState() != EResourceState::Ready) return;
 
 		// 2. 화면 초기화 (조명 결과가 그려질 기본 프레임버퍼)
+		auto sceneBuffer = context->GetSceneBuffer();
+		if (!sceneBuffer) return;
+		sceneBuffer->Bind();
+
 		glClearColor(0.55f, 0.45, 0.95f, 1.0f);
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		glClear(GL_COLOR_BUFFER_BIT);
 
 		// 3. 디퍼드 라이팅은 화면에 2D 사각형을 그리는 작업이므로 깊이 테스트 비활성화
 		glDisable(GL_DEPTH_TEST);

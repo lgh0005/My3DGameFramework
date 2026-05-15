@@ -8,7 +8,7 @@ namespace MGF3D
 	GLTexture2D::GLTexture2D() = default;
 	GLTexture2D::~GLTexture2D() = default;
 
-	GLTexture2DPtr GLTexture2D::Create(ktxTexture2* ktx)
+	GLTexture2DPtr GLTexture2D::Create(ktxTexture* ktx)
 	{
 		if (ktx == nullptr) return nullptr;
 		auto texture = SharedPtr<GLTexture2D>(new GLTexture2D());
@@ -20,13 +20,13 @@ namespace MGF3D
 	GLTexture2DPtr GLTexture2D::Create
 	(
 		uint32 width, uint32 height, 
-		uint32 vkFormat, uint32 levels
+		uint32 internalFormat, uint32 levels
 	)
 	{
 		auto texture = SharedPtr<GLTexture2D>(new GLTexture2D());
 		texture->m_width = width;
 		texture->m_height = height;
-		texture->m_vkFormat = vkFormat;
+		texture->m_internalFormat = internalFormat;
 		texture->m_levels = levels;
 		texture->SetState(EResourceState::Loaded);
 		return texture;
@@ -47,36 +47,54 @@ namespace MGF3D
 	{
 		bool success = false;
 		if (m_ktxTexture != nullptr) success = CreateFromKtx();
-		else success = AllocateStorage(m_width, m_height, m_vkFormat, m_levels);
+		else success = AllocateStorage(m_width, m_height, m_internalFormat, m_levels);
+
 		if (success) m_state = EResourceState::Ready;
 		return success;
 	}
 
 	bool GLTexture2D::CreateFromKtx()
 	{
+		if (m_ktxTexture == nullptr) return false;
+
 		uint32 width = m_ktxTexture->baseWidth;
 		uint32 height = m_ktxTexture->baseHeight;
-		uint32 vkFormat = m_ktxTexture->vkFormat;
 		uint32 levels = m_ktxTexture->numLevels;
 		bool isCompressed = m_ktxTexture->isCompressed;
 
-		// KTX 정보를 바탕으로 GPU 스토리지 할당
-		if (!AllocateStorage(width, height, vkFormat, levels))
-			return false;
+		uint32 internalFormat = 0;
+		uint32 format = 0;
+		uint32 type = 0;
 
-		uint32 internalFormat = TextureUtils::MapVkFormatToGLInternal(vkFormat);
-		uint32 format = TextureUtils::GetPixelFormatFromInternal(internalFormat);
-		uint32 type = TextureUtils::GetGLDataTypeFromVk(vkFormat);
+		if (m_ktxTexture->classId == ktxTexture1_c)
+		{
+			ktxTexture1* ktx1 = reinterpret_cast<ktxTexture1*>(m_ktxTexture);
+			internalFormat = ktx1->glInternalformat;
+			format = ktx1->glFormat;
+			type = ktx1->glType;
+		}
+		else if (m_ktxTexture->classId == ktxTexture2_c)
+		{
+			ktxTexture2* ktx2 = reinterpret_cast<ktxTexture2*>(m_ktxTexture);
+			uint32 vkFormat = ktx2->vkFormat;
+			internalFormat = TextureUtils::MapVkFormatToGLInternal(vkFormat);
+			format = TextureUtils::GetPixelFormatFromInternal(internalFormat);
+			type = TextureUtils::GetGLDataTypeFromVk(vkFormat);
+		}
+		else return false;
+
+		if (!AllocateStorage(width, height, internalFormat, levels))
+			return false;
 
 		for (uint32 level = 0; level < levels; ++level)
 		{
 			ktx_size_t offset;
-			if (ktxTexture_GetImageOffset(ktxTexture(m_ktxTexture), level, 0, 0, &offset) != KTX_SUCCESS) break;
+			if (ktxTexture_GetImageOffset(m_ktxTexture, level, 0, 0, &offset) != KTX_SUCCESS) break;
 
 			uint32 levelWidth = Math::Max(1u, width >> level);
 			uint32 levelHeight = Math::Max(1u, height >> level);
-			void* data = ktxTexture_GetData(ktxTexture(m_ktxTexture)) + offset;
-			ktx_size_t imageSize = ktxTexture_GetImageSize(ktxTexture(m_ktxTexture), level);
+			void* data = ktxTexture_GetData(m_ktxTexture) + offset;
+			ktx_size_t imageSize = ktxTexture_GetImageSize(m_ktxTexture, level);
 
 			if (isCompressed)
 				glCompressedTextureSubImage2D(m_handle, level, 0, 0, levelWidth, levelHeight, internalFormat, static_cast<GLsizei>(imageSize), data);
@@ -84,12 +102,12 @@ namespace MGF3D
 				glTextureSubImage2D(m_handle, level, 0, 0, levelWidth, levelHeight, format, type, data);
 		}
 
-		ktxTexture_Destroy(ktxTexture(m_ktxTexture));
+		ktxTexture_Destroy(m_ktxTexture);
 		m_ktxTexture = nullptr;
 		return true;
 	}
 
-	bool GLTexture2D::AllocateStorage(uint32 width, uint32 height, uint32 vkFormat, uint32 levels)
+	bool GLTexture2D::AllocateStorage(uint32 width, uint32 height, uint32 internalFormat, uint32 levels)
 	{
 		if (width <= 0 || height <= 0) return false;
 
@@ -97,7 +115,6 @@ namespace MGF3D
 		m_width = width;
 		m_height = height;
 
-		uint32 internalFormat = TextureUtils::MapVkFormatToGLInternal(vkFormat);
 		uint32 mipmapLevel = CommonUtils::Select(levels == 0, TextureUtils::CalculateMaxMipLevels(m_width, m_height), levels);
 
 		glCreateTextures(m_target, 1, &m_handle);

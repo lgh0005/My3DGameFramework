@@ -1,7 +1,7 @@
 #pragma once
 #include "Textures/GLTextureHandle.h"
 
-struct ktxTexture2;
+struct ktxTexture;
 
 namespace MGF3D
 {
@@ -10,8 +10,8 @@ namespace MGF3D
 	{
 	public:
 		virtual ~GLTextureCube() override;
-		static GLTextureCubePtr Create(ktxTexture2* ktx);
-		static GLTextureCubePtr Create(uint32 size, uint32 vkFormat, uint32 levels = 1);
+		static GLTextureCubePtr Create(ktxTexture* ktx);
+		static GLTextureCubePtr Create(uint32 size, uint32 internalFormat, uint32 levels = 1);
 		uint32 GetSize() const { return m_size; }
 
 	/*======================//
@@ -25,10 +25,10 @@ namespace MGF3D
 	private:
 		GLTextureCube();
 		bool CreateFromKtx();
-		bool AllocateStorage(uint32 size, uint32 vkFormat, uint32 levels);
+		bool AllocateStorage(uint32 size, uint32 internalFormat, uint32 levels);
 
 		uint32 m_size{ 0 };
-		uint32 m_vkFormat{ 0 };
+		uint32 m_internalFormat{ 0 };
 		uint32 m_levels{ 1 };
 	};
 }

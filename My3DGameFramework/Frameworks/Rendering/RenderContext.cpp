@@ -24,6 +24,7 @@ namespace MGF3D
         m_spotShadowSSBO = GLShaderStorageBuffer::Create(nullptr, 0);
 
         InitGeometryBuffer(WINDOW_WIDTH, WINDOW_HEIGHT);
+        InitPostProcessBuffer(WINDOW_WIDTH, WINDOW_HEIGHT);
         m_screenMesh = MGF_RESOURCE.CreateImmediate<ScreenMesh>();
 	}
 	RenderContext::~RenderContext() = default;
@@ -85,22 +86,22 @@ namespace MGF3D
 
         // 2. G-Buffer 텍스쳐 생성 (다시 MGF3D 내부 규격인 Vulkan 포맷으로 원복!)
         // [0] Position (RGB) + AO (A) -> RGBA16F
-        m_gBufferTextures.push_back(MGF_RESOURCE.CreateImmediate<GLTexture2D>(width, height, VK_FORMAT_R16G16B16A16_SFLOAT, 1));
+        m_gBufferTextures.push_back(MGF_RESOURCE.CreateImmediate<GLTexture2D>(width, height, GL_RGBA16F, 1));
 
         // [1] Normal (RGB) + Roughness (A) -> RGBA16F
-        m_gBufferTextures.push_back(MGF_RESOURCE.CreateImmediate<GLTexture2D>(width, height, VK_FORMAT_R16G16B16A16_SFLOAT, 1));
+        m_gBufferTextures.push_back(MGF_RESOURCE.CreateImmediate<GLTexture2D>(width, height, GL_RGBA16F, 1));
 
         // [2] Albedo (RGB) + Metallic (A) -> RGBA8 Unorm
-        m_gBufferTextures.push_back(MGF_RESOURCE.CreateImmediate<GLTexture2D>(width, height, VK_FORMAT_R8G8B8A8_UNORM, 1));
+        m_gBufferTextures.push_back(MGF_RESOURCE.CreateImmediate<GLTexture2D>(width, height, GL_RGBA8, 1));
 
         // [3] Emission (RGB) + 잉여 (A) -> RGBA16F
-        m_gBufferTextures.push_back(MGF_RESOURCE.CreateImmediate<GLTexture2D>(width, height, VK_FORMAT_R16G16B16A16_SFLOAT, 1));
+        m_gBufferTextures.push_back(MGF_RESOURCE.CreateImmediate<GLTexture2D>(width, height, GL_RGBA16F, 1));
 
         // [4] Velocity (RG) -> RG16F
-        m_gBufferTextures.push_back(MGF_RESOURCE.CreateImmediate<GLTexture2D>(width, height, VK_FORMAT_R16G16_SFLOAT, 1));
+        m_gBufferTextures.push_back(MGF_RESOURCE.CreateImmediate<GLTexture2D>(width, height, GL_RG16F, 1));
 
         // 3. 깊이/스텐실 버퍼 텍스처 생성 -> Depth24 Stencil8
-        auto depthAttachment = MGF_RESOURCE.CreateImmediate<GLTexture2D>(width, height, VK_FORMAT_D24_UNORM_S8_UINT, 1);
+        auto depthAttachment = MGF_RESOURCE.CreateImmediate<GLTexture2D>(width, height, GL_DEPTH24_STENCIL8, 1);
 
         // 4. 무사히 핸들을 발급받은 텍스처들로 프레임버퍼 생성
         m_geometryBuffer = GLFramebuffer2D::Create(m_gBufferTextures, depthAttachment);
@@ -111,6 +112,15 @@ namespace MGF3D
         uint8 index = static_cast<uint8>(slot);
         if (index < m_gBufferTextures.size()) return m_gBufferTextures[index].get();
         return nullptr;
+    }
+
+    void RenderContext::InitPostProcessBuffer(uint32 width, uint32 height)
+    {
+        // 1. 조명 결과를 담을 HDR 텍스처 생성
+        m_sceneColorTexture = MGF_RESOURCE.CreateImmediate<GLTexture2D>(width, height, GL_RGBA16F, 1);
+
+        // 2. 텍스처를 포함하는 프레임버퍼 생성
+        m_sceneBuffer = GLFramebuffer2D::Create({ m_sceneColorTexture }, m_geometryBuffer->GetDepthAttachment());
     }
 
     void RenderContext::SetCachedTexture(ETextureCache slot, const GLTexture2DPtr& texture)

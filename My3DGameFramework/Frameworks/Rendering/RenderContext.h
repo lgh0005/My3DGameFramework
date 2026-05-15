@@ -76,10 +76,15 @@ namespace MGF3D
 		Vector<SpotShadowData>& GetSpotShadows() { return m_spotShadows; }
 
 	public:
-		ScreenMesh* GetScreenMesh() const { return m_screenMesh.get(); }
 		void InitGeometryBuffer(uint32 width, uint32 height);
 		GLFramebuffer2D* GetGeometryBuffer() const { return m_geometryBuffer.get(); }
 		GLTexture2D* GetGeometryBufferTexture(EGBufferSlot slot) const;
+
+	public:
+		void InitPostProcessBuffer(uint32 width, uint32 height);
+		ScreenMesh* GetScreenMesh() const { return m_screenMesh.get(); }
+		GLFramebuffer2D* GetSceneBuffer() const { return m_sceneBuffer.get(); }
+		GLTexture2D* GetSceneColorTexture() const { return m_sceneColorTexture.get(); }
 
 	public:
 		void SetCachedTexture(ETextureCache slot, const GLTexture2DPtr& texture);
@@ -118,6 +123,8 @@ namespace MGF3D
 
 		// Screen 메쉬
 		ScreenMeshPtr m_screenMesh;
+		GLFramebuffer2DPtr m_sceneBuffer;
+		GLTexture2DPtr      m_sceneColorTexture;
 
 		// G-Buffer
 		GLFramebuffer2DPtr m_geometryBuffer;

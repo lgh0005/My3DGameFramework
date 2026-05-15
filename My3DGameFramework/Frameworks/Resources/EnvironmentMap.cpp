@@ -31,18 +31,17 @@ namespace MGF3D
 		return nullptr;
 	}
 
-	EnvironmentMapPtr EnvironmentMap::Create(StringView mapName, const ImagePtr& image)
+	EnvironmentMapPtr EnvironmentMap::Create(StringView mapName)
 	{
 		auto envMap = EnvironmentMapPtr(new EnvironmentMap(mapName));
-		if (!envMap->Init(mapName, image)) return nullptr;
+		if (!envMap->Init(mapName)) return nullptr;
 		envMap->SetState(EResourceState::Loaded);
 		return envMap;
 	}
 
-	bool EnvironmentMap::Init(StringView mapNAme, const ImagePtr& image)
+	bool EnvironmentMap::Init(StringView mapName)
 	{
-		// 0. 이미지 세팅
-		m_environmentCubeImage = image;
+		m_name = mapName;
 
 		// 1. 공통 셰이더 (여러 프로그램에서 공유)
 		auto commonVs = MGF_ASSET.LoadAssetAsync<Shader>("@BuiltInAsset/Shaders/IBL/MGF3D_IBL_Common.vert", GL_VERTEX_SHADER, EShaderFileType::GLSL);
@@ -70,6 +69,25 @@ namespace MGF3D
 
 	bool EnvironmentMap::OnSyncCreate()
 	{
+		// 0. HDR 이미지 텍스처 준비 여부 확인
+		if (!m_environmentCubeImage) return false;
+
+		EAssetState imgState = m_environmentCubeImage->GetState();
+		if (imgState == EAssetState::Failed)
+		{
+			MGF_LOG_ERROR("EnvironmentMap: HDR image failed to load.");
+			SetState(EResourceState::Failed);
+			return false;
+		}
+		if (imgState != EAssetState::Ready)
+			return false;
+
+		// 1. 셰이더 프로그램 준비 여부 확인 (이것도 비동기 로딩)
+		if (!m_skyboxProgram || m_skyboxProgram->GetState() != EResourceState::Ready ||
+			!m_irradianceProgram || m_irradianceProgram->GetState() != EResourceState::Ready ||
+			!m_prefilterProgram || m_prefilterProgram->GetState() != EResourceState::Ready ||
+			!m_brdfProgram || m_brdfProgram->GetState() != EResourceState::Ready) return false;
+
 		// 2. 임시 도구 생성 (FBO는 원시 API 직접 호출)
 		uint32 tempFBO = 0;
 		glCreateFramebuffers(1, &tempFBO);
@@ -105,12 +123,13 @@ namespace MGF3D
 		bakeUBO->Bind(1);
 		uint32 cubeVAO = cubeMesh->GetVertexLayout()->GetHandle();
 		uint32 screenVAO = screenMesh->GetVertexLayout()->GetHandle();
+		uint32 cubeIndexCount = cubeMesh->GetIndexCount();
 
 		// 4. 베이킹 단계 수행
-		BakeSkybox(tempFBO, cubeVAO);
-		BakeIrradiance(tempFBO, cubeVAO);
-		BakePrefiltered(tempFBO, bakeUBO, cubeVAO);
-		BakeBRDF(tempFBO, screenVAO);
+		BakeSkybox(tempFBO, cubeVAO, cubeIndexCount);
+		BakeIrradiance(tempFBO, cubeVAO, cubeIndexCount);
+		BakePrefiltered(tempFBO, bakeUBO, cubeVAO, cubeIndexCount);
+		BakeBRDF(tempFBO, screenVAO, cubeIndexCount);
 
 		// 5. 임시 자원 파괴
 		glDeleteFramebuffers(1, &tempFBO);
@@ -124,10 +143,10 @@ namespace MGF3D
 		m_environmentCubeImage = image;
 	}
 
-	void EnvironmentMap::BakeSkybox(uint32 fbo, uint32 cubeVAO)
+	void EnvironmentMap::BakeSkybox(uint32 fbo, uint32 cubeVAO, usize indexCount)
 	{
 		const int32 res = 1024;
-		m_skybox = GLTextureCube::Create(res, GL_RGB16F, GL_FLOAT);
+		m_skybox = MGF_RESOURCE.CreateImmediate<GLTextureCube>(res, GL_RGB16F, 0);
 
 		// HDR 소스 이미지로부터 임시 2D 텍스처 생성
 		const auto& resources = m_environmentCubeImage->GetResources();
@@ -144,15 +163,15 @@ namespace MGF3D
 		hdrTex->Bind(0);
 
 		glBindVertexArray(cubeVAO);
-		glDrawArrays(GL_TRIANGLES, 0, 36);
+		glDrawElements(GL_TRIANGLES, indexCount, GL_UNSIGNED_INT, nullptr);
 
 		m_skybox->GenerateMipmap();
 	}
 
-	void EnvironmentMap::BakeIrradiance(uint32 fbo, uint32 cubeVAO)
+	void EnvironmentMap::BakeIrradiance(uint32 fbo, uint32 cubeVAO, usize indexCount)
 	{
 		const int32 res = 32;
-		m_irradiance = GLTextureCube::Create(res, GL_RGB16F, GL_FLOAT);
+		m_irradiance = MGF_RESOURCE.CreateImmediate<GLTextureCube>(res, GL_RGB16F, 1);
 
 		glBindFramebuffer(GL_FRAMEBUFFER, fbo);
 		glNamedFramebufferTexture(fbo, GL_COLOR_ATTACHMENT0, m_irradiance->GetHandle(), 0); // DSA 적용
@@ -162,13 +181,13 @@ namespace MGF3D
 		m_skybox->Bind(0);
 
 		glBindVertexArray(cubeVAO);
-		glDrawArrays(GL_TRIANGLES, 0, 36);
+		glDrawElements(GL_TRIANGLES, indexCount, GL_UNSIGNED_INT, nullptr);
 	}
 
-	void EnvironmentMap::BakePrefiltered(uint32 fbo, const GLUniformBufferUPtr& ubo, uint32 cubeVAO)
+	void EnvironmentMap::BakePrefiltered(uint32 fbo, const GLUniformBufferUPtr& ubo, uint32 cubeVAO, usize indexCount)
 	{
 		const int32 baseRes = 512;
-		m_prefiltered = GLTextureCube::Create(baseRes, GL_RGB16F, GL_FLOAT);
+		m_prefiltered = MGF_RESOURCE.CreateImmediate<GLTextureCube>(baseRes, GL_RGB16F, 0);
 		m_prefiltered->GenerateMipmap();
 
 		glBindFramebuffer(GL_FRAMEBUFFER, fbo);
@@ -176,7 +195,7 @@ namespace MGF3D
 		m_skybox->Bind(0);
 
 		const uint32 maxMipLevels = 5;
-		usize roughnessOffset = sizeof(mat4) * 6; // VPs 행렬 다음의 오프셋 계산
+		usize roughnessOffset = sizeof(mat4) * 6;
 
 		for (uint32 mip = 0; mip < maxMipLevels; ++mip)
 		{
@@ -185,19 +204,19 @@ namespace MGF3D
 
 			// 거칠기 계산 및 UBO 갱신
 			float roughness = (float)mip / (float)(maxMipLevels - 1);
-			ubo->UpdateData(&roughness, roughnessOffset, sizeof(float)); // SetUniform 대신 UpdateData 사용
+			ubo->UpdateData(&roughness, roughnessOffset, sizeof(float));
 
 			glNamedFramebufferTexture(fbo, GL_COLOR_ATTACHMENT0, m_prefiltered->GetHandle(), mip);
 
 			glBindVertexArray(cubeVAO);
-			glDrawArrays(GL_TRIANGLES, 0, 36);
+			glDrawElements(GL_TRIANGLES, indexCount, GL_UNSIGNED_INT, nullptr);
 		}
 	}
 
-	void EnvironmentMap::BakeBRDF(uint32 fbo, uint32 screenVAO)
+	void EnvironmentMap::BakeBRDF(uint32 fbo, uint32 screenVAO, usize indexCount)
 	{
 		const int32 res = 512;
-		m_brdf = GLTexture2D::Create(res, res, GL_RG16F, GL_FLOAT);
+		m_brdf = MGF_RESOURCE.CreateImmediate<GLTexture2D>(res, res, GL_RG16F, 1);
 
 		glBindFramebuffer(GL_FRAMEBUFFER, fbo);
 		glNamedFramebufferTexture(fbo, GL_COLOR_ATTACHMENT0, m_brdf->GetHandle(), 0);
