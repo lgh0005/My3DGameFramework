@@ -18,12 +18,8 @@ namespace MGF3D
 	{
 		if (!resource) return;
 
-		// 1. 이미 Ready이거나 Failed이면 GPU에 넘길 필요 없음
-		auto state = resource->GetState();
-		if (state == EResourceState::Ready || state == EResourceState::Failed) return;
-
-		// 2. 상태를 Syncing(GPU 작업 대기)으로 변경
-		resource->SetState(EResourceState::Syncing);
+		// 1. 동기화 진입 시도
+		if (!resource->TryBeginSync()) return;
 
 		// 3. GPU 워커 스레드 큐로 작업 던지기
 		MGF_THREAD.PushGPUTask
@@ -35,16 +31,18 @@ namespace MGF3D
 				{
 					glFlush();
 					resource->SetState(EResourceState::Ready);
+					return;
 				}
 
-				// 실패 시 다른 스레드에서 무한 대기하는 것을 막기 위해 상태 변경
-				else
+				if (resource->GetState() == EResourceState::Failed)
 				{
-					if (resource->GetState() != EResourceState::Failed)
-						MGF_RESOURCE.RegisterSync(resource);
-
-					else MGF_LOG_ERROR("Resource permanently failed.");
+					MGF_LOG_ERROR("Resource permanently failed.");
+					return;
 				}
+
+				// 일시적 실패 시 다른 스레드에서 무한 대기하는 것을 막기 위해 상태 변경
+				resource->SetState(EResourceState::Empty);
+				MGF_RESOURCE.RegisterSync(resource);
 			}
 		);
 	}

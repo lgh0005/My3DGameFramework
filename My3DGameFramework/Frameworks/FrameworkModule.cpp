@@ -85,7 +85,7 @@ namespace MGF3D
 
 		// 3. 머캐닉 타입
 		MGFTypeTree* mechanicsTree = MGF_TYPE.GetTree("Mechanics");
-		SkyLight::s_typeIndex = mechanicsTree->Register("SkyLight", "");
+		SkyCube::s_typeIndex = mechanicsTree->Register("SkyCube", "");
 		AnimController::s_typeIndex = mechanicsTree->Register("AnimController", "");
 
 		// 3. Component 레지스트리 주입

@@ -17,6 +17,9 @@ namespace MGF3D
     {
         if (!mesh || !material) return;
 
+        if (mesh->GetState() != EResourceState::Ready) return;
+        if (material->GetState() != EResourceState::Ready) return;
+
         auto& batch = m_batches[mesh][material];
         if (batch.GetInstances().empty())
         {

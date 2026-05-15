@@ -9,8 +9,7 @@ namespace MGF3D
 	(
 		ObjectIDHash id, ObjectIDHash ownerID,
 		const MeshPtr& mesh, const MaterialPtr& material
-	)
-		: Super(id, ownerID), m_mesh(mesh), m_material(material) { }
+	) : Super(id, ownerID), m_mesh(mesh), m_material(material) { }
 	MeshRenderer::~MeshRenderer() = default;
 	MeshRenderer::MeshRenderer(MeshRenderer&& other) noexcept = default;
 	MeshRenderer& MeshRenderer::operator=(MeshRenderer&& other) noexcept = default;

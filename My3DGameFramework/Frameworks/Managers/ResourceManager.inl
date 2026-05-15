@@ -53,7 +53,7 @@ namespace MGF3D
 
 		StringHash hash(name);
 
-		// 1. 캐시 히트 확인 (빠른 반환)
+		// 1. 첫 번째 캐시 검사
 		{
 			LockScope lock(m_mutex);
 			auto it = m_namedCache.find(hash);
@@ -61,15 +61,21 @@ namespace MGF3D
 				return MGFTypeCaster::Cast<T>(it->second);
 		}
 
-		// 2. 캐시 미스 시 새로 생성 (껍데기 생성)
+		// 2. 락 밖에서 새 리소스 생성
 		// name은 캐싱 키로만 사용하고, 나머지 인자들은 T::Create로 포워딩합니다.
 		auto newResource = T::Create(name, std::forward<Args>(args)...);
-		if (newResource)
+		if (!newResource) return nullptr;
+
+		// 3. 락 다시 잡고 한 번 더 확인 후 삽입
 		{
 			LockScope lock(m_mutex);
+			auto it = m_namedCache.find(hash);
+			if (it != m_namedCache.end()) return MGFTypeCaster::Cast<T>(it->second);
 			m_namedCache[hash] = newResource;
-			RegisterSync(newResource);
 		}
+
+		// 4. 락 밖에서 RegisterSync 호출
+		RegisterSync(newResource);
 
 		return newResource;
 	}

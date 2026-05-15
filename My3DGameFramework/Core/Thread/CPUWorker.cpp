@@ -4,7 +4,10 @@
 namespace MGF3D
 {
 	CPUWorker::CPUWorker(TaskQueue& queue) : Super(queue) { }
-	CPUWorker::~CPUWorker() = default;
+	CPUWorker::~CPUWorker()
+	{
+		Join();
+	}
 
 	void CPUWorker::Run()
 	{

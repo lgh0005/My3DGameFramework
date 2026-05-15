@@ -25,6 +25,13 @@ namespace MGF3D
 		static int16 s_typeIndex;
 		virtual const MGFType* GetType() const;
 
+	/*===============================//
+	//       SkyLight Methods        //
+	//===============================*/
+	public:
+		bool IsMainSkyLight() const { return m_isMainSkyLight; }
+		void SetMainSkyLight(bool isMain) { m_isMainSkyLight = isMain; }
+
 	public:
 		SkyCube* GetSkyCube() const { return m_skyCube.get(); }
 
@@ -42,6 +49,8 @@ namespace MGF3D
 
 	private:
 		SkyCubeUPtr m_skyCube{ nullptr };
+
+		bool m_isMainSkyLight{ false };
 
 		float m_intensity{ 1.0f };
 		vec3  m_tint{ 1.0f, 1.0f, 1.0f };

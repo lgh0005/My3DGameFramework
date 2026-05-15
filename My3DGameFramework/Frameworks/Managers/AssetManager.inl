@@ -16,10 +16,8 @@ namespace MGF3D
 			"T must be derived from Asset."
 		);
 
-		// 1. 가상 경로를 물리 경로로 변환
+		// 1. 가상 경로 → 물리 경로 → 해시
 		String resolvedPath = MGF_PATH.ResolvePath(virtualPath);
-
-		// 2. 물리 경로 기반의 정수 해시 계산
 		PathHash pathHash(resolvedPath);
 
 		// 3. 캐시 검사 및 안전한 타입 캐스팅
@@ -34,8 +32,12 @@ namespace MGF3D
 		auto newAsset = T::Create(resolvedPath, std::forward<Args>(args)...);
 		if (!newAsset) return nullptr;
 		newAsset->SetState(EAssetState::Loading);
+		
+		// 4. 락 다시 잡고 한 번 더 확인 후 삽입
 		{
 			LockScope lock(m_cacheMutex);
+			auto it = m_assetCache.find(pathHash);
+			if (it != m_assetCache.end()) return MGFTypeCaster::Cast<T>(it->second);
 			m_assetCache[pathHash] = newAsset;
 		}
 
@@ -64,9 +66,8 @@ namespace MGF3D
 		String resolvedPath = MGF_PATH.ResolvePath(virtualPath);
 		PathHash pathHash(resolvedPath);
 
-		std::shared_ptr<T> asset = nullptr;
-
 		// 1. 캐시 검사 및 에셋 포인터 획득
+		std::shared_ptr<T> asset = nullptr;
 		{
 			LockScope lock(m_cacheMutex);
 			auto it = m_assetCache.find(pathHash);
@@ -76,34 +77,21 @@ namespace MGF3D
 		// 2. 캐시에 에셋이 등록된 적이 없다면 nullptr
 		if (!asset) return nullptr;
 
-		// 3. 로딩 중이라면 스레드 대기
-		while (asset->GetState() == EAssetState::Loading)
-			std::this_thread::yield();
-
-		// 2. 지연 평가 (Lazy Evaluation): 
-		// GPU 워커에서 작업 중인(Syncing) 상태일 때 누군가 에셋을 요청하면, 
-		// 하위 리소스들이 모두 구워졌는지 확인하고 상태를 업데이트합니다.
-		if (asset->GetState() == EAssetState::Syncing)
+		// 3. CPU 로딩 단계 통과 대기
+		while (true)
 		{
-			bool bAllReady = true;
-			for (const auto& res : asset->GetResources())
-			{
-				if (res->GetState() != EResourceState::Ready)
-				{
-					bAllReady = false;
-					break;
-				}
-			}
-
-			if (bAllReady)
-				asset->SetState(EAssetState::Ready);
+			EAssetState state = asset->GetState();
+			if (state == EAssetState::Syncing ||
+				state == EAssetState::Ready ||
+				state == EAssetState::Failed)
+				break;
+			std::this_thread::yield();
 		}
 
-		// 3. 실패 상태만 아니라면 에셋 반환 
-		// (Syncing 상태여도 렌더러가 내부적으로 리소스 Ready 체크를 수행하므로 껍데기를 줍니다)
-		if (asset->GetState() != EAssetState::Failed)
-			return MGFTypeCaster::Cast<T>(asset);
+		// 4. 최종 판정
+		if (asset->GetState() == EAssetState::Failed)
+			return nullptr;
 
-		return nullptr;
+		return asset;
 	}
 }

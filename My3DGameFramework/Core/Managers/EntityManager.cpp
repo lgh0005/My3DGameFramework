@@ -28,12 +28,17 @@ namespace MGF3D
 
 	void EntityManager::Shutdown()
 	{
+		Clear();
+
 		m_gameObjectRegistry.Shutdown();
 		for (auto& registry : m_componentRegistries)
 		{
 			if (registry != nullptr)
 				registry->Shutdown();
 		}
+
+		m_componentRegistries.clear();
+		m_registryLookup.clear();
 	}
 
 	void EntityManager::Clear()

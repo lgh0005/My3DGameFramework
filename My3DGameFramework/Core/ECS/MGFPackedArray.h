@@ -51,6 +51,11 @@ namespace MGF3D
 
 		T** GetData() { return m_data.data(); }
 		usize GetSize() const { return m_data.size(); }
+
+	public:
+		T* operator[](usize index);
+		const T* operator[](usize index) const;
+		bool IsEmpty() const { return m_data.empty(); }
 	};
 }
 

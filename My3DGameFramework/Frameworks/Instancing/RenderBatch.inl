@@ -13,6 +13,8 @@ namespace MGF3D
 	)
 	{
 		if (m_instances.empty() || !m_mesh || !m_material) return;
+		MGF_ASSERT(m_mesh->GetState() == EResourceState::Ready, "Mesh must be 'ready' state here.");
+		MGF_ASSERT(m_material->GetState() == EResourceState::Ready, "Material must be 'ready' state here.");
 
 		// 1. 머티리얼 또는 오버라이드 셰이더 바인딩
 		if (overrideProgram != nullptr) overrideProgram->Use();

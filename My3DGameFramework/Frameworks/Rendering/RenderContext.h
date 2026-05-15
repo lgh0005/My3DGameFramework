@@ -13,6 +13,7 @@
 namespace MGF3D
 {
 	MGF_CLASS_PTR(Camera)
+	MGF_CLASS_PTR(SkyLight)
 	MGF_CLASS_PTR(GLUniformBuffer)
 	MGF_CLASS_PTR(GLShaderStorageBuffer)
 	MGF_CLASS_PTR(GLTexture2D)
@@ -54,6 +55,8 @@ namespace MGF3D
 		void UpdateGlobals(const GlobalData& globalData);
 		void SetCurrentCamera(const Camera* camera) { m_currentCamera = camera; }
 		const Camera* GetCurrentCamera() const { return m_currentCamera; }
+		void SetMainSkyLight(const SkyLight* skyLight) { m_mainSkyLight = skyLight; }
+		const SkyLight* GetMainSkyLight() const { return m_mainSkyLight; }
 		
 		void UpdateDirectionalLights(const Vector<DirectionalLightData>& lights);
 		void UpdatePointLights(const Vector<PointLightData>& lights);
@@ -100,6 +103,7 @@ namespace MGF3D
 	private:
 		// 전역 설정 대상들
 		const Camera* m_currentCamera{ nullptr };
+		const SkyLight* m_mainSkyLight{ nullptr };
 		GLUniformBufferUPtr m_globalUBO;
 		RenderQueue<StaticInstanceData>  m_staticQueue;
 		RenderQueue<SkinnedInstanceData> m_skinnedQueue;
@@ -131,7 +135,6 @@ namespace MGF3D
 
 		// 기타 텍스쳐 캐시 (SSAO, 그림자 등)
 		Vector<GLTexture2DPtr> m_cachedTextures;
-
 		GLTexture2DArrayPtr m_dirShadowMapArray;
 		GLTextureCubeArrayPtr m_pointShadowMapArray;
 		GLTexture2DArrayPtr m_spotShadowMapArray;

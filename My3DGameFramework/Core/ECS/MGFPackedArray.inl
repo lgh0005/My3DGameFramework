@@ -164,4 +164,16 @@ namespace MGF3D
 	{
 		return m_entityToIndex.find(id) != m_entityToIndex.end();
 	}
+
+	template<typename T>
+	T* MGFPackedArray<T>::operator[](usize index)
+	{
+		return m_data[index];
+	}
+
+	template<typename T>
+	const T* MGFPackedArray<T>::operator[](usize index) const
+	{
+		return m_data[index];
+	}
 }

@@ -6,6 +6,7 @@
 #include "Managers/TimeManager.h"
 #include "Components/Transform.h"
 #include "Components/Camera.h"
+#include "Components/Lights/SkyLight.h"
 #include "Components/Lights/DirectionalLight.h"
 #include "Components/Lights/PointLight.h"
 #include "Components/Lights/SpotLight.h"
@@ -26,7 +27,7 @@ namespace MGF3D
 		m_spotShadows.clear();
 	}
 
-	void RenderCollector::CollectGlobals(RenderContext* context, const Camera* camera)
+	void RenderCollector::CollectGlobals(RenderContext* context, const Camera* camera, const SkyLight* skyLight)
 	{
 		if (!camera || !context) return;
 
@@ -49,6 +50,7 @@ namespace MGF3D
 
 		context->UpdateGlobals(globalData);
 		context->SetCurrentCamera(camera);
+		context->SetMainSkyLight(skyLight);
 	}
 
 	void RenderCollector::CollectMeshData(RenderContext* context, const Camera* camera)

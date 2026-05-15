@@ -5,6 +5,9 @@ namespace MGF3D
 	template<typename T, usize ChunkSize>
 	class MGFChunk
 	{
+		MGF_DISABLE_COPY(MGFChunk)
+		MGF_DISABLE_MOVE(MGFChunk)
+
 	public:
 		MGFChunk();
 		~MGFChunk();

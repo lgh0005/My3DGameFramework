@@ -6,7 +6,10 @@ namespace MGF3D
 {
 	GPUWorker::GPUWorker(TaskQueue& queue, MGFWindowUPtr sharedWindow)
 		: Super(queue), m_sharedWindow(std::move(sharedWindow)) { }
-	GPUWorker::~GPUWorker() = default;
+	GPUWorker::~GPUWorker()
+	{
+		Join();
+	}
 
 	void GPUWorker::Run()
 	{

@@ -10,6 +10,7 @@ namespace MGF3D
 	{
 		{
 			LockScope lock(m_mutex);
+			if (m_bStop) return;
 			m_tasks.push_back(std::move(task));
 		}
 		m_cv.notify_one();

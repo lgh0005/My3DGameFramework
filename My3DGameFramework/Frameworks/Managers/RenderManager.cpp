@@ -7,6 +7,7 @@
 #include "Rendering/RenderContext.h"
 #include "Rendering/RenderCollector.h"
 #include "Components/Camera.h"
+#include "Components/Lights/SkyLight.h"
 
 namespace MGF3D
 {
@@ -29,6 +30,10 @@ namespace MGF3D
 		auto* cameraRegistry = MGF_ENTITY.GetComponentRegistry<Camera>();
 		if (!cameraRegistry) return;
 
+		// 2. 하늘 컴포넌트 레지스트리 가져오기
+		auto* skyLightRegistry = MGF_ENTITY.GetComponentRegistry<SkyLight>();
+		if (!skyLightRegistry) return;
+
 		// 2. 렌더링 데이터 수집기 초기화
 		m_renderCollector->Clear();
 		
@@ -36,13 +41,15 @@ namespace MGF3D
 		m_renderCollector->CollectDirectionalLights(m_renderContext.get());
 		m_renderCollector->CollectPointLights(m_renderContext.get());
 		m_renderCollector->CollectSpotLights(m_renderContext.get());
+		auto& skies = skyLightRegistry->GetComponents();
+		const SkyLight* mainSkyLight = skies.IsEmpty() ? nullptr : skies[0];
 
 		// 3. 카메라 순회
 		const auto& cameras = cameraRegistry->GetComponents();
 		for (const auto* camera : cameras)
 		{
 			// 3-1. 현재 카메라의 렌더링 데이터 수집
-			m_renderCollector->CollectGlobals(m_renderContext.get(), camera);
+			m_renderCollector->CollectGlobals(m_renderContext.get(), camera, mainSkyLight);
 
 			// 3-2. 씬의 엔티티들로부터 메쉬 및 인스턴스 데이터 추출
 			m_renderCollector->CollectMeshData(m_renderContext.get(), camera);

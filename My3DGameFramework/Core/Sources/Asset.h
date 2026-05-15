@@ -42,11 +42,11 @@ namespace MGF3D
 	//==================================*/
 	public:
 		EAssetState GetState() const;
-		void SetState(EAssetState state) { m_state = state; }
+		void SetState(EAssetState state) { m_state.store(state, std::memory_order_release); };
 
 	protected:
 		String m_path;
-		EAssetState m_state	{ EAssetState::Empty };
+		Atomic<EAssetState> m_state	{ EAssetState::Empty };
 		Vector<ResourcePtr> m_resources;
 	};
 }

@@ -34,12 +34,12 @@ namespace MGF3D
 
 	void ThreadManager::Shutdown()
 	{
-		// 1. 영업 종료 선언 (모든 큐 정지 및 대기 중인 스레드 기상)
+		// CPU 먼저 완전히 정리
 		m_cpuQueue.Stop();
-		m_gpuQueue.Stop();
-
-		// 2. 스레드 소멸 (소멸자에서 Join 호출됨)
 		m_cpuWorkers.clear();
+
+		// 이제 GPU 큐로 들어올 신규 푸시 없음
+		m_gpuQueue.Stop();
 		m_gpuWorkers.clear();
 	}
 

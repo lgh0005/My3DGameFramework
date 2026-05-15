@@ -10,6 +10,7 @@ namespace MGF3D
 {
 	MGF_CLASS_PTR(RenderContext)
 	MGF_CLASS_PTR(Camera)
+	MGF_CLASS_PTR(SkyLight)
 
 	MGF_CLASS_PTR(RenderCollector)
 	class RenderCollector
@@ -19,7 +20,7 @@ namespace MGF3D
 		~RenderCollector();
 
 	public:
-		void CollectGlobals(RenderContext* context, const Camera* camera);
+		void CollectGlobals(RenderContext* context, const Camera* camera, const SkyLight* skyLight);
 		void CollectMeshData(RenderContext* context, const Camera* camera);
 	
 		void CollectDirectionalLights(RenderContext* context);

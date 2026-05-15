@@ -57,9 +57,9 @@ namespace MGF3D
 
 	void Material::Bind() const
 	{
-		if (m_state != EResourceState::Ready || !m_materialBuffer) return;
+		if (GetState() != EResourceState::Ready || !m_materialBuffer) return;
 
-		// 2. 래퍼 클래스를 이용한 데이터 업데이트 및 바인딩
+		// 1. 래퍼 클래스를 이용한 데이터 업데이트 및 바인딩
 		MaterialData data;
 		data.albedoFactor = albedoFactor;
 		data.emissiveFactor = emissiveFactor;
@@ -78,9 +78,15 @@ namespace MGF3D
 		{
 			bool success = false;
 			const auto& image = m_images[i];
+			if (!image) continue;
 
 			// 에셋이 있고, 로드가 완료된 상태인지 확인
-			if (image && image->GetState() >= EAssetState::Loaded)
+			auto imgState = image->GetState();
+			bool imgUsable = image &&
+				imgState != EAssetState::Empty &&
+				imgState != EAssetState::Loading &&
+				imgState != EAssetState::Failed;
+			if (image && imgUsable)
 			{
 				const auto& resources = image->GetResources();
 				if (!resources.empty())

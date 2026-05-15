@@ -30,15 +30,16 @@ namespace MGF3D
 	public:
 		// GPU 컨텍스트 스레드에서 호출되어 실제 GPU 핸들(VAO, TextureID 등)을 생성함
 		virtual bool OnSyncCreate() = 0;
+		bool TryBeginSync();
 
 	/*==================================//
 	//         State Management         //
 	//==================================*/
 	public:
-		EResourceState GetState() const { return m_state; }
-		void SetState(EResourceState state) { m_state = state; }
+		EResourceState GetState() const { return m_state.load(std::memory_order_acquire); }
+		void SetState(EResourceState state) { m_state.store(state, std::memory_order_release); }
 
 	protected:
-		EResourceState m_state{ EResourceState::Empty };
+		Atomic<EResourceState> m_state{ EResourceState::Empty };
 	};
 }

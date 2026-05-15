@@ -11,8 +11,34 @@ namespace MGF3D
 		m_skyCube->SetOwner(this);
 	}
 	SkyLight::~SkyLight() = default;
-	SkyLight::SkyLight(SkyLight&& other) noexcept = default;
-	SkyLight& SkyLight::operator=(SkyLight&& other) noexcept = default;
+	SkyLight::SkyLight(SkyLight&& other) noexcept
+		: Super(std::move(other)),
+		m_skyCube(std::move(other.m_skyCube)),
+		m_isMainSkyLight(other.m_isMainSkyLight),
+		m_intensity(other.m_intensity),
+		m_tint(other.m_tint),
+		m_rotation(other.m_rotation),
+		m_maxReflectionLod(other.m_maxReflectionLod)
+	{
+		if (m_skyCube != nullptr) m_skyCube->SetOwner(this);
+	}
+	SkyLight& SkyLight::operator=(SkyLight&& other) noexcept
+	{
+		if (this != &other)
+		{
+			Super::operator=(std::move(other));
+
+			m_skyCube = std::move(other.m_skyCube);
+			m_isMainSkyLight = other.m_isMainSkyLight;
+			m_intensity = other.m_intensity;
+			m_tint = other.m_tint;
+			m_rotation = other.m_rotation;
+			m_maxReflectionLod = other.m_maxReflectionLod;
+
+			if (m_skyCube != nullptr) m_skyCube->SetOwner(this);
+		}
+		return *this;
+	}
 
 	/*================================//
 	//   MGF3D Component Custom Type  //
