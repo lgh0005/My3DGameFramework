@@ -12,6 +12,7 @@ set(LIB_TEST_SOURCE
 
     # Scripts
     "Assets/Scripts/CameraController.h"     "Assets/Scripts/CameraController.cpp"
+    "Assets/Scripts/PlayerController.h"     "Assets/Scripts/PlayerController.cpp"
 )
 
 # 2. Visual Studio 필터 자동 생성

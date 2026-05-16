@@ -1,6 +1,8 @@
 #include "GamePch.h"
 #include "SampleScene.h"
+
 #include "Assets/Scripts/CameraController.h"
+#include "Assets/Scripts/PlayerController.h"
 
 namespace MGF3D
 {
@@ -27,7 +29,8 @@ namespace MGF3D
 		MGF_ASSET.LoadAssetAsync<Model>("@GameAsset/Models/backpack/backpack.mymodel");
 		
 		MGF_ASSET.LoadAssetAsync<Model>("@GameAsset/pbrtester/aliensoldier.mymodel");
-		MGF_ASSET.LoadAssetAsync<Animation>("@GameAsset/Models/aliensoldier/Hip Hop Dancing.myanim");
+		MGF_ASSET.LoadAssetAsync<Animation>("@GameAsset/Models/aliensoldier/Idle.myanim");
+		MGF_ASSET.LoadAssetAsync<Animation>("@GameAsset/Models/aliensoldier/Walking.myanim");
 
 		auto sky = MGF_RESOURCE.GetOrCreate<EnvironmentMap>("Sky");
 		sky->SetCubeTexture(MGF_ASSET.LoadAssetAsync<Image>("@GameAsset/Images/mirrored_hall_4k.ktx"));
@@ -80,7 +83,7 @@ namespace MGF3D
 		//spotLight->SetSpotAngles(12.5f, 17.5f);
 		//spotLight->SetCastShadow(true);
 
-		//// 4. 객체 생성 [디렉셔널 라이트]
+		// 4. 객체 생성 [디렉셔널 라이트]
 		ObjectIDHash lightID2 = Entities::Create("dirLight");
 		auto* lightTransform2 = Entities::AddComponent<Transform>(lightID2);
 		auto* dirLight = Entities::AddComponent<DirectionalLight>(lightID2);
@@ -110,16 +113,13 @@ namespace MGF3D
 		// 6. AilenSoldier
 		auto soldier = MGF_ASSET.GetAsset<Model>("@GameAsset/pbrtester/aliensoldier.mymodel");
 		ObjectIDHash soldierID = soldier->Instantiate("Soldier");
+		Scripts::AddScript<PlayerController>(soldierID);
 		auto* soldierTransform = Entities::GetComponent<Transform>(soldierID);
 		soldierTransform->SetLocalPosition(vec3(0.0f, -0.7f, 0.0f));
-		soldierTransform->SetLocalRotation(vec3(0.0f, 90.0f, 0.0f));
+		soldierTransform->SetLocalRotation(vec3(0.0f, 0.0f, 0.0f));
 		soldierTransform->SetLocalScale(vec3(0.02f));
 
-		auto danceAsset = MGF_ASSET.GetAsset<Animation>("@GameAsset/Models/aliensoldier/Hip Hop Dancing.myanim");
 		auto animController = MakeUnique<AnimController>(nullptr);
-		animController->AddState("Dance", danceAsset, true, 1.0f);
-		animController->SetStartState(StringHash("Dance"));
-		animController->Play(StringHash("Dance"));
 		Entities::AddComponent<Animator>(soldierID, soldier, std::move(animController));
 
 		// 7. Sky
