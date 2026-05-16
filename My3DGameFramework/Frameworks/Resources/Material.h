@@ -37,6 +37,7 @@ namespace MGF3D
 
 	public:
 		void Bind() const;
+		static void Unbind();
 		void SetTexture(ETextureSlot slot, const ImagePtr& image);
 		ImagePtr GetTexture(ETextureSlot slot) const;
 
@@ -48,7 +49,6 @@ namespace MGF3D
 		void SetAlbedoFactor(const vec4& factor) { albedoFactor = factor; }
 		void SetEmissionStrength(float strength) { emissionStrength = strength; }
 		void SetEmissiveFactor(const vec3& factor) { emissiveFactor = factor; }
-		void SetShininess(float value) { shininess = value; }
 		void SetHeightScale(float scale) { heightScale = scale; }
 		void SetMetallicFactor(float factor) { metallicFactor = factor; }
 		void SetRoughnessFactor(float factor) { roughnessFactor = factor; }
@@ -57,7 +57,6 @@ namespace MGF3D
 		const vec4& GetAlbedoFactor() const { return albedoFactor; }
 		float       GetEmissionStrength() const { return emissionStrength; }
 		const vec3& GetEmissiveFactor() const { return emissiveFactor; }
-		float       GetShininess() const { return shininess; }
 		float       GetHeightScale() const { return heightScale; }
 		float       GetMetallicFactor() const { return metallicFactor; }
 		float       GetRoughnessFactor() const { return roughnessFactor; }
@@ -66,10 +65,9 @@ namespace MGF3D
 		vec4  albedoFactor{ 1.0f, 1.0f, 1.0f, 1.0f };
 		float emissionStrength{ 1.0f };
 		vec3  emissiveFactor{ 0.0f, 0.0f, 0.0f };
-		float shininess			{ 32.0f };
 		float heightScale		{ 1.0f };
 		float metallicFactor{ 1.0f };
-		float roughnessFactor{ 1.0f };
+		float roughnessFactor{ 0.5f };
 
 	private:
 		Material(StringView name);

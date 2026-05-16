@@ -12,6 +12,9 @@ set(SOURCES
     # Module
     "FrameworkModule.h"     "FrameworkModule.cpp"
 
+    # FrameworkUtils
+    "FrameworkUtils/MaterialUtils.h"    "FrameworkUtils/MaterialUtils.cpp"
+
     # Managers
     "Managers/AnimationManager.h"    "Managers/AnimationManager.cpp"
     "Managers/AssetManager.h"       "Managers/AssetManager.cpp"      "Managers/AssetManager.inl"

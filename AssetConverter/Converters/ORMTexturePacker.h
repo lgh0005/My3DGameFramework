@@ -45,7 +45,8 @@ namespace MGF3D
         uint8 GetPixelChannel
         (
             const RawImage& img,
-            int32 px, int32 py
+            int32 px, int32 py,
+            int32 channelOffset
         );
     };
 }

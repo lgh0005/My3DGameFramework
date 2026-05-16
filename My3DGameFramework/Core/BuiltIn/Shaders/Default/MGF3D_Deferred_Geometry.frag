@@ -26,12 +26,14 @@ layout(std140, binding = 0) uniform SceneGlobalBuffer
 layout(std140, binding = 2) uniform MaterialBlock 
 {
     vec4  albedoFactor;
+
     vec3  emissiveFactor;
     float emissionStrength; 
-    float shininess;
+
     float heightScale;
     float metallicFactor;
     float roughnessFactor;
+    float pad;
 };
 
 layout(binding = 0) uniform sampler2D uAlbedoMap;
@@ -50,22 +52,22 @@ void main()
 
     // 2. Normal
     vec3 normalSample = texture(uNormalMap, vTexCoord).rgb;
-    normalSample = normalize(normalSample * 2.0 - 1.0); 
+    normalSample = normalize(normalSample * 2.0 - 1.0);
     vec3 N = normalize(vTBN * normalSample);
 
     // 3. PBR 파라미터 구성
-    float ao = 1.0; 
-    float specFactor = texture(uSpecularMap, vTexCoord).r;
+    vec3 orm = texture(uORMMap, vTexCoord).rgb;
+    float ao        = orm.r; 
+    float roughness = orm.g;
+    float metallic  = orm.b;
 
     // 4. Emission
     vec3 emission = texture(uEmissionMap, vTexCoord).rgb * emissiveFactor * emissionStrength;
 
     // 5. G-Buffer 출력
     gPositionAO      = vec4(vWorldPos, ao);
-    gNormalRoughness = vec4(N, shininess);
-    gAlbedoMetallic  = vec4(albedo, specFactor);
+    gNormalRoughness = vec4(N, roughness);
+    gAlbedoMetallic  = vec4(albedo, metallic);
     gEmission        = vec4(emission, 1.0);
-
-    // 6. 모션 벡터 처리 보류 (안전한 빈 값 출력)
     gVelocity = vec2(0.0);
 }

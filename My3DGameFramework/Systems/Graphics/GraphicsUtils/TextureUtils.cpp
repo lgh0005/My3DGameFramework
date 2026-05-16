@@ -1,10 +1,6 @@
 #include "GraphicsPch.h"
 #include "TextureUtils.h"
 
-// TODO : 이후에 MathUtils으로 대체 필요
-#include <algorithm>
-#include <cmath>
-
 namespace MGF3D
 {
 	uint32 TextureUtils::MapVkFormatToGLInternal(uint32 vkFormat)
@@ -93,7 +89,7 @@ namespace MGF3D
 	uint32 TextureUtils::CalculateMaxMipLevels(uint32 width, uint32 height)
 	{
 		if (width == 0 || height == 0) return 0;
-		uint32 maxSide = std::max(width, height);
+		uint32 maxSide = Math::Max(width, height);
 		return static_cast<uint32>(std::floor(std::log2(static_cast<float>(maxSide)))) + 1;
 	}
 

@@ -8,14 +8,18 @@ layout(location = 0) in vec2 vTexCoord;
 // G-Buffer Samplers
 // --------------------------------------------------------
 layout(binding = 0) uniform sampler2D gPositionAO;
-layout(binding = 1) uniform sampler2D gNormalRoughness; // .a 채널에 shininess 저장됨
-layout(binding = 2) uniform sampler2D gAlbedoMetallic;  // .a 채널에 specFactor 저장됨
+layout(binding = 1) uniform sampler2D gNormalRoughness;
+layout(binding = 2) uniform sampler2D gAlbedoMetallic;
 layout(binding = 3) uniform sampler2D gEmission;
 // layout(binding = 4) uniform sampler2D gVelocity;
 layout(binding = 5) uniform sampler2D gSSAO;
 layout(binding = 6) uniform sampler2DArray gShadowMapDir;
 layout(binding = 7) uniform samplerCubeArray gShadowMapPoint;
 layout(binding = 8) uniform sampler2DArray gShadowMapSpot;
+
+layout(binding = 9) uniform samplerCube irradianceMap;
+layout(binding = 10) uniform samplerCube prefilterMap;
+layout(binding = 11) uniform sampler2D brdfLUT;
 
 // --------------------------------------------------------
 // Scene & Light Uniforms
@@ -31,6 +35,8 @@ layout(std140, binding = 0) uniform SceneGlobalBuffer
     int spotLightCount;
     int pad1;
 } uScene;
+
+const float PI = 3.14159265359;
 
 struct DirectionalLight { vec4 direction; vec4 color; int shadowIndex; int pad1; int pad2; int pad3; };
 struct PointLight       { vec4 position;  vec4 color; int shadowIndex; int pad1; int pad2; int pad3; };
@@ -51,7 +57,6 @@ layout(std430, binding = 8) readonly buffer SpotShadowBuffer  { SpotShadowData s
 // --------------------------------------------------------
 // 3. Shadow Calculation Functions
 // --------------------------------------------------------
-
 // Directional Light (CSM) 그림자 계산
 float CalcDirShadow(int shadowIndex, vec3 fragPosWorld, vec3 normal, vec3 lightDir)
 {
@@ -169,8 +174,75 @@ float CalcSpotShadow(int shadowIndex, vec3 fragPosWorld, vec3 normal, vec3 light
 }
 
 // --------------------------------------------------------
+// PBR Functions
+// --------------------------------------------------------
+float DistributionGGX(vec3 N, vec3 H, float roughness)
+{
+    float a = roughness * roughness;
+    float a2 = a * a;
+    float NdotH = max(dot(N, H), 0.0);
+    float NdotH2 = NdotH * NdotH;
+
+    float nom   = a2;
+    float denom = (NdotH2 * (a2 - 1.0) + 1.0);
+    denom = PI * denom * denom;
+
+    return nom / max(denom, 0.0000001);
+}
+
+float GeometrySchlickGGX(float NdotV, float roughness)
+{
+    float r = (roughness + 1.0);
+    float k = (r * r) / 8.0;
+
+    float nom   = NdotV;
+    float denom = NdotV * (1.0 - k) + k;
+
+    return nom / denom;
+}
+
+float GeometrySmith(vec3 N, vec3 V, vec3 L, float roughness)
+{
+    float NdotV = max(dot(N, V), 0.0);
+    float NdotL = max(dot(N, L), 0.0);
+    float ggx2 = GeometrySchlickGGX(NdotV, roughness);
+    float ggx1 = GeometrySchlickGGX(NdotL, roughness);
+
+    return ggx1 * ggx2;
+}
+
+vec3 fresnelSchlick(float cosTheta, vec3 F0)
+{
+    return F0 + (1.0 - F0) * pow(clamp(1.0 - cosTheta, 0.0, 1.0), 5.0);
+}
+
+vec3 fresnelSchlickRoughness(float cosTheta, vec3 F0, float roughness)
+{
+    return F0 + (max(vec3(1.0 - roughness), F0) - F0) * pow(clamp(1.0 - cosTheta, 0.0, 1.0), 5.0);
+}
+
+// --------------------------------------------------------
 // Lighting Functions (포워드 렌더링과 동일한 공식 적용)
 // --------------------------------------------------------
+vec3 CalcPBRLight(vec3 lightDir, vec3 lightColor, vec3 normal, vec3 viewDir, vec3 albedo, float roughness, float metallic, vec3 F0)
+{
+    vec3 H = normalize(viewDir + lightDir);
+    float NDF = DistributionGGX(normal, H, roughness);   
+    float G   = GeometrySmith(normal, viewDir, lightDir, roughness);      
+    vec3 F    = fresnelSchlick(max(dot(H, viewDir), 0.0), F0);
+       
+    vec3 numerator    = NDF * G * F; 
+    float denominator = 4.0 * max(dot(normal, viewDir), 0.0) * max(dot(normal, lightDir), 0.0) + 0.0001;
+    vec3 specular     = numerator / denominator;
+    
+    vec3 kS = F;
+    vec3 kD = vec3(1.0) - kS;
+    kD *= 1.0 - metallic;	  
+    
+    float NdotL = max(dot(normal, lightDir), 0.0);        
+    return (kD * albedo / PI + specular) * lightColor * NdotL;
+}
+
 vec3 CalcDirLight(DirectionalLight light, vec3 normal, vec3 fragPos, vec3 viewDir, vec3 albedo, float specFactor, float shininess)
 {
     vec3 lightDir = normalize(-light.direction.xyz);
@@ -239,7 +311,7 @@ vec3 CalcSpotLight(SpotLight light, vec3 normal, vec3 fragPos, vec3 viewDir, vec
     return (diffuse + specular) * attenuation * intensity * (1.0 - shadow) * light.color.a;
 }
 
-void main() 
+void main()
 {
     // 1. G-Buffer 데이터 언패킹 (Unpacking)
     vec4 dataPosAO      = texture(gPositionAO, vTexCoord);
@@ -249,34 +321,89 @@ void main()
 
     vec3 fragPos    = dataPosAO.xyz;
     float ao        = dataPosAO.a * texture(gSSAO, vTexCoord).r;
-    vec3 normal     = dataNormRough.xyz;
+    vec3 normal     = normalize(dataNormRough.xyz);
     
-    // G-Buffer의 Alpha 채널에서 기존 방식의 파라미터를 꺼내옵니다.
-    float shininess = dataNormRough.a;
-    vec3 albedo     = dataAlbMetal.rgb;
-    float specFactor= dataAlbMetal.a;
-    vec3 emission   = dataEmission.rgb;
-
     // 만약 배경(빈 공간)이라면 렌더링하지 않음
     if (dot(normal, normal) < 0.1) 
         discard;
 
-    // 2. 공통 계산
-    vec3 viewDir = normalize(uScene.viewPos - fragPos);
-    vec3 ambient = albedo * 0.05 * ao;
+    // 2. PBR 파라미터 및 공통 계산 
+    // (이제 shininess, specFactor라는 단어는 엔진에서 완전히 퇴출되었습니다!)
+    vec3 viewDir    = normalize(uScene.viewPos - fragPos);
+    vec3 albedo     = dataAlbMetal.rgb;
+    float roughness = clamp(dataNormRough.a, 0.05, 1.0); // 0.0 방지용 최소값 0.05
+    float metallic  = clamp(dataAlbMetal.a,  0.0,  1.0);
+    vec3 emission   = dataEmission.rgb;
+
+    // 기본 반사율 계산
+    vec3 F0 = mix(vec3(0.04), albedo, metallic);
+    vec3 R = reflect(-viewDir, normal);
+
+    // IBL (Image-Based Lighting) Ambient 연산 시작
+    vec3 F = fresnelSchlickRoughness(max(dot(normal, viewDir), 0.0), F0, roughness);
+    vec3 kS = F;
+    vec3 kD = 1.0 - kS;
+    kD *= 1.0 - metallic;
+
+    // a. Diffuse IBL (Irradiance Map)
+    vec3 irradiance = texture(irradianceMap, normal).rgb;
+    vec3 diffuse    = irradiance * albedo;
+
+    // b. Specular IBL (Prefilter Map + BRDF LUT)
+    const float MAX_REFLECTION_LOD = 4.0; // 생성된 프리필터 맵의 최대 Mip 단계
+    vec3 prefilteredColor = textureLod(prefilterMap, R, roughness * MAX_REFLECTION_LOD).rgb;    
+    vec2 brdf  = texture(brdfLUT, vec2(max(dot(normal, viewDir), 0.0), roughness)).rg;
+    vec3 specularIBL = prefilteredColor * (F * brdf.x + brdf.y);
+
+    // 최종 Ambient (주변광) 도출
+    vec3 ambient = (kD * diffuse + specularIBL) * ao;
+
     vec3 resultColor = ambient;
+     for (int i = 0; i < uScene.dirLightCount; ++i)
+    {
+        vec3 lightDir = normalize(-dirLights[i].direction.xyz);
+        float shadow  = CalcDirShadow(dirLights[i].shadowIndex, fragPos, normal, lightDir);
+        vec3 radiance = dirLights[i].color.rgb * dirLights[i].color.a;
+        resultColor  += CalcPBRLight(lightDir, radiance, normal, viewDir, albedo, roughness, metallic, F0)
+                        * (1.0 - shadow);
+    }
 
-    // 3. 조명 누적 계산 (인자 수정 반영)
-    for(int i = 0; i < uScene.dirLightCount; ++i)
-        resultColor += CalcDirLight(dirLights[i], normal, fragPos, viewDir, albedo, specFactor, shininess);
+    for (int i = 0; i < uScene.pointLightCount; ++i)
+    {
+        vec3 lightVec = pointLights[i].position.xyz - fragPos;
+        float dist    = length(lightVec);
+        float range   = pointLights[i].position.w;
+        if (dist > range) continue;
 
-    for(int i = 0; i < uScene.pointLightCount; ++i)
-        resultColor += CalcPointLight(pointLights[i], normal, fragPos, viewDir, albedo, specFactor, shininess);
+        vec3  lightDir  = normalize(lightVec);
+        float atten     = clamp(1.0 - (dist * dist) / (range * range), 0.0, 1.0);
+        atten          *= atten;
+        float shadow    = CalcPointShadow(pointLights[i].shadowIndex, fragPos, pointLights[i].position.xyz);
+        vec3  radiance  = pointLights[i].color.rgb * pointLights[i].color.a * atten;
+        resultColor    += CalcPBRLight(lightDir, radiance, normal, viewDir, albedo, roughness, metallic, F0)
+                          * (1.0 - shadow);
+    }
 
-    for(int i = 0; i < uScene.spotLightCount; ++i)
-        resultColor += CalcSpotLight(spotLights[i], normal, fragPos, viewDir, albedo, specFactor, shininess);
+    for (int i = 0; i < uScene.spotLightCount; ++i)
+    {
+        vec3  lightVec  = spotLights[i].position.xyz - fragPos;
+        float dist      = length(lightVec);
+        float range     = spotLights[i].position.w;
+        if (dist > range) continue;
 
-    // 4. 에미션 적용
+        vec3  lightDir  = normalize(lightVec);
+        float atten     = clamp(1.0 - (dist * dist) / (range * range), 0.0, 1.0);
+        atten          *= atten;
+        float theta     = dot(lightDir, normalize(-spotLights[i].direction.xyz));
+        float epsilon   = max(spotLights[i].params.x - spotLights[i].params.y, 0.0001);
+        float intensity = clamp((theta - spotLights[i].params.y) / epsilon, 0.0, 1.0);
+        float shadow    = CalcSpotShadow(spotLights[i].shadowIndex, fragPos, normal, lightDir);
+        vec3  radiance  = spotLights[i].color.rgb * spotLights[i].color.a * atten * intensity;
+        resultColor    += CalcPBRLight(lightDir, radiance, normal, viewDir, albedo, roughness, metallic, F0)
+                          * (1.0 - shadow);
+    }
+
+    // 5. emission
     resultColor += emission;
 
     FragColor = vec4(resultColor, 1.0);

@@ -3,6 +3,7 @@
 #include "Managers/TypeManager.h"
 #include "Assets/Image.h"
 #include "Textures/GLTextureHandle.h"
+#include "Textures/GLTexture2D.h"
 #include "Buffers/GLUniformBuffer.h"
 
 namespace MGF3D
@@ -64,7 +65,6 @@ namespace MGF3D
 		data.albedoFactor = albedoFactor;
 		data.emissiveFactor = emissiveFactor;
 		data.emissionStrength = emissionStrength;
-		data.shininess = shininess;
 		data.heightScale = heightScale;
 		data.metallicFactor = metallicFactor;
 		data.roughnessFactor = roughnessFactor;
@@ -78,15 +78,8 @@ namespace MGF3D
 		{
 			bool success = false;
 			const auto& image = m_images[i];
-			if (!image) continue;
 
-			// 에셋이 있고, 로드가 완료된 상태인지 확인
-			auto imgState = image->GetState();
-			bool imgUsable = image &&
-				imgState != EAssetState::Empty &&
-				imgState != EAssetState::Loading &&
-				imgState != EAssetState::Failed;
-			if (image && imgUsable)
+			if (image)
 			{
 				const auto& resources = image->GetResources();
 				if (!resources.empty())
@@ -100,7 +93,29 @@ namespace MGF3D
 				}
 			}
 
-			if (!success) GLTextureHandle::Unbind(i);
+			if (!success)
+			{
+				ETextureSlot slot = static_cast<ETextureSlot>(i);
+				switch (slot)
+				{
+				case ETextureSlot::Albedo:
+					MaterialUtils::GetDefaultAlbedo()->Bind(i);
+					break;
+				case ETextureSlot::Normal:
+					MaterialUtils::GetDefaultNormal()->Bind(i);
+					break;
+				case ETextureSlot::ORM:
+					MaterialUtils::GetDefaultORM()->Bind(i);
+					break;
+				case ETextureSlot::Emission:
+					MaterialUtils::GetDefaultEmission()->Bind(i);
+					break;
+				default:
+					// Specular, Height 등 더미가 정의되지 않은 슬롯은 안전하게 Unbind 처리
+					GLTextureHandle::Unbind(i);
+					break;
+				}
+			}
 		}
 	}
 }

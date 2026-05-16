@@ -26,8 +26,8 @@ namespace MGF3D
 
 		MGF_ASSET.LoadAssetAsync<Model>("@GameAsset/Models/backpack/backpack.mymodel");
 		
-		MGF_ASSET.LoadAssetAsync<Model>("@GameAsset/Models/test/aliensoldier.mymodel");
-		MGF_ASSET.LoadAssetAsync<Animation>("@GameAsset/Models/test/Hip Hop Dancing.myanim");
+		MGF_ASSET.LoadAssetAsync<Model>("@GameAsset/pbrtester/aliensoldier.mymodel");
+		MGF_ASSET.LoadAssetAsync<Animation>("@GameAsset/Models/aliensoldier/Hip Hop Dancing.myanim");
 
 		auto sky = MGF_RESOURCE.GetOrCreate<EnvironmentMap>("Sky");
 		sky->SetCubeTexture(MGF_ASSET.LoadAssetAsync<Image>("@GameAsset/Images/mirrored_hall_4k.ktx"));
@@ -69,26 +69,26 @@ namespace MGF3D
 		cubeTransform2->SetLocalPosition(vec3(1.5f, -0.25f, 0.0f));
 
 		// 4. 객체 생성 [스폿 라이트]
-		ObjectIDHash lightID = Entities::Create("spotLight");
-		auto* lightTransform = Entities::AddComponent<Transform>(lightID);
-		auto* spotLight = Entities::AddComponent<SpotLight>(lightID);
-		lightTransform->SetLocalPosition(vec3(0.0f, 12.0f, 0.0f));
-		lightTransform->SetLocalRotation(vec3(-90.0f, 0.0f, 0.0f));
-		spotLight->SetColor(vec3(0.9f, 0.6f, 1.0f));
-		spotLight->SetIntensity(2.0f);
-		spotLight->SetRange(120);
-		spotLight->SetSpotAngles(12.5f, 17.5f);
-		spotLight->SetCastShadow(true);
+		//ObjectIDHash lightID = Entities::Create("spotLight");
+		//auto* lightTransform = Entities::AddComponent<Transform>(lightID);
+		//auto* spotLight = Entities::AddComponent<SpotLight>(lightID);
+		//lightTransform->SetLocalPosition(vec3(0.0f, 12.0f, 0.0f));
+		//lightTransform->SetLocalRotation(vec3(-90.0f, 0.0f, 0.0f));
+		//spotLight->SetColor(vec3(0.9f, 0.6f, 1.0f));
+		//spotLight->SetIntensity(2.0f);
+		//spotLight->SetRange(120);
+		//spotLight->SetSpotAngles(12.5f, 17.5f);
+		//spotLight->SetCastShadow(true);
 
 		//// 4. 객체 생성 [디렉셔널 라이트]
-		//ObjectIDHash lightID2 = Entities::Create("dirLight");
-		//auto* lightTransform2 = Entities::AddComponent<Transform>(lightID2);
-		//auto* dirLight = Entities::AddComponent<DirectionalLight>(lightID2);
-		//lightTransform2->SetLocalPosition(vec3(1.5f, 3.0f, 5.0f));
-		//lightTransform2->SetLocalRotation(vec3(-45.0f, 30.0f, 0.0f));
-		//dirLight->SetColor(vec3(0.8f, 1.0f, 0.7f));
-		//dirLight->SetIntensity(2.0f);
-		//dirLight->SetCastShadow(true);
+		ObjectIDHash lightID2 = Entities::Create("dirLight");
+		auto* lightTransform2 = Entities::AddComponent<Transform>(lightID2);
+		auto* dirLight = Entities::AddComponent<DirectionalLight>(lightID2);
+		lightTransform2->SetLocalPosition(vec3(1.5f, 3.0f, 5.0f));
+		lightTransform2->SetLocalRotation(vec3(-45.0f, 30.0f, 0.0f));
+		dirLight->SetColor(vec3(1.0f, 1.0f, 1.0f));
+		dirLight->SetIntensity(2.0f);
+		dirLight->SetCastShadow(true);
 
 		// 4. 객체 생성 [포인트 라이트]
 		//ObjectIDHash lightID3 = Entities::Create("PointLight3");
@@ -108,14 +108,14 @@ namespace MGF3D
 		bagTransform->SetLocalScale(vec3(1.0f));
 
 		// 6. AilenSoldier
-		auto soldier = MGF_ASSET.GetAsset<Model>("@GameAsset/Models/test/aliensoldier.mymodel");
+		auto soldier = MGF_ASSET.GetAsset<Model>("@GameAsset/pbrtester/aliensoldier.mymodel");
 		ObjectIDHash soldierID = soldier->Instantiate("Soldier");
 		auto* soldierTransform = Entities::GetComponent<Transform>(soldierID);
 		soldierTransform->SetLocalPosition(vec3(0.0f, -0.7f, 0.0f));
 		soldierTransform->SetLocalRotation(vec3(0.0f, 90.0f, 0.0f));
 		soldierTransform->SetLocalScale(vec3(0.02f));
 
-		auto danceAsset = MGF_ASSET.GetAsset<Animation>("@GameAsset/Models/test/Hip Hop Dancing.myanim");
+		auto danceAsset = MGF_ASSET.GetAsset<Animation>("@GameAsset/Models/aliensoldier/Hip Hop Dancing.myanim");
 		auto animController = MakeUnique<AnimController>(nullptr);
 		animController->AddState("Dance", danceAsset, true, 1.0f);
 		animController->SetStartState(StringHash("Dance"));

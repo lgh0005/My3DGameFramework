@@ -5,6 +5,11 @@
 //==========================*/
 #include "GraphicsPch.h"
 
+/*=================================//
+//    Framework common utilities   //
+//=================================*/
+#include "FrameworkUtils/MaterialUtils.h"
+
 /*===============================//
 //    Framework common defines   //
 //===============================*/

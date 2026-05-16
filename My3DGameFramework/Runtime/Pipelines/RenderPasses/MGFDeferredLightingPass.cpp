@@ -8,9 +8,12 @@
 #include "Graphics/Framebuffers/GLFramebuffer2D.h"
 #include "Rendering/RenderContext.h"
 #include "Textures/GLTexture2D.h"
+#include "Textures/GLTextureCube.h"
 #include "TextureArrays/GLTexture2DArray.h"
 #include "TextureArrays/GLTextureCubeArray.h"
 #include "Meshes/ScreenMesh.h"
+#include "Components/Lights/SkyLight.h"
+#include "Resources/EnvironmentMap.h"
 
 namespace MGF3D
 {
@@ -71,17 +74,26 @@ namespace MGF3D
 		if (albMetalTex)  albMetalTex->Bind(2);
 		if (emissionTex)  emissionTex->Bind(3);
 
-		// 5. 중간 텍스쳐들을 가져와 이어서 바인딩 (SSAO)
+		// 5. SSAO 텍스쳐 바인딩
 		auto ssaoTex = context->GetCachedTexture(ETextureCache::SSAO);
 		if (ssaoTex) ssaoTex->Bind(5);
 
+		// 6. 그림자 맵 텍스쳐 바인딩
 		auto dirShadowMap = context->GetDirectionalShadowMap();
 		auto pointShadowMap = context->GetPointShadowMap();
 		auto spotShadowMap = context->GetSpotShadowMap();
-
 		if (dirShadowMap)   dirShadowMap->Bind(6);
 		if (pointShadowMap) pointShadowMap->Bind(7);
 		if (spotShadowMap)  spotShadowMap->Bind(8);
+
+		// 7. IBL 텍스쳐 바인딩
+		auto envMap = context->GetMainSkyLight()->GetEnvironmentMap();
+		auto irradianceMap = envMap->GetIrradiance();
+		auto prefilterMap = envMap->GetPrefiltered();
+		auto brdfLutMap = envMap->GetBrdfLUT();
+		if (irradianceMap) irradianceMap->Bind(9);
+		if (prefilterMap)  prefilterMap->Bind(10);
+		if (brdfLutMap)    brdfLutMap->Bind(11);
 
 		// 5. 셰이더 활성화
 		m_deferredLightingProgram->Use();

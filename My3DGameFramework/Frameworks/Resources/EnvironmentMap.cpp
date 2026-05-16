@@ -124,12 +124,13 @@ namespace MGF3D
 		uint32 cubeVAO = cubeMesh->GetVertexLayout()->GetHandle();
 		uint32 screenVAO = screenMesh->GetVertexLayout()->GetHandle();
 		uint32 cubeIndexCount = cubeMesh->GetIndexCount();
+		uint32 planeIndexCount = screenMesh->GetIndexCount();
 
 		// 4. 베이킹 단계 수행
 		BakeSkybox(tempFBO, cubeVAO, cubeIndexCount);
 		BakeIrradiance(tempFBO, cubeVAO, cubeIndexCount);
 		BakePrefiltered(tempFBO, bakeUBO, cubeVAO, cubeIndexCount);
-		BakeBRDF(tempFBO, screenVAO, cubeIndexCount);
+		BakeBRDF(tempFBO, screenVAO, planeIndexCount);
 
 		// 5. 임시 자원 파괴
 		glDeleteFramebuffers(1, &tempFBO);
@@ -172,6 +173,7 @@ namespace MGF3D
 	{
 		const int32 res = 32;
 		m_irradiance = MGF_RESOURCE.CreateImmediate<GLTextureCube>(res, GL_RGB16F, 1);
+		m_irradiance->SetFilter(GL_LINEAR, GL_LINEAR);
 
 		glBindFramebuffer(GL_FRAMEBUFFER, fbo);
 		glNamedFramebufferTexture(fbo, GL_COLOR_ATTACHMENT0, m_irradiance->GetHandle(), 0); // DSA 적용
@@ -188,7 +190,8 @@ namespace MGF3D
 	{
 		const int32 baseRes = 512;
 		m_prefiltered = MGF_RESOURCE.CreateImmediate<GLTextureCube>(baseRes, GL_RGB16F, 0);
-		m_prefiltered->GenerateMipmap();
+		m_prefiltered->SetFilter(GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR);
+		glTextureParameteri(m_prefiltered->GetHandle(), GL_TEXTURE_MAX_LEVEL, 4);
 
 		glBindFramebuffer(GL_FRAMEBUFFER, fbo);
 		m_prefilterProgram->Use();
@@ -217,6 +220,8 @@ namespace MGF3D
 	{
 		const int32 res = 512;
 		m_brdf = MGF_RESOURCE.CreateImmediate<GLTexture2D>(res, res, GL_RG16F, 1);
+		m_brdf->SetFilter(GL_LINEAR, GL_LINEAR);
+		m_brdf->SetWrap(GL_CLAMP_TO_EDGE, GL_CLAMP_TO_EDGE);
 
 		glBindFramebuffer(GL_FRAMEBUFFER, fbo);
 		glNamedFramebufferTexture(fbo, GL_COLOR_ATTACHMENT0, m_brdf->GetHandle(), 0);
@@ -225,6 +230,6 @@ namespace MGF3D
 		m_brdfProgram->Use();
 
 		glBindVertexArray(screenVAO);
-		glDrawArrays(GL_TRIANGLES, 0, 6);
+		glDrawElements(GL_TRIANGLES, indexCount, GL_UNSIGNED_INT, nullptr);
 	}
 }

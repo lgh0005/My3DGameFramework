@@ -78,32 +78,32 @@ namespace MGF3D
 			{
 				usize idx = (usize)(y * finalWidth + x) * 4;
 
-				// R: AO (Default 255)
+				// R: AO
 				uint8 r_val = 255;
 				if (ao.IsValid())
 				{
 					int32 srcX = (int32)((float)x / finalWidth * ao.width);
 					int32 srcY = (int32)((float)y / finalHeight * ao.height);
-					r_val = GetPixelChannel(ao, srcX, srcY);
+					r_val = GetPixelChannel(ao, srcX, srcY, 0);
 				}
 
-				// G: Roughness (Default 0)
-				uint8 g_val = 0;
+				// G: Roughness
+				uint8 g_val = 255;
 				if (roughness.IsValid())
 				{
 					int32 srcX = (int32)((float)x / finalWidth * roughness.width);
 					int32 srcY = (int32)((float)y / finalHeight * roughness.height);
-					g_val = GetPixelChannel(roughness, srcX, srcY);
+					g_val = GetPixelChannel(roughness, srcX, srcY, 1);
 					if (invertRoughness) g_val = 255 - g_val;
 				}
 
-				// B: Metallic (Default 0)
-				uint8 b_val = 0;
+				// B: Metallic
+				uint8 b_val = 255;
 				if (metallic.IsValid())
 				{
 					int32 srcX = (int32)((float)x / finalWidth * metallic.width);
 					int32 srcY = (int32)((float)y / finalHeight * metallic.height);
-					b_val = GetPixelChannel(metallic, srcX, srcY);
+					b_val = GetPixelChannel(metallic, srcX, srcY, 2);
 				}
 
 				outImage.pixels[idx] = r_val;
@@ -148,7 +148,7 @@ namespace MGF3D
 		return outImage.IsValid();
 	}
 
-	uint8 ORMTexturePacker::GetPixelChannel(const RawImage& img, int32 px, int32 py)
+	uint8 ORMTexturePacker::GetPixelChannel(const RawImage& img, int32 px, int32 py, int32 channelOffset)
 	{
 		// 유효하지 않거나 범위 밖이면 0 (검은색) 반환
 		if (!img.IsValid() || px >= img.width || py >= img.height) return 0;
@@ -157,7 +157,8 @@ namespace MGF3D
 		usize index = (usize)(py * img.width + px) * img.channels;
 
 		// 세 채널 값이 모두 같으므로, 첫 번째 채널(R)을 사용
-		return img.pixels[index];
+		if (channelOffset >= img.channels) return img.pixels[index];
+		return img.pixels[index + channelOffset];
 	}
 
 	void ORMTexturePacker::FlipImageVertically(uint8* data, int32 w, int32 h, int32 ch)
