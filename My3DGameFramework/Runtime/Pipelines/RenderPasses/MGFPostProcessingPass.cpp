@@ -33,6 +33,6 @@ namespace MGF3D
 
 	void MGFPostProcessingPass::Execute(RenderContext* context)
 	{
-		// TODO : 절두체 기반 컬링
+
 	}
 }

@@ -5,19 +5,29 @@
 
 #pragma region MANAGERS
 #include "Managers/TypeManager.h"
+#include "Managers/WindowManager.h"
 #include "Managers/RenderManager.h"
+#include "Managers/GUIManager.h"
 #pragma endregion
 
 #pragma region TYPES
 #include "Identities/MGFTypeTree.h"
 #pragma endregion
 
-#pragma once RENDER_PIPELINE
+#pragma region RENDER_PIPELINE
 #include "Pipelines/MGFRenderPipeline.h"
 #include "Pipelines/RenderPasses/MGFShadowPass.h"
 #include "Pipelines/RenderPasses/MGFGeometryPass.h"
 #include "Pipelines/RenderPasses/MGFSSAOPass.h"
 #include "Pipelines/RenderPasses/MGFDeferredLightingPass.h"
+#pragma endregion
+
+#pragma region GUI_WINDOWS
+#include "Editor/Windows/GUISceneViewport.h"
+#include "Editor/Windows/GUIInspectorViewport.h"
+#include "Editor/Windows/GUIConsoleViewport.h"
+#include "Editor/Windows/GUIHierarchyViewport.h"
+#include "Editor/Windows/GUIProjectViewport.h"
 #pragma endregion
 
 namespace MGF3D
@@ -47,11 +57,24 @@ namespace MGF3D
 		// 2. 현재 활성 파이프라인으로 설정
 		MGF_RENDER.SetRenderPipeline("MGFRenderPipeline");
 
+		// 3. 에디터 초기화
+		MGF_EDITOR.Init(MGF_WINDOW.GetNativeHandle());
+
+		// 4. 에디터 윈도우 주입
+		MGF_EDITOR.AddGUIWindow(SceneViewport::Create("Scene View"));
+		MGF_EDITOR.AddGUIWindow(InspectorViewport::Create("Inspector View"));
+		MGF_EDITOR.AddGUIWindow(ConsoleViewport::Create("Console View"));
+		MGF_EDITOR.AddGUIWindow(HierarchyViewport::Create("Hierarchy View"));
+		MGF_EDITOR.AddGUIWindow(ProjectViewport::Create("Project View"));
+
 		return true;
 	}
 
 	bool RuntimeModule::OnShutdown()
 	{
+		// 1. GUI 매니저 종료
+		MGF_EDITOR.Shutdown();
+
 		return true;
 	}
 }

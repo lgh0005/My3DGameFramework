@@ -328,7 +328,6 @@ void main()
         discard;
 
     // 2. PBR 파라미터 및 공통 계산 
-    // (이제 shininess, specFactor라는 단어는 엔진에서 완전히 퇴출되었습니다!)
     vec3 viewDir    = normalize(uScene.viewPos - fragPos);
     vec3 albedo     = dataAlbMetal.rgb;
     float roughness = clamp(dataNormRough.a, 0.05, 1.0); // 0.0 방지용 최소값 0.05

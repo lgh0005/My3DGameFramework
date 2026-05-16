@@ -25,6 +25,7 @@ namespace MGF3D
 		RenderPipeline* GetActiveRenderPipeline() const;
 		template<typename T> void RegisterRenderPipeline(StringView name);
 		void SetRenderPipeline(StringView name);
+		uint32 GetFinalSceneTextureID() const;
 
 	public:
 		HashMap<int64, RenderPipelineFactory> m_pipelines;

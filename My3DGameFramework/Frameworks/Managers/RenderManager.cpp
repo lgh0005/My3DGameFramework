@@ -58,16 +58,7 @@ namespace MGF3D
 
 			// 3-3. 파이프라인 실행
 			m_activePipeline->Render(m_renderContext.get());
-
-			// [DEBUG] Scene 버퍼 상에서의 고속복사
-			auto sceneBuffer = m_renderContext->GetSceneBuffer();
-			GLFramebufferHandle::Blit
-			(
-				sceneBuffer, nullptr,
-				0, 0, WINDOW_WIDTH, WINDOW_HEIGHT,
-				0, 0, WINDOW_WIDTH, WINDOW_HEIGHT,
-				GL_COLOR_BUFFER_BIT, GL_NEAREST
-			);
+			GLFramebufferHandle::Unbind();
 
 			// 3-4. 다음 카메라(혹은 프레임)를 위한 큐 정리
 			m_renderContext->ClearQueues();
@@ -98,5 +89,15 @@ namespace MGF3D
 			m_activePipeline = it->second();
 			Resize();
 		}
+	}
+
+	uint32 RenderManager::GetFinalSceneTextureID() const
+	{
+		if (!m_renderContext) return 0;
+		
+		GLTexture2D* finalTexture = m_renderContext->GetSceneColorTexture();
+		if (!finalTexture) return 0;
+		
+		return finalTexture->GetHandle();
 	}
 }

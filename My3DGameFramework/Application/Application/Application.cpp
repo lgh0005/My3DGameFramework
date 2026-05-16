@@ -9,6 +9,7 @@
 #pragma endregion
 
 #pragma region MANAGERS
+#include "Managers/GUIManager.h"
 #include "Managers/InputManager.h"
 #include "Managers/WindowManager.h"
 #include "Managers/TimeManager.h"
@@ -16,6 +17,7 @@
 #include "Managers/ScriptManager.h"
 #include "Managers/RenderManager.h"
 #include "Managers/AnimationManager.h"
+
 #pragma endregion
 
 namespace MGF3D
@@ -69,6 +71,7 @@ namespace MGF3D
 			// 5. 렌더링
 			MGF_ANIM.Update(MGF_TIME.GetDeltaTime());
 			MGF_RENDER.Render();
+			MGF_EDITOR.Render();
 			MGF_WINDOW.SwapWindowBuffers();
 		}
 	}

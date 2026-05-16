@@ -25,5 +25,7 @@ namespace MGF3D
 	private:
 		MGFPostProcessingPass();
 		bool Init();
+
+
 	};
 }

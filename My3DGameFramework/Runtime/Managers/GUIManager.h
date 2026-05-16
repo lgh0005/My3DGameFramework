@@ -1,7 +1,11 @@
 ﻿#pragma once
 
+struct GLFWwindow;
+
 namespace MGF3D
 {
+	MGF_CLASS_PTR(GUIWindow)
+
 	class GUIManager
 	{
 		MGF_DECLARE_SINGLE(GUIManager)
@@ -11,14 +15,14 @@ namespace MGF3D
 		~GUIManager();
 
 	public:
-		void Init(bool enable);
-		void Clear();
-		void BeginFrame();
-		void EndFrame();
-		bool Begin(cstr name, bool* p_open = nullptr, ImGuiWindowFlags flags = 0);
-		void End();
+		void Init(GLFWwindow* window);
+		void Render();
+		void Shutdown();
+
+	public:
+		void AddGUIWindow(GUIWindowUPtr gui);
 
 	private:
-		bool m_isEnable{ true };
+		Vector<GUIWindowUPtr> m_guis;
 	};
 }
