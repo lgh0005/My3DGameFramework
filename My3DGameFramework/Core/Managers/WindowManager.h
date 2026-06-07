@@ -15,7 +15,11 @@ namespace MGF3D
 		~WindowManager();
 
 	public:
-		bool Init(int32 width, int32 height, const String& title, int32 vsync = 0);
+		bool Init
+		(
+			int32 width, int32 height, 
+			const String& title, int32 vsync = 0
+		);
 		void Update();
 		void Shutdown();
 

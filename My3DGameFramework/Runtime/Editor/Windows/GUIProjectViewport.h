@@ -18,10 +18,10 @@ namespace MGF3D
 	private:
 		ProjectViewport();
 		bool Init(const String& name);
-		void ScanDirectory(const std::filesystem::path& path);
+		void ScanDirectory(const FileSystem::path& path);
 
 	private:
-		std::filesystem::path m_rootPath;
-		std::filesystem::path m_currentPath;
+		FileSystem::path m_rootPath;
+		FileSystem::path m_currentPath;
 	};
 }

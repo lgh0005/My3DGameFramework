@@ -28,7 +28,7 @@ namespace MGF3D
 
 		MGF_ASSET.LoadAssetAsync<Model>("@GameAsset/Models/backpack/backpack.mymodel");
 		
-		MGF_ASSET.LoadAssetAsync<Model>("@GameAsset/pbrtester/aliensoldier.mymodel");
+		MGF_ASSET.LoadAssetAsync<Model>("@GameAsset/Models/aliensoldier/aliensoldier.mymodel");
 		MGF_ASSET.LoadAssetAsync<Animation>("@GameAsset/Models/aliensoldier/Idle.myanim");
 		MGF_ASSET.LoadAssetAsync<Animation>("@GameAsset/Models/aliensoldier/Walking.myanim");
 
@@ -111,14 +111,13 @@ namespace MGF3D
 		bagTransform->SetLocalScale(vec3(1.0f));
 
 		// 6. AilenSoldier
-		auto soldier = MGF_ASSET.GetAsset<Model>("@GameAsset/pbrtester/aliensoldier.mymodel");
+		auto soldier = MGF_ASSET.GetAsset<Model>("@GameAsset/Models/aliensoldier/aliensoldier.mymodel");
 		ObjectIDHash soldierID = soldier->Instantiate("Soldier");
 		Scripts::AddScript<PlayerController>(soldierID);
 		auto* soldierTransform = Entities::GetComponent<Transform>(soldierID);
 		soldierTransform->SetLocalPosition(vec3(0.0f, -0.7f, 0.0f));
 		soldierTransform->SetLocalRotation(vec3(0.0f, 0.0f, 0.0f));
 		soldierTransform->SetLocalScale(vec3(0.02f));
-
 		auto animController = MakeUnique<AnimController>(nullptr);
 		Entities::AddComponent<Animator>(soldierID, soldier, std::move(animController));
 

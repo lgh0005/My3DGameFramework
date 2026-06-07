@@ -21,6 +21,7 @@ namespace MGF3D
 
 	public:
 		void AddGUIWindow(GUIWindowUPtr gui);
+		void SetGUIDockSpace();
 
 	private:
 		Vector<GUIWindowUPtr> m_guis;

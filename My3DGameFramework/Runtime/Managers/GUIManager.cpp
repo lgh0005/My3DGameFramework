@@ -62,6 +62,8 @@ namespace MGF3D
 		// 1-1. DockSpace 공간
 		ImGui::Begin("MGF3D DockSpace", nullptr, window_flags);
 		ImGui::PopStyleVar(3);
+		SetGUIDockSpace();
+
 		ImGuiID dockspace_id = ImGui::GetID("MainDockSpace");
 		ImGui::DockSpace(dockspace_id, ImVec2(0.0f, 0.0f), dockspace_flags);
 		ImGui::End();
@@ -98,5 +100,41 @@ namespace MGF3D
 	void GUIManager::AddGUIWindow(GUIWindowUPtr gui)
 	{
 		m_guis.push_back(std::move(gui));
+	}
+
+	void GUIManager::SetGUIDockSpace()
+	{
+		ImGuiID dockspace_id = ImGui::GetID("MainDockSpace");
+
+		// imgui.ini 설정 파일에 도크스페이스 정보가 없는 경우 (초기 상태)
+		if (ImGui::DockBuilderGetNode(dockspace_id) == nullptr)
+		{
+			ImGuiViewport* viewport = ImGui::GetMainViewport();
+
+			// 도크스페이스 초기화 및 추가
+			ImGui::DockBuilderRemoveNode(dockspace_id);
+			ImGui::DockBuilderAddNode(dockspace_id, ImGuiDockNodeFlags_PassthruCentralNode | ImGuiDockNodeFlags_DockSpace);
+			ImGui::DockBuilderSetNodeSize(dockspace_id, viewport->WorkSize);
+
+			ImGuiID dock_main_id = dockspace_id;
+
+			// 노드 분할: 우측(20%) 및 하단(25%) 분리
+			ImGuiID dock_id_right = ImGui::DockBuilderSplitNode(dock_main_id, ImGuiDir_Right, 0.20f, nullptr, &dock_main_id);
+			ImGuiID dock_id_bottom = ImGui::DockBuilderSplitNode(dock_main_id, ImGuiDir_Down, 0.25f, nullptr, &dock_main_id);
+
+			// 우측 패널 탭 등록
+			ImGui::DockBuilderDockWindow("Hierarchy View", dock_id_right);
+			ImGui::DockBuilderDockWindow("Inspector View", dock_id_right);
+
+			// 하단 패널 탭 등록
+			ImGui::DockBuilderDockWindow("Project View", dock_id_bottom);
+			ImGui::DockBuilderDockWindow("Console View", dock_id_bottom);
+
+			// 중앙 패널 등록
+			ImGui::DockBuilderDockWindow("Scene View", dock_main_id);
+
+			// 도크 빌더 적용
+			ImGui::DockBuilderFinish(dockspace_id);
+		}
 	}
 }

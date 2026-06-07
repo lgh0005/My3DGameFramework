@@ -99,13 +99,6 @@ namespace MGF3D
 			glEnable(GL_FRAMEBUFFER_SRGB);
 
 			glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
-
-			// TODO : 디버그 에 하나 추가 필요
-//#ifdef _DEBUG
-//			glEnable(GL_DEBUG_OUTPUT);
-//			glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS); // 에러 발생 시 즉시 브레이크포인트가 걸리도록 함
-//			// glDebugMessageCallback(YourCallbackFunction, nullptr); // 콜백 함수가 있다면 등록
-//#endif
 		}
 
 		MGF_LOG_INFO("MGFWindow: Window created successfully ({0}x{1})", width, height);

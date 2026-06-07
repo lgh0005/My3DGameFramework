@@ -20,7 +20,7 @@ namespace MGF3D
 		m_name = name;
 		m_isOpen = true;
 
-		m_rootPath = "C:/MyProject/Contents";
+		m_rootPath = FileSystem::current_path();
 		m_currentPath = m_rootPath;
 
 		return true;

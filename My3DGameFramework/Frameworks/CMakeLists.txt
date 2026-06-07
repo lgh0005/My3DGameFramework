@@ -28,12 +28,6 @@ set(SOURCES
 
     # Components
     "Components/Animation/Animator.h"       "Components/Animation/Animator.cpp"
-    # "Components/Audios/AudioListener.h"     "Components/Audios/AudioListener.cpp"
-    # "Components/Audios/AudioSource.h"       "Components/Audios/AudioSource.cpp"
-    # "Components/Colliders/Collider.h"     "Components/Colliders/Collider.cpp"
-    # "Components/Colliders/BoxCollider.h"        "Components/Colliders/BoxCollider.cpp"
-    # "Components/Colliders/SphereCollider.h"     "Components/Colliders/SphereCollider.cpp"
-    # "Components/Colliders/CapsuleCollider.h"        "Components/Colliders/CapsuleCollider.cpp"
     "Components/Lights/Light.h"        "Components/Lights/Light.cpp"
     "Components/Lights/SkyLight.h"        "Components/Lights/SkyLight.cpp"
     "Components/Lights/PointLight.h"        "Components/Lights/PointLight.cpp"
@@ -41,9 +35,6 @@ set(SOURCES
     "Components/Lights/DirectionalLight.h"        "Components/Lights/DirectionalLight.cpp"
     "Components/MeshRenderers/MeshRenderer.h"           "Components/MeshRenderers/MeshRenderer.cpp" 
     "Components/MeshRenderers/SkinnedMeshRenderer.h"   "Components/MeshRenderers/SkinnedMeshRenderer.cpp" 
-    # "Components/MeshRenderers/MeshOutline.h"           "Components/MeshRenderers/MeshOutline.cpp" 
-    # "Components/Physics/PhysicsComponent.h"            "Components/Physics/PhysicsComponent.cpp" 
-    # "Components/Physics/Rigidbody.h"                  "Components/Physics/Rigidbody.cpp" 
     "Components/Script/Script.h"                  "Components/Script/Script.cpp" 
 
     # Mechanics
@@ -57,8 +48,7 @@ set(SOURCES
     "Mechanics/Lights/SkyCube.h"            "Mechanics/Lights/SkyCube.cpp"
 
     # Assets
-    "Assets/Animation.h"             "Assets/Animation.cpp"
-    # "Assets/AudioClip.h"             "Assets/AudioClip.cpp"
+    "Assets/Animation.h"                "Assets/Animation.cpp"
     "Assets/Model.h"                   "Assets/Model.cpp"
 
     # Resources
@@ -87,7 +77,6 @@ set(SOURCES
     "Instancing/Shadows/SpotShadowData.h"
 
     "Instancing/Animations/AnimationBuffer.h"       "Instancing/Animations/AnimationBuffer.cpp"
-    "Instancing/Animations/AnimationTexture.h"      "Instancing/Animations/AnimationTexture.cpp"
 )
 
 # 2. 빌드 타겟 생성 및 별칭 등록

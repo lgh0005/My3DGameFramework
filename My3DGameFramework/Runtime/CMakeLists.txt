@@ -40,8 +40,6 @@ set(SOURCES
 
     # Post-Processing
     "PostProcessing/PostProcessEffect.h"                    "PostProcessing/PostProcessEffect.cpp"
-    # "PostProcessing/Effects/MotionBlurEffect.h"              "PostProcessing/Effects/MotionBlurEffect.cpp"
-    # "PostProcessing/Effects/OutlineEffect.h"              "PostProcessing/Effects/OutlineEffect.cpp"
     "PostProcessing/Effects/WorldSpaceEffects.h"              "PostProcessing/Effects/WorldSpaceEffects.cpp"
     "PostProcessing/Effects/HDREffects.h"              "PostProcessing/Effects/HDREffects.cpp"
     "PostProcessing/Effects/LDREffects.h"              "PostProcessing/Effects/LDREffects.cpp"
@@ -69,7 +67,6 @@ target_link_libraries(${LIB_NAME}
 
 PUBLIC
     imgui::imgui
-    imguizmo::imguizmo
 
 PUBLIC
     Engine::Core

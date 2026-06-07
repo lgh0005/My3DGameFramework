@@ -11,14 +11,8 @@
       "name": "imgui",
       "features": [ "glfw-binding", "opengl3-binding", "docking-experimental" ]
     },
-    "imguizmo",
-    {
-      "name": "joltphysics",
-      "features": [ "debugrenderer", "profiler" ]
-    },
     "assimp",
     "nlohmann-json",
-    "stb",
-    "miniaudio"
+    "stb"
   ]
 }
