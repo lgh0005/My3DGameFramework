@@ -118,9 +118,11 @@ namespace MGF3D
     {
         // 1. 조명 결과를 담을 HDR 텍스처 생성
         m_sceneColorTexture = MGF_RESOURCE.CreateImmediate<GLTexture2D>(width, height, GL_RGBA16F, 1);
+        m_sceneColorTextureB = MGF_RESOURCE.CreateImmediate<GLTexture2D>(width, height, GL_RGBA16F, 1);
 
         // 2. 텍스처를 포함하는 프레임버퍼 생성
         m_sceneBuffer = GLFramebuffer2D::Create({ m_sceneColorTexture }, m_geometryBuffer->GetDepthAttachment());
+        m_sceneBufferB = GLFramebuffer2D::Create({ m_sceneColorTextureB }, m_geometryBuffer->GetDepthAttachment());
     }
 
     void RenderContext::SetCachedTexture(ETextureCache slot, const GLTexture2DPtr& texture)

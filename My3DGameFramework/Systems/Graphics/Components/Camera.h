@@ -52,13 +52,12 @@ namespace MGF3D
 		const Frustum& GetFrustum() const;
 
 	public:
+		Transform* GetTransform() const;
 		bool IsProjectionDirty() const { return m_isProjectionDirty; }
 		void SetProjectionDirty() { m_isProjectionDirty = true; }
 		void CleanProjectionDirty() { m_isProjectionDirty = false; }
 
 	private:
-		Transform* GetTransform() const;
-
 		bool m_isMainCamera{ false };
 
 		float m_fovDegrees		{ 45.0f };

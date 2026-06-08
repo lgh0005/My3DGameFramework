@@ -3,7 +3,9 @@
 
 namespace MGF3D
 {
-	MGF_CLASS_PTR(GraphicsProgram)
+	MGF_CLASS_PTR(HDREffects)
+	MGF_CLASS_PTR(LDREffects)
+	MGF_CLASS_PTR(WorldSpaceEffects)
 
 	MGF_CLASS_PTR(MGFPostProcessingPass)
 	class MGFPostProcessingPass : public RenderPass
@@ -26,6 +28,8 @@ namespace MGF3D
 		MGFPostProcessingPass();
 		bool Init();
 
-
+		HDREffectsUPtr m_hdrEffects{ nullptr };
+		LDREffectsUPtr m_ldrEffects{ nullptr };
+		WorldSpaceEffectsUPtr m_worldSpaceEffects{ nullptr };
 	};
 }

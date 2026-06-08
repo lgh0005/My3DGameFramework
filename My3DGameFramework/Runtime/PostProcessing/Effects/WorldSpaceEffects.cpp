@@ -1,7 +1,16 @@
 ﻿#include "RuntimePch.h"
 #include "WorldSpaceEffects.h"
-#include "Rendering/RenderContext.h"
+#include "Managers/TypeManager.h"
+#include "Managers/ResourceManager.h"
+#include "Managers/AssetManager.h"
+#include "Assets/Shader.h""
 #include "Programs/GraphicsProgram.h"
+#include "Rendering/RenderContext.h"
+#include "Textures/GLTexture2D.h"
+#include "Meshes/ScreenMesh.h"
+#include "Components/Camera.h"
+#include "Components/Transform.h"
+#include "Entities/GameObject.h"
 
 namespace MGF3D
 {
@@ -10,11 +19,18 @@ namespace MGF3D
 
 	WorldSpaceEffectsUPtr WorldSpaceEffects::Create()
 	{
-		return nullptr;
+		auto effect = WorldSpaceEffectsUPtr(new WorldSpaceEffects());
+		if (!effect->Init()) return nullptr;
+		return effect;
 	}
 
 	bool WorldSpaceEffects::Init()
 	{
+		// 1. HDR 효과용 프로그램 로드
+		auto worldVs = MGF_ASSET.LoadAssetAsync<Shader>("@BuiltInAsset/Shaders/PostProcessing/MGF3D_PostProcess_World.vert", GL_VERTEX_SHADER, EShaderFileType::GLSL);
+		auto worldFs = MGF_ASSET.LoadAssetAsync<Shader>("@BuiltInAsset/Shaders/PostProcessing/MGF3D_PostProcess_World.frag", GL_FRAGMENT_SHADER, EShaderFileType::GLSL);
+		m_worldSpaceEffectProgram = MGF_RESOURCE.Create<GraphicsProgram>("WorldSpaceEffectProgram", Vector<ShaderPtr>{ worldVs, worldFs });
+
 		return true;
 	}
 
@@ -23,97 +39,44 @@ namespace MGF3D
 
 	}
 
-	bool WorldSpaceEffects::Render
-	(
-		RenderContext* context,
-		GLFramebuffer2D* srcFBO,
-		GLFramebuffer2D* dstFBO
-	)
+	bool WorldSpaceEffects::Render(RenderContext* context)
 	{
+		if (!context || !m_worldSpaceEffectProgram) return false;
+		if (m_worldSpaceEffectProgram->GetState() != EResourceState::Ready) return false;
+
+		// 1. 텍스처 가져오기 (핑퐁 버퍼 중 현재 읽기용인 A버퍼 컬러와 G-Buffer 위치 정보)
+		auto sceneColorTex = context->GetSceneColorTexture();
+		auto positionTex = context->GetGeometryBufferTexture(EGBufferSlot::PositionAO);
+		if (!sceneColorTex || !positionTex) return false;
+
+		// 2. 프로그램 바인딩
+		m_worldSpaceEffectProgram->Use();
+
+		// 3. 텍스처 바인딩 (슬롯 지정)
+		sceneColorTex->Bind(0);
+		positionTex->Bind(1);
+
+		// 4. 유니폼 값 설정 (GraphicsProgram의 SetUniform 사용)
+		m_worldSpaceEffectProgram->SetUniform("uSceneTex", 0);
+		m_worldSpaceEffectProgram->SetUniform("uPositionTex", 1);
+
+		m_worldSpaceEffectProgram->SetUniform("uPixelSize", m_pixelSize);
+		m_worldSpaceEffectProgram->SetUniform("uDilationRadius", m_dilationRadius);
+		m_worldSpaceEffectProgram->SetUniform("uPostLevels", m_postLevels);
+		m_worldSpaceEffectProgram->SetUniform("uFogColor", m_fogColor);
+		m_worldSpaceEffectProgram->SetUniform("uFogDensity", m_fogDensity);
+
+		// 카메라 위치 넘겨주기 (안개 거리 계산용)
+		const Camera* camera = context->GetCurrentCamera();
+		if (camera)
+		{
+			auto transform = camera->GetTransform();
+			m_worldSpaceEffectProgram->SetUniform("uCameraPos", transform->GetWorldPosition());
+		}
+
+		// 5. 화면(B버퍼)에 그리기
+		context->GetScreenMesh()->Draw();
+
 		return true;
 	}
 }
-
-
-
-
-
-
-
-
-
-//#include "EnginePch.h"
-//#include "WorldSpaceEffects.h"
-//#include "Graphics/Rendering/RenderContext.h"
-//#include "Resources/Programs/Program.h"
-//#include "Resources/Programs/GraphicsProgram.h"
-//#include "Resources/Textures/Texture.h"
-//#include "Resources/Meshes/ScreenMesh.h"
-//#include "Graphics/Framebuffers/PostProcessFrameBuffer.h"
-//#include "Components/Camera.h"
-//
-//DECLARE_DEFAULTS_IMPL(WorldSpaceEffects)
-//
-//WorldSpaceEffectsUPtr WorldSpaceEffects::Create(int32 priority, int32 width, int32 height)
-//{
-//	auto effects = WorldSpaceEffectsUPtr(new WorldSpaceEffects());
-//	if (!effects->Init(priority, width, height)) return nullptr;
-//	return std::move(effects);
-//}
-//
-//bool WorldSpaceEffects::Init(int32 priority, int32 width, int32 height)
-//{
-//	m_priority = priority;
-//	m_width = width;
-//	m_height = height;
-//	m_worldSpaceEffectProgram = RESOURCE.Add<GraphicsProgram>
-//	(
-//		"world_space_effects",
-//		"@BuiltInAsset/Shaders/PostProcessing/PostProcess_World_Space_Effects.vert",
-//		"@BuiltInAsset/Shaders/PostProcessing/PostProcess_World_Space_Effects.frag"
-//	);
-//	return m_worldSpaceEffectProgram != nullptr;
-//}
-//
-//bool WorldSpaceEffects::Render(RenderContext* context, Framebuffer* src, Framebuffer* dst, ScreenMesh* scrn)
-//{
-//	if (!context || !src || !dst || !scrn) return false;
-//	auto camera = context->GetCamera();
-//	if (!camera) return false;
-//
-//	dst->Bind();
-//	glViewport(0, 0, m_width, m_height);
-//	glClear(GL_COLOR_BUFFER_BIT);
-//	glDisable(GL_DEPTH_TEST); // 포스트 프로세싱은 깊이 테스트가 필요 없음
-//	glDisable(GL_CULL_FACE);  // 사각형이 뒤집혀 보일 가능성 차단
-//
-//	m_worldSpaceEffectProgram->Use();
-//
-//	// [Input 0] Scene Color (HDR)
-//	glActiveTexture(GL_TEXTURE0);
-//	src->GetColorAttachment(0)->Bind();
-//	m_worldSpaceEffectProgram->SetUniform("uSceneTex", 0);
-//
-//	// [Input 1] Depth Texture (G-Buffer에서 가져옴)
-//	// TODO : 깊이도 GBuffer에 기록을 해야함
-//	Texture* depthTex = context->GetTexture(RenderSlot::GVelocity);
-//	if (depthTex)
-//	{
-//		glActiveTexture(GL_TEXTURE1);
-//		depthTex->Bind();
-//		m_worldSpaceEffectProgram->SetUniform("uDepthTex", 1);
-//	}
-//
-//	// [Uniforms] 파라미터 전송
-//	m_worldSpaceEffectProgram->SetUniform("uPixelSize", m_pixelSize);
-//	m_worldSpaceEffectProgram->SetUniform("uPostLevels", m_postLevels);
-//	m_worldSpaceEffectProgram->SetUniform("uDilationRadius", m_dilationRadius);
-//	m_worldSpaceEffectProgram->SetUniform("uFogColor", m_fogColor);
-//	m_worldSpaceEffectProgram->SetUniform("uFogDensity", m_fogDensity);
-//
-//	scrn->Draw();
-//
-//	glEnable(GL_DEPTH_TEST);
-//
-//	return true;
-//}

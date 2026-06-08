@@ -17,7 +17,6 @@ namespace MGF3D
 	MGFRenderPipeline::MGFRenderPipeline() = default;
 	MGFRenderPipeline::~MGFRenderPipeline() = default;
 
-
 	MGFRenderPipelineUPtr MGFRenderPipeline::Create()
 	{
 		auto pipeline = MGFRenderPipelineUPtr(new MGFRenderPipeline());
@@ -62,13 +61,10 @@ namespace MGF3D
 		// 4. 라이팅 패스
 		m_deferredLightingPass->Execute(context);
 
-		// 5. 프레임 버퍼 복사
-		// TODO
-
-		// 6. 스카이 패스
+		// 5. 스카이 패스
 		m_skyboxPass->Execute(context);
 
-		// 7. 포스트-프로세스 패스
+		// 6. 포스트-프로세스 패스
 		m_postProcessPass->Execute(context);
 	}
 

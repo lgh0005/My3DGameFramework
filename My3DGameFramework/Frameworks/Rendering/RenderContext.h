@@ -28,7 +28,6 @@ namespace MGF3D
 		NormalRoughness,     // location = 1
 		AlbedoMetallic,      // location = 2
 		Emission,            // location = 3
-		Velocity,            // location = 4
 		Max
 	};
 
@@ -85,6 +84,13 @@ namespace MGF3D
 		ScreenMesh* GetScreenMesh() const { return m_screenMesh.get(); }
 		GLFramebuffer2D* GetSceneBuffer() const { return m_sceneBuffer.get(); }
 		GLTexture2D* GetSceneColorTexture() const { return m_sceneColorTexture.get(); }
+		GLFramebuffer2D* GetSceneBufferB() const { return m_sceneBufferB.get(); }
+		GLTexture2D* GetSceneColorTextureB() const { return m_sceneColorTextureB.get(); }
+		void SwapSceneBuffers()
+		{
+			m_sceneBuffer.swap(m_sceneBufferB);
+			m_sceneColorTexture.swap(m_sceneColorTextureB);
+		}
 
 	public:
 		void SetCachedTexture(ETextureCache slot, const GLTexture2DPtr& texture);
@@ -106,6 +112,7 @@ namespace MGF3D
 		);
 
 	private:
+
 		// 전역 설정 대상들
 		const Camera* m_currentCamera{ nullptr };
 		const SkyLight* m_mainSkyLight{ nullptr };
@@ -122,9 +129,11 @@ namespace MGF3D
 		Vector<SpotShadowData> m_spotShadows;
 
 		// Screen 메쉬
-		ScreenMeshPtr m_screenMesh;
-		GLFramebuffer2DPtr m_sceneBuffer;
+		ScreenMeshPtr		m_screenMesh;
+		GLFramebuffer2DPtr  m_sceneBuffer;
 		GLTexture2DPtr      m_sceneColorTexture;
+		GLFramebuffer2DPtr  m_sceneBufferB;
+		GLTexture2DPtr      m_sceneColorTextureB;
 
 		// G-Buffer
 		GLFramebuffer2DPtr m_geometryBuffer;

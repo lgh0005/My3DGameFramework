@@ -12,12 +12,7 @@ namespace MGF3D
 		virtual ~PostProcessEffect();
 		
 	public:
-		virtual bool Render
-		(
-			RenderContext* context,
-			GLFramebuffer2D* srcFBO,
-			GLFramebuffer2D* dstFBO
-		) = 0;
+		virtual bool Render(RenderContext* context) = 0;
 		virtual void Resize(int32 width, int32 height) = 0;
 
 	public:

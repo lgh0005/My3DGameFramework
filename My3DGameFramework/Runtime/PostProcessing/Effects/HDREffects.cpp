@@ -1,7 +1,11 @@
 #include "RuntimePch.h"
 #include "HDREffects.h"
-#include "Rendering/RenderContext.h"
+#include "Managers/TypeManager.h"
+#include "Managers/ResourceManager.h"
+#include "Managers/AssetManager.h"
+#include "Assets/Shader.h"
 #include "Programs/GraphicsProgram.h"
+#include "Rendering/RenderContext.h"
 
 namespace MGF3D
 {
@@ -10,11 +14,18 @@ namespace MGF3D
 
 	HDREffectsUPtr HDREffects::Create()
 	{
-		return nullptr;
+		auto effect = HDREffectsUPtr(new HDREffects());
+		if (!effect->Init()) return nullptr;
+		return effect;
 	}
 
 	bool HDREffects::Init()
 	{
+		// 1. HDR 효과용 프로그램 로드
+		auto hdrVs = MGF_ASSET.LoadAssetAsync<Shader>("@BuiltInAsset/Shaders/PostProcessing/MGF3D_PostProcess_HDR.vert", GL_VERTEX_SHADER, EShaderFileType::GLSL);
+		auto hdrFs = MGF_ASSET.LoadAssetAsync<Shader>("@BuiltInAsset/Shaders/PostProcessing/MGF3D_PostProcess_HDR.frag", GL_FRAGMENT_SHADER, EShaderFileType::GLSL);
+		m_highDynamicRangeProgram = MGF_RESOURCE.Create<GraphicsProgram>("HighDynamicRangeProgram", Vector<ShaderPtr>{ hdrVs, hdrFs });
+
 		return true;
 	}
 
@@ -23,12 +34,7 @@ namespace MGF3D
 
 	}
 
-	bool HDREffects::Render
-	(
-		RenderContext* context,
-		GLFramebuffer2D* srcFBO,
-		GLFramebuffer2D* dstFBO
-	)
+	bool HDREffects::Render(RenderContext* context)
 	{
 		return true;
 	}

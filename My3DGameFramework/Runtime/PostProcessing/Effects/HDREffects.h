@@ -1,8 +1,12 @@
 #pragma once
 #include "PostProcessing/PostProcessEffect.h"
+#include "Textures/GLTexture2D.h"
+#include "Framebuffers/GLFramebuffer2D.h"
 
 namespace MGF3D
 {
+	MGF_CLASS_PTR(GraphicsProgram)
+
 	enum class EBloomMode : uint8
 	{
 		None = 0,
@@ -20,17 +24,15 @@ namespace MGF3D
 		static HDREffectsUPtr Create();
 
 	public:
-		virtual bool Render
-		(
-			RenderContext* context,
-			GLFramebuffer2D* srcFBO,
-			GLFramebuffer2D* dstFBO
-		) override;
+		virtual bool Render(RenderContext* context) override;
 		virtual void Resize(int32 width, int32 height) override;
 
-	public:
+	private:
 		HDREffects();
 		bool Init();
+
+		// HDR-effect program
+		GraphicsProgramPtr m_highDynamicRangeProgram{ nullptr };
 
 		// Depth of Field effect params
 		float m_focusDistance{ 10.0f };
@@ -46,11 +48,23 @@ namespace MGF3D
 
 		// Bloom params
 		EBloomMode m_bloomMode{ EBloomMode::None };
+		float m_threshold { 1.0f };
+		int32 m_iteration { 5 };
 
 		// Gaussian-bloom effect params
-
+		Array<GLFramebuffer2DUPtr, 2> m_gaussianBloomFBOs;
+		GraphicsProgramPtr m_gaussainThresholdProgram;
+		GraphicsProgramPtr m_gaussianBlurProgram;
 
 		// Kawase-bloom effect params
-
+		struct KawaseBloomMips
+		{
+			GLTexture2D texture;
+			int32 width; 
+			int32 height;
+		};
+		Vector<KawaseBloomMips> m_kawaseBloomMips;
+		GLFramebuffer2DUPtr m_kawaseBloomFBO;
+		GraphicsProgramPtr m_kawaseBloomProgram;
 	};
 }
