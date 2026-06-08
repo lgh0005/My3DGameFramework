@@ -1,8 +1,10 @@
 #include "RuntimeModule.h"
 #include "MGFPostProcessingPass.h"
 #include "Managers/TypeManager.h"
+#include "Managers/WindowManager.h"
+#include "Managers/EntityManager.h"
 #include "Rendering/RenderContext.h"
-#include "PostProcessing/Effects/HDREffects.h"
+#include "Framebuffers/GLFramebuffer2D.h"
 #include "PostProcessing/Effects/LDREffects.h"
 #include "PostProcessing/Effects/WorldSpaceEffects.h"
 
@@ -20,11 +22,18 @@ namespace MGF3D
 
 	bool MGFPostProcessingPass::Init()
 	{
-		m_hdrEffects = HDREffects::Create();
 		m_ldrEffects = LDREffects::Create();
 		m_worldSpaceEffects = WorldSpaceEffects::Create();
-		if (!m_hdrEffects || !m_ldrEffects || !m_worldSpaceEffects) return false;
+		if (!m_ldrEffects || !m_worldSpaceEffects) return false;
 		return true;
+	}
+
+	void MGFPostProcessingPass::Resize()
+	{
+		int32 width = MGF_WINDOW.GetWindowWidth();
+		int32 height = MGF_WINDOW.GetWindowHeight();
+		m_ldrEffects->Resize(width, height);
+		m_worldSpaceEffects->Resize(width, height);
 	}
 
 	/*==============================//
@@ -42,6 +51,8 @@ namespace MGF3D
 	{
 		if (!context) return;
 
+		glDisable(GL_DEPTH_TEST);
+
 		// 1. World-Space Effects (Fog, Pixelization 등)
 		if (m_worldSpaceEffects)
 		{
@@ -51,21 +62,12 @@ namespace MGF3D
 			context->SwapSceneBuffers();
 		}
 
-		//// 2. HDR Effects (Bloom, Lens Flare, DoF 등)
-		//if (m_hdrEffects)
-		//{
-		//	context->GetSceneBufferB()->Bind();
-		//	glClear(GL_COLOR_BUFFER_BIT);
-		//	m_hdrEffects->Render(context);
-		//	context->SwapSceneBuffers();
-		//}
-
-		// 3. LDR Effects (Tone Mapping, Gamma, Vignette, Screen Dirt 등)
+		// 2. LDR Effects (Tone Mapping, Gamma, Vignette 등)
 		if (m_ldrEffects)
 		{
 			context->GetSceneBufferB()->Bind();
 			glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+			glClear(GL_COLOR_BUFFER_BIT);
 			glDisable(GL_DEPTH_TEST);
 			m_ldrEffects->Render(context);
 			context->SwapSceneBuffers();

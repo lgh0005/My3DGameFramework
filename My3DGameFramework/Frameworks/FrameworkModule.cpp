@@ -9,6 +9,7 @@
 #include "Managers/AnimationManager.h"
 #include "Managers/EntityManager.h"
 #include "Managers/TypeManager.h"
+#include "Managers/WindowManager.h"
 #pragma endregion
 
 #pragma region TYPES

@@ -11,7 +11,6 @@ layout(binding = 0) uniform sampler2D gPositionAO;
 layout(binding = 1) uniform sampler2D gNormalRoughness;
 layout(binding = 2) uniform sampler2D gAlbedoMetallic;
 layout(binding = 3) uniform sampler2D gEmission;
-// layout(binding = 4) uniform sampler2D gVelocity;
 layout(binding = 5) uniform sampler2D gSSAO;
 layout(binding = 6) uniform sampler2DArray gShadowMapDir;
 layout(binding = 7) uniform samplerCubeArray gShadowMapPoint;

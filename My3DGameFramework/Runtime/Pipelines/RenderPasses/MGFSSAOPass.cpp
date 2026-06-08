@@ -3,6 +3,8 @@
 #include "Managers/TypeManager.h"
 #include "Managers/ResourceManager.h"
 #include "Managers/AssetManager.h"
+#include "Managers/WindowManager.h"
+#include "Managers/EntityManager.h"
 #include "Assets/Shader.h"
 #include "Graphics/Programs/GraphicsProgram.h"
 #include "Framebuffers/GLFramebuffer2D.h"
@@ -52,6 +54,25 @@ namespace MGF3D
 		m_ssaoKernalUBO = GLUniformBuffer::Create(&m_kernelData, sizeof(SSAOKernelData));
 
 		return true;
+	}
+
+	void MGFSSAOPass::Resize()
+	{
+		int32 width = MGF_WINDOW.GetWindowWidth();
+		int32 height = MGF_WINDOW.GetWindowHeight();
+
+		// 최소화 시 0이 들어오는 것을 방지
+		if (width <= 0 || height <= 0) return;
+
+		// 1. SSAO FBO 텍스처 재생성
+		auto ssaoTex = MGF_RESOURCE.CreateImmediate<GLTexture2D>(width, height, GL_R16F, 1);
+		ssaoTex->SetFilter(GL_NEAREST, GL_NEAREST);
+		m_ssaoFBO = GLFramebuffer2D::Create(Vector<GLTexture2DPtr>{ ssaoTex });
+
+		// 2. Blur FBO 텍스처 재생성
+		auto ssaoBlurTex = MGF_RESOURCE.CreateImmediate<GLTexture2D>(width, height, GL_R16F, 1);
+		ssaoBlurTex->SetFilter(GL_NEAREST, GL_NEAREST);
+		m_ssaoBlurFBO = GLFramebuffer2D::Create(Vector<GLTexture2DPtr>{ ssaoBlurTex });
 	}
 
 	void MGFSSAOPass::GenerateKernel()

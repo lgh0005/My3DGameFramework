@@ -10,7 +10,7 @@ namespace MGF3D
 	public:
 		virtual ~RenderPass();
 		virtual void Execute(RenderContext* context) = 0;
-		// TODO : Resize가 필요
+		virtual void Resize() = 0;
 
 	/*=================================//
 	//   MGF3D RenderPass Custom Type  //

@@ -18,7 +18,6 @@ namespace MGF3D
 
     public:
         virtual void Render(RenderContext* context) = 0;
-        virtual void Resize() = 0;
 
     protected:
         RenderPipeline();

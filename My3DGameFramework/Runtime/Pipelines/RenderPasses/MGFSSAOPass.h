@@ -29,6 +29,7 @@ namespace MGF3D
 
 	public:
 		virtual void Execute(RenderContext* context) override;
+		virtual void Resize() override;
 
 	private:
 		void GenerateKernel();

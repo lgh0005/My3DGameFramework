@@ -8,10 +8,8 @@
 /*=======================//
 //  default engine APIs  //
 //=======================*/
-#include "Interfaces/Cores.h"
 #include "Interfaces/Entity.h"
 #include "Interfaces/Inputs.h"
-#include "Interfaces/Levels.h"
 #include "Interfaces/Pipelines.h"
 #include "Interfaces/Scenes.h"
 #include "Interfaces/Scripts.h"

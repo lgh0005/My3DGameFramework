@@ -10,7 +10,6 @@
 #include "Meshes/ScreenMesh.h"
 #include "Components/Camera.h"
 #include "Components/Transform.h"
-#include "Entities/GameObject.h"
 
 namespace MGF3D
 {

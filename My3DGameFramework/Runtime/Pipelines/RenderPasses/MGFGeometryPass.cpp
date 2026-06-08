@@ -3,6 +3,8 @@
 #include "Managers/TypeManager.h"
 #include "Managers/ResourceManager.h"
 #include "Managers/AssetManager.h"
+#include "Managers/WindowManager.h"
+#include "Managers/EntityManager.h"
 #include "Managers/AnimationManager.h"
 #include "Instancing/Animations/AnimationBuffer.h"
 #include "Assets/Shader.h"
@@ -33,6 +35,11 @@ namespace MGF3D
 		m_geometrySkinnedDrawProgram = MGF_RESOURCE.GetOrCreate<GraphicsProgram>("GeometrySkinnedDrawProgram", Vector<ShaderPtr>{ vs2, fs2 });
 
 		return true;
+	}
+
+	void MGFGeometryPass::Resize()
+	{
+
 	}
 
 	/*==============================//

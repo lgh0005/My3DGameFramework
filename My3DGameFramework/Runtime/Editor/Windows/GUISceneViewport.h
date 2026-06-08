@@ -18,5 +18,7 @@ namespace MGF3D
     private:
         SceneViewport();
         bool Init(const String& name);
+
+        ImVec2 m_viewportSize{ 0.0f, 0.0f };
     };
 }

@@ -18,7 +18,7 @@ namespace MGF3D
 	public:
 		bool Init();
 		void Render();
-		void Resize();
+		void Resize(int32 width, int32 height);
 		void Shutdown();
 
 	public:
@@ -32,6 +32,9 @@ namespace MGF3D
 		RenderPipelineUPtr m_activePipeline;
 		RenderCollectorUPtr m_renderCollector;
 		RenderContextUPtr m_renderContext;
+
+		int32 m_currentWidth{ 0 };
+		int32 m_currentHeight{ 0 };
 	};
 }
 

@@ -3,6 +3,8 @@
 #include "Managers/TypeManager.h"
 #include "Managers/ResourceManager.h"
 #include "Managers/AssetManager.h"
+#include "Managers/WindowManager.h"
+#include "Managers/EntityManager.h"
 #include "Assets/Shader.h"
 #include "Graphics/Programs/GraphicsProgram.h"
 #include "Graphics/Framebuffers/GLFramebuffer2D.h"
@@ -35,6 +37,11 @@ namespace MGF3D
 		return true;
 	}
 
+	void MGFDeferredLightingPass::Resize()
+	{
+
+	}	
+
 	/*==============================//
 	//    RenderPass Custom Type    //
 	//==============================*/
@@ -56,6 +63,7 @@ namespace MGF3D
 		if (!sceneBuffer) return;
 		sceneBuffer->Bind();
 
+		glViewport(0, 0, sceneBuffer->GetWidth(), sceneBuffer->GetHeight());
 		glClearColor(0.55f, 0.45, 0.95f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT);
 

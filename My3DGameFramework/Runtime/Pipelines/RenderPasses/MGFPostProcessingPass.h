@@ -23,12 +23,14 @@ namespace MGF3D
 
 	public:
 		virtual void Execute(RenderContext* context) override;
+		virtual void Resize() override;
+		LDREffects* GetLDREffects() const { return m_ldrEffects.get(); }
+		WorldSpaceEffects* GetWorldSpaceEffects() const { return m_worldSpaceEffects.get(); }
 
 	private:
 		MGFPostProcessingPass();
 		bool Init();
 
-		HDREffectsUPtr m_hdrEffects{ nullptr };
 		LDREffectsUPtr m_ldrEffects{ nullptr };
 		WorldSpaceEffectsUPtr m_worldSpaceEffects{ nullptr };
 	};

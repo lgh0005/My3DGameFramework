@@ -34,6 +34,8 @@ namespace MGF3D
 		int32 GetWindowPosY() const { return m_winY; }
 		bool IsIconified() const { return m_isIconified; }
 		bool IsFocused()   const { return m_isFocused; }
+		bool IsResized()   const { return m_isResized; }
+		void SetResized(bool resized) { m_isResized = resized; }
 		bool ShouldClose() const { return m_shouldClose; }
 
 	public:
@@ -68,6 +70,7 @@ namespace MGF3D
 
 		bool m_isIconified  { false };
 		bool m_isFocused	{ true };
+		bool m_isResized	{ false };
 		bool m_shouldClose  { false };
 	};
 }

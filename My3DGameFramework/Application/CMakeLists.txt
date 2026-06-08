@@ -16,16 +16,12 @@ set(SOURCES
     "Managers/LevelManager.h"       "Managers/LevelManager.cpp"       "Managers/LevelManager.inl"
 
     # Interfaces
-    "Interfaces/Cores.h"        "Interfaces/Cores.cpp"
+            
     "Interfaces/Scenes.h"       "Interfaces/Scenes.cpp"      "Interfaces/Scenes.inl"
-    "Interfaces/Levels.h"       "Interfaces/Levels.cpp"
     "Interfaces/Pipelines.h"    "Interfaces/Pipelines.cpp"
     "Interfaces/Inputs.h"       "Interfaces/Inputs.cpp"
     "Interfaces/Entity.h"       "Interfaces/Entity.cpp"      "Interfaces/Entity.inl"
     "Interfaces/Scripts.h"      "Interfaces/Scripts.cpp"     "Interfaces/Scripts.inl"
-
-    # Level
-    "Level/Level.h"     "Level/Level.cpp"
 )
 
 # 2. 빌드 타겟 생성 및 별칭 등록

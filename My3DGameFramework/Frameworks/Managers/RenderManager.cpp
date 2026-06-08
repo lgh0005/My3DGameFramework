@@ -10,6 +10,7 @@
 #include "Components/Lights/SkyLight.h"
 #include "Graphics/Framebuffers/GLFramebufferHandle.h"
 #include "Graphics/Framebuffers/GLFramebuffer2D.h"
+#include "Window/MGFWindow.h"
 
 namespace MGF3D
 {
@@ -65,9 +66,37 @@ namespace MGF3D
 		}
 	}
 
-	void RenderManager::Resize()
+	void RenderManager::Resize(int32 width, int32 height)
 	{
-		m_activePipeline->Resize();
+		// 창이 최소화(0x0)되었을 때 그래픽스 API 오류(Crash) 방지
+		if (width <= 0 || height <= 0) return;
+
+		// 1. 현재 해상도 캐싱
+		m_currentWidth = width;
+		m_currentHeight = height;
+
+		// 2. 전체 OpenGL 뷰포트 크기 갱신
+		glViewport(0, 0, width, height);
+
+		// 3. RenderContext의 공통 '도화지' 크기 갱신
+		// G-Buffer와 포스트 프로세싱 핑퐁 버퍼가 새 해상도에 맞춰 다시 할당됩니다.
+		if (m_renderContext)
+		{
+			m_renderContext->InitGeometryBuffer(width, height);
+			m_renderContext->InitPostProcessBuffer(width, height);
+		}
+
+		// 4. [핵심] 씬에 존재하는 모든 카메라의 종횡비(Aspect Ratio) 동기화
+		// 이 부분이 화면 찌그러짐(Stretching)을 막아주는 핵심 로직입니다.
+		auto* cameraRegistry = MGF_ENTITY.GetComponentRegistry<Camera>();
+		if (cameraRegistry)
+		{
+			for (auto* camera : cameraRegistry->GetComponents())
+			{
+				// 카메라 컴포넌트의 비율을 변경하고 투영 행렬(Projection Matrix)을 재계산합니다.
+				camera->SetViewportSize(static_cast<float>(width), static_cast<float>(height));
+			}
+		}
 	}
 
 	void RenderManager::Shutdown()
@@ -87,7 +116,7 @@ namespace MGF3D
 		if (it != m_pipelines.end())
 		{
 			m_activePipeline = it->second();
-			Resize();
+			Resize(m_currentWidth, m_currentHeight);
 		}
 	}
 

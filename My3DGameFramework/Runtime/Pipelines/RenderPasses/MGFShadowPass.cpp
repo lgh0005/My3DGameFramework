@@ -3,6 +3,8 @@
 #include "Managers/TypeManager.h"
 #include "Managers/ResourceManager.h"
 #include "Managers/AssetManager.h"
+#include "Managers/WindowManager.h"
+#include "Managers/EntityManager.h"
 #include "Assets/Shader.h"
 #include "Graphics/Programs/GraphicsProgram.h"
 #include "Rendering/RenderContext.h"
@@ -70,6 +72,11 @@ namespace MGF3D
 		if (!m_dirShadowFBO || !m_pointShadowFBO || !m_spotShadowFBO) return false;
 
 		return true;
+	}
+
+	void MGFShadowPass::Resize()
+	{
+
 	}
 
 	/*==============================//

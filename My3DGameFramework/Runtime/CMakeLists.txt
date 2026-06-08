@@ -18,18 +18,16 @@ set(SOURCES
     # Managers
     "Managers/SceneManager.h"      "Managers/SceneManager.cpp"       "Managers/SceneManager.inl"
     "Managers/GUIManager.h"        "Managers/GUIManager.cpp"
+    "Managers/ConsoleManager.h"        "Managers/ConsoleManager.cpp"
 
     # Editor
-    "Editor/GUIWindow.h"            "Editor/GUIWindow.cpp"
-    "Editor/Windows/GUISceneViewport.h"            "Editor/Windows/GUISceneViewport.cpp"
+    "Editor/GUIWindow.h"                            "Editor/GUIWindow.cpp"
+    "Editor/Windows/GUISceneViewport.h"             "Editor/Windows/GUISceneViewport.cpp"
     "Editor/Windows/GUIInspectorViewport.h"            "Editor/Windows/GUIInspectorViewport.cpp"
-    "Editor/Windows/GUIHierarchyViewport.h"            "Editor/Windows/GUIHierarchyViewport.cpp"
     "Editor/Windows/GUIConsoleViewport.h"            "Editor/Windows/GUIConsoleViewport.cpp"
-    "Editor/Windows/GUIProjectViewport.h"            "Editor/Windows/GUIProjectViewport.cpp"
 
     # RenderPipeline & RenderPass
     "Pipelines/MGFRenderPipeline.h"                          "Pipelines/MGFRenderPipeline.cpp"
-
     "Pipelines/RenderPasses/MGFShadowPass.h"                 "Pipelines/RenderPasses/MGFShadowPass.cpp"
     "Pipelines/RenderPasses/MGFGeometryPass.h"               "Pipelines/RenderPasses/MGFGeometryPass.cpp"
     "Pipelines/RenderPasses/MGFDeferredLightingPass.h"       "Pipelines/RenderPasses/MGFDeferredLightingPass.cpp"
@@ -41,7 +39,6 @@ set(SOURCES
     # Post-Processing
     "PostProcessing/PostProcessEffect.h"                    "PostProcessing/PostProcessEffect.cpp"
     "PostProcessing/Effects/WorldSpaceEffects.h"              "PostProcessing/Effects/WorldSpaceEffects.cpp"
-    "PostProcessing/Effects/HDREffects.h"              "PostProcessing/Effects/HDREffects.cpp"
     "PostProcessing/Effects/LDREffects.h"              "PostProcessing/Effects/LDREffects.cpp"
 
     # Managers

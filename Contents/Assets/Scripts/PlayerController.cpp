@@ -1,5 +1,6 @@
 #include "GamePch.h"
 #include "PlayerController.h"
+#include "Managers/ConsoleManager.h"
 
 namespace MGF3D
 {
@@ -55,9 +56,16 @@ namespace MGF3D
 
 		// 1. 이동 로직
 		vec3 velocity = vec3(0.0f);
+		if (Inputs::GetButtonDown("PlayerForward"))  MGF_CONSOLE.LogWarning("Player Forward Key Pressed");
 		if (Inputs::GetButton("PlayerForward"))  velocity -= transform->GetForward();
+
+		if (Inputs::GetButtonDown("PlayerBackward")) MGF_CONSOLE.LogWarning("Player Backward Key Pressed");
 		if (Inputs::GetButton("PlayerBackward")) velocity += transform->GetForward();
+
+		if (Inputs::GetButtonDown("PlayerRight"))    MGF_CONSOLE.LogWarning("Player Right Key Pressed");
 		if (Inputs::GetButton("PlayerRight"))     velocity -= transform->GetRight();
+
+		if (Inputs::GetButtonDown("PlayerLeft"))     MGF_CONSOLE.LogWarning("Player Left Key Pressed");
 		if (Inputs::GetButton("PlayerLeft"))    velocity += transform->GetRight();
 
 		m_isMoving = Math::HasLength(velocity);

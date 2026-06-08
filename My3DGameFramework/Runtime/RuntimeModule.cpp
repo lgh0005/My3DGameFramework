@@ -26,8 +26,6 @@
 #include "Editor/Windows/GUISceneViewport.h"
 #include "Editor/Windows/GUIInspectorViewport.h"
 #include "Editor/Windows/GUIConsoleViewport.h"
-#include "Editor/Windows/GUIHierarchyViewport.h"
-#include "Editor/Windows/GUIProjectViewport.h"
 #pragma endregion
 
 namespace MGF3D
@@ -64,8 +62,6 @@ namespace MGF3D
 		MGF_EDITOR.AddGUIWindow(SceneViewport::Create("Scene View"));
 		MGF_EDITOR.AddGUIWindow(InspectorViewport::Create("Inspector View"));
 		MGF_EDITOR.AddGUIWindow(ConsoleViewport::Create("Console View"));
-		MGF_EDITOR.AddGUIWindow(HierarchyViewport::Create("Hierarchy View"));
-		MGF_EDITOR.AddGUIWindow(ProjectViewport::Create("Project View"));
 
 		return true;
 	}

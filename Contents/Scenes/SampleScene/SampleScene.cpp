@@ -39,6 +39,14 @@ namespace MGF3D
 		sharedMaterial2->SetTexture(ETextureSlot::Albedo, MGF_ASSET.LoadAssetAsync<Image>("@GameAsset/Images/wood_albedo.ktx"));
 		sharedMaterial2->SetTexture(ETextureSlot::Normal, MGF_ASSET.LoadAssetAsync<Image>("@GameAsset/Images/wood_normal.ktx"));
 
+		auto sharedMaterial3 = MGF_RESOURCE.GetOrCreate<Material>("SharedCubeMaterial3");
+		sharedMaterial3->SetTexture(ETextureSlot::Albedo, MGF_ASSET.LoadAssetAsync<Image>("@GameAsset/Images/rustediron2_basecolor.ktx"));
+		sharedMaterial3->SetTexture(ETextureSlot::Normal, MGF_ASSET.LoadAssetAsync<Image>("@GameAsset/Images/rustediron2_normal.ktx"));
+
+		auto sharedMaterial4 = MGF_RESOURCE.GetOrCreate<Material>("SharedCubeMaterial4");
+		sharedMaterial4->SetTexture(ETextureSlot::Albedo, MGF_ASSET.LoadAssetAsync<Image>("@GameAsset/Images/toy_box_diffuse.ktx"));
+		sharedMaterial4->SetTexture(ETextureSlot::Normal, MGF_ASSET.LoadAssetAsync<Image>("@GameAsset/Images/toy_box_normal.ktx"));
+
 		return true;
 	}
 
@@ -53,35 +61,45 @@ namespace MGF3D
 		camera->SetMainCamera(true);
 		camera->SetProjection(45.0f, (float)WINDOW_WIDTH / (float)WINDOW_HEIGHT, 0.1f, 100.0f);
 
-		// [핵심] 자원은 메모리에 딱 한 번만 생성하여 공유합니다.
+		// 자원은 메모리에 딱 한 번만 생성하여 공유합니다.
 		StaticMeshPtr sharedMesh = GeometryUtils::CreateSphere();
 		StaticMeshPtr sharedMesh2 = GeometryUtils::CreateBox();
+		StaticMeshPtr sharedMesh3 = GeometryUtils::CreateCone();
 		MaterialPtr sharedMaterial = MGF_RESOURCE.Get<Material>("SharedCubeMaterial");
 		MaterialPtr sharedMaterial2 = MGF_RESOURCE.Get<Material>("SharedCubeMaterial2");
+		MaterialPtr sharedMaterial3 = MGF_RESOURCE.Get<Material>("SharedCubeMaterial3");
+		MaterialPtr sharedMaterial4 = MGF_RESOURCE.Get<Material>("SharedCubeMaterial4");
 
-		// 2. 객체 생성 [첫 번째 큐브]
-		ObjectIDHash cubeID1 = Entities::Create("Cube1");
+		// 2. 객체 생성 [구]
+		ObjectIDHash cubeID1 = Entities::Create("Sphere");
 		auto* cubeTransform1 = Entities::AddComponent<Transform>(cubeID1);
 		Entities::AddComponent<MeshRenderer>(cubeID1, sharedMesh, sharedMaterial);
 		cubeTransform1->SetLocalPosition(vec3(-1.5f, -0.25f, 0.0f));
 
-		// 3. 객체 생성 [두 번째 큐브]
-		ObjectIDHash cubeID2 = Entities::Create("Cube2");
+		// 3. 객체 생성 [큐브]
+		ObjectIDHash cubeID2 = Entities::Create("Cube");
 		auto* cubeTransform2 = Entities::AddComponent<Transform>(cubeID2);
-		Entities::AddComponent<MeshRenderer>(cubeID2, sharedMesh, sharedMaterial);
+		Entities::AddComponent<MeshRenderer>(cubeID2, sharedMesh2, sharedMaterial4);
 		cubeTransform2->SetLocalPosition(vec3(1.5f, -0.25f, 0.0f));
 
+		// 3. 객체 생성 [콘]
+		ObjectIDHash cubeID3 = Entities::Create("Cone");
+		auto* cubeTransform3 = Entities::AddComponent<Transform>(cubeID3);
+		Entities::AddComponent<MeshRenderer>(cubeID3, sharedMesh3, sharedMaterial3);
+		cubeTransform3->SetLocalPosition(vec3(3.0, 0.0f, 0.0f));
+		cubeTransform3->SetLocalRotation(vec3(-90.0f, 1.0f, 0.0f));
+
 		// 4. 객체 생성 [스폿 라이트]
-		//ObjectIDHash lightID = Entities::Create("spotLight");
-		//auto* lightTransform = Entities::AddComponent<Transform>(lightID);
-		//auto* spotLight = Entities::AddComponent<SpotLight>(lightID);
-		//lightTransform->SetLocalPosition(vec3(0.0f, 12.0f, 0.0f));
-		//lightTransform->SetLocalRotation(vec3(-90.0f, 0.0f, 0.0f));
-		//spotLight->SetColor(vec3(0.9f, 0.6f, 1.0f));
-		//spotLight->SetIntensity(2.0f);
-		//spotLight->SetRange(120);
-		//spotLight->SetSpotAngles(12.5f, 17.5f);
-		//spotLight->SetCastShadow(true);
+		ObjectIDHash lightID = Entities::Create("spotLight");
+		auto* lightTransform = Entities::AddComponent<Transform>(lightID);
+		auto* spotLight = Entities::AddComponent<SpotLight>(lightID);
+		lightTransform->SetLocalPosition(vec3(0.0f, 12.0f, 0.0f));
+		lightTransform->SetLocalRotation(vec3(-90.0f, 0.0f, 0.0f));
+		spotLight->SetColor(vec3(0.9f, 0.6f, 1.0f));
+		spotLight->SetIntensity(2.0f);
+		spotLight->SetRange(120);
+		spotLight->SetSpotAngles(12.5f, 17.5f);
+		spotLight->SetCastShadow(true);
 
 		// 4. 객체 생성 [디렉셔널 라이트]
 		ObjectIDHash lightID2 = Entities::Create("dirLight");
@@ -94,14 +112,14 @@ namespace MGF3D
 		dirLight->SetCastShadow(true);
 
 		// 4. 객체 생성 [포인트 라이트]
-		//ObjectIDHash lightID3 = Entities::Create("PointLight3");
-		//auto* lightTransform3 = Entities::AddComponent<Transform>(lightID3);
-		//auto* pointLight3 = Entities::AddComponent<PointLight>(lightID3);
-		//lightTransform3->SetLocalPosition(vec3(1.5f, 3.0f, 5.0f));
-		//pointLight3->SetColor(vec3(0.8f, 1.0f, 0.7f));
-		//pointLight3->SetIntensity(2.0f);
-		//pointLight3->SetRange(20);
-		//pointLight3->SetCastShadow(true);
+		ObjectIDHash lightID3 = Entities::Create("PointLight");
+		auto* lightTransform3 = Entities::AddComponent<Transform>(lightID3);
+		auto* pointLight3 = Entities::AddComponent<PointLight>(lightID3);
+		lightTransform3->SetLocalPosition(vec3(1.5f, 3.0f, 5.0f));
+		pointLight3->SetColor(vec3(0.8f, 1.0f, 0.7f));
+		pointLight3->SetIntensity(2.0f);
+		pointLight3->SetRange(20);
+		pointLight3->SetCastShadow(true);
 
 		// 5. 가방
 		auto bag = MGF_ASSET.GetAsset<Model>("@GameAsset/Models/backpack/backpack.mymodel");

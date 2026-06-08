@@ -96,7 +96,6 @@ namespace MGF3D
 			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 			glEnable(GL_MULTISAMPLE);
-			glEnable(GL_FRAMEBUFFER_SRGB);
 
 			glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
 		}
@@ -129,6 +128,7 @@ namespace MGF3D
 		m_height = h;
 		glViewport(0, 0, m_width, m_height);
 		if (m_onWindowResize) m_onWindowResize(w, h);
+		m_isResized = true;
 	}
 
 	void MGFWindow::UpdateWindowIconified(bool icon)

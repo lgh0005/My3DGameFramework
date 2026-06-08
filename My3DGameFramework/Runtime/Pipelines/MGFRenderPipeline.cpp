@@ -78,9 +78,4 @@ namespace MGF3D
 		if (tree != nullptr) return tree->GetType(s_typeIndex);
 		return nullptr;
 	}
-
-	void MGFRenderPipeline::Resize()
-	{
-		// TODO : 랜더페스들 Resizing 로직 필요
-	}
 }

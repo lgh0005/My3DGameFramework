@@ -3,6 +3,8 @@
 #include "Managers/TypeManager.h"
 #include "Managers/ResourceManager.h"
 #include "Managers/AssetManager.h"
+#include "Managers/WindowManager.h"
+#include "Managers/EntityManager.h"
 #include "Assets/Shader.h"
 #include "Graphics/Programs/GraphicsProgram.h"
 #include "Rendering/RenderContext.h"
@@ -42,6 +44,11 @@ namespace MGF3D
 		m_cubeMesh = GeometryUtils::CreateBox();
 
 		return (m_skyboxProgram && m_skyboxUBO && m_cubeMesh);
+	}
+
+	void MGFSkyboxPass::Resize()
+	{
+
 	}
 
 	/*==============================//

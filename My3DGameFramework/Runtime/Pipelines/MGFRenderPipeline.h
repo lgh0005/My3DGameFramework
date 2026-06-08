@@ -31,7 +31,9 @@ namespace MGF3D
 
 	public:
 		virtual void Render(RenderContext* context) override;
-		virtual void Resize() override;
+
+	public:
+		MGFPostProcessingPass* GetPostProcessingPass() const { return m_postProcessPass.get(); }
 
 	private:
 		MGFRenderPipeline();
